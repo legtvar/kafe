@@ -16,6 +16,7 @@ build-api:
   only:
     - master
     - ci
+    - api
 
 build-web:
   image: alpine:latest
@@ -34,3 +35,4 @@ build-web:
   only:
     - master
     - ci
+    - web

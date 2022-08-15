@@ -1,0 +1,19 @@
+*
+
+# directories
+!*/
+
+# git
+!.gitignore
+!.gitattributes
+!.gitkeep
+
+# common
+!*.cs
+!*.csproj
+!*.sln
+!*.json
+
+# reignore output
+obj/
+bin/

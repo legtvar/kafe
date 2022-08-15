@@ -16,3 +16,21 @@ build-api:
   only:
     - master
     - ci
+
+build-web:
+  image: alpine:latest
+  stage: build
+  script:
+    - apk update
+    - apk add npm
+    - cd Web
+    - npm ci
+    - npm run build
+  tags:
+    - shared-fi
+  cache:
+    paths:
+      - Web/node_modules
+  only:
+    - master
+    - ci

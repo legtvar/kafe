@@ -63,7 +63,7 @@ pages:
   dependencies: 
     - test-web
   script:
-    - cp Web/build public
+    - cp Web/build public -r
   tags:
     - shared-fi
   artifacts:

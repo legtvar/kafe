@@ -1,5 +1,6 @@
 stages:
   - build
+  - test
   - deploy
 
 build-api:
@@ -40,12 +41,28 @@ build-web:
     - ci
     - web
 
-pages:
-  stage: deploy
+test-web:
+  stage: test
   dependencies: 
     - build-web
   script:
-    - cp Wep/build public
+    - cd Web
+    - npm run test
+  tags:
+    - shared-fi
+  artifacts:
+    untracked: true
+  only:
+    - master
+    - ci
+    - web
+
+pages:
+  stage: deploy
+  dependencies: 
+    - test-web
+  script:
+    - cp Web/build public
   tags:
     - shared-fi
   artifacts:

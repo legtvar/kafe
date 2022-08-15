@@ -1,0 +1,18 @@
+stages:
+  - build
+
+build-api:
+  image: alpine:latest
+  stage: build
+  script:
+    - apk update
+    - apk add dotnet6-sdk
+    - dotnet build Kafe.sln
+  tags:
+    - shared-fi
+  cache:
+    paths:
+      - $HOME/.nuget
+  only:
+    - master
+    - ci

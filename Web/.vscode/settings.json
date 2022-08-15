@@ -1,0 +1,15 @@
+{
+    "files.eol": "\n",
+    "editor.formatOnSave": true,
+    "prettier.configPath": ".prettierrc",
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "typescript.tsc.autoDetect": "on",
+    "npm.autoDetect": "on",
+    "debug.allowBreakpointsEverywhere": true,
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": true
+    },
+    "search.exclude": {
+        "*/**/node_modules/": true
+    },
+}

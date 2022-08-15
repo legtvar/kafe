@@ -1,5 +1,6 @@
 stages:
   - build
+  - deploy
 
 build-api:
   image: alpine:latest
@@ -32,6 +33,24 @@ build-web:
   cache:
     paths:
       - Web/node_modules
+  artifacts:
+    untracked: true
+  only:
+    - master
+    - ci
+    - web
+
+pages:
+  stage: deploy
+  dependencies: 
+    - build-web
+  script:
+    - cp Wep/build public
+  tags:
+    - shared-fi
+  artifacts:
+    paths:
+      - public
   only:
     - master
     - ci

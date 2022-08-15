@@ -46,6 +46,7 @@ test-web:
   dependencies: 
     - build-web
   script:
+    - apk add npm
     - cd Web
     - npm run test
   tags:

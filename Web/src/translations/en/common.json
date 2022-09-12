@@ -1,0 +1,7 @@
+{
+    "beta": {
+        "title": "Development in progress...",
+        "description": "The development has just started. Please hold tight as we build the app with our sweat and tears.",
+        "toggleLanguage": "Switch to {{language}}"
+    }
+}

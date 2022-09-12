@@ -1,0 +1,7 @@
+{
+    "beta": {
+        "title": "Právě probíhá vývoj...",
+        "description": "Vývoj této aplikace právě začal. Čeká nás semestr plný krve, potu a slz.",
+        "toggleLanguage": "Přepnout na {{language}}"
+    }
+}

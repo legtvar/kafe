@@ -27,7 +27,7 @@ function App() {
                         text={t('common:beta.toggleLanguage', {
                             language: i18n.language === 'cs' ? 'en' : 'cs',
                         })}
-                        icon="flag"
+                        icon="translate"
                         intent="primary"
                         onClick={() => i18n.changeLanguage(i18n.language === 'cs' ? 'en' : 'cs')}
                     />

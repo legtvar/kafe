@@ -13,9 +13,9 @@
 | opening_hours | časy, kdy jsou issuemasters k dispozici |
 | permission_categories | RS: kategorie LEMMA a LEMMAnad100 |
 | persons | účty, jména, adresy a jejich status |
-| persons__permission_categories | kategorie oprávnění pro `person` s daným id |
+| persons__permission_categories | kategorie oprávnění pro `person` s daným id (RS) |
 | playlist | seznam videí |
-| playlistitem | zařazení danéo videa do daného playlistu na daný index |
+| playlistitem | zařazení daného videa do daného playlistu na daný index |
 | project | projekt s popisem, vlastníkem a dalšími metadaty |
 | project__person | n-n asociace člověka s projektem |
 | project__reservation__source | n-n-n asociace projektu s rezervací a rezervačním zdrojem |
@@ -35,6 +35,8 @@
 | videolink | asi externí link na dané video |
 | vote | prázdná tabulka hlasování za videa |
 | wma_property | konfigurace WMA (převážně odkazy) |
+
+**Pro WMA jsou důležité `appf` (?), `author`, `entry` (?), `persons` (?), `playlist`, `playlistitem`, `project`, `project__person`, `projectgroup`, `role_table`, `video`, `videolink` (?), `wma_property` (?).**
 
 ## Otevřené otázky
 

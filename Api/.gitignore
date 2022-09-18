@@ -14,6 +14,7 @@
 !*.sln
 !*.json
 !*.yml
+!*.md
 
 # reignore output
 obj/

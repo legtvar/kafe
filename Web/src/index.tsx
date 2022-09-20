@@ -4,8 +4,7 @@ import ReactDOM from 'react-dom/client';
 import { I18nextProvider } from 'react-i18next';
 import App from './App';
 
-import '@blueprintjs/core/lib/css/blueprint.css';
-import '@blueprintjs/icons/lib/css/blueprint-icons.css';
+import 'antd/dist/antd.css';
 
 import common_cs from './translations/cs/common.json';
 import common_en from './translations/en/common.json';

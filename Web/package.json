@@ -4,8 +4,8 @@
   "homepage": "kafe/",
   "private": true,
   "dependencies": {
-    "@blueprintjs/core": "^4.9.4",
-    "@blueprintjs/icons": "^4.4.2",
+    "@ant-design/icons": "^4.7.0",
+    "antd": "^4.23.2",
     "i18next": "^21.9.1",
     "moment": "^2.29.1",
     "react": "^18.2.0",

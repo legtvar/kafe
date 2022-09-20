@@ -7,10 +7,9 @@
     "@ant-design/icons": "^4.7.0",
     "antd": "^4.23.2",
     "i18next": "^21.9.1",
-    "less": "^4.1.3",
-    "less-loader": "^11.0.0",
     "moment": "^2.29.1",
     "react": "^18.2.0",
+    "react-app-rewired": "^2.2.1",
     "react-dom": "^18.2.0",
     "react-i18next": "^11.18.6",
     "react-scripts": "5.0.1",
@@ -27,14 +26,17 @@
     "@types/node": "^16.11.48",
     "@types/react": "^18.0.17",
     "@types/react-dom": "^18.0.6",
+    "i18next-parser": "^6.5.0",
+    "less": "^4.1.3",
+    "less-loader": "^11.0.0",
     "tslint": "^6.1.3"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "eject": "react-scripts eject",
-    "test": "react-scripts test",
-    "lint": "tslint -p tsconfig.json"
+    "start": "react-app-rewired start",
+    "build": "react-app-rewired build",
+    "test": "react-app-rewired test",
+    "lint": "tslint -p tsconfig.json",
+    "extract-translations": "i18next 'src/**/*.{ts,tsx,js}' -c i18next-parser.config.mjs"
   },
   "eslintConfig": {
     "extends": [

@@ -1,7 +1,12 @@
 {
     "beta": {
-        "title": "Development in progress...",
         "description": "The development has just started. Please hold tight as we build the app with our sweat, tears and covfefe.",
+        "title": "Development in progress...",
         "toggleLanguage": "Switch to {{language}}"
+    },
+    "layout": {
+        "footer": {
+            "copy": "Created with <1>❤️</1> and ☕ by <3>LEMMA</3>"
+        }
     }
 }

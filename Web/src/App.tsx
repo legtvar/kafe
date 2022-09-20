@@ -5,11 +5,26 @@ import {
     UserOutlined,
     VideoCameraOutlined,
 } from '@ant-design/icons';
-import { Layout, Menu, PageHeader } from 'antd';
-import React, { useState } from 'react';
+import { Layout, Menu, PageHeader, Typography } from 'antd';
+import ErrorBoundary from 'antd/lib/alert/ErrorBoundary';
+import React, { useEffect, useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
+import { Lemmipsum } from './components/utils/Lemmipsum';
 
 export const App: React.FC = () => {
     const [collapsed, setCollapsed] = useState(false);
+    const [isSmallScreen, setIsSmallScreen] = useState(false);
+
+    const handleWindowResize = () => {
+        setIsSmallScreen(window.innerWidth < 992); // lg
+    };
+
+    useEffect(() => {
+        window.addEventListener('resize', handleWindowResize);
+        return () => window.removeEventListener('resize', handleWindowResize);
+    });
+
+    const { t } = useTranslation();
 
     return (
         <Layout style={{ minHeight: '100vh' }}>
@@ -19,9 +34,10 @@ export const App: React.FC = () => {
                 collapsed={collapsed}
                 trigger={null}
                 onCollapse={(value) => setCollapsed(value)}
-                collapsedWidth="0"
+                collapsedWidth={isSmallScreen ? '0' : undefined}
+                width={250}
             >
-                <div className="logo" />
+                <div className="kafe-logo">Kafe</div>
                 <Menu
                     theme="dark"
                     mode="inline"
@@ -34,24 +50,48 @@ export const App: React.FC = () => {
                 />
             </Layout.Sider>
             <Layout>
-                <Layout.Header style={{ padding: 0 }}>
+                <Layout.Header className="kafe-layout-header">
                     <PageHeader
-                        className="site-page-header"
-                        onBack={() => null}
+                        backIcon={React.createElement(collapsed ? MenuUnfoldOutlined : MenuFoldOutlined, {
+                            className: 'trigger',
+                        })}
+                        onBack={() => setCollapsed(!collapsed)}
                         title="Title"
                         subTitle="This is a subtitle"
                     />
-                    {React.createElement(collapsed ? MenuUnfoldOutlined : MenuFoldOutlined, {
-                        className: 'trigger',
-                        onClick: () => setCollapsed(!collapsed),
-                    })}
                 </Layout.Header>
                 <Layout.Content style={{ margin: '24px 16px 0' }}>
-                    <div className="site-layout-background" style={{ padding: 24, minHeight: 360 }}>
-                        content
-                    </div>
+                    <ErrorBoundary>
+                        <div className="kafe-layout-content">
+                            <Typography.Paragraph>
+                                <Lemmipsum />
+                            </Typography.Paragraph>
+                            <Typography.Paragraph>
+                                <Lemmipsum />
+                            </Typography.Paragraph>
+                            <Typography.Paragraph>
+                                <Lemmipsum />
+                            </Typography.Paragraph>
+                            <Typography.Paragraph>
+                                <Lemmipsum />
+                            </Typography.Paragraph>
+                            <Typography.Paragraph>
+                                <Lemmipsum />
+                            </Typography.Paragraph>
+                        </div>
+                    </ErrorBoundary>
                 </Layout.Content>
-                <Layout.Footer style={{ textAlign: 'center' }}>Ant Design ©2018 Created by Ant UED</Layout.Footer>
+                <Layout.Footer className="kafe-layout-footer">
+                    <span className="kafe-footer-content">
+                        <Trans i18nKey="layout.footer.copy">
+                            Created with <span className="kafe-heart">❤️</span> and ☕ by
+                            <a href="https://lemma.fi.muni.cz/" target="_blank" rel="noreferrer">
+                                LEMMA
+                            </a>
+                        </Trans>{' '}
+                        &copy; 2022 - {new Date().getFullYear()}
+                    </span>
+                </Layout.Footer>
             </Layout>
         </Layout>
     );

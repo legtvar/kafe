@@ -1,7 +1,12 @@
 {
     "beta": {
-        "title": "Právě probíhá vývoj...",
         "description": "Vývoj této aplikace právě začal. Prosím buďte shovívaví zatímco za vás proléváme krev, pot a kafe.",
+        "title": "Právě probíhá vývoj...",
         "toggleLanguage": "Přepnout na {{language}}"
+    },
+    "layout": {
+        "footer": {
+            "copy": "Vytvořil tým <3>LEMMA</3> z <1>❤️</1> a ☕"
+        }
     }
 }

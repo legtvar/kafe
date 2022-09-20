@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom/client';
 import { I18nextProvider } from 'react-i18next';
 import App from './App';
 
-import './App.less';
+import './styles/index.less';
 
 import common_cs from './translations/cs/common.json';
 import common_en from './translations/en/common.json';
@@ -13,6 +13,7 @@ i18next.init({
     interpolation: { escapeValue: false }, // React already does escaping
     lng: 'cs',
     fallbackLng: 'en',
+    defaultNS: 'common',
     resources: {
         en: {
             common: common_en,

@@ -36,25 +36,31 @@ build-web:
       - Web/node_modules
   artifacts:
     paths:
-      - build
+      - Web/build
   only:
     - master
     - ci
     - web
 
 test-web:
+  image: alpine:latest
   stage: test
   dependencies: 
     - build-web
   script:
+    - apk update
     - apk add npm
     - cd Web
+    - npm ci
     - npm run test
   tags:
     - shared-fi
+  cache:
+    paths:
+      - Web/node_modules
   artifacts:
     paths:
-      - build
+      - Web/build
   only:
     - master
     - ci

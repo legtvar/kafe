@@ -35,7 +35,8 @@ build-web:
     paths:
       - Web/node_modules
   artifacts:
-    untracked: true
+    paths:
+      - build
   only:
     - master
     - ci
@@ -52,7 +53,8 @@ test-web:
   tags:
     - shared-fi
   artifacts:
-    untracked: true
+    paths:
+      - build
   only:
     - master
     - ci

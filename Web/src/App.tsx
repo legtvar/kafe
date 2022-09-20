@@ -1,41 +1,60 @@
-import { TranslationOutlined } from '@ant-design/icons';
-import { Button, Result } from 'antd';
-import { useTranslation } from 'react-i18next';
+import {
+    MenuFoldOutlined,
+    MenuUnfoldOutlined,
+    UploadOutlined,
+    UserOutlined,
+    VideoCameraOutlined,
+} from '@ant-design/icons';
+import { Layout, Menu, PageHeader } from 'antd';
+import React, { useState } from 'react';
 
-function App() {
-    const { t, i18n } = useTranslation();
+export const App: React.FC = () => {
+    const [collapsed, setCollapsed] = useState(false);
 
     return (
-        <div
-            style={{
-                position: 'fixed',
-                top: 0,
-                left: 0,
-                bottom: 0,
-                right: 0,
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-            }}
-        >
-            <Result
-                status="404"
-                title={t('common:beta.title')}
-                subTitle={t('common:beta.description')}
-                extra={
-                    <Button
-                        type="default"
-                        onClick={() => i18n.changeLanguage(i18n.language === 'cs' ? 'en' : 'cs')}
-                        icon={<TranslationOutlined />}
-                    >
-                        {t('common:beta.toggleLanguage', {
-                            language: i18n.language === 'cs' ? 'en' : 'cs',
-                        })}
-                    </Button>
-                }
-            />
-        </div>
+        <Layout style={{ minHeight: '100vh' }}>
+            <Layout.Sider
+                breakpoint="lg"
+                collapsible
+                collapsed={collapsed}
+                trigger={null}
+                onCollapse={(value) => setCollapsed(value)}
+                collapsedWidth="0"
+            >
+                <div className="logo" />
+                <Menu
+                    theme="dark"
+                    mode="inline"
+                    defaultSelectedKeys={['4']}
+                    items={[UserOutlined, VideoCameraOutlined, UploadOutlined, UserOutlined].map((icon, index) => ({
+                        key: String(index + 1),
+                        icon: React.createElement(icon),
+                        label: `nav ${index + 1}`,
+                    }))}
+                />
+            </Layout.Sider>
+            <Layout>
+                <Layout.Header style={{ padding: 0 }}>
+                    <PageHeader
+                        className="site-page-header"
+                        onBack={() => null}
+                        title="Title"
+                        subTitle="This is a subtitle"
+                    />
+                    {React.createElement(collapsed ? MenuUnfoldOutlined : MenuFoldOutlined, {
+                        className: 'trigger',
+                        onClick: () => setCollapsed(!collapsed),
+                    })}
+                </Layout.Header>
+                <Layout.Content style={{ margin: '24px 16px 0' }}>
+                    <div className="site-layout-background" style={{ padding: 24, minHeight: 360 }}>
+                        content
+                    </div>
+                </Layout.Content>
+                <Layout.Footer style={{ textAlign: 'center' }}>Ant Design ©2018 Created by Ant UED</Layout.Footer>
+            </Layout>
+        </Layout>
     );
-}
+};
 
 export default App;

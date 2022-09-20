@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom/client';
 import { I18nextProvider } from 'react-i18next';
 import App from './App';
 
-import 'antd/dist/antd.css';
+import './App.less';
 
 import common_cs from './translations/cs/common.json';
 import common_en from './translations/en/common.json';

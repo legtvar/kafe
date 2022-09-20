@@ -8,7 +8,7 @@ import {
 import { Layout, Menu, PageHeader, Typography } from 'antd';
 import ErrorBoundary from 'antd/lib/alert/ErrorBoundary';
 import React, { useEffect, useState } from 'react';
-import { Trans, useTranslation } from 'react-i18next';
+import { Trans } from 'react-i18next';
 import { Lemmipsum } from './components/utils/Lemmipsum';
 
 export const App: React.FC = () => {
@@ -23,8 +23,6 @@ export const App: React.FC = () => {
         window.addEventListener('resize', handleWindowResize);
         return () => window.removeEventListener('resize', handleWindowResize);
     });
-
-    const { t } = useTranslation();
 
     return (
         <Layout style={{ minHeight: '100vh' }}>

@@ -9,7 +9,9 @@ import './styles/index.less';
 import { routerConfig } from './utils/routerConfig';
 
 i18next.init(languageConfig);
-const router = createBrowserRouter(routerConfig(i18next.t));
+const router = createBrowserRouter(routerConfig(i18next.t), {
+    basename: '/kafe',
+});
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 root.render(

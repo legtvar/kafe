@@ -7,6 +7,21 @@
     "layout": {
         "footer": {
             "copy": "Created with <1>❤️</1> and ☕ by <3>LEMMA</3>"
+        },
+        "title-prefix": "Kafe - "
+    },
+    "route": {
+        "groups": {
+            "title": "Project groups"
+        },
+        "home": {
+            "title": "Home"
+        },
+        "playlists": {
+            "title": "Playlists"
+        },
+        "projects": {
+            "title": "Projects"
         }
     }
 }

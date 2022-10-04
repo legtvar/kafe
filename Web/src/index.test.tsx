@@ -1,8 +1,8 @@
 import { render } from '@testing-library/react';
-import App from './App';
+import { Root } from './components/layout/Root';
 
 test('Fake test', () => {
-    render(<App />);
+    render(<Root />);
 
     expect(true).toBeTruthy();
 });

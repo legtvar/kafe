@@ -7,6 +7,21 @@
     "layout": {
         "footer": {
             "copy": "Vytvořil tým <3>LEMMA</3> z <1>❤️</1> a ☕"
+        },
+        "title-prefix": "Kafe - "
+    },
+    "route": {
+        "groups": {
+            "title": "Skupiny projektů"
+        },
+        "home": {
+            "title": "Domů"
+        },
+        "playlists": {
+            "title": "Playlisty"
+        },
+        "projects": {
+            "title": "Projekty"
         }
     }
 }

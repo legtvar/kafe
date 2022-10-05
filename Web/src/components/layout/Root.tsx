@@ -14,6 +14,7 @@ export const Root: React.FC = () => {
     };
 
     useEffect(() => {
+        handleWindowResize();
         window.addEventListener('resize', handleWindowResize);
         return () => window.removeEventListener('resize', handleWindowResize);
     });

@@ -1,6 +1,6 @@
 import { classNames } from './classNames';
 
-test('ClassNames', () => {
+test('classNames', () => {
     expect(classNames('a', 'b', 'c')).toBe('a b c');
     expect(classNames()).toBe('');
     expect(classNames('a', false, 'c')).toBe('a c');

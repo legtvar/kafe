@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.32421.90
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kafe.Api", "Kafe.Api.csproj", "{B2EB6382-1064-4AD8-B56F-B26B9F61BD7B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kafe.Api", "Api/Kafe.Api.csproj", "{B2EB6382-1064-4AD8-B56F-B26B9F61BD7B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

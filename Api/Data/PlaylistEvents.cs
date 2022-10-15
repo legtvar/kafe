@@ -1,6 +1,8 @@
 namespace Kafe.Data;
 
-public record PlaylistCreated;
+public record PlaylistCreated(
+    CreationMethod CreationMethod
+);
 public record PlaylistInfoChanged(
     string? Name,
     string? Description,

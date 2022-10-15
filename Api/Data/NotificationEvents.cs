@@ -1,16 +1,26 @@
 namespace Kafe.Data;
 
-public record NotificationValidationCreated;
-public record NotificationConversionFailureCreated(
+public record NotificationValidationCreated(
+    CreationMethod CreationMethod,
+    List<string> Recipients,
+    bool IsSuccessful,
+    string ProjectId,
+    string? Description,
+    string? DescriptionEnglish
+);
+public record NotificationConversionCreated(
+    CreationMethod Method,
     string ProjectId,
     string VideoId,
-    string Reason
+    string? Description
 );
 public record NotificationDramaturgyCreated(
     string ProjectId,
     bool IsAccepted,
-    string AdditionalInfo
+    string? Description,
+    string? DescriptionEnglish
 );
-public record NotificationSent(
-    string EmailAddress
+public record NotificationError(
+    string Reason
 );
+public record NotificationSent;

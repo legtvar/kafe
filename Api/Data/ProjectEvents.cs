@@ -1,6 +1,8 @@
 namespace Kafe.Data;
 
-public record ProjectCreated;
+public record ProjectCreated(
+    CreationMethod CreationMethod
+);
 public record ProjectOwnerAdded(
     string OwnerId
 );

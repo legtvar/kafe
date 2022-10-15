@@ -1,6 +1,8 @@
 namespace Kafe.Data;
 
-public record ProjectGroupCreated;
+public record ProjectGroupCreated(
+    CreationMethod CreationMethod
+);
 public record ProjectGroupInfoChanged(
     string? Name,
     string? Description,

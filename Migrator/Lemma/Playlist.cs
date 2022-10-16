@@ -4,28 +4,27 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
-namespace Kafe.Lemma
+namespace Kafe.Lemma;
+
+[Table("playlist", Schema = "lemma")]
+public partial class Playlist
 {
-    [Table("playlist", Schema = "lemma")]
-    public partial class Playlist
+    public Playlist()
     {
-        public Playlist()
-        {
-            Playlistitems = new HashSet<Playlistitem>();
-        }
-
-        [Key]
-        [Column("id")]
-        public int Id { get; set; }
-        [Column("name")]
-        [StringLength(255)]
-        public string Name { get; set; } = null!;
-        [Column("desc")]
-        public string? Desc { get; set; }
-        [Column("position")]
-        public int? Position { get; set; }
-
-        [InverseProperty("PlaylistNavigation")]
-        public virtual ICollection<Playlistitem> Playlistitems { get; set; }
+        Playlistitems = new HashSet<Playlistitem>();
     }
+
+    [Key]
+    [Column("id")]
+    public int Id { get; set; }
+    [Column("name")]
+    [StringLength(255)]
+    public string Name { get; set; } = null!;
+    [Column("desc")]
+    public string? Desc { get; set; }
+    [Column("position")]
+    public int? Position { get; set; }
+
+    [InverseProperty("PlaylistNavigation")]
+    public virtual ICollection<Playlistitem> Playlistitems { get; set; }
 }

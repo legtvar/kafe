@@ -1,5 +1,8 @@
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace Kafe.Wma;
 
+[Table("projectgroup")]
 public class ProjectGroup
 {
     public int Id { get; set; }

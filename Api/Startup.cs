@@ -1,4 +1,5 @@
 using Marten;
+using Marten.Events;
 using Weasel.Core;
 
 namespace Kafe.Api;
@@ -17,7 +18,8 @@ public class Startup
         services.AddAuthorization();
         services.AddMarten(options =>
         {
-            options.Connection(Configuration.GetConnectionString("Marten"));
+            options.Connection(Configuration.GetConnectionString("KAFE"));
+            options.Events.StreamIdentity = StreamIdentity.AsString;
             if (environment.IsDevelopment())
             {
                 options.AutoCreateSchemaObjects = AutoCreate.All;

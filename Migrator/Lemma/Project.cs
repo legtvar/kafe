@@ -25,7 +25,7 @@ public partial class Project
     [Column("desc")]
     public string? Desc { get; set; }
     [Column("releasedate", TypeName = "timestamp without time zone")]
-    public DateTime? Releasedate { get; set; }
+    public DateTime? ReleaseDate { get; set; }
     [Column("web", TypeName = "character varying")]
     public string? Web { get; set; }
     [Column("owner")]
@@ -38,16 +38,16 @@ public partial class Project
     public int? Group { get; set; }
     [Column("externalauthorname")]
     [StringLength(255)]
-    public string? Externalauthorname { get; set; }
+    public string? ExternalAuthorName { get; set; }
     [Column("externalauthoruco")]
     [StringLength(255)]
-    public string? Externalauthoruco { get; set; }
+    public string? ExternalAuthorUco { get; set; }
     [Column("externalauthormail")]
     [StringLength(255)]
-    public string? Externalauthormail { get; set; }
+    public string? ExternalAuthorMail { get; set; }
     [Column("externalauthorphone")]
     [StringLength(255)]
-    public string? Externalauthorphone { get; set; }
+    public string? ExternalAuthorPhone { get; set; }
 
     [ForeignKey("Group")]
     [InverseProperty("Projects")]

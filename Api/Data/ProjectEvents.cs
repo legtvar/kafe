@@ -1,7 +1,8 @@
 namespace Kafe.Data;
 
 public record ProjectCreated(
-    CreationMethod CreationMethod
+    CreationMethod CreationMethod,
+    string ProjectGroupId
 );
 public record ProjectOwnerAdded(
     string OwnerId
@@ -9,11 +10,21 @@ public record ProjectOwnerAdded(
 public record ProjectOwnerRemoved(
     string OwnerId
 );
+public record ProjectAuthorAdded(
+    string AuthorId,
+    List<IndustryJobs>? IdustryJobs = null,
+    List<string>? OtherJobs = null);
+public record ProjectAuthorRemoved(
+    string AuthorId
+);
 public record ProjectInfoChanged(
-    string? Name,
-    string? Description,
-    string? EnglishName,
-    string? EnglishDescription
+    string? Name = null,
+    string? Description = null,
+    string? EnglishName = null,
+    string? EnglishDescription = null,
+    ProjectVisibility? Visibility = null,
+    DateTimeOffset? ReleaseDate = null,
+    string? Link = null
 );
 public record ProjectVideoAdded(
     string VideoId

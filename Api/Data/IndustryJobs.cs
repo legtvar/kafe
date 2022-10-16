@@ -1,0 +1,47 @@
+namespace Kafe.Data;
+
+// https://www.masterclass.com/articles/film-industry-jobs
+public enum IndustryJobs
+{
+    Unknown,
+    Screenwriter,
+    ExecutiveProducer,
+    Director,
+    CastingDirector,
+    LineProducer, // "produkční" in czech
+    LocationManager,
+    ProductionManager,
+    AssistantProductionManager,
+    ProductionCoordinator,
+    AssistantDirector,
+    ProductionDesigner,
+    ArtDirector,
+    SetDesigner,
+    SetDecorator,
+    ConstructionCoordinator,
+    Propmaster,
+    CostumeDesigner,
+    KeyMakeupArtist,
+    KeyHairstylist,
+    DirectorOfPhotography,
+    CameraOperator,
+    Gaffer,
+    BestBoy,
+    KeyGrip,
+    Electrician,
+    ProductionSoundMixer,
+    BoomOperator,
+    StuntCoordinator,
+    SpecialEffectsCoordinator,
+    ProductionAssistant,
+    PostproductionSupervisor,
+    Editor,
+    Colorist,
+    VisualEffectsProducer,
+    SoundDesigner,
+    DialogueEditor,
+    Composer,
+    MusicSupervisor,
+    MusicEditor,
+    SoundEditor
+}

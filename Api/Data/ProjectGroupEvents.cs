@@ -4,11 +4,11 @@ public record ProjectGroupCreated(
     CreationMethod CreationMethod
 );
 public record ProjectGroupInfoChanged(
-    string? Name,
-    string? Description,
-    string? EnglishName,
-    string? EnglishDescription,
-    DateTimeOffset? Deadline);
+    string? Name = null,
+    string? Description = null,
+    string? EnglishName = null,
+    string? EnglishDescription = null,
+    DateTimeOffset? Deadline = null);
 public record ProjectGroupProjectOpened;
 public record ProjectGroupProjectClosed;
 public record ProjectGroupValidationRulesChanged(

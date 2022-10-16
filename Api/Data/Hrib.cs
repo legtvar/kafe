@@ -34,4 +34,9 @@ public record Hrib
         }
         return new Hrib(sb.ToString());
     }
+
+    public override string ToString()
+    {
+        return Value;
+    }
 }

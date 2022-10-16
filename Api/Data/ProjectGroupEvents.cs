@@ -9,8 +9,8 @@ public record ProjectGroupInfoChanged(
     string? EnglishName = null,
     string? EnglishDescription = null,
     DateTimeOffset? Deadline = null);
-public record ProjectGroupProjectOpened;
-public record ProjectGroupProjectClosed;
+public record ProjectGroupOpened;
+public record ProjectGroupClosed;
 public record ProjectGroupValidationRulesChanged(
     int? MinimumWidth,
     int? MinimumHeight,

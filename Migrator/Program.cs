@@ -15,6 +15,7 @@ public static class Program
     private static IDocumentStore martenStore = null!;
     private static IDocumentSession kafe = null!;
     private static ILogger logger = null!;
+    private static Dictionary<int, Hrib> videoMap = new();
 
     public static async Task Main(string[] args)
     {
@@ -52,12 +53,25 @@ public static class Program
         await martenStore.Storage.ApplyAllConfiguredChangesToDatabaseAsync();
         kafe = martenStore.OpenSession();
         wma = host.Services.GetRequiredService<LemmaContext>();
-        var projectGroups = wma.Projectgroups.OrderBy(a => a.Name).Include(g => g.Projects).ToList();
+        var projectGroups = wma.Projectgroups.OrderBy(a => a.Name)
+            .Include(g => g.Projects)
+            .ThenInclude(p => p.Videos)
+            .ToList();
         foreach (var group in projectGroups)
         {
             MigrateProjectGroup(group);
         }
         await kafe.SaveChangesAsync();
+
+        var playlists = wma.Playlists
+            .Include(p => p.Items)
+            .ToList();
+        foreach (var playlist in playlists)
+        {
+            MigratePlaylist(playlist);
+        }
+        await kafe.SaveChangesAsync();
+
         await kafe.DisposeAsync();
     }
 
@@ -66,9 +80,11 @@ public static class Program
         var hrib = Hrib.Create();
         var created = new ProjectGroupCreated(CreationMethod.Migrator);
         var infoChanged = new ProjectGroupInfoChanged(group.Name);
+        var closed = new ProjectGroupClosed();
         logger.LogInformation($"[{hrib}]: {created}");
         logger.LogInformation($"[{hrib}]: {infoChanged}");
-        var stream = kafe.Events.StartStream(hrib, created, infoChanged);
+        logger.LogInformation($"[{hrib}]: {closed}");
+        var stream = kafe.Events.StartStream(hrib, created, infoChanged, closed);
         foreach (var project in group.Projects)
         {
             MigrateProject(project, hrib);
@@ -83,7 +99,7 @@ public static class Program
         var infoChanged = new ProjectInfoChanged(
             Name: project.Name,
             Description: project.Desc,
-            Visibility: project.Publicpseudosecret == true ? ProjectVisibility.Internal : ProjectVisibility.Private,
+            Visibility: project.Publicpseudosecret == true ? Visibility.Internal : Visibility.Private,
             ReleaseDate: project.ReleaseDate,
             Link: project.Web);
         logger.LogInformation($"[{hrib}]: {created}");
@@ -109,6 +125,47 @@ public static class Program
             var authorAdded = new ProjectAuthorAdded(authorId);
             logger.LogInformation($"[{hrib}]: {authorAdded}");
             kafe.Events.Append(hrib, authorAdded);
+        }
+
+        foreach (var video in project.Videos)
+        {
+            MigrateVideo(video, hrib);
+        }
+        return hrib;
+    }
+
+    private static Hrib MigrateVideo(Video video, Hrib projectId)
+    {
+        var hrib = Hrib.Create();
+        var added = new ProjectVideoAdded(hrib, video.Name);
+        videoMap.Add(video.Id, hrib);
+        logger.LogInformation($"[{projectId}]: {added}");
+        kafe.Events.Append(projectId, added);
+        return hrib;
+    }
+
+    private static Hrib MigratePlaylist(Playlist playlist)
+    {
+        var hrib = Hrib.Create();
+        var created = new PlaylistCreated(CreationMethod.Migrator);
+        var infoChanged = new PlaylistInfoChanged(
+            Name: playlist.Name,
+            Description: playlist.Desc,
+            Visibility: Visibility.Internal);
+        logger.LogInformation($"[{hrib}]: {created}");
+        logger.LogInformation($"[{hrib}]: {infoChanged}");
+        kafe.Events.StartStream(hrib, created, infoChanged);
+
+        foreach (var item in playlist.Items.OrderBy(i => i.Position))
+        {
+            if (!videoMap.TryGetValue(item.Video, out var videoId))
+            {
+                logger.LogWarning($"Video '{item.Video}' has not been migrated but is referenced by a playlist.");
+                continue;
+            }
+            var itemAdded = new PlaylistVideoAdded(videoId);
+            logger.LogInformation($"[{hrib}]: {itemAdded}");
+            kafe.Events.Append(hrib, itemAdded);
         }
         return hrib;
     }

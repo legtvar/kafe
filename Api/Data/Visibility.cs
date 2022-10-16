@@ -1,6 +1,6 @@
 namespace Kafe.Data;
 
-public enum ProjectVisibility
+public enum Visibility
 {
     Unknown, // admin-only
     Private, // people with the capability / link

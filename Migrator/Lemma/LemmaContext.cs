@@ -175,7 +175,7 @@ public partial class LemmaContext : DbContext
             entity.Property(e => e.Id).ValueGeneratedNever();
 
             entity.HasOne(d => d.PlaylistNavigation)
-                .WithMany(p => p.Playlistitems)
+                .WithMany(p => p.Items)
                 .HasForeignKey(d => d.Playlist)
                 .HasConstraintName("playlist_id_fk");
 

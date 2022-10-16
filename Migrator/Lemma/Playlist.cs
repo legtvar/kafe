@@ -11,7 +11,7 @@ public partial class Playlist
 {
     public Playlist()
     {
-        Playlistitems = new HashSet<Playlistitem>();
+        Items = new HashSet<Playlistitem>();
     }
 
     [Key]
@@ -26,5 +26,5 @@ public partial class Playlist
     public int? Position { get; set; }
 
     [InverseProperty("PlaylistNavigation")]
-    public virtual ICollection<Playlistitem> Playlistitems { get; set; }
+    public virtual ICollection<Playlistitem> Items { get; set; }
 }

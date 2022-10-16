@@ -20,9 +20,9 @@ public partial class Playlistitem
     public int Video { get; set; }
 
     [ForeignKey("Playlist")]
-    [InverseProperty("Playlistitems")]
+    [InverseProperty(nameof(Lemma.Playlist.Items))]
     public virtual Playlist PlaylistNavigation { get; set; } = null!;
     [ForeignKey("Video")]
-    [InverseProperty("Playlistitems")]
+    [InverseProperty(nameof(Lemma.Video.Playlistitems))]
     public virtual Video VideoNavigation { get; set; } = null!;
 }

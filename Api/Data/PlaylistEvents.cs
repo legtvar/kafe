@@ -4,18 +4,19 @@ public record PlaylistCreated(
     CreationMethod CreationMethod
 );
 public record PlaylistInfoChanged(
-    string? Name,
-    string? Description,
-    string? EnglishName,
-    string? EnglishDescription
+    string? Name = null,
+    string? Description = null,
+    string? EnglishName = null,
+    string? EnglishDescription = null,
+    Visibility? Visibility = null
 );
-public record PlaylistProjectAdded(
-    string ProjectId
+public record PlaylistVideoAdded(
+    string VideoId
 );
-public record PlaylistProjectRemoved(
-    string ProjectId
+public record PlaylistVideoRemoved(
+    string VideoId
 );
-public record PlaylistProjectOrderChanged(
-    string ProjectId,
+public record PlaylistVideoOrderChanged(
+    string VideoId,
     int NewIndex
 );

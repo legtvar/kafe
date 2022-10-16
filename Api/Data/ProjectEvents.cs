@@ -22,12 +22,14 @@ public record ProjectInfoChanged(
     string? Description = null,
     string? EnglishName = null,
     string? EnglishDescription = null,
-    ProjectVisibility? Visibility = null,
+    Visibility? Visibility = null,
     DateTimeOffset? ReleaseDate = null,
     string? Link = null
 );
 public record ProjectVideoAdded(
-    string VideoId
+    string VideoId,
+    string? Name = null,
+    VideoKind Kind = default
 );
 public record ProjectVideoRemoved(
     string VideoId

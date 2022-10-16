@@ -16,7 +16,7 @@ public class Project
     public bool IsClosed { get; set; }
     [Column("publicpseudosecret")]
     public bool IsPublic { get;set; }
-    public ProjectGroup Group { get; set; }
+    public ProjectGroup? Group { get; set; }
     [Column("externalauthorname")]
     public string? ExternalAuthorName { get; set; }
     [Column("externalauthoruco")]

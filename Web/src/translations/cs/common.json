@@ -1,27 +1,40 @@
 {
-    "beta": {
-        "description": "Vývoj této aplikace právě začal. Prosím buďte shovívaví zatímco za vás proléváme krev, pot a kafe.",
-        "title": "Právě probíhá vývoj...",
-        "toggleLanguage": "Přepnout na {{language}}"
+  "beta": {
+    "description": "Vývoj této aplikace právě začal. Prosím buďte shovívaví zatímco za vás proléváme krev, pot a kafe.",
+    "title": "Právě probíhá vývoj...",
+    "toggleLanguage": "Přepnout na {{language}}"
+  },
+  "layout": {
+    "footer": {
+      "copy": "Vytvořil tým <3>LEMMA</3> z <1>❤️</1> a ☕"
     },
-    "layout": {
-        "footer": {
-            "copy": "Vytvořil tým <3>LEMMA</3> z <1>❤️</1> a ☕"
-        },
-        "title-prefix": "Kafe - "
+    "title-prefix": "Kafe - "
+  },
+  "route": {
+    "groups": {
+      "title": "Skupiny projektů"
     },
-    "route": {
-        "groups": {
-            "title": "Skupiny projektů"
-        },
-        "home": {
-            "title": "Domů"
-        },
-        "playlists": {
-            "title": "Playlisty"
-        },
-        "projects": {
-            "title": "Projekty"
-        }
+    "home": {
+      "title": "Domů"
+    },
+    "playlists": {
+      "title": "Playlisty"
+    },
+    "projects": {
+      "title": "Projekty",
+      "detail": {
+        "title": "Detail projektu"
+      }
     }
+  },
+  "project": {
+    "locked": "Projekt je uzamčený"
+  },
+  "error": {
+    "invalidPath": "URL adresa je nesprávná",
+    "projectDoesNotExist": "Projekt s daným ID neexistuje"
+  },
+  "common": {
+    "backHome": "Zpět na domovskou stránku"
+  }
 }

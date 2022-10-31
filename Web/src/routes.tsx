@@ -1,4 +1,6 @@
 import { GroupOutlined, HomeOutlined, PlaySquareOutlined, VideoCameraOutlined } from '@ant-design/icons';
+import { ProjectDetail } from './pages/projects/ProjectDetail';
+import { ProjectsPage } from './pages/projects/ProjectsPage';
 
 export type AppRoute = {
     path: string;
@@ -21,9 +23,16 @@ export const routes = (t: (id: string) => string): AppRoute[] => [
     {
         path: 'projects',
         title: t('route.projects.title'),
-        element: <>Tady bude seznam projektů</>,
+        element: <ProjectsPage />,
         inMenu: true,
         icon: <VideoCameraOutlined />,
+        children: [
+            {
+                path: ':id',
+                title: t('route.projects.detail.title'),
+                element: <ProjectDetail />,
+            },
+        ],
     },
     {
         path: 'groups',

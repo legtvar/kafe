@@ -1,27 +1,40 @@
 {
-    "beta": {
-        "description": "The development has just started. Please hold tight as we build the app with our sweat, tears and covfefe.",
-        "title": "Development in progress...",
-        "toggleLanguage": "Switch to {{language}}"
+  "beta": {
+    "description": "The development has just started. Please hold tight as we build the app with our sweat, tears and covfefe.",
+    "title": "Development in progress...",
+    "toggleLanguage": "Switch to {{language}}"
+  },
+  "layout": {
+    "footer": {
+      "copy": "Created with <1>❤️</1> and ☕ by <3>LEMMA</3>"
     },
-    "layout": {
-        "footer": {
-            "copy": "Created with <1>❤️</1> and ☕ by <3>LEMMA</3>"
-        },
-        "title-prefix": "Kafe - "
+    "title-prefix": "Kafe - "
+  },
+  "route": {
+    "groups": {
+      "title": "Project groups"
     },
-    "route": {
-        "groups": {
-            "title": "Project groups"
-        },
-        "home": {
-            "title": "Home"
-        },
-        "playlists": {
-            "title": "Playlists"
-        },
-        "projects": {
-            "title": "Projects"
-        }
+    "home": {
+      "title": "Home"
+    },
+    "playlists": {
+      "title": "Playlists"
+    },
+    "projects": {
+      "title": "Projects",
+      "detail": {
+        "title": "Project detail"
+      }
     }
+  },
+  "project": {
+    "locked": "Project is locked"
+  },
+  "error": {
+    "invalidPath": "URL path is invalid",
+    "projectDoesNotExist": "Project with the given ID does not exist"
+  },
+  "common": {
+    "backHome": "Back Home"
+  }
 }

@@ -37,7 +37,7 @@ export const Root: React.FC = () => {
                 <PageMenu />
             </Layout.Sider>
             <Layout>
-                <Outlet context={{ collapsed, setCollapsed } as PageOutletContext} />
+                <Outlet context={{ collapsed, setCollapsed, isSmallScreen } as PageOutletContext} />
                 <Layout.Footer className="kafe-layout-footer">
                     <span className="kafe-footer-content">
                         <Trans i18nKey="layout.footer.copy">

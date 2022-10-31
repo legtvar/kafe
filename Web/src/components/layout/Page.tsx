@@ -14,6 +14,7 @@ export interface IPageProps {
 export type PageOutletContext = {
     collapsed: boolean;
     setCollapsed: (value: boolean) => void;
+    isSmallScreen: boolean;
 };
 
 export const Page: React.FC<IPageProps> = (props) => {

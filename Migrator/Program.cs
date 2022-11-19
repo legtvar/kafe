@@ -31,38 +31,36 @@ public static class Program
             })
             .Build();
         logger = host.Services.GetRequiredService<ILogger<Migrator>>();
-        // if (TryDropDb())
-        // {
-        //     logger.LogInformation("Database dropped.");
-        // }
+        if (TryDropDb(host))
+        {
+            logger.LogInformation("Database dropped.");
+        }
         martenStore = host.Services.GetRequiredService<IDocumentStore>();
         await martenStore.Storage.ApplyAllConfiguredChangesToDatabaseAsync();
         kafe = martenStore.OpenSession();
         wma = host.Services.GetRequiredService<LemmaContext>();
-        // var projectGroups = wma.Projectgroups.OrderBy(a => a.Name)
-        //     .Include(g => g.Projects)
-        //     .ThenInclude(p => p.Videos)
-        //     .ToList();
-        // foreach (var group in projectGroups)
-        // {
-        //     MigrateProjectGroup(group);
-        // }
-        // await kafe.SaveChangesAsync();
-
-        // var playlists = wma.Playlists
-        //     .Include(p => p.Items)
-        //     .ToList();
-        // foreach (var playlist in playlists)
-        // {
-        //     MigratePlaylist(playlist);
-        // }
-        // await kafe.SaveChangesAsync();
-        
-        var authors = kafe.Query<Kafe.Data.Aggregates.Author>().OrderBy(a => a.Uco).ToList();
-        foreach(var author in authors) {
-            logger.LogInformation($"[{author.Id}]: {author.Name}, {author.Uco}");
+        var projectGroups = wma.Projectgroups.OrderBy(a => a.Name)
+            .Include(g => g.Projects)
+            .ThenInclude(p => p.Videos)
+            .ToList();
+        foreach (var group in projectGroups)
+        {
+            MigrateProjectGroup(group);
         }
-        logger.LogInformation($"Found {authors.Count} authors.");
+        await kafe.SaveChangesAsync();
+
+        var playlists = wma.Playlists
+            .Include(p => p.Items)
+            .ToList();
+        foreach (var playlist in playlists)
+        {
+            MigratePlaylist(playlist);
+        }
+        await kafe.SaveChangesAsync();
+
+        var authorCount = await Marten.QueryableExtensions.CountAsync(
+            kafe.Query<Kafe.Data.Aggregates.Author>());
+        logger.LogInformation($"Found {authorCount} authors.");
 
         await kafe.DisposeAsync();
     }

@@ -8,7 +8,7 @@ public record PlaylistInfoChanged(
     string? Description = null,
     string? EnglishName = null,
     string? EnglishDescription = null,
-    Visibility? Visibility = null
+    Visibility Visibility = Visibility.Unknown
 );
 public record PlaylistVideoAdded(
     string VideoId

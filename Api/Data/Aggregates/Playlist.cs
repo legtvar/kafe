@@ -35,11 +35,11 @@ public class PlaylistProjection : SingleStreamAggregation<Playlist>
     {
         return p with
         {
-            Name = p.Name,
-            Description = p.Description,
-            EnglishName = p.EnglishName,
-            EnglishDescription = p.EnglishDescription,
-            Visibility = p.Visibility
+            Name = e.Name,
+            Description = e.Description,
+            EnglishName = e.EnglishName,
+            EnglishDescription = e.EnglishDescription,
+            Visibility = e.Visibility
         };
     }
 

@@ -1,4 +1,5 @@
 ﻿using Kafe.Data;
+using Kafe.Data.Events;
 using Kafe.Lemma;
 using Marten;
 using Marten.Events;
@@ -10,7 +11,6 @@ namespace Kafe.Migrator;
 
 public static class Program
 {
-    private static IHost host = null!;
     private static LemmaContext wma = null!;
     private static IDocumentStore martenStore = null!;
     private static IDocumentSession kafe = null!;
@@ -19,7 +19,7 @@ public static class Program
 
     public static async Task Main(string[] args)
     {
-        host = Host.CreateDefaultBuilder(args)
+        using var host = Host.CreateDefaultBuilder(args)
             .ConfigureServices((context, services) =>
             {
                 services.AddDbContext<LemmaContext>(options =>
@@ -27,50 +27,42 @@ public static class Program
                     options.UseNpgsql(context.Configuration.GetConnectionString("WMA"));
                 }
                 );
-                services.AddMarten(options =>
-                {
-                    options.Connection(context.Configuration.GetConnectionString("KAFE"));
-                    options.Events.StreamIdentity = StreamIdentity.AsString;
-                    options.AutoCreateSchemaObjects = AutoCreate.All;
-                    options.CreateDatabasesForTenants(c =>
-                    {
-                        c.MaintenanceDatabase(context.Configuration.GetConnectionString("postgres"));
-                        c.ForTenant()
-                            .CheckAgainstPgDatabase()
-                            .WithOwner("postgres")
-                            .WithEncoding("UTF-8")
-                            .ConnectionLimit(-1);
-                    });
-                });
+                Db.AddDb(services, context.Configuration, context.HostingEnvironment);
             })
             .Build();
         logger = host.Services.GetRequiredService<ILogger<Migrator>>();
-        if (TryDropDb())
-        {
-            logger.LogInformation("Database dropped.");
-        }
+        // if (TryDropDb())
+        // {
+        //     logger.LogInformation("Database dropped.");
+        // }
         martenStore = host.Services.GetRequiredService<IDocumentStore>();
         await martenStore.Storage.ApplyAllConfiguredChangesToDatabaseAsync();
         kafe = martenStore.OpenSession();
         wma = host.Services.GetRequiredService<LemmaContext>();
-        var projectGroups = wma.Projectgroups.OrderBy(a => a.Name)
-            .Include(g => g.Projects)
-            .ThenInclude(p => p.Videos)
-            .ToList();
-        foreach (var group in projectGroups)
-        {
-            MigrateProjectGroup(group);
-        }
-        await kafe.SaveChangesAsync();
+        // var projectGroups = wma.Projectgroups.OrderBy(a => a.Name)
+        //     .Include(g => g.Projects)
+        //     .ThenInclude(p => p.Videos)
+        //     .ToList();
+        // foreach (var group in projectGroups)
+        // {
+        //     MigrateProjectGroup(group);
+        // }
+        // await kafe.SaveChangesAsync();
 
-        var playlists = wma.Playlists
-            .Include(p => p.Items)
-            .ToList();
-        foreach (var playlist in playlists)
-        {
-            MigratePlaylist(playlist);
+        // var playlists = wma.Playlists
+        //     .Include(p => p.Items)
+        //     .ToList();
+        // foreach (var playlist in playlists)
+        // {
+        //     MigratePlaylist(playlist);
+        // }
+        // await kafe.SaveChangesAsync();
+        
+        var authors = kafe.Query<Kafe.Data.Aggregates.Author>().OrderBy(a => a.Uco).ToList();
+        foreach(var author in authors) {
+            logger.LogInformation($"[{author.Id}]: {author.Name}, {author.Uco}");
         }
-        await kafe.SaveChangesAsync();
+        logger.LogInformation($"Found {authors.Count} authors.");
 
         await kafe.DisposeAsync();
     }
@@ -181,12 +173,12 @@ public static class Program
             Phone: phone);
         logger.LogInformation($"[{hrib}]: {created}");
         logger.LogInformation($"[{hrib}]: {infoChanged}");
-        var stream = kafe.Events.StartStream(hrib, created, infoChanged);
+        var stream = kafe.Events.StartStream<Author>(hrib, created, infoChanged);
         return hrib;
     }
 
     // knicked from https://github.com/JasperFx/marten/blob/master/src/CoreTests/create_database_Tests.cs
-    private static bool TryDropDb()
+    private static bool TryDropDb(IHost host)
     {
         const string db = "kafe";
         try

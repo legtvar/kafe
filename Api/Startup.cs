@@ -1,3 +1,4 @@
+using Kafe.Data;
 using Marten;
 using Marten.Events;
 using Weasel.Core;
@@ -16,15 +17,7 @@ public class Startup
     public void ConfigureServices(IServiceCollection services, IHostEnvironment environment)
     {
         services.AddAuthorization();
-        services.AddMarten(options =>
-        {
-            options.Connection(Configuration.GetConnectionString("KAFE"));
-            options.Events.StreamIdentity = StreamIdentity.AsString;
-            if (environment.IsDevelopment())
-            {
-                options.AutoCreateSchemaObjects = AutoCreate.All;
-            }
-        });
+        Db.AddDb(services, Configuration, environment);
     }
     
     public void Configure(IApplicationBuilder app, IHostEnvironment environment)

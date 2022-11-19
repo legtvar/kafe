@@ -10,10 +10,16 @@ public record Hrib
     public const string Alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
     public const int Length = 11;
 
+    public const string Invalid = "Invalid HRIB";
+
     private static readonly Random Random = new Random();
 
     private Hrib(string value)
     {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            throw new ArgumentNullException(nameof(value));
+        }
         Value = value;
     }
 
@@ -24,6 +30,10 @@ public record Hrib
         return hrib.Value;
     }
 
+    public static implicit operator Hrib(string value)
+    {
+        return new(value);
+    }
 
     public static Hrib Create()
     {

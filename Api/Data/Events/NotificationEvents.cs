@@ -1,4 +1,4 @@
-namespace Kafe.Data;
+namespace Kafe.Data.Events;
 
 public record NotificationValidationCreated(
     CreationMethod CreationMethod,

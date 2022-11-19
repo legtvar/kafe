@@ -28,6 +28,8 @@ public static class Db
             });
 
             options.Projections.Add<AuthorProjection>();
+            options.Projections.Add<NotificationProjection>();
+            options.Projections.Add<PlaylistProjection>();
         });
     }
 }

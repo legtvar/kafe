@@ -60,7 +60,9 @@ public static class Program
 
         var authorCount = await Marten.QueryableExtensions.CountAsync(
             kafe.Query<Kafe.Data.Aggregates.Author>());
-        logger.LogInformation($"Found {authorCount} authors.");
+        var playlistCount = await Marten.QueryableExtensions.CountAsync(
+            kafe.Query<Kafe.Data.Aggregates.Playlist>());
+        logger.LogInformation($"Found {authorCount} authors, {playlistCount} playlist.");
 
         await kafe.DisposeAsync();
     }

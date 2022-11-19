@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using Kafe.Data.Events;
 using Marten.Events;
 using Marten.Events.Aggregation;
@@ -8,7 +9,7 @@ public record Notification(
     string Id,
     CreationMethod CreationMethod,
     NotificationKind Kind,
-    List<string> Recipients,
+    ImmutableArray<string> Recipients,
     string? ProjectId,
     string? VideoId,
     string? Description,
@@ -29,7 +30,9 @@ public class NotificationProjection : SingleStreamAggregation<Notification>
             Id: e.StreamKey!,
             CreationMethod: e.Data.CreationMethod,
             Kind: e.Data.Kind,
-            Recipients: e.Data.Recipients,
+            Recipients: !e.Data.Recipients.HasValue || e.Data.Recipients.Value.IsDefault
+                ? ImmutableArray.Create<string>()
+                : e.Data.Recipients.Value,
             ProjectId: e.Data.ProjectId,
             VideoId: e.Data.VideoId,
             Description: e.Data.Description,

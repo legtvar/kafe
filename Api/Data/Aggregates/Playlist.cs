@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using Kafe.Data.Events;
 using Marten.Events;
 using Marten.Events.Aggregation;
@@ -7,12 +8,12 @@ namespace Kafe.Data.Aggregates;
 public record Playlist(
     string Id,
     CreationMethod CreationMethod,
+    ImmutableArray<string> Videos,
     string? Name = null,
     string? Description = null,
     string? EnglishName = null,
     string? EnglishDescription = null,
-    Visibility Visibility = Visibility.Unknown,
-    List<string>? Videos = null
+    Visibility Visibility = Visibility.Unknown
 );
 
 public class PlaylistProjection : SingleStreamAggregation<Playlist>
@@ -26,7 +27,7 @@ public class PlaylistProjection : SingleStreamAggregation<Playlist>
         return new Playlist(
             Id: e.StreamKey!,
             CreationMethod: e.Data.CreationMethod,
-            Videos: new List<string>()
+            Videos: ImmutableArray.Create<string>()
         );
     }
 
@@ -38,8 +39,7 @@ public class PlaylistProjection : SingleStreamAggregation<Playlist>
             Description = p.Description,
             EnglishName = p.EnglishName,
             EnglishDescription = p.EnglishDescription,
-            Visibility = p.Visibility,
-            Videos = new List<string>()
+            Visibility = p.Visibility
         };
     }
 

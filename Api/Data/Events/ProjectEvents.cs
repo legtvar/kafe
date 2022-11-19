@@ -1,19 +1,15 @@
+using System.Collections.Immutable;
+
 namespace Kafe.Data.Events;
 
 public record ProjectCreated(
     CreationMethod CreationMethod,
     string ProjectGroupId
 );
-public record ProjectOwnerAdded(
-    string OwnerId
-);
-public record ProjectOwnerRemoved(
-    string OwnerId
-);
 public record ProjectAuthorAdded(
     string AuthorId,
-    List<IndustryJobs>? IdustryJobs = null,
-    List<string>? OtherJobs = null);
+    ImmutableArray<string>? Jobs = null
+);
 public record ProjectAuthorRemoved(
     string AuthorId
 );
@@ -22,8 +18,8 @@ public record ProjectInfoChanged(
     string? Description = null,
     string? EnglishName = null,
     string? EnglishDescription = null,
-    Visibility? Visibility = null,
-    DateTimeOffset? ReleaseDate = null,
+    Visibility Visibility = Visibility.Unknown,
+    DateTimeOffset ReleaseDate = default,
     string? Link = null
 );
 public record ProjectVideoAdded(

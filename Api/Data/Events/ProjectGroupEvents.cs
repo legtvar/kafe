@@ -12,12 +12,5 @@ public record ProjectGroupInfoChanged(
 public record ProjectGroupOpened;
 public record ProjectGroupClosed;
 public record ProjectGroupValidationRulesChanged(
-    int? MinimumWidth,
-    int? MinimumHeight,
-    long? MaxFileSize,
-    List<ContainerFormat>? AllowedContainerFormats,
-    List<VideoCodec>? AllowedVideoCodecs,
-    List<AudioCodec>? AllowedAudioCodecs,
-    List<VideoFramerate>? AllowedVideoFramerates,
-    List<SubtitleFormat>? AllowedSubtitleFormats
+    ValidationRules ValidationRules
 );

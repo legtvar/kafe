@@ -62,7 +62,11 @@ public static class Program
             kafe.Query<Kafe.Data.Aggregates.Author>());
         var playlistCount = await Marten.QueryableExtensions.CountAsync(
             kafe.Query<Kafe.Data.Aggregates.Playlist>());
-        logger.LogInformation($"Found {authorCount} authors, {playlistCount} playlist.");
+        var projectGroupCount = await Marten.QueryableExtensions.CountAsync(
+            kafe.Query<Kafe.Data.Aggregates.ProjectGroup>());
+        var projectCounts = await Marten.QueryableExtensions.CountAsync(
+            kafe.Query<Kafe.Data.Aggregates.Project>());
+        logger.LogInformation($"Found {authorCount} authors, {playlistCount} playlist, {projectGroupCount} project groups, {projectCounts} projects.");
 
         await kafe.DisposeAsync();
     }
@@ -76,7 +80,7 @@ public static class Program
         logger.LogInformation($"[{hrib}]: {created}");
         logger.LogInformation($"[{hrib}]: {infoChanged}");
         logger.LogInformation($"[{hrib}]: {closed}");
-        var stream = kafe.Events.StartStream(hrib, created, infoChanged, closed);
+        var stream = kafe.Events.StartStream<Kafe.Data.Aggregates.ProjectGroup>(hrib, created, infoChanged, closed);
         foreach (var project in group.Projects)
         {
             MigrateProject(project, hrib);
@@ -92,11 +96,13 @@ public static class Program
             Name: project.Name,
             Description: project.Desc,
             Visibility: project.Publicpseudosecret == true ? Visibility.Internal : Visibility.Private,
-            ReleaseDate: project.ReleaseDate,
+            ReleaseDate: project.ReleaseDate.HasValue
+                ? new DateTimeOffset(project.ReleaseDate.Value)
+                : default,
             Link: project.Web);
         logger.LogInformation($"[{hrib}]: {created}");
         logger.LogInformation($"[{hrib}]: {infoChanged}");
-        var stream = kafe.Events.StartStream(hrib, created, infoChanged);
+        var stream = kafe.Events.StartStream<Kafe.Data.Aggregates.Project>(hrib, created, infoChanged);
 
         if (project.Closed == true)
         {
@@ -146,7 +152,7 @@ public static class Program
             Visibility: Visibility.Internal);
         logger.LogInformation($"[{hrib}]: {created}");
         logger.LogInformation($"[{hrib}]: {infoChanged}");
-        kafe.Events.StartStream(hrib, created, infoChanged);
+        kafe.Events.StartStream<Kafe.Data.Aggregates.Playlist>(hrib, created, infoChanged);
 
         foreach (var item in playlist.Items.OrderBy(i => i.Position))
         {
@@ -173,7 +179,7 @@ public static class Program
             Phone: phone);
         logger.LogInformation($"[{hrib}]: {created}");
         logger.LogInformation($"[{hrib}]: {infoChanged}");
-        var stream = kafe.Events.StartStream<Author>(hrib, created, infoChanged);
+        var stream = kafe.Events.StartStream<Kafe.Data.Aggregates.Author>(hrib, created, infoChanged);
         return hrib;
     }
 

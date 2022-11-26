@@ -1,51 +1,123 @@
+import { Avatar, Button, List, Typography } from 'antd';
 import Paragraph from 'antd/lib/typography/Paragraph';
-import Title from 'antd/lib/typography/Title';
 import { t } from 'i18next';
-import { useParams } from 'react-router-dom';
+import React from 'react';
 import { ProjectDataType } from '../../api/types';
-import { Error } from '../../components/layout/Error';
-import { AwaitAPI } from '../../components/utils/AwaitAPI';
+import { Page } from '../../components/layout/Page';
+import { Space } from '../../components/utils/Space';
 import { VideoJS } from '../../components/VideoPlayer';
-import { isNumeric } from '../../utils/isNumeric';
+import { deepCopy } from '../../utils/deepCopy';
+import { truthy } from '../../utils/truthy';
 
-interface IProjectDetailProps {}
+interface IProjectDetailProps {
+    data: ProjectDataType;
+}
 
 export function ProjectDetail(props: IProjectDetailProps) {
-    const { id } = useParams();
+    const [editing, setEditing] = React.useState(false);
+    const [toSave, setToSave] = React.useState({});
+    const { data } = props;
 
-    if (!id || !isNumeric(id)) {
-        return <Error error={t('error.invalidPath')} />;
-    }
-    const projectId = parseInt(id);
+    const startEdit = () => {
+        setEditing(true);
+        setToSave(deepCopy(props.data));
+    };
+
+    const saveEdit = () => {
+        setEditing(false);
+        console.log(toSave);
+    };
+
+    const cancelEdit = () => {
+        setEditing(false);
+    };
 
     return (
-        <AwaitAPI request={(caffeine) => caffeine.api.projects.getById(projectId)}>
-            {(data: ProjectDataType | null) =>
-                data ? (
-                    <>
-                        <Title level={3}>{data.title}</Title>
-                        <Paragraph>{data.description}</Paragraph>
+        <Page
+            title={data.title}
+            headerProps={{
+                extra: truthy(
+                    !editing && (
+                        <Button key="1" type="primary" onClick={startEdit}>
+                            {t('common.edit').toString()}
+                        </Button>
+                    ),
+                    editing && (
+                        <Button key="1" onClick={cancelEdit}>
+                            {t('common.cancel').toString()}
+                        </Button>
+                    ),
+                    editing && (
+                        <Button key="1" type="primary" onClick={saveEdit}>
+                            {t('common.save').toString()}
+                        </Button>
+                    ),
+                ),
+            }}
+        >
+            <Typography.Title level={4}>{t('project.annotation').toString()}</Typography.Title>
+            <Paragraph>
+                <em>{data.genere}</em>
+            </Paragraph>
+            <Paragraph>{data.annotation}</Paragraph>
 
-                        <VideoJS
-                            options={{
-                                autoplay: false,
-                                controls: true,
-                                responsive: true,
-                                fluid: false,
-                                sources: [
-                                    {
-                                        src: '/kafe/jejky.mp4',
-                                        type: 'video/mp4',
-                                    },
-                                ],
-                                width: 500,
-                            }}
+            <Space size="m" />
+
+            <Typography.Title level={4}>{t('project.actors').toString()}</Typography.Title>
+            <List
+                dataSource={data.actors}
+                renderItem={(item, i) => (
+                    <List.Item>
+                        <List.Item.Meta
+                            avatar={<Avatar src={`https://joeschmoe.io/api/v1/${i}`} />}
+                            title={item.name}
+                            description={item.role}
                         />
-                    </>
-                ) : (
-                    <Error error={t('error.projectDoesNotExist')} />
-                )
-            }
-        </AwaitAPI>
+                    </List.Item>
+                )}
+            />
+
+            <Space size="l" />
+
+            <Typography.Title level={4}>{t('project.crew').toString()}</Typography.Title>
+            <List
+                dataSource={data.crew}
+                renderItem={(item, i) => (
+                    <List.Item>
+                        <List.Item.Meta
+                            avatar={<Avatar src={`https://joeschmoe.io/api/v1/10${i}`} />}
+                            title={item.name}
+                            description={item.role}
+                        />
+                    </List.Item>
+                )}
+            />
+
+            {/*
+                - Název projektu
+                - Žánr
+                - Anotace
+                - Filmový štáb
+                - Herci
+                - Film + Titulky
+                - Grafika
+                - Souhlasy
+            */}
+
+            <VideoJS
+                options={{
+                    autoplay: false,
+                    controls: true,
+                    responsive: true,
+                    fill: true,
+                    sources: [
+                        {
+                            src: '/kafe/jejky.mp4',
+                            type: 'video/mp4',
+                        },
+                    ]
+                }}
+            />
+        </Page>
     );
 }

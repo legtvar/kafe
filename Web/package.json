@@ -5,9 +5,10 @@
   "private": true,
   "dependencies": {
     "@ant-design/icons": "^4.7.0",
-    "antd": "^4.23.2",
+    "antd": "^4.24.4",
     "country-flag-icons": "^1.5.5",
     "i18next": "^21.9.1",
+    "mime": "^3.0.0",
     "moment": "^2.29.1",
     "react": "^18.2.0",
     "react-app-rewired": "^2.2.1",

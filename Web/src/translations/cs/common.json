@@ -8,7 +8,7 @@
     "footer": {
       "copy": "Vytvořil tým <3>LEMMA</3> z <1>❤️</1> a ☕"
     },
-    "title-prefix": "Kafe - "
+    "title-prefix": "Kafe"
   },
   "route": {
     "groups": {
@@ -28,13 +28,23 @@
     }
   },
   "project": {
-    "locked": "Projekt je uzamčený"
+    "locked": "Projekt je uzamčený",
+    "annotation": "Anotace",
+    "actors": "Obsazení",
+    "crew": "Filmový štáb"
   },
   "error": {
     "invalidPath": "URL adresa je nesprávná",
     "projectDoesNotExist": "Projekt s daným ID neexistuje"
   },
   "common": {
-    "backHome": "Zpět na domovskou stránku"
+    "backHome": "Zpět na domovskou stránku",
+    "edit": "Upravit",
+    "save": "Uložit",
+    "cancel": "Zrušit"
+  },
+  "projects": {
+    "title": "Moje projekty",
+    "detail": "Detail"
   }
 }

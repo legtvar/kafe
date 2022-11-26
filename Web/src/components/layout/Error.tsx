@@ -1,4 +1,4 @@
-import { Button, Layout, Result } from 'antd';
+import { Button, Result } from 'antd';
 import { t } from 'i18next';
 import React from 'react';
 import { useLinkClickHandler, useRouteError } from 'react-router-dom';
@@ -27,17 +27,15 @@ export const Error: React.FC<IErrorProps> = (props: IErrorProps) => {
     console.error(error);
 
     return (
-        <Layout style={{ minHeight: '100vh', justifyContent: 'center' }}>
-            <Result
-                status={error.status}
-                title={error.statusText}
-                subTitle={error.message}
-                extra={
-                    <Button type="primary" onClick={backlink}>
-                        {t('common.backHome').toString()}
-                    </Button>
-                }
-            />
-        </Layout>
+        <Result
+            status={error.status}
+            title={error.statusText}
+            subTitle={error.message}
+            extra={
+                <Button type="primary" onClick={backlink}>
+                    {t('common.backHome').toString()}
+                </Button>
+            }
+        />
     );
 };

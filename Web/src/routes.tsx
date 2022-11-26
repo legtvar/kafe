@@ -1,11 +1,10 @@
 import { GroupOutlined, HomeOutlined, PlaySquareOutlined, VideoCameraOutlined } from '@ant-design/icons';
-import { ProjectDetail } from './pages/projects/ProjectDetail';
+import { ProjectDetailWrapper } from './pages/projects/ProjectDetailWrapper';
 import { ProjectsPage } from './pages/projects/ProjectsPage';
 
 export type AppRoute = {
     path: string;
     title: string;
-    subtitle?: string;
     icon?: React.ReactNode;
     element: React.ReactNode;
     inMenu?: boolean;
@@ -30,7 +29,7 @@ export const routes = (t: (id: string) => string): AppRoute[] => [
             {
                 path: ':id',
                 title: t('route.projects.detail.title'),
-                element: <ProjectDetail />,
+                element: <ProjectDetailWrapper />,
             },
         ],
     },

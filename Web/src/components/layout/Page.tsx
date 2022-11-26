@@ -1,14 +1,15 @@
 import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
-import { Layout, PageHeader } from 'antd';
+import { Affix, Layout, PageHeader, PageHeaderProps } from 'antd';
 import ErrorBoundary from 'antd/lib/alert/ErrorBoundary';
 import { t } from 'i18next';
 import React, { useEffect } from 'react';
 import { useOutlet, useOutletContext } from 'react-router-dom';
 
 export interface IPageProps {
-    title: string;
+    title?: string;
     subtitle?: string;
     children: React.ReactNode;
+    headerProps?: PageHeaderProps;
 }
 
 export type PageOutletContext = {
@@ -22,9 +23,10 @@ export const Page: React.FC<IPageProps> = (props) => {
     const { collapsed, setCollapsed } = outletContext;
     const outlet = useOutlet(outletContext);
     const { title, subtitle, children } = props;
+    const headerProps = props.headerProps || {};
 
     useEffect(() => {
-        document.title = t('layout.title-prefix') + title;
+        document.title = title ? t('layout.title-prefix') + ' - ' + title : t('layout.title-prefix');
     }, [title]);
 
     if (outlet) {
@@ -33,16 +35,19 @@ export const Page: React.FC<IPageProps> = (props) => {
 
     return (
         <>
-            <Layout.Header className="kafe-layout-header">
-                <PageHeader
-                    backIcon={React.createElement(collapsed ? MenuUnfoldOutlined : MenuFoldOutlined, {
-                        className: 'trigger',
-                    })}
-                    onBack={() => setCollapsed(!collapsed)}
-                    title={title}
-                    subTitle={subtitle}
-                />
-            </Layout.Header>
+            <Affix offsetTop={0}>
+                <Layout.Header className="kafe-layout-header">
+                    <PageHeader
+                        backIcon={React.createElement(collapsed ? MenuUnfoldOutlined : MenuFoldOutlined, {
+                            className: 'trigger',
+                        })}
+                        onBack={() => setCollapsed(!collapsed)}
+                        title={title}
+                        subTitle={subtitle}
+                        {...headerProps}
+                    />
+                </Layout.Header>
+            </Affix>
             <Layout.Content style={{ margin: '24px 16px 0' }}>
                 <ErrorBoundary>
                     <div className="kafe-layout-content">{children}</div>

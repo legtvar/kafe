@@ -8,7 +8,7 @@
     "footer": {
       "copy": "Created with <1>❤️</1> and ☕ by <3>LEMMA</3>"
     },
-    "title-prefix": "Kafe - "
+    "title-prefix": "Kafe"
   },
   "route": {
     "groups": {
@@ -28,13 +28,23 @@
     }
   },
   "project": {
-    "locked": "Project is locked"
+    "locked": "Project is locked",
+    "annotation": "Annotation",
+    "actors": "Actors",
+    "crew": "Film crew"
   },
   "error": {
     "invalidPath": "URL path is invalid",
     "projectDoesNotExist": "Project with the given ID does not exist"
   },
   "common": {
-    "backHome": "Back Home"
+    "backHome": "Back Home",
+    "edit": "Edit",
+    "save": "Save",
+    "cancel": "Cancel"
+  },
+  "projects": {
+    "title": "My projects",
+    "detail": "Detail"
   }
 }

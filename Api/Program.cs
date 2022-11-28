@@ -8,6 +8,9 @@ public static class Program
     {
         var builder = Host.CreateDefaultBuilder(args)
             .ConfigureWebHostDefaults(builder => {
+                builder.ConfigureAppConfiguration(c => {
+                   c.AddJsonFile("appsettings.local.json");
+                });
                 builder.UseStartup<Startup>();
             });
 

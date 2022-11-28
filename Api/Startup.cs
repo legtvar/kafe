@@ -1,10 +1,9 @@
+using System.Security.Claims;
+using idunno.Authentication.Basic;
 using Kafe.Data;
 using Kafe.Endpoints;
-using Marten;
-using Marten.Events;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Models;
-using Weasel.Core;
 
 namespace Kafe.Api;
 
@@ -21,6 +20,39 @@ public class Startup
 
     public void ConfigureServices(IServiceCollection services)
     {
+        services.AddAuthentication("basic")
+            .AddBasic("basic", o =>
+            {
+                o.Realm = "Basic Authentication";
+                o.Events = new BasicAuthenticationEvents
+                {
+                    OnValidateCredentials = context =>
+                    {
+                        if (context.Username == Configuration["Authentication:Basic:Username"]
+                            && context.Password == Configuration["Authentication:Basic:Password"])
+                        {
+                            var claims = new[]
+                            {
+                                new Claim(
+                                    ClaimTypes.NameIdentifier,
+                                    context.Username,
+                                    ClaimValueTypes.String,
+                                    context.Options.ClaimsIssuer),
+                                new Claim(
+                                    ClaimTypes.Name,
+                                    context.Username,
+                                    ClaimValueTypes.String,
+                                    context.Options.ClaimsIssuer)
+                            };
+
+                            context.Principal = new ClaimsPrincipal(new ClaimsIdentity(claims, context.Scheme.Name));
+                            context.Success();
+                        }
+
+                        return Task.CompletedTask;
+                    }
+                };
+            });
         services.AddAuthorization();
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen(o =>
@@ -43,6 +75,7 @@ public class Startup
 
         app.UseRouting();
 
+        app.UseAuthentication();
         app.UseAuthorization();
 
         if (environment.IsDevelopment())

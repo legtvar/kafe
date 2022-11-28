@@ -4,5 +4,3 @@ RUN dotnet publish /kafe/src --configuration Release --output /kafe/publish --ru
 
 FROM mcr.microsoft.com/dotnet/aspnet:6.0
 COPY --from=builder /kafe/publish /kafe
-
-RUN /kafe/Kafe.Api

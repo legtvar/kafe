@@ -24,6 +24,7 @@ public class Startup
             .AddBasic("basic", o =>
             {
                 o.Realm = "Basic Authentication";
+                o.AllowInsecureProtocol = true;
                 o.Events = new BasicAuthenticationEvents
                 {
                     OnValidateCredentials = context =>

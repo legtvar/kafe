@@ -1,5 +1,6 @@
 stages:
   - build
+  - deploy
 
 build-api:
   image: alpine:latest

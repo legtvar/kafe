@@ -25,6 +25,8 @@ services:
       - db
     networks:
       backbone:
+        aliases:
+          - kafe-api
       default:
     restart: always
 

@@ -4,13 +4,13 @@ services:
   db:
     image: postgres:13-alpine
     ports:
-      - 5433:5432
+      - 5434:5432
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     environment:
-      - POSTGRES_DB=lemmars
-      - POSTGRES_USER=lemmars
-      - POSTGRES_PASSWORD=lemmars
+      - POSTGRES_DB=kafe
+      - POSTGRES_USER=kafe
+      - POSTGRES_PASSWORD=kafe
     restart: always
 
   api:
@@ -23,17 +23,10 @@ services:
       - 44369
     depends_on:
       - db
-    configs:
-      - source: appsettings
-        target: /kafe/appsettings.local.json
     networks:
       backbone:
       default:
     restart: always
-
-configs:
-  appsettings:
-    file: ./Api/appsettings.local.json
 
 volumes:
   postgres_data:

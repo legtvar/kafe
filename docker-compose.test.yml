@@ -1,0 +1,43 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres:13-alpine
+    ports:
+      - 5433:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_DB=lemmars
+      - POSTGRES_USER=lemmars
+      - POSTGRES_PASSWORD=lemmars
+    restart: always
+
+  api:
+    build:
+      context: ./Api
+      dockerfile: Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    expose:
+      - 44369
+    depends_on:
+      - db
+    configs:
+      - source: appsettings
+        target: /kafe/appsettings.local.json
+    networks:
+      backbone:
+      default:
+    restart: always
+
+configs:
+  appsettings:
+    file: ./Api/appsettings.local.json
+
+volumes:
+  postgres_data:
+
+networks:
+    backbone:
+      external: true

@@ -18,21 +18,31 @@ build-api:
     - ci
     - api
 
-build-web:
-  image: alpine:latest
-  stage: build
+publish-api-test:
+  image: docker/compose:alpine-1.29.2
+  stage: deploy
   script:
-    - apk update
-    - apk add npm
-    - cd Web
-    - npm ci
-    - npm run build
-  tags:
-    - shared-fi
-  cache:
-    paths:
-      - Web/node_modules
+    - docker-compose -f docker-compose.test.yml build
+    - docker-compose -f docker-compose.test.yml down
+    - docker-compose -f docker-compose.test.yml up -d
   only:
-    - master
-    - ci
-    - web
+    - api
+
+# build-web:
+#   image: alpine:latest
+#   stage: build
+#   script:
+#     - apk update
+#     - apk add npm
+#     - cd Web
+#     - npm ci
+#     - npm run build
+#   tags:
+#     - shared-fi
+#   cache:
+#     paths:
+#       - Web/node_modules
+#   only:
+#     - master
+#     - ci
+#     - web

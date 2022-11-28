@@ -16,6 +16,9 @@
 !*.yml
 !*.md
 
+# Docker
+!Dockerfile*
+
 # reignore output
 obj/
 bin/

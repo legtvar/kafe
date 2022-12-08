@@ -21,7 +21,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
     command: /kafe/Kafe.Api
     expose:
-      - 44369
+      - 80
     depends_on:
       - db
     networks:

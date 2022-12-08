@@ -8,9 +8,9 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     environment:
-      - POSTGRES_DB=kafe
-      - POSTGRES_USER=kafe
-      - POSTGRES_PASSWORD=kafe
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
     restart: always
 
   api:

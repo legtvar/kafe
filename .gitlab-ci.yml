@@ -22,7 +22,7 @@ build-api:
 migrate-wma:
   image: alpine:latest
   stage: deploy
-  dependencies:
+  needs:
     - publish-api-test
   script:
     - apk update

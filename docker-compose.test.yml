@@ -3,13 +3,12 @@ version: "3.8"
 services:
   db:
     image: postgres:13-alpine
-    ports:
-      - 5434:5432
+    expose:
+      - 5432
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     environment:
       - POSTGRES_DB=postgres
-      - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
     networks:
       default:

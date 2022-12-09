@@ -34,10 +34,9 @@ migrate-wma:
   only:
     - api
   tags:
-    - lemma-new
+    - lemma-new-docker
 
 publish-api-test:
-  image: docker/compose:alpine-1.29.2
   stage: deploy
   script:
     - cp "$APPSETTINGS_TEST" "./Api/appsettings.local.json"

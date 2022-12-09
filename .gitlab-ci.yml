@@ -24,10 +24,12 @@ migrate-wma:
   stage: deploy
   needs:
     - publish-api-test
+  variables:
+    PGPASSWORD: postgres
   script:
     - apk update
     - apk add dotnet6-sdk postgresql-client
-    - cat /mnt/kafe/lemma-15-08-2022-all.sql | psql -h kafe-db -p 5432 -U postgres -W postgres
+    - cat /mnt/kafe/lemma-15-08-2022-all.sql | psql -h kafe-db -p 5432 -U postgres
     - dotnet build Migrator
     - cp "$APPSETTINGS_TEST" "./Migrator/appsettings.json"
     - dotnet run --project Migrator

@@ -19,6 +19,22 @@ build-api:
     - ci
     - api
 
+migrate-wma:
+  image: alpine:latest
+  stage: deploy
+  dependencies:
+    - publish-api-test
+  script:
+    - apk update
+    - apk add dotnet6-sdk
+    - dotnet build Migrator
+    - cp "$APPSETTINGS_TEST" "./Migrator/appsettings.json"
+    - dotnet run --project Migrator
+  only:
+    - api
+  tags:
+    - lemma-new
+
 publish-api-test:
   image: docker/compose:alpine-1.29.2
   stage: deploy

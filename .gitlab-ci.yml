@@ -27,7 +27,7 @@ migrate-wma:
   script:
     - apk update
     - apk add dotnet6-sdk postgresql-client
-    - cat /mnt/kafe/lemma-15-08-2022-all.sql | psql -h db -p 5432
+    - cat /mnt/kafe/lemma-15-08-2022-all.sql | psql -h kafe-db -p 5432
     - dotnet build Migrator
     - cp "$APPSETTINGS_TEST" "./Migrator/appsettings.json"
     - dotnet run --project Migrator

@@ -1,6 +1,7 @@
 using Ardalis.ApiEndpoints;
 using Asp.Versioning;
 using Kafe.Data.Aggregates;
+using Kafe.Transfer;
 using Marten;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,7 +13,7 @@ namespace Kafe.Endpoints;
 [Authorize]
 public class ProjectGroupListEndpoint : EndpointBaseAsync
     .WithoutRequest
-    .WithActionResult<List<ProjectGroup>>
+    .WithActionResult<List<ProjectGroupListDto>>
 {
     private readonly IQuerySession db;
 
@@ -22,9 +23,10 @@ public class ProjectGroupListEndpoint : EndpointBaseAsync
     }
     
     [HttpGet]
-    public override async Task<ActionResult<List<ProjectGroup>>>HandleAsync(
+    public override async Task<ActionResult<List<ProjectGroupListDto>>>HandleAsync(
         CancellationToken cancellationToken = default)
     {
-        return Ok(await db.Query<ProjectGroup>().ToListAsync());
+        var projectGroups = await db.Query<ProjectGroup>().ToListAsync(cancellationToken);
+        return Ok(projectGroups.Select(TransferMaps.ToProjectGroupListDto).ToList());
     }
 }

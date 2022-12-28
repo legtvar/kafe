@@ -1,6 +1,8 @@
+using System.Linq;
 using Ardalis.ApiEndpoints;
 using Asp.Versioning;
 using Kafe.Data.Aggregates;
+using Kafe.Transfer;
 using Marten;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,7 +14,7 @@ namespace Kafe.Endpoints;
 [Authorize]
 public class AuthorListEndpoint : EndpointBaseAsync
     .WithoutRequest
-    .WithActionResult<List<Author>>
+    .WithActionResult<List<AuthorListDto>>
 {
     private readonly IQuerySession db;
 
@@ -20,11 +22,12 @@ public class AuthorListEndpoint : EndpointBaseAsync
     {
         this.db = db;
     }
-    
+
     [HttpGet]
-    public override async Task<ActionResult<List<Author>>>HandleAsync(
+    public override async Task<ActionResult<List<AuthorListDto>>> HandleAsync(
         CancellationToken cancellationToken = default)
     {
-        return Ok(await db.Query<Author>().ToListAsync());
+        var authors = await db.Query<Author>().ToListAsync(cancellationToken);
+        return Ok(authors.Select(TransferMaps.ToAuthorListDto).ToList());
     }
 }

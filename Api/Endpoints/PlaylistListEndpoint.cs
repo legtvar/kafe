@@ -1,6 +1,7 @@
 using Ardalis.ApiEndpoints;
 using Asp.Versioning;
 using Kafe.Data.Aggregates;
+using Kafe.Transfer;
 using Marten;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,7 +13,7 @@ namespace Kafe.Endpoints;
 [Authorize]
 public class PlaylistListEndpoint : EndpointBaseAsync
     .WithoutRequest
-    .WithActionResult<List<Playlist>>
+    .WithActionResult<List<PlaylistListDto>>
 {
     private readonly IQuerySession db;
 
@@ -22,9 +23,10 @@ public class PlaylistListEndpoint : EndpointBaseAsync
     }
     
     [HttpGet]
-    public override async Task<ActionResult<List<Playlist>>>HandleAsync(
+    public override async Task<ActionResult<List<PlaylistListDto>>>HandleAsync(
         CancellationToken cancellationToken = default)
     {
-        return Ok(await db.Query<Playlist>().ToListAsync());
+        var playlists = await db.Query<Playlist>().ToListAsync(cancellationToken);
+        return Ok(playlists.Select(TransferMaps.ToPlaylistListDto).ToList());
     }
 }

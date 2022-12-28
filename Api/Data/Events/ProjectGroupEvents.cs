@@ -8,7 +8,7 @@ public record ProjectGroupInfoChanged(
     string? Description = null,
     string? EnglishName = null,
     string? EnglishDescription = null,
-    DateTimeOffset? Deadline = null);
+    DateTimeOffset Deadline = default);
 public record ProjectGroupOpened;
 public record ProjectGroupClosed;
 public record ProjectGroupValidationRulesChanged(

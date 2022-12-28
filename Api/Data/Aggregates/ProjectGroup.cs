@@ -11,7 +11,7 @@ public record ProjectGroup(
     string? Description = null,
     string? EnglishName = null,
     string? EnglishDescription = null,
-    DateTimeOffset? Deadline = default,
+    DateTimeOffset Deadline = default,
     bool IsOpen = false,
     ValidationRules? ValidationRules = null
 );

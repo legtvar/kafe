@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using System.Text.Json.Serialization;
 using idunno.Authentication.Basic;
 using Kafe.Data;
 using Kafe.Endpoints;
@@ -66,6 +67,10 @@ public class Startup
         services.AddControllers(o =>
         {
             o.Conventions.Add(new RoutePrefixConvention(new RouteAttribute("/api/v{version:apiVersion}")));
+        })
+        .AddJsonOptions(o =>
+        {
+            o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
         });
         services.AddApiVersioning(o => o.ReportApiVersions = true);
     }

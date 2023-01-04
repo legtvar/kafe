@@ -14,7 +14,8 @@ public static class TransferMaps
             Description: data.Description,
             EnglishName: data.EnglishName,
             EnglishDescription: data.EnglishDescription,
-            Visibility: data.Visibility);
+            Visibility: data.Visibility,
+            ReleaseDate: data.ReleaseDate);
     }
 
     public static ProjectDetailDto ToProjectDetailDto(Project data)

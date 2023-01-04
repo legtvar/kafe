@@ -60,6 +60,8 @@ public class Startup
         services.AddSwaggerGen(o =>
         {
             o.SwaggerDoc("v1", new OpenApiInfo { Title = "KAFE API", Version = "v1" });
+            o.SupportNonNullableReferenceTypes();
+            o.SchemaFilter<RequireNonNullablePropertiesSchemaFilter>();
             o.EnableAnnotations();
         });
 

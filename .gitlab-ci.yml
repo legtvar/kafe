@@ -7,7 +7,7 @@ build-api:
   stage: build
   script:
     - apk update
-    - apk add dotnet6-sdk
+    - apk add dotnet7-sdk
     - dotnet build Kafe.sln
   tags:
     - shared-fi

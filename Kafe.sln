@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kafe.Migrator", "Migrator\K
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kafe.Tests", "Tests\Kafe.Tests.csproj", "{58B4DB5E-3C7B-4853-BEB9-46616D3FF7BA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kafe.Ruv", "Ruv\Kafe.Ruv.csproj", "{F6AA5B2C-FADA-4B93-BC4C-5E076C93E85F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{58B4DB5E-3C7B-4853-BEB9-46616D3FF7BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{58B4DB5E-3C7B-4853-BEB9-46616D3FF7BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{58B4DB5E-3C7B-4853-BEB9-46616D3FF7BA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F6AA5B2C-FADA-4B93-BC4C-5E076C93E85F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F6AA5B2C-FADA-4B93-BC4C-5E076C93E85F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F6AA5B2C-FADA-4B93-BC4C-5E076C93E85F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F6AA5B2C-FADA-4B93-BC4C-5E076C93E85F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

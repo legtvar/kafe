@@ -12,7 +12,8 @@ public static class Db
     {
         services.AddMarten(options =>
         {
-            options.Connection(configuration.GetConnectionString("KAFE"));
+            options.Connection(configuration.GetConnectionString("KAFE")
+                ?? throw new ArgumentException("The KAFE connection string is missing!"));
             options.Events.StreamIdentity = StreamIdentity.AsString;
             if (environment.IsDevelopment())
             {
@@ -20,7 +21,8 @@ public static class Db
             }
             options.CreateDatabasesForTenants(c =>
             {
-                c.MaintenanceDatabase(configuration.GetConnectionString("postgres"));
+                c.MaintenanceDatabase(configuration.GetConnectionString("postgres")
+                    ?? throw new ArgumentException("The postgres connection string is missing!"));
                 c.ForTenant()
                     .CheckAgainstPgDatabase()
                     .WithOwner("postgres")

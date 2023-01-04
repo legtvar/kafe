@@ -22,7 +22,8 @@ public static class Program
             {
                 services.AddDbContext<LemmaContext>(options =>
                 {
-                    options.UseNpgsql(context.Configuration.GetConnectionString("WMA"));
+                    options.UseNpgsql(context.Configuration.GetConnectionString("WMA")
+                        ?? throw new ArgumentException("The WMA connection string is missing!"));
                 }
                 );
                 Db.AddDb(services, context.Configuration, context.HostingEnvironment);

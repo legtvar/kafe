@@ -5,17 +5,13 @@ namespace Kafe.Transfer;
 
 public record PlaylistListDto(
     string Id,
-    string? Name,
-    string? Description,
-    string? EnglishName,
-    string? EnglishDescription,
+    LocalizedString Name,
+    LocalizedString? Description,
     Visibility Visibility);
 
 public record PlaylistDetailDto(
     string Id,
-    string? Name,
-    string? Description,
-    string? EnglishName,
-    string? EnglishDescription,
-    Visibility? Visibility,
+    LocalizedString Name,
+    LocalizedString? Description,
+    Visibility Visibility,
     ImmutableArray<string> Videos);

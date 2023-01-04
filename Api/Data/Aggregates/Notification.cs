@@ -12,8 +12,7 @@ public record Notification(
     ImmutableArray<string> Recipients,
     string? ProjectId,
     string? VideoId,
-    string? Description,
-    string? EnglishDescription,
+    LocalizedString Description,
     bool IsSent = false
 );
 
@@ -35,8 +34,7 @@ public class NotificationProjection : SingleStreamAggregation<Notification>
                 : e.Data.Recipients.Value,
             ProjectId: e.Data.ProjectId,
             VideoId: e.Data.VideoId,
-            Description: e.Data.Description,
-            EnglishDescription: e.Data.EnglishDescription
+            Description: e.Data.Description
         );
     }
     

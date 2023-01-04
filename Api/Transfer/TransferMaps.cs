@@ -12,8 +12,6 @@ public static class TransferMaps
             ProjectGroupId: data.ProjectGroupId,
             Name: data.Name,
             Description: data.Description,
-            EnglishName: data.EnglishName,
-            EnglishDescription: data.EnglishDescription,
             Visibility: data.Visibility,
             ReleaseDate: data.ReleaseDate);
     }
@@ -25,8 +23,6 @@ public static class TransferMaps
             ProjectGroupId: data.ProjectGroupId,
             Name: data.Name,
             Description: data.Description,
-            EnglishName: data.EnglishName,
-            EnglishDescription: data.EnglishDescription,
             Visibility: data.Visibility,
             Authors: data.Authors.Select(a => a.Id).ToImmutableArray(),
             ReleaseDate: data.ReleaseDate);
@@ -55,8 +51,6 @@ public static class TransferMaps
             Id: data.Id,
             Name: data.Name,
             Description: data.Description,
-            EnglishName: data.EnglishName,
-            EnglishDescription: data.EnglishDescription,
             Visibility: data.Visibility);
     }
 
@@ -66,8 +60,6 @@ public static class TransferMaps
             Id: data.Id,
             Name: data.Name,
             Description: data.Description,
-            EnglishName: data.EnglishName,
-            EnglishDescription: data.EnglishDescription,
             Visibility: data.Visibility,
             Videos: data.Videos);
     }
@@ -78,8 +70,6 @@ public static class TransferMaps
             Id: data.Id,
             Name: data.Name,
             Description: data.Description,
-            EnglishName: data.EnglishName,
-            EnglishDescription: data.EnglishDescription,
             Deadline: data.Deadline,
             IsOpen: data.IsOpen);
     }
@@ -90,8 +80,6 @@ public static class TransferMaps
             Id: data.Id,
             Name: data.Name,
             Description: data.Description,
-            EnglishName: data.EnglishName,
-            EnglishDescription: data.EnglishDescription,
             Deadline: data.Deadline,
             IsOpen: data.IsOpen,
             ValidationRules: data.ValidationRules);

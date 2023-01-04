@@ -7,10 +7,8 @@ namespace Kafe.Data.Aggregates;
 public record ProjectGroup(
     string Id,
     CreationMethod CreationMethod,
-    string? Name = null,
-    string? Description = null,
-    string? EnglishName = null,
-    string? EnglishDescription = null,
+    LocalizedString Name,
+    LocalizedString? Description = null,
     DateTimeOffset Deadline = default,
     bool IsOpen = false,
     ValidationRules? ValidationRules = null
@@ -26,7 +24,8 @@ public class ProjectGroupProjection : SingleStreamAggregation<ProjectGroup>
     {
         return new ProjectGroup(
             Id: e.StreamKey!,
-            CreationMethod: e.Data.CreationMethod
+            CreationMethod: e.Data.CreationMethod,
+            Name: e.Data.Name
         );
     }
 
@@ -34,11 +33,9 @@ public class ProjectGroupProjection : SingleStreamAggregation<ProjectGroup>
     {
         return g with
         {
-            Name = e.Name,
-            Description = e.Description,
-            EnglishName = e.EnglishName,
-            EnglishDescription = e.EnglishDescription,
-            Deadline = e.Deadline
+            Name = e.Name ?? g.Name,
+            Description = e.Description ?? g.Description,
+            Deadline = e.Deadline ?? g.Deadline
         };
     }
 

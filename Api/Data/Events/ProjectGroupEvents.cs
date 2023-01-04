@@ -1,14 +1,13 @@
 namespace Kafe.Data.Events;
 
 public record ProjectGroupCreated(
-    CreationMethod CreationMethod
+    CreationMethod CreationMethod,
+    LocalizedString Name
 );
 public record ProjectGroupInfoChanged(
-    string? Name = null,
-    string? Description = null,
-    string? EnglishName = null,
-    string? EnglishDescription = null,
-    DateTimeOffset Deadline = default);
+    LocalizedString? Name = null,
+    LocalizedString? Description = null,
+    DateTimeOffset? Deadline = null);
 public record ProjectGroupOpened;
 public record ProjectGroupClosed;
 public record ProjectGroupValidationRulesChanged(

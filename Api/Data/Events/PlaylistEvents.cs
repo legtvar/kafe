@@ -1,14 +1,14 @@
 namespace Kafe.Data.Events;
 
 public record PlaylistCreated(
-    CreationMethod CreationMethod
+    CreationMethod CreationMethod,
+    LocalizedString Name,
+    Visibility Visibility
 );
 public record PlaylistInfoChanged(
-    string? Name = null,
-    string? Description = null,
-    string? EnglishName = null,
-    string? EnglishDescription = null,
-    Visibility Visibility = Visibility.Unknown
+    LocalizedString? Name = null,
+    LocalizedString? Description = null,
+    Visibility? Visibility = null
 );
 public record PlaylistVideoAdded(
     string VideoId

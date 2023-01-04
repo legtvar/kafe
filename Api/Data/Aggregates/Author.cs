@@ -5,9 +5,9 @@ using Marten.Events;
 namespace Kafe.Data.Aggregates;
 
 public record Author(
-    string Id = Hrib.Invalid,
-    CreationMethod CreationMethod = CreationMethod.Unknown,
-    string? Name = null,
+    string Id,
+    CreationMethod CreationMethod,
+    string Name,
     string? Uco = null,
     string? Email = null,
     string? Phone = null);
@@ -20,17 +20,20 @@ public class AuthorProjection : SingleStreamAggregation<Author>
 
     public Author Create(IEvent<AuthorCreated> e)
     {
-        return new Author(Id: e.StreamKey!, CreationMethod: e.Data.CreationMethod);
+        return new Author(
+            Id: e.StreamKey!,
+            CreationMethod: e.Data.CreationMethod,
+            Name: e.Data.Name);
     }
 
     public Author Apply(AuthorInfoChanged e, Author a)
     {
         return a with
         {
-            Name = e.Name,
-            Uco = e.Uco,
-            Email = e.Email,
-            Phone = e.Phone
+            Name = e.Name ?? a.Name,
+            Uco = e.Uco ?? a.Uco,
+            Email = e.Email ?? a.Email,
+            Phone = e.Phone ?? a.Phone
         };
     }
 }

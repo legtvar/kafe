@@ -8,8 +8,7 @@ public record NotificationCreated(
     ImmutableArray<string>? Recipients,
     string? ProjectId,
     string? VideoId,
-    string? Description,
-    string? EnglishDescription
+    LocalizedString Description
 );
 
 public record NotificationSent;

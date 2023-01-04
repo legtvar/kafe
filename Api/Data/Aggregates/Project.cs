@@ -10,13 +10,10 @@ public record Project(
     CreationMethod CreationMethod,
     string ProjectGroupId,
     ImmutableArray<ProjectAuthor> Authors,
-    string? Name = null,
-    string? Description = null,
-    string? EnglishName = null,
-    string? EnglishDescription = null,
+    LocalizedString Name,
+    LocalizedString? Description = null,
     Visibility Visibility = Visibility.Unknown,
-    DateTimeOffset ReleaseDate = default,
-    string? Link = null
+    DateTimeOffset ReleaseDate = default
 );
 
 public record ProjectAuthor(
@@ -36,19 +33,18 @@ public class ProjectProjection : SingleStreamAggregation<Project>
             Id: e.StreamKey!,
             CreationMethod: e.Data.CreationMethod,
             ProjectGroupId: e.Data.ProjectGroupId,
-            Authors: ImmutableArray.Create<ProjectAuthor>());
+            Authors: ImmutableArray.Create<ProjectAuthor>(),
+            Name: e.Data.Name,
+            Visibility: e.Data.Visibility);
     }
     
     public Project Apply(ProjectInfoChanged e, Project p)
     {
         return p with {
-            Name = e.Name,
-            Description = e.Description,
-            EnglishName = e.EnglishName,
-            EnglishDescription = e.EnglishDescription,
-            Visibility = e.Visibility,
-            ReleaseDate = e.ReleaseDate,
-            Link = e.Link
+            Name = e.Name ?? p.Name,
+            Description = e.Description ?? p.Description,
+            Visibility = e.Visibility ?? p.Visibility,
+            ReleaseDate = e.ReleaseDate ?? p.ReleaseDate
         };
     }
 

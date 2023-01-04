@@ -4,7 +4,9 @@ namespace Kafe.Data.Events;
 
 public record ProjectCreated(
     CreationMethod CreationMethod,
-    string ProjectGroupId
+    string ProjectGroupId,
+    LocalizedString Name,
+    Visibility Visibility
 );
 public record ProjectAuthorAdded(
     string AuthorId,
@@ -14,17 +16,14 @@ public record ProjectAuthorRemoved(
     string AuthorId
 );
 public record ProjectInfoChanged(
-    string? Name = null,
-    string? Description = null,
-    string? EnglishName = null,
-    string? EnglishDescription = null,
-    Visibility Visibility = Visibility.Unknown,
-    DateTimeOffset ReleaseDate = default,
-    string? Link = null
+    LocalizedString? Name = null,
+    LocalizedString? Description = null,
+    Visibility? Visibility = null,
+    DateTimeOffset? ReleaseDate = null
 );
 public record ProjectVideoAdded(
     string VideoId,
-    string? Name = null,
+    LocalizedString Name,
     VideoKind Kind = default
 );
 public record ProjectVideoRemoved(
@@ -46,14 +45,14 @@ public record ProjectSubtitlesRemoved(
 );
 public record ProjectPassedAutomaticValidation;
 public record ProjectFailedAutomaticValidation(
-    string? Reason
+    LocalizedString Reason
 );
 public record ProjectPassedManualValidation;
 public record ProjectFailedManualValidation(
-    string? Reason
+    LocalizedString Reason
 );
 public record ProjectPassedDramaturgy;
 public record ProjectFailedDramaturgy(
-    string? Reason
+    LocalizedString Reason
 );
 public record ProjectValidationReset;

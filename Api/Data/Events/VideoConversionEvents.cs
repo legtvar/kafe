@@ -5,5 +5,5 @@ public record VideoConversionCreated(
 );
 public record VideoConversionCompleted;
 public record VideoConversionFailed(
-    string Reason
+    LocalizedString Reason
 );

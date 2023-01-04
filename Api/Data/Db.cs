@@ -1,6 +1,7 @@
 using Kafe.Data.Aggregates;
 using Marten;
 using Marten.Events;
+using Marten.Services.Json;
 using Weasel.Core;
 
 namespace Kafe.Data;
@@ -33,6 +34,7 @@ public static class Db
             options.Projections.Add<ProjectProjection>();
             options.Projections.Add<ProjectGroupProjection>();
             options.Projections.Add<VideoConversionProjection>();
+            options.UseDefaultSerialization(serializerType: SerializerType.SystemTextJson);
         });
     }
 }

@@ -1,10 +1,12 @@
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace Kafe.Data;
 
+[JsonConverter(typeof(LocalizedStringJsonConverter))]
 public sealed class LocalizedString : IEquatable<LocalizedString>
 {
     private ImmutableDictionary<string, string> data;
@@ -49,6 +51,26 @@ public sealed class LocalizedString : IEquatable<LocalizedString>
     public static LocalizedString Create(string invariantString, CultureInfo localCulture, string localString)
     {
         return Create((CultureInfo.InvariantCulture, invariantString), (localCulture, localString));
+    }
+
+    public static LocalizedString Invariant(string invariantString)
+    {
+        return Create((CultureInfo.InvariantCulture, invariantString));
+    }
+
+    public static explicit operator string?(LocalizedString? localized)
+    {
+        return localized?[CultureInfo.InvariantCulture];
+    }
+
+    [return: NotNullIfNotNull(nameof(invariantString))]
+    public static explicit operator LocalizedString?(string? invariantString)
+    {
+        if (invariantString is null)
+        {
+            return null;
+        }
+        return Invariant(invariantString);
     }
 
     public static bool operator ==(LocalizedString? lhs, LocalizedString? rhs)
@@ -96,6 +118,11 @@ public sealed class LocalizedString : IEquatable<LocalizedString>
     public override int GetHashCode()
     {
         return data.GetHashCode();
+    }
+
+    public override string? ToString()
+    {
+        return this[CultureInfo.CurrentCulture];
     }
 }
 

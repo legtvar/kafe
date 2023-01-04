@@ -9,10 +9,8 @@ public record Playlist(
     string Id,
     CreationMethod CreationMethod,
     ImmutableArray<string> Videos,
-    string? Name = null,
-    string? Description = null,
-    string? EnglishName = null,
-    string? EnglishDescription = null,
+    LocalizedString Name,
+    LocalizedString? Description = null,
     Visibility Visibility = Visibility.Unknown
 );
 
@@ -27,7 +25,9 @@ public class PlaylistProjection : SingleStreamAggregation<Playlist>
         return new Playlist(
             Id: e.StreamKey!,
             CreationMethod: e.Data.CreationMethod,
-            Videos: ImmutableArray.Create<string>()
+            Videos: ImmutableArray.Create<string>(),
+            Name: e.Data.Name,
+            Visibility: e.Data.Visibility
         );
     }
 
@@ -35,11 +35,9 @@ public class PlaylistProjection : SingleStreamAggregation<Playlist>
     {
         return p with
         {
-            Name = e.Name,
-            Description = e.Description,
-            EnglishName = e.EnglishName,
-            EnglishDescription = e.EnglishDescription,
-            Visibility = e.Visibility
+            Name = e.Name ?? p.Name,
+            Description = e.Description ?? p.Name,
+            Visibility = e.Visibility ?? p.Visibility
         };
     }
 

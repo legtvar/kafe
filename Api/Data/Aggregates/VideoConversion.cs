@@ -9,7 +9,7 @@ public record VideoConversion(
     string VideoId,
     bool IsCompleted = false,
     bool HasFailed = false,
-    string? Error = null
+    LocalizedString? Error = null
 );
 
 public class VideoConversionProjection : SingleStreamAggregation<VideoConversion>

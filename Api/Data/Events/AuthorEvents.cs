@@ -1,7 +1,8 @@
 namespace Kafe.Data.Events;
 
 public record AuthorCreated(
-    CreationMethod CreationMethod
+    CreationMethod CreationMethod,
+    string Name
 );
 public record AuthorInfoChanged(
     string? Name = null,

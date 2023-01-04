@@ -1,14 +1,15 @@
 using System.Collections.Immutable;
+using Kafe.Data;
 
 namespace Kafe.Transfer;
 
 public record AuthorListDto(
     string Id,
-    string? Name);
+    string Name);
 
 public record AuthorDetailDto(
     string Id,
-    string? Name,
+    string Name,
     string? Uco,
     string? Email,
     string? Phone);

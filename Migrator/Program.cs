@@ -2,10 +2,8 @@
 using Kafe.Data.Events;
 using Kafe.Lemma;
 using Marten;
-using Marten.Events;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
-using Weasel.Core;
 
 namespace Kafe.Migrator;
 
@@ -74,13 +72,13 @@ public static class Program
     private static Hrib MigrateProjectGroup(Projectgroup group)
     {
         var hrib = Hrib.Create();
-        var created = new ProjectGroupCreated(CreationMethod.Migrator);
-        var infoChanged = new ProjectGroupInfoChanged(group.Name);
+        var created = new ProjectGroupCreated(
+            CreationMethod.Migrator,
+            (LocalizedString)(group.Name ?? string.Format(Fallback.ProjectGroupName, hrib)));
         var closed = new ProjectGroupClosed();
         logger.LogInformation($"[{hrib}]: {created}");
-        logger.LogInformation($"[{hrib}]: {infoChanged}");
         logger.LogInformation($"[{hrib}]: {closed}");
-        var stream = kafe.Events.StartStream<Kafe.Data.Aggregates.ProjectGroup>(hrib, created, infoChanged, closed);
+        var stream = kafe.Events.StartStream<Kafe.Data.Aggregates.ProjectGroup>(hrib, created, closed);
         foreach (var project in group.Projects)
         {
             MigrateProject(project, hrib);
@@ -91,15 +89,16 @@ public static class Program
     private static Hrib MigrateProject(Project project, Hrib groupId)
     {
         var hrib = Hrib.Create();
-        var created = new ProjectCreated(CreationMethod.Migrator, groupId);
+        var created = new ProjectCreated(
+            CreationMethod: CreationMethod.Migrator,
+            ProjectGroupId: groupId,
+            Name: (LocalizedString)(project.Name ?? string.Format(Fallback.ProjectName, hrib)),
+            Visibility: project.Publicpseudosecret == true ? Visibility.Internal : Visibility.Private);
         var infoChanged = new ProjectInfoChanged(
-            Name: project.Name,
-            Description: project.Desc,
-            Visibility: project.Publicpseudosecret == true ? Visibility.Internal : Visibility.Private,
             ReleaseDate: project.ReleaseDate.HasValue
                 ? new DateTimeOffset(project.ReleaseDate.Value)
-                : default,
-            Link: project.Web);
+                : null,
+            Description: (LocalizedString?)project.Desc);
         logger.LogInformation($"[{hrib}]: {created}");
         logger.LogInformation($"[{hrib}]: {infoChanged}");
         var stream = kafe.Events.StartStream<Kafe.Data.Aggregates.Project>(hrib, created, infoChanged);
@@ -135,7 +134,9 @@ public static class Program
     private static Hrib MigrateVideo(Video video, Hrib projectId)
     {
         var hrib = Hrib.Create();
-        var added = new ProjectVideoAdded(hrib, video.Name);
+        var added = new ProjectVideoAdded(
+            VideoId: hrib,
+            Name: (LocalizedString)video.Name);
         videoMap.Add(video.Id, hrib);
         logger.LogInformation($"[{projectId}]: {added}");
         kafe.Events.Append(projectId, added);
@@ -145,14 +146,19 @@ public static class Program
     private static Hrib MigratePlaylist(Playlist playlist)
     {
         var hrib = Hrib.Create();
-        var created = new PlaylistCreated(CreationMethod.Migrator);
-        var infoChanged = new PlaylistInfoChanged(
-            Name: playlist.Name,
-            Description: playlist.Desc,
+        var created = new PlaylistCreated(
+            CreationMethod: CreationMethod.Migrator,
+            Name: (LocalizedString)(playlist.Name ?? string.Format(Fallback.PlaylistName, hrib)),
             Visibility: Visibility.Internal);
         logger.LogInformation($"[{hrib}]: {created}");
-        logger.LogInformation($"[{hrib}]: {infoChanged}");
-        kafe.Events.StartStream<Kafe.Data.Aggregates.Playlist>(hrib, created, infoChanged);
+        kafe.Events.StartStream<Kafe.Data.Aggregates.Playlist>(hrib, created);
+        if (!string.IsNullOrEmpty(playlist.Desc)) {
+            var infoChanged = new PlaylistInfoChanged(
+                Description: (LocalizedString?)playlist.Desc
+            );
+            kafe.Events.Append(hrib, infoChanged);
+            logger.LogInformation($"[{hrib}]: {infoChanged}");
+        }
 
         foreach (var item in playlist.Items.OrderBy(i => i.Position))
         {
@@ -171,9 +177,11 @@ public static class Program
     private static Hrib CreateAuthor(string? name, string? uco, string? email, string? phone)
     {
         var hrib = Hrib.Create();
-        var created = new AuthorCreated(CreationMethod.Migrator);
+        name ??= string.Format(Fallback.ProjectName, hrib);
+        var created = new AuthorCreated(
+            CreationMethod: CreationMethod.Migrator,
+            Name: name);
         var infoChanged = new AuthorInfoChanged(
-            Name: name,
             Uco: uco,
             Email: email,
             Phone: phone);

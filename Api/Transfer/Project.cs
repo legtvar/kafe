@@ -6,10 +6,8 @@ namespace Kafe.Transfer;
 public record ProjectListDto(
     string Id,
     string ProjectGroupId,
-    string? Name,
-    string? Description,
-    string? EnglishName,
-    string? EnglishDescription,
+    LocalizedString Name,
+    LocalizedString? Description,
     Visibility Visibility,
     DateTimeOffset ReleaseDate
     // string? Thumbnail
@@ -20,10 +18,8 @@ public record ProjectDetailDto(
     string Id,
     string ProjectGroupId,
     // string ProjectGroupName,
-    string? Name,
-    string? Description,
-    string? EnglishName,
-    string? EnglishDescription,
+    LocalizedString Name,
+    LocalizedString? Description,
     Visibility Visibility,
     ImmutableArray<string> Authors,
     DateTimeOffset ReleaseDate

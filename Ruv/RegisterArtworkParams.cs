@@ -1,3 +1,5 @@
+using System.Collections.Immutable;
+
 namespace Kafe.Ruv;
 
 public enum RegisterArtworkEnum

@@ -1,40 +1,40 @@
-﻿using System;
+﻿using FFMpegCore;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Xabe.FFmpeg;
 
 namespace Kafe.Media;
 
-public class XabeFFmpegService : IMediaService
+public class FFMpegCoreService : IMediaService
 {
     public async Task<MediaInfo> GetInfo(string filePath)
     {
-        var data = await FFmpeg.GetMediaInfo(filePath);
+        var data = await FFProbe.AnalyseAsync(filePath);
 
         var videoInfos = data.VideoStreams
             .Select(v => new VideoInfo(
-                Codec: v.Codec,
-                Bitrate: v.Bitrate,
+                Codec: v.CodecName,
+                Bitrate: v.BitRate,
                 Width: v.Width,
                 Height: v.Height,
-                Framerate: v.Framerate))
+                Framerate: v.FrameRate))
             .ToImmutableArray();
 
         var audioInfos = data.AudioStreams
             .Select(a => new AudioInfo(
-                Codec: a.Codec,
-                Bitrate: a.Bitrate,
+                Codec: a.CodecName,
+                Bitrate: a.BitRate,
                 Channels: a.Channels,
-                SampleRate: a.SampleRate))
+                SampleRate: a.SampleRateHz))
             .ToImmutableArray();
 
         var subtitleInfos = data.SubtitleStreams
             .Select(s => new SubtitleInfo(
-                Codec: s.Codec,
-                Bitrate: default))
+                Codec: s.CodecName,
+                Bitrate: s.BitRate))
             .ToImmutableArray();
 
         return new MediaInfo(

@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 
 namespace Kafe.Media;
 
-public record AudioInfo
-{
-}
+public record AudioInfo(
+    string Codec,
+    long Bitrate,
+    int Channels,
+    int SampleRate);

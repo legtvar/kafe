@@ -10,7 +10,6 @@ namespace Kafe.Media;
 public record MediaInfo(
     string Path,
     TimeSpan Duration,
-    DateTimeOffset? CreationTime,
     ImmutableArray<VideoInfo> VideoStreams,
     ImmutableArray<AudioInfo> AudioStreams,
     ImmutableArray<SubtitleInfo> SubtitleStreams);

@@ -6,6 +6,6 @@ using System.Threading.Tasks;
 
 namespace Kafe.Media;
 
-public record SubtitleInfo
-{
-}
+public record SubtitleInfo(
+    string Codec,
+    long Bitrate);

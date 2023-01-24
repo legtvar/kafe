@@ -4,6 +4,7 @@ using Kafe.Lemma;
 using Marten;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
+using LemmaVideo = Kafe.Lemma.Video;
 
 namespace Kafe.Migrator;
 
@@ -132,7 +133,7 @@ public static class Program
         return hrib;
     }
 
-    private static Hrib MigrateVideo(Video video, Hrib projectId)
+    private static Hrib MigrateVideo(LemmaVideo video, Hrib projectId)
     {
         var hrib = Hrib.Create();
         var added = new ProjectVideoAdded(

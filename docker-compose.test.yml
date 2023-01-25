@@ -19,7 +19,7 @@ services:
 
   api:
     build:
-      context: ./Api
+      context: ./
       dockerfile: Dockerfile
     environment:
       - ASPNETCORE_ENVIRONMENT=Development

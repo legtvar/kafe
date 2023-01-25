@@ -37,6 +37,7 @@ migrate-wma:
     - api
   tags:
     - lemma-new-docker
+  when: manual
 
 publish-api-test:
   stage: deploy

@@ -81,6 +81,8 @@ public class Startup
     public void Configure(IApplicationBuilder app, IHostEnvironment environment)
     {
         app.UseHttpsRedirection();
+
+        app.UseDefaultFiles();
         app.UseStaticFiles();
 
         app.UseRouting();

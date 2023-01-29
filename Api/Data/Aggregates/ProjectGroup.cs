@@ -12,7 +12,7 @@ public record ProjectGroup(
     DateTimeOffset Deadline = default,
     bool IsOpen = false,
     ValidationRules? ValidationRules = null
-);
+) : IEntity;
 
 public class ProjectGroupProjection : SingleStreamAggregation<ProjectGroup>
 {

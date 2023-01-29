@@ -14,7 +14,7 @@ public record Project(
     LocalizedString? Description = null,
     Visibility Visibility = Visibility.Unknown,
     DateTimeOffset ReleaseDate = default
-);
+) : IEntity;
 
 public record ProjectAuthor(
     string Id,

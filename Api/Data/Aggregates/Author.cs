@@ -10,7 +10,7 @@ public record Author(
     string Name,
     string? Uco = null,
     string? Email = null,
-    string? Phone = null);
+    string? Phone = null) : IEntity;
 
 public class AuthorProjection : SingleStreamAggregation<Author>
 {

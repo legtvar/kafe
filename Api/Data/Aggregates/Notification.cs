@@ -14,7 +14,7 @@ public record Notification(
     string? VideoId,
     LocalizedString Description,
     bool IsSent = false
-);
+) : IEntity;
 
 public class NotificationProjection : SingleStreamAggregation<Notification>
 {

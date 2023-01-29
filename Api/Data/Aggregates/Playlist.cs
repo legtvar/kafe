@@ -12,7 +12,7 @@ public record Playlist(
     LocalizedString Name,
     LocalizedString? Description = null,
     Visibility Visibility = Visibility.Unknown
-);
+) : IEntity;
 
 public class PlaylistProjection : SingleStreamAggregation<Playlist>
 {

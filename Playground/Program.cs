@@ -2,7 +2,7 @@
 
 var samplePath = @"";
 
-var ffcore = new FFMpegCoreService();
+var ffcore = new FFmpegCoreService();
 var ffcoreTest = await ffcore.GetInfo(samplePath);
 
 var xabe = new XabeFFmpegService();

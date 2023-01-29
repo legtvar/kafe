@@ -6,4 +6,4 @@ public record Video(
     string Id,
     CreationMethod CreationMethod,
     string? FileName,
-    VideoInfo Metadata);
+    MediaInfo Metadata);

@@ -1,5 +1,8 @@
-﻿namespace Kafe.Data.Events;
+﻿using Kafe.Media;
 
-public class VideoEvents
-{
-}
+namespace Kafe.Data.Events;
+
+public record VideoCreated(
+    CreationMethod CreationMethod,
+    string? FileName,
+    MediaInfo Metadata);

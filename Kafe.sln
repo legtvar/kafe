@@ -15,6 +15,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kafe.Media", "Media\Kafe.Me
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kafe.Playground", "Playground\Kafe.Playground.csproj", "{42A6C973-2DF2-40E6-BAFB-632CC64CBDF3}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kafe.Common", "Common\Kafe.Common.csproj", "{1CE245F6-4D7E-46A0-8B92-EDAEB9F851FE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{42A6C973-2DF2-40E6-BAFB-632CC64CBDF3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{42A6C973-2DF2-40E6-BAFB-632CC64CBDF3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{42A6C973-2DF2-40E6-BAFB-632CC64CBDF3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1CE245F6-4D7E-46A0-8B92-EDAEB9F851FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1CE245F6-4D7E-46A0-8B92-EDAEB9F851FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1CE245F6-4D7E-46A0-8B92-EDAEB9F851FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1CE245F6-4D7E-46A0-8B92-EDAEB9F851FE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

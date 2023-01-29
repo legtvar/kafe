@@ -1,9 +1,11 @@
-﻿using System;
+﻿using Kafe.Data;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Xabe.FFmpeg;
 
@@ -20,6 +22,16 @@ public class XabeFFmpegService : IMediaService
         }
 
         Xabe.FFmpeg.FFmpeg.SetExecutablesPath(Path.GetDirectoryName(path));
+    }
+
+    public Task<bool> ConvertToPreset(Hrib hrib, VideoQualityPreset preset, CancellationToken cancellationToken = default)
+    {
+        throw new NotImplementedException();
+    }
+
+    public ImmutableArray<VideoQualityPreset> GetAvailablePresets(Hrib hrib)
+    {
+        throw new NotImplementedException();
     }
 
     public async Task<MediaInfo> GetInfo(string filePath)
@@ -55,5 +67,15 @@ public class XabeFFmpegService : IMediaService
             VideoStreams: videoInfos,
             AudioStreams: audioInfos,
             SubtitleStreams: subtitleInfos);
+    }
+
+    public Stream? Load(Hrib hrib, VideoQualityPreset preset = VideoQualityPreset.Original)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task Save(Hrib hrib, Stream data, CancellationToken cancellationToken = default)
+    {
+        throw new NotImplementedException();
     }
 }

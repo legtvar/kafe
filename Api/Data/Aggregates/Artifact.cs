@@ -5,30 +5,32 @@ using Marten.Events.Aggregation;
 
 namespace Kafe.Data.Aggregates;
 
-public record Video(
+public record Artifact(
     string Id,
+    ArtifactKind Kind,
     CreationMethod CreationMethod,
     LocalizedString Name,
     string? FileName,
     MediaInfo Metadata) : IEntity;
 
-public class VideoProjections : SingleStreamAggregation<Video>
+public class ArtifactProjections : SingleStreamAggregation<Artifact>
 {
-    public VideoProjections()
+    public ArtifactProjections()
     {
     }
 
-    public Video Create(IEvent<VideoCreated> e)
+    public Artifact Create(IEvent<ArtifactCreated> e)
     {
-        return new Video(
+        return new Artifact(
             Id: e.StreamKey!,
+            Kind: e.Data.Kind,
             CreationMethod: e.Data.CreationMethod,
             Name: e.Data.Name,
             FileName: e.Data.FileName,
             Metadata: e.Data.Metadata);
     }
 
-    public Video Apply(VideoInfoChanged e, Video v)
+    public Artifact Apply(ArtifactInfoChanged e, Artifact v)
     {
         return v with
         {

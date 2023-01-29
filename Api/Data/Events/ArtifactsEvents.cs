@@ -2,13 +2,14 @@
 
 namespace Kafe.Data.Events;
 
-public record VideoCreated(
+public record ArtifactCreated(
     CreationMethod CreationMethod,
+    ArtifactKind Kind,
     LocalizedString Name,
     string? FileName,
     MediaInfo Metadata);
 
-public record VideoInfoChanged(
+public record ArtifactInfoChanged(
     LocalizedString? Name,
     string? FileName,
     MediaInfo? Metadata);

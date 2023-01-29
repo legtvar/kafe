@@ -8,6 +8,7 @@ public record Author(
     string Id,
     CreationMethod CreationMethod,
     string Name,
+    LocalizedString? Bio = null,
     string? Uco = null,
     string? Email = null,
     string? Phone = null) : IEntity;
@@ -31,6 +32,7 @@ public class AuthorProjection : SingleStreamAggregation<Author>
         return a with
         {
             Name = e.Name ?? a.Name,
+            Bio = e.Bio ?? a.Bio,
             Uco = e.Uco ?? a.Uco,
             Email = e.Email ?? a.Email,
             Phone = e.Phone ?? a.Phone

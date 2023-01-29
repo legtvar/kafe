@@ -136,7 +136,7 @@ public static class Program
     private static Hrib MigrateVideo(LemmaVideo video, Hrib projectId)
     {
         var hrib = Hrib.Create();
-        var added = new ProjectVideoAdded(
+        var added = new ProjectArtifactAdded(
             VideoId: hrib,
             Name: (LocalizedString)video.Name);
         videoMap.Add(video.Id, hrib);

@@ -19,30 +19,17 @@ public record ProjectInfoChanged(
     LocalizedString? Name = null,
     LocalizedString? Description = null,
     Visibility? Visibility = null,
-    DateTimeOffset? ReleaseDate = null
+    DateTimeOffset? ReleaseDate = null,
+    string? PrimaryArtifactId = null
 );
-public record ProjectVideoAdded(
-    string VideoId,
-    LocalizedString Name,
-    VideoKind Kind = default
+public record ProjectArtifactAdded(
+    string ArtifactId
 );
-public record ProjectVideoRemoved(
-    string VideoId
+public record ProjectArtifactRemoved(
+    string ArtifactId
 );
 public record ProjectLocked;
 public record ProjectUnlocked;
-public record ProjectPhotoAdded(
-    string PhotoId
-);
-public record ProjectPhotoRemoved(
-    string PhotoId
-);
-public record ProjectSubtitlesAdded(
-    string SubtitlesId
-);
-public record ProjectSubtitlesRemoved(
-    string SubtitlesId
-);
 public record ProjectPassedAutomaticValidation;
 public record ProjectFailedAutomaticValidation(
     LocalizedString Reason

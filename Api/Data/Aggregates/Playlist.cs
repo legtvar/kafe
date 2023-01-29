@@ -8,7 +8,7 @@ namespace Kafe.Data.Aggregates;
 public record Playlist(
     string Id,
     CreationMethod CreationMethod,
-    ImmutableArray<string> Videos,
+    ImmutableArray<string> VideoIds,
     LocalizedString Name,
     LocalizedString? Description = null,
     Visibility Visibility = Visibility.Unknown
@@ -25,7 +25,7 @@ public class PlaylistProjection : SingleStreamAggregation<Playlist>
         return new Playlist(
             Id: e.StreamKey!,
             CreationMethod: e.Data.CreationMethod,
-            Videos: ImmutableArray.Create<string>(),
+            VideoIds: ImmutableArray.Create<string>(),
             Name: e.Data.Name,
             Visibility: e.Data.Visibility
         );
@@ -43,20 +43,20 @@ public class PlaylistProjection : SingleStreamAggregation<Playlist>
 
     public Playlist Apply(PlaylistVideoAdded e, Playlist p)
     {
-        p.Videos!.Add(e.VideoId);
+        p.VideoIds!.Add(e.VideoId);
         return p;
     }
     
     public Playlist Apply(PlaylistVideoRemoved e, Playlist p)
     {
-        p.Videos!.RemoveAll(v => v == e.VideoId);
+        p.VideoIds!.RemoveAll(v => v == e.VideoId);
         return p;
     }
     
     public Playlist Apply(PlaylistVideoOrderChanged e, Playlist p)
     {
-        p.Videos!.RemoveAll(v => v == e.VideoId);
-        p.Videos!.Insert(e.NewIndex, e.VideoId);
+        p.VideoIds!.RemoveAll(v => v == e.VideoId);
+        p.VideoIds!.Insert(e.NewIndex, e.VideoId);
         return p;
     }
 }

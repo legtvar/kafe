@@ -10,4 +10,8 @@
     <PackageReference Include="Xabe.FFmpeg" Version="5.2.3" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="../Common/Kafe.Common.csproj" />
+  </ItemGroup>
+
 </Project>

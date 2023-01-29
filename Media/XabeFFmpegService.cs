@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,9 +11,20 @@ namespace Kafe.Media;
 
 public class XabeFFmpegService : IMediaService
 {
+    public XabeFFmpegService()
+    {
+        var path = FFmpeg.FindExecutable();
+        if (path is null)
+        {
+            throw new InvalidOperationException("FFmpeg could not be found.");
+        }
+
+        Xabe.FFmpeg.FFmpeg.SetExecutablesPath(Path.GetDirectoryName(path));
+    }
+
     public async Task<MediaInfo> GetInfo(string filePath)
     {
-        var data = await FFmpeg.GetMediaInfo(filePath);
+        var data = await Xabe.FFmpeg.FFmpeg.GetMediaInfo(filePath);
 
         var videoInfos = data.VideoStreams
             .Select(v => new VideoInfo(

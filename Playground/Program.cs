@@ -1,11 +1,4 @@
-﻿
-using FFMpegCore;
-using Kafe.Media;
-using Xabe.FFmpeg;
-
-FFmpeg.SetExecutablesPath(@"C:\Users\Adam\scoop\shims");
-
-GlobalFFOptions.Configure(new FFOptions { BinaryFolder = @"C:\Users\Adam\scoop\shims" });
+﻿using Kafe.Media;
 
 var samplePath = @"";
 

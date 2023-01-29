@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,6 +11,17 @@ namespace Kafe.Media;
 
 public class FFMpegCoreService : IMediaService
 {
+    public FFMpegCoreService()
+    {
+        var path = FFmpeg.FindExecutable();
+        if (path is null)
+        {
+            throw new InvalidOperationException("FFmpeg could not be found.");
+        }
+
+        GlobalFFOptions.Configure(new FFOptions { BinaryFolder = Path.GetDirectoryName(path)! });
+    }
+
     public async Task<MediaInfo> GetInfo(string filePath)
     {
         var data = await FFProbe.AnalyseAsync(filePath);

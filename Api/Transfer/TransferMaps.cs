@@ -61,7 +61,7 @@ public static class TransferMaps
             Name: data.Name,
             Description: data.Description,
             Visibility: data.Visibility,
-            Videos: data.Videos);
+            Videos: data.VideoIds);
     }
     
     public static ProjectGroupListDto ToProjectGroupListDto(ProjectGroup data)

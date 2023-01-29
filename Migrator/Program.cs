@@ -137,8 +137,7 @@ public static class Program
     {
         var hrib = Hrib.Create();
         var added = new ProjectArtifactAdded(
-            VideoId: hrib,
-            Name: (LocalizedString)video.Name);
+            ArtifactId: hrib);
         videoMap.Add(video.Id, hrib);
         logger.LogInformation($"[{projectId}]: {added}");
         kafe.Events.Append(projectId, added);

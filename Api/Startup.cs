@@ -4,6 +4,7 @@ using idunno.Authentication.Basic;
 using Kafe.Data;
 using Kafe.Endpoints;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Rewrite;
 using Microsoft.OpenApi.Models;
 
 namespace Kafe.Api;
@@ -81,6 +82,14 @@ public class Startup
     public void Configure(IApplicationBuilder app, IHostEnvironment environment)
     {
         app.UseHttpsRedirection();
+
+        app.UseRewriter(new RewriteOptions().AddRewrite("login", "login.html", true));
+        // app.Use(async (context, next) => {
+        //     if (context.Request.Path.Value == "/login") {
+                
+        //     }
+        //     await next(context);
+        // });
 
         app.UseDefaultFiles();
         app.UseStaticFiles();

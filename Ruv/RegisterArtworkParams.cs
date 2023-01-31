@@ -4,7 +4,20 @@ namespace Kafe.Ruv;
 
 public enum RegisterArtworkEnum
 {
-    Audiovize = 3
+    Architektura_Architektura = 14,
+    Architektura_UrbanismusAÚzemníPlánování = 15,
+    Architektura_KrajinářskáArchitektura = 16,
+    Architektura_VýstupyZadanéPředRokem2020 = 17,
+    Audiovize = 3,
+    Design_GrafickýDesign = 9,
+    Design_MódaTextilŠperk = 11,
+    Design_ProduktovýAPrůmyslovýDesign = 8,
+    Design_SkloPorcelánKeramika = 10,
+    Hudba = 4,
+    Literatura = 5,
+    ScénickáUmění = 6,
+    VýtvarnáUmění_Restaurování = 13,
+    VýtvarnáUmění_VýtvarnáUmění = 12,
 }
 
 public enum RegisterArtworkArtworkType

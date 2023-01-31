@@ -3,7 +3,6 @@
 public enum ArtifactKind
 {
     Invalid = 0,
-    Video = 1,
+    Film = 1,
     Image = 2,
-    Subtitles = 3
 }

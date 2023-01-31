@@ -17,17 +17,26 @@ public record ProjectListDto(
 public record ProjectDetailDto(
     string Id,
     string ProjectGroupId,
-    // string ProjectGroupName,
+    LocalizedString ProjectGroupName,
+    LocalizedString? Genre,
     LocalizedString Name,
     LocalizedString? Description,
     Visibility Visibility,
     ImmutableArray<string> Authors,
-    DateTimeOffset ReleaseDate
-    // Genre
+    DateTimeOffset ReleaseDate,
+    ImmutableArray<ProjectAuthorDto> Crew,
+    ImmutableArray<ProjectAuthorDto> Cast,
+
     // Authors => Crew, Cast
     // Medias: Media[]
     );
-    
+
+public record ProjectAuthorDto(
+    string Id,
+    string Name,
+    ImmutableArray<string> Jobs);
+
+
 // Media (Files: File[])
 // File (FileType, Id, Validation Requirements, Validation Status)
 // FileType: Image | Video | Subtitles | Other

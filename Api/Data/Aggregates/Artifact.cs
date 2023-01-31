@@ -2,25 +2,48 @@
 using Kafe.Media;
 using Marten.Events;
 using Marten.Events.Aggregation;
+using System.Collections.Immutable;
 
 namespace Kafe.Data.Aggregates;
 
-public record Artifact(
+public abstract record ArtifactBase(
     string Id,
     ArtifactKind Kind,
     CreationMethod CreationMethod,
-    LocalizedString Name,
-    string? FileName,
-    MediaInfo Metadata) : IEntity;
+    LocalizedString Name) : IEntity;
 
-public class ArtifactProjections : SingleStreamAggregation<Artifact>
+public record FilmArtifact(
+    string Id,
+    CreationMethod CreationMethod,
+    LocalizedString Name,
+    ImmutableArray<MediaInfo> Media)
+     : ArtifactBase(Id, ArtifactKind.Film, CreationMethod, Name);
+
+public record ImageArtifact(
+    string Id,
+    CreationMethod CreationMethod,
+    LocalizedString Name)
+    : ArtifactBase(Id, ArtifactKind.Image, CreationMethod, Name);
+
+public class ArtifactProjections : SingleStreamAggregation<FilmArtifact>
 {
     public ArtifactProjections()
     {
     }
 
-    public Artifact Create(IEvent<ArtifactCreated> e)
+    public FilmArtifact Create(IEvent<FilmArtifactCreated> e)
     {
+        return new FilmArtifact(
+            Id: e.StreamKey!,
+            CreationMethod: e.Data.CreationMethod,
+            Name: e.Data.Name,
+            Variants: ImmutableArray.Create<VideoQualityPreset>(VideoQualityPreset.Original),
+            Media: );
+
+        return e.Data.Kind switch
+        {
+            ArtifactKind.Film => 
+        };
         return new Artifact(
             Id: e.StreamKey!,
             Kind: e.Data.Kind,

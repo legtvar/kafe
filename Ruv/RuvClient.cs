@@ -226,7 +226,7 @@ public class RuvClient : IDisposable
                 ? (int)Math.Ceiling(100.0 / data.Authors.Length)
                 : (int)Math.Floor(100.0 / data.Authors.Length);
             request.AddParameter($"artworkAuthors[{i}].id", "");
-            request.AddParameter($"artworkAuthors[{i}].uuid", Guid.NewGuid().ToString());
+            request.AddParameter($"artworkAuthors[{i}].uuid", "");
             request.AddParameter($"artworkAuthors[{i}].acl", "");
             request.AddParameter($"artworkAuthors[{i}].author", author.Author);
             request.AddParameter($"artworkAuthors[{i}].firstname", author.FirstName);
@@ -354,8 +354,8 @@ public class RuvClient : IDisposable
             Author: json["id"]?.GetValue<int>() ?? -1,
             FirstName: json["firstname"]?.GetValue<string>() ?? string.Empty,
             LastName: json["lastname"]?.GetValue<string>() ?? string.Empty,
-            DegreeBeforeName: json["degreebeforename"]?.GetValue<string>() ?? string.Empty,
-            DegreeAfterName: json["degreeaftername"]?.GetValue<string>() ?? string.Empty,
+            DegreeBeforeName: json["degreeBeforeName"]?.GetValue<string>() ?? string.Empty,
+            DegreeAfterName: json["degreeAfterName"]?.GetValue<string>() ?? string.Empty,
             Organization: string.Empty);
     }
 }

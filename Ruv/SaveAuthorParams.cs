@@ -10,7 +10,7 @@ public record SaveAuthorParams(
     string PersonalNumber,
     string FirstName,
     string LastName,
-    string DegreeBeforeName,
-    string DegreeAfterName,
+    string DegreeBeforeName = "",
+    string DegreeAfterName = "",
     int OrgUnit = RuvConst.DefaultOrgUnit
 );

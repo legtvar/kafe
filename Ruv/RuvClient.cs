@@ -1,4 +1,6 @@
 ﻿using RestSharp;
+using System.Net;
+using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
@@ -8,15 +10,23 @@ public class RuvClient : IDisposable
 {
     public const string RuvBaseUrl = "https://www.iruv.cz";
 
-    private readonly RestClient client = new RestClient(new RestClientOptions(RuvBaseUrl)
+    private readonly RestClient client;
+    private readonly CookieContainer cookieJar = new();
+
+    public RuvClient()
     {
-        MaxTimeout = -1,
-        UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:108.0) Gecko/20100101 Firefox/108.0",
-    });
+        client = new RestClient(new RestClientOptions(RuvBaseUrl)
+        {
+            MaxTimeout = -1,
+            UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:108.0) Gecko/20100101 Firefox/108.0",
+            CookieContainer = cookieJar
+        });
+    }
 
     public async Task LogIn(string username, string password)
     {
         var request = new RestRequest("/app/LoginProcess", Method.Post);
+        //request.CookieContainer = cookieJar;
         request.AddHeader("Content-Type", "application/x-www-form-urlencoded");
         request.AddParameter("u_username", username);
         request.AddParameter("u_password", password);
@@ -32,9 +42,47 @@ public class RuvClient : IDisposable
 
     }
 
+    public async Task<Guid?> SendUpload(string filePath, string contentType)
+    {
+        using var multipartFormContent = new MultipartFormDataContent();
+        //Load the file and set the file's Content-Type header
+        var fileStreamContent = new StreamContent(File.OpenRead(filePath));
+        fileStreamContent.Headers.ContentType = new MediaTypeHeaderValue(contentType);
+
+        //Add the file
+        multipartFormContent.Add(fileStreamContent, name: "file", fileName: "file");
+
+        //Send it
+        using var clientHandler = new HttpClientHandler() {  CookieContainer = cookieJar };
+        using var client = new HttpClient(clientHandler);
+        var response = await client.PostAsync($"{RuvBaseUrl}/app/rest/file/upload", multipartFormContent);
+        response.EnsureSuccessStatusCode();
+        var jsonString = await response.Content.ReadAsStringAsync();
+
+        //var request = new RestRequest("/app/rest/file/upload", Method.Post);
+        ////request.CookieContainer = cookieJar;
+        //request.AlwaysMultipartFormData = true;
+        //request.AddParameter("description", "");
+        //request.AddFile("file", filePath, contentType);
+        //RestResponse response = await client.ExecuteAsync(request);
+        //if (!response.IsSuccessStatusCode)
+        //{
+        //    throw new InvalidOperationException("An 'Upload' request was unsuccessful.");
+        //}
+
+        var json = JsonNode.Parse(jsonString);
+        if (json is null)
+        {
+            throw new InvalidOperationException("An 'Upload' response is not valid JSON.");
+        }
+
+        return json["data"]?["uuid"]?.GetValue<Guid>();
+    }
+
     public async Task<RegisterArtworkAuthor?> SendCheckAuthor(string personalNumber)
     {
         var request = new RestRequest("/app/rest/user/check_author", Method.Post);
+        //request.CookieContainer = cookieJar;
         request.AddHeader("Host", "www.iruv.cz");
         request.AddHeader("Accept", "application/json, text/javascript, */*; q=0.01");
         request.AddHeader("Accept-Language", "cs,en-US;q=0.7,en;q=0.3");
@@ -77,6 +125,7 @@ public class RuvClient : IDisposable
     private async Task SendRegisterArtwork(RegisterArtworkParams data)
     {
         var request = new RestRequest("/app/artwork/RegisterArtwork", Method.Get);
+        //request.CookieContainer = cookieJar;
         request.AddHeader("Accept-Language", "cs,en-US;q=0.7,en;q=0.3");
         request.AddHeader("Content-Type", "application/x-www-form-urlencoded");
         request.AddHeader("Origin", "https://www.iruv.cz");

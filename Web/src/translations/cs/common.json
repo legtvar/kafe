@@ -31,7 +31,12 @@
     "locked": "Projekt je uzamčený",
     "annotation": "Anotace",
     "actors": "Obsazení",
-    "crew": "Filmový štáb"
+    "crew": "Filmový štáb",
+    "files": "Soubory",
+    "unknownGroup": "Neznámá skupina projektů",
+    "releaseDate": {
+      "na": "Neuvedeno"
+    }
   },
   "error": {
     "invalidPath": "URL adresa je nesprávná",
@@ -45,6 +50,11 @@
   },
   "projects": {
     "title": "Moje projekty",
-    "detail": "Detail"
+    "detail": "Detail",
+    "empty": "Žádné projekty"
+  },
+  "content": {
+    "unknownType": "Neznámý typ souboru",
+    "noFileSelected": "Žádný vybraný soubor"
   }
 }

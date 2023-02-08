@@ -10,9 +10,15 @@ import { languageConfig } from './languageConfig';
 import './styles/index.less';
 import { routerConfig } from './utils/routerConfig';
 
+import moment from 'moment';
+import 'moment/locale/cs';
 import 'video.js/dist/video-js.css';
 
 i18next.init(languageConfig);
+i18next.on('languageChanged', function (lng) {
+    moment.locale(lng);
+});
+
 const router = createBrowserRouter(routerConfig(i18next.t), {
     basename: '/kafe',
 });

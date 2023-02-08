@@ -25,12 +25,17 @@ export const VideoJS = (props: IVideoJSProps) => {
             });
             setPlayer(player);
         } else {
-            // You could update an existing player in the `else` block here
-            // on prop change, for example:
-            //   player.autoplay(options.autoplay);
-            //   player.src(options.sources);
+            options.sources && player.src(options.sources);
         }
     }, [options, videoRef, onReady, player]);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    React.useEffect(
+        () => () => {
+            if (player) player.dispose();
+        },
+        [],
+    );
 
     // Dispose the Video.js player when the functional component unmounts
     React.useEffect(() => {

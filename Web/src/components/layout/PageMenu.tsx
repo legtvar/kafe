@@ -29,7 +29,7 @@ export const PageMenu: React.FC = () => {
 
             return (
                 <>
-                    <Menu.Item key={fullPath}>
+                    <Menu.Item key={i}>
                         {route.icon}
                         <span>{route.title}</span>
                         <Link to={fullPath} />
@@ -40,6 +40,7 @@ export const PageMenu: React.FC = () => {
                             mode="inline"
                             selectedKeys={[match.path]}
                             style={{ backgroundColor: '#000c17' }}
+                            key={i + '_sub'}
                         >
                             {children}
                         </Menu>

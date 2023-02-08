@@ -6,8 +6,10 @@
   "dependencies": {
     "@ant-design/icons": "^4.7.0",
     "antd": "^4.24.4",
+    "axios": "^1.2.1",
     "country-flag-icons": "^1.5.5",
     "i18next": "^21.9.1",
+    "localforage": "^1.10.0",
     "mime": "^3.0.0",
     "moment": "^2.29.1",
     "react": "^18.2.0",
@@ -34,6 +36,7 @@
     "i18next-parser": "^6.5.0",
     "less": "^4.1.3",
     "less-loader": "^11.0.0",
+    "openapi-typescript": "^6.1.0",
     "tslint": "^6.1.3"
   },
   "scripts": {
@@ -41,7 +44,8 @@
     "build": "react-app-rewired build",
     "test": "react-app-rewired test",
     "lint": "tslint -p tsconfig.json",
-    "extract-translations": "i18next 'src/**/*.{ts,tsx,js}' -c i18next-parser.config.mjs"
+    "extract-translations": "i18next 'src/**/*.{ts,tsx,js}' -c i18next-parser.config.mjs",
+    "generate-typings": "npx openapi-typescript https://wma.lemma.fi.muni.cz/swagger/v1/swagger.json --output src/schemas/api.ts --path-params-as-types"
   },
   "eslintConfig": {
     "extends": [

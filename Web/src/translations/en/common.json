@@ -31,7 +31,12 @@
     "locked": "Project is locked",
     "annotation": "Annotation",
     "actors": "Actors",
-    "crew": "Film crew"
+    "crew": "Film crew",
+    "files": "Files",
+    "unknownGroup": "Unknown group",
+    "releaseDate": {
+      "na": "Not specified"
+    }
   },
   "error": {
     "invalidPath": "URL path is invalid",
@@ -45,6 +50,11 @@
   },
   "projects": {
     "title": "My projects",
-    "detail": "Detail"
+    "detail": "Detail",
+    "empty": "No projects"
+  },
+  "content": {
+    "unknownType": "Unknown file type",
+    "noFileSelected": "No file selected"
   }
 }

@@ -1,11 +1,10 @@
 import { Skeleton } from 'antd';
 import { t } from 'i18next';
 import { useParams } from 'react-router-dom';
-import { ProjectDataType } from '../../api/types';
 import { Error } from '../../components/layout/Error';
 import { Page } from '../../components/layout/Page';
 import { AwaitAPI } from '../../components/utils/AwaitAPI';
-import { isNumeric } from '../../utils/isNumeric';
+import { Project } from '../../data/Project';
 import { ProjectDetail } from './ProjectDetail';
 
 interface IProjectDetailWrapperProps {}
@@ -13,14 +12,13 @@ interface IProjectDetailWrapperProps {}
 export function ProjectDetailWrapper(props: IProjectDetailWrapperProps) {
     const { id } = useParams();
 
-    if (!id || !isNumeric(id)) {
+    if (!id) {
         return <Error error={t('error.invalidPath')} />;
     }
-    const projectId = parseInt(id);
 
     return (
         <AwaitAPI
-            request={(caffeine) => caffeine.api.projects.getById(projectId)}
+            request={(caffeine) => caffeine.api.projects.getById(id)}
             loader={
                 <Page
                     headerProps={{
@@ -31,7 +29,7 @@ export function ProjectDetailWrapper(props: IProjectDetailWrapperProps) {
                 </Page>
             }
         >
-            {(data: ProjectDataType | null) =>
+            {(data: Project | null) =>
                 data ? <ProjectDetail data={data} /> : <Error error={t('error.projectDoesNotExist')} />
             }
         </AwaitAPI>

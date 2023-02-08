@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -8,7 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Api\Kafe.Api.csproj" />
+    <!--<ProjectReference Include="..\Api\Kafe.Api.csproj" />-->
+    <ProjectReference Include="..\Ruv\Kafe.Ruv.csproj" />
   </ItemGroup>
 
 </Project>

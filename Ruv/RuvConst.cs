@@ -13,4 +13,9 @@ public static class RuvConst
     public const string DefaultStudyProgram = "Vizuální informatika";
 
     public const string DefaultStudySubject = "PV110 Základy filmové řeči";
+
+    /// <summary>
+    /// Name: MU/FI/Katedra vizuální informatiky
+    /// </summary>
+    public const int DefaultOrgUnit = 554;
 }

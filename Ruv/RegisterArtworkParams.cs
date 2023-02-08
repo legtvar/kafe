@@ -86,14 +86,14 @@ public record RegisterArtworkParams(
     int Scope, // Velikost
     string NameCS, // Název v originále, limit 254
     ImmutableArray<string> KeywordsCS, // Klíčová slova v češtině, limit 254, new-line separated
-    string AnotationCS, // Anotace v češtině, limit 4000, minimum nevíme
+    string AnnotationCS, // Anotace v češtině, limit 4000, minimum nevíme
     string NameEN, // Název v angličtině
     ImmutableArray<string> KeywordsEN, // Klíčovná slova v angličtině
-    string AnotationEN, // Anotace v angličtině
+    string AnnotationEN, // Anotace v angličtině
     ImmutableArray<RegisterArtworkAuthor> Authors,
     DateTimeOffset FestivalDate,
-    string? CitationLink, // Link na video
     ImmutableArray<Guid> Attachments,
+    string? CitationLink = null, // link to the video
     string StudyProgram = RuvConst.DefaultStudyProgram,
     string StudySubject = RuvConst.DefaultStudySubject
 );
@@ -104,5 +104,5 @@ public record RegisterArtworkAuthor(
     string LastName,
     string DegreeBeforeName,
     string DegreeAfterName,
-    string Organization
+    string Organization = ""
 );

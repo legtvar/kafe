@@ -1,4 +1,5 @@
 ﻿using RestSharp;
+using System.Collections.Immutable;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Text.Json;
@@ -37,38 +38,78 @@ public class RuvClient : IDisposable
         }
     }
 
-    public async Task AddFilm()
+    public async Task AddFilm(AddFilmParams data)
     {
+        var registerAuthors = (await Task.WhenAll(data.Authors.Select(async a =>
+        {
+            var existing = await SendCheckAuthor(a.PersonalNumber);
+            if (existing is not null)
+            {
+                return existing;
+            }
 
+            var newAuthor = await SendSaveAuthor(a);
+            if (newAuthor is null)
+            {
+                throw new InvalidOperationException($"Author '{a.LastName}, {a.FirstName}' could not be registered.");
+            }
+            return newAuthor;
+        }))).ToImmutableArray();
+
+        var imageId = await SendUpload(data.ImagePath, "image/jpeg");
+        if (imageId is null)
+        {
+            throw new InvalidOperationException("Could not upload a film's image.");
+        }
+
+        var impactOptions = await SendImpactQuery((int)data.ArtworkType);
+        var impactCategory = data.IsFestivalWinner ? "C" : "D";
+        var impact = impactOptions.SingleOrDefault(o => o.NameCS.StartsWith(impactCategory));
+        if (impact is null)
+        {
+            throw new InvalidOperationException("A valid impact option could not be found.");
+        }
+
+        var scopeOptions = await SendScopeQuery((int)data.ArtworkType);
+        var scope = scopeOptions.SingleOrDefault(o => o.NameCS.StartsWith("M"));
+        if (scope is null)
+        {
+            throw new InvalidOperationException("A valid 'M' scope option could not be found.");
+        }
+
+        var registerArtworkParams = new RegisterArtworkParams(
+            Year: data.Year,
+            Segment: RuvConst.AudiovisionSegment,
+            ArtworkType: data.ArtworkType,
+            Impact: impact.Value,
+            Scope: scope.Value,
+            NameCS: data.NameCS,
+            KeywordsCS: data.KeywordsCS,
+            AnnotationCS: data.AnnotationCS,
+            NameEN: data.NameEN,
+            KeywordsEN: data.KeywordsEN,
+            AnnotationEN: data.AnnotationEN,
+            Authors: registerAuthors,
+            FestivalDate: data.FestivalDate,
+            Attachments: ImmutableArray.Create(imageId.Value),
+            CitationLink: data.CitationLink,
+            StudyProgram: data.StudyProgram,
+            StudySubject: data.StudySubject);
+        await SendRegisterArtwork(registerArtworkParams);
     }
 
     public async Task<Guid?> SendUpload(string filePath, string contentType)
     {
         using var multipartFormContent = new MultipartFormDataContent();
-        //Load the file and set the file's Content-Type header
         var fileStreamContent = new StreamContent(File.OpenRead(filePath));
         fileStreamContent.Headers.ContentType = new MediaTypeHeaderValue(contentType);
-
-        //Add the file
         multipartFormContent.Add(fileStreamContent, name: "file", fileName: "file");
-
-        //Send it
+            
         using var clientHandler = new HttpClientHandler() {  CookieContainer = cookieJar };
         using var client = new HttpClient(clientHandler);
         var response = await client.PostAsync($"{RuvBaseUrl}/app/rest/file/upload", multipartFormContent);
         response.EnsureSuccessStatusCode();
         var jsonString = await response.Content.ReadAsStringAsync();
-
-        //var request = new RestRequest("/app/rest/file/upload", Method.Post);
-        ////request.CookieContainer = cookieJar;
-        //request.AlwaysMultipartFormData = true;
-        //request.AddParameter("description", "");
-        //request.AddFile("file", filePath, contentType);
-        //RestResponse response = await client.ExecuteAsync(request);
-        //if (!response.IsSuccessStatusCode)
-        //{
-        //    throw new InvalidOperationException("An 'Upload' request was unsuccessful.");
-        //}
 
         var json = JsonNode.Parse(jsonString);
         if (json is null)
@@ -89,7 +130,6 @@ public class RuvClient : IDisposable
         request.AddHeader("Accept-Encoding", "gzip, deflate, br");
         request.AddHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
         request.AddHeader("X-Requested-With", "XMLHttpRequest");
-        request.AddHeader("Content-Length", "25");
         request.AddHeader("Origin", "https://www.iruv.cz");
         request.AddHeader("Connection", "keep-alive");
         //request.AddHeader("Referer", "https://www.iruv.cz/app/user/Authors");
@@ -107,22 +147,47 @@ public class RuvClient : IDisposable
             throw new InvalidOperationException("A 'CheckAuthor' request was unsuccessful.");
         }
 
-        var json = JsonNode.Parse(response.Content ?? string.Empty);
-        if (json is null)
-        {
-            throw new InvalidOperationException("A 'CheckAuthor' response is not valid JSON.");
-        }
-
-        return new(
-            Author: json["id"]?.GetValue<int>() ?? -1,
-            FirstName: json["firstname"]?.GetValue<string>() ?? string.Empty,
-            LastName: json["lastname"]?.GetValue<string>() ?? string.Empty,
-            DegreeBeforeName: json["degreebeforename"]?.GetValue<string>() ?? string.Empty,
-            DegreeAfterName: json["degreeaftername"]?.GetValue<string>() ?? string.Empty,
-            Organization: string.Empty);
+        return ParserRegisterArtworkAuthor(response.Content);
     }
 
-    private async Task SendRegisterArtwork(RegisterArtworkParams data)
+    public async Task<RegisterArtworkAuthor?> SendSaveAuthor(SaveAuthorParams data)
+    {
+        var request = new RestRequest("/app/rest/user/save_author", Method.Post);
+        request.AddHeader("Host", "www.iruv.cz");
+        request.AddHeader("Accept", "application/json, text/javascript, */*; q=0.01");
+        request.AddHeader("Accept-Language", "cs,en-US;q=0.7,en;q=0.3");
+        request.AddHeader("Accept-Encoding", "gzip, deflate, br");
+        request.AddHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+        request.AddHeader("X-Requested-With", "XMLHttpRequest");
+        request.AddHeader("Origin", "https://www.iruv.cz");
+        request.AddHeader("Connection", "keep-alive");
+        //request.AddHeader("Referer", "https://www.iruv.cz/app/user/Authors");
+        request.AddHeader("Sec-Fetch-Dest", "empty");
+        request.AddHeader("Sec-Fetch-Mode", "cors");
+        request.AddHeader("Sec-Fetch-Site", "same-origin");
+        request.AddHeader("Pragma", "no-cache");
+        request.AddHeader("Cache-Control", "no-cache");
+        request.AddParameter("id", "");
+        request.AddParameter("uuid", "");
+        request.AddParameter("orgUnit", data.OrgUnit);
+        request.AddParameter("firstname", data.FirstName);
+        request.AddParameter("lastname", data.LastName);
+        request.AddParameter("degreeBeforeName", data.DegreeBeforeName);
+        request.AddParameter("degreeAfterName", data.DegreeAfterName);
+        request.AddParameter("personalNumber", data.PersonalNumber);
+        request.AddParameter("authorType", "");
+        RestResponse response = await client.ExecuteAsync(request);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            throw new InvalidOperationException("A 'SaveAuthor' request was unsuccessful.");
+        }
+
+
+        return ParserRegisterArtworkAuthor(response.Content);
+    }
+
+    public async Task SendRegisterArtwork(RegisterArtworkParams data)
     {
         var request = new RestRequest("/app/artwork/RegisterArtwork", Method.Get);
         //request.CookieContainer = cookieJar;
@@ -150,10 +215,10 @@ public class RuvClient : IDisposable
         request.AddParameter("scope", data.Scope);
         request.AddParameter("name_cs", data.NameCS);
         request.AddParameter("keywords_cs", string.Join('\n', data.KeywordsCS));
-        request.AddParameter("annotation_cs", data.AnotationCS);
+        request.AddParameter("annotation_cs", data.AnnotationCS);
         request.AddParameter("name_en", data.NameEN);
         request.AddParameter("keywords_en", string.Join('\n', data.KeywordsEN));
-        request.AddParameter("annotation_en", data.AnotationEN);
+        request.AddParameter("annotation_en", data.AnnotationEN);
         for (int i = 0; i < data.Authors.Length; i++)
         {
             var author = data.Authors[i];
@@ -206,8 +271,91 @@ public class RuvClient : IDisposable
         Console.WriteLine(response.Content);
     }
 
+    public record ImpactOption(string NameCS, int Value);
+
+    public async Task<ImmutableArray<ImpactOption>> SendImpactQuery(int artworkType)
+    {
+        var request = new RestRequest($"/app/rest/api/impact?artwork_type={artworkType}", Method.Get);
+        RestResponse response = await client.ExecuteAsync(request);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            throw new InvalidOperationException("An 'Impact' query was unsuccessful.");
+        }
+
+        var json = JsonNode.Parse(response.Content ?? string.Empty);
+        if (json is null)
+        {
+            throw new InvalidOperationException("An 'Impact' query response is not valid JSON.");
+        }
+
+        var options = json.AsArray()
+            .Where(o => o is not null)
+            .Select(o => new ImpactOption(
+                NameCS: o!["name_cs"]?.GetValue<string>() ?? string.Empty,
+                Value: o!["id"]?.GetValue<int>() ?? -1))
+            .Where(o => !string.IsNullOrEmpty(o.NameCS) && o.Value != -1)
+            .ToImmutableArray();
+        if (options.IsDefaultOrEmpty)
+        {
+            throw new InvalidOperationException($"No impact options were found for the '{artworkType}' artwork type.");
+        }
+
+        return options;
+    }
+
+    public record ScopeOption(string NameCS, int Value);
+
+    public async Task<ImmutableArray<ScopeOption>> SendScopeQuery(int artworkType)
+    {
+        var request = new RestRequest($"/app/rest/api/scope?artwork_type={artworkType}", Method.Get);
+        RestResponse response = await client.ExecuteAsync(request);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            throw new InvalidOperationException("An 'Scope' query was unsuccessful.");
+        }
+
+        var json = JsonNode.Parse(response.Content ?? string.Empty);
+        if (json is null)
+        {
+            throw new InvalidOperationException("An 'Scope' query response is not valid JSON.");
+        }
+
+        var options = json.AsArray()
+            .Where(o => o is not null)
+            .Select(o => new ScopeOption(
+                NameCS: o!["name_cs"]?.GetValue<string>() ?? string.Empty,
+                Value: o!["id"]?.GetValue<int>() ?? -1))
+            .Where(o => !string.IsNullOrEmpty(o.NameCS) && o.Value != -1)
+            .ToImmutableArray();
+        if (options.IsDefaultOrEmpty)
+        {
+            throw new InvalidOperationException($"No impact options were found for the '{artworkType}' artwork type.");
+        }
+
+        return options;
+    }
+
     public void Dispose()
     {
         ((IDisposable)client).Dispose();
+    }
+
+    private RegisterArtworkAuthor? ParserRegisterArtworkAuthor(string? jsonString)
+    {
+        var json = JsonNode.Parse(jsonString ?? string.Empty);
+        if (json is null)
+        {
+            throw new InvalidOperationException("Could not parse an author. Maybe the string is not valid JSON.");
+        }
+
+        return new(
+            Author: json["id"]?.GetValue<int>() ?? -1,
+            FirstName: json["firstname"]?.GetValue<string>() ?? string.Empty,
+            LastName: json["lastname"]?.GetValue<string>() ?? string.Empty,
+            DegreeBeforeName: json["degreebeforename"]?.GetValue<string>() ?? string.Empty,
+            DegreeAfterName: json["degreeaftername"]?.GetValue<string>() ?? string.Empty,
+            Organization: string.Empty);
     }
 }

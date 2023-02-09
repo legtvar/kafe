@@ -1,4 +1,3 @@
-import { Empty } from 'antd';
 import axios from 'axios';
 import { t } from 'i18next';
 import { FileEntry } from '../data/FileEntry';
@@ -50,7 +49,7 @@ export function ContentViewer(props: IContentViewerProps) {
             }
         }
 
-        return <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={t('content.unknownType').toString()} />;
+        return t('content.unknownType').toString();
     }
-    return <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={t('content.noFileSelected').toString()} />;
+    return t('content.noFileSelected').toString();
 }

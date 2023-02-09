@@ -56,5 +56,12 @@
   "content": {
     "unknownType": "Neznámý typ souboru",
     "noFileSelected": "Žádný vybraný soubor"
+  },
+  "status": {
+    "404": {
+      "title": "Stránka nebyla nalezena",
+      "subtitle": "Vypadá to, že stránka kterou hledáte neexistuje"
+    },
+    "backlink": "Vrátit se zpět"
   }
 }

@@ -6,13 +6,13 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { API } from './api/API';
 import { Caffeine } from './Caffeine';
 import { languageConfig } from './languageConfig';
-
-import './styles/index.less';
 import { routerConfig } from './utils/routerConfig';
 
+import { ChakraProvider, ColorModeScript } from '@chakra-ui/react';
 import moment from 'moment';
 import 'moment/locale/cs';
 import 'video.js/dist/video-js.css';
+import theme from './theme';
 
 i18next.init(languageConfig);
 i18next.on('languageChanged', function (lng) {
@@ -30,9 +30,12 @@ const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement)
 root.render(
     <React.StrictMode>
         <I18nextProvider i18n={i18next}>
-            <caffeine.Provider value={caffeineObject}>
-                <RouterProvider router={router} />
-            </caffeine.Provider>
+            <ChakraProvider theme={theme}>
+                <caffeine.Provider value={caffeineObject}>
+                    <ColorModeScript initialColorMode={theme.config.initialColorMode} />
+                    <RouterProvider router={router} />
+                </caffeine.Provider>
+            </ChakraProvider>
         </I18nextProvider>
     </React.StrictMode>,
 );

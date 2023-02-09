@@ -56,5 +56,12 @@
   "content": {
     "unknownType": "Unknown file type",
     "noFileSelected": "No file selected"
+  },
+  "status": {
+    "404": {
+      "title": "Page Not Found",
+      "subtitle": "The page you're looking for does not seem to exist"
+    },
+    "backlink": "Go to Home"
   }
 }

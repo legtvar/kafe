@@ -1,11 +1,25 @@
-import { GroupOutlined, HomeOutlined, PlaySquareOutlined, VideoCameraOutlined } from '@ant-design/icons';
-import { ProjectDetailWrapper } from './pages/projects/ProjectDetailWrapper';
-import { ProjectsPage } from './pages/projects/ProjectsPage';
+import { IconType } from 'react-icons';
+import {
+    IoFolderOpen,
+    IoFolderOpenOutline,
+    IoHome,
+    IoHomeOutline,
+    IoListCircle,
+    IoListCircleOutline,
+    IoVideocam,
+    IoVideocamOutline,
+} from 'react-icons/io5';
+import { PageHome } from './pages/Home';
+
+export type SelectableIcon = {
+    default: IconType;
+    selected?: IconType;
+};
 
 export type AppRoute = {
     path: string;
     title: string;
-    icon?: React.ReactNode;
+    icon?: SelectableIcon;
     element: React.ReactNode;
     inMenu?: boolean;
     children?: AppRoute[];
@@ -15,21 +29,27 @@ export const routes = (t: (id: string) => string): AppRoute[] => [
     {
         path: '',
         title: t('route.home.title'),
-        element: <>Lorem ipsum</>,
+        element: <PageHome />,
         inMenu: true,
-        icon: <HomeOutlined />,
+        icon: {
+            default: IoHomeOutline,
+            selected: IoHome,
+        },
     },
     {
         path: 'projects',
         title: t('route.projects.title'),
-        element: <ProjectsPage />,
+        element: <>Lorem ipsum</>,
         inMenu: true,
-        icon: <VideoCameraOutlined />,
+        icon: {
+            default: IoVideocamOutline,
+            selected: IoVideocam,
+        },
         children: [
             {
                 path: ':id',
                 title: t('route.projects.detail.title'),
-                element: <ProjectDetailWrapper />,
+                element: <>Lorem ipsum</>,
             },
         ],
     },
@@ -38,13 +58,19 @@ export const routes = (t: (id: string) => string): AppRoute[] => [
         title: t('route.groups.title'),
         element: <>Tady bude seznam skupin projektů</>,
         inMenu: true,
-        icon: <GroupOutlined />,
+        icon: {
+            default: IoFolderOpenOutline,
+            selected: IoFolderOpen,
+        },
     },
     {
         path: 'playlists',
         title: t('route.playlists.title'),
         element: <>Tady bude seznam playlistů</>,
         inMenu: true,
-        icon: <PlaySquareOutlined />,
+        icon: {
+            default: IoListCircleOutline,
+            selected: IoListCircle,
+        },
     },
 ];

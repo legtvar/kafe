@@ -2,6 +2,10 @@ using Kafe.Data.Aggregates;
 using Marten;
 using Marten.Events;
 using Marten.Services.Json;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using System;
 using Weasel.Core;
 
 namespace Kafe.Data;

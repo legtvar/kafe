@@ -1,3 +1,5 @@
+using System;
+
 namespace Kafe.Api;
 
 public class WeatherForecast

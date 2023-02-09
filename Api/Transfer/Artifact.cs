@@ -1,5 +1,8 @@
-﻿namespace Kafe.Api.Transfer;
+﻿using System.Collections.Immutable;
 
-public class ArtifactDto(
+namespace Kafe.Api.Transfer;
+
+public record ArtifactDto(
     string Id,
-    )
+    string ProjectId,
+    ImmutableArray<ShardListDto> Shards);

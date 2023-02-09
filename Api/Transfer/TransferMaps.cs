@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using System.Linq;
 using Kafe.Data.Aggregates;
 
 namespace Kafe.Transfer;
@@ -16,11 +17,12 @@ public static class TransferMaps
             ReleaseDate: data.ReleaseDate);
     }
 
-    public static ProjectDetailDto ToProjectDetailDto(Project data)
+    public static ProjectDetailDto ToProjectDetailDto(Project data, ProjectGroup group)
     {
         return new ProjectDetailDto(
             Id: data.Id,
             ProjectGroupId: data.ProjectGroupId,
+            ProjectGroupName: group.Name,
             Name: data.Name,
             Description: data.Description,
             Visibility: data.Visibility,

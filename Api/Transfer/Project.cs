@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Immutable;
 using Kafe.Data;
 
@@ -25,7 +26,7 @@ public record ProjectDetailDto(
     ImmutableArray<string> Authors,
     DateTimeOffset ReleaseDate,
     ImmutableArray<ProjectAuthorDto> Crew,
-    ImmutableArray<ProjectAuthorDto> Cast,
+    ImmutableArray<ProjectAuthorDto> Cast
 
     // Authors => Crew, Cast
     // Medias: Media[]

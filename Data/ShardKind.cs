@@ -1,8 +1,9 @@
 ﻿namespace Kafe.Data;
 
-public enum ArtifactKind
+public enum ShardKind
 {
     Invalid = 0,
-    Film = 1,
+    Video = 1,
     Image = 2,
+    Subtitles = 3
 }

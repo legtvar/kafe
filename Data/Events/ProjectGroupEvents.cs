@@ -1,3 +1,5 @@
+using System;
+
 namespace Kafe.Data.Events;
 
 public record ProjectGroupCreated(

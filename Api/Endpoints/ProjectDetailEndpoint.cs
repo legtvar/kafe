@@ -5,6 +5,8 @@ using Kafe.Transfer;
 using Marten;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Kafe.Endpoints;
 
@@ -23,11 +25,18 @@ public class ProjectDetailEndpoint : EndpointBaseAsync
     }
 
     [HttpGet]
-    public override async Task<ActionResult<ProjectDetailDto>> HandleAsync(string id,
+    public override async Task<ActionResult<ProjectDetailDto>> HandleAsync(
+        string id,
         CancellationToken cancellationToken = default)
     {
         var data = await db.Events.AggregateStreamAsync<Project>(id, token: cancellationToken);
         if (data is null)
+        {
+            return NotFound();
+        }
+
+        var group = await db.Events.AggregateStreamAsync<ProjectGroup>(data.ProjectGroupId, token: cancellationToken);
+        if (group is null)
         {
             return NotFound();
         }

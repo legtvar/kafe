@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Immutable;
 
 namespace Kafe.Data.Events;

@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace Kafe.Data;
+namespace Kafe;
 
 /// <summary>
 /// Human-Readable Identifier Ballast

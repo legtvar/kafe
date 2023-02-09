@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Immutable;
+using System.Linq;
 using Kafe.Data.Events;
 using Marten.Events;
 using Marten.Events.Aggregation;
@@ -50,7 +52,7 @@ public class ProjectProjection : SingleStreamAggregation<Project>
             Name = e.Name ?? p.Name,
             Description = e.Description ?? p.Description,
             Visibility = e.Visibility ?? p.Visibility,
-            ReleaseDate = e.ReleaseDate ?? p.ReleaseDate,
+            ReleaseDate = e.ReleaseDate.HasValue ? e.ReleaseDate.Value : p.ReleaseDate,
             PrimaryArtifactId = e.PrimaryArtifactId ?? p.PrimaryArtifactId
         };
     }

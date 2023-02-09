@@ -1,4 +1,5 @@
-﻿using Kafe.Data;
+﻿using Kafe.Common;
+using Kafe.Data;
 using Kafe.Data.Events;
 using Kafe.Lemma;
 using Marten;

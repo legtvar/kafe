@@ -1,10 +1,15 @@
 using System.Security.Claims;
 using System.Text.Json.Serialization;
+using System.Threading.Tasks;
 using idunno.Authentication.Basic;
 using Kafe.Data;
 using Kafe.Endpoints;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Rewrite;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 
 namespace Kafe.Api;

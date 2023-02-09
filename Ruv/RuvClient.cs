@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using System.Web;
 
 namespace Kafe.Ruv;
 
@@ -22,6 +23,7 @@ public class RuvClient : IDisposable
             UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:108.0) Gecko/20100101 Firefox/108.0",
             CookieContainer = cookieJar
         });
+        client = client.UseQueryEncoder(HttpUtility.UrlEncode);
     }
 
     public async Task LogIn(string username, string password)
@@ -32,7 +34,7 @@ public class RuvClient : IDisposable
         request.AddParameter("u_username", username);
         request.AddParameter("u_password", password);
         RestResponse response = await client.ExecuteAsync(request);
-        if (!response.IsSuccessStatusCode)
+        if (!response.IsSuccessful)
         {
             throw new InvalidOperationException("The 'LogIn' request failed.");
         }
@@ -56,8 +58,8 @@ public class RuvClient : IDisposable
             return newAuthor;
         }))).ToImmutableArray();
 
-        var imageId = await SendUpload(data.ImagePath, "image/jpeg");
-        if (imageId is null)
+        var image = await SendUpload(data.ImagePath, "image/jpeg");
+        if (image is null)
         {
             throw new InvalidOperationException("Could not upload a film's image.");
         }
@@ -91,21 +93,21 @@ public class RuvClient : IDisposable
             AnnotationEN: data.AnnotationEN,
             Authors: registerAuthors,
             FestivalDate: data.FestivalDate,
-            Attachments: ImmutableArray.Create(imageId.Value),
+            Attachments: ImmutableArray.Create(image),
             CitationLink: data.CitationLink,
             StudyProgram: data.StudyProgram,
             StudySubject: data.StudySubject);
         await SendRegisterArtwork(registerArtworkParams);
     }
 
-    public async Task<Guid?> SendUpload(string filePath, string contentType)
+    public async Task<RegisterArtworkAttachment> SendUpload(string filePath, string contentType)
     {
         using var multipartFormContent = new MultipartFormDataContent();
         var fileStreamContent = new StreamContent(File.OpenRead(filePath));
         fileStreamContent.Headers.ContentType = new MediaTypeHeaderValue(contentType);
         multipartFormContent.Add(fileStreamContent, name: "file", fileName: "file");
-            
-        using var clientHandler = new HttpClientHandler() {  CookieContainer = cookieJar };
+
+        using var clientHandler = new HttpClientHandler() { CookieContainer = cookieJar };
         using var client = new HttpClient(clientHandler);
         var response = await client.PostAsync($"{RuvBaseUrl}/app/rest/file/upload", multipartFormContent);
         response.EnsureSuccessStatusCode();
@@ -117,7 +119,10 @@ public class RuvClient : IDisposable
             throw new InvalidOperationException("An 'Upload' response is not valid JSON.");
         }
 
-        return json["data"]?["uuid"]?.GetValue<Guid>();
+        return new RegisterArtworkAttachment(
+            Id: (json["data"]?["id"]?.GetValue<int>())!.Value,
+            FileItemMetadata: (json["data"]?["uuid"]?.GetValue<Guid>())!.Value
+        );
     }
 
     public async Task<RegisterArtworkAuthor?> SendCheckAuthor(string personalNumber)
@@ -141,8 +146,8 @@ public class RuvClient : IDisposable
         //request.AddHeader("Cookie", "JSESSIONID=1F93E6D527194211EDD2BF39706249EF");
         request.AddParameter("personalNumber", personalNumber);
         RestResponse response = await client.ExecuteAsync(request);
-        
-        if (!response.IsSuccessStatusCode)
+
+        if (!response.IsSuccessful)
         {
             throw new InvalidOperationException("A 'CheckAuthor' request was unsuccessful.");
         }
@@ -178,7 +183,7 @@ public class RuvClient : IDisposable
         request.AddParameter("authorType", "");
         RestResponse response = await client.ExecuteAsync(request);
 
-        if (!response.IsSuccessStatusCode)
+        if (!response.IsSuccessful)
         {
             throw new InvalidOperationException("A 'SaveAuthor' request was unsuccessful.");
         }
@@ -189,7 +194,7 @@ public class RuvClient : IDisposable
 
     public async Task SendRegisterArtwork(RegisterArtworkParams data)
     {
-        var request = new RestRequest("/app/artwork/RegisterArtwork", Method.Get);
+        var request = new RestRequest("/app/artwork/RegisterArtwork", Method.Post);
         //request.CookieContainer = cookieJar;
         request.AddHeader("Accept-Language", "cs,en-US;q=0.7,en;q=0.3");
         request.AddHeader("Content-Type", "application/x-www-form-urlencoded");
@@ -199,7 +204,7 @@ public class RuvClient : IDisposable
         request.AddHeader("Upgrade-Insecure-Requests", "1");
         //request.AddHeader("Cookie", "JSESSIONID=1F93E6D527194211EDD2BF39706249EF");
         request.AddParameter("id", "");
-        request.AddParameter("uuid", "7960b64f-8936-45cc-9e1d-b40e2ba64ce3");
+        request.AddParameter("uuid", Guid.NewGuid());
         request.AddParameter("status", "0");
         request.AddParameter("acl", "");
         request.AddParameter("acl_status", "");
@@ -214,10 +219,10 @@ public class RuvClient : IDisposable
         request.AddParameter("impact", data.Impact);
         request.AddParameter("scope", data.Scope);
         request.AddParameter("name_cs", data.NameCS);
-        request.AddParameter("keywords_cs", string.Join('\n', data.KeywordsCS));
+        request.AddParameter("keywords_cs", string.Join("\r\n", data.KeywordsCS));
         request.AddParameter("annotation_cs", data.AnnotationCS);
         request.AddParameter("name_en", data.NameEN);
-        request.AddParameter("keywords_en", string.Join('\n', data.KeywordsEN));
+        request.AddParameter("keywords_en", string.Join("\r\n", data.KeywordsEN));
         request.AddParameter("annotation_en", data.AnnotationEN);
         for (int i = 0; i < data.Authors.Length; i++)
         {
@@ -226,7 +231,7 @@ public class RuvClient : IDisposable
                 ? (int)Math.Ceiling(100.0 / data.Authors.Length)
                 : (int)Math.Floor(100.0 / data.Authors.Length);
             request.AddParameter($"artworkAuthors[{i}].id", "");
-            request.AddParameter($"artworkAuthors[{i}].uuid", "");
+            request.AddParameter($"artworkAuthors[{i}].uuid", Guid.NewGuid());
             request.AddParameter($"artworkAuthors[{i}].acl", "");
             request.AddParameter($"artworkAuthors[{i}].author", author.Author);
             request.AddParameter($"artworkAuthors[{i}].firstname", author.FirstName);
@@ -236,11 +241,11 @@ public class RuvClient : IDisposable
             request.AddParameter($"artworkAuthors[{i}].organization", author.Organization);
             request.AddParameter($"artworkAuthors[{i}].share", share);
         }
-        
+
         // FFFI MU
         request.AddParameter("artworkInstitutions[0].id", "");
         request.AddParameter("artworkInstitutions[0].uuid", "");
-        request.AddParameter("artworkInstitutions[0].acl", "");
+        //request.AddParameter("artworkInstitutions[0].acl", "");
         request.AddParameter("artworkInstitutions[0].institution", "215950");
         request.AddParameter("artworkInstitutions[0].dateFrom", data.FestivalDate.ToString("dd.MM.yyyy"));
         request.AddParameter("artworkInstitutions[0].dateTo", data.FestivalDate.ToString("dd.MM.yyyy"));
@@ -259,16 +264,21 @@ public class RuvClient : IDisposable
 
         for (int i = 0; i < data.Attachments.Length; i++)
         {
+            var attachment = data.Attachments[i];
             request.AddParameter($"artworkAttachments[{i}].id", "");
             request.AddParameter($"artworkAttachments[{i}].uuid", "");
-            request.AddParameter($"artworkAttachments[{i}].acl", "");
-            request.AddParameter($"artworkAttachments[{i}].fileItemMetadata", data.Attachments[i].ToString());
+            //request.AddParameter($"artworkAttachments[{i}].acl", "");
+            request.AddParameter($"artworkAttachments[{i}].fileItemMetadata", attachment.FileItemMetadata);
         }
 
         request.AddParameter("file", "");
         request.AddParameter("save_ROZ", "");
         RestResponse response = await client.ExecuteAsync(request);
-        Console.WriteLine(response.Content);
+
+        if (!response.IsSuccessful)
+        {
+            throw new InvalidOperationException("A 'RegisterArtwork' request was unsuccessful.");
+        }
     }
 
     public record ImpactOption(string NameCS, int Value);
@@ -278,7 +288,7 @@ public class RuvClient : IDisposable
         var request = new RestRequest($"/app/rest/api/impact?artwork_type={artworkType}", Method.Get);
         RestResponse response = await client.ExecuteAsync(request);
 
-        if (!response.IsSuccessStatusCode)
+        if (!response.IsSuccessful)
         {
             throw new InvalidOperationException("An 'Impact' query was unsuccessful.");
         }
@@ -311,7 +321,7 @@ public class RuvClient : IDisposable
         var request = new RestRequest($"/app/rest/api/scope?artwork_type={artworkType}", Method.Get);
         RestResponse response = await client.ExecuteAsync(request);
 
-        if (!response.IsSuccessStatusCode)
+        if (!response.IsSuccessful)
         {
             throw new InvalidOperationException("An 'Scope' query was unsuccessful.");
         }

@@ -92,7 +92,7 @@ public record RegisterArtworkParams(
     string AnnotationEN, // Anotace v angličtině
     ImmutableArray<RegisterArtworkAuthor> Authors,
     DateTimeOffset FestivalDate,
-    ImmutableArray<Guid> Attachments,
+    ImmutableArray<RegisterArtworkAttachment> Attachments,
     string? CitationLink = null, // link to the video
     string StudyProgram = RuvConst.DefaultStudyProgram,
     string StudySubject = RuvConst.DefaultStudySubject
@@ -106,3 +106,7 @@ public record RegisterArtworkAuthor(
     string DegreeAfterName,
     string Organization = ""
 );
+
+public record RegisterArtworkAttachment(
+    int Id,
+    Guid FileItemMetadata);

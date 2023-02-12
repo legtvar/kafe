@@ -11,17 +11,19 @@ public record ProjectCreated(
 );
 public record ProjectAuthorAdded(
     string AuthorId,
-    ImmutableArray<string>? Jobs = null
+    ProjectAuthorKind Kind,
+    ImmutableArray<string>? Roles = null
 );
 public record ProjectAuthorRemoved(
-    string AuthorId
+    string AuthorId,
+    ImmutableArray<string>? Roles = null
 );
 public record ProjectInfoChanged(
     LocalizedString? Name = null,
     LocalizedString? Description = null,
     Visibility? Visibility = null,
     DateTimeOffset? ReleaseDate = null,
-    string? PrimaryArtifactId = null
+    LocalizedString? Genre = null
 );
 public record ProjectArtifactAdded(
     string ArtifactId

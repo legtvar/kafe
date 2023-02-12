@@ -41,6 +41,6 @@ public class ProjectDetailEndpoint : EndpointBaseAsync
             return NotFound();
         }
 
-        return Ok(TransferMaps.ToProjectDetailDto(data));
+        return Ok(TransferMaps.ToProjectDetailDto(data, group));
     }
 }

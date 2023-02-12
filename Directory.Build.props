@@ -1,0 +1,7 @@
+<Project>
+  <PropertyGroup>
+    <DefaultTargetFrameworks>net7.0</DefaultTargetFrameworks>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+</Project>

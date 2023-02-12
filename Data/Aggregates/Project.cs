@@ -12,10 +12,10 @@ public record Project(
     CreationMethod CreationMethod,
     string ProjectGroupId,
     ImmutableArray<ProjectAuthor> Authors,
-    string? PrimaryArtifactId,
     ImmutableArray<string> ArtifactIds,
     LocalizedString Name,
     LocalizedString? Description = null,
+    LocalizedString? Genre = null,
     Visibility Visibility = Visibility.Unknown,
     DateTimeOffset ReleaseDate = default,
     bool IsLocked = false
@@ -23,7 +23,8 @@ public record Project(
 
 public record ProjectAuthor(
     string Id,
-    ImmutableArray<string> Jobs
+    ProjectAuthorKind Kind,
+    ImmutableArray<string> Roles
 ) : IEntity;
 
 public class ProjectProjection : SingleStreamAggregation<Project>
@@ -39,7 +40,6 @@ public class ProjectProjection : SingleStreamAggregation<Project>
             CreationMethod: e.Data.CreationMethod,
             ProjectGroupId: e.Data.ProjectGroupId,
             Authors: ImmutableArray<ProjectAuthor>.Empty,
-            PrimaryArtifactId: null,
             ArtifactIds: ImmutableArray<string>.Empty,
             Name: e.Data.Name,
             Visibility: e.Data.Visibility);
@@ -52,8 +52,8 @@ public class ProjectProjection : SingleStreamAggregation<Project>
             Name = e.Name ?? p.Name,
             Description = e.Description ?? p.Description,
             Visibility = e.Visibility ?? p.Visibility,
-            ReleaseDate = e.ReleaseDate.HasValue ? e.ReleaseDate.Value : p.ReleaseDate,
-            PrimaryArtifactId = e.PrimaryArtifactId ?? p.PrimaryArtifactId
+            ReleaseDate = e.ReleaseDate ?? p.ReleaseDate,
+            Genre = e.Genre ?? p.Genre
         };
     }
 
@@ -65,16 +65,20 @@ public class ProjectProjection : SingleStreamAggregation<Project>
         }
 
         var author = p.Authors.SingleOrDefault(a => a.Id == e.AuthorId);
-        if (author is not null && e.Jobs.HasValue && !e.Jobs.Value.IsDefault)
+        if (author is not null && e.Roles.HasValue && !e.Roles.Value.IsDefault)
         {
-            author.Jobs
-                .Union(e.Jobs)
+            author.Roles
+                .Union(e.Roles)
                 .ToImmutableArray();
         }
         else
         {
-            author = new ProjectAuthor(e.AuthorId, e.Jobs.HasValue && !e.Jobs.Value.IsDefault
-                ? e.Jobs.Value : ImmutableArray.Create<string>());
+            author = new ProjectAuthor(
+                Id: e.AuthorId,
+                Kind: e.Kind,
+                Roles: e.Roles.HasValue && !e.Roles.Value.IsDefault
+                    ? e.Roles.Value
+                    : ImmutableArray.Create<string>());
         }
 
         return p with
@@ -91,10 +95,35 @@ public class ProjectProjection : SingleStreamAggregation<Project>
             return p;
         }
 
-        return p with
+        if (e.Roles is null)
         {
-            Authors = p.Authors.RemoveAll(a => a.Id == e.AuthorId)
-        };
+            return p with
+            {
+                Authors = p.Authors.RemoveAll(a => a.Id == e.AuthorId)
+            };
+        }
+        else
+        {
+            return p with
+            {
+                Authors = p.Authors
+                    .Select(a =>
+                    {
+                        if (a.Id != e.AuthorId)
+                        {
+                            return a;
+                        }
+
+                        return a with
+                        {
+                            Roles = a.Roles.RemoveAll(r => e.Roles.Value.Contains(r))
+                                .ToImmutableArray()
+                        };
+                    })
+                    .ToImmutableArray()
+            };
+        }
+
     }
 
     public Project Apply(ProjectArtifactAdded e, Project p)
@@ -120,8 +149,7 @@ public class ProjectProjection : SingleStreamAggregation<Project>
 
         return p with
         {
-            ArtifactIds = p.ArtifactIds.RemoveAll(a => a == e.ArtifactId),
-            PrimaryArtifactId = p.PrimaryArtifactId == e.ArtifactId ? null : p.PrimaryArtifactId
+            ArtifactIds = p.ArtifactIds.RemoveAll(a => a == e.ArtifactId)
         };
     }
 

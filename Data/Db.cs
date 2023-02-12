@@ -35,6 +35,10 @@ public static class Db
             });
 
             options.Projections.Add<AuthorProjection>();
+            options.Projections.Add<ArtifactProjection>();
+            options.Projections.Add<VideoShardProjection>();
+            options.Projections.Add<ImageShardProjection>();
+            options.Projections.Add<SubtitlesShardProjection>();
             options.Projections.Add<NotificationProjection>();
             options.Projections.Add<PlaylistProjection>();
             options.Projections.Add<ProjectProjection>();

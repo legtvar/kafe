@@ -2,7 +2,6 @@
 using Kafe.Data.Events;
 using Kafe.Lemma;
 using Marten;
-using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using LemmaVideo = Kafe.Lemma.Video;
 
@@ -10,26 +9,29 @@ namespace Kafe.Migrator;
 
 public static class Program
 {
-    private static LemmaContext wma = null!;
+    private static IConfiguration configuration = null!;
+    private static WmaClient wma = null!;
     private static IDocumentStore martenStore = null!;
     private static IDocumentSession kafe = null!;
     private static ILogger logger = null!;
+    private static Dictionary<int, Hrib> authorMap = new();
     private static Dictionary<int, Hrib> videoMap = new();
 
     public static async Task Main(string[] args)
     {
         using var host = Host.CreateDefaultBuilder(args)
+            .ConfigureAppConfiguration(c =>
+            {
+                c.AddJsonFile("appsettings.local.json");
+            })
             .ConfigureServices((context, services) =>
             {
-                services.AddDbContext<LemmaContext>(options =>
-                {
-                    options.UseNpgsql(context.Configuration.GetConnectionString("WMA")
-                        ?? throw new ArgumentException("The WMA connection string is missing!"));
-                }
-                );
+                WmaClient.AddWmaDb(services);
                 Db.AddDb(services, context.Configuration, context.HostingEnvironment);
+                services.AddSingleton<WmaClient>();
             })
             .Build();
+        configuration = host.Services.GetRequiredService<IConfiguration>();
         logger = host.Services.GetRequiredService<ILogger<Migrator>>();
         if (TryDropDb(host))
         {
@@ -38,37 +40,100 @@ public static class Program
         martenStore = host.Services.GetRequiredService<IDocumentStore>();
         await martenStore.Storage.ApplyAllConfiguredChangesToDatabaseAsync();
         kafe = martenStore.OpenSession();
-        wma = host.Services.GetRequiredService<LemmaContext>();
-        var projectGroups = wma.Projectgroups.OrderBy(a => a.Name)
-            .Include(g => g.Projects)
-            .ThenInclude(p => p.Videos)
-            .ToList();
-        foreach (var group in projectGroups)
-        {
-            MigrateProjectGroup(group);
-        }
+        wma = host.Services.GetRequiredService<WmaClient>();
+
+        await MigrateAllAuthors();
+        await MigrateAllProjectGroups();
+        await MigrateAllPlaylists();
+
         await kafe.SaveChangesAsync();
 
-        var playlists = wma.Playlists
-            .Include(p => p.Items)
-            .ToList();
-        foreach (var playlist in playlists)
-        {
-            MigratePlaylist(playlist);
-        }
-        await kafe.SaveChangesAsync();
+        //var projectGroups = await wma.GetAllProjectGroups();
+        //foreach (var group in projectGroups)
+        //{
+        //    MigrateProjectGroup(group);
+        //}
+        //await kafe.SaveChangesAsync();
 
-        var authorCount = await Marten.QueryableExtensions.CountAsync(
-            kafe.Query<Kafe.Data.Aggregates.Author>());
-        var playlistCount = await Marten.QueryableExtensions.CountAsync(
-            kafe.Query<Kafe.Data.Aggregates.Playlist>());
-        var projectGroupCount = await Marten.QueryableExtensions.CountAsync(
-            kafe.Query<Kafe.Data.Aggregates.ProjectGroup>());
-        var projectCounts = await Marten.QueryableExtensions.CountAsync(
-            kafe.Query<Kafe.Data.Aggregates.Project>());
+        //var playlists = await wma.GetAllPlaylists();
+        //foreach (var playlist in playlists)
+        //{
+        //    MigratePlaylist(playlist);
+        //}
+
+        var authorCount = await QueryableExtensions.CountAsync(
+            kafe.Query<Data.Aggregates.Author>());
+        var playlistCount = await QueryableExtensions.CountAsync(
+            kafe.Query<Data.Aggregates.Playlist>());
+        var projectGroupCount = await QueryableExtensions.CountAsync(
+            kafe.Query<Data.Aggregates.ProjectGroup>());
+        var projectCounts = await QueryableExtensions.CountAsync(
+            kafe.Query<Data.Aggregates.Project>());
         logger.LogInformation($"Found {authorCount} authors, {playlistCount} playlist, {projectGroupCount} project groups, {projectCounts} projects.");
 
         await kafe.DisposeAsync();
+    }
+
+    private static async Task MigrateAllAuthors()
+    {
+        var authors = await wma.GetAllAuthors();
+        foreach (var author in authors)
+        {
+            var id = CreateAuthor(
+                name: author.Name,
+                uco: author.RoleTables.FirstOrDefault(r => r.Authoruco is not null)?.Authoruco?.ToString(),
+                email: null,
+                phone: null);
+            authorMap.Add(author.Id, id);
+        }
+        await kafe.SaveChangesAsync();
+    }
+
+    private static async Task<Data.Aggregates.Author?> GetOrAddAuthor(int? id, string? name, string? uco, string? email, string? phone)
+    {
+        Data.Aggregates.Author? author = null;
+        if (id is not null && authorMap.TryGetValue(id.Value, out var hrib))
+        {
+            author = await kafe.Events.AggregateStreamAsync<Data.Aggregates.Author>(hrib)!;
+        }
+        else if (name is not null)
+        {
+            author = await kafe.Query<Data.Aggregates.Author>().Where(a => a.Name == name).FirstOrDefaultAsync();
+        }
+        else if (uco is not null)
+        {
+            author = await kafe.Query<Data.Aggregates.Author>().Where(a => a.Uco == uco).FirstOrDefaultAsync();
+        }
+        else if (email is not null)
+        {
+            author = await kafe.Query<Data.Aggregates.Author>().Where(a => a.Email == email).FirstOrDefaultAsync();
+        }
+        else if (phone is not null)
+        {
+            author = await kafe.Query<Data.Aggregates.Author>().Where(a => a.Phone == phone).FirstOrDefaultAsync();
+        }
+
+        if (author is null)
+        {
+            var hrib = CreateAuthor()
+        }
+        var infoChanged = new AuthorInfoChanged
+        {
+            Name = name,
+            Uco = uco,
+            Email = email,
+            Phone = phone
+        };
+    }
+
+    private static async Task MigrateAllProjectGroups()
+    {
+        var projectGroups = await wma.GetAllProjectGroups();
+    }
+
+    private static async Task MigrateAllPlaylists()
+    {
+        var playlists = await wma.GetAllPlaylists();
     }
 
     private static Hrib MigrateProjectGroup(Projectgroup group)
@@ -80,7 +145,7 @@ public static class Program
         var closed = new ProjectGroupClosed();
         logger.LogInformation($"[{hrib}]: {created}");
         logger.LogInformation($"[{hrib}]: {closed}");
-        var stream = kafe.Events.StartStream<Kafe.Data.Aggregates.ProjectGroup>(hrib, created, closed);
+        var stream = kafe.Events.StartStream<Data.Aggregates.ProjectGroup>(hrib, created, closed);
         foreach (var project in group.Projects)
         {
             MigrateProject(project, hrib);
@@ -103,7 +168,7 @@ public static class Program
             Description: (LocalizedString?)project.Desc);
         logger.LogInformation($"[{hrib}]: {created}");
         logger.LogInformation($"[{hrib}]: {infoChanged}");
-        var stream = kafe.Events.StartStream<Kafe.Data.Aggregates.Project>(hrib, created, infoChanged);
+        var stream = kafe.Events.StartStream<Data.Aggregates.Project>(hrib, created, infoChanged);
 
         if (project.Closed == true)
         {
@@ -133,6 +198,11 @@ public static class Program
         return hrib;
     }
 
+    private static async Task DiscoverMigratedArtifacts()
+    {
+
+    }
+
     private static Hrib MigrateVideo(LemmaVideo video, Hrib projectId)
     {
         var hrib = Hrib.Create();
@@ -152,8 +222,9 @@ public static class Program
             Name: (LocalizedString)(playlist.Name ?? string.Format(Fallback.PlaylistName, hrib)),
             Visibility: Visibility.Internal);
         logger.LogInformation($"[{hrib}]: {created}");
-        kafe.Events.StartStream<Kafe.Data.Aggregates.Playlist>(hrib, created);
-        if (!string.IsNullOrEmpty(playlist.Desc)) {
+        kafe.Events.StartStream<Data.Aggregates.Playlist>(hrib, created);
+        if (!string.IsNullOrEmpty(playlist.Desc))
+        {
             var infoChanged = new PlaylistInfoChanged(
                 Description: (LocalizedString?)playlist.Desc
             );
@@ -188,7 +259,7 @@ public static class Program
             Phone: phone);
         logger.LogInformation($"[{hrib}]: {created}");
         logger.LogInformation($"[{hrib}]: {infoChanged}");
-        var stream = kafe.Events.StartStream<Kafe.Data.Aggregates.Author>(hrib, created, infoChanged);
+        kafe.Events.StartStream<Data.Aggregates.Author>(hrib, created, infoChanged);
         return hrib;
     }
 

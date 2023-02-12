@@ -13,9 +13,9 @@ public record Artifact(
     string ProjectId,
     ImmutableArray<string> ShardIds) : IEntity;
 
-public class ArtifactProjections : SingleStreamAggregation<Artifact>
+public class ArtifactProjection : SingleStreamAggregation<Artifact>
 {
-    public ArtifactProjections()
+    public ArtifactProjection()
     {
     }
 

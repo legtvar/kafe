@@ -11,3 +11,10 @@ dotnet ef dbcontext scaffold "host=localhost;database=lemma;password=password;us
 ```
 
 > You may need to adjust the connection string.
+
+## Importing data into Postgres
+
+1. Download the exported file (e.g. `lemma-15-08-2022.sql`).
+2. Localize `psql` (try `C:\Program Files\PostgreSQL\14\bin` on Windows).
+3. Run `cat ./lemma-15-08-2022.sql | psql -U postgres`.
+4. The default password is `postgres`.

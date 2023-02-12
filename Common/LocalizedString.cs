@@ -60,6 +60,7 @@ public sealed class LocalizedString : IEquatable<LocalizedString>
         return Create((CultureInfo.InvariantCulture, invariantString));
     }
 
+    [return: NotNullIfNotNull(nameof(localized))]
     public static explicit operator string?(LocalizedString? localized)
     {
         return localized?[CultureInfo.InvariantCulture];

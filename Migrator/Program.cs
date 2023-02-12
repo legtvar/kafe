@@ -1,5 +1,4 @@
-﻿using Kafe.Common;
-using Kafe.Data;
+﻿using Kafe.Data;
 using Kafe.Data.Events;
 using Kafe.Lemma;
 using Marten;
@@ -122,7 +121,7 @@ public static class Program
                 project.ExternalAuthorUco,
                 project.ExternalAuthorMail,
                 project.ExternalAuthorPhone);
-            var authorAdded = new ProjectAuthorAdded(authorId);
+            var authorAdded = new ProjectAuthorAdded(authorId, ProjectAuthorKind.Unknown);
             logger.LogInformation($"[{hrib}]: {authorAdded}");
             kafe.Events.Append(hrib, authorAdded);
         }

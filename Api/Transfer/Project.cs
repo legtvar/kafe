@@ -11,33 +11,36 @@ public record ProjectListDto(
     LocalizedString? Description,
     Visibility Visibility,
     DateTimeOffset ReleaseDate
-    // string? Thumbnail
-    // TODO: LocalizedString
+    // TODO: Thumbnail
     );
 
 public record ProjectDetailDto(
     string Id,
     string ProjectGroupId,
-    LocalizedString ProjectGroupName,
+    LocalizedString? ProjectGroupName,
     LocalizedString? Genre,
     LocalizedString Name,
     LocalizedString? Description,
     Visibility Visibility,
-    ImmutableArray<string> Authors,
     DateTimeOffset ReleaseDate,
     ImmutableArray<ProjectAuthorDto> Crew,
-    ImmutableArray<ProjectAuthorDto> Cast
-
-    // Authors => Crew, Cast
-    // Medias: Media[]
+    ImmutableArray<ProjectAuthorDto> Cast,
+    ImmutableArray<ProjectArtifactDto> Artifacts
     );
 
 public record ProjectAuthorDto(
     string Id,
     string Name,
-    ImmutableArray<string> Jobs);
+    ImmutableArray<string> Roles);
 
+public record ProjectArtifactDto(
+    string Id,
+    LocalizedString Name,
+    // TODO: Blueprint reference
+    // TODO: Validation status
+    ImmutableArray<ProjectArtifactShardDto> Shards);
 
-// Media (Files: File[])
-// File (FileType, Id, Validation Requirements, Validation Status)
-// FileType: Image | Video | Subtitles | Other
+public record ProjectArtifactShardDto(
+    string Id,
+    ShardKind Kind,
+    ImmutableArray<string> Variants);

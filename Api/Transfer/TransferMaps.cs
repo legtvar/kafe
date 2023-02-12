@@ -17,17 +17,21 @@ public static class TransferMaps
             ReleaseDate: data.ReleaseDate);
     }
 
-    public static ProjectDetailDto ToProjectDetailDto(Project data, ProjectGroup group)
+    public static ProjectDetailDto ToProjectDetailDto(Project data)
     {
         return new ProjectDetailDto(
             Id: data.Id,
             ProjectGroupId: data.ProjectGroupId,
-            ProjectGroupName: group.Name,
+            ProjectGroupName: null,
+            Genre: data.Genre,
             Name: data.Name,
             Description: data.Description,
             Visibility: data.Visibility,
-            Authors: data.Authors.Select(a => a.Id).ToImmutableArray(),
-            ReleaseDate: data.ReleaseDate);
+            ReleaseDate: data.ReleaseDate,
+            Crew: ImmutableArray<ProjectAuthorDto>.Empty,
+            Cast: ImmutableArray<ProjectAuthorDto>.Empty,
+            Artifacts: ImmutableArray<ProjectArtifactDto>.Empty
+        );
     }
 
     public static AuthorListDto ToAuthorListDto(Author data)

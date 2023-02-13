@@ -3,12 +3,15 @@ using Kafe.Data.Events;
 using Kafe.Lemma;
 using Marten;
 using Npgsql;
+using System.Text.Json;
 using LemmaVideo = Kafe.Lemma.Video;
 
 namespace Kafe.Migrator;
 
 public static class Program
 {
+    private const string MigrationInfoFileName = "migration.json";
+
     private static IConfiguration configuration = null!;
     private static WmaClient wma = null!;
     private static IDocumentStore martenStore = null!;
@@ -16,6 +19,8 @@ public static class Program
     private static ILogger logger = null!;
     private static Dictionary<int, Hrib> authorMap = new();
     private static Dictionary<int, Hrib> videoMap = new();
+    private static Dictionary<int, Hrib> artifactMap = new();
+
 
     public static async Task Main(string[] args)
     {
@@ -42,6 +47,7 @@ public static class Program
         kafe = martenStore.OpenSession();
         wma = host.Services.GetRequiredService<WmaClient>();
 
+        await DiscoverMigratedArtifacts();
         await MigrateAllAuthors();
         await MigrateAllProjectGroups();
         await MigrateAllPlaylists();
@@ -89,7 +95,12 @@ public static class Program
         await kafe.SaveChangesAsync();
     }
 
-    private static async Task<Data.Aggregates.Author?> GetOrAddAuthor(int? id, string? name, string? uco, string? email, string? phone)
+    private static async Task<Data.Aggregates.Author?> GetOrAddAuthor(
+        int? id,
+        string? name,
+        string? uco,
+        string? email,
+        string? phone)
     {
         Data.Aggregates.Author? author = null;
         if (id is not null && authorMap.TryGetValue(id.Value, out var hrib))
@@ -115,15 +126,25 @@ public static class Program
 
         if (author is null)
         {
-            var hrib = CreateAuthor()
+            var newHrib = CreateAuthor(name, uco, email, phone);
+            author = await kafe.Events.AggregateStreamAsync<Data.Aggregates.Author>(newHrib);
         }
-        var infoChanged = new AuthorInfoChanged
+        else
         {
-            Name = name,
-            Uco = uco,
-            Email = email,
-            Phone = phone
-        };
+            var infoChanged = new AuthorInfoChanged
+            {
+                Name = name,
+                Uco = uco,
+                Email = email,
+                Phone = phone
+            };
+            if (name is not null || uco is not null || email is not null || phone is not null)
+            {
+                kafe.Events.Append(author.Id, infoChanged);
+            }
+        }
+        await kafe.SaveChangesAsync();
+        return author;
     }
 
     private static async Task MigrateAllProjectGroups()
@@ -200,7 +221,33 @@ public static class Program
 
     private static async Task DiscoverMigratedArtifacts()
     {
+        var artifactDirectory = configuration.Get<MigratorConfiguration>()?.ArtifactDirectory;
+        if (string.IsNullOrEmpty(artifactDirectory))
+        {
+            throw new InvalidOperationException("The 'ArtifactDirectory' setting is not set.");
+        }
 
+        var subdirs = new DirectoryInfo(artifactDirectory).GetDirectories();
+        foreach (var subdir in subdirs)
+        {
+            var migrationInfoFile = subdir.GetFiles(MigrationInfoFileName).SingleOrDefault();
+
+            if (migrationInfoFile is null)
+            {
+                logger.LogWarning($"'{subdir}' does not contain a {MigrationInfoFileName}.");
+                continue;
+            }
+
+            using var stream = migrationInfoFile.OpenRead();
+            var migrationInfo = await JsonSerializer.DeserializeAsync<ArtifactMigrationInfo>(stream);
+            if (migrationInfo is null)
+            {
+                logger.LogWarning($"'{migrationInfoFile}' could not be deserialized from JSON.");
+                continue;
+            }
+
+            artifactMap.Add(migrationInfo.WmaId, migrationInfo.KafeId);
+        }
     }
 
     private static Hrib MigrateVideo(LemmaVideo video, Hrib projectId)
@@ -249,7 +296,7 @@ public static class Program
     private static Hrib CreateAuthor(string? name, string? uco, string? email, string? phone)
     {
         var hrib = Hrib.Create();
-        name ??= string.Format(Fallback.ProjectName, hrib);
+        name ??= string.Format(Fallback.AuthorName, hrib);
         var created = new AuthorCreated(
             CreationMethod: CreationMethod.Migrator,
             Name: name);
@@ -261,6 +308,17 @@ public static class Program
         logger.LogInformation($"[{hrib}]: {infoChanged}");
         kafe.Events.StartStream<Data.Aggregates.Author>(hrib, created, infoChanged);
         return hrib;
+    }
+
+    private static Hrib CreateArtifact(string name, Hrib projectId, Hrib? id = null)
+    {
+        id ??= Hrib.Create();
+        var created = new ArtifactCreated(
+            CreationMethod: CreationMethod.Migrator,
+            Name: (LocalizedString)name,
+            ProjectId: projectId);
+        logger.LogInformation($"[{id}]: {created}");
+        return id;
     }
 
     // knicked from https://github.com/JasperFx/marten/blob/master/src/CoreTests/create_database_Tests.cs

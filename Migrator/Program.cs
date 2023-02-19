@@ -3,6 +3,8 @@ using Kafe.Data.Events;
 using Kafe.Lemma;
 using Marten;
 using Npgsql;
+using System.Collections.Concurrent;
+using System.Collections.Immutable;
 using System.Text.Json;
 using LemmaVideo = Kafe.Lemma.Video;
 
@@ -13,13 +15,14 @@ public static class Program
     private const string MigrationInfoFileName = "migration.json";
 
     private static IConfiguration configuration = null!;
+    private static MigratorConfiguration migratorConfiguration = null!;
     private static WmaClient wma = null!;
-    private static IDocumentStore martenStore = null!;
-    private static IDocumentSession kafe = null!;
+    private static KafeClient kafe = null!;
     private static ILogger logger = null!;
-    private static Dictionary<int, Hrib> authorMap = new();
-    private static Dictionary<int, Hrib> videoMap = new();
-    private static Dictionary<int, Hrib> artifactMap = new();
+    private static readonly ConcurrentDictionary<int, Hrib> authorMap = new();
+    private static readonly ConcurrentDictionary<int, Hrib> videoMap = new();
+    private static readonly ConcurrentDictionary<int, Hrib> projectMap = new();
+    private static readonly ConcurrentDictionary<int, Hrib> artifactMap = new();
 
 
     public static async Task Main(string[] args)
@@ -34,25 +37,26 @@ public static class Program
                 WmaClient.AddWmaDb(services);
                 Db.AddDb(services, context.Configuration, context.HostingEnvironment);
                 services.AddSingleton<WmaClient>();
+                services.AddSingleton<KafeClient>();
             })
             .Build();
         configuration = host.Services.GetRequiredService<IConfiguration>();
+        migratorConfiguration = configuration.Get<MigratorConfiguration>()!;
         logger = host.Services.GetRequiredService<ILogger<Migrator>>();
         if (TryDropDb(host))
         {
             logger.LogInformation("Database dropped.");
         }
-        martenStore = host.Services.GetRequiredService<IDocumentStore>();
-        await martenStore.Storage.ApplyAllConfiguredChangesToDatabaseAsync();
-        kafe = martenStore.OpenSession();
+        kafe = host.Services.GetRequiredService<KafeClient>();
         wma = host.Services.GetRequiredService<WmaClient>();
 
-        await DiscoverMigratedArtifacts();
         await MigrateAllAuthors();
         await MigrateAllProjectGroups();
-        await MigrateAllPlaylists();
 
-        await kafe.SaveChangesAsync();
+        await DiscoverMigratedArtifacts();
+        await MigrateAllVideos();
+
+        await MigrateAllPlaylists();
 
         //var projectGroups = await wma.GetAllProjectGroups();
         //foreach (var group in projectGroups)
@@ -67,17 +71,31 @@ public static class Program
         //    MigratePlaylist(playlist);
         //}
 
-        var authorCount = await QueryableExtensions.CountAsync(
-            kafe.Query<Data.Aggregates.Author>());
-        var playlistCount = await QueryableExtensions.CountAsync(
-            kafe.Query<Data.Aggregates.Playlist>());
-        var projectGroupCount = await QueryableExtensions.CountAsync(
-            kafe.Query<Data.Aggregates.ProjectGroup>());
-        var projectCounts = await QueryableExtensions.CountAsync(
-            kafe.Query<Data.Aggregates.Project>());
-        logger.LogInformation($"Found {authorCount} authors, {playlistCount} playlist, {projectGroupCount} project groups, {projectCounts} projects.");
+        var authorCount = await kafe.CountAuthors();
+        var playlistCount = await kafe.CountPlaylists();
+        var projectGroupCount = await kafe.CountProjectGroups();
+        var projectCount = await kafe.CountProjects();
+        var artifactCount = await kafe.CountArtifacts();
+        logger.LogInformation("Found {} authors, {} playlist, {} project groups, {} projects, {} artifacts.",
+            authorCount,
+            playlistCount,
+            projectGroupCount,
+            projectCount,
+            artifactCount);
 
         await kafe.DisposeAsync();
+        wma.Dispose();
+    }
+
+    private static Task<Data.Aggregates.Author> GetOrAddAuthor(
+        int? id,
+        string? name,
+        string? uco,
+        string? email,
+        string? phone)
+    {
+        Hrib? hrib = id.HasValue ? authorMap.GetValueOrDefault(id.Value) : null;
+        return kafe.GetOrAddAuthor(hrib, name, uco, email, phone);
     }
 
     private static async Task MigrateAllAuthors()
@@ -85,143 +103,88 @@ public static class Program
         var authors = await wma.GetAllAuthors();
         foreach (var author in authors)
         {
-            var id = CreateAuthor(
+            await GetOrAddAuthor(
+                id: null,
                 name: author.Name,
                 uco: author.RoleTables.FirstOrDefault(r => r.Authoruco is not null)?.Authoruco?.ToString(),
                 email: null,
                 phone: null);
-            authorMap.Add(author.Id, id);
         }
-        await kafe.SaveChangesAsync();
-    }
-
-    private static async Task<Data.Aggregates.Author?> GetOrAddAuthor(
-        int? id,
-        string? name,
-        string? uco,
-        string? email,
-        string? phone)
-    {
-        Data.Aggregates.Author? author = null;
-        if (id is not null && authorMap.TryGetValue(id.Value, out var hrib))
-        {
-            author = await kafe.Events.AggregateStreamAsync<Data.Aggregates.Author>(hrib)!;
-        }
-        else if (name is not null)
-        {
-            author = await kafe.Query<Data.Aggregates.Author>().Where(a => a.Name == name).FirstOrDefaultAsync();
-        }
-        else if (uco is not null)
-        {
-            author = await kafe.Query<Data.Aggregates.Author>().Where(a => a.Uco == uco).FirstOrDefaultAsync();
-        }
-        else if (email is not null)
-        {
-            author = await kafe.Query<Data.Aggregates.Author>().Where(a => a.Email == email).FirstOrDefaultAsync();
-        }
-        else if (phone is not null)
-        {
-            author = await kafe.Query<Data.Aggregates.Author>().Where(a => a.Phone == phone).FirstOrDefaultAsync();
-        }
-
-        if (author is null)
-        {
-            var newHrib = CreateAuthor(name, uco, email, phone);
-            author = await kafe.Events.AggregateStreamAsync<Data.Aggregates.Author>(newHrib);
-        }
-        else
-        {
-            var infoChanged = new AuthorInfoChanged
-            {
-                Name = name,
-                Uco = uco,
-                Email = email,
-                Phone = phone
-            };
-            if (name is not null || uco is not null || email is not null || phone is not null)
-            {
-                kafe.Events.Append(author.Id, infoChanged);
-            }
-        }
-        await kafe.SaveChangesAsync();
-        return author;
     }
 
     private static async Task MigrateAllProjectGroups()
     {
         var projectGroups = await wma.GetAllProjectGroups();
+        foreach (var projectGroup in projectGroups)
+        {
+            var kafeGroup = await kafe.CreateProjectGroup(projectGroup.Name);
+            foreach (var project in projectGroup.Projects)
+            {
+                await MigrateProject(project, kafeGroup.Id);
+            }
+        }
     }
 
     private static async Task MigrateAllPlaylists()
     {
         var playlists = await wma.GetAllPlaylists();
+        foreach (var playlist in playlists)
+        {
+            await MigratePlaylist(playlist);
+        }
     }
 
-    private static Hrib MigrateProjectGroup(Projectgroup group)
+    private static async Task<Data.Aggregates.Project> MigrateProject(Project project, Hrib groupId)
     {
-        var hrib = Hrib.Create();
-        var created = new ProjectGroupCreated(
-            CreationMethod.Migrator,
-            (LocalizedString)(group.Name ?? string.Format(Fallback.ProjectGroupName, hrib)));
-        var closed = new ProjectGroupClosed();
-        logger.LogInformation($"[{hrib}]: {created}");
-        logger.LogInformation($"[{hrib}]: {closed}");
-        var stream = kafe.Events.StartStream<Data.Aggregates.ProjectGroup>(hrib, created, closed);
-        foreach (var project in group.Projects)
-        {
-            MigrateProject(project, hrib);
-        }
-        return hrib;
-    }
-
-    private static Hrib MigrateProject(Project project, Hrib groupId)
-    {
-        var hrib = Hrib.Create();
-        var created = new ProjectCreated(
-            CreationMethod: CreationMethod.Migrator,
-            ProjectGroupId: groupId,
-            Name: (LocalizedString)(project.Name ?? string.Format(Fallback.ProjectName, hrib)),
-            Visibility: project.Publicpseudosecret == true ? Visibility.Internal : Visibility.Private);
-        var infoChanged = new ProjectInfoChanged(
-            ReleaseDate: project.ReleaseDate.HasValue
-                ? new DateTimeOffset(project.ReleaseDate.Value)
-                : null,
-            Description: (LocalizedString?)project.Desc);
-        logger.LogInformation($"[{hrib}]: {created}");
-        logger.LogInformation($"[{hrib}]: {infoChanged}");
-        var stream = kafe.Events.StartStream<Data.Aggregates.Project>(hrib, created, infoChanged);
-
-        if (project.Closed == true)
-        {
-            var locked = new ProjectLocked();
-            kafe.Events.Append(hrib, locked);
-            logger.LogInformation($"[{hrib}]: {locked}");
-        }
+        var authors = ImmutableArray.CreateBuilder<Data.Aggregates.ProjectAuthor>();
 
         if (project.ExternalAuthorName is not null
             || project.ExternalAuthorMail is not null
             || project.ExternalAuthorUco is not null)
         {
-            var authorId = CreateAuthor(
+            var author = await GetOrAddAuthor(
+                null,
                 project.ExternalAuthorName,
                 project.ExternalAuthorUco,
                 project.ExternalAuthorMail,
                 project.ExternalAuthorPhone);
-            var authorAdded = new ProjectAuthorAdded(authorId, ProjectAuthorKind.Unknown);
-            logger.LogInformation($"[{hrib}]: {authorAdded}");
-            kafe.Events.Append(hrib, authorAdded);
+            authors.Add(new Data.Aggregates.ProjectAuthor(
+                Id: author.Id,
+                Kind: ProjectAuthorKind.Crew,
+                Roles: ImmutableArray<string>.Empty));
         }
 
-        foreach (var video in project.Videos)
+
+        foreach (var authorRole in project.RoleTables.GroupBy(r => r.Authoruco))
         {
-            MigrateVideo(video, hrib);
+            var first = authorRole.First();
+            var kafeAuthor = await GetOrAddAuthor(
+                first.Authoruco,
+                first.Authorname,
+                authorRole.Key.ToString(),
+                null,
+                null);
+            var projectAuthor = new Data.Aggregates.ProjectAuthor(
+                Id: kafeAuthor.Id,
+                Kind: ProjectAuthorKind.Crew,
+                Roles: authorRole.Select(r => r.Name).ToImmutableArray());
+            authors.Add(projectAuthor);
         }
-        return hrib;
+
+        var kafeProject = await kafe.CreateProject(
+            name: project.Name,
+            visibility: project.Publicpseudosecret == true ? Visibility.Internal : Visibility.Private,
+            projectGroupId: groupId,
+            description: project.Desc,
+            releaseDate: project.ReleaseDate,
+            isLocked: project.Closed == true,
+            authors: authors);
+        return kafeProject;
     }
 
     private static async Task DiscoverMigratedArtifacts()
     {
-        var artifactDirectory = configuration.Get<MigratorConfiguration>()?.ArtifactDirectory;
+        var artifactDirectory = migratorConfiguration.KafeArtifactDirectory;
         if (string.IsNullOrEmpty(artifactDirectory))
         {
             throw new InvalidOperationException("The 'ArtifactDirectory' setting is not set.");
@@ -246,79 +209,122 @@ public static class Program
                 continue;
             }
 
-            artifactMap.Add(migrationInfo.WmaId, migrationInfo.KafeId);
+            artifactMap[migrationInfo.WmaId] = migrationInfo.ArtifactId;
+            await kafe.CreateVideoArtifact(
+                name: migrationInfo.Name,
+                artifactId: migrationInfo.ArtifactId,
+                shardId: migrationInfo.VideoShardId);
         }
     }
 
-    private static Hrib MigrateVideo(LemmaVideo video, Hrib projectId)
+    private static async Task MigrateAllVideos()
     {
-        var hrib = Hrib.Create();
-        var added = new ProjectArtifactAdded(
-            ArtifactId: hrib);
-        videoMap.Add(video.Id, hrib);
-        logger.LogInformation($"[{projectId}]: {added}");
-        kafe.Events.Append(projectId, added);
-        return hrib;
-    }
-
-    private static Hrib MigratePlaylist(Playlist playlist)
-    {
-        var hrib = Hrib.Create();
-        var created = new PlaylistCreated(
-            CreationMethod: CreationMethod.Migrator,
-            Name: (LocalizedString)(playlist.Name ?? string.Format(Fallback.PlaylistName, hrib)),
-            Visibility: Visibility.Internal);
-        logger.LogInformation($"[{hrib}]: {created}");
-        kafe.Events.StartStream<Data.Aggregates.Playlist>(hrib, created);
-        if (!string.IsNullOrEmpty(playlist.Desc))
+        var videos = await wma.GetAllVideos();
+        foreach (var video in videos)
         {
-            var infoChanged = new PlaylistInfoChanged(
-                Description: (LocalizedString?)playlist.Desc
-            );
-            kafe.Events.Append(hrib, infoChanged);
-            logger.LogInformation($"[{hrib}]: {infoChanged}");
+            await MigrateVideo(video);
+        }
+    }
+
+    private static async Task<Hrib> MigrateVideo(LemmaVideo video)
+    {
+        if (artifactMap.TryGetValue(video.Id, out var hrib))
+        {
+            if (projectMap.TryGetValue(video.Project, out var projectId))
+            {
+                await kafe.AddArtifactToProject(hrib, projectId);
+            }
+            return hrib;
         }
 
+        var (artifact, shard) = await kafe.CreateVideoArtifact(
+            name: video.Name,
+            projectId: projectMap.GetValueOrDefault(video.Project));
+
+        await CopyVideo(
+            name: video.Name,
+            wmaId: video.Id,
+            artifactId: artifact.Id,
+            shardId: shard.Id);
+
+        return artifact.Id;
+    }
+
+    private static async Task CopyVideo(string name, int wmaId, Hrib artifactId, Hrib shardId)
+    {
+        var originalDir = new DirectoryInfo(Path.Combine(migratorConfiguration.WmaVideoDirectory, wmaId.ToString()));
+        if (!originalDir.Exists)
+        {
+            logger.LogError("Video '{}' ({}) could not be migrated because its directory could not be found on disk.",
+                name, wmaId);
+            return;
+        }
+
+        var originalCandidates = originalDir.GetFiles("original.*").OrderBy(f => f.Name).ToArray();
+        if (originalCandidates.Length == 0)
+        {
+            logger.LogError("Video '{}' ({}) could not be migrated because the original footage could not be found.",
+                name, wmaId);
+            return;
+        }
+
+        if (originalCandidates.Length > 1)
+        {
+            logger.LogWarning("Video '{}' ({}) has multiple original footage files. Picking '{}'.",
+                name, wmaId, originalCandidates.First().Name);
+        }
+
+        var originalFile = originalCandidates.First();
+
+        var destination = new DirectoryInfo(Path.Combine(migratorConfiguration.KafeArtifactDirectory, artifactId));
+        if (destination.Exists)
+        {
+            logger.LogError("Video '{}' ({}) with artifact id '{}' has already been migrated. " +
+                "Hopefully this is not a HRIB conflict.",
+                name, wmaId, artifactId);
+            return;
+        }
+
+        destination.Create();
+
+        var migrationInfo = new ArtifactMigrationInfo(
+            WmaId: wmaId,
+            ArtifactId: artifactId,
+            VideoShardId: shardId,
+            Name: name);
+        using var metadataFile = new FileStream(
+            Path.Combine(destination.FullName, MigrationInfoFileName),
+            FileMode.Create,
+            FileAccess.Write);
+        await JsonSerializer.SerializeAsync(metadataFile, migrationInfo);
+
+        var shardDir = destination.CreateSubdirectory(shardId);
+
+        var src = originalFile.OpenRead();
+        using var dst = new FileStream(
+            Path.Combine(shardDir.FullName, originalFile.Name),
+            FileMode.Create,
+            FileAccess.Write);
+        await src.CopyToAsync(dst);
+    }
+
+    private static async Task<Data.Aggregates.Playlist> MigratePlaylist(Playlist playlist)
+    {
+        var artifactIds = ImmutableArray.CreateBuilder<Hrib>();
         foreach (var item in playlist.Items.OrderBy(i => i.Position))
         {
-            if (!videoMap.TryGetValue(item.Video, out var videoId))
+            if (!artifactMap.TryGetValue(item.Video, out var artifactId))
             {
-                logger.LogWarning($"Video '{item.Video}' has not been migrated but is referenced by a playlist.");
+                logger.LogWarning($"Video '{item.Video}' could not be found but is referenced by a playlist.");
                 continue;
             }
-            var itemAdded = new PlaylistVideoAdded(videoId);
-            logger.LogInformation($"[{hrib}]: {itemAdded}");
-            kafe.Events.Append(hrib, itemAdded);
+            artifactIds.Add(artifactId);
         }
-        return hrib;
-    }
 
-    private static Hrib CreateAuthor(string? name, string? uco, string? email, string? phone)
-    {
-        var hrib = Hrib.Create();
-        name ??= string.Format(Fallback.AuthorName, hrib);
-        var created = new AuthorCreated(
-            CreationMethod: CreationMethod.Migrator,
-            Name: name);
-        var infoChanged = new AuthorInfoChanged(
-            Uco: uco,
-            Email: email,
-            Phone: phone);
-        logger.LogInformation($"[{hrib}]: {created}");
-        logger.LogInformation($"[{hrib}]: {infoChanged}");
-        kafe.Events.StartStream<Data.Aggregates.Author>(hrib, created, infoChanged);
-        return hrib;
-    }
-
-    private static Hrib CreateArtifact(string name, Hrib projectId, Hrib? id = null)
-    {
-        id ??= Hrib.Create();
-        var created = new ArtifactCreated(
-            CreationMethod: CreationMethod.Migrator,
-            Name: (LocalizedString)name,
-            ProjectId: projectId);
-        logger.LogInformation($"[{id}]: {created}");
-        return id;
+        return await kafe.CreatePlaylist(
+            name: playlist.Name,
+            description: playlist.Desc,
+            videos: artifactIds.ToImmutable());
     }
 
     // knicked from https://github.com/JasperFx/marten/blob/master/src/CoreTests/create_database_Tests.cs

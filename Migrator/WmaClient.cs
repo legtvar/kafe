@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Kafe.Migrator;
 
-public class WmaClient
+public sealed class WmaClient : IDisposable
 {
     private readonly LemmaContext wma;
 
@@ -33,9 +33,8 @@ public class WmaClient
     {
         return wma.Projectgroups.OrderBy(a => a.Name)
             .Include(g => g.Projects)
-            .ThenInclude(p => p.Videos)
-            .Include(g => g.Projects)
             .ThenInclude(p => p.RoleTables)
+            .ThenInclude(r => r.AuthorucoNavigation)
             .ToListAsync();
     }
 
@@ -46,4 +45,16 @@ public class WmaClient
             .ToListAsync();
     }
 
+    public Task<List<Video>> GetAllVideos()
+    {
+        return wma.Videos
+            .Include(v => v.ProjectNavigation)
+            .Include(v => v.ResponsiblepersonNavigation)
+            .ToListAsync();
+    }
+
+    public void Dispose()
+    {
+        ((IDisposable)wma).Dispose();
+    }
 }

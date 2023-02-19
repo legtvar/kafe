@@ -2,4 +2,6 @@
 
 public record ArtifactMigrationInfo(
     int WmaId,
-    string KafeId);
+    string ArtifactId,
+    string VideoShardId,
+    string Name);

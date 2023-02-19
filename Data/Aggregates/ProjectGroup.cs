@@ -21,12 +21,12 @@ public class ProjectGroupProjection : SingleStreamAggregation<ProjectGroup>
     {
     }
 
-    public ProjectGroup Create(IEvent<ProjectGroupCreated> e)
+    public ProjectGroup Create(ProjectGroupCreated e)
     {
         return new ProjectGroup(
-            Id: e.StreamKey!,
-            CreationMethod: e.Data.CreationMethod,
-            Name: e.Data.Name
+            Id: e.ProjectGroupId,
+            CreationMethod: e.CreationMethod,
+            Name: e.Name
         );
     }
 

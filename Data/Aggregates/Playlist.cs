@@ -20,14 +20,14 @@ public class PlaylistProjection : SingleStreamAggregation<Playlist>
     {
     }
 
-    public Playlist Create(IEvent<PlaylistCreated> e)
+    public Playlist Create(PlaylistCreated e)
     {
         return new Playlist(
-            Id: e.StreamKey!,
-            CreationMethod: e.Data.CreationMethod,
+            Id: e.PlaylistId,
+            CreationMethod: e.CreationMethod,
             VideoIds: ImmutableArray.Create<string>(),
-            Name: e.Data.Name,
-            Visibility: e.Data.Visibility
+            Name: e.Name,
+            Visibility: e.Visibility
         );
     }
 

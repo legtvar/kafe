@@ -24,12 +24,12 @@ public class ImageShardProjection : SingleStreamAggregation<ImageShard>
     {
     }
 
-    public ImageShard Create(IEvent<ImageShardCreated> e)
+    public ImageShard Create(ImageShardCreated e)
     {
         return new(
-            Id: e.StreamKey!,
-            CreationMethod: e.Data.CreationMethod,
-            ArtifactId: e.Data.ArtifactId,
+            Id: e.ShardId,
+            CreationMethod: e.CreationMethod,
+            ArtifactId: e.ArtifactId,
             Variants: ImmutableArray.Create(ImageQualityPreset.Original));
     }
 

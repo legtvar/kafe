@@ -47,8 +47,10 @@ public static class Program
         {
             logger.LogInformation("Database dropped.");
         }
-        kafe = host.Services.GetRequiredService<KafeClient>();
+
         wma = host.Services.GetRequiredService<WmaClient>();
+        kafe = host.Services.GetRequiredService<KafeClient>();
+        await kafe.Initialize();
 
         await MigrateAllAuthors();
         await MigrateAllProjectGroups();
@@ -57,19 +59,6 @@ public static class Program
         await MigrateAllVideos();
 
         await MigrateAllPlaylists();
-
-        //var projectGroups = await wma.GetAllProjectGroups();
-        //foreach (var group in projectGroups)
-        //{
-        //    MigrateProjectGroup(group);
-        //}
-        //await kafe.SaveChangesAsync();
-
-        //var playlists = await wma.GetAllPlaylists();
-        //foreach (var playlist in playlists)
-        //{
-        //    MigratePlaylist(playlist);
-        //}
 
         var authorCount = await kafe.CountAuthors();
         var playlistCount = await kafe.CountPlaylists();
@@ -190,7 +179,14 @@ public static class Program
             throw new InvalidOperationException("The 'ArtifactDirectory' setting is not set.");
         }
 
-        var subdirs = new DirectoryInfo(artifactDirectory).GetDirectories();
+        var artifactDirectoryInfo = new DirectoryInfo(artifactDirectory);
+        if (!artifactDirectoryInfo.Exists)
+        {
+            artifactDirectoryInfo.Create();
+            return;
+        }
+
+        var subdirs = artifactDirectoryInfo.GetDirectories();
         foreach (var subdir in subdirs)
         {
             var migrationInfoFile = subdir.GetFiles(MigrationInfoFileName).SingleOrDefault();

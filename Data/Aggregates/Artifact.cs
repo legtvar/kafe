@@ -11,23 +11,30 @@ public record Artifact(
     string Id,
     CreationMethod CreationMethod,
     LocalizedString Name,
-    ImmutableArray<string> ShardIds) : IEntity;
+    ImmutableArray<string> ShardIds) : IEntity
+{
+    public Artifact() : this("", default, (LocalizedString)"", ImmutableArray<string>.Empty)
+    {
+    }
+}
 
-public class ArtifactProjection : MultiStreamAggregation<Artifact, string>
+public class ArtifactProjection : MultiStreamAggregation<Artifact, Hrib>
 {
     public ArtifactProjection()
     {
+        Identity<ArtifactCreated>(e => e.ArtifactId);
+        Identity<ArtifactInfoChanged>(e => e.ArtifactId);
         Identity<VideoShardCreated>(e => e.ArtifactId);
         Identity<ImageShardCreated>(e => e.ArtifactId);
         Identity<SubtitlesShardCreated>(e => e.ArtifactId);
     }
 
-    public Artifact Create(IEvent<ArtifactCreated> e)
+    public Artifact Create(ArtifactCreated e)
     {
         return new Artifact(
-            Id: e.StreamKey!,
-            CreationMethod: e.Data.CreationMethod,
-            Name: e.Data.Name,
+            Id: e.ArtifactId,
+            CreationMethod: e.CreationMethod,
+            Name: e.Name,
             ShardIds: ImmutableArray<string>.Empty);
     }
 
@@ -39,42 +46,42 @@ public class ArtifactProjection : MultiStreamAggregation<Artifact, string>
         };
     }
 
-    public Artifact Apply(IEvent<VideoShardCreated> e, Artifact a)
+    public Artifact Apply(VideoShardCreated e, Artifact a)
     {
-        if (a.ShardIds.Contains(e.StreamKey!))
+        if (a.ShardIds.Contains(e.ShardId))
         {
             return a;
         }
 
         return a with
         {
-            ShardIds = a.ShardIds.Add(e.StreamKey!)
+            ShardIds = a.ShardIds.Add(e.ShardId)
         };
     }
 
-    public Artifact Apply(IEvent<ImageShardCreated> e, Artifact a)
+    public Artifact Apply(ImageShardCreated e, Artifact a)
     {
-        if (a.ShardIds.Contains(e.StreamKey!))
+        if (a.ShardIds.Contains(e.ShardId))
         {
             return a;
         }
 
         return a with
         {
-            ShardIds = a.ShardIds.Add(e.StreamKey!)
+            ShardIds = a.ShardIds.Add(e.ShardId)
         };
     }
 
-    public Artifact Apply(IEvent<SubtitlesShardCreated> e, Artifact a)
+    public Artifact Apply(SubtitlesShardCreated e, Artifact a)
     {
-        if (a.ShardIds.Contains(e.StreamKey!))
+        if (a.ShardIds.Contains(e.ShardId))
         {
             return a;
         }
 
         return a with
         {
-            ShardIds = a.ShardIds.Add(e.StreamKey!)
+            ShardIds = a.ShardIds.Add(e.ShardId)
         };
     }
 }

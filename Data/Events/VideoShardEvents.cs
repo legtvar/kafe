@@ -4,8 +4,12 @@ using System.Collections.Immutable;
 namespace Kafe.Data.Events;
 
 public record VideoShardCreated(
+    Hrib ShardId,
     CreationMethod CreationMethod,
-    string ArtifactId);
+    string ArtifactId
+);
 
 public record VideoShardVariantsAdded(
-    ImmutableArray<VideoQualityPreset> Variants);
+    Hrib ShardId,
+    ImmutableArray<VideoQualityPreset> Variants
+);

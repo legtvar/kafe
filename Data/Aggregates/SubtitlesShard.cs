@@ -24,12 +24,12 @@ public class SubtitlesShardProjection : SingleStreamAggregation<SubtitlesShard>
     {
     }
 
-    public SubtitlesShard Create(IEvent<SubtitlesShardCreated> e)
+    public SubtitlesShard Create(SubtitlesShardCreated e)
     {
         return new(
-            Id: e.StreamKey!,
-            CreationMethod: e.Data.CreationMethod,
-            ArtifactId: e.Data.ArtifactId,
+            Id: e.ShardId,
+            CreationMethod: e.CreationMethod,
+            ArtifactId: e.ArtifactId,
             Variants: ImmutableArray.Create(CultureInfo.InvariantCulture.TwoLetterISOLanguageName));
     }
 

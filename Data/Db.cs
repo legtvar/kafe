@@ -14,7 +14,7 @@ public static class Db
 {
     public static void AddDb(IServiceCollection services, IConfiguration configuration, IHostEnvironment environment)
     {
-        services.AddMarten(options =>
+        void ConfigureMarten(StoreOptions options)
         {
             options.Connection(configuration.GetConnectionString("KAFE")
                 ?? throw new ArgumentException("The KAFE connection string is missing!"));
@@ -45,6 +45,8 @@ public static class Db
             options.Projections.Add<ProjectGroupProjection>();
             options.Projections.Add<VideoConversionProjection>();
             options.UseDefaultSerialization(serializerType: SerializerType.SystemTextJson);
-        });
+        }
+
+        services.AddMarten(ConfigureMarten);
     }
 }

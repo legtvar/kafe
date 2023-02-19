@@ -24,12 +24,12 @@ public class VideoShardProjection : SingleStreamAggregation<VideoShard>
     {
     }
 
-    public VideoShard Create(IEvent<VideoShardCreated> e)
+    public VideoShard Create(VideoShardCreated e)
     {
         return new(
-            Id: e.StreamKey!,
-            CreationMethod: e.Data.CreationMethod,
-            ArtifactId: e.Data.ArtifactId,
+            Id: e.ShardId,
+            CreationMethod: e.CreationMethod,
+            ArtifactId: e.ArtifactId,
             Variants: ImmutableArray.Create(VideoQualityPreset.Original));
     }
 

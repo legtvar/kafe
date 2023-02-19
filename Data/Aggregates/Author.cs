@@ -19,12 +19,12 @@ public class AuthorProjection : SingleStreamAggregation<Author>
     {
     }
 
-    public Author Create(IEvent<AuthorCreated> e)
+    public Author Create(AuthorCreated e)
     {
         return new Author(
-            Id: e.StreamKey!,
-            CreationMethod: e.Data.CreationMethod,
-            Name: e.Data.Name);
+            Id: e.AuthorId,
+            CreationMethod: e.CreationMethod,
+            Name: e.Name);
     }
 
     public Author Apply(AuthorInfoChanged e, Author a)

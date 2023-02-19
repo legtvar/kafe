@@ -22,19 +22,19 @@ public class NotificationProjection : SingleStreamAggregation<Notification>
     {
     }
 
-    public Notification Create(IEvent<NotificationCreated> e)
+    public Notification Create(NotificationCreated e)
     {
         return new Notification
         (
-            Id: e.StreamKey!,
-            CreationMethod: e.Data.CreationMethod,
-            Kind: e.Data.Kind,
-            Recipients: !e.Data.Recipients.HasValue || e.Data.Recipients.Value.IsDefault
+            Id: e.NotificationId,
+            CreationMethod: e.CreationMethod,
+            Kind: e.Kind,
+            Recipients: !e.Recipients.HasValue || e.Recipients.Value.IsDefault
                 ? ImmutableArray.Create<string>()
-                : e.Data.Recipients.Value,
-            ProjectId: e.Data.ProjectId,
-            VideoId: e.Data.VideoId,
-            Description: e.Data.Description
+                : e.Recipients.Value,
+            ProjectId: e.ProjectId,
+            VideoId: e.VideoId,
+            Description: e.Description
         );
     }
     

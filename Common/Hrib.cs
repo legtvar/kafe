@@ -1,10 +1,13 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace Kafe;
 
 /// <summary>
 /// Human-Readable Identifier Ballast
 /// </summary>
+[JsonConverter(typeof(HribJsonConverter))]
 public record Hrib
 {
     public const string Alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
@@ -14,7 +17,7 @@ public record Hrib
 
     private static readonly Random Random = new Random();
 
-    private Hrib(string value)
+    private Hrib(string? value)
     {
         if (string.IsNullOrWhiteSpace(value))
         {
@@ -25,12 +28,19 @@ public record Hrib
 
     public string Value { get; init; }
 
-    public static implicit operator string(Hrib hrib)
+    [return: NotNullIfNotNull(nameof(hrib))]
+    public static implicit operator string?(Hrib? hrib)
     {
+        if (hrib is null)
+        {
+            return null;
+        }
+
         return hrib.Value;
     }
 
-    public static implicit operator Hrib(string value)
+    [return: NotNullIfNotNull(nameof(value))]
+    public static implicit operator Hrib?(string? value)
     {
         return new(value);
     }

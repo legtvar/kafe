@@ -33,16 +33,16 @@ public class ProjectProjection : SingleStreamAggregation<Project>
     {
     }
 
-    public Project Create(IEvent<ProjectCreated> e)
+    public Project Create(ProjectCreated e)
     {
         return new Project(
-            Id: e.StreamKey!,
-            CreationMethod: e.Data.CreationMethod,
-            ProjectGroupId: e.Data.ProjectGroupId,
+            Id: e.ProjectId,
+            CreationMethod: e.CreationMethod,
+            ProjectGroupId: e.ProjectGroupId,
             Authors: ImmutableArray<ProjectAuthor>.Empty,
             ArtifactIds: ImmutableArray<string>.Empty,
-            Name: e.Data.Name,
-            Visibility: e.Data.Visibility);
+            Name: e.Name,
+            Visibility: e.Visibility);
     }
 
     public Project Apply(ProjectInfoChanged e, Project p)

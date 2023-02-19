@@ -18,11 +18,11 @@ public class VideoConversionProjection : SingleStreamAggregation<VideoConversion
     {
     }
 
-    public VideoConversion Create(IEvent<VideoConversionCreated> e)
+    public VideoConversion Create(VideoConversionCreated e)
     {
         return new VideoConversion(
-            Id: e.StreamKey!,
-            VideoId: e.Data.VideoId);
+            Id: e.ConversionId,
+            VideoId: e.VideoId);
     }
 
     public VideoConversion Apply(VideoConversionCompleted e, VideoConversion c)

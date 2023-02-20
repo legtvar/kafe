@@ -2,6 +2,7 @@ import { Box, Button, Center, Heading, Text } from '@chakra-ui/react';
 import { t } from 'i18next';
 import React from 'react';
 import { useLinkClickHandler, useRouteError } from 'react-router-dom';
+import { Brand } from '../brand/Brand';
 
 export interface IStatusProps {
     error?:
@@ -29,7 +30,10 @@ export const Status: React.FC<IStatusProps> = (props: IStatusProps) => {
     return (
         <Center w="100vw" h="100vh">
             <Box textAlign="center" py={10} px={6}>
-                <Heading display="inline-block" as="h2" size="2xl" bg="brand.500" backgroundClip="text">
+                <Heading display="block" fontSize="15rem" color="brand.500">
+                    <Brand variant="broken" />
+                </Heading>
+                <Heading display="block" as="h2" size="4xl" bg="brand.500" backgroundClip="text">
                     {error.status}
                 </Heading>
                 <Text fontSize="18px" mt={3} mb={2}>

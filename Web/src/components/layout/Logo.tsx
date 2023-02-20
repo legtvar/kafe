@@ -1,5 +1,5 @@
 import { HStack, HTMLChakraProps, Text } from '@chakra-ui/react';
-import { FiCoffee } from 'react-icons/fi';
+import { Brand } from '../brand/Brand';
 
 interface ILogoProps extends HTMLChakraProps<'div'> {}
 
@@ -10,7 +10,7 @@ export function Logo(props: ILogoProps) {
                 KAFE
             </Text>
             <Text fontSize="2xl" pl={2}>
-                <FiCoffee />
+                <Brand variant="stripe" />
             </Text>
         </HStack>
     );

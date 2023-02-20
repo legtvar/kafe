@@ -1,7 +1,7 @@
 import { Box, Center, Heading, Text } from '@chakra-ui/react';
 import { t } from 'i18next';
 import * as React from 'react';
-import { IoWarning } from 'react-icons/io5';
+import { Brand } from '../brand/Brand';
 import { ErrorContent } from './ErrorContent';
 
 interface IErrorBoundaryProps {
@@ -26,8 +26,8 @@ export class ErrorBoundary extends React.Component<IErrorBoundaryProps, IErrorBo
             return (
                 <>
                     <Box textAlign="center" py={10} px={6}>
-                        <Center color={'orange.300'} fontSize={'70px'}>
-                            <IoWarning />
+                        <Center color={'orange.300'} fontSize={'10em'}>
+                            <Brand variant="cracked" />
                         </Center>
                         <Heading as="h2" size="xl" mt={4} mb={2}>
                             {t('error.title').toString()}

@@ -19,6 +19,8 @@ export function PublicPlaylists(props: IPublicPlaylistsProps) {
                 const first = data[0];
                 const regular = data.slice(1);
 
+                throw new Error('Hahaha!');
+
                 return (
                     <>
                         <Stack direction="row" role="group" overflow="hidden" mb={16} w="100%" h={96}>

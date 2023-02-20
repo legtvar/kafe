@@ -3,8 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { IoReader, IoReaderOutline } from 'react-icons/io5';
 import { Link, useMatches } from 'react-router-dom';
 import { AppRoute, routes } from '../../../routes';
-import { Footer } from '../../Footer';
-import { Logo } from '../../Logo';
+import { Footer } from '../Footer';
+import { Logo } from '../Logo';
 import { NavItem } from './NavItem';
 
 interface ISidebarProps extends BoxProps {
@@ -45,7 +45,7 @@ export function Sidebar({ onClose, ...rest }: ISidebarProps) {
 
             return (
                 <>
-                    <Link to={fullPath}>
+                    <Link to={'/auth/' + fullPath}>
                         <NavItem
                             key={i}
                             icon={

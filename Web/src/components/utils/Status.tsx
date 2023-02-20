@@ -29,13 +29,7 @@ export const Status: React.FC<IStatusProps> = (props: IStatusProps) => {
     return (
         <Center w="100vw" h="100vh">
             <Box textAlign="center" py={10} px={6}>
-                <Heading
-                    display="inline-block"
-                    as="h2"
-                    size="2xl"
-                    bgGradient="linear(to-r, teal.400, teal.600)"
-                    backgroundClip="text"
-                >
+                <Heading display="inline-block" as="h2" size="2xl" bg="brand.500" backgroundClip="text">
                     {error.status}
                 </Heading>
                 <Text fontSize="18px" mt={3} mb={2}>
@@ -45,13 +39,7 @@ export const Status: React.FC<IStatusProps> = (props: IStatusProps) => {
                     {t('status.404.subtitle').toString()}
                 </Text>
 
-                <Button
-                    colorScheme="teal"
-                    bgGradient="linear(to-r, teal.400, teal.500, teal.600)"
-                    color="white"
-                    variant="solid"
-                    onClick={backlink as any}
-                >
+                <Button color="white" variant="solid" onClick={backlink as any}>
                     {t('status.backlink').toString()}
                 </Button>
             </Box>

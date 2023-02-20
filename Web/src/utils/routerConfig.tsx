@@ -1,13 +1,28 @@
 import { RouteObject } from 'react-router-dom';
 import { Root } from '../components/layout/Root';
-import { Status } from '../components/layout/Status';
+import { Login } from '../components/pages/account/Login';
+import { Register } from '../components/pages/account/Register';
+import { Home } from '../components/pages/landing/Home';
+import { Status } from '../components/utils/Status';
 import { routes } from '../routes';
 
 export const routerConfig = (t: (id: string) => string): RouteObject[] => [
     {
         path: '/',
-        element: <Root />,
+        element: <Home />,
         errorElement: <Status />,
+    },
+    {
+        path: '/auth',
+        element: <Root />,
         children: routes(t),
+    },
+    {
+        path: '/login',
+        element: <Login />,
+    },
+    {
+        path: '/register',
+        element: <Register />,
     },
 ];

@@ -9,7 +9,8 @@ import {
     IoVideocam,
     IoVideocamOutline,
 } from 'react-icons/io5';
-import { PageHome } from './pages/Home';
+import { PublicPlaylists } from './components/pages/playlists/PublicPlaylists';
+import { PageProjects } from './components/pages/Projects';
 
 export type SelectableIcon = {
     default: IconType;
@@ -29,7 +30,7 @@ export const routes = (t: (id: string) => string): AppRoute[] => [
     {
         path: '',
         title: t('route.home.title'),
-        element: <PageHome />,
+        element: <PublicPlaylists />,
         inMenu: true,
         icon: {
             default: IoHomeOutline,
@@ -39,7 +40,7 @@ export const routes = (t: (id: string) => string): AppRoute[] => [
     {
         path: 'projects',
         title: t('route.projects.title'),
-        element: <>Lorem ipsum</>,
+        element: <PageProjects />,
         inMenu: true,
         icon: {
             default: IoVideocamOutline,
@@ -66,7 +67,7 @@ export const routes = (t: (id: string) => string): AppRoute[] => [
     {
         path: 'playlists',
         title: t('route.playlists.title'),
-        element: <>Tady bude seznam playlistů</>,
+        element: <>Playlists</>,
         inMenu: true,
         icon: {
             default: IoListCircleOutline,

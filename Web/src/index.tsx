@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom/client';
 import { I18nextProvider } from 'react-i18next';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { API } from './api/API';
-import { Caffeine } from './Caffeine';
+import { Caffeine, CaffeineProvider } from './hooks/Caffeine';
 import { languageConfig } from './languageConfig';
 import { routerConfig } from './utils/routerConfig';
 
@@ -23,18 +23,17 @@ const router = createBrowserRouter(routerConfig(i18next.t), {
     basename: '/kafe',
 });
 
-const caffeineObject = new Caffeine(new API());
-export const caffeine = React.createContext(caffeineObject);
+const caffeine = new Caffeine(new API());
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 root.render(
     <React.StrictMode>
         <I18nextProvider i18n={i18next}>
             <ChakraProvider theme={theme}>
-                <caffeine.Provider value={caffeineObject}>
+                <CaffeineProvider value={caffeine}>
                     <ColorModeScript initialColorMode={theme.config.initialColorMode} />
                     <RouterProvider router={router} />
-                </caffeine.Provider>
+                </CaffeineProvider>
             </ChakraProvider>
         </I18nextProvider>
     </React.StrictMode>,

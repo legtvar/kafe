@@ -40,7 +40,9 @@
   },
   "error": {
     "invalidPath": "URL path is invalid",
-    "projectDoesNotExist": "Project with the given ID does not exist"
+    "projectDoesNotExist": "Project with the given ID does not exist",
+    "title": "Whops, something went wrong",
+    "subtitle": "We are terribly sorry for the inconvenience. If you feel like this was not supposed to happen (which it probably wasn't), please send us the report bellow"
   },
   "common": {
     "backHome": "Back Home",
@@ -63,5 +65,39 @@
       "subtitle": "The page you're looking for does not seem to exist"
     },
     "backlink": "Go to Home"
+  },
+  "role": {
+    "admin": "Administrator",
+    "temp": "Temporary account",
+    "user": "User"
+  },
+  "navbar": {
+    "profile": "Profile",
+    "settings": "Settings",
+    "signout": "Sign out"
+  },
+  "login": {
+    "title": "Sign in",
+    "subtitle": "to your account to access all the features of the system",
+    "email": "Email address",
+    "password": "Password",
+    "remember": "Remember me",
+    "forgot": "Forgot password?",
+    "button": "Sign in",
+    "register": "Don't have an account? <1>Register now!</1>"
+  },
+  "register": {
+    "login": "Already a user? <1>Login</1>",
+    "button": "Sign up",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "email": "Email address",
+    "password": "Password",
+    "title": "Sign up",
+    "subtitle": "to access your daily dose of caffeine",
+    "passwordAgain": "Password again"
+  },
+  "playlists": {
+    "videoCount": "videos"
   }
 }

@@ -1,22 +1,20 @@
-import { caffeine } from '../..';
-import { Caffeine } from '../../Caffeine';
+import { API } from '../../api/API';
+import { useApi } from '../../hooks/Caffeine';
 import { Await } from './Await';
 import { Loading } from './Loading';
 
 interface IAwaitAPIProps<T> {
-    request: (caffeine: Caffeine) => Promise<T>;
+    request: (api: API) => Promise<T>;
     loader?: JSX.Element;
     children: ((data: T) => JSX.Element) | JSX.Element;
 }
 
 export function AwaitAPI<T>(props: IAwaitAPIProps<T>) {
+    const api = useApi();
+
     return (
-        <caffeine.Consumer>
-            {(caffeine) => (
-                <Await for={props.request(caffeine)} loading={props.loader || <Loading large center />}>
-                    {props.children}
-                </Await>
-            )}
-        </caffeine.Consumer>
+        <Await for={props.request(api)} loading={props.loader || <Loading large center />}>
+            {props.children}
+        </Await>
     );
 }

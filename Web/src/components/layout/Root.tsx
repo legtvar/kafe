@@ -1,6 +1,7 @@
 import { Box, Drawer, DrawerContent, useDisclosure } from '@chakra-ui/react';
 import React from 'react';
 import { Outlet } from 'react-router-dom';
+import { ErrorBoundary } from '../utils/ErrorBoundary';
 import { Navbar } from './navigation/Navbar';
 import { Sidebar } from './navigation/Sidebar';
 
@@ -25,7 +26,9 @@ export const Root: React.FC = () => {
             </Drawer>
             <Navbar onOpen={onOpen} />
             <Box ml={{ base: 0, md: 64 }} p="4" height="calc(100vh - 80px)">
-                <Outlet />
+                <ErrorBoundary>
+                    <Outlet />
+                </ErrorBoundary>
             </Box>
         </Box>
     );

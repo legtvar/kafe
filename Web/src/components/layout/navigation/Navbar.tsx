@@ -16,14 +16,20 @@ import {
     useColorModeValue,
     VStack,
 } from '@chakra-ui/react';
+import { t } from 'i18next';
 import { FiBell, FiChevronDown, FiMenu, FiMoon, FiSun } from 'react-icons/fi';
-import { Logo } from '../../Logo';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../../hooks/Caffeine';
+import { avatarUrl } from '../../../utils/avatarUrl';
+import { Logo } from '../Logo';
 
 interface INavbarProps extends FlexProps {
     onOpen: () => void;
 }
 export function Navbar({ onOpen, ...rest }: INavbarProps) {
     const { colorMode, toggleColorMode } = useColorMode();
+    const { user } = useAuth();
+    const navigate = useNavigate();
 
     return (
         <Flex
@@ -61,12 +67,7 @@ export function Navbar({ onOpen, ...rest }: INavbarProps) {
                         <Button size="lg" variant="ghost" px={2} ml={{ base: 0, md: 4 }}>
                             <MenuButton>
                                 <HStack>
-                                    <Avatar
-                                        size={'sm'}
-                                        src={
-                                            'https://images.unsplash.com/photo-1619946794135-5bc917a27793?ixlib=rb-0.3.5&q=80&fm=jpg&crop=faces&fit=crop&h=200&w=200&s=b616b2c5b373a80ffc9636ba24f7a4a9'
-                                        }
-                                    />
+                                    <Avatar size={'sm'} src={avatarUrl(user!)} />
                                     <VStack
                                         display={{ base: 'none', md: 'flex' }}
                                         alignItems="flex-start"
@@ -74,9 +75,9 @@ export function Navbar({ onOpen, ...rest }: INavbarProps) {
                                         ml="2"
                                         w={150}
                                     >
-                                        <Text fontSize="sm">Justina Clark</Text>
-                                        <Text fontSize="xs" color="gray.600">
-                                            Admin
+                                        <Text fontSize="sm">{user?.name}</Text>
+                                        <Text fontSize="xs" color={useColorModeValue('gray.500', 'gray.500')}>
+                                            {t(`role.${user?.role}`).toString()}
                                         </Text>
                                     </VStack>
                                     <Box display={{ base: 'none', md: 'flex' }}>
@@ -86,11 +87,10 @@ export function Navbar({ onOpen, ...rest }: INavbarProps) {
                             </MenuButton>
                         </Button>
                         <MenuList>
-                            <MenuItem>Profile</MenuItem>
-                            <MenuItem>Settings</MenuItem>
-                            <MenuItem>Billing</MenuItem>
+                            <MenuItem>{t('navbar.profile').toString()}</MenuItem>
+                            <MenuItem>{t('navbar.settings').toString()}</MenuItem>
                             <MenuDivider />
-                            <MenuItem>Sign out</MenuItem>
+                            <MenuItem onClick={() => navigate('/login')}>{t('navbar.signout').toString()}</MenuItem>
                         </MenuList>
                     </Menu>
                 </Flex>

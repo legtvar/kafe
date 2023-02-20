@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { t } from 'i18next';
-import { FileEntry } from '../data/FileEntry';
-import { Await } from './utils/Await';
+import { FileEntry } from '../../data/FileEntry';
+import { Await } from '../utils/Await';
 import { VideoJS } from './VideoJS';
 
 interface IContentViewerProps {

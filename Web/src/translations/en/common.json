@@ -100,7 +100,8 @@
   "playlists": {
     "videoCount": "videos",
     "play": "Play the playlist",
-    "readmore": "More info"
+    "readmore": "More info",
+    "watchNewest": "Watch the newest playlist"
   },
   "home": {
     "signin": "Sign in"

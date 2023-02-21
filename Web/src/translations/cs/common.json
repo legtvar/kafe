@@ -100,7 +100,8 @@
   "playlists": {
     "videoCount": "videí",
     "play": "Přehrát playlist",
-    "readmore": "Více informací"
+    "readmore": "Více informací",
+    "watchNewest": "Podívejte se na nejnovější playlist"
   },
   "home": {
     "signin": "Přihlásit se"

@@ -61,7 +61,7 @@ export function Playlists(props: IPlaylistsProps) {
                             </Box>
                             <Stack py={6} px={8} spacing={2}>
                                 <Box fontSize="xl" as="h2" lineHeight="tight" color="gray.500" isTruncated>
-                                    Podívejte se na nejnovější playlist
+                                    {t('playlists.watchNewest').toString()}
                                 </Box>
                                 <Box fontSize="4xl" fontWeight="semibold" as="h2" lineHeight="tight" isTruncated>
                                     {first.getName()}

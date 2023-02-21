@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { forValueDefined } from 'waitasecond';
 import { Group } from '../data/Group';
+import { Playlist } from '../data/Playlist';
 import { Project } from '../data/Project';
 import { components } from '../schemas/api';
 import { storageOrPrompt } from '../utils/storageOrPrompt';
@@ -45,12 +46,26 @@ export class API {
         };
     }
 
+    public get playlists() {
+        const api = this;
+
+        return {
+            async getAll() {
+                return await forValueDefined(() => api.data.playlists);
+            },
+            async getById(id: string) {
+                return getById(await forValueDefined(() => api.data.playlists), id);
+            },
+        };
+    }
+
     // END
 
     // === To be changed (does not get refetched on change...) ===
     private data = {
         projects: null as Project[] | null,
         groups: null as Group[] | null,
+        playlists: null as Playlist[] | null,
     };
 
     private async fetchAll() {
@@ -83,7 +98,17 @@ export class API {
 
             this.data.groups = groups.map((s) => new Group(s));
 
-            console.log(this.data);
+            // Playlists
+            const playlists = (
+                await axios.get('https://wma.lemma.fi.muni.cz/api/v1/playlists', {
+                    auth: {
+                        username,
+                        password,
+                    },
+                })
+            ).data as components['schemas']['PlaylistListDto'][];
+
+            this.data.playlists = playlists.map((s) => new Playlist(s));
         } catch (e) {
             console.error('Error fetching data from the API', e);
 

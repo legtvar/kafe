@@ -40,7 +40,9 @@
   },
   "error": {
     "invalidPath": "URL adresa je nesprávná",
-    "projectDoesNotExist": "Projekt s daným ID neexistuje"
+    "projectDoesNotExist": "Projekt s daným ID neexistuje",
+    "title": "Jejky, tak to nešlo podle plánu",
+    "subtitle": "Omlouváme se za potíže. Pokud máte pocit, že se to nemělo stát (což pravděpodobně nemělo), pošlete nám prosím tento report"
   },
   "common": {
     "backHome": "Zpět na domovskou stránku",
@@ -56,5 +58,51 @@
   "content": {
     "unknownType": "Neznámý typ souboru",
     "noFileSelected": "Žádný vybraný soubor"
+  },
+  "status": {
+    "404": {
+      "title": "Stránka nebyla nalezena",
+      "subtitle": "Vypadá to, že stránka kterou hledáte neexistuje"
+    },
+    "backlink": "Vrátit se zpět"
+  },
+  "role": {
+    "admin": "Administrátor",
+    "temp": "Dočasný účet",
+    "user": "Uživatel"
+  },
+  "navbar": {
+    "profile": "Profil",
+    "settings": "Nastavení",
+    "signout": "Odhlásit se"
+  },
+  "login": {
+    "title": "Přihlaste se",
+    "subtitle": "ke svému účtu pro přístup ke všem funkcím Kafe",
+    "email": "Emailová adresa",
+    "password": "Heslo",
+    "remember": "Zapamatuj si mě",
+    "forgot": "Zapomněli jste heslo?",
+    "button": "Přihlásit se",
+    "register": "Nemáte ještě účet? <1>Zaregistrujte se!</1>"
+  },
+  "register": {
+    "login": "Už máte účet? <1>Přihlaste se</1>",
+    "button": "Zaregistrovat se",
+    "firstName": "Křestní jméno",
+    "lastName": "Příjmení",
+    "email": "Emailová adresa",
+    "password": "Heslo",
+    "title": "Zaregistrujte se",
+    "subtitle": "pro přístup k vaší denní dávce kofeinu",
+    "passwordAgain": "Heslo znovu"
+  },
+  "playlists": {
+    "videoCount": "videí",
+    "play": "Přehrát playlist",
+    "readmore": "Více informací"
+  },
+  "home": {
+    "signin": "Přihlásit se"
   }
 }

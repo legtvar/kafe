@@ -1,55 +1,37 @@
-import { Layout } from 'antd';
-import React, { useEffect, useState } from 'react';
-import { Trans } from 'react-i18next';
-import { Link, Outlet } from 'react-router-dom';
-import { PageOutletContext } from './Page';
-import { PageMenu } from './PageMenu';
+import { Box, Drawer, DrawerContent, useDisclosure } from '@chakra-ui/react';
+import React from 'react';
+import { Outlet } from 'react-router-dom';
+import { useReloadVar } from '../../hooks/useReload';
+import { ErrorBoundary } from '../utils/ErrorBoundary';
+import { Navbar } from './navigation/Navbar';
+import { Sidebar } from './navigation/Sidebar';
 
 export const Root: React.FC = () => {
-    const [collapsed, setCollapsed] = useState(false);
-    const [isSmallScreen, setIsSmallScreen] = useState(false);
-
-    const handleWindowResize = () => {
-        setIsSmallScreen(window.innerWidth < 992); // lg
-    };
-
-    useEffect(() => {
-        handleWindowResize();
-        window.addEventListener('resize', handleWindowResize);
-        return () => window.removeEventListener('resize', handleWindowResize);
-    });
+    const { isOpen, onOpen, onClose } = useDisclosure();
+    const { reload, value } = useReloadVar();
 
     return (
-        <Layout style={{ minHeight: '100vh' }}>
-            <Layout.Sider
-                breakpoint="lg"
-                collapsible
-                collapsed={collapsed}
-                trigger={null}
-                onCollapse={(value) => setCollapsed(value)}
-                collapsedWidth={isSmallScreen ? '0' : undefined}
-                width={250}
-                className="kafe-sider"
+        <Box minH="100vh">
+            <Sidebar onClose={() => onClose} display={{ base: 'none', md: 'block' }} />
+            <Drawer
+                autoFocus={false}
+                isOpen={isOpen}
+                placement="left"
+                onClose={onClose}
+                returnFocusOnClose={false}
+                onOverlayClick={onClose}
+                size="xs"
             >
-                <Link to="/">
-                    <div className="kafe-logo">Kafe</div>
-                </Link>
-                <PageMenu />
-            </Layout.Sider>
-            <Layout>
-                <Outlet context={{ collapsed, setCollapsed, isSmallScreen } as PageOutletContext} />
-                <Layout.Footer className="kafe-layout-footer">
-                    <span className="kafe-footer-content">
-                        <Trans i18nKey="layout.footer.copy">
-                            Created with <span className="kafe-heart">❤️</span> and ☕ by
-                            <a href="https://lemma.fi.muni.cz/" target="_blank" rel="noreferrer">
-                                LEMMA
-                            </a>
-                        </Trans>{' '}
-                        &copy; 2022 - {new Date().getFullYear()}
-                    </span>
-                </Layout.Footer>
-            </Layout>
-        </Layout>
+                <DrawerContent>
+                    <Sidebar onClose={onClose} />
+                </DrawerContent>
+            </Drawer>
+            <Navbar onOpen={() => onOpen()} forceReload={() => reload()} signedIn={true} />
+            <Box ml={{ base: 0, md: 64 }} px={4} pb={16} pt={24} height="calc(100vh - 80px)">
+                <ErrorBoundary>
+                    <Outlet key={value ? 'a' : 'b'} />
+                </ErrorBoundary>
+            </Box>
+        </Box>
     );
 };

@@ -5,9 +5,9 @@ import { Link } from 'react-router-dom';
 import { Playlist } from '../../../data/Playlist';
 import { AwaitAPI } from '../../utils/AwaitAPI';
 
-interface IPublicPlaylistsProps {}
+interface IPlaylistsProps {}
 
-export function PublicPlaylists(props: IPublicPlaylistsProps) {
+export function Playlists(props: IPlaylistsProps) {
     const boxColor = useColorModeValue('white', 'gray.800');
     const overlayColor = useColorModeValue('whiteAlpha.800', 'grayAlpha.800');
     const tagColor = useColorModeValue('grayAlpha.200', 'whiteAlpha.200');

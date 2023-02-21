@@ -9,8 +9,10 @@ import {
     IoVideocam,
     IoVideocamOutline,
 } from 'react-icons/io5';
-import { PublicPlaylists } from './components/pages/playlists/PublicPlaylists';
-import { PageProjects } from './components/pages/Projects';
+import { Groups } from './components/pages/groups/Groups';
+import { PlaylistList } from './components/pages/playlists/PlaylistList';
+import { Playlists } from './components/pages/playlists/Playlists';
+import { Projects } from './components/pages/projects/Projects';
 
 export type SelectableIcon = {
     default: IconType;
@@ -30,7 +32,7 @@ export const routes = (t: (id: string) => string): AppRoute[] => [
     {
         path: '',
         title: t('route.home.title'),
-        element: <PublicPlaylists />,
+        element: <Playlists />,
         inMenu: true,
         icon: {
             default: IoHomeOutline,
@@ -40,7 +42,7 @@ export const routes = (t: (id: string) => string): AppRoute[] => [
     {
         path: 'projects',
         title: t('route.projects.title'),
-        element: <PageProjects />,
+        element: <Projects />,
         inMenu: true,
         icon: {
             default: IoVideocamOutline,
@@ -57,7 +59,7 @@ export const routes = (t: (id: string) => string): AppRoute[] => [
     {
         path: 'groups',
         title: t('route.groups.title'),
-        element: <>Tady bude seznam skupin projektů</>,
+        element: <Groups />,
         inMenu: true,
         icon: {
             default: IoFolderOpenOutline,
@@ -67,7 +69,7 @@ export const routes = (t: (id: string) => string): AppRoute[] => [
     {
         path: 'playlists',
         title: t('route.playlists.title'),
-        element: <>Playlists</>,
+        element: <PlaylistList />,
         inMenu: true,
         icon: {
             default: IoListCircleOutline,

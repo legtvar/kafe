@@ -98,6 +98,11 @@
     "passwordAgain": "Heslo znovu"
   },
   "playlists": {
-    "videoCount": "videí"
+    "videoCount": "videí",
+    "play": "Přehrát playlist",
+    "readmore": "Více informací"
+  },
+  "home": {
+    "signin": "Přihlásit se"
   }
 }

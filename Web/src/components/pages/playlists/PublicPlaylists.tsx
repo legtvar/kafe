@@ -1,5 +1,6 @@
-import { AspectRatio, Box, Image, SimpleGrid, Stack, Tag, useColorModeValue } from '@chakra-ui/react';
+import { AspectRatio, Box, Button, Center, Image, SimpleGrid, Stack, Tag, useColorModeValue } from '@chakra-ui/react';
 import { t } from 'i18next';
+import { BsPlayFill } from 'react-icons/bs';
 import { Link } from 'react-router-dom';
 import { Playlist } from '../../../data/Playlist';
 import { AwaitAPI } from '../../utils/AwaitAPI';
@@ -19,16 +20,12 @@ export function PublicPlaylists(props: IPublicPlaylistsProps) {
                 const first = data[0];
                 const regular = data.slice(1);
 
-                throw new Error('Hahaha!');
-
                 return (
                     <>
-                        <Stack direction="row" role="group" overflow="hidden" mb={16} w="100%" h={96}>
-                            <Box h="100%">
+                        <Stack direction="row" overflow="hidden" mb={16} w="100%" h={96} alignItems="center">
+                            <Box h="100%" position="relative" role="group" overflow="hidden" rounded="md">
                                 <Image
-                                    src={
-                                        'https://images.unsplash.com/photo-1572635196237-14b3f281503f?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=4600&q=80'
-                                    }
+                                    src={`https://picsum.photos/seed/${first.id}/1920/1080`}
                                     objectPosition="center center"
                                     objectFit="cover"
                                     height="100%"
@@ -36,7 +33,31 @@ export function PublicPlaylists(props: IPublicPlaylistsProps) {
                                     __css={{
                                         aspectRatio: (16 / 9).toString(),
                                     }}
+                                    _groupHover={{
+                                        filter: 'blur(10px)',
+                                        transform: 'scale(110%)',
+                                    }}
+                                    transition="ease 0.3s"
                                 />
+                                <Link to={`playlists/${first.id}`}>
+                                    <Center
+                                        position="absolute"
+                                        inset="0"
+                                        height="100%"
+                                        width="100%"
+                                        background={overlayColor}
+                                        opacity="0"
+                                        _groupHover={{
+                                            opacity: '1',
+                                        }}
+                                        transition="ease 0.3s"
+                                        py={6}
+                                        px={8}
+                                        fontSize={96}
+                                    >
+                                        <BsPlayFill />
+                                    </Center>
+                                </Link>
                             </Box>
                             <Stack py={6} px={8} spacing={2}>
                                 <Box fontSize="xl" as="h2" lineHeight="tight" color="gray.500" isTruncated>
@@ -52,6 +73,16 @@ export function PublicPlaylists(props: IPublicPlaylistsProps) {
                                 <Box lineHeight="tight" overflow="hidden">
                                     {first.getDescription()}
                                 </Box>
+                                <Stack direction="row" pt={6}>
+                                    <Link to={`playlists/${first.id}`}>
+                                        <Button colorScheme="brand" leftIcon={<BsPlayFill />}>
+                                            {t('playlists.play').toString()}
+                                        </Button>
+                                    </Link>
+                                    <Link to={`playlists/${first.id}`}>
+                                        <Button colorScheme="gray">{t('playlists.readmore').toString()}</Button>
+                                    </Link>
+                                </Stack>
                             </Stack>
                         </Stack>
                         <SimpleGrid columns={{ base: 1, md: 2, lg: 3, xl: 4 }} spacing={4} pb={4}>
@@ -70,9 +101,7 @@ export function PublicPlaylists(props: IPublicPlaylistsProps) {
                                             overflow="hidden"
                                         >
                                             <Image
-                                                src={
-                                                    'https://images.unsplash.com/photo-1572635196237-14b3f281503f?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=4600&q=80'
-                                                }
+                                                src={`https://picsum.photos/seed/${playlist.id}/1920/1080`}
                                                 objectPosition="center center"
                                                 objectFit="cover"
                                                 position="absolute"

@@ -98,6 +98,11 @@
     "passwordAgain": "Password again"
   },
   "playlists": {
-    "videoCount": "videos"
+    "videoCount": "videos",
+    "play": "Play the playlist",
+    "readmore": "More info"
+  },
+  "home": {
+    "signin": "Sign in"
   }
 }

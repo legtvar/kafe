@@ -43,7 +43,7 @@ export const Status: React.FC<IStatusProps> = (props: IStatusProps) => {
                     {t('status.404.subtitle').toString()}
                 </Text>
 
-                <Button color="white" variant="solid" onClick={backlink as any}>
+                <Button variant="solid" onClick={backlink as any}>
                     {t('status.backlink').toString()}
                 </Button>
             </Box>

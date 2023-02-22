@@ -1,12 +1,11 @@
 import { Box, Drawer, DrawerContent, useDisclosure } from '@chakra-ui/react';
 import React from 'react';
 import { Outlet } from 'react-router-dom';
-import { useReloadVar } from '../../hooks/useReload';
-import { ErrorBoundary } from '../utils/ErrorBoundary';
-import { Navbar } from './navigation/Navbar';
-import { Sidebar } from './navigation/Sidebar';
-
-export const Root: React.FC = () => {
+import { useReloadVar } from '../../../hooks/useReload';
+import { Navbar } from '../../layout/navigation/Navbar';
+import { Sidebar } from '../../layout/navigation/Sidebar';
+import { ErrorBoundary } from '../../utils/ErrorBoundary';
+export const AuthRoot: React.FC = () => {
     const { isOpen, onOpen, onClose } = useDisclosure();
     const { reload, value } = useReloadVar();
 

@@ -18,7 +18,10 @@
       "title": "Home"
     },
     "playlists": {
-      "title": "Playlists"
+      "title": "Playlists",
+      "detail": {
+        "title": "Playlist detail"
+      }
     },
     "projects": {
       "title": "Projects",

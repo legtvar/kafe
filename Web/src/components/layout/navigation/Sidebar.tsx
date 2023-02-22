@@ -2,7 +2,7 @@ import { Box, BoxProps, CloseButton, Flex, useColorModeValue } from '@chakra-ui/
 import { useTranslation } from 'react-i18next';
 import { IoReader, IoReaderOutline } from 'react-icons/io5';
 import { Link, useMatches } from 'react-router-dom';
-import { AppRoute, routes } from '../../../routes';
+import { AppRoute, authRoutes } from '../../../routes';
 import { Footer } from '../Footer';
 import { Logo } from '../Logo';
 import { NavItem } from './NavItem';
@@ -16,11 +16,11 @@ export function Sidebar({ onClose, ...rest }: ISidebarProps) {
     const i18next = useTranslation();
     const fgColor = useColorModeValue('gray.900', 'white');
 
-    const routeValues = routes(i18next.t);
+    const routeValues = authRoutes(i18next.t);
 
     const match = matches[matches.length - 1].id
         .split('-')
-        .slice(1)
+        .slice(2)
         .reduce(
             ({ route, path }, id) => ({
                 route: route.children![parseInt(id)],
@@ -28,8 +28,6 @@ export function Sidebar({ onClose, ...rest }: ISidebarProps) {
             }),
             { route: { children: routeValues, path: '' } as AppRoute, path: '' },
         );
-
-    console.log(match);
 
     const mapper =
         (path: string, isChild: boolean, matchPath: string) =>
@@ -100,7 +98,9 @@ export function Sidebar({ onClose, ...rest }: ISidebarProps) {
         >
             <Flex direction="column" minH="100%">
                 <Flex h="20" alignItems="center" mx="8" justifyContent="space-between">
-                    <Logo />
+                    <Link to="/">
+                        <Logo />
+                    </Link>
                     <CloseButton display={{ base: 'flex', md: 'none' }} onClick={onClose} />
                 </Flex>
                 {items}

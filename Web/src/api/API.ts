@@ -1,22 +1,18 @@
 import axios from 'axios';
-import { forValueDefined } from 'waitasecond';
 import { Group } from '../data/Group';
 import { Playlist } from '../data/Playlist';
 import { Project } from '../data/Project';
-import { components } from '../schemas/api';
-import { storageOrPrompt } from '../utils/storageOrPrompt';
 
-function getById<T>(data: Array<T extends { id: string } ? T : never>, id: string) {
-    const found = data.filter((item) => item.id === id);
-    if (found && found.length > 0) {
-        return found[0];
-    }
-    return null;
-}
+export type ApiCredentials = {
+    username: string;
+    password: string;
+};
 
 export class API {
-    public constructor() {
-        this.fetchAll();
+    private credentials: ApiCredentials;
+
+    public constructor(credentials: ApiCredentials) {
+        this.credentials = credentials;
     }
 
     // API fetch functions
@@ -25,10 +21,10 @@ export class API {
 
         return {
             async getAll() {
-                return await forValueDefined(() => api.data.projects);
+                return api.requestArray(`https://wma.lemma.fi.muni.cz/api/v1/projects`, Project);
             },
             async getById(id: string) {
-                return getById(await forValueDefined(() => api.data.projects), id);
+                return api.requestSingle(`https://wma.lemma.fi.muni.cz/api/v1/project/${id}`, Project);
             },
         };
     }
@@ -38,10 +34,10 @@ export class API {
 
         return {
             async getAll() {
-                return await forValueDefined(() => api.data.groups);
+                return api.requestArray(`https://wma.lemma.fi.muni.cz/api/v1/project-groups`, Group);
             },
             async getById(id: string) {
-                return getById(await forValueDefined(() => api.data.groups), id);
+                return api.requestSingle(`https://wma.lemma.fi.muni.cz/api/v1/project-group/${id}`, Group);
             },
         };
     }
@@ -51,69 +47,41 @@ export class API {
 
         return {
             async getAll() {
-                return await forValueDefined(() => api.data.playlists);
+                return api.requestArray(`https://wma.lemma.fi.muni.cz/api/v1/playlists`, Playlist);
             },
             async getById(id: string) {
-                return getById(await forValueDefined(() => api.data.playlists), id);
+                return api.requestSingle(`https://wma.lemma.fi.muni.cz/api/v1/playlist/${id}`, Playlist);
             },
         };
     }
 
     // END
 
-    // === To be changed (does not get refetched on change...) ===
-    private data = {
-        projects: null as Project[] | null,
-        groups: null as Group[] | null,
-        playlists: null as Playlist[] | null,
-    };
+    private async requestSingle<Class>(path: string, type: new (response: any) => Class) {
+        return this.request(path, type, false) as Promise<Class>;
+    }
 
-    private async fetchAll() {
-        // Get credentials from the local storage or request them from the user
-        const username = (await storageOrPrompt('dev_username')) as string;
-        const password = (await storageOrPrompt('dev_password')) as string;
+    private async requestArray<Class>(path: string, type: new (response: any) => Class) {
+        return this.request(path, type, true) as Promise<Class[]>;
+    }
 
-        try {
-            // Projects
-            const projects = (
-                await axios.get('https://wma.lemma.fi.muni.cz/api/v1/projects', {
-                    auth: {
-                        username,
-                        password,
-                    },
-                })
-            ).data as components['schemas']['ProjectListDto'][];
+    private async request<Class>(path: string, type: new (response: any) => Class, isArray: boolean) {
+        // Projects
+        const response = (
+            await axios.get(path, {
+                auth: {
+                    username: this.credentials.username,
+                    password: this.credentials.password,
+                },
+            })
+        ).data;
 
-            this.data.projects = projects.map((s) => new Project(s));
+        console.log(response);
 
-            // Project groups
-            const groups = (
-                await axios.get('https://wma.lemma.fi.muni.cz/api/v1/project-groups', {
-                    auth: {
-                        username,
-                        password,
-                    },
-                })
-            ).data as components['schemas']['ProjectGroupListDto'][];
-
-            this.data.groups = groups.map((s) => new Group(s));
-
-            // Playlists
-            const playlists = (
-                await axios.get('https://wma.lemma.fi.muni.cz/api/v1/playlists', {
-                    auth: {
-                        username,
-                        password,
-                    },
-                })
-            ).data as components['schemas']['PlaylistListDto'][];
-
-            this.data.playlists = playlists.map((s) => new Playlist(s));
-        } catch (e) {
-            console.error('Error fetching data from the API', e);
-
-            this.data.projects = [];
-            this.data.groups = [];
+        if (isArray) {
+            return response.map((s: any) => new type(s)) as Class[];
+        } else {
+            return new type(response) as Class;
         }
     }
 }

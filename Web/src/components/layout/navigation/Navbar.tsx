@@ -32,7 +32,7 @@ interface INavbarProps extends FlexProps {
 }
 export function Navbar({ onOpen, forceReload, signedIn, ...rest }: INavbarProps) {
     const { colorMode, toggleColorMode } = useColorMode();
-    const { user } = useAuth();
+    const { user, setUser } = useAuth();
     const navigate = useNavigate();
 
     return (
@@ -62,7 +62,9 @@ export function Navbar({ onOpen, forceReload, signedIn, ...rest }: INavbarProps)
             )}
 
             {signedIn && <Spacer />}
-            <Logo display={signedIn ? { base: 'flex', md: 'none' } : 'flex'} ml={6} />
+            <Link to="/">
+                <Logo display={signedIn ? { base: 'flex', md: 'none' } : 'flex'} ml={6} />
+            </Link>
             <Spacer />
 
             <HStack spacing={1}>
@@ -75,7 +77,7 @@ export function Navbar({ onOpen, forceReload, signedIn, ...rest }: INavbarProps)
                     icon={colorMode === 'light' ? <FiMoon /> : <FiSun />}
                 />
                 {!signedIn && (
-                    <Link to="/login">
+                    <Link to="/account/login">
                         <Button ml={4}>{t('home.signin').toString()}</Button>
                     </Link>
                 )}
@@ -110,7 +112,14 @@ export function Navbar({ onOpen, forceReload, signedIn, ...rest }: INavbarProps)
                                     <MenuItem>{t('navbar.profile').toString()}</MenuItem>
                                     <MenuItem>{t('navbar.settings').toString()}</MenuItem>
                                     <MenuDivider />
-                                    <MenuItem onClick={() => navigate('/')}>{t('navbar.signout').toString()}</MenuItem>
+                                    <MenuItem
+                                        onClick={() => {
+                                            setUser(null);
+                                            navigate('/');
+                                        }}
+                                    >
+                                        {t('navbar.signout').toString()}
+                                    </MenuItem>
                                 </MenuList>
                             </Menu>
                         </Flex>

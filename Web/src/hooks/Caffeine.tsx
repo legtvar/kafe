@@ -8,12 +8,7 @@ export class Caffeine {
 
     public constructor(api: API) {
         this.api = api;
-
-        this.user = new User();
-        this.user.email = 'rosecky.jonas@gmail.com';
-        this.user.id = '123456789';
-        this.user.name = 'Jonáš Rosecký';
-        this.user.role = 'admin';
+        this.user = null;
     }
 }
 
@@ -31,5 +26,8 @@ export function useAuth() {
 
     return {
         user: caffeine.user,
+        setUser: (user: User | null) => {
+            caffeine.user = user;
+        },
     };
 }

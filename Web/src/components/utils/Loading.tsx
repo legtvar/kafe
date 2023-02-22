@@ -1,13 +1,15 @@
+import { Center, Spinner } from '@chakra-ui/react';
+
 interface ILoadingProps {
     center?: true;
     large?: true;
 }
 
 export function Loading(props: ILoadingProps) {
-    const spinner = <>Loading...</>;
+    const spinner = <Spinner size="xl" />;
 
     if (props.center) {
-        return <div style={{ minHeight: 200, justifyContent: 'center' }}>{spinner}</div>;
+        return <Center my={16}>{spinner}</Center>;
     }
     return spinner;
 }

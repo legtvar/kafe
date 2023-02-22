@@ -2,6 +2,7 @@ import { Flex, Text, useColorModeValue } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
 import { Playlist } from '../../../data/Playlist';
 import { AwaitAPI } from '../../utils/AwaitAPI';
+import { OutletOrChildren } from '../../utils/OutletOrChildren';
 import { Pagination } from '../../utils/Pagination';
 
 interface IPlaylistListProps {}
@@ -10,7 +11,7 @@ export function PlaylistList(props: IPlaylistListProps) {
     const borderColor = useColorModeValue('gray.300', 'gray.700');
     const hoverColor = useColorModeValue('gray.200', 'gray.700');
     return (
-        <>
+        <OutletOrChildren>
             <AwaitAPI request={(api) => api.playlists.getAll()}>
                 {(data: Playlist[]) => (
                     <Flex direction="column" w="full" mt={-4}>
@@ -47,6 +48,6 @@ export function PlaylistList(props: IPlaylistListProps) {
                     </Flex>
                 )}
             </AwaitAPI>
-        </>
+        </OutletOrChildren>
     );
 }

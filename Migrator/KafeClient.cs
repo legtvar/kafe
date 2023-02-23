@@ -27,7 +27,6 @@ public sealed class KafeClient : IAsyncDisposable
 
     public async ValueTask DisposeAsync()
     {
-        await session.SaveChangesAsync();
         martenStore.Dispose();
         await session.DisposeAsync();
     }

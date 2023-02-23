@@ -20,7 +20,6 @@ public static class Program
     private static KafeClient kafe = null!;
     private static ILogger logger = null!;
     private static readonly ConcurrentDictionary<int, Hrib> authorMap = new();
-    private static readonly ConcurrentDictionary<int, Hrib> videoMap = new();
     private static readonly ConcurrentDictionary<int, Hrib> projectMap = new();
     private static readonly ConcurrentDictionary<int, Hrib> artifactMap = new();
 
@@ -76,7 +75,7 @@ public static class Program
         wma.Dispose();
     }
 
-    private static Task<Data.Aggregates.Author> GetOrAddAuthor(
+    private static async Task<Data.Aggregates.Author> GetOrAddAuthor(
         int? id,
         string? name,
         string? uco,
@@ -84,7 +83,12 @@ public static class Program
         string? phone)
     {
         Hrib? hrib = id.HasValue ? authorMap.GetValueOrDefault(id.Value) : null;
-        return kafe.GetOrAddAuthor(hrib, name, uco, email, phone);
+        var kafeAuthor = await kafe.GetOrAddAuthor(hrib, name, uco, email, phone);
+        if (id.HasValue)
+        {
+            authorMap.AddOrUpdate(id.Value, kafeAuthor.Id, (_, _) => kafeAuthor.Id);
+        }
+        return kafeAuthor;
     }
 
     private static async Task MigrateAllAuthors()
@@ -98,6 +102,7 @@ public static class Program
                 uco: author.RoleTables.FirstOrDefault(r => r.Authoruco is not null)?.Authoruco?.ToString(),
                 email: null,
                 phone: null);
+
         }
     }
 
@@ -168,6 +173,7 @@ public static class Program
             releaseDate: project.ReleaseDate,
             isLocked: project.Closed == true,
             authors: authors);
+        projectMap.AddOrUpdate(project.Id, kafeProject.Id, (_, _) => kafeProject.Id);
         return kafeProject;
     }
 
@@ -205,7 +211,7 @@ public static class Program
                 continue;
             }
 
-            artifactMap[migrationInfo.WmaId] = migrationInfo.ArtifactId;
+            artifactMap.AddOrUpdate(migrationInfo.WmaId, migrationInfo.ArtifactId, (_, _) => migrationInfo.ArtifactId);
             await kafe.CreateVideoArtifact(
                 name: migrationInfo.Name,
                 artifactId: migrationInfo.ArtifactId,
@@ -242,6 +248,8 @@ public static class Program
             wmaId: video.Id,
             artifactId: artifact.Id,
             shardId: shard.Id);
+
+        artifactMap.AddOrUpdate(video.Id, artifact.Id, (_, _) => artifact.Id);
 
         return artifact.Id;
     }

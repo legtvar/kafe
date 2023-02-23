@@ -2,8 +2,23 @@ namespace Kafe.Data;
 
 public enum Visibility
 {
-    Unknown, // admin-only
-    Private, // people with the capability / link
-    Internal, // all people with access to KAFE
-    Public // all of the Internet
+    /// <summary>
+    /// Admin-only.
+    /// </summary>
+    Unknown,
+
+    /// <summary>
+    /// People with ownership / link.
+    /// </summary>
+    Private,
+
+    /// <summary>
+    /// All people with internal access to Kafe.
+    /// </summary>
+    Internal,
+
+    /// <summary>
+    /// All of the Internet.
+    /// </summary>
+    Public
 }

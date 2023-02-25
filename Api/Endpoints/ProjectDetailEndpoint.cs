@@ -6,6 +6,7 @@ using Kafe.Transfer;
 using Marten;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
@@ -46,12 +47,16 @@ public class ProjectDetailEndpoint : EndpointBaseAsync
             return NotFound();
         }
 
+
         dto = dto with { ProjectGroupName = group.Name };
 
-        var authors = await Task.WhenAll(data.Authors
-            .Select(a => db.Events.AggregateStreamAsync<Author>(a.Id, token: cancellationToken)));
+        var authors = new List<Author?>();
+        foreach (var projectAuthor in data.Authors)
+        {
+            authors.Add(await db.Events.AggregateStreamAsync<Author>(projectAuthor.Id, token: cancellationToken));
+        }
 
-        if (authors is null || authors.Any(a => a is null))
+        if (authors.Any(a => a is null))
         {
             return NotFound();
         }
@@ -72,10 +77,13 @@ public class ProjectDetailEndpoint : EndpointBaseAsync
                 .ToImmutableArray()
         };
 
-        var artifacts = await Task.WhenAll(data.ArtifactIds
-            .Select(a => db.Events.AggregateStreamAsync<Artifact>(a, token: cancellationToken)));
+        var artifacts = new List<Artifact?>();
+        foreach (var artifactId in data.ArtifactIds)
+        {
+            artifacts.Add(await db.Events.AggregateStreamAsync<Artifact>(artifactId, token: cancellationToken));
+        }
 
-        if (artifacts is null || artifacts.Any(a => a is null))
+        if (artifacts.Any(a => a is null))
         {
             return NotFound();
         }
@@ -83,9 +91,13 @@ public class ProjectDetailEndpoint : EndpointBaseAsync
         var artifactsBuilder = ImmutableArray.CreateBuilder<ProjectArtifactDto>();
         foreach (var artifact in artifacts)
         {
-            var shards = await Task.WhenAll(artifact!.ShardIds
-                .Select(s => db.Events.AggregateStreamAsync<Shard>(s, token: cancellationToken)));
-            if (shards is null || shards.Any(s => s is null))
+            var shards = new List<Shard?>();
+            foreach (var shardId in artifact!.ShardIds)
+            {
+                shards.Add(await db.Events.AggregateStreamAsync<Shard>(shardId, token: cancellationToken));
+            }
+
+            if (shards.Any(s => s is null))
             {
                 return NotFound();
             }
@@ -105,6 +117,6 @@ public class ProjectDetailEndpoint : EndpointBaseAsync
             Artifacts = artifactsBuilder.ToImmutable()
         };
 
-        return Ok();
+        return Ok(dto);
     }
 }

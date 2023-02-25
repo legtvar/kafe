@@ -5,10 +5,18 @@ namespace Kafe.Data.Events;
 public record SubtitlesShardCreated(
     Hrib ShardId,
     CreationMethod CreationMethod,
-    string ArtifactId
-);
+    Hrib ArtifactId
+) : IShardCreated;
+
+public record SubtitlesShardVariant(
+    string Name);
 
 public record SubtitlesShardVariantsAdded(
     Hrib ShardId,
-    ImmutableArray<string> Variants
+    ImmutableArray<SubtitlesShardVariant> Variants
+);
+
+public record SubtitlesShardVariantsRemoved(
+    Hrib ShardId,
+    ImmutableArray<SubtitlesShardVariant> Variants
 );

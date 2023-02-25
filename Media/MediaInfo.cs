@@ -12,5 +12,5 @@ public record MediaInfo(
     TimeSpan Duration,
     ImmutableArray<VideoInfo> VideoStreams,
     ImmutableArray<AudioInfo> AudioStreams,
-    ImmutableArray<SubtitleInfo> SubtitleStreams);
-
+    ImmutableArray<SubtitleInfo> SubtitleStreams
+);

@@ -10,8 +10,7 @@ namespace Kafe.Data.Aggregates;
 public record Artifact(
     string Id,
     CreationMethod CreationMethod,
-    LocalizedString Name,
-    ImmutableArray<string> ShardIds) : IEntity;
+    LocalizedString Name) : IEntity;
 
 public class ArtifactProjection : SingleStreamAggregation<Artifact>
 {
@@ -20,8 +19,7 @@ public class ArtifactProjection : SingleStreamAggregation<Artifact>
         return new Artifact(
             Id: e.ArtifactId,
             CreationMethod: e.CreationMethod,
-            Name: e.Name,
-            ShardIds: ImmutableArray<string>.Empty);
+            Name: e.Name);
     }
 
     public Artifact Apply(ArtifactInfoChanged e, Artifact a)

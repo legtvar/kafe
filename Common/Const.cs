@@ -11,6 +11,13 @@ public static class Const
 {
     public const string OriginalShardVariant = "original";
     public const string InvalidPath = "invalid";
+    public const long VideoShardSizeLimit = 4_294_967_296;
+
+    public const string MatroskaMimeType = "video/x-matroska";
+    public const string MatroskaFileExtension = "mkv";
+
+    public const string Mp4MimeType = "video/mp4";
+    public const string Mp4FileExtension = "mp4";
 
     public static readonly LocalizedString UnknownAuthor
         = LocalizedString.Create(

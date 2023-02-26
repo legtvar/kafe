@@ -12,7 +12,7 @@ public record ProjectListDto(
     Visibility Visibility,
     DateTimeOffset ReleaseDate
     // TODO: Thumbnail
-    );
+);
 
 public record ProjectDetailDto(
     string Id,
@@ -25,22 +25,11 @@ public record ProjectDetailDto(
     DateTimeOffset ReleaseDate,
     ImmutableArray<ProjectAuthorDto> Crew,
     ImmutableArray<ProjectAuthorDto> Cast,
-    ImmutableArray<ProjectArtifactDto> Artifacts
-    );
+    ImmutableArray<ArtifactDetailDto> Artifacts
+);
 
 public record ProjectAuthorDto(
     string Id,
     string Name,
-    ImmutableArray<string> Roles);
-
-public record ProjectArtifactDto(
-    string Id,
-    LocalizedString Name,
-    // TODO: Blueprint reference
-    // TODO: Validation status
-    ImmutableArray<ProjectArtifactShardDto> Shards);
-
-public record ProjectArtifactShardDto(
-    string Id,
-    ShardKind Kind,
-    ImmutableArray<string> Variants);
+    ImmutableArray<string> Roles
+);

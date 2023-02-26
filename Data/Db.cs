@@ -50,5 +50,6 @@ public static class Db
         }
 
         services.AddMarten(ConfigureMarten);
+        services.Configure<StorageOptions>(configuration.GetSection("Storage"));
     }
 }

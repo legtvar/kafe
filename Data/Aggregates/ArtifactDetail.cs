@@ -17,7 +17,8 @@ public record ArtifactDetail(
     string Id,
     CreationMethod CreationMethod,
     LocalizedString Name,
-    ImmutableArray<ArtifactShardInfo> Shards
+    ImmutableArray<ArtifactShardInfo> Shards,
+    ImmutableArray<Hrib> ContainingProjectIds
 );
 
 public record ArtifactShardInfo(
@@ -32,6 +33,8 @@ public class ArtifactDetailProjection : MultiStreamAggregation<ArtifactDetail, s
     {
         Identity<ArtifactCreated>(a => a.ArtifactId);
         Identity<IShardCreated>(c => c.ArtifactId);
+        Identity<ProjectArtifactAdded>(c => c.ArtifactId);
+        Identity<ProjectArtifactRemoved>(c => c.ArtifactId);
         IncludeType<IShardEvent>();
         CustomGrouping(new Grouper());
     }
@@ -42,7 +45,9 @@ public class ArtifactDetailProjection : MultiStreamAggregation<ArtifactDetail, s
             Id: e.ArtifactId,
             CreationMethod: e.CreationMethod,
             Name: e.Name,
-            Shards: ImmutableArray<ArtifactShardInfo>.Empty);
+            Shards: ImmutableArray<ArtifactShardInfo>.Empty,
+            ContainingProjectIds: ImmutableArray<Hrib>.Empty
+        );
     }
 
     public ArtifactDetail Apply(IShardCreated e, ArtifactDetail a)
@@ -77,6 +82,22 @@ public class ArtifactDetailProjection : MultiStreamAggregation<ArtifactDetail, s
             {
                 Variants = oldShard.Variants.RemoveRange(e.GetVariantNames())
             })
+        };
+    }
+
+    public ArtifactDetail Apply(ProjectArtifactAdded e, ArtifactDetail a)
+    {
+        return a with
+        {
+            ContainingProjectIds = a.ContainingProjectIds.Add(e.ProjectId)
+        };
+    }
+
+    public ArtifactDetail Apply(ProjectArtifactRemoved e, ArtifactDetail a)
+    {
+        return a with
+        {
+            ContainingProjectIds = a.ContainingProjectIds.RemoveAll(p => p == e.ProjectId)
         };
     }
 

@@ -4,6 +4,6 @@ using System.Collections.Immutable;
 namespace Kafe.Api.Transfer;
 
 public record ShardListDto(
-    string Id,
+    Hrib Id,
     ShardKind Kind,
     ImmutableArray<string> Variants);

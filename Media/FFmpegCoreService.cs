@@ -33,9 +33,9 @@ public class FFmpegCoreService : IMediaService
         throw new NotImplementedException();
     }
 
-    public async Task<MediaInfo> GetInfo(string filePath)
+    public async Task<MediaInfo> GetInfo(string filePath, CancellationToken token = default)
     {
-        var data = await FFProbe.AnalyseAsync(filePath);
+        var data = await FFProbe.AnalyseAsync(filePath, cancellationToken: token);
 
         var videoInfos = data.VideoStreams
             .Select(v => new VideoInfo(

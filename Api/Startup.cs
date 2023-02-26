@@ -12,6 +12,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Kafe.Api.Swagger;
+using Kafe.Api.Services;
+using Kafe.Media;
 
 namespace Kafe.Api;
 
@@ -83,6 +85,10 @@ public class Startup
             o.JsonSerializerOptions.Converters.Add(new LocalizedStringJsonConverter());
         });
         services.AddApiVersioning(o => o.ReportApiVersions = true);
+
+        // KAFE services
+        services.AddSingleton<IMediaService, XabeFFmpegService>();
+        services.AddScoped<IArtifactService, DefaultArtifactService>();
     }
 
     public void Configure(IApplicationBuilder app, IHostEnvironment environment)

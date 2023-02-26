@@ -16,7 +16,7 @@ public interface IMediaService
     public const string FullHDFileName = "fullhd";
     public const string OriginalFileName = "original";
 
-    Task<MediaInfo> GetInfo(string filePath);
+    Task<MediaInfo> GetInfo(string filePath, CancellationToken token = default);
 
     Task Save(Hrib hrib, Stream data, CancellationToken cancellationToken = default);
 

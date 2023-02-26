@@ -46,7 +46,7 @@ public class ProjectDetailEndpoint : EndpointBaseAsync
         var dto = TransferMaps.ToProjectDetailDto(data) with
         {
             ProjectGroupName = group?.Name ?? Const.UnknownProjectGroup,
-            Artifacts = artifactDetails.Select(TransferMaps.ToProjectArtifactDto).ToImmutableArray(),
+            Artifacts = artifactDetails.Select(TransferMaps.ToArtifactDetailDto).ToImmutableArray(),
             Cast = data.Authors.Where(a => a.Kind == ProjectAuthorKind.Cast)
                     .Select(a => new ProjectAuthorDto(
                         Id: a.Id,

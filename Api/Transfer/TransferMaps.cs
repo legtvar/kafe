@@ -30,7 +30,7 @@ public static class TransferMaps
             ReleaseDate: data.ReleaseDate,
             Crew: ImmutableArray<ProjectAuthorDto>.Empty,
             Cast: ImmutableArray<ProjectAuthorDto>.Empty,
-            Artifacts: ImmutableArray<ProjectArtifactDto>.Empty
+            Artifacts: ImmutableArray<ArtifactDetailDto>.Empty
         );
     }
 
@@ -90,17 +90,19 @@ public static class TransferMaps
             IsOpen: data.IsOpen);
     }
 
-    public static ProjectArtifactDto ToProjectArtifactDto(ArtifactDetail data)
+    public static ArtifactDetailDto ToArtifactDetailDto(ArtifactDetail data)
     {
-        return new ProjectArtifactDto(
+        return new ArtifactDetailDto(
             Id: data.Id,
             Name: data.Name,
-            Shards: data.Shards.Select(ToProjectArtifactShardDto).ToImmutableArray());
+            Shards: data.Shards.Select(ToShardListDto).ToImmutableArray(),
+            ContainingProjectIds: data.ContainingProjectIds
+        );
     }
 
-    public static ProjectArtifactShardDto ToProjectArtifactShardDto(ArtifactShardInfo data)
+    public static ShardListDto ToShardListDto(ArtifactShardInfo data)
     {
-        return new ProjectArtifactShardDto(
+        return new ShardListDto(
             Id: data.ShardId,
             Kind: data.Kind,
             Variants: data.Variants);

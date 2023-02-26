@@ -12,6 +12,11 @@ public static class Program
         var builder = Host.CreateDefaultBuilder(args)
             .ConfigureWebHostDefaults(builder =>
             {
+                builder.ConfigureKestrel(k =>
+                {
+                    // set request limit to 4 GiB
+                    k.Limits.MaxRequestBodySize = Const.VideoShardSizeLimit;
+                });
                 builder.ConfigureAppConfiguration(c =>
                 {
                     c.AddJsonFile("appsettings.local.json");

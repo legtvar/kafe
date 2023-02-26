@@ -33,9 +33,9 @@ public class XabeFFmpegService : IMediaService
         throw new NotImplementedException();
     }
 
-    public async Task<MediaInfo> GetInfo(string filePath)
+    public async Task<MediaInfo> GetInfo(string filePath, CancellationToken token = default)
     {
-        var data = await Xabe.FFmpeg.FFmpeg.GetMediaInfo(filePath);
+        var data = await Xabe.FFmpeg.FFmpeg.GetMediaInfo(filePath, token);
 
         var videoInfos = data.VideoStreams
             .Select(v => new VideoInfo(

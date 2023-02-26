@@ -77,7 +77,7 @@ public static class Program
         wma.Dispose();
     }
 
-    private static async Task<Data.Aggregates.Author> GetOrAddAuthor(
+    private static async Task<Data.Aggregates.AuthorInfo> GetOrAddAuthor(
         int? id,
         string? name,
         string? uco,
@@ -130,7 +130,7 @@ public static class Program
         }
     }
 
-    private static async Task<Data.Aggregates.Project> MigrateProject(Project project, Hrib groupId)
+    private static async Task<Data.Aggregates.ProjectInfo> MigrateProject(Project project, Hrib groupId)
     {
         var authors = ImmutableArray.CreateBuilder<Data.Aggregates.ProjectAuthor>();
 
@@ -342,7 +342,7 @@ public static class Program
         return new VideoShardVariant("original", mediaInfo);
     }
 
-    private static async Task<Data.Aggregates.Playlist> MigratePlaylist(Playlist playlist)
+    private static async Task<Data.Aggregates.PlaylistInfo> MigratePlaylist(Playlist playlist)
     {
         var artifactIds = ImmutableArray.CreateBuilder<Hrib>();
         foreach (var item in playlist.Items.OrderBy(i => i.Position))

@@ -29,7 +29,7 @@ public class AuthorDetailEndpoint : EndpointBaseAsync
         string id,
         CancellationToken cancellationToken = default)
     {
-        var data = await db.Events.AggregateStreamAsync<Author>(id, token: cancellationToken);
+        var data = await db.Events.AggregateStreamAsync<AuthorInfo>(id, token: cancellationToken);
         if (data is null)
         {
             return NotFound();

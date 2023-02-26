@@ -6,7 +6,7 @@ namespace Kafe.Transfer;
 
 public static class TransferMaps
 {
-    public static ProjectListDto ToProjectListDto(Project data)
+    public static ProjectListDto ToProjectListDto(ProjectInfo data)
     {
         return new ProjectListDto(
             Id: data.Id,
@@ -17,7 +17,7 @@ public static class TransferMaps
             ReleaseDate: data.ReleaseDate);
     }
 
-    public static ProjectDetailDto ToProjectDetailDto(Project data)
+    public static ProjectDetailDto ToProjectDetailDto(ProjectInfo data)
     {
         return new ProjectDetailDto(
             Id: data.Id,
@@ -34,14 +34,14 @@ public static class TransferMaps
         );
     }
 
-    public static AuthorListDto ToAuthorListDto(Author data)
+    public static AuthorListDto ToAuthorListDto(AuthorInfo data)
     {
         return new AuthorListDto(
             Id: data.Id,
             Name: data.Name);
     }
 
-    public static AuthorDetailDto ToAuthorDetailDto(Author data)
+    public static AuthorDetailDto ToAuthorDetailDto(AuthorInfo data)
     {
         return new AuthorDetailDto(
             Id: data.Id,
@@ -51,7 +51,7 @@ public static class TransferMaps
             Phone: data.Phone);
     }
 
-    public static PlaylistListDto ToPlaylistListDto(Playlist data)
+    public static PlaylistListDto ToPlaylistListDto(PlaylistInfo data)
     {
         return new PlaylistListDto(
             Id: data.Id,
@@ -60,7 +60,7 @@ public static class TransferMaps
             Visibility: data.Visibility);
     }
 
-    public static PlaylistDetailDto ToPlaylistDetailDto(Playlist data)
+    public static PlaylistDetailDto ToPlaylistDetailDto(PlaylistInfo data)
     {
         return new PlaylistDetailDto(
             Id: data.Id,
@@ -87,7 +87,6 @@ public static class TransferMaps
             Name: data.Name,
             Description: data.Description,
             Deadline: data.Deadline,
-            IsOpen: data.IsOpen,
-            ValidationRules: data.ValidationRules);
+            IsOpen: data.IsOpen);
     }
 }

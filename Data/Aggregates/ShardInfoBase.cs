@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace Kafe.Data.Aggregates;
 
-public abstract record Shard(
+public abstract record ShardInfoBase(
     string Id,
     CreationMethod CreationMethod,
     Hrib ArtifactId) : IEntity

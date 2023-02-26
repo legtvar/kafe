@@ -15,5 +15,4 @@ public record ProjectGroupDetailDto(
     LocalizedString Name,
     LocalizedString? Description,
     DateTimeOffset Deadline,
-    bool IsOpen,
-    ValidationRules? ValidationRules);
+    bool IsOpen);

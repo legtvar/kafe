@@ -3,19 +3,23 @@ using System.Collections.Immutable;
 
 namespace Kafe.Data.Events;
 
+public interface IVideoShardEvent : IShardEvent
+{
+}
+
 public record VideoShardCreated(
     Hrib ShardId,
     CreationMethod CreationMethod,
     Hrib ArtifactId,
     VideoShardVariant OriginalVariant
-) : IShardCreated;
+) : IVideoShardEvent, IShardCreated;
 
 public record VideoShardVariantsAdded(
     Hrib ShardId,
     ImmutableArray<VideoShardVariant> Variants
-) : IShardModified;
+) : IVideoShardEvent;
 
 public record VideoShardVariantsRemoved(
     Hrib ShardId,
     ImmutableArray<VideoShardVariant> Variants
-) : IShardModified;
+) : IVideoShardEvent;

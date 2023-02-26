@@ -8,23 +8,24 @@ using System.Linq;
 
 namespace Kafe.Data.Aggregates;
 
-public record ImageShard(
+public record ImageShardInfo(
     string Id,
     CreationMethod CreationMethod,
     Hrib ArtifactId,
-    ImmutableArray<ImageShardVariant> Variants) : Shard(Id, CreationMethod, ArtifactId)
+    ImmutableArray<ImageShardVariant> Variants
+) : ShardInfoBase(Id, CreationMethod, ArtifactId)
 {
     public override ShardKind Kind => ShardKind.Image;
 }
 
 
-public class ImageShardProjection : SingleStreamAggregation<ImageShard>
+public class ImageShardInfoProjection : SingleStreamAggregation<ImageShardInfo>
 {
-    public ImageShardProjection()
+    public ImageShardInfoProjection()
     {
     }
 
-    public ImageShard Create(ImageShardCreated e)
+    public ImageShardInfo Create(ImageShardCreated e)
     {
         return new(
             Id: e.ShardId,
@@ -33,7 +34,7 @@ public class ImageShardProjection : SingleStreamAggregation<ImageShard>
             Variants: ImmutableArray.Create(e.OriginalVariant));
     }
 
-    public ImageShard Apply(ImageShardVariantsAdded e, ImageShard s)
+    public ImageShardInfo Apply(ImageShardVariantsAdded e, ImageShardInfo s)
     {
         return s with
         {
@@ -41,7 +42,7 @@ public class ImageShardProjection : SingleStreamAggregation<ImageShard>
         };
     }
 
-    public ImageShard Apply(ImageShardVariantsRemoved e, ImageShard s)
+    public ImageShardInfo Apply(ImageShardVariantsRemoved e, ImageShardInfo s)
     {
         return s with
         {

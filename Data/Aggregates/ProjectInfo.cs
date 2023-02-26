@@ -7,7 +7,7 @@ using Marten.Events.Aggregation;
 
 namespace Kafe.Data.Aggregates;
 
-public record Project(
+public record ProjectInfo(
     string Id,
     CreationMethod CreationMethod,
     string ProjectGroupId,
@@ -27,15 +27,15 @@ public record ProjectAuthor(
     ImmutableArray<string> Roles
 ) : IEntity;
 
-public class ProjectProjection : SingleStreamAggregation<Project>
+public class ProjectInfoProjection : SingleStreamAggregation<ProjectInfo>
 {
-    public ProjectProjection()
+    public ProjectInfoProjection()
     {
     }
 
-    public Project Create(ProjectCreated e)
+    public ProjectInfo Create(ProjectCreated e)
     {
-        return new Project(
+        return new ProjectInfo(
             Id: e.ProjectId,
             CreationMethod: e.CreationMethod,
             ProjectGroupId: e.ProjectGroupId,
@@ -45,7 +45,7 @@ public class ProjectProjection : SingleStreamAggregation<Project>
             Visibility: e.Visibility);
     }
 
-    public Project Apply(ProjectInfoChanged e, Project p)
+    public ProjectInfo Apply(ProjectInfoChanged e, ProjectInfo p)
     {
         return p with
         {
@@ -57,7 +57,7 @@ public class ProjectProjection : SingleStreamAggregation<Project>
         };
     }
 
-    public Project Apply(ProjectAuthorAdded e, Project p)
+    public ProjectInfo Apply(ProjectAuthorAdded e, ProjectInfo p)
     {
         if (p.Authors.IsDefault)
         {
@@ -88,7 +88,7 @@ public class ProjectProjection : SingleStreamAggregation<Project>
         };
     }
 
-    public Project Apply(ProjectAuthorRemoved e, Project p)
+    public ProjectInfo Apply(ProjectAuthorRemoved e, ProjectInfo p)
     {
         if (p.Authors.IsDefault)
         {
@@ -126,7 +126,7 @@ public class ProjectProjection : SingleStreamAggregation<Project>
 
     }
 
-    public Project Apply(ProjectArtifactAdded e, Project p)
+    public ProjectInfo Apply(ProjectArtifactAdded e, ProjectInfo p)
     {
         if (p.ArtifactIds.IsDefault)
         {
@@ -140,7 +140,7 @@ public class ProjectProjection : SingleStreamAggregation<Project>
         };
     }
 
-    public Project Apply(ProjectArtifactRemoved e, Project p)
+    public ProjectInfo Apply(ProjectArtifactRemoved e, ProjectInfo p)
     {
         if (p.ArtifactIds.IsDefault)
         {
@@ -153,12 +153,12 @@ public class ProjectProjection : SingleStreamAggregation<Project>
         };
     }
 
-    public Project Apply(ProjectLocked _, Project p)
+    public ProjectInfo Apply(ProjectLocked _, ProjectInfo p)
     {
         return p with { IsLocked = true };
     }
 
-    public Project Apply(ProjectUnlocked _, Project p)
+    public ProjectInfo Apply(ProjectUnlocked _, ProjectInfo p)
     {
         return p with { IsLocked = false };
     }

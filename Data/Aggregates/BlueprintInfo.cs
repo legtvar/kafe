@@ -1,6 +1,6 @@
 ﻿namespace Kafe.Data.Aggregates;
 
-public record Blueprint(
+public record BlueprintInfo(
     string Id
 
     ) : IEntity;

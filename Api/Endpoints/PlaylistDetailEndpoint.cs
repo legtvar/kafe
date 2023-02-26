@@ -29,7 +29,7 @@ public class PlaylistDetailEndpoint : EndpointBaseAsync
         string id,
         CancellationToken cancellationToken = default)
     {
-        var data = await db.Events.AggregateStreamAsync<Playlist>(id, token: cancellationToken);
+        var data = await db.Events.AggregateStreamAsync<PlaylistInfo>(id, token: cancellationToken);
         if (data is null)
         {
             return NotFound();

@@ -4,7 +4,7 @@ using Marten.Events;
 
 namespace Kafe.Data.Aggregates;
 
-public record Author(
+public record AuthorInfo(
     string Id,
     CreationMethod CreationMethod,
     string Name,
@@ -13,21 +13,21 @@ public record Author(
     string? Email = null,
     string? Phone = null) : IEntity;
 
-public class AuthorProjection : SingleStreamAggregation<Author>
+public class AuthorInfoProjection : SingleStreamAggregation<AuthorInfo>
 {
-    public AuthorProjection()
+    public AuthorInfoProjection()
     {
     }
 
-    public Author Create(AuthorCreated e)
+    public AuthorInfo Create(AuthorCreated e)
     {
-        return new Author(
+        return new AuthorInfo(
             Id: e.AuthorId,
             CreationMethod: e.CreationMethod,
             Name: e.Name);
     }
 
-    public Author Apply(AuthorInfoChanged e, Author a)
+    public AuthorInfo Apply(AuthorInfoChanged e, AuthorInfo a)
     {
         return a with
         {

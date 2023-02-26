@@ -4,7 +4,7 @@ using Marten.Events.Aggregation;
 
 namespace Kafe.Data.Aggregates;
 
-public record VideoConversion(
+public record VideoConversionInfo(
     string Id,
     string VideoId,
     bool IsCompleted = false,
@@ -12,25 +12,25 @@ public record VideoConversion(
     LocalizedString? Error = null
 );
 
-public class VideoConversionProjection : SingleStreamAggregation<VideoConversion>
+public class VideoConversionInfoProjection : SingleStreamAggregation<VideoConversionInfo>
 {
-    public VideoConversionProjection()
+    public VideoConversionInfoProjection()
     {
     }
 
-    public VideoConversion Create(VideoConversionCreated e)
+    public VideoConversionInfo Create(VideoConversionCreated e)
     {
-        return new VideoConversion(
+        return new VideoConversionInfo(
             Id: e.ConversionId,
             VideoId: e.VideoId);
     }
 
-    public VideoConversion Apply(VideoConversionCompleted e, VideoConversion c)
+    public VideoConversionInfo Apply(VideoConversionCompleted e, VideoConversionInfo c)
     {
         return c with { IsCompleted = true };
     }
 
-    public VideoConversion Apply(VideoConversionFailed e, VideoConversion c)
+    public VideoConversionInfo Apply(VideoConversionFailed e, VideoConversionInfo c)
     {
         return c with { HasFailed = true, Error = e.Reason };
     }

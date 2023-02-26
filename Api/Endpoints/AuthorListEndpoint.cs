@@ -30,7 +30,7 @@ public class AuthorListEndpoint : EndpointBaseAsync
     public override async Task<ActionResult<List<AuthorListDto>>> HandleAsync(
         CancellationToken cancellationToken = default)
     {
-        var authors = await db.Query<Author>().ToListAsync(cancellationToken);
+        var authors = await db.Query<AuthorInfo>().ToListAsync(cancellationToken);
         return Ok(authors.Select(TransferMaps.ToAuthorListDto).ToList());
     }
 }

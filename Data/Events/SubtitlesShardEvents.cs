@@ -2,19 +2,23 @@
 
 namespace Kafe.Data.Events;
 
+public interface ISubtitlesShardEvent : IShardEvent
+{
+}
+
 public record SubtitlesShardCreated(
     Hrib ShardId,
     CreationMethod CreationMethod,
     Hrib ArtifactId,
     SubtitlesShardVariant OriginalVariant
-) : IShardCreated;
+) : ISubtitlesShardEvent, IShardCreated;
 
 public record SubtitlesShardVariantsAdded(
     Hrib ShardId,
     ImmutableArray<SubtitlesShardVariant> Variants
-) : IShardModified;
+) : ISubtitlesShardEvent;
 
 public record SubtitlesShardVariantsRemoved(
     Hrib ShardId,
     ImmutableArray<SubtitlesShardVariant> Variants
-) : IShardModified;
+) : ISubtitlesShardEvent;

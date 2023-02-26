@@ -8,23 +8,24 @@ using System.Linq;
 
 namespace Kafe.Data.Aggregates;
 
-public record SubtitlesShard(
+public record VideoShardInfo(
     string Id,
     CreationMethod CreationMethod,
     Hrib ArtifactId,
-    ImmutableArray<SubtitlesShardVariant> Variants) : Shard(Id, CreationMethod, ArtifactId)
+    ImmutableArray<VideoShardVariant> Variants
+) : ShardInfoBase(Id, CreationMethod, ArtifactId)
 {
-    public override ShardKind Kind => ShardKind.Subtitles;
+    public override ShardKind Kind => ShardKind.Video;
 }
 
 
-public class SubtitlesShardProjection : SingleStreamAggregation<SubtitlesShard>
+public class VideoShardInfoProjection : SingleStreamAggregation<VideoShardInfo>
 {
-    public SubtitlesShardProjection()
+    public VideoShardInfoProjection()
     {
     }
 
-    public SubtitlesShard Create(SubtitlesShardCreated e)
+    public VideoShardInfo Create(VideoShardCreated e)
     {
         return new(
             Id: e.ShardId,
@@ -33,7 +34,7 @@ public class SubtitlesShardProjection : SingleStreamAggregation<SubtitlesShard>
             Variants: ImmutableArray.Create(e.OriginalVariant));
     }
 
-    public SubtitlesShard Apply(SubtitlesShardVariantsAdded e, SubtitlesShard s)
+    public VideoShardInfo Apply(VideoShardVariantsAdded e, VideoShardInfo s)
     {
         return s with
         {
@@ -41,11 +42,11 @@ public class SubtitlesShardProjection : SingleStreamAggregation<SubtitlesShard>
         };
     }
 
-    public SubtitlesShard Apply(SubtitlesShardVariantsRemoved e, SubtitlesShard s)
+    public VideoShardInfo Apply(VideoShardVariantsRemoved e, VideoShardInfo s)
     {
         return s with
         {
-            Variants = s.Variants.Except(e.Variants).ToImmutableArray()
+            Variants = s.Variants.Except(s.Variants).ToImmutableArray()
         };
     }
 }

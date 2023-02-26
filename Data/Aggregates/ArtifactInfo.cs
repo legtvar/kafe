@@ -7,22 +7,22 @@ using System.Collections.Immutable;
 
 namespace Kafe.Data.Aggregates;
 
-public record Artifact(
+public record ArtifactInfo(
     string Id,
     CreationMethod CreationMethod,
     LocalizedString Name) : IEntity;
 
-public class ArtifactProjection : SingleStreamAggregation<Artifact>
+public class ArtifactInfoProjection : SingleStreamAggregation<ArtifactInfo>
 {
-    public Artifact Create(ArtifactCreated e)
+    public ArtifactInfo Create(ArtifactCreated e)
     {
-        return new Artifact(
+        return new ArtifactInfo(
             Id: e.ArtifactId,
             CreationMethod: e.CreationMethod,
             Name: e.Name);
     }
 
-    public Artifact Apply(ArtifactInfoChanged e, Artifact a)
+    public ArtifactInfo Apply(ArtifactInfoChanged e, ArtifactInfo a)
     {
         return a with
         {

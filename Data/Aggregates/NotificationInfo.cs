@@ -5,7 +5,7 @@ using Marten.Events.Aggregation;
 
 namespace Kafe.Data.Aggregates;
 
-public record Notification(
+public record NotificationInfo(
     string Id,
     CreationMethod CreationMethod,
     NotificationKind Kind,
@@ -16,15 +16,15 @@ public record Notification(
     bool IsSent = false
 ) : IEntity;
 
-public class NotificationProjection : SingleStreamAggregation<Notification>
+public class NotificationInfoProjection : SingleStreamAggregation<NotificationInfo>
 {
-    public NotificationProjection()
+    public NotificationInfoProjection()
     {
     }
 
-    public Notification Create(NotificationCreated e)
+    public NotificationInfo Create(NotificationCreated e)
     {
-        return new Notification
+        return new NotificationInfo
         (
             Id: e.NotificationId,
             CreationMethod: e.CreationMethod,
@@ -38,7 +38,7 @@ public class NotificationProjection : SingleStreamAggregation<Notification>
         );
     }
     
-    public Notification Apply(NotificationSent e, Notification n)
+    public NotificationInfo Apply(NotificationSent e, NotificationInfo n)
     {
         return n with { IsSent = true };
     }

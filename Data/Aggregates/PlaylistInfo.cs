@@ -5,7 +5,7 @@ using Marten.Events.Aggregation;
 
 namespace Kafe.Data.Aggregates;
 
-public record Playlist(
+public record PlaylistInfo(
     string Id,
     CreationMethod CreationMethod,
     ImmutableArray<string> VideoIds,
@@ -14,15 +14,15 @@ public record Playlist(
     Visibility Visibility = Visibility.Unknown
 ) : IEntity;
 
-public class PlaylistProjection : SingleStreamAggregation<Playlist>
+public class PlaylistInfoProjection : SingleStreamAggregation<PlaylistInfo>
 {
-    public PlaylistProjection()
+    public PlaylistInfoProjection()
     {
     }
 
-    public Playlist Create(PlaylistCreated e)
+    public PlaylistInfo Create(PlaylistCreated e)
     {
-        return new Playlist(
+        return new PlaylistInfo(
             Id: e.PlaylistId,
             CreationMethod: e.CreationMethod,
             VideoIds: ImmutableArray.Create<string>(),
@@ -31,7 +31,7 @@ public class PlaylistProjection : SingleStreamAggregation<Playlist>
         );
     }
 
-    public Playlist Apply(PlaylistInfoChanged e, Playlist p)
+    public PlaylistInfo Apply(PlaylistInfoChanged e, PlaylistInfo p)
     {
         return p with
         {
@@ -41,19 +41,19 @@ public class PlaylistProjection : SingleStreamAggregation<Playlist>
         };
     }
 
-    public Playlist Apply(PlaylistVideoAdded e, Playlist p)
+    public PlaylistInfo Apply(PlaylistVideoAdded e, PlaylistInfo p)
     {
         p.VideoIds!.Add(e.VideoId);
         return p;
     }
     
-    public Playlist Apply(PlaylistVideoRemoved e, Playlist p)
+    public PlaylistInfo Apply(PlaylistVideoRemoved e, PlaylistInfo p)
     {
         p.VideoIds!.RemoveAll(v => v == e.VideoId);
         return p;
     }
     
-    public Playlist Apply(PlaylistVideoOrderChanged e, Playlist p)
+    public PlaylistInfo Apply(PlaylistVideoOrderChanged e, PlaylistInfo p)
     {
         p.VideoIds!.RemoveAll(v => v == e.VideoId);
         p.VideoIds!.Insert(e.NewIndex, e.VideoId);

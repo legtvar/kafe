@@ -1,6 +1,7 @@
 using Kafe.Data.Aggregates;
 using Marten;
 using Marten.Events;
+using Marten.Events.Projections;
 using Marten.Services.Json;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -34,16 +35,17 @@ public static class Db
                     .ConnectionLimit(-1);
             });
 
-            options.Projections.Add<AuthorProjection>();
-            options.Projections.Add<ArtifactProjection>();
-            options.Projections.Add<VideoShardProjection>();
-            options.Projections.Add<ImageShardProjection>();
-            options.Projections.Add<SubtitlesShardProjection>();
-            options.Projections.Add<NotificationProjection>();
-            options.Projections.Add<PlaylistProjection>();
-            options.Projections.Add<ProjectProjection>();
+            options.Projections.Add<AuthorInfoProjection>();
+            options.Projections.Add<ArtifactInfoProjection>();
+            options.Projections.Add<VideoShardInfoProjection>();
+            options.Projections.Add<ImageShardInfoProjection>();
+            options.Projections.Add<SubtitlesShardInfoProjection>();
+            options.Projections.Add<NotificationInfoProjection>();
+            options.Projections.Add<PlaylistInfoProjection>();
+            options.Projections.Add<ProjectInfoProjection>();
             options.Projections.Add<ProjectGroupProjection>();
-            options.Projections.Add<VideoConversionProjection>();
+            options.Projections.Add<VideoConversionInfoProjection>();
+            options.Projections.Add<ArtifactDetailProjection>(ProjectionLifecycle.Inline);
             options.UseDefaultSerialization(serializerType: SerializerType.SystemTextJson);
         }
 

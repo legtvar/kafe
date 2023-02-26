@@ -30,7 +30,7 @@ public class PlaylistListEndpoint : EndpointBaseAsync
     public override async Task<ActionResult<List<PlaylistListDto>>>HandleAsync(
         CancellationToken cancellationToken = default)
     {
-        var playlists = await db.Query<Playlist>().ToListAsync(cancellationToken);
+        var playlists = await db.Query<PlaylistInfo>().ToListAsync(cancellationToken);
         return Ok(playlists.Select(TransferMaps.ToPlaylistListDto).ToList());
     }
 }

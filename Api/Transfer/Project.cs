@@ -2,7 +2,7 @@ using System;
 using System.Collections.Immutable;
 using Kafe.Data;
 
-namespace Kafe.Transfer;
+namespace Kafe.Api.Transfer;
 
 public record ProjectListDto(
     string Id,

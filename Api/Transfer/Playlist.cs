@@ -1,7 +1,7 @@
 using System.Collections.Immutable;
 using Kafe.Data;
 
-namespace Kafe.Transfer;
+namespace Kafe.Api.Transfer;
 
 public record PlaylistListDto(
     string Id,

@@ -2,7 +2,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using Kafe.Data.Aggregates;
 
-namespace Kafe.Transfer;
+namespace Kafe.Api.Transfer;
 
 public static class TransferMaps
 {

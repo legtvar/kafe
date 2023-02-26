@@ -2,7 +2,7 @@ using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Linq;
 
-namespace Kafe.Data;
+namespace Kafe.Api.Swagger;
 
 // based on: https://stackoverflow.com/questions/46576234/swashbuckle-make-non-nullable-properties-required
 public class RequireNonNullablePropertiesSchemaFilter : ISchemaFilter

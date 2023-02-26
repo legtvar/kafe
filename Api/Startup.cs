@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using idunno.Authentication.Basic;
 using Kafe.Data;
-using Kafe.Endpoints;
+using Kafe.Api.Endpoints;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Rewrite;
@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using Kafe.Api.Swagger;
 
 namespace Kafe.Api;
 
@@ -91,7 +92,7 @@ public class Startup
         app.UseRewriter(new RewriteOptions().AddRewrite("login", "login.html", true));
         // app.Use(async (context, next) => {
         //     if (context.Request.Path.Value == "/login") {
-                
+
         //     }
         //     await next(context);
         // });

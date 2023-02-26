@@ -1,7 +1,7 @@
 using System;
 using Kafe.Data;
 
-namespace Kafe.Transfer;
+namespace Kafe.Api.Transfer;
 
 public record ProjectGroupListDto(
     string Id,

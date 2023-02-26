@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.Routing;
 using System.Linq;
 
-namespace Kafe.Endpoints;
+namespace Kafe.Api.Endpoints;
 
 // Based on: https://stackoverflow.com/a/58406404
 public class RoutePrefixConvention : IApplicationModelConvention

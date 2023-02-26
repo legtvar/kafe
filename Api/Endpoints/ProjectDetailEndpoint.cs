@@ -2,7 +2,7 @@ using Ardalis.ApiEndpoints;
 using Asp.Versioning;
 using Kafe.Data;
 using Kafe.Data.Aggregates;
-using Kafe.Transfer;
+using Kafe.Api.Transfer;
 using Marten;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,7 +12,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Kafe.Endpoints;
+namespace Kafe.Api.Endpoints;
 
 [ApiVersion("1.0")]
 [Route("project/{id}")]

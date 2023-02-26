@@ -33,89 +33,33 @@ public class ProjectDetailEndpoint : EndpointBaseAsync
         string id,
         CancellationToken cancellationToken = default)
     {
-        var data = await db.Events.AggregateStreamAsync<ProjectInfo>(id, token: cancellationToken);
+        var data = await db.LoadAsync<ProjectInfo>(id, cancellationToken);
         if (data is null)
         {
             return NotFound();
         }
 
-        var dto = TransferMaps.ToProjectDetailDto(data);
 
-        //var group = await db.Events.AggregateStreamAsync<ProjectGroup>(data.ProjectGroupId, token: cancellationToken);
-        //if (group is null)
-        //{
-        //    return NotFound();
-        //}
-
-
-        //dto = dto with { ProjectGroupName = group.Name };
-
-        //var authors = new List<Author?>();
-        //foreach (var projectAuthor in data.Authors)
-        //{
-        //    authors.Add(await db.Events.AggregateStreamAsync<Author>(projectAuthor.Id, token: cancellationToken));
-        //}
-
-        //if (authors.Any(a => a is null))
-        //{
-        //    return NotFound();
-        //}
-
-        //dto = dto with
-        //{
-        //    Cast = data.Authors.Where(a => a.Kind == ProjectAuthorKind.Cast)
-        //        .Select(a => new ProjectAuthorDto(
-        //            Id: a.Id,
-        //            Name: authors.SingleOrDefault(e => e?.Id == a.Id)?.Name ?? (string)Const.UnknownAuthor,
-        //            Roles: a.Roles))
-        //        .ToImmutableArray(),
-        //    Crew = data.Authors.Where(a => a.Kind == ProjectAuthorKind.Crew)
-        //        .Select(a => new ProjectAuthorDto(
-        //            Id: a.Id,
-        //            Name: authors.SingleOrDefault(e => e?.Id == a.Id)?.Name ?? (string)Const.UnknownAuthor,
-        //            Roles: a.Roles))
-        //        .ToImmutableArray()
-        //};
-
-        //var artifacts = new List<Artifact?>();
-        //foreach (var artifactId in data.ArtifactIds)
-        //{
-        //    artifacts.Add(await db.Events.AggregateStreamAsync<Artifact>(artifactId, token: cancellationToken));
-        //}
-
-        //if (artifacts.Any(a => a is null))
-        //{
-        //    return NotFound();
-        //}
-
-        //var artifactsBuilder = ImmutableArray.CreateBuilder<ProjectArtifactDto>();
-        //foreach (var artifact in artifacts)
-        //{
-        //    var shards = new List<Shard?>();
-        //    foreach (var shardId in artifact!.ShardIds)
-        //    {
-        //        shards.Add(await db.Events.AggregateStreamAsync<Shard>(shardId, token: cancellationToken));
-        //    }
-
-        //    if (shards.Any(s => s is null))
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    artifactsBuilder.Add(new ProjectArtifactDto(
-        //        Id: artifact.Id,
-        //        Name: artifact.Name,
-        //        Shards: shards.Select(s => new ProjectArtifactShardDto(
-        //            Id: s!.Id,
-        //            Kind: s.Kind,
-        //            Variants: s.GetVariants()))
-        //        .ToImmutableArray()));
-        //}
-
-        //dto = dto with
-        //{
-        //    Artifacts = artifactsBuilder.ToImmutable()
-        //};
+        var group = await db.LoadAsync<ProjectGroupInfo>(data.ProjectGroupId, cancellationToken);
+        var artifactDetails = await db.LoadManyAsync<ArtifactDetail>(cancellationToken, data.ArtifactIds);
+        var authors = await db.LoadManyAsync<AuthorInfo>(cancellationToken, data.Authors.Select(a => a.Id));
+        var dto = TransferMaps.ToProjectDetailDto(data) with
+        {
+            ProjectGroupName = group?.Name ?? Const.UnknownProjectGroup,
+            Artifacts = artifactDetails.Select(TransferMaps.ToProjectArtifactDto).ToImmutableArray(),
+            Cast = data.Authors.Where(a => a.Kind == ProjectAuthorKind.Cast)
+                    .Select(a => new ProjectAuthorDto(
+                        Id: a.Id,
+                        Name: authors.SingleOrDefault(e => e?.Id == a.Id)?.Name ?? (string)Const.UnknownAuthor,
+                        Roles: a.Roles))
+                    .ToImmutableArray(),
+            Crew = data.Authors.Where(a => a.Kind == ProjectAuthorKind.Crew)
+                    .Select(a => new ProjectAuthorDto(
+                        Id: a.Id,
+                        Name: authors.SingleOrDefault(e => e?.Id == a.Id)?.Name ?? (string)Const.UnknownAuthor,
+                        Roles: a.Roles))
+                    .ToImmutableArray()
+        };
 
         return Ok(dto);
     }

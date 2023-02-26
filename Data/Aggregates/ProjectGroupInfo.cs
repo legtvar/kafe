@@ -5,7 +5,7 @@ using System;
 
 namespace Kafe.Data.Aggregates;
 
-public record ProjectGroup(
+public record ProjectGroupInfo(
     string Id,
     CreationMethod CreationMethod,
     LocalizedString Name,
@@ -14,22 +14,22 @@ public record ProjectGroup(
     bool IsOpen = false
 ) : IEntity;
 
-public class ProjectGroupProjection : SingleStreamAggregation<ProjectGroup>
+public class ProjectGroupInfoProjection : SingleStreamAggregation<ProjectGroupInfo>
 {
-    public ProjectGroupProjection()
+    public ProjectGroupInfoProjection()
     {
     }
 
-    public ProjectGroup Create(ProjectGroupCreated e)
+    public ProjectGroupInfo Create(ProjectGroupCreated e)
     {
-        return new ProjectGroup(
+        return new ProjectGroupInfo(
             Id: e.ProjectGroupId,
             CreationMethod: e.CreationMethod,
             Name: e.Name
         );
     }
 
-    public ProjectGroup Apply(ProjectGroupInfoChanged e, ProjectGroup g)
+    public ProjectGroupInfo Apply(ProjectGroupInfoChanged e, ProjectGroupInfo g)
     {
         return g with
         {
@@ -39,12 +39,12 @@ public class ProjectGroupProjection : SingleStreamAggregation<ProjectGroup>
         };
     }
 
-    public ProjectGroup Apply(ProjectGroupOpened e, ProjectGroup g)
+    public ProjectGroupInfo Apply(ProjectGroupOpened e, ProjectGroupInfo g)
     {
         return g with { IsOpen = true };
     }
 
-    public ProjectGroup Apply(ProjectGroupClosed e, ProjectGroup g)
+    public ProjectGroupInfo Apply(ProjectGroupClosed e, ProjectGroupInfo g)
     {
         return g with { IsOpen = false };
     }

@@ -38,7 +38,7 @@ public sealed class KafeClient : IAsyncDisposable
 
     public async Task<int> CountProjectGroups()
     {
-        return await session.Query<ProjectGroup>().CountAsync();
+        return await session.Query<ProjectGroupInfo>().CountAsync();
     }
 
     public async Task<int> CountProjects()
@@ -261,7 +261,7 @@ public sealed class KafeClient : IAsyncDisposable
         return (await session.Events.AggregateStreamAsync<ProjectInfo>(hrib))!;
     }
 
-    public async Task<ProjectGroup> CreateProjectGroup(
+    public async Task<ProjectGroupInfo> CreateProjectGroup(
         string name,
         Hrib? hrib = null)
     {
@@ -272,14 +272,14 @@ public sealed class KafeClient : IAsyncDisposable
             (LocalizedString)name);
         LogEvent(hrib, created);
 
-        session.Events.StartStream<ProjectGroup>(hrib, created);
+        session.Events.StartStream<ProjectGroupInfo>(hrib, created);
 
         var closed = new ProjectGroupClosed(hrib);
         session.Events.Append(hrib, closed);
         LogEvent(hrib, closed);
 
         await session.SaveChangesAsync();
-        return (await session.Events.AggregateStreamAsync<ProjectGroup>(hrib))!;
+        return (await session.Events.AggregateStreamAsync<ProjectGroupInfo>(hrib))!;
     }
 
     private void LogEvent<TEvent>(Hrib hrib, TEvent @event)

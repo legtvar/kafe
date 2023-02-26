@@ -1,4 +1,5 @@
 ﻿using Kafe.Data.Aggregates;
+using Kafe.Data.Events;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,4 +21,16 @@ public static class ShardExtensions
                 "this method. This could be an oversight.")
         };
     }
+
+    public static ShardKind GetShardKind(this IShardEvent e)
+    {
+        return e switch
+        {
+            IVideoShardEvent => ShardKind.Video,
+            IImageShardEvent => ShardKind.Image,
+            ISubtitlesShardEvent => ShardKind.Subtitles,
+            _ => ShardKind.Invalid
+        };
+    }
+
 }

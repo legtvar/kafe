@@ -35,16 +35,16 @@ public static class Db
                     .ConnectionLimit(-1);
             });
 
-            options.Projections.Add<AuthorInfoProjection>();
-            options.Projections.Add<ArtifactInfoProjection>();
-            options.Projections.Add<VideoShardInfoProjection>();
-            options.Projections.Add<ImageShardInfoProjection>();
-            options.Projections.Add<SubtitlesShardInfoProjection>();
-            options.Projections.Add<NotificationInfoProjection>();
-            options.Projections.Add<PlaylistInfoProjection>();
-            options.Projections.Add<ProjectInfoProjection>();
-            options.Projections.Add<ProjectGroupProjection>();
-            options.Projections.Add<VideoConversionInfoProjection>();
+            options.Projections.Add<AuthorInfoProjection>(ProjectionLifecycle.Inline);
+            options.Projections.Add<ArtifactInfoProjection>(ProjectionLifecycle.Inline);
+            options.Projections.Add<VideoShardInfoProjection>(ProjectionLifecycle.Inline);
+            options.Projections.Add<ImageShardInfoProjection>(ProjectionLifecycle.Inline);
+            options.Projections.Add<SubtitlesShardInfoProjection>(ProjectionLifecycle.Inline);
+            options.Projections.Add<NotificationInfoProjection>(ProjectionLifecycle.Inline);
+            options.Projections.Add<PlaylistInfoProjection>(ProjectionLifecycle.Inline);
+            options.Projections.Add<ProjectInfoProjection>(ProjectionLifecycle.Inline);
+            options.Projections.Add<ProjectGroupInfoProjection>(ProjectionLifecycle.Inline);
+            options.Projections.Add<VideoConversionInfoProjection>(ProjectionLifecycle.Inline);
             options.Projections.Add<ArtifactDetailProjection>(ProjectionLifecycle.Inline);
             options.UseDefaultSerialization(serializerType: SerializerType.SystemTextJson);
         }

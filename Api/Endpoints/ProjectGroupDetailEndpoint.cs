@@ -29,7 +29,7 @@ public class ProjectGroupDetailEndpoint : EndpointBaseAsync
         string id,
         CancellationToken cancellationToken = default)
     {
-        var data = await db.Events.AggregateStreamAsync<ProjectGroup>(id, token: cancellationToken);
+        var data = await db.Events.AggregateStreamAsync<ProjectGroupInfo>(id, token: cancellationToken);
         if (data is null)
         {
             return NotFound();

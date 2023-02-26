@@ -70,7 +70,7 @@ public static class TransferMaps
             Videos: data.VideoIds);
     }
     
-    public static ProjectGroupListDto ToProjectGroupListDto(ProjectGroup data)
+    public static ProjectGroupListDto ToProjectGroupListDto(ProjectGroupInfo data)
     {
         return new ProjectGroupListDto(
             Id: data.Id,
@@ -80,7 +80,7 @@ public static class TransferMaps
             IsOpen: data.IsOpen);
     }
     
-    public static ProjectGroupDetailDto ToProjectGroupDetailDto(ProjectGroup data)
+    public static ProjectGroupDetailDto ToProjectGroupDetailDto(ProjectGroupInfo data)
     {
         return new ProjectGroupDetailDto(
             Id: data.Id,
@@ -88,5 +88,21 @@ public static class TransferMaps
             Description: data.Description,
             Deadline: data.Deadline,
             IsOpen: data.IsOpen);
+    }
+
+    public static ProjectArtifactDto ToProjectArtifactDto(ArtifactDetail data)
+    {
+        return new ProjectArtifactDto(
+            Id: data.Id,
+            Name: data.Name,
+            Shards: data.Shards.Select(ToProjectArtifactShardDto).ToImmutableArray());
+    }
+
+    public static ProjectArtifactShardDto ToProjectArtifactShardDto(ArtifactShardInfo data)
+    {
+        return new ProjectArtifactShardDto(
+            Id: data.ShardId,
+            Kind: data.Kind,
+            Variants: data.Variants);
     }
 }

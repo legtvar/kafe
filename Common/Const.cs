@@ -7,10 +7,18 @@ using System.Threading.Tasks;
 
 namespace Kafe;
 
-public class Const
+public static class Const
 {
+    public const string OriginalShardVariant = "original";
+    public const string InvalidPath = "invalid";
+
     public static readonly LocalizedString UnknownAuthor
         = LocalizedString.Create(
             (CultureInfo.InvariantCulture, "Unknown author"),
             (CultureInfo.CreateSpecificCulture("cs"), "Neznámý autor"));
+
+    public static readonly LocalizedString UnknownProjectGroup
+        = LocalizedString.Create(
+            (CultureInfo.InvariantCulture, "Unknown project group"),
+            (CultureInfo.CreateSpecificCulture("cs"), "Neznámá skupina projektů"));
 }

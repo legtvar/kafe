@@ -1,5 +1,7 @@
 ﻿using Kafe.Media;
+using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 
 namespace Kafe.Data.Events;
 
@@ -17,9 +19,21 @@ public record VideoShardCreated(
 public record VideoShardVariantsAdded(
     Hrib ShardId,
     ImmutableArray<VideoShardVariant> Variants
-) : IVideoShardEvent;
+) : IVideoShardEvent, IShardVariantsAdded
+{
+    public IEnumerable<string> GetVariantNames()
+    {
+        return Variants.Select(v => v.Name);
+    }
+}
 
 public record VideoShardVariantsRemoved(
     Hrib ShardId,
     ImmutableArray<VideoShardVariant> Variants
-) : IVideoShardEvent;
+) : IVideoShardEvent, IShardVariantsRemoved
+{
+    public IEnumerable<string> GetVariantNames()
+    {
+        return Variants.Select(v => v.Name);
+    }
+}

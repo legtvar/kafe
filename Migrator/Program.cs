@@ -329,7 +329,8 @@ public static class Program
         var shardDir = Path.Combine(migratorConfiguration.KafeArtifactDirectory, artifactId, shardId);
         if (!Directory.Exists(shardDir))
         {
-            throw new ArgumentException($"Shard directory '{shardId}' does not exist.");
+            logger.LogError($"Shard directory '{shardId}' does not exist. Video will be migrated without MediaInfo.");
+            return new VideoShardVariant(Const.OriginalShardVariant, MediaInfo.Invalid);
         }
 
         var originalCandidates = Directory.GetFiles(shardDir, "original.*");
@@ -339,7 +340,7 @@ public static class Program
         }
 
         var mediaInfo = await mediaService.GetInfo(originalCandidates.Single());
-        return new VideoShardVariant("original", mediaInfo);
+        return new VideoShardVariant(Const.OriginalShardVariant, mediaInfo);
     }
 
     private static async Task<Data.Aggregates.PlaylistInfo> MigratePlaylist(Playlist playlist)

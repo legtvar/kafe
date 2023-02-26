@@ -13,4 +13,13 @@ public record MediaInfo(
     ImmutableArray<VideoInfo> VideoStreams,
     ImmutableArray<AudioInfo> AudioStreams,
     ImmutableArray<SubtitleInfo> SubtitleStreams
-);
+)
+{
+    public static MediaInfo Invalid { get; }
+        = new(
+            Const.InvalidPath,
+            TimeSpan.Zero,
+            ImmutableArray<VideoInfo>.Empty,
+            ImmutableArray<AudioInfo>.Empty,
+            ImmutableArray<SubtitleInfo>.Empty);
+}

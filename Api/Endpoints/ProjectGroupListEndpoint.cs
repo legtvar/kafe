@@ -30,7 +30,7 @@ public class ProjectGroupListEndpoint : EndpointBaseAsync
     public override async Task<ActionResult<List<ProjectGroupListDto>>>HandleAsync(
         CancellationToken cancellationToken = default)
     {
-        var projectGroups = await db.Query<ProjectGroup>().ToListAsync(cancellationToken);
+        var projectGroups = await db.Query<ProjectGroupInfo>().ToListAsync(cancellationToken);
         return Ok(projectGroups.Select(TransferMaps.ToProjectGroupListDto).ToList());
     }
 }

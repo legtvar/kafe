@@ -130,6 +130,7 @@ public sealed class KafeClient : IAsyncDisposable
 
     public async Task<(Artifact, VideoShard)> CreateVideoArtifact(
         string name,
+        VideoShardVariant originalVariant,
         Hrib? projectId = null,
         Hrib? artifactId = null,
         Hrib? shardId = null)
@@ -146,7 +147,8 @@ public sealed class KafeClient : IAsyncDisposable
         var shardCreated = new VideoShardCreated(
             ShardId: shardId,
             CreationMethod: CreationMethod.Migrator,
-            ArtifactId: artifactId);
+            ArtifactId: artifactId,
+            OriginalVariant: originalVariant);
         session.Events.StartStream<VideoShard>(shardId, shardCreated);
         LogEvent(shardId, shardCreated);
 

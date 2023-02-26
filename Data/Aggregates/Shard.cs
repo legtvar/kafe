@@ -11,7 +11,7 @@ namespace Kafe.Data.Aggregates;
 public abstract record Shard(
     string Id,
     CreationMethod CreationMethod,
-    string ArtifactId) : IEntity
+    Hrib ArtifactId) : IEntity
 {
     public abstract ShardKind Kind { get; }
 }

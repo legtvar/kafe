@@ -11,8 +11,7 @@ public record ProjectGroup(
     LocalizedString Name,
     LocalizedString? Description = null,
     DateTimeOffset Deadline = default,
-    bool IsOpen = false,
-    ValidationRules? ValidationRules = null
+    bool IsOpen = false
 ) : IEntity;
 
 public class ProjectGroupProjection : SingleStreamAggregation<ProjectGroup>
@@ -48,10 +47,5 @@ public class ProjectGroupProjection : SingleStreamAggregation<ProjectGroup>
     public ProjectGroup Apply(ProjectGroupClosed e, ProjectGroup g)
     {
         return g with { IsOpen = false };
-    }
-
-    public ProjectGroup Apply(ProjectGroupValidationRulesChanged e, ProjectGroup g)
-    {
-        return g with { ValidationRules = e.ValidationRules };
     }
 }

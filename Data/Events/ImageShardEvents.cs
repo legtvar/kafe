@@ -6,20 +6,16 @@ namespace Kafe.Data.Events;
 public record ImageShardCreated(
     Hrib ShardId,
     CreationMethod CreationMethod,
-    Hrib ArtifactId
+    Hrib ArtifactId,
+    ImageShardVariant OriginalVariant
 ) : IShardCreated;
-
-public record ImageShardVariant(
-    string Name,
-    ImageInfo Info
-);
 
 public record ImageShardVariantsAdded(
     Hrib ShardId,
     ImmutableArray<ImageShardVariant> Variants
-);
+) : IShardModified;
 
 public record ImageShardVariantsRemoved(
     Hrib ShardId,
     ImmutableArray<ImageShardVariant> Variants
-);
+) : IShardModified;

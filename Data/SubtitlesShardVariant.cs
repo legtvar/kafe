@@ -4,11 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Kafe.Media;
+namespace Kafe.Data;
 
-public record ImageInfo(
-    string Path,
-    int Width,
-    int Height,
-    string Format
+public record SubtitlesShardVariant(
+    string Name
 );

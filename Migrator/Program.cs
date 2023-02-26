@@ -1,6 +1,7 @@
 ﻿using Kafe.Data;
 using Kafe.Data.Events;
 using Kafe.Lemma;
+using Kafe.Media;
 using Marten;
 using Npgsql;
 using System.Collections.Concurrent;
@@ -22,6 +23,7 @@ public static class Program
     private static readonly ConcurrentDictionary<int, Hrib> authorMap = new();
     private static readonly ConcurrentDictionary<int, Hrib> projectMap = new();
     private static readonly ConcurrentDictionary<int, Hrib> artifactMap = new();
+    private static readonly IMediaService mediaService = new XabeFFmpegService();
 
 
     public static async Task Main(string[] args)
@@ -212,8 +214,10 @@ public static class Program
             }
 
             artifactMap.AddOrUpdate(migrationInfo.WmaId, migrationInfo.ArtifactId, (_, _) => migrationInfo.ArtifactId);
+            var originalVariant = await GetOriginalVariant(migrationInfo.ArtifactId, migrationInfo.VideoShardId);
             await kafe.CreateVideoArtifact(
                 name: migrationInfo.Name,
+                originalVariant: originalVariant,
                 artifactId: migrationInfo.ArtifactId,
                 shardId: migrationInfo.VideoShardId);
         }
@@ -239,19 +243,27 @@ public static class Program
             return hrib;
         }
 
-        var (artifact, shard) = await kafe.CreateVideoArtifact(
-            name: video.Name,
-            projectId: projectMap.GetValueOrDefault(video.Project));
-
+        var artifactId = Hrib.Create();
+        var shardId = Hrib.Create();
         await CopyVideo(
             name: video.Name,
             wmaId: video.Id,
-            artifactId: artifact.Id,
-            shardId: shard.Id);
+            artifactId: artifactId,
+            shardId: shardId);
 
-        artifactMap.AddOrUpdate(video.Id, artifact.Id, (_, _) => artifact.Id);
+        var originalVariant = await GetOriginalVariant(artifactId, shardId);
 
-        return artifact.Id;
+        await kafe.CreateVideoArtifact(
+            name: video.Name,
+            originalVariant: originalVariant,
+            projectId: projectMap.GetValueOrDefault(video.Project),
+            artifactId: artifactId,
+            shardId: shardId);
+
+
+        artifactMap.AddOrUpdate(video.Id, artifactId, (_, _) => artifactId);
+
+        return artifactId;
     }
 
     private static async Task CopyVideo(string name, int wmaId, Hrib artifactId, Hrib shardId)
@@ -310,6 +322,24 @@ public static class Program
             FileMode.Create,
             FileAccess.Write);
         await src.CopyToAsync(dst);
+    }
+
+    private static async Task<VideoShardVariant> GetOriginalVariant(Hrib artifactId, Hrib shardId)
+    {
+        var shardDir = Path.Combine(migratorConfiguration.KafeArtifactDirectory, artifactId, shardId);
+        if (!Directory.Exists(shardDir))
+        {
+            throw new ArgumentException($"Shard directory '{shardId}' does not exist.");
+        }
+
+        var originalCandidates = Directory.GetFiles(shardDir, "original.*");
+        if (originalCandidates.Length == 0 || originalCandidates.Length > 1)
+        {
+            throw new ArgumentException($"Shard '{shardId}' has multiple 'original' variants.");
+        }
+
+        var mediaInfo = await mediaService.GetInfo(originalCandidates.Single());
+        return new VideoShardVariant("original", mediaInfo);
     }
 
     private static async Task<Data.Aggregates.Playlist> MigratePlaylist(Playlist playlist)

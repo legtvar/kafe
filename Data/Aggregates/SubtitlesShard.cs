@@ -11,8 +11,8 @@ namespace Kafe.Data.Aggregates;
 public record SubtitlesShard(
     string Id,
     CreationMethod CreationMethod,
-    string ArtifactId,
-    ImmutableArray<string> Variants) : Shard(Id, CreationMethod, ArtifactId)
+    Hrib ArtifactId,
+    ImmutableArray<SubtitlesShardVariant> Variants) : Shard(Id, CreationMethod, ArtifactId)
 {
     public override ShardKind Kind => ShardKind.Subtitles;
 }
@@ -30,7 +30,7 @@ public class SubtitlesShardProjection : SingleStreamAggregation<SubtitlesShard>
             Id: e.ShardId,
             CreationMethod: e.CreationMethod,
             ArtifactId: e.ArtifactId,
-            Variants: ImmutableArray.Create(CultureInfo.InvariantCulture.TwoLetterISOLanguageName));
+            Variants: ImmutableArray.Create(e.OriginalVariant));
     }
 
     public SubtitlesShard Apply(SubtitlesShardVariantsAdded e, SubtitlesShard s)
@@ -38,6 +38,14 @@ public class SubtitlesShardProjection : SingleStreamAggregation<SubtitlesShard>
         return s with
         {
             Variants = s.Variants.Union(e.Variants).ToImmutableArray()
+        };
+    }
+
+    public SubtitlesShard Apply(SubtitlesShardVariantsRemoved e, SubtitlesShard s)
+    {
+        return s with
+        {
+            Variants = s.Variants.Except(e.Variants).ToImmutableArray()
         };
     }
 }

@@ -11,9 +11,9 @@ namespace Kafe.Media;
 
 public interface IMediaService
 {
-    public const string SDFileName = "sd.mp4";
-    public const string HDFileName = "hd.mp4";
-    public const string FullHDFileName = "fullhd.mp4";
+    public const string SDFileName = "sd";
+    public const string HDFileName = "hd";
+    public const string FullHDFileName = "fullhd";
     public const string OriginalFileName = "original";
 
     Task<MediaInfo> GetInfo(string filePath);

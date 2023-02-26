@@ -11,8 +11,8 @@ namespace Kafe.Data.Aggregates;
 public record ImageShard(
     string Id,
     CreationMethod CreationMethod,
-    string ArtifactId,
-    ImmutableArray<ImageQualityPreset> Variants) : Shard(Id, CreationMethod, ArtifactId)
+    Hrib ArtifactId,
+    ImmutableArray<ImageShardVariant> Variants) : Shard(Id, CreationMethod, ArtifactId)
 {
     public override ShardKind Kind => ShardKind.Image;
 }
@@ -30,7 +30,7 @@ public class ImageShardProjection : SingleStreamAggregation<ImageShard>
             Id: e.ShardId,
             CreationMethod: e.CreationMethod,
             ArtifactId: e.ArtifactId,
-            Variants: ImmutableArray.Create(ImageQualityPreset.Original));
+            Variants: ImmutableArray.Create(e.OriginalVariant));
     }
 
     public ImageShard Apply(ImageShardVariantsAdded e, ImageShard s)
@@ -38,6 +38,14 @@ public class ImageShardProjection : SingleStreamAggregation<ImageShard>
         return s with
         {
             Variants = s.Variants.Union(e.Variants).ToImmutableArray()
+        };
+    }
+
+    public ImageShard Apply(ImageShardVariantsRemoved e, ImageShard s)
+    {
+        return s with
+        {
+            Variants = s.Variants.Except(e.Variants).ToImmutableArray()
         };
     }
 }

@@ -6,6 +6,11 @@ using System.Threading.Tasks;
 
 namespace Kafe.Data.Events;
 
+public interface IShardModified
+{
+    Hrib ShardId { get; }
+}
+
 public interface IShardCreated
 {
     Hrib ShardId { get; }

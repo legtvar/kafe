@@ -21,8 +21,3 @@ public record ProjectGroupOpened(
 public record ProjectGroupClosed(
     Hrib ProjectGroupId
 );
-
-public record ProjectGroupValidationRulesChanged(
-    Hrib ProjectGroupId,
-    ValidationRules ValidationRules
-);

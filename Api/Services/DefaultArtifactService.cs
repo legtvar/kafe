@@ -29,10 +29,10 @@ public class DefaultArtifactService : IArtifactService
         this.db = db;
         this.storageOptions = storageOptions;
         this.mediaService = mediaService;
-        if (storageOptions.Value.ArtifactDirectory is null
-            || !Directory.Exists(storageOptions.Value.ArtifactDirectory))
+        if (storageOptions.Value.VideoShardsDirectory is null
+            || !Directory.Exists(storageOptions.Value.VideoShardsDirectory))
         {
-            throw new ArgumentException($"Artifact directory '{storageOptions.Value.ArtifactDirectory}' is not " +
+            throw new ArgumentException($"VideoShard directory '{storageOptions.Value.VideoShardsDirectory}' is not " +
                 "configured or does not exist.");
         }
     }
@@ -94,18 +94,19 @@ public class DefaultArtifactService : IArtifactService
             throw new ArgumentException($"Artifact '{artifactId}' does not exist.");
         }
 
-        var artifactDir = new DirectoryInfo(Path.Combine(storageOptions.Value.ArtifactDirectory!, artifactId));
-        if (!artifactDir.Exists)
+        var videoShardsDir = new DirectoryInfo(storageOptions.Value.VideoShardsDirectory!);
+        if (!videoShardsDir.Exists)
         {
-            artifactDir.Create();
+            throw new InvalidOperationException($"VideoShard directory '{videoShardsDir.FullName}' " +
+                $"does not exist.");
         }
 
         var shardId = Hrib.Create();
-        var shardDir = artifactDir.CreateSubdirectory(shardId);
+        var shardDir = videoShardsDir.CreateSubdirectory(shardId);
         var originalFileExtension = mimeType == Const.MatroskaMimeType
             ? Const.MatroskaFileExtension
             : Const.Mp4FileExtension;
-        var originalPath = Path.Combine(shardDir.FullName, $"{Const.OriginalShardVariant}.{originalFileExtension}");
+        var originalPath = Path.Combine(shardDir.FullName, $"{Const.OriginalShardVariant}{originalFileExtension}");
         using var originalStream = new FileStream(originalPath, FileMode.Create, FileAccess.Write);
         await videoStream.CopyToAsync(originalStream, token);
 
@@ -122,5 +123,37 @@ public class DefaultArtifactService : IArtifactService
 
         await db.SaveChangesAsync(token);
         return shardId;
+    }
+
+    public (Stream stream, string mimeType) OpenVideoShard(Hrib shardId, string variant)
+    {
+        var shardDir = new DirectoryInfo(Path.Combine(storageOptions.Value.VideoShardsDirectory!, shardId));
+        if (!shardDir.Exists)
+        {
+            throw new ArgumentException($"VideoShard '{shardId}' could not be found.");
+        }
+
+        var variantFiles = shardDir.GetFiles($"{variant}.*");
+        if (variantFiles.Length == 0)
+        {
+            throw new ArgumentException($"The '{variant}' variant of VideoShard '{shardId}' could not be found.");
+        }
+        else if (variantFiles.Length > 1)
+        {
+            throw new ArgumentException($"The '{variant}' variant of VideoShard '{shardId}' has multiple source " +
+                "files. This is probably a bug.");
+        }
+
+        var variantFile = variantFiles.Single();
+        var variantExtension = Path.GetExtension(variantFile.FullName);
+        var mimeType = variantExtension switch
+        {
+            Const.MatroskaFileExtension => Const.MatroskaMimeType,
+            Const.Mp4FileExtension => Const.Mp4MimeType,
+            _ => throw new ArgumentException($"The '{variant}' variant of VideoShard '{shardId}' has an " +
+                $"unrecognized extension '{variantExtension}'. This is probably a bug.")
+        };
+        var stream = variantFile.OpenRead();
+        return (stream, mimeType);
     }
 }

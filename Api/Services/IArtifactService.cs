@@ -20,4 +20,6 @@ public interface IArtifactService
         string mimeType,
         Stream videoStream,
         CancellationToken token = default);
+
+    (Stream stream, string mimeType) OpenVideoShard(Hrib shardId, string variant);
 }

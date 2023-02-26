@@ -9,5 +9,5 @@ namespace Kafe.Data;
 
 public record StorageOptions
 {
-    public string? ArtifactDirectory { get; init; }
+    public string? VideoShardsDirectory { get; init; }
 }

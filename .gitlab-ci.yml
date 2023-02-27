@@ -35,8 +35,6 @@ migrate-wma:
     - dotnet run --project Migrator
   only:
     - api
-  services:
-  - 
   tags:
     - lemma-new-docker
   when: manual

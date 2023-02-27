@@ -22,14 +22,12 @@ build-api:
 migrate-wma:
   image: alpine:latest
   stage: deploy
-  needs:
-    - publish-api-test
   variables:
     PGPASSWORD: postgres
   script:
     - apk update
-    - apk add dotnet7-sdk postgresql-client
-    - cat /mnt/kafe/lemma-15-08-2022-all.sql | psql -h kafe-db -p 5432 -U postgres
+    - apk add dotnet7-sdk postgresql-client ffmpeg
+    #- cat /mnt/kafe/lemma-15-08-2022-all.sql | psql -h kafe-db -p 5432 -U postgres
     - dotnet build Migrator
     - cp "$APPSETTINGS_MIGRATOR" "./Migrator/appsettings.local.json"
     - dotnet run --project Migrator --framework net7.0

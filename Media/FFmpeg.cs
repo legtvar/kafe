@@ -18,9 +18,12 @@ public static class FFmpeg
         foreach (var path in envPath.Split(separator))
         {
             var dir = new DirectoryInfo(path);
-            foreach (var file in dir.EnumerateFiles("ffmpeg*"))
+            if (dir.Exists)
             {
-                return file.FullName;
+                foreach (var file in dir.EnumerateFiles("ffmpeg*"))
+                {
+                    return file.FullName;
+                }
             }
         }
         return null;

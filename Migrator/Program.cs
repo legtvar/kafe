@@ -204,21 +204,29 @@ public static class Program
                 continue;
             }
 
-            using var stream = migrationInfoFile.OpenRead();
-            var migrationInfo = await JsonSerializer.DeserializeAsync<VideoShardMigrationInfo>(stream);
-            if (migrationInfo is null)
+            try
             {
-                logger.LogWarning($"'{migrationInfoFile}' could not be deserialized from JSON.");
-                continue;
-            }
+                using var stream = migrationInfoFile.OpenRead();
+                var migrationInfo = await JsonSerializer.DeserializeAsync<VideoShardMigrationInfo>(stream);
+                if (migrationInfo is null)
+                {
+                    logger.LogWarning($"'{migrationInfoFile}' could not be deserialized from JSON.");
+                    continue;
+                }
 
-            artifactMap.AddOrUpdate(migrationInfo.WmaId, migrationInfo.ArtifactId, (_, _) => migrationInfo.ArtifactId);
-            var originalVariant = await GetOriginalVariant(migrationInfo.VideoShardId);
-            await kafe.CreateVideoArtifact(
-                name: migrationInfo.Name,
-                originalVariant: originalVariant,
-                artifactId: migrationInfo.ArtifactId,
-                shardId: migrationInfo.VideoShardId);
+                artifactMap.AddOrUpdate(migrationInfo.WmaId, migrationInfo.ArtifactId, (_, _) => migrationInfo.ArtifactId);
+                var originalVariant = await GetOriginalVariant(migrationInfo.VideoShardId);
+                await kafe.CreateVideoArtifact(
+                    name: migrationInfo.Name,
+                    originalVariant: originalVariant,
+                    artifactId: migrationInfo.ArtifactId,
+                    shardId: migrationInfo.VideoShardId);
+            }
+            catch (JsonException e)
+            {
+                logger.LogCritical(e, $"Could not read '{migrationInfoFile}'.");
+                throw e;
+            }
         }
     }
 

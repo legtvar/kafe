@@ -7,6 +7,7 @@ services:
       - 5432
     volumes:
       - postgres_data:/var/lib/postgresql/data/
+      - videos:/mnt/kafe-videos
     environment:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
@@ -37,6 +38,13 @@ services:
 
 volumes:
   postgres_data:
+  videos:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=storage-brno1-cerit.metacentrum.cz
+      device: :/gpfs/vol1/nfs/lemma/kafe/videos
+    
 
 networks:
     backbone:

@@ -44,7 +44,6 @@ volumes:
       type: nfs
       o: addr=storage-brno1-cerit.metacentrum.cz
       device: :/gpfs/vol1/nfs/lemma/kafe/videos
-    
 
 networks:
     backbone:

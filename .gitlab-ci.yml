@@ -24,6 +24,7 @@ migrate-wma:
   stage: deploy
   variables:
     PGPASSWORD: postgres
+  timeout: 3h
   script:
     - apk update
     - apk add dotnet7-sdk postgresql-client ffmpeg

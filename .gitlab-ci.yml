@@ -32,7 +32,7 @@ migrate-wma:
     - cat /mnt/kafe/lemma-15-08-2022-all.sql | psql -h kafe-db -p 5432 -U postgres
     - dotnet build Migrator
     - cp "$APPSETTINGS_MIGRATOR" "./Migrator/appsettings.local.json"
-    - dotnet run --project Migrator
+    - dotnet run --project Migrator --framework net7.0
   only:
     - api
   tags:

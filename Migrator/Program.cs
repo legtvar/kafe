@@ -16,7 +16,7 @@ public static class Program
     private const string MigrationInfoFileName = "migration.json";
 
     private static IConfiguration configuration = null!;
-    private static MigratorConfiguration migratorConfiguration = null!;
+    private static MigratorOptions migratorOptions = null!;
     private static WmaClient wma = null!;
     private static KafeClient kafe = null!;
     private static ILogger logger = null!;
@@ -42,7 +42,7 @@ public static class Program
             })
             .Build();
         configuration = host.Services.GetRequiredService<IConfiguration>();
-        migratorConfiguration = configuration.Get<MigratorConfiguration>()!;
+        migratorOptions = configuration.Get<MigratorOptions>()!;
         logger = host.Services.GetRequiredService<ILogger<Migrator>>();
         if (TryDropDb(host))
         {
@@ -181,20 +181,19 @@ public static class Program
 
     private static async Task DiscoverMigratedArtifacts()
     {
-        var artifactDirectory = migratorConfiguration.KafeArtifactDirectory;
-        if (string.IsNullOrEmpty(artifactDirectory))
+        if (string.IsNullOrEmpty(migratorOptions.KafeVideosDirectory))
         {
-            throw new InvalidOperationException("The 'ArtifactDirectory' setting is not set.");
+            throw new InvalidOperationException("The 'KafeVideosDirectory' setting is not set.");
         }
 
-        var artifactDirectoryInfo = new DirectoryInfo(artifactDirectory);
-        if (!artifactDirectoryInfo.Exists)
+        var videosDir = new DirectoryInfo(migratorOptions.KafeVideosDirectory);
+        if (!videosDir.Exists)
         {
-            artifactDirectoryInfo.Create();
+            videosDir.Create();
             return;
         }
 
-        var subdirs = artifactDirectoryInfo.GetDirectories();
+        var subdirs = videosDir.GetDirectories();
         foreach (var subdir in subdirs)
         {
             var migrationInfoFile = subdir.GetFiles(MigrationInfoFileName).SingleOrDefault();
@@ -206,7 +205,7 @@ public static class Program
             }
 
             using var stream = migrationInfoFile.OpenRead();
-            var migrationInfo = await JsonSerializer.DeserializeAsync<ArtifactMigrationInfo>(stream);
+            var migrationInfo = await JsonSerializer.DeserializeAsync<VideoShardMigrationInfo>(stream);
             if (migrationInfo is null)
             {
                 logger.LogWarning($"'{migrationInfoFile}' could not be deserialized from JSON.");
@@ -214,7 +213,7 @@ public static class Program
             }
 
             artifactMap.AddOrUpdate(migrationInfo.WmaId, migrationInfo.ArtifactId, (_, _) => migrationInfo.ArtifactId);
-            var originalVariant = await GetOriginalVariant(migrationInfo.ArtifactId, migrationInfo.VideoShardId);
+            var originalVariant = await GetOriginalVariant(migrationInfo.VideoShardId);
             await kafe.CreateVideoArtifact(
                 name: migrationInfo.Name,
                 originalVariant: originalVariant,
@@ -251,7 +250,7 @@ public static class Program
             artifactId: artifactId,
             shardId: shardId);
 
-        var originalVariant = await GetOriginalVariant(artifactId, shardId);
+        var originalVariant = await GetOriginalVariant(shardId);
 
         await kafe.CreateVideoArtifact(
             name: video.Name,
@@ -268,7 +267,12 @@ public static class Program
 
     private static async Task CopyVideo(string name, int wmaId, Hrib artifactId, Hrib shardId)
     {
-        var originalDir = new DirectoryInfo(Path.Combine(migratorConfiguration.WmaVideoDirectory, wmaId.ToString()));
+        if (string.IsNullOrEmpty(migratorOptions.WmaVideosDirectory))
+        {
+            throw new InvalidOperationException("The 'WmaVideosDirectory' setting is not set.");
+        }
+
+        var originalDir = new DirectoryInfo(Path.Combine(migratorOptions.WmaVideosDirectory, wmaId.ToString()));
         if (!originalDir.Exists)
         {
             logger.LogError("Video '{}' ({}) could not be migrated because its directory could not be found on disk.",
@@ -292,29 +296,27 @@ public static class Program
 
         var originalFile = originalCandidates.First();
 
-        var destination = new DirectoryInfo(Path.Combine(migratorConfiguration.KafeArtifactDirectory, artifactId));
-        if (destination.Exists)
+        var shardDir = new DirectoryInfo(Path.Combine(migratorOptions.KafeVideosDirectory!, shardId));
+        if (shardDir.Exists)
         {
-            logger.LogError("Video '{}' ({}) with artifact id '{}' has already been migrated. " +
-                "Hopefully this is not a HRIB conflict.",
-                name, wmaId, artifactId);
+            logger.LogError("Video '{}' ({}) with shard id '{}' has already been migrated. " +
+                "Hopefully this is not a hrib conflict.",
+                name, wmaId, shardId);
             return;
         }
 
-        destination.Create();
+        shardDir.Create();
 
-        var migrationInfo = new ArtifactMigrationInfo(
+        var migrationInfo = new VideoShardMigrationInfo(
             WmaId: wmaId,
             ArtifactId: artifactId,
             VideoShardId: shardId,
             Name: name);
         using var metadataFile = new FileStream(
-            Path.Combine(destination.FullName, MigrationInfoFileName),
+            Path.Combine(shardDir.FullName, MigrationInfoFileName),
             FileMode.Create,
             FileAccess.Write);
         await JsonSerializer.SerializeAsync(metadataFile, migrationInfo);
-
-        var shardDir = destination.CreateSubdirectory(shardId);
 
         var src = originalFile.OpenRead();
         using var dst = new FileStream(
@@ -324,22 +326,22 @@ public static class Program
         await src.CopyToAsync(dst);
     }
 
-    private static async Task<VideoShardVariant> GetOriginalVariant(Hrib artifactId, Hrib shardId)
+    private static async Task<VideoShardVariant> GetOriginalVariant(Hrib shardId)
     {
-        var shardDir = Path.Combine(migratorConfiguration.KafeArtifactDirectory, artifactId, shardId);
-        if (!Directory.Exists(shardDir))
+        var shardDir = new DirectoryInfo(Path.Combine(migratorOptions.KafeVideosDirectory!, shardId));
+        if (!shardDir.Exists)
         {
             logger.LogError($"Shard directory '{shardId}' does not exist. Video will be migrated without MediaInfo.");
             return new VideoShardVariant(Const.OriginalShardVariant, MediaInfo.Invalid);
         }
 
-        var originalCandidates = Directory.GetFiles(shardDir, "original.*");
+        var originalCandidates = shardDir.GetFiles($"{Const.OriginalShardVariant}.*");
         if (originalCandidates.Length == 0 || originalCandidates.Length > 1)
         {
-            throw new ArgumentException($"Shard '{shardId}' has multiple 'original' variants.");
+            throw new ArgumentException($"Shard '{shardId}' has either none or too many 'original' variants.");
         }
 
-        var mediaInfo = await mediaService.GetInfo(originalCandidates.Single());
+        var mediaInfo = await mediaService.GetInfo(originalCandidates.Single().FullName);
         return new VideoShardVariant(Const.OriginalShardVariant, mediaInfo);
     }
 

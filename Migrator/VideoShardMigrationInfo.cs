@@ -1,6 +1,6 @@
 ﻿namespace Kafe.Migrator;
 
-public record ArtifactMigrationInfo(
+public record VideoShardMigrationInfo(
     int WmaId,
     string ArtifactId,
     string VideoShardId,

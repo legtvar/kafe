@@ -26,7 +26,8 @@ public class VideoShardDownloadEndpoint : EndpointBaseSync
     public override ActionResult Handle([FromRoute] RequestData data)
     {
         var (stream, mime) = artifacts.OpenVideoShard(data.ShardId, data.Variant);
-        return File(stream, mime);
+        var extension = mime == Const.MatroskaMimeType ? Const.MatroskaFileExtension : Const.Mp4FileExtension;
+        return File(stream, "application/octet-stream", $"{data.ShardId}{extension}", true);
     }
 
     public record RequestData(

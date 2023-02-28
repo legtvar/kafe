@@ -4,109 +4,148 @@
     "title": "Právě probíhá vývoj...",
     "toggleLanguage": "Přepnout na {{language}}"
   },
+  "common": {
+    "backHome": "Zpět na domovskou stránku",
+    "cancel": "Zrušit",
+    "edit": "Upravit",
+    "save": "Uložit"
+  },
+  "content": {
+    "noFileSelected": "Žádný vybraný soubor",
+    "unknownType": "Neznámý typ souboru"
+  },
+  "createProject": {
+    "fields": {
+      "description": "Anotace",
+      "genere": "Žánr",
+      "movie": "Film",
+      "name": "Název filmu",
+      "videoannotation": "Videoanotace"
+    },
+    "language": {
+      "cs": "česky",
+      "en": "anglicky"
+    },
+    "title": "Vytvořte nový projekt ve skupině projektů",
+    "upload": {
+      "specs": "Technické požadavky souboru",
+      "filetype": {
+        "video": "Soubor videa",
+        "subtitles": "Soubor titulků"
+      }
+    }
+  },
+  "error": {
+    "invalidPath": "URL adresa je nesprávná",
+    "projectDoesNotExist": "Projekt s daným ID neexistuje",
+    "subtitle": "Omlouváme se za potíže. Pokud máte pocit, že se to nemělo stát (což pravděpodobně nemělo), pošlete nám prosím tento report",
+    "title": "Jejky, tak to nešlo podle plánu"
+  },
+  "generic": {
+    "empty": "Je to zvláštní, ale nic tu není...",
+    "for": "pro"
+  },
+  "home": {
+    "signin": "Přihlásit se"
+  },
   "layout": {
     "footer": {
       "copy": "Vytvořil tým <3>LEMMA</3> z <1>❤️</1> a ☕"
     },
     "title-prefix": "Kafe"
   },
-  "route": {
-    "groups": {
-      "title": "Skupiny projektů"
-    },
-    "home": {
-      "title": "Domů"
-    },
-    "playlists": {
-      "title": "Playlisty",
-      "detail": {
-        "title": "Detail playlistu"
-      }
-    },
-    "projects": {
-      "title": "Projekty",
-      "detail": {
-        "title": "Detail projektu"
-      }
-    }
-  },
-  "project": {
-    "locked": "Projekt je uzamčený",
-    "annotation": "Anotace",
-    "actors": "Obsazení",
-    "crew": "Filmový štáb",
-    "files": "Soubory",
-    "unknownGroup": "Neznámá skupina projektů",
-    "releaseDate": {
-      "na": "Neuvedeno"
-    }
-  },
-  "error": {
-    "invalidPath": "URL adresa je nesprávná",
-    "projectDoesNotExist": "Projekt s daným ID neexistuje",
-    "title": "Jejky, tak to nešlo podle plánu",
-    "subtitle": "Omlouváme se za potíže. Pokud máte pocit, že se to nemělo stát (což pravděpodobně nemělo), pošlete nám prosím tento report"
-  },
-  "common": {
-    "backHome": "Zpět na domovskou stránku",
-    "edit": "Upravit",
-    "save": "Uložit",
-    "cancel": "Zrušit"
-  },
-  "projects": {
-    "title": "Moje projekty",
-    "detail": "Detail",
-    "empty": "Žádné projekty"
-  },
-  "content": {
-    "unknownType": "Neznámý typ souboru",
-    "noFileSelected": "Žádný vybraný soubor"
-  },
-  "status": {
-    "404": {
-      "title": "Stránka nebyla nalezena",
-      "subtitle": "Vypadá to, že stránka kterou hledáte neexistuje"
-    },
-    "backlink": "Vrátit se zpět"
-  },
-  "role": {
-    "admin": "Administrátor",
-    "temp": "Dočasný účet",
-    "user": "Uživatel"
+  "login": {
+    "button": "Přihlásit se",
+    "email": "Emailová adresa",
+    "forgot": "Zapomněli jste heslo?",
+    "password": "Heslo",
+    "register": "Nemáte ještě účet? <1>Zaregistrujte se!</1>",
+    "remember": "Zapamatuj si mě",
+    "subtitle": "ke svému účtu pro přístup ke všem funkcím Kafe",
+    "title": "Přihlaste se"
   },
   "navbar": {
     "profile": "Profil",
     "settings": "Nastavení",
     "signout": "Odhlásit se"
   },
-  "login": {
-    "title": "Přihlaste se",
-    "subtitle": "ke svému účtu pro přístup ke všem funkcím Kafe",
-    "email": "Emailová adresa",
-    "password": "Heslo",
-    "remember": "Zapamatuj si mě",
-    "forgot": "Zapomněli jste heslo?",
-    "button": "Přihlásit se",
-    "register": "Nemáte ještě účet? <1>Zaregistrujte se!</1>"
-  },
-  "register": {
-    "login": "Už máte účet? <1>Přihlaste se</1>",
-    "button": "Zaregistrovat se",
-    "firstName": "Křestní jméno",
-    "lastName": "Příjmení",
-    "email": "Emailová adresa",
-    "password": "Heslo",
-    "title": "Zaregistrujte se",
-    "subtitle": "pro přístup k vaší denní dávce kofeinu",
-    "passwordAgain": "Heslo znovu"
-  },
   "playlists": {
-    "videoCount": "videí",
     "play": "Přehrát playlist",
     "readmore": "Více informací",
+    "videoCount": "videí",
     "watchNewest": "Podívejte se na nejnovější playlist"
   },
-  "home": {
-    "signin": "Přihlásit se"
+  "project": {
+    "actors": "Obsazení",
+    "annotation": "Anotace",
+    "crew": "Filmový štáb",
+    "files": "Soubory",
+    "locked": "Projekt je uzamčený",
+    "releaseDate": {
+      "na": "Neuvedeno"
+    },
+    "unknownGroup": "Neznámá skupina projektů"
+  },
+  "projects": {
+    "detail": "Detail",
+    "empty": "Žádné projekty",
+    "title": "Moje projekty"
+  },
+  "register": {
+    "button": "Zaregistrovat se",
+    "email": "Emailová adresa",
+    "firstName": "Křestní jméno",
+    "lastName": "Příjmení",
+    "login": "Už máte účet? <1>Přihlaste se</1>",
+    "password": "Heslo",
+    "passwordAgain": "Heslo znovu",
+    "subtitle": "pro přístup k vaší denní dávce kofeinu",
+    "title": "Zaregistrujte se"
+  },
+  "role": {
+    "admin": "Administrátor",
+    "temp": "Dočasný účet",
+    "user": "Uživatel"
+  },
+  "route": {
+    "groups": {
+      "create": {
+        "title": "Vytvořte nový projekt"
+      },
+      "detail": {
+        "title": "Detail skupiny projektů"
+      },
+      "title": "Skupiny projektů"
+    },
+    "home": {
+      "title": "Domů"
+    },
+    "playlists": {
+      "detail": {
+        "title": "Detail playlistu"
+      },
+      "title": "Playlisty"
+    },
+    "projects": {
+      "detail": {
+        "title": "Detail projektu"
+      },
+      "title": "Projekty"
+    }
+  },
+  "upload": {
+    "ready": "Sem přetáhněte <1>{{title}}</1><2></2>nebo klikněte pro výběr z počítače<4></4>",
+    "uploading": "<0>Soubor se nahrává</0><1></1>Nahráno {{progress}}%",
+    "uploaded": "<0>Úspěšně nahráno</0><1></1>Formulář už můžete odeslat"
+  },
+  "status": {
+    "404": {
+      "subtitle": "Vypadá to, že stránka kterou hledáte neexistuje",
+      "title": "Stránka nebyla nalezena"
+    },
+    "backlink": "Vrátit se zpět"
+  },
+  "textarea": {
+    "characters": "znaků"
   }
 }

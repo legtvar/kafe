@@ -8,7 +8,15 @@ export class Caffeine {
 
     public constructor(api: API) {
         this.api = api;
-        this.user = null;
+
+        const user = new User();
+        user.email = 'rosecky.jonas@gmail.com';
+        user.id = '123456789';
+        user.name = 'Jonáš Rosecký';
+        user.role = 'admin';
+
+        //this.user = null;
+        this.user = user;
     }
 }
 

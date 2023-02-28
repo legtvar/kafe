@@ -20,31 +20,74 @@ export function PlaylistGallery(props: IPlaylistGalleryProps) {
                 const first = data[0];
                 const regular = data.slice(1);
 
+                const firstElement = (
+                    <>
+                        <Box fontSize="xl" as="h2" lineHeight="tight" color="gray.500" isTruncated>
+                            {t('playlists.watchNewest').toString()}
+                        </Box>
+                        <Box fontSize="4xl" fontWeight="semibold" as="h2" lineHeight="tight" isTruncated>
+                            {first.getName()}
+                        </Box>
+                        <Stack direction="row" spacing={2}>
+                            <Tag bg={tagColor}>16 {t('playlists.videoCount').toString()}</Tag>
+                            <Tag bg={tagColor}>2:34:56</Tag>
+                        </Stack>
+                        <Box lineHeight="tight" overflow="hidden">
+                            {first.getDescription()}
+                        </Box>
+                        <Stack direction="row" pt={6}>
+                            <Link to={`playlists/${first.id}`}>
+                                <Button colorScheme="brand" leftIcon={<BsPlayFill />}>
+                                    {t('playlists.play').toString()}
+                                </Button>
+                            </Link>
+                            <Link to={`playlists/${first.id}`}>
+                                <Button colorScheme="gray">{t('playlists.readmore').toString()}</Button>
+                            </Link>
+                        </Stack>
+                    </>
+                );
+
                 return (
                     <>
-                        <Stack direction="row" overflow="hidden" mb={16} w="100%" h={96} alignItems="center">
-                            <Box h="100%" position="relative" role="group" overflow="hidden" rounded="md">
+                        <Stack
+                            direction="row"
+                            overflow="hidden"
+                            mb={16}
+                            maxW="100%"
+                            w="100%"
+                            h={{ base: 'unset', lg: 96 }}
+                            alignItems="center"
+                            spacing={0}
+                        >
+                            <Box
+                                w={{ base: '100%', lg: '50%' }}
+                                maxH="100%"
+                                position="relative"
+                                role="group"
+                                overflow="hidden"
+                                rounded="md"
+                            >
                                 <Image
                                     src={`https://picsum.photos/seed/${first.id}/1920/1080`}
                                     objectPosition="center center"
-                                    objectFit="cover"
-                                    height="100%"
+                                    objectFit="contain"
+                                    w="100%"
+                                    h="100%"
                                     rounded="md"
-                                    __css={{
-                                        aspectRatio: (16 / 9).toString(),
-                                    }}
                                     _groupHover={{
                                         filter: 'blur(10px)',
                                         transform: 'scale(110%)',
                                     }}
+                                    filter={{ base: 'blur(10px)', lg: 'unset' }}
+                                    transform={{ base: 'scale(110%)', lg: 'unset' }}
                                     transition="ease 0.3s"
                                 />
                                 <Link to={`playlists/${first.id}`}>
                                     <Center
+                                        display={{ base: 'none', lg: 'flex' }}
                                         position="absolute"
                                         inset="0"
-                                        height="100%"
-                                        width="100%"
                                         background={overlayColor}
                                         opacity="0"
                                         _groupHover={{
@@ -58,31 +101,21 @@ export function PlaylistGallery(props: IPlaylistGalleryProps) {
                                         <BsPlayFill />
                                     </Center>
                                 </Link>
+                                <Stack
+                                    display={{ base: 'block', lg: 'none' }}
+                                    py={6}
+                                    px={8}
+                                    spacing={2}
+                                    overflow="hidden"
+                                    position="absolute"
+                                    inset="0"
+                                    background={overlayColor}
+                                >
+                                    {firstElement}
+                                </Stack>
                             </Box>
-                            <Stack py={6} px={8} spacing={2}>
-                                <Box fontSize="xl" as="h2" lineHeight="tight" color="gray.500" isTruncated>
-                                    {t('playlists.watchNewest').toString()}
-                                </Box>
-                                <Box fontSize="4xl" fontWeight="semibold" as="h2" lineHeight="tight" isTruncated>
-                                    {first.getName()}
-                                </Box>
-                                <Stack direction="row" spacing={2}>
-                                    <Tag bg={tagColor}>16 {t('playlists.videoCount').toString()}</Tag>
-                                    <Tag bg={tagColor}>2:34:56</Tag>
-                                </Stack>
-                                <Box lineHeight="tight" overflow="hidden">
-                                    {first.getDescription()}
-                                </Box>
-                                <Stack direction="row" pt={6}>
-                                    <Link to={`playlists/${first.id}`}>
-                                        <Button colorScheme="brand" leftIcon={<BsPlayFill />}>
-                                            {t('playlists.play').toString()}
-                                        </Button>
-                                    </Link>
-                                    <Link to={`playlists/${first.id}`}>
-                                        <Button colorScheme="gray">{t('playlists.readmore').toString()}</Button>
-                                    </Link>
-                                </Stack>
+                            <Stack display={{ base: 'none', lg: 'block' }} py={6} px={12} spacing={2} overflow="hidden">
+                                {firstElement}
                             </Stack>
                         </Stack>
                         <SimpleGrid columns={{ base: 1, md: 2, lg: 3, xl: 4 }} spacing={4} pb={4}>
@@ -112,6 +145,8 @@ export function PlaylistGallery(props: IPlaylistGalleryProps) {
                                                     filter: 'blur(10px)',
                                                     transform: 'scale(110%)',
                                                 }}
+                                                filter={{ base: 'blur(10px)', lg: 'unset' }}
+                                                transform={{ base: 'scale(110%)', lg: 'unset' }}
                                                 transition="ease 0.3s"
                                             />
                                             <Stack
@@ -120,10 +155,10 @@ export function PlaylistGallery(props: IPlaylistGalleryProps) {
                                                 height="100%"
                                                 width="100%"
                                                 background={overlayColor}
-                                                opacity="0"
                                                 _groupHover={{
                                                     opacity: '1',
                                                 }}
+                                                opacity={{ base: '1', lg: '0' }}
                                                 transition="ease 0.3s"
                                                 py={6}
                                                 px={8}

@@ -1,6 +1,8 @@
-import { HStack, IconButton } from '@chakra-ui/react';
+import { Center, HStack, IconButton, Text, VStack } from '@chakra-ui/react';
+import { t } from 'i18next';
 import React from 'react';
 import { AiOutlineLeft, AiOutlineRight } from 'react-icons/ai';
+import { BsFillInboxFill } from 'react-icons/bs';
 import { sequence } from '../../utils/sequence';
 
 interface IPaginationProps<T> {
@@ -17,7 +19,22 @@ export function Pagination<T>(props: IPaginationProps<T>) {
     maxPages = maxPages || 7;
     const pagesInData = Math.ceil(data.length / perPage);
 
-    if (page >= pagesInData) {
+    if (pagesInData === 0) {
+        return (
+            <Center py={16} color="gray.500">
+                <VStack>
+                    <Text fontSize="4em">
+                        <BsFillInboxFill />
+                    </Text>
+                    <Text fontSize="18px" mt={3} mb={2}>
+                        {t('generic.empty').toString()}
+                    </Text>
+                </VStack>
+            </Center>
+        );
+    }
+
+    if (page >= pagesInData && page !== 0) {
         setPage(0);
     }
 

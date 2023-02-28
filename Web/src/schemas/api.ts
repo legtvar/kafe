@@ -5,12 +5,32 @@
 
 
 export interface paths {
-  "/api/v{version}/author/{id}": {
+  "/api/v1/artifact": {
+    post: {
+      requestBody?: {
+        content: {
+          "application/json": components["schemas"]["ArtifactCreationDto"];
+          "text/json": components["schemas"]["ArtifactCreationDto"];
+          "application/*+json": components["schemas"]["ArtifactCreationDto"];
+        };
+      };
+      responses: {
+        /** @description Success */
+        200: {
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
+          };
+        };
+      };
+    };
+  };
+  "/api/v1/author/{id}": {
     get: {
       parameters: {
         path: {
           id: string;
-          version: string;
         };
       };
       responses: {
@@ -25,13 +45,8 @@ export interface paths {
       };
     };
   };
-  "/api/v{version}/authors": {
+  "/api/v1/authors": {
     get: {
-      parameters: {
-        path: {
-          version: string;
-        };
-      };
       responses: {
         /** @description Success */
         200: {
@@ -44,12 +59,11 @@ export interface paths {
       };
     };
   };
-  "/api/v{version}/playlist/{id}": {
+  "/api/v1/playlist/{id}": {
     get: {
       parameters: {
         path: {
           id: string;
-          version: string;
         };
       };
       responses: {
@@ -64,13 +78,8 @@ export interface paths {
       };
     };
   };
-  "/api/v{version}/playlists": {
+  "/api/v1/playlists": {
     get: {
-      parameters: {
-        path: {
-          version: string;
-        };
-      };
       responses: {
         /** @description Success */
         200: {
@@ -83,12 +92,11 @@ export interface paths {
       };
     };
   };
-  "/api/v{version}/project/{id}": {
+  "/api/v1/project/{id}": {
     get: {
       parameters: {
         path: {
           id: string;
-          version: string;
         };
       };
       responses: {
@@ -103,12 +111,11 @@ export interface paths {
       };
     };
   };
-  "/api/v{version}/project-group/{id}": {
+  "/api/v1/project-group/{id}": {
     get: {
       parameters: {
         path: {
           id: string;
-          version: string;
         };
       };
       responses: {
@@ -123,13 +130,8 @@ export interface paths {
       };
     };
   };
-  "/api/v{version}/project-groups": {
+  "/api/v1/project-groups": {
     get: {
-      parameters: {
-        path: {
-          version: string;
-        };
-      };
       responses: {
         /** @description Success */
         200: {
@@ -142,13 +144,8 @@ export interface paths {
       };
     };
   };
-  "/api/v{version}/projects": {
+  "/api/v1/projects": {
     get: {
-      parameters: {
-        path: {
-          version: string;
-        };
-      };
       responses: {
         /** @description Success */
         200: {
@@ -161,14 +158,69 @@ export interface paths {
       };
     };
   };
+  "/api/v1/artifact/{artifactId}/video": {
+    post: {
+      parameters: {
+        path: {
+          ArtifactId: string;
+        };
+      };
+      requestBody?: {
+        content: {
+          "multipart/form-data": {
+            /** Format: binary */
+            File?: string;
+          };
+        };
+      };
+      responses: {
+        /** @description Success */
+        200: {
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
+          };
+        };
+      };
+    };
+  };
+  "/api/v1/video/{shardId}/{variant}": {
+    get: {
+      parameters: {
+        path: {
+          ShardId: string;
+          Variant: string;
+        };
+      };
+      responses: {
+        /** @description Success */
+        200: {
+          content: {
+            "application/octet-stream": string;
+          };
+        };
+      };
+    };
+  };
 }
 
 export type webhooks = Record<string, never>;
 
 export interface components {
   schemas: {
-    /** @enum {string} */
-    AudioCodec: "None" | "WAV" | "FLAC" | "MP3";
+    ArtifactCreationDto: {
+      name: components["schemas"]["LocalizedString"];
+      /** Format: hrib */
+      containingProject?: string | null;
+    };
+    ArtifactDetailDto: {
+      /** Format: hrib */
+      id: string;
+      name: components["schemas"]["LocalizedString"];
+      shards: (components["schemas"]["ShardListDto"])[];
+      containingProjectIds: (string)[];
+    };
     AuthorDetailDto: {
       id: string;
       name: string;
@@ -180,8 +232,6 @@ export interface components {
       id: string;
       name: string;
     };
-    /** @enum {string} */
-    ContainerFormat: "None" | "MP4" | "M4V" | "MKV";
     LocalizedString: Record<string, never>;
     PlaylistDetailDto: {
       id: string;
@@ -196,15 +246,24 @@ export interface components {
       description: components["schemas"]["LocalizedString"];
       visibility: components["schemas"]["Visibility"];
     };
+    ProjectAuthorDto: {
+      id: string;
+      name: string;
+      roles: (string)[];
+    };
     ProjectDetailDto: {
       id: string;
       projectGroupId: string;
+      projectGroupName: components["schemas"]["LocalizedString"];
+      genre: components["schemas"]["LocalizedString"];
       name: components["schemas"]["LocalizedString"];
       description: components["schemas"]["LocalizedString"];
       visibility: components["schemas"]["Visibility"];
-      authors: (string)[];
       /** Format: date-time */
       releaseDate: string;
+      crew: (components["schemas"]["ProjectAuthorDto"])[];
+      cast: (components["schemas"]["ProjectAuthorDto"])[];
+      artifacts: (components["schemas"]["ArtifactDetailDto"])[];
     };
     ProjectGroupDetailDto: {
       id: string;
@@ -213,7 +272,6 @@ export interface components {
       /** Format: date-time */
       deadline: string;
       isOpen: boolean;
-      validationRules: components["schemas"]["ValidationRules"];
     };
     ProjectGroupListDto: {
       id: string;
@@ -233,24 +291,13 @@ export interface components {
       releaseDate: string;
     };
     /** @enum {string} */
-    SubtitleFormat: "None" | "SRT" | "ASS";
-    ValidationRules: {
-      /** Format: int32 */
-      minimumWidth?: number | null;
-      /** Format: int32 */
-      minimumHeight?: number | null;
-      /** Format: int64 */
-      maxFileSize?: number | null;
-      allowedContainerFormats: (components["schemas"]["ContainerFormat"])[];
-      allowedVideoCodecs: (components["schemas"]["VideoCodec"])[];
-      allowedAudioCodecs: (components["schemas"]["AudioCodec"])[];
-      allowedVideoFramerates: (components["schemas"]["VideoFramerate"])[];
-      allowedSubtitleFormats: (components["schemas"]["SubtitleFormat"])[];
+    ShardKind: "Invalid" | "Video" | "Image" | "Subtitles";
+    ShardListDto: {
+      /** Format: hrib */
+      id: string;
+      kind: components["schemas"]["ShardKind"];
+      variants: (string)[];
     };
-    /** @enum {string} */
-    VideoCodec: "None" | "H264" | "H265";
-    /** @enum {string} */
-    VideoFramerate: "None" | "F23_970" | "F24_000" | "F25_000" | "F29_970" | "F30_000" | "F60_000";
     /** @enum {string} */
     Visibility: "Unknown" | "Private" | "Internal" | "Public";
   };

@@ -49,7 +49,7 @@ export function ContentViewer(props: IContentViewerProps) {
             }
         }
 
-        return t('content.unknownType').toString();
+        return <>{t('content.unknownType').toString()}</>;
     }
-    return t('content.noFileSelected').toString();
+    return <>{t('content.noFileSelected').toString()}</>;
 }

@@ -12,9 +12,13 @@ import {
 import { Navigate, RouteObject } from 'react-router-dom';
 import { Login } from './components/pages/account/Login';
 import { Register } from './components/pages/account/Register';
+import { CreateProject } from './components/pages/form/CreateProject';
 import { Groups } from './components/pages/groups/Groups';
+import { GroupsDetail } from './components/pages/groups/GroupsDetail';
+import { PlaylistDetail } from './components/pages/playlists/PlaylistDetail';
 import { PlaylistGallery } from './components/pages/playlists/PlaylistGallery';
 import { PlaylistList } from './components/pages/playlists/PlaylistList';
+import { ProjectDetail } from './components/pages/projects/ProjectDetail';
 import { Projects } from './components/pages/projects/Projects';
 import { AccountRoot } from './components/pages/root/AccountRoot';
 import { AuthRoot } from './components/pages/root/AuthRoot';
@@ -87,7 +91,7 @@ export const authRoutes = (t: (id: string) => string): AppRoute[] => [
             {
                 path: ':id',
                 title: t('route.projects.detail.title'),
-                element: <>Lorem ipsum</>,
+                element: <ProjectDetail />,
             },
         ],
     },
@@ -100,6 +104,20 @@ export const authRoutes = (t: (id: string) => string): AppRoute[] => [
             default: IoFolderOpenOutline,
             selected: IoFolderOpen,
         },
+        children: [
+            {
+                path: ':id',
+                title: t('route.groups.detail.title'),
+                element: <GroupsDetail />,
+                children: [
+                    {
+                        path: 'create',
+                        title: t('route.groups.create.title'),
+                        element: <CreateProject />,
+                    },
+                ],
+            },
+        ],
     },
     {
         path: 'playlists',
@@ -145,6 +163,6 @@ export const playlistChildRoutes = (t: (id: string) => string): AppRoute[] => [
     {
         path: ':id',
         title: t('route.playlists.detail.title'),
-        element: <>Lorem ipsum</>,
+        element: <PlaylistDetail />,
     },
 ];

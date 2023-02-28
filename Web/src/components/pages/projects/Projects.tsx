@@ -17,7 +17,15 @@ export function Projects(props: IProjectsProps) {
             <AwaitAPI request={(api) => api.projects.getAll()}>
                 {(data: Project[]) => (
                     <Flex direction="column" w="full" mt={-4}>
-                        <Pagination data={data}>
+                        <Pagination
+                            data={data.sort((a, b) =>
+                                a.releaseDate
+                                    ? b.releaseDate
+                                        ? b.releaseDate.getTime() - a.releaseDate.getTime()
+                                        : -1
+                                    : 1,
+                            )}
+                        >
                             {(project, i) => (
                                 <Link to={project.id}>
                                     <Flex

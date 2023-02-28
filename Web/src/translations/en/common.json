@@ -4,109 +4,148 @@
     "title": "Development in progress...",
     "toggleLanguage": "Switch to {{language}}"
   },
+  "common": {
+    "backHome": "Back Home",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "save": "Save"
+  },
+  "content": {
+    "noFileSelected": "No file selected",
+    "unknownType": "Unknown file type"
+  },
+  "createProject": {
+    "fields": {
+      "description": "Description",
+      "genere": "Genere",
+      "movie": "Movie",
+      "name": "Name of the movie",
+      "videoannotation": "Video annotation"
+    },
+    "language": {
+      "cs": "in czech",
+      "en": "in english"
+    },
+    "title": "Create a new project in the project group",
+    "upload": {
+      "specs": "Technical requirements",
+      "filetype": {
+        "video": "Video file",
+        "subtitles": "Subtitles file"
+      }
+    }
+  },
+  "error": {
+    "invalidPath": "URL path is invalid",
+    "projectDoesNotExist": "Project with the given ID does not exist",
+    "subtitle": "We are terribly sorry for the inconvenience. If you feel like this was not supposed to happen (which it probably wasn't), please send us the report bellow",
+    "title": "Whops, something went wrong"
+  },
+  "generic": {
+    "empty": "It's empty in here...",
+    "for": "for"
+  },
+  "home": {
+    "signin": "Sign in"
+  },
   "layout": {
     "footer": {
       "copy": "Created with <1>❤️</1> and ☕ by <3>LEMMA</3>"
     },
     "title-prefix": "Kafe"
   },
-  "route": {
-    "groups": {
-      "title": "Project groups"
-    },
-    "home": {
-      "title": "Home"
-    },
-    "playlists": {
-      "title": "Playlists",
-      "detail": {
-        "title": "Playlist detail"
-      }
-    },
-    "projects": {
-      "title": "Projects",
-      "detail": {
-        "title": "Project detail"
-      }
-    }
-  },
-  "project": {
-    "locked": "Project is locked",
-    "annotation": "Annotation",
-    "actors": "Actors",
-    "crew": "Film crew",
-    "files": "Files",
-    "unknownGroup": "Unknown group",
-    "releaseDate": {
-      "na": "Not specified"
-    }
-  },
-  "error": {
-    "invalidPath": "URL path is invalid",
-    "projectDoesNotExist": "Project with the given ID does not exist",
-    "title": "Whops, something went wrong",
-    "subtitle": "We are terribly sorry for the inconvenience. If you feel like this was not supposed to happen (which it probably wasn't), please send us the report bellow"
-  },
-  "common": {
-    "backHome": "Back Home",
-    "edit": "Edit",
-    "save": "Save",
-    "cancel": "Cancel"
-  },
-  "projects": {
-    "title": "My projects",
-    "detail": "Detail",
-    "empty": "No projects"
-  },
-  "content": {
-    "unknownType": "Unknown file type",
-    "noFileSelected": "No file selected"
-  },
-  "status": {
-    "404": {
-      "title": "Page Not Found",
-      "subtitle": "The page you're looking for does not seem to exist"
-    },
-    "backlink": "Go to Home"
-  },
-  "role": {
-    "admin": "Administrator",
-    "temp": "Temporary account",
-    "user": "User"
+  "login": {
+    "button": "Sign in",
+    "email": "Email address",
+    "forgot": "Forgot password?",
+    "password": "Password",
+    "register": "Don't have an account? <1>Register now!</1>",
+    "remember": "Remember me",
+    "subtitle": "to your account to access all the features of the system",
+    "title": "Sign in"
   },
   "navbar": {
     "profile": "Profile",
     "settings": "Settings",
     "signout": "Sign out"
   },
-  "login": {
-    "title": "Sign in",
-    "subtitle": "to your account to access all the features of the system",
-    "email": "Email address",
-    "password": "Password",
-    "remember": "Remember me",
-    "forgot": "Forgot password?",
-    "button": "Sign in",
-    "register": "Don't have an account? <1>Register now!</1>"
-  },
-  "register": {
-    "login": "Already a user? <1>Login</1>",
-    "button": "Sign up",
-    "firstName": "First name",
-    "lastName": "Last name",
-    "email": "Email address",
-    "password": "Password",
-    "title": "Sign up",
-    "subtitle": "to access your daily dose of caffeine",
-    "passwordAgain": "Password again"
-  },
   "playlists": {
-    "videoCount": "videos",
     "play": "Play the playlist",
     "readmore": "More info",
+    "videoCount": "videos",
     "watchNewest": "Watch the newest playlist"
   },
-  "home": {
-    "signin": "Sign in"
+  "project": {
+    "actors": "Actors",
+    "annotation": "Annotation",
+    "crew": "Film crew",
+    "files": "Files",
+    "locked": "Project is locked",
+    "releaseDate": {
+      "na": "Not specified"
+    },
+    "unknownGroup": "Unknown group"
+  },
+  "projects": {
+    "detail": "Detail",
+    "empty": "No projects",
+    "title": "My projects"
+  },
+  "register": {
+    "button": "Sign up",
+    "email": "Email address",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "login": "Already a user? <1>Login</1>",
+    "password": "Password",
+    "passwordAgain": "Password again",
+    "subtitle": "to access your daily dose of caffeine",
+    "title": "Sign up"
+  },
+  "role": {
+    "admin": "Administrator",
+    "temp": "Temporary account",
+    "user": "User"
+  },
+  "route": {
+    "groups": {
+      "create": {
+        "title": "Create a new projece"
+      },
+      "detail": {
+        "title": "Project group detail"
+      },
+      "title": "Project groups"
+    },
+    "home": {
+      "title": "Home"
+    },
+    "playlists": {
+      "detail": {
+        "title": "Playlist detail"
+      },
+      "title": "Playlists"
+    },
+    "projects": {
+      "detail": {
+        "title": "Project detail"
+      },
+      "title": "Projects"
+    }
+  },
+  "upload": {
+    "ready": "Drag the <1>{{title}}</1> here<2></2>or click to select the file from your computer<4></4>",
+    "uploading": "<0>Uploading the file</0><1></1>{{progress}}% uploaded",
+    "uploaded": "<0>Successfully uploaded</0><1></1>You can now submit the form"
+  },
+  "status": {
+    "404": {
+      "subtitle": "The page you're looking for does not seem to exist",
+      "title": "Page Not Found"
+    },
+    "backlink": "Go to Home"
+  },
+  "textarea": {
+    "characters": "characters"
   }
 }

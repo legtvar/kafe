@@ -7,7 +7,8 @@ import { Loading } from './Loading';
 interface IAwaitAPIProps<T> {
     request: (api: API) => Promise<T>;
     loader?: JSX.Element;
-    children: ((data: T) => JSX.Element) | JSX.Element;
+    error?: JSX.Element;
+    children: (data: T) => JSX.Element;
 }
 
 export function AwaitAPI<T>(props: IAwaitAPIProps<T>) {
@@ -17,9 +18,12 @@ export function AwaitAPI<T>(props: IAwaitAPIProps<T>) {
         <Await
             for={props.request(api)}
             loading={props.loader || <Loading large center />}
-            error={(error) => <Error error={error} />}
+            error={(error) => {
+                console.log(error);
+                return props.error || <Error error={error} />;
+            }}
         >
-            {props.children}
+            {(data) => (data ? props.children(data) : props.error || <Error error={404} />)}
         </Await>
     );
 }

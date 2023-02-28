@@ -8,6 +8,7 @@ export class Playlist {
     public name!: localizedString;
     public description?: localizedString;
     public visibility?: components['schemas']['Visibility'];
+    public videos!: string[];
 
     public constructor(struct: components['schemas']['PlaylistListDto'] | components['schemas']['PlaylistDetailDto']) {
         Object.assign(this, struct);

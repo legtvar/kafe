@@ -29,11 +29,11 @@ export const VideoJS = (props: IVideoJSProps) => {
         }
     }, [options, videoRef, onReady, player]);
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     React.useEffect(
         () => () => {
             if (player) player.dispose();
         },
+        // eslint-disable-next-line react-hooks/exhaustive-deps
         [],
     );
 

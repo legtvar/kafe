@@ -28,11 +28,13 @@ public class AuthorDetailEndpoint : EndpointBaseAsync
 
     [HttpGet]
     [SwaggerOperation(Tags = new[] { SwaggerTags.Author })]
+    [ProducesResponseType(typeof(AuthorDetailDto), 200)]
+    [ProducesResponseType(404)]
     public override async Task<ActionResult<AuthorDetailDto>> HandleAsync(
         string id,
         CancellationToken cancellationToken = default)
     {
-        var data = await db.Events.AggregateStreamAsync<AuthorInfo>(id, token: cancellationToken);
+        var data = await db.LoadAsync<AuthorInfo>(id, token: cancellationToken);
         if (data is null)
         {
             return NotFound();

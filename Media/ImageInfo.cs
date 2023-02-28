@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 namespace Kafe.Media;
 
 public record ImageInfo(
-    string Path,
     int Width,
     int Height,
     string Format

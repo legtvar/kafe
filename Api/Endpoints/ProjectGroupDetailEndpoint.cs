@@ -28,11 +28,13 @@ public class ProjectGroupDetailEndpoint : EndpointBaseAsync
 
     [HttpGet]
     [SwaggerOperation(Tags = new[] { SwaggerTags.ProjectGroup })]
+    [ProducesResponseType(typeof(ProjectGroupDetailDto), 200)]
+    [ProducesResponseType(404)]
     public override async Task<ActionResult<ProjectGroupDetailDto>> HandleAsync(
         string id,
         CancellationToken cancellationToken = default)
     {
-        var data = await db.Events.AggregateStreamAsync<ProjectGroupInfo>(id, token: cancellationToken);
+        var data = await db.LoadAsync<ProjectGroupInfo>(id, token: cancellationToken);
         if (data is null)
         {
             return NotFound();

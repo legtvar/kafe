@@ -80,7 +80,9 @@ public class Startup
             o.SupportNonNullableReferenceTypes();
             o.SchemaFilter<RequireNonNullablePropertiesSchemaFilter>();
             o.MapType<Hrib>(() => new OpenApiSchema { Type = "string", Format = "hrib" });
-            o.EnableAnnotations();
+            o.EnableAnnotations(
+                enableAnnotationsForInheritance: true,
+                enableAnnotationsForPolymorphism: true);
             o.OperationFilter<RemoveVersionParameter>();
             o.DocumentFilter<ReplaceVersionWithDocVersion>();
             o.DocInclusionPredicate((version, desc) =>
@@ -101,6 +103,7 @@ public class Startup
 
                 return versions.Any(v => $"v{v}" == version) && (maps.Length == 0 || maps.Any(v => $"v{v}" == version));
             });
+            o.UseOneOfForPolymorphism();
         });
 
         Db.AddDb(services, Configuration, Environment);
@@ -117,6 +120,7 @@ public class Startup
         // KAFE services
         services.AddSingleton<IMediaService, XabeFFmpegService>();
         services.AddScoped<IArtifactService, DefaultArtifactService>();
+        services.AddScoped<IShardService, DefaultShardService>();
     }
 
     public void Configure(IApplicationBuilder app, IHostEnvironment environment)

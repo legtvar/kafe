@@ -15,7 +15,7 @@ public static class Program
                 builder.ConfigureKestrel(k =>
                 {
                     // set request limit to 4 GiB
-                    k.Limits.MaxRequestBodySize = Const.VideoShardSizeLimit;
+                    k.Limits.MaxRequestBodySize = Const.ShardSizeLimit;
                 });
                 builder.ConfigureAppConfiguration(c =>
                 {

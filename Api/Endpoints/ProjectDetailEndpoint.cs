@@ -32,6 +32,8 @@ public class ProjectDetailEndpoint : EndpointBaseAsync
 
     [HttpGet]
     [SwaggerOperation(Tags = new[] { SwaggerTags.Project })]
+    [ProducesResponseType(typeof(ProjectDetailDto), 200)]
+    [ProducesResponseType(404)]
     public override async Task<ActionResult<ProjectDetailDto>> HandleAsync(
         string id,
         CancellationToken cancellationToken = default)

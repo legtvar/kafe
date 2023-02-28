@@ -7,5 +7,5 @@ public static class SwaggerTags
     public const string Playlist = "Playlist";
     public const string Project = "Project";
     public const string ProjectGroup = "ProjectGroup";
-    public const string VideoShard = "VideoShard";
+    public const string Shard = "Shard";
 }

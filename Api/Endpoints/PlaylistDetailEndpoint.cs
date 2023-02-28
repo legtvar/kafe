@@ -28,11 +28,13 @@ public class PlaylistDetailEndpoint : EndpointBaseAsync
 
     [HttpGet]
     [SwaggerOperation(Tags = new[] { SwaggerTags.Playlist })]
+    [ProducesResponseType(typeof(PlaylistDetailDto), 200)]
+    [ProducesResponseType(404)]
     public override async Task<ActionResult<PlaylistDetailDto>> HandleAsync(
         string id,
         CancellationToken cancellationToken = default)
     {
-        var data = await db.Events.AggregateStreamAsync<PlaylistInfo>(id, token: cancellationToken);
+        var data = await db.LoadAsync<PlaylistInfo>(id, token: cancellationToken);
         if (data is null)
         {
             return NotFound();

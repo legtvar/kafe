@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Immutable;
 using System.Linq;
 using Kafe.Data.Aggregates;
+using Kafe.Media;
 
 namespace Kafe.Api.Transfer;
 
@@ -69,7 +71,7 @@ public static class TransferMaps
             Visibility: data.Visibility,
             Videos: data.VideoIds);
     }
-    
+
     public static ProjectGroupListDto ToProjectGroupListDto(ProjectGroupInfo data)
     {
         return new ProjectGroupListDto(
@@ -79,7 +81,7 @@ public static class TransferMaps
             Deadline: data.Deadline,
             IsOpen: data.IsOpen);
     }
-    
+
     public static ProjectGroupDetailDto ToProjectGroupDetailDto(ProjectGroupInfo data)
     {
         return new ProjectGroupDetailDto(
@@ -106,5 +108,76 @@ public static class TransferMaps
             Id: data.ShardId,
             Kind: data.Kind,
             Variants: data.Variants);
+    }
+
+    public static VideoShardDetailDto ToVideoShardDetailDto(VideoShardInfo data)
+    {
+        return new VideoShardDetailDto(
+            Id: data.Id,
+            Kind: data.Kind,
+            ArtifactId: data.ArtifactId,
+            Variants: data.Variants.ToImmutableDictionary(v => v.Name, v => ToMediaInfoDto(v.Info)));
+    }
+
+    public static MediaDto ToMediaInfoDto(MediaInfo data)
+    {
+        return new MediaDto(
+            Duration: data.Duration,
+            VideoStreams: data.VideoStreams.Select(ToVideoStreamDto).ToImmutableArray(),
+            AudioStreams: data.AudioStreams.Select(ToAudioStreamDto).ToImmutableArray(),
+            SubtitleStreams: data.SubtitleStreams.Select(ToSubtitleStreamDto).ToImmutableArray());
+    }
+
+    public static VideoStreamDto ToVideoStreamDto(VideoInfo data)
+    {
+        return new VideoStreamDto(
+            Codec: data.Codec,
+            Bitrate: data.Bitrate,
+            Width: data.Width,
+            Height: data.Height,
+            Framerate: data.Framerate);
+    }
+
+    public static AudioStreamDto ToAudioStreamDto(AudioInfo data)
+    {
+        return new AudioStreamDto(
+            Codec: data.Codec,
+            Bitrate: data.Bitrate,
+            Channels: data.Channels,
+            SampleRate: data.SampleRate);
+    }
+
+    public static SubtitleStreamDto ToSubtitleStreamDto(SubtitleInfo data)
+    {
+        return new SubtitleStreamDto(
+            Codec: data.Codec,
+            Bitrate: data.Bitrate);
+    }
+
+    public static ImageShardDetailDto ToImageShardDetailDto(ImageShardInfo data)
+    {
+        return new ImageShardDetailDto(
+            Id: data.Id,
+            Kind: data.Kind,
+            ArtifactId: data.ArtifactId,
+            Variants: data.Variants.ToImmutableDictionary(v => v.Name, v => ToImageDto(v.Info)));
+    }
+
+    public static ImageDto ToImageDto(ImageInfo data)
+    {
+        return new ImageDto(
+            Width: data.Width,
+            Height: data.Height,
+            Format: data.Format);
+    }
+
+    public static ShardDetailBaseDto ToShardDetailDto(ShardInfoBase data)
+    {
+        return data switch
+        {
+            VideoShardInfo v => ToVideoShardDetailDto(v),
+            ImageShardInfo i => ToImageShardDetailDto(i),
+            _ => throw new NotSupportedException($"Shards of '{data.GetType()}' are not supported.")
+        };
     }
 }

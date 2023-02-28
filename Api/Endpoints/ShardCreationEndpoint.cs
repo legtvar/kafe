@@ -2,6 +2,7 @@
 using Asp.Versioning;
 using Kafe.Api.Services;
 using Kafe.Api.Swagger;
+using Kafe.Api.Transfer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -13,30 +14,30 @@ using System.Threading.Tasks;
 namespace Kafe.Api.Endpoints;
 
 [ApiVersion("1")]
-[Route("artifact/{artifactId}/video")]
+[Route("shard")]
 [Authorize]
-public class VideoShardCreationEndpoint : EndpointBaseAsync
-    .WithRequest<VideoShardCreationEndpoint.RequestData>
+public class ShardCreationEndpoint : EndpointBaseAsync
+    .WithRequest<ShardCreationEndpoint.RequestData>
     .WithActionResult<Hrib>
 {
-    private readonly IArtifactService artifacts;
+    private readonly IShardService shards;
 
-    public VideoShardCreationEndpoint(IArtifactService artifacts)
+    public ShardCreationEndpoint(IShardService shards)
     {
-        this.artifacts = artifacts;
+        this.shards = shards;
     }
 
     [HttpPost]
-    [SwaggerOperation(Tags = new[] { SwaggerTags.VideoShard })]
-    [RequestSizeLimit(Const.VideoShardSizeLimit)]
-    [RequestFormLimits(MultipartBodyLengthLimit = Const.VideoShardSizeLimit)]
+    [SwaggerOperation(Tags = new[] { SwaggerTags.Shard })]
+    [RequestSizeLimit(Const.ShardSizeLimit)]
+    [RequestFormLimits(MultipartBodyLengthLimit = Const.ShardSizeLimit)]
     public override async Task<ActionResult<Hrib>> HandleAsync(
         [FromRoute]RequestData request,
         CancellationToken cancellationToken = default)
     {
         using var stream = request.File.OpenReadStream();
-        var id = await artifacts.AddVideoShard(
-            request.ArtifactId,
+        var id = await shards.Create(
+            request.Dto,
             request.File.ContentType,
             stream,
             cancellationToken);
@@ -49,6 +50,6 @@ public class VideoShardCreationEndpoint : EndpointBaseAsync
     }
 
     public record RequestData(
-        [FromRoute(Name = "artifactId")] string ArtifactId,
+        [FromBody] ShardCreationDto Dto,
         [FromBody] IFormFile File);
 }

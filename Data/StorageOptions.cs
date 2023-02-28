@@ -10,4 +10,20 @@ namespace Kafe.Data;
 public record StorageOptions
 {
     public string? VideoShardsDirectory { get; init; }
+
+    public string? ImageShardsDirectory { get; init; }
+
+    public string? SubtitlesShardsDirectory { get; init; }
+
+    public string? GetShardDirectory(ShardKind kind)
+    {
+        // TODO: Make this more general. It should not depend on the current values in ShardKind.
+        return kind switch
+        {
+            ShardKind.Video => VideoShardsDirectory,
+            ShardKind.Image => ImageShardsDirectory,
+            ShardKind.Subtitles => SubtitlesShardsDirectory,
+            _ => throw new NotSupportedException($"ShardKind '{kind}' is not supported.")
+        };
+    }
 }

@@ -9,10 +9,12 @@ using Kafe.Api.Transfer;
 using Marten;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Kafe.Api.Swagger;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace Kafe.Api.Endpoints;
 
-[ApiVersion("1.0")]
+[ApiVersion("1")]
 [Route("authors")]
 [Authorize]
 public class AuthorListEndpoint : EndpointBaseAsync
@@ -27,6 +29,7 @@ public class AuthorListEndpoint : EndpointBaseAsync
     }
 
     [HttpGet]
+    [SwaggerOperation(Tags = new[] { SwaggerTags.Author })]
     public override async Task<ActionResult<List<AuthorListDto>>> HandleAsync(
         CancellationToken cancellationToken = default)
     {

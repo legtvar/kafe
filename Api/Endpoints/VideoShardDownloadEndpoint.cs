@@ -1,14 +1,16 @@
 ﻿using Ardalis.ApiEndpoints;
 using Asp.Versioning;
 using Kafe.Api.Services;
+using Kafe.Api.Swagger;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Kafe.Api.Endpoints;
 
-[ApiVersion("1.0")]
+[ApiVersion("1")]
 [Route("video/{shardId}/{variant}")]
 [Authorize]
 public class VideoShardDownloadEndpoint : EndpointBaseSync
@@ -23,6 +25,8 @@ public class VideoShardDownloadEndpoint : EndpointBaseSync
     }
 
     [HttpGet]
+    [SwaggerOperation(Tags = new[] { SwaggerTags.VideoShard })]
+    [Produces("application/octet-stream", Type = typeof(FileStreamResult))]
     public override ActionResult Handle([FromRoute] RequestData data)
     {
         var (stream, mime) = artifacts.OpenVideoShard(data.ShardId, data.Variant);

@@ -1,16 +1,18 @@
 ﻿using Ardalis.ApiEndpoints;
 using Asp.Versioning;
 using Kafe.Api.Services;
+using Kafe.Api.Swagger;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Kafe.Api.Endpoints;
 
-[ApiVersion("1.0")]
+[ApiVersion("1")]
 [Route("artifact/{artifactId}/video")]
 [Authorize]
 public class VideoShardCreationEndpoint : EndpointBaseAsync
@@ -25,6 +27,7 @@ public class VideoShardCreationEndpoint : EndpointBaseAsync
     }
 
     [HttpPost]
+    [SwaggerOperation(Tags = new[] { SwaggerTags.VideoShard })]
     [RequestSizeLimit(Const.VideoShardSizeLimit)]
     [RequestFormLimits(MultipartBodyLengthLimit = Const.VideoShardSizeLimit)]
     public override async Task<ActionResult<Hrib>> HandleAsync(

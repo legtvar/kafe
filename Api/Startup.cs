@@ -14,6 +14,9 @@ using Microsoft.OpenApi.Models;
 using Kafe.Api.Swagger;
 using Kafe.Api.Services;
 using Kafe.Media;
+using Asp.Versioning;
+using Swashbuckle.AspNetCore.SwaggerGen;
+using System.Linq;
 
 namespace Kafe.Api;
 
@@ -66,12 +69,38 @@ public class Startup
             });
         services.AddAuthorization();
         services.AddEndpointsApiExplorer();
+        services.AddApiVersioning(o =>
+        {
+            o.ReportApiVersions = true;
+            o.DefaultApiVersion = new ApiVersion(1);
+        });
         services.AddSwaggerGen(o =>
         {
             o.SwaggerDoc("v1", new OpenApiInfo { Title = "KAFE API", Version = "v1" });
             o.SupportNonNullableReferenceTypes();
             o.SchemaFilter<RequireNonNullablePropertiesSchemaFilter>();
+            o.MapType<Hrib>(() => new OpenApiSchema { Type = "string", Format = "hrib" });
             o.EnableAnnotations();
+            o.OperationFilter<RemoveVersionParameter>();
+            o.DocumentFilter<ReplaceVersionWithDocVersion>();
+            o.DocInclusionPredicate((version, desc) =>
+            {
+                if (!desc.TryGetMethodInfo(out var method))
+                {
+                    return false;
+                }
+
+                var versions = method.DeclaringType!.GetCustomAttributes(true)
+                    .OfType<ApiVersionAttribute>()
+                    .SelectMany(attr => attr.Versions);
+
+                var maps = method.GetCustomAttributes(true)
+                    .OfType<MapToApiVersionAttribute>()
+                    .SelectMany(attr => attr.Versions)
+                    .ToArray();
+
+                return versions.Any(v => $"v{v}" == version) && (maps.Length == 0 || maps.Any(v => $"v{v}" == version));
+            });
         });
 
         Db.AddDb(services, Configuration, Environment);
@@ -84,7 +113,6 @@ public class Startup
             o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
             o.JsonSerializerOptions.Converters.Add(new LocalizedStringJsonConverter());
         });
-        services.AddApiVersioning(o => o.ReportApiVersions = true);
 
         // KAFE services
         services.AddSingleton<IMediaService, XabeFFmpegService>();

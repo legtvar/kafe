@@ -17,40 +17,8 @@ build-api:
       - ~/.nuget
   only:
     - master
+    - api
     - ci
-    - api
-
-migrate-wma:
-  image: alpine:latest
-  stage: deploy
-  variables:
-    PGPASSWORD: postgres
-  timeout: 3h
-  script:
-    - apk update
-    - apk add dotnet7-sdk postgresql-client ffmpeg
-    #- cat /mnt/kafe/lemma-15-08-2022-all.sql | psql -h kafe-db -p 5432 -U postgres
-    - dotnet build Migrator
-    - cp "$APPSETTINGS_MIGRATOR" "./Migrator/appsettings.local.json"
-    - dotnet run --project Migrator --framework net7.0
-  only:
-    - api
-  tags:
-    - lemma-new-docker
-  when: manual
-
-publish-api-test:
-  stage: deploy
-  script:
-    - cp "$APPSETTINGS_TEST" "./Api/appsettings.local.json"
-    - docker-compose -f docker-compose.test.yml build
-    - docker-compose -f docker-compose.test.yml down
-    - docker-compose -f docker-compose.test.yml up -d
-  only:
-    - api
-  tags:
-    - lemma-new
-  when: manual
 
 build-web:
   image: alpine:latest
@@ -71,13 +39,49 @@ build-web:
       - Web/build
   only:
     - master
-    - ci
     - web
+    - ci
+
+migrate-wma:
+  image: alpine:latest
+  stage: deploy
+  variables:
+    PGPASSWORD: postgres
+  timeout: 3h
+  script:
+    - apk update
+    - apk add dotnet7-sdk postgresql-client ffmpeg
+    #- cat /mnt/kafe/lemma-15-08-2022-all.sql | psql -h kafe-db -p 5432 -U postgres
+    - dotnet build Migrator
+    - cp "$APPSETTINGS_MIGRATOR" "./Migrator/appsettings.local.json"
+    - dotnet run --project Migrator --framework net7.0
+  only:
+    - master
+    - api
+    - ci
+  tags:
+    - lemma-new-docker
+  when: manual
+
+publish-api:
+  stage: deploy
+  script:
+    - cp "$APPSETTINGS_PRODUCTION" "./Api/appsettings.local.json"
+    - docker-compose -f docker-compose.yml build
+    - docker-compose -f docker-compose.yml down api
+    - docker-compose -f docker-compose.yml up -d api
+  tags:
+    - lemma-new
+  only:
+    - master
+    - api
+    - ci
+  when: manual
 
 test-web:
   image: alpine:latest
   stage: test
-  dependencies: 
+  dependencies:
     - build-web
   script:
     - apk update
@@ -95,12 +99,12 @@ test-web:
       - Web/build
   only:
     - master
-    - ci
     - web
+    - ci
 
 pages:
   stage: deploy
-  dependencies: 
+  dependencies:
     - test-web
   script:
     - cp Web/build public -r
@@ -110,6 +114,18 @@ pages:
     paths:
       - public
   only:
-    - master
-    - ci
     - web
+
+publish-web:
+  stage: deploy
+  script:
+    - docker-compose -f docker-compose.yml build
+    - docker-compose -f docker-compose.yml down web
+    - docker-compose -f docker-compose.yml up -d web
+  tags:
+    - lemma-new
+  only:
+    - master
+    - api
+    - ci
+  when: manual

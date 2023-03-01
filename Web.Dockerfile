@@ -1,7 +1,9 @@
 FROM node:18 as builder
 WORKDIR /web
+COPY ./Web/package*.json ./
+RUN npm ci
 COPY ./Web ./
-RUN npm ci && npm run build
+RUN npm run build
 
 FROM nginx:alpine
 RUN mkdir /web

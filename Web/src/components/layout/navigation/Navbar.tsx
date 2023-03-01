@@ -86,28 +86,33 @@ export function Navbar({ onOpen, forceReload, signedIn, ...rest }: INavbarProps)
                         <IconButton size="lg" variant="ghost" aria-label="Notifications" icon={<FiBell />} />
                         <Flex alignItems={'center'}>
                             <Menu>
-                                <Button size="lg" variant="ghost" px={2} ml={{ base: 0, md: 4 }}>
-                                    <MenuButton>
-                                        <HStack>
-                                            <Avatar size={'sm'} src={avatarUrl(user!)} />
-                                            <VStack
-                                                display={{ base: 'none', md: 'flex' }}
-                                                alignItems="flex-start"
-                                                spacing="1px"
-                                                ml="2"
-                                                w={150}
-                                            >
-                                                <Text fontSize="sm">{user?.name}</Text>
-                                                <Text fontSize="xs" color={'gray.500'}>
-                                                    {t(`role.${user?.role}`).toString()}
-                                                </Text>
-                                            </VStack>
-                                            <Box display={{ base: 'none', md: 'flex' }}>
-                                                <FiChevronDown />
-                                            </Box>
-                                        </HStack>
-                                    </MenuButton>
-                                </Button>
+                                <MenuButton
+                                    as={Button}
+                                    size="lg"
+                                    variant="ghost"
+                                    px={2}
+                                    ml={{ base: 0, md: 4 }}
+                                    fontWeight="normal"
+                                >
+                                    <HStack>
+                                        <Avatar size={'sm'} src={avatarUrl(user!.email)} />
+                                        <VStack
+                                            display={{ base: 'none', md: 'flex' }}
+                                            alignItems="flex-start"
+                                            spacing="1px"
+                                            ml="2"
+                                            w={150}
+                                        >
+                                            <Text fontSize="sm">{user?.name}</Text>
+                                            <Text fontSize="xs" color={'gray.500'}>
+                                                {t(`role.${user?.role}`).toString()}
+                                            </Text>
+                                        </VStack>
+                                        <Box display={{ base: 'none', md: 'flex' }}>
+                                            <FiChevronDown />
+                                        </Box>
+                                    </HStack>
+                                </MenuButton>
                                 <MenuList>
                                     <MenuItem>{t('navbar.profile').toString()}</MenuItem>
                                     <MenuItem>{t('navbar.settings').toString()}</MenuItem>

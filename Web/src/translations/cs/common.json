@@ -30,8 +30,9 @@
     "upload": {
       "specs": "Technické požadavky souboru",
       "filetype": {
-        "video": "Soubor videa",
-        "subtitles": "Soubor titulků"
+        "Video": "Soubor videa",
+        "Image": "Obrázkový soubor",
+        "Subtitles": "Soubor titulků"
       }
     }
   },

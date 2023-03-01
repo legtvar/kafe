@@ -119,8 +119,8 @@ export function PlaylistGallery(props: IPlaylistGalleryProps) {
                             </Stack>
                         </Stack>
                         <SimpleGrid columns={{ base: 1, md: 2, lg: 3, xl: 4 }} spacing={4} pb={4}>
-                            {regular.map((playlist) => (
-                                <Link to={`playlists/${playlist.id}`}>
+                            {regular.map((playlist, i) => (
+                                <Link to={`playlists/${playlist.id}`} key={i}>
                                     <AspectRatio ratio={16 / 9}>
                                         <Box
                                             bg={boxColor}

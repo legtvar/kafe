@@ -11,6 +11,10 @@ export function Root(props: IRootProps) {
     let authRequested = false;
     if (matches && matches.length > 1) {
         authRequested = matches[1].pathname === '/auth';
+
+        if (matches[1].pathname === '/go') {
+            return outlet;
+        }
     }
 
     if (authRequested && !user) {

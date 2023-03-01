@@ -17,14 +17,13 @@ export function Groups(props: IGroupsProps) {
                     <Flex direction="column" w="full" mt={-4}>
                         <Pagination data={data}>
                             {(project, i) => (
-                                <Link to={project.id}>
+                                <Link to={project.id} key={i}>
                                     <Flex
                                         direction={{
                                             base: 'column',
                                             md: 'row',
                                         }}
                                         mx={-4}
-                                        key={i}
                                         py={7}
                                         px={8}
                                         borderBottomWidth="1px"

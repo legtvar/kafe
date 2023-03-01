@@ -42,6 +42,14 @@ export interface paths {
             "text/json": components["schemas"]["AuthorDetailDto"];
           };
         };
+        /** @description Not Found */
+        404: {
+          content: {
+            "text/plain": components["schemas"]["ProblemDetails"];
+            "application/json": components["schemas"]["ProblemDetails"];
+            "text/json": components["schemas"]["ProblemDetails"];
+          };
+        };
       };
     };
   };
@@ -73,6 +81,14 @@ export interface paths {
             "text/plain": components["schemas"]["PlaylistDetailDto"];
             "application/json": components["schemas"]["PlaylistDetailDto"];
             "text/json": components["schemas"]["PlaylistDetailDto"];
+          };
+        };
+        /** @description Not Found */
+        404: {
+          content: {
+            "text/plain": components["schemas"]["ProblemDetails"];
+            "application/json": components["schemas"]["ProblemDetails"];
+            "text/json": components["schemas"]["ProblemDetails"];
           };
         };
       };
@@ -108,6 +124,14 @@ export interface paths {
             "text/json": components["schemas"]["ProjectDetailDto"];
           };
         };
+        /** @description Not Found */
+        404: {
+          content: {
+            "text/plain": components["schemas"]["ProblemDetails"];
+            "application/json": components["schemas"]["ProblemDetails"];
+            "text/json": components["schemas"]["ProblemDetails"];
+          };
+        };
       };
     };
   };
@@ -125,6 +149,14 @@ export interface paths {
             "text/plain": components["schemas"]["ProjectGroupDetailDto"];
             "application/json": components["schemas"]["ProjectGroupDetailDto"];
             "text/json": components["schemas"]["ProjectGroupDetailDto"];
+          };
+        };
+        /** @description Not Found */
+        404: {
+          content: {
+            "text/plain": components["schemas"]["ProblemDetails"];
+            "application/json": components["schemas"]["ProblemDetails"];
+            "text/json": components["schemas"]["ProblemDetails"];
           };
         };
       };
@@ -158,13 +190,8 @@ export interface paths {
       };
     };
   };
-  "/api/v1/artifact/{artifactId}/video": {
+  "/api/v1/shard": {
     post: {
-      parameters: {
-        path: {
-          ArtifactId: string;
-        };
-      };
       requestBody?: {
         content: {
           "multipart/form-data": {
@@ -185,11 +212,38 @@ export interface paths {
       };
     };
   };
-  "/api/v1/video/{shardId}/{variant}": {
+  "/api/v1/shard/{id}": {
     get: {
       parameters: {
         path: {
-          ShardId: string;
+          id: string;
+        };
+      };
+      responses: {
+        /** @description Success */
+        200: {
+          content: {
+            "text/plain": components["schemas"]["VideoShardDetailDto"] | components["schemas"]["ImageShardDetailDto"];
+            "application/json": components["schemas"]["VideoShardDetailDto"] | components["schemas"]["ImageShardDetailDto"];
+            "text/json": components["schemas"]["VideoShardDetailDto"] | components["schemas"]["ImageShardDetailDto"];
+          };
+        };
+        /** @description Not Found */
+        404: {
+          content: {
+            "text/plain": components["schemas"]["ProblemDetails"];
+            "application/json": components["schemas"]["ProblemDetails"];
+            "text/json": components["schemas"]["ProblemDetails"];
+          };
+        };
+      };
+    };
+  };
+  "/api/v1/shard/{id}/{variant}": {
+    get: {
+      parameters: {
+        path: {
+          Id: string;
           Variant: string;
         };
       };
@@ -221,6 +275,15 @@ export interface components {
       shards: (components["schemas"]["ShardListDto"])[];
       containingProjectIds: (string)[];
     };
+    AudioStreamDto: {
+      codec: string;
+      /** Format: int64 */
+      bitrate: number;
+      /** Format: int32 */
+      channels: number;
+      /** Format: int32 */
+      sampleRate: number;
+    };
     AuthorDetailDto: {
       id: string;
       name: string;
@@ -232,7 +295,26 @@ export interface components {
       id: string;
       name: string;
     };
+    ImageDto: {
+      /** Format: int32 */
+      width: number;
+      /** Format: int32 */
+      height: number;
+      format: string;
+    };
+    ImageShardDetailDto: ({
+      Kind: "ImageShardDetailDto";
+      variants: {
+        [key: string]: components["schemas"]["ImageDto"] | undefined;
+      };
+    }) & Omit<components["schemas"]["ShardDetailBaseDto"], "Kind">;
     LocalizedString: Record<string, never>;
+    MediaDto: {
+      duration: components["schemas"]["TimeSpan"];
+      videoStreams: (components["schemas"]["VideoStreamDto"])[];
+      audioStreams: (components["schemas"]["AudioStreamDto"])[];
+      subtitleStreams: (components["schemas"]["SubtitleStreamDto"])[];
+    };
     PlaylistDetailDto: {
       id: string;
       name: components["schemas"]["LocalizedString"];
@@ -245,6 +327,15 @@ export interface components {
       name: components["schemas"]["LocalizedString"];
       description: components["schemas"]["LocalizedString"];
       visibility: components["schemas"]["Visibility"];
+    };
+    ProblemDetails: {
+      type?: string | null;
+      title?: string | null;
+      /** Format: int32 */
+      status?: number | null;
+      detail?: string | null;
+      instance?: string | null;
+      [key: string]: unknown | undefined;
     };
     ProjectAuthorDto: {
       id: string;
@@ -290,6 +381,14 @@ export interface components {
       /** Format: date-time */
       releaseDate: string;
     };
+    ShardDetailBaseDto: {
+      Kind: string;
+      /** Format: hrib */
+      id: string;
+      kind: components["schemas"]["ShardKind"];
+      /** Format: hrib */
+      artifactId: string;
+    };
     /** @enum {string} */
     ShardKind: "Invalid" | "Video" | "Image" | "Subtitles";
     ShardListDto: {
@@ -297,6 +396,60 @@ export interface components {
       id: string;
       kind: components["schemas"]["ShardKind"];
       variants: (string)[];
+    };
+    SubtitleStreamDto: {
+      codec: string;
+      /** Format: int64 */
+      bitrate: number;
+    };
+    TimeSpan: {
+      /** Format: int64 */
+      ticks: number;
+      /** Format: int32 */
+      days: number;
+      /** Format: int32 */
+      hours: number;
+      /** Format: int32 */
+      milliseconds: number;
+      /** Format: int32 */
+      microseconds: number;
+      /** Format: int32 */
+      nanoseconds: number;
+      /** Format: int32 */
+      minutes: number;
+      /** Format: int32 */
+      seconds: number;
+      /** Format: double */
+      totalDays: number;
+      /** Format: double */
+      totalHours: number;
+      /** Format: double */
+      totalMilliseconds: number;
+      /** Format: double */
+      totalMicroseconds: number;
+      /** Format: double */
+      totalNanoseconds: number;
+      /** Format: double */
+      totalMinutes: number;
+      /** Format: double */
+      totalSeconds: number;
+    };
+    VideoShardDetailDto: ({
+      Kind: "VideoShardDetailDto";
+      variants: {
+        [key: string]: components["schemas"]["MediaDto"] | undefined;
+      };
+    }) & Omit<components["schemas"]["ShardDetailBaseDto"], "Kind">;
+    VideoStreamDto: {
+      codec: string;
+      /** Format: int64 */
+      bitrate: number;
+      /** Format: int32 */
+      width: number;
+      /** Format: int32 */
+      height: number;
+      /** Format: double */
+      framerate: number;
     };
     /** @enum {string} */
     Visibility: "Unknown" | "Private" | "Internal" | "Public";

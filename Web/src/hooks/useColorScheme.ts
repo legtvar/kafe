@@ -4,5 +4,6 @@ export function useColorScheme() {
     return {
         border: useColorModeValue('gray.300', 'gray.700'),
         bg: useColorModeValue('white', 'gray.900'),
+        bgDarker: useColorModeValue('gray.300', 'gray.700'),
     };
 }

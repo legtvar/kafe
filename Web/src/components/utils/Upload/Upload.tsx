@@ -4,12 +4,14 @@ import { useState } from 'react';
 import Dropzone from 'react-dropzone';
 import { Trans } from 'react-i18next';
 import { BsCloudArrowUp, BsCloudArrowUpFill, BsCloudCheckFill } from 'react-icons/bs';
-import { useApi } from '../../hooks/Caffeine';
+import { useApi } from '../../../hooks/Caffeine';
+import { components } from '../../../schemas/api';
 
 interface IUploadProps {
     title: string;
     projectId: string;
-    // getArtifactId: () => string;
+    shardKind: components['schemas']['ShardKind'];
+    getArtifactId: () => Promise<string>;
 }
 
 export function Upload(props: IUploadProps) {
@@ -23,14 +25,11 @@ export function Upload(props: IUploadProps) {
 
         setStatus('uploading');
 
-        const artifactId = await api.artifacts.create(
-            {
-                iv: 'Test',
-            },
-            props.projectId,
-        );
+        const artifactId = await props.getArtifactId();
 
-        const fileId = await api.shards.createVideo(artifactId, files[0], (event) => setProgress(event.progress || 0));
+        const fileId = await api.shards.create(artifactId, files[0], 'Video', (event) =>
+            setProgress(event.progress || 0),
+        );
 
         setStatus('uploaded');
         console.log(fileId);

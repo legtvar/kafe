@@ -17,6 +17,8 @@ using Kafe.Media;
 using Asp.Versioning;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Linq;
+using System;
+using Microsoft.OpenApi.Any;
 
 namespace Kafe.Api;
 
@@ -79,7 +81,18 @@ public class Startup
             o.SwaggerDoc("v1", new OpenApiInfo { Title = "KAFE API", Version = "v1" });
             o.SupportNonNullableReferenceTypes();
             o.SchemaFilter<RequireNonNullablePropertiesSchemaFilter>();
-            o.MapType<Hrib>(() => new OpenApiSchema { Type = "string", Format = "hrib" });
+            o.MapType<Hrib>(() => new OpenApiSchema
+            {
+                Type = "string",
+                Format = "hrib",
+                Example = new OpenApiString("AAAAbadf00d")
+            });
+            o.MapType<TimeSpan>(() => new OpenApiSchema
+            {
+                Type = "string",
+                Format = "time-span",
+                Example = new OpenApiString("00:00:00")
+            });
             o.EnableAnnotations(
                 enableAnnotationsForInheritance: true,
                 enableAnnotationsForPolymorphism: true);

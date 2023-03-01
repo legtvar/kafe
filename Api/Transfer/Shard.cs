@@ -9,7 +9,7 @@ public record ShardListDto(
     ShardKind Kind,
     ImmutableArray<string> Variants);
 
-[SwaggerDiscriminator(nameof(Kind))]
+[SwaggerDiscriminator("kind")]
 [SwaggerSubType(typeof(VideoShardDetailDto), DiscriminatorValue = nameof(ShardKind.Video))]
 [SwaggerSubType(typeof(ImageShardDetailDto), DiscriminatorValue = nameof(ShardKind.Image))]
 public abstract record ShardDetailBaseDto(

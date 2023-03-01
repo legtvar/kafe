@@ -1,7 +1,7 @@
 stages:
+  - manual
   - build
   - test
-  - deploy
 
 build-api:
   image: alpine:latest
@@ -45,7 +45,7 @@ build-web:
 
 migrate-wma:
   image: alpine:latest
-  stage: deploy
+  stage: manual
   variables:
     PGPASSWORD: postgres
   timeout: 3h
@@ -65,7 +65,7 @@ migrate-wma:
   when: manual
 
 publish-api:
-  stage: deploy
+  stage: manual
   script:
     - cp "$APPSETTINGS_PRODUCTION" "./Api/appsettings.local.json"
     - docker-compose -f docker-compose.yml build
@@ -116,7 +116,7 @@ pages:
     - web
 
 publish-web:
-  stage: deploy
+  stage: manual
   script:
     - docker-compose -f docker-compose.yml build
     - docker-compose -f docker-compose.yml down web

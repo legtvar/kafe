@@ -20,7 +20,7 @@ services:
   api:
     build:
       context: ./
-      dockerfile: Dockerfile
+      dockerfile: Api.Dockerfile
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
     command: /kafe/Kafe.Api
@@ -34,6 +34,17 @@ services:
       backbone:
         aliases:
           - kafe-api
+      default:
+    restart: always
+
+  web:
+    build:
+      context: ./
+      dockerfile: Web.Dockerfile
+    networks:
+      backbone:
+        aliases:
+          - kafe-web
       default:
     restart: always
 

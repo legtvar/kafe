@@ -37,6 +37,7 @@ build-web:
   artifacts:
     paths:
       - Web/build
+    expire_in: 42s
   only:
     - master
     - web
@@ -94,9 +95,6 @@ test-web:
   cache:
     paths:
       - Web/node_modules
-  artifacts:
-    paths:
-      - Web/build
   only:
     - master
     - web
@@ -113,6 +111,7 @@ pages:
   artifacts:
     paths:
       - public
+    expire_in: 42s
   only:
     - web
 

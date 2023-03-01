@@ -5,11 +5,22 @@ namespace Kafe.Api.Transfer;
 
 public record AuthorListDto(
     string Id,
-    string Name);
+    string Name
+);
 
 public record AuthorDetailDto(
     string Id,
     string Name,
+    LocalizedString? Bio,
     string? Uco,
     string? Email,
-    string? Phone);
+    string? Phone
+);
+
+public record AuthorCreationDto(
+    string Name,
+    LocalizedString? Bio,
+    string? Uco,
+    string? Email,
+    string? Phone
+);

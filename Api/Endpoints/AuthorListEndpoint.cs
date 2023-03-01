@@ -11,6 +11,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Kafe.Api.Swagger;
 using Swashbuckle.AspNetCore.Annotations;
+using Kafe.Api.Services;
+using System.Collections.Immutable;
 
 namespace Kafe.Api.Endpoints;
 
@@ -19,21 +21,20 @@ namespace Kafe.Api.Endpoints;
 [Authorize]
 public class AuthorListEndpoint : EndpointBaseAsync
     .WithoutRequest
-    .WithActionResult<List<AuthorListDto>>
+    .WithActionResult<ImmutableArray<AuthorListDto>>
 {
-    private readonly IQuerySession db;
+    private readonly IAuthorService authors;
 
-    public AuthorListEndpoint(IQuerySession db)
+    public AuthorListEndpoint(IAuthorService authors)
     {
-        this.db = db;
+        this.authors = authors;
     }
 
     [HttpGet]
     [SwaggerOperation(Tags = new[] { SwaggerTags.Author })]
-    public override async Task<ActionResult<List<AuthorListDto>>> HandleAsync(
+    public override async Task<ActionResult<ImmutableArray<AuthorListDto>>> HandleAsync(
         CancellationToken cancellationToken = default)
     {
-        var authors = await db.Query<AuthorInfo>().ToListAsync(cancellationToken);
-        return Ok(authors.Select(TransferMaps.ToAuthorListDto).ToList());
+        return Ok(await authors.List(cancellationToken));
     }
 }

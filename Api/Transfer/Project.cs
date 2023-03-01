@@ -5,8 +5,8 @@ using Kafe.Data;
 namespace Kafe.Api.Transfer;
 
 public record ProjectListDto(
-    string Id,
-    string ProjectGroupId,
+    Hrib Id,
+    Hrib ProjectGroupId,
     LocalizedString Name,
     LocalizedString? Description,
     Visibility Visibility,
@@ -15,8 +15,8 @@ public record ProjectListDto(
 );
 
 public record ProjectDetailDto(
-    string Id,
-    string ProjectGroupId,
+    Hrib Id,
+    Hrib ProjectGroupId,
     LocalizedString? ProjectGroupName,
     LocalizedString? Genre,
     LocalizedString Name,
@@ -31,5 +31,19 @@ public record ProjectDetailDto(
 public record ProjectAuthorDto(
     string Id,
     string Name,
+    ImmutableArray<string> Roles
+);
+
+public record ProjectCreationDto(
+    string ProjectGroupId,
+    LocalizedString Name,
+    LocalizedString? Description,
+    LocalizedString? Genre,
+    ImmutableArray<ProjectCreationAuthorDto> Crew,
+    ImmutableArray<ProjectCreationAuthorDto> Cast
+);
+
+public record ProjectCreationAuthorDto(
+    string Id,
     ImmutableArray<string> Roles
 );

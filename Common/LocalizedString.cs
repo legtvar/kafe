@@ -60,6 +60,11 @@ public sealed class LocalizedString : IEquatable<LocalizedString>
         return Create((CultureInfo.InvariantCulture, invariantString));
     }
 
+    public static bool IsNullOrEmpty([NotNullWhen(false)] LocalizedString? value)
+    {
+        return value is null || value.data.Values.All(string.IsNullOrEmpty);
+    }
+
     [return: NotNullIfNotNull(nameof(localized))]
     public static explicit operator string?(LocalizedString? localized)
     {

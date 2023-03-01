@@ -19,6 +19,7 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Linq;
 using System;
 using Microsoft.OpenApi.Any;
+using System.IO;
 
 namespace Kafe.Api;
 
@@ -117,6 +118,11 @@ public class Startup
                 return versions.Any(v => $"v{v}" == version) && (maps.Length == 0 || maps.Any(v => $"v{v}" == version));
             });
             o.UseOneOfForPolymorphism();
+            var xmlFiles = new DirectoryInfo(AppContext.BaseDirectory).GetFiles("*.xml");
+            foreach (var xmlFile in xmlFiles)
+            {
+                o.IncludeXmlComments(xmlFile.FullName);
+            }
         });
 
         Db.AddDb(services, Configuration, Environment);
@@ -132,6 +138,8 @@ public class Startup
 
         // KAFE services
         services.AddSingleton<IMediaService, XabeFFmpegService>();
+        services.AddScoped<IProjectService, DefaultProjectService>();
+        services.AddScoped<IAuthorService, DefaultAuthorService>();
         services.AddScoped<IArtifactService, DefaultArtifactService>();
         services.AddScoped<IShardService, DefaultShardService>();
     }

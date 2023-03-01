@@ -11,6 +11,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Kafe.Api.Swagger;
 using Swashbuckle.AspNetCore.Annotations;
+using System.Collections.Immutable;
+using Kafe.Api.Services;
 
 namespace Kafe.Api.Endpoints;
 
@@ -19,21 +21,20 @@ namespace Kafe.Api.Endpoints;
 [Authorize]
 public class ProjectListEndpoint : EndpointBaseAsync
     .WithoutRequest
-    .WithActionResult<List<ProjectListDto>>
+    .WithActionResult<ImmutableArray<ProjectListDto>>
 {
-    private readonly IQuerySession db;
+    private readonly IProjectService projects;
 
-    public ProjectListEndpoint(IQuerySession db)
+    public ProjectListEndpoint(IProjectService projects)
     {
-        this.db = db;
+        this.projects = projects;
     }
 
     [HttpGet]
     [SwaggerOperation(Tags = new[] { SwaggerTags.Project })]
-    public override async Task<ActionResult<List<ProjectListDto>>>HandleAsync(
+    public override async Task<ActionResult<ImmutableArray<ProjectListDto>>>HandleAsync(
         CancellationToken cancellationToken = default)
     {
-        var projects = await db.Query<ProjectInfo>().ToListAsync(cancellationToken);
-        return Ok(projects.Select(TransferMaps.ToProjectListDto).ToList());
+        return Ok(await projects.List(cancellationToken));
     }
 }

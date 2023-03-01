@@ -2,6 +2,7 @@ stages:
   - manual
   - build
   - test
+  - deploy
 
 build-api:
   image: alpine:latest

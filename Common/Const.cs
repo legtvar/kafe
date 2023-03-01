@@ -11,6 +11,8 @@ public static class Const
 {
     public const string OriginalShardVariant = "original";
     public const string InvalidPath = "invalid";
+    public const string InvalidFileExtension = "invalid";
+    public const string InvalidFormatName = "invalid";
     public const long ShardSizeLimit = 4_294_967_296;
 
     public const string MatroskaMimeType = "video/x-matroska";

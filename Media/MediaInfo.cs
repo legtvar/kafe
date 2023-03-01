@@ -8,7 +8,8 @@ using System.Threading.Tasks;
 namespace Kafe.Media;
 
 public record MediaInfo(
-    string Path,
+    string FileExtension,
+    string FormatName,
     TimeSpan Duration,
     ImmutableArray<VideoInfo> VideoStreams,
     ImmutableArray<AudioInfo> AudioStreams,
@@ -17,7 +18,8 @@ public record MediaInfo(
 {
     public static MediaInfo Invalid { get; }
         = new(
-            Const.InvalidPath,
+            Const.InvalidFileExtension,
+            Const.InvalidFormatName,
             TimeSpan.Zero,
             ImmutableArray<VideoInfo>.Empty,
             ImmutableArray<AudioInfo>.Empty,

@@ -61,7 +61,8 @@ public class XabeFFmpegService : IMediaService
             .ToImmutableArray();
 
         return new MediaInfo(
-            Path: filePath,
+            FileExtension: Path.GetExtension(filePath),
+            FormatName: "",
             Duration: data.Duration,
             VideoStreams: videoInfos,
             AudioStreams: audioInfos,

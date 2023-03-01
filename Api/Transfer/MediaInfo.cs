@@ -4,6 +4,8 @@ using System.Collections.Immutable;
 namespace Kafe.Api.Transfer;
 
 public record MediaDto(
+    string FileExtension,
+    string MimeType,
     TimeSpan Duration,
     ImmutableArray<VideoStreamDto> VideoStreams,
     ImmutableArray<AudioStreamDto> AudioStreams,

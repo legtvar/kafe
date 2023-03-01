@@ -152,7 +152,7 @@ public class Startup
         });
 
         // KAFE services
-        services.AddSingleton<IMediaService, XabeFFmpegService>();
+        services.AddSingleton<IMediaService, FFmpegCoreService>();
         services.AddScoped<IProjectService, DefaultProjectService>();
         services.AddScoped<IAuthorService, DefaultAuthorService>();
         services.AddScoped<IArtifactService, DefaultArtifactService>();

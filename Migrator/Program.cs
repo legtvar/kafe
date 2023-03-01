@@ -23,7 +23,7 @@ public static class Program
     private static readonly ConcurrentDictionary<int, Hrib> authorMap = new();
     private static readonly ConcurrentDictionary<int, Hrib> projectMap = new();
     private static readonly ConcurrentDictionary<int, Hrib> artifactMap = new();
-    private static readonly IMediaService mediaService = new XabeFFmpegService();
+    private static readonly IMediaService mediaService = new FFmpegCoreService();
 
 
     public static async Task Main(string[] args)

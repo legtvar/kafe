@@ -39,8 +39,8 @@ public class FFmpegCoreService : IMediaService
 
         var videoInfos = data.VideoStreams
             .Select(v => new VideoInfo(
-                Codec: v.CodecName,
-                Bitrate: v.BitRate,
+                    Codec: v.CodecName,
+                    Bitrate: v.BitRate,
                 Width: v.Width,
                 Height: v.Height,
                 Framerate: v.FrameRate))
@@ -61,7 +61,8 @@ public class FFmpegCoreService : IMediaService
             .ToImmutableArray();
 
         return new MediaInfo(
-            Path: filePath,
+            FileExtension: Path.GetExtension(filePath),
+            FormatName: data.Format.FormatName,
             Duration: data.Duration,
             VideoStreams: videoInfos,
             AudioStreams: audioInfos,

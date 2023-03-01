@@ -123,6 +123,8 @@ public static class TransferMaps
     public static MediaDto ToMediaInfoDto(MediaInfo data)
     {
         return new MediaDto(
+            FileExtension: data.FileExtension,
+            MimeType: data.GetMimeType(),
             Duration: data.Duration,
             VideoStreams: data.VideoStreams.Select(ToVideoStreamDto).ToImmutableArray(),
             AudioStreams: data.AudioStreams.Select(ToAudioStreamDto).ToImmutableArray(),

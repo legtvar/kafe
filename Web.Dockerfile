@@ -1,11 +1,11 @@
 FROM node:18 as builder
-WORKDIR /web
+WORKDIR /app
 COPY ./Web/package*.json ./
 RUN npm ci
 COPY ./Web ./
 RUN npm run build
 
 FROM nginx:alpine
-RUN mkdir /web
-COPY --from=builder /web/build /web
-COPY --from=builder /web/nginx.conf /etc/nginx.conf
+RUN mkdir /app
+COPY --from=builder /app/build /app
+COPY --from=builder /app/nginx.conf /etc/nginx.conf

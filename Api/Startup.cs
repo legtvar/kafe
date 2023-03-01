@@ -71,7 +71,8 @@ public class Startup
                         return Task.CompletedTask;
                     }
                 };
-            });
+            })
+            .AddCookie();
         services.AddAuthorization();
         services.AddEndpointsApiExplorer();
         services.AddApiVersioning(o =>

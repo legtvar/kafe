@@ -3,8 +3,13 @@ using Asp.Versioning;
 using Kafe.Api.Services;
 using Kafe.Api.Swagger;
 using Kafe.Api.Transfer;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
+using System;
+using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -16,6 +21,9 @@ public class TemporaryAccountConfirmationEndpoint : EndpointBaseAsync
     .WithRequest<string>
     .WithActionResult
 {
+    public const string TemporaryAccountRole = "TemporaryAccount";
+    public static readonly TimeSpan CookieExpirationTime = new(30, 0, 0, 0);
+
     private readonly IAccountService accounts;
 
     public TemporaryAccountConfirmationEndpoint(IAccountService accounts)
@@ -31,7 +39,22 @@ public class TemporaryAccountConfirmationEndpoint : EndpointBaseAsync
         [FromRoute] string token,
         CancellationToken cancellationToken = default)
     {
-        await accounts.ConfirmTemporaryAccount(token, cancellationToken);
-        return Ok();
+        var account = await accounts.ConfirmTemporaryAccount(token, cancellationToken);
+        var claims = new List<Claim>()
+        {
+            new Claim(ClaimTypes.Name, account.EmailAddress),
+            new Claim(ClaimTypes.NameIdentifier, account.Id),
+            new Claim(ClaimTypes.Role, TemporaryAccountRole)
+        };
+        var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+        var authProperties = new AuthenticationProperties
+        {
+            AllowRefresh = false,
+            IssuedUtc = DateTimeOffset.UtcNow,
+            ExpiresUtc = DateTimeOffset.UtcNow.Add(CookieExpirationTime),
+            IsPersistent = true
+        };
+
+        return SignIn(new ClaimsPrincipal(claimsIdentity), authProperties);
     }
 }

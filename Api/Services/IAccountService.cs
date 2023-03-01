@@ -6,7 +6,11 @@ namespace Kafe.Api.Services;
 
 public interface IAccountService
 {
-    Task CreateTemporaryAccount(TemporaryAccountCreationDto dto, CancellationToken token = default);
+    Task CreateTemporaryAccount(
+        TemporaryAccountCreationDto dto,
+        CancellationToken token = default);
 
-    Task ConfirmTemporaryAccount(string confirmationToken, CancellationToken token = default);
+    Task<TemporaryAccountInfoDto> ConfirmTemporaryAccount(
+        string confirmationToken,
+        CancellationToken token = default);
 }

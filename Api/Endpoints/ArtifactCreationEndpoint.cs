@@ -28,6 +28,8 @@ public class ArtifactCreationEndpoint : EndpointBaseAsync
 
     [HttpPost]
     [SwaggerOperation(Tags = new[] { SwaggerTags.Artifact })]
+    [ProducesResponseType(typeof(Hrib), 200)]
+    [ProducesResponseType(400)]
     public override async Task<ActionResult<Hrib>> HandleAsync(
         ArtifactCreationDto request,
         CancellationToken cancellationToken = default)

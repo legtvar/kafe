@@ -156,6 +156,7 @@ public class Startup
         services.AddScoped<IAuthorService, DefaultAuthorService>();
         services.AddScoped<IArtifactService, DefaultArtifactService>();
         services.AddScoped<IShardService, DefaultShardService>();
+        services.AddScoped<IAccountService, DefaultAccountService>();
     }
 
     public void Configure(IApplicationBuilder app, IHostEnvironment environment)

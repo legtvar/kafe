@@ -1,0 +1,37 @@
+﻿using Ardalis.ApiEndpoints;
+using Asp.Versioning;
+using Kafe.Api.Services;
+using Kafe.Api.Swagger;
+using Kafe.Api.Transfer;
+using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace Kafe.Api.Endpoints;
+
+[ApiVersion("1")]
+[Route("tmp-account")]
+public class TemporaryAccountCreationEndpoint : EndpointBaseAsync
+    .WithRequest<TemporaryAccountCreationDto>
+    .WithActionResult
+{
+    private readonly IAccountService accounts;
+
+    public TemporaryAccountCreationEndpoint(IAccountService accounts)
+    {
+        this.accounts = accounts;
+    }
+
+    [HttpPost]
+    [SwaggerOperation(Tags = new[] { SwaggerTags.Account })]
+    [ProducesResponseType(200)]
+    [ProducesResponseType(400)]
+    public override async Task<ActionResult> HandleAsync(
+        TemporaryAccountCreationDto dto,
+        CancellationToken cancellationToken = default)
+    {
+        await accounts.CreateTemporaryAccount(dto, cancellationToken);
+        return Ok();
+    }
+}

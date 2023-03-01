@@ -2,6 +2,7 @@
 
 public static class SwaggerTags
 {
+    public const string Account = "Account";
     public const string Author = "Author";
     public const string Artifact = "Artifact";
     public const string Playlist = "Playlist";

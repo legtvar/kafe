@@ -22,7 +22,7 @@ import { storageOrPrompt } from './utils/storageOrPrompt';
     });
 
     const router = createBrowserRouter(routerConfig(i18next.t), {
-        basename: '/kafe',
+        basename: '/',
     });
 
     const apiCredentials = {

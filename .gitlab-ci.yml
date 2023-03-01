@@ -1,5 +1,7 @@
 stages:
   - build
+  - test
+  - deploy
 
 build-api:
   image: alpine:latest
@@ -32,6 +34,49 @@ build-web:
   cache:
     paths:
       - Web/node_modules
+  artifacts:
+    paths:
+      - Web/build
+  only:
+    - master
+    - ci
+    - web
+
+test-web:
+  image: alpine:latest
+  stage: test
+  dependencies: 
+    - build-web
+  script:
+    - apk update
+    - apk add npm
+    - cd Web
+    - npm ci
+    - npm run test
+  tags:
+    - shared-fi
+  cache:
+    paths:
+      - Web/node_modules
+  artifacts:
+    paths:
+      - Web/build
+  only:
+    - master
+    - ci
+    - web
+
+pages:
+  stage: deploy
+  dependencies: 
+    - test-web
+  script:
+    - cp Web/build public -r
+  tags:
+    - shared-fi
+  artifacts:
+    paths:
+      - public
   only:
     - master
     - ci

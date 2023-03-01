@@ -80,6 +80,20 @@ publish-api:
     - ci
   when: manual
 
+publish-all:
+  stage: manual
+  script:
+    - cp "$APPSETTINGS_PRODUCTION" "./Api/appsettings.local.json"
+    - docker-compose -f docker-compose.yml build
+    - docker-compose -f docker-compose.yml down
+    - docker-compose -f docker-compose.yml up -d
+  tags:
+    - lemma-new
+  only:
+    - master
+    - ci
+  when: manual
+
 test-web:
   image: alpine:latest
   stage: test

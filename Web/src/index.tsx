@@ -1,17 +1,48 @@
+import i18next from 'i18next';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import App from './App';
-import './index.css';
-import reportWebVitals from './reportWebVitals';
+import { I18nextProvider } from 'react-i18next';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { API } from './api/API';
+import { Caffeine, CaffeineProvider } from './hooks/Caffeine';
+import { languageConfig } from './languageConfig';
+import { routerConfig } from './routes';
 
-const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
-root.render(
-    <React.StrictMode>
-        <App />
-    </React.StrictMode>,
-);
+import { ChakraProvider, ColorModeScript } from '@chakra-ui/react';
+import moment from 'moment';
+import 'moment/locale/cs';
+import 'video.js/dist/video-js.css';
+import theme from './theme';
+import { storageOrPrompt } from './utils/storageOrPrompt';
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+(async () => {
+    i18next.init(languageConfig);
+    i18next.on('languageChanged', function (lng) {
+        moment.locale(lng);
+    });
+
+    const router = createBrowserRouter(routerConfig(i18next.t), {
+        basename: '/kafe',
+    });
+
+    const apiCredentials = {
+        username: (await storageOrPrompt('dev_username')) as string,
+        password: (await storageOrPrompt('dev_password')) as string,
+    };
+
+    const caffeine = new Caffeine(new API(apiCredentials));
+
+    const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
+    root.render(
+        <React.StrictMode>
+            <I18nextProvider i18n={i18next}>
+                <ChakraProvider theme={theme}>
+                    <CaffeineProvider value={caffeine}>
+                        <ColorModeScript initialColorMode={theme.config.initialColorMode} />
+                        <RouterProvider router={router} />
+                    </CaffeineProvider>
+                </ChakraProvider>
+            </I18nextProvider>
+        </React.StrictMode>,
+    );
+})();

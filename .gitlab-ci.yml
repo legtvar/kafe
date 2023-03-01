@@ -70,7 +70,6 @@ publish-api:
   script:
     - cp "$APPSETTINGS_PRODUCTION" "./Api/appsettings.local.json"
     - docker-compose -f docker-compose.yml build
-    - docker-compose -f docker-compose.yml down api
     - docker-compose -f docker-compose.yml up -d api
   tags:
     - lemma-new
@@ -134,7 +133,6 @@ publish-web:
   stage: manual
   script:
     - docker-compose -f docker-compose.yml build
-    - docker-compose -f docker-compose.yml down web
     - docker-compose -f docker-compose.yml up -d web
   tags:
     - lemma-new

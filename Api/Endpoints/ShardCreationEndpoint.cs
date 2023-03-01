@@ -3,6 +3,7 @@ using Asp.Versioning;
 using Kafe.Api.Services;
 using Kafe.Api.Swagger;
 using Kafe.Api.Transfer;
+using Kafe.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -32,12 +33,12 @@ public class ShardCreationEndpoint : EndpointBaseAsync
     [RequestSizeLimit(Const.ShardSizeLimit)]
     [RequestFormLimits(MultipartBodyLengthLimit = Const.ShardSizeLimit)]
     public override async Task<ActionResult<Hrib>> HandleAsync(
-        [FromRoute]RequestData request,
+        [FromForm] RequestData request,
         CancellationToken cancellationToken = default)
     {
         using var stream = request.File.OpenReadStream();
         var id = await shards.Create(
-            request.Dto,
+            new ShardCreationDto(request.Kind, request.ArtifactId),
             request.File.ContentType,
             stream,
             cancellationToken);
@@ -50,6 +51,7 @@ public class ShardCreationEndpoint : EndpointBaseAsync
     }
 
     public record RequestData(
-        [FromBody] ShardCreationDto Dto,
-        [FromBody] IFormFile File);
+        [FromForm] ShardKind Kind,
+        [FromForm] string ArtifactId,
+        IFormFile File);
 }

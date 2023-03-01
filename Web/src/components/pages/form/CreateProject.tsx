@@ -21,11 +21,9 @@ import { AwaitAPI } from '../../utils/AwaitAPI';
 import { OutletOrChildren } from '../../utils/OutletOrChildren';
 import { Status } from '../../utils/Status';
 import { TextareaLimited } from '../../utils/TextareaLimited';
-import { Upload } from '../../utils/Upload';
+import { UploadArtifact } from '../../utils/Upload/UploadArtifact';
 
 interface ICreateProjectProps {}
-
-const tempProjectId = '0INB9KB5bhz';
 
 export function CreateProject(props: ICreateProjectProps) {
     const { id } = useParams();
@@ -249,253 +247,25 @@ export function CreateProject(props: ICreateProjectProps) {
                                 </Stack>
                             </FormControl>
 
-                            <FormControl>
-                                <FormLabel>{t('createProject.fields.movie').toString()}</FormLabel>
-                                <Stack
-                                    direction="column"
-                                    borderColor={border}
-                                    bg={bg}
-                                    borderWidth={1}
-                                    borderRadius="md"
-                                    p={4}
-                                    spacing={12}
-                                >
-                                    <Box>
-                                        <FormLabel>{t('createProject.upload.filetype.video').toString()}</FormLabel>
-                                        <Box
-                                            w="100%"
-                                            borderColor={border}
-                                            bg={bg}
-                                            borderWidth={1}
-                                            borderRadius="md"
-                                            py={4}
-                                            px={6}
-                                        >
-                                            <Upload
-                                                title={`${t('createProject.upload.filetype.video').toString()} ${t(
-                                                    'generic.for',
-                                                ).toString()} ${t(
-                                                    'createProject.fields.movie',
-                                                ).toString()}`.toLowerCase()}
-                                                projectId={tempProjectId}
-                                            />
-                                            <Accordion allowToggle mx={-6} my={-4}>
-                                                <AccordionItem borderWidth="0 !important">
-                                                    <AccordionButton>
-                                                        <Box as="span" flex="1" textAlign="left">
-                                                            <Text fontWeight="bold" color={'gray.500'}>
-                                                                {t('createProject.upload.specs').toString()}
-                                                            </Text>
-                                                        </Box>
-                                                        <AccordionIcon />
-                                                    </AccordionButton>
-                                                    <AccordionPanel pb={4}>
-                                                        <UnorderedList listStyleType="none" ml={0} color={'gray.500'}>
-                                                            <ListItem>
-                                                                Formát (kodek) videa: H.264 (doporučený), MPEG-4 Part 2
-                                                            </ListItem>
-                                                            <ListItem>
-                                                                Formát (kodek) audia: WAV, FLAC, MP3 (bitrate u MP3
-                                                                alespoň 192 kbps)
-                                                            </ListItem>
-                                                            <ListItem>Frame rate videa: 24 fps</ListItem>
-                                                            <ListItem>
-                                                                Titulky: anglické ve formátu SRT nebo ASS
-                                                            </ListItem>
-                                                            <ListItem>Kontejner: MP4 (doporučené), M4V, MKV</ListItem>
-                                                            <ListItem>
-                                                                Rozlišení: na šířku alespoň FullHD (t.j. 1920)
-                                                            </ListItem>
-                                                            <ListItem>Bitrate: 10 - 20 Mbps</ListItem>
-                                                            <ListItem>Hlasitost: max. -3dB</ListItem>
-                                                            <ListItem>Velikost: max. 2GB</ListItem>
-                                                        </UnorderedList>
-                                                    </AccordionPanel>
-                                                </AccordionItem>
-                                            </Accordion>
-                                        </Box>
-                                    </Box>
-                                    <Box>
-                                        <FormLabel>{t('createProject.upload.filetype.subtitles').toString()}</FormLabel>
-                                        <Box
-                                            w="100%"
-                                            borderColor={border}
-                                            bg={bg}
-                                            borderWidth={1}
-                                            borderRadius="md"
-                                            py={4}
-                                            px={6}
-                                        >
-                                            <Upload
-                                                title={`${t('createProject.upload.filetype.subtitles').toString()} ${t(
-                                                    'generic.for',
-                                                ).toString()} ${t(
-                                                    'createProject.fields.movie',
-                                                ).toString()}`.toLowerCase()}
-                                                projectId={tempProjectId}
-                                            />
-                                            <Accordion allowToggle mx={-6} my={-4}>
-                                                <AccordionItem borderWidth="0 !important">
-                                                    <AccordionButton>
-                                                        <Box as="span" flex="1" textAlign="left">
-                                                            <Text fontWeight="bold" color={'gray.500'}>
-                                                                {t('createProject.upload.specs').toString()}
-                                                            </Text>
-                                                        </Box>
-                                                        <AccordionIcon />
-                                                    </AccordionButton>
-                                                    <AccordionPanel pb={4}>
-                                                        <UnorderedList listStyleType="none" ml={0} color={'gray.500'}>
-                                                            <ListItem>
-                                                                Formát (kodek) videa: H.264 (doporučený), MPEG-4 Part 2
-                                                            </ListItem>
-                                                            <ListItem>
-                                                                Formát (kodek) audia: WAV, FLAC, MP3 (bitrate u MP3
-                                                                alespoň 192 kbps)
-                                                            </ListItem>
-                                                            <ListItem>Frame rate videa: 24 fps</ListItem>
-                                                            <ListItem>
-                                                                Titulky: anglické ve formátu SRT nebo ASS
-                                                            </ListItem>
-                                                            <ListItem>Kontejner: MP4 (doporučené), M4V, MKV</ListItem>
-                                                            <ListItem>
-                                                                Rozlišení: na šířku alespoň FullHD (t.j. 1920)
-                                                            </ListItem>
-                                                            <ListItem>Bitrate: 10 - 20 Mbps</ListItem>
-                                                            <ListItem>Hlasitost: max. -3dB</ListItem>
-                                                            <ListItem>Velikost: max. 2GB</ListItem>
-                                                        </UnorderedList>
-                                                    </AccordionPanel>
-                                                </AccordionItem>
-                                            </Accordion>
-                                        </Box>
-                                    </Box>
-                                </Stack>
-                            </FormControl>
-
-                            <FormControl>
-                                <FormLabel>{t('createProject.fields.videoannotation').toString()}</FormLabel>
-                                <Stack
-                                    direction="column"
-                                    borderColor={border}
-                                    bg={bg}
-                                    borderWidth={1}
-                                    borderRadius="md"
-                                    p={4}
-                                    spacing={12}
-                                >
-                                    <Box>
-                                        <FormLabel>{t('createProject.upload.filetype.video').toString()}</FormLabel>
-                                        <Box
-                                            w="100%"
-                                            borderColor={border}
-                                            bg={bg}
-                                            borderWidth={1}
-                                            borderRadius="md"
-                                            py={4}
-                                            px={6}
-                                        >
-                                            <Upload
-                                                title={`${t('createProject.upload.filetype.video').toString()} ${t(
-                                                    'generic.for',
-                                                ).toString()} ${t(
-                                                    'createProject.fields.videoannotation',
-                                                ).toString()}`.toLowerCase()}
-                                                projectId={tempProjectId}
-                                            />
-                                            <Accordion allowToggle mx={-6} my={-4}>
-                                                <AccordionItem borderWidth="0 !important">
-                                                    <AccordionButton>
-                                                        <Box as="span" flex="1" textAlign="left">
-                                                            <Text fontWeight="bold" color={'gray.500'}>
-                                                                {t('createProject.upload.specs').toString()}
-                                                            </Text>
-                                                        </Box>
-                                                        <AccordionIcon />
-                                                    </AccordionButton>
-                                                    <AccordionPanel pb={4}>
-                                                        <UnorderedList listStyleType="none" ml={0} color={'gray.500'}>
-                                                            <ListItem>
-                                                                Formát (kodek) videa: H.264 (doporučený), MPEG-4 Part 2
-                                                            </ListItem>
-                                                            <ListItem>
-                                                                Formát (kodek) audia: WAV, FLAC, MP3 (bitrate u MP3
-                                                                alespoň 192 kbps)
-                                                            </ListItem>
-                                                            <ListItem>Frame rate videa: 24 fps</ListItem>
-                                                            <ListItem>
-                                                                Titulky: anglické ve formátu SRT nebo ASS
-                                                            </ListItem>
-                                                            <ListItem>Kontejner: MP4 (doporučené), M4V, MKV</ListItem>
-                                                            <ListItem>
-                                                                Rozlišení: na šířku alespoň FullHD (t.j. 1920)
-                                                            </ListItem>
-                                                            <ListItem>Bitrate: 10 - 20 Mbps</ListItem>
-                                                            <ListItem>Hlasitost: max. -3dB</ListItem>
-                                                            <ListItem>Velikost: max. 2GB</ListItem>
-                                                        </UnorderedList>
-                                                    </AccordionPanel>
-                                                </AccordionItem>
-                                            </Accordion>
-                                        </Box>
-                                    </Box>
-                                    <Box>
-                                        <FormLabel>{t('createProject.upload.filetype.subtitles').toString()}</FormLabel>
-                                        <Box
-                                            w="100%"
-                                            borderColor={border}
-                                            bg={bg}
-                                            borderWidth={1}
-                                            borderRadius="md"
-                                            py={4}
-                                            px={6}
-                                        >
-                                            <Upload
-                                                title={`${t('createProject.upload.filetype.subtitles').toString()} ${t(
-                                                    'generic.for',
-                                                ).toString()} ${t(
-                                                    'createProject.fields.videoannotation',
-                                                ).toString()}`.toLowerCase()}
-                                                projectId={tempProjectId}
-                                            />
-                                            <Accordion allowToggle mx={-6} my={-4}>
-                                                <AccordionItem borderWidth="0 !important">
-                                                    <AccordionButton>
-                                                        <Box as="span" flex="1" textAlign="left">
-                                                            <Text fontWeight="bold" color={'gray.500'}>
-                                                                {t('createProject.upload.specs').toString()}
-                                                            </Text>
-                                                        </Box>
-                                                        <AccordionIcon />
-                                                    </AccordionButton>
-                                                    <AccordionPanel pb={4}>
-                                                        <UnorderedList listStyleType="none" ml={0} color={'gray.500'}>
-                                                            <ListItem>
-                                                                Formát (kodek) videa: H.264 (doporučený), MPEG-4 Part 2
-                                                            </ListItem>
-                                                            <ListItem>
-                                                                Formát (kodek) audia: WAV, FLAC, MP3 (bitrate u MP3
-                                                                alespoň 192 kbps)
-                                                            </ListItem>
-                                                            <ListItem>Frame rate videa: 24 fps</ListItem>
-                                                            <ListItem>
-                                                                Titulky: anglické ve formátu SRT nebo ASS
-                                                            </ListItem>
-                                                            <ListItem>Kontejner: MP4 (doporučené), M4V, MKV</ListItem>
-                                                            <ListItem>
-                                                                Rozlišení: na šířku alespoň FullHD (t.j. 1920)
-                                                            </ListItem>
-                                                            <ListItem>Bitrate: 10 - 20 Mbps</ListItem>
-                                                            <ListItem>Hlasitost: max. -3dB</ListItem>
-                                                            <ListItem>Velikost: max. 2GB</ListItem>
-                                                        </UnorderedList>
-                                                    </AccordionPanel>
-                                                </AccordionItem>
-                                            </Accordion>
-                                        </Box>
-                                    </Box>
-                                </Stack>
-                            </FormControl>
+                            <UploadArtifact
+                                projectId={'0INB9KB5bhz'}
+                                artifactFootprint={{
+                                    id: 'test',
+                                    name: {
+                                        iv: 'Film',
+                                    },
+                                    shards: [
+                                        {
+                                            id: 'aaaaa',
+                                            kind: 'Video',
+                                        },
+                                        {
+                                            id: 'bbbbb',
+                                            kind: 'Subtitles',
+                                        },
+                                    ],
+                                }}
+                            />
 
                             <Box h={64}></Box>
 

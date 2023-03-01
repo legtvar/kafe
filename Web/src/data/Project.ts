@@ -7,13 +7,18 @@ export class Project {
     // API object
     public id!: string;
     public projectGroupId!: string;
+    public projectGroupName!: localizedString;
     public name?: localizedString;
+    public genere?: localizedString;
     public description?: localizedString;
     public visibility!: components['schemas']['Visibility'];
     public releaseDate!: Date | null;
 
-    // Author IDs
-    public authors!: string[];
+    // Authors
+    public crew!: components['schemas']['ProjectAuthorDto'][];
+    public cast!: components['schemas']['ProjectAuthorDto'][];
+
+    public artifacts!: components['schemas']['ArtifactDetailDto'][];
 
     public constructor(struct: components['schemas']['ProjectListDto'] | components['schemas']['ProjectDetailDto']) {
         Object.assign(this, struct);
@@ -27,6 +32,10 @@ export class Project {
 
     public getDescription() {
         return getPrefered(this.description);
+    }
+
+    public getGroupName() {
+        return getPrefered(this.projectGroupName);
     }
 
     public getFiles() {

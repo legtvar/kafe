@@ -4,16 +4,16 @@ import styled, { keyframes } from 'styled-components';
 
 interface IFooterProps extends BoxProps {}
 
+const pulseAnimation = keyframes`
+    10% { transform: scale(1.3); }
+`;
+
+const Heart = styled.span`
+    animation: ${pulseAnimation} 1s infinite;
+    display: inline-block;
+`;
+
 export function Footer(props: IFooterProps) {
-    const pulseAnimation = keyframes`
-        10% { transform: scale(1.3); }
-    `;
-
-    const Heart = styled.span`
-        animation: ${pulseAnimation} 1s infinite;
-        display: inline-block;
-    `;
-
     return (
         <Box
             className="kafe-layout-footer"

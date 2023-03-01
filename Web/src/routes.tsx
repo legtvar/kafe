@@ -13,6 +13,7 @@ import { Navigate, RouteObject } from 'react-router-dom';
 import { Login } from './components/pages/account/Login';
 import { Register } from './components/pages/account/Register';
 import { CreateProject } from './components/pages/form/CreateProject';
+import { GoRedirect } from './components/pages/GoRedirect';
 import { Groups } from './components/pages/groups/Groups';
 import { GroupsDetail } from './components/pages/groups/GroupsDetail';
 import { PlaylistDetail } from './components/pages/playlists/PlaylistDetail';
@@ -62,6 +63,20 @@ export const routerConfig = (t: (id: string) => string): RouteObject[] => [
                 path: 'account',
                 element: <AccountRoot />,
                 children: accountRoutes(t),
+            },
+            {
+                path: 'go',
+                element: (
+                    <OutletOrChildren>
+                        <Navigate to="/" />
+                    </OutletOrChildren>
+                ),
+                children: [
+                    {
+                        path: ':slug',
+                        element: <GoRedirect />,
+                    },
+                ],
             },
         ],
     },

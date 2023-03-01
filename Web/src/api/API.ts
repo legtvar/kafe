@@ -75,15 +75,18 @@ export class API {
         const api = this;
 
         return {
-            async createVideo(
+            async create(
                 artifactId: string,
                 file: File,
+                shardKind: components['schemas']['ShardKind'],
                 onUploadProgress?: (progressEvent: AxiosProgressEvent) => void,
             ) {
                 const formData = new FormData();
-                formData.append('File', file, file.name);
+                formData.append('file', file, file.name);
+                formData.append('shardKind', shardKind);
+                formData.append('artifactId', artifactId);
 
-                return await api.upload<FormData, string>(`artifact/${artifactId}/video`, formData, onUploadProgress);
+                return await api.upload<FormData, string>(`shard`, formData, onUploadProgress);
             },
         };
     }

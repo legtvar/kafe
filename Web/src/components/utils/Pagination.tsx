@@ -70,6 +70,7 @@ export function Pagination<T>(props: IPaginationProps<T>) {
                     aria-label={'Previous'}
                     icon={<AiOutlineLeft />}
                     isDisabled={page === 0}
+                    key={-1}
                 />
                 {visiblePages.map((id) => (
                     <IconButton
@@ -79,6 +80,7 @@ export function Pagination<T>(props: IPaginationProps<T>) {
                         onClick={() => setPage(id)}
                         aria-label={`Page ${(id + 1).toString()}`}
                         icon={<>{id + 1}</>}
+                        key={id}
                     />
                 ))}
                 <IconButton
@@ -88,6 +90,7 @@ export function Pagination<T>(props: IPaginationProps<T>) {
                     aria-label={'Next'}
                     icon={<AiOutlineRight />}
                     isDisabled={page === pagesInData - 1}
+                    key={-2}
                 />
             </HStack>
         </>

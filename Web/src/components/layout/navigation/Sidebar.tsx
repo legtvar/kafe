@@ -65,6 +65,7 @@ export function Sidebar({ onClose, ...rest }: ISidebarProps) {
                             direction="column"
                             position="relative"
                             ml={isChild ? '25px' : '39px'}
+                            key={`${i}_sub`}
                             _before={{
                                 display: 'block',
                                 content: '""',
@@ -97,14 +98,14 @@ export function Sidebar({ onClose, ...rest }: ISidebarProps) {
             {...rest}
         >
             <Flex direction="column" minH="100%">
-                <Flex h="20" alignItems="center" mx="8" justifyContent="space-between">
+                <Flex h="20" alignItems="center" mx="8" justifyContent="space-between" key="heading">
                     <Link to="/">
                         <Logo />
                     </Link>
                     <CloseButton display={{ base: 'flex', md: 'none' }} onClick={onClose} />
                 </Flex>
                 {items}
-                <Footer mt="auto" />
+                <Footer mt="auto" key="footer" />
             </Flex>
         </Box>
     );

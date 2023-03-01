@@ -27,14 +27,13 @@ export function Projects(props: IProjectsProps) {
                             )}
                         >
                             {(project, i) => (
-                                <Link to={project.id}>
+                                <Link to={project.id} key={i}>
                                     <Flex
                                         direction={{
                                             base: 'column',
                                             md: 'row',
                                         }}
                                         mx={-4}
-                                        key={i}
                                         py={7}
                                         px={8}
                                         borderBottomWidth="1px"

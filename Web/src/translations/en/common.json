@@ -30,8 +30,9 @@
     "upload": {
       "specs": "Technical requirements",
       "filetype": {
-        "video": "Video file",
-        "subtitles": "Subtitles file"
+        "Video": "Video file",
+        "Image": "Image file",
+        "Subtitles": "Subtitles file"
       }
     }
   },

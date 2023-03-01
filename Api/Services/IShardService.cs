@@ -18,6 +18,11 @@ public interface IShardService
 
     Task<ShardKind> GetShardKind(Hrib id, CancellationToken token = default);
 
-    Task<Stream> OpenStream(Hrib id, string variant, CancellationToken token = default);
+    Task<ShardVariantMediaTypeDto?> GetShardVariantMediaType(
+        Hrib id,
+        string? variant,
+        CancellationToken token = default);
+
+    Task<Stream> OpenStream(Hrib id, string? variant, CancellationToken token = default);
 
 }

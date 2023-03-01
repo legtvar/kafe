@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace Kafe.Api.Endpoints;
 
 [ApiVersion("1")]
-[Route("shard/{id}/{variant}")]
+[Route("shard-download/{id}/{variant?}")]
 [Authorize]
 public class ShardDownloadEndpoint : EndpointBaseAsync
     .WithRequest<ShardDownloadEndpoint.RequestData>
@@ -26,16 +26,22 @@ public class ShardDownloadEndpoint : EndpointBaseAsync
 
     [HttpGet]
     [SwaggerOperation(Tags = new[] { SwaggerTags.Shard })]
-    [Produces("application/octet-stream", Type = typeof(FileStreamResult))]
+    [Produces("video/mp4", "video/x-matroska", "application/octet-stream", Type = typeof(FileStreamResult))]
     public override async Task<ActionResult> HandleAsync(
         [FromRoute] RequestData data,
         CancellationToken cancellationToken = default)
     {
+        var mediaType = await shards.GetShardVariantMediaType(data.Id, data.Variant, cancellationToken);
+        if (mediaType is null)
+        {
+            return NotFound();
+        }
+
         var stream = await shards.OpenStream(data.Id, data.Variant, cancellationToken);
-        return File(stream, "application/octet-stream", $"{data.Id}", true);
+        return File(stream, mediaType.MimeType, $"{data.Id}.{mediaType.Variant}{mediaType.FileExtension}", true);
     }
 
     public record RequestData(
         [FromRoute] string Id,
-        [FromRoute] string Variant);
+        [FromRoute] string? Variant);
 }

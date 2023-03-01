@@ -1,4 +1,5 @@
 ﻿using FFMpegCore;
+using FFMpegCore.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -35,38 +36,45 @@ public class FFmpegCoreService : IMediaService
 
     public async Task<MediaInfo> GetInfo(string filePath, CancellationToken token = default)
     {
-        var data = await FFProbe.AnalyseAsync(filePath, cancellationToken: token);
+        try
+        {
+            var data = await FFProbe.AnalyseAsync(filePath, cancellationToken: token);
 
-        var videoInfos = data.VideoStreams
-            .Select(v => new VideoInfo(
-                    Codec: v.CodecName,
-                    Bitrate: v.BitRate,
-                Width: v.Width,
-                Height: v.Height,
-                Framerate: v.FrameRate))
-            .ToImmutableArray();
+            var videoInfos = data.VideoStreams
+                .Select(v => new VideoInfo(
+                        Codec: v.CodecName,
+                        Bitrate: v.BitRate,
+                    Width: v.Width,
+                    Height: v.Height,
+                    Framerate: v.FrameRate))
+                .ToImmutableArray();
 
-        var audioInfos = data.AudioStreams
-            .Select(a => new AudioInfo(
-                Codec: a.CodecName,
-                Bitrate: a.BitRate,
-                Channels: a.Channels,
-                SampleRate: a.SampleRateHz))
-            .ToImmutableArray();
+            var audioInfos = data.AudioStreams
+                .Select(a => new AudioInfo(
+                    Codec: a.CodecName,
+                    Bitrate: a.BitRate,
+                    Channels: a.Channels,
+                    SampleRate: a.SampleRateHz))
+                .ToImmutableArray();
 
-        var subtitleInfos = data.SubtitleStreams
-            .Select(s => new SubtitleInfo(
-                Codec: s.CodecName,
-                Bitrate: s.BitRate))
-            .ToImmutableArray();
+            var subtitleInfos = data.SubtitleStreams
+                .Select(s => new SubtitleInfo(
+                    Codec: s.CodecName,
+                    Bitrate: s.BitRate))
+                .ToImmutableArray();
 
-        return new MediaInfo(
-            FileExtension: Path.GetExtension(filePath),
-            FormatName: data.Format.FormatName,
-            Duration: data.Duration,
-            VideoStreams: videoInfos,
-            AudioStreams: audioInfos,
-            SubtitleStreams: subtitleInfos);
+            return new MediaInfo(
+                FileExtension: Path.GetExtension(filePath),
+                FormatName: data.Format.FormatName,
+                Duration: data.Duration,
+                VideoStreams: videoInfos,
+                AudioStreams: audioInfos,
+                SubtitleStreams: subtitleInfos);
+        }
+        catch(FFMpegException)
+        {
+            return MediaInfo.Invalid;
+        }
     }
 
     public Stream? Load(Hrib hrib, VideoQualityPreset preset = VideoQualityPreset.Original)

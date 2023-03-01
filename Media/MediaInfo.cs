@@ -13,7 +13,8 @@ public record MediaInfo(
     TimeSpan Duration,
     ImmutableArray<VideoInfo> VideoStreams,
     ImmutableArray<AudioInfo> AudioStreams,
-    ImmutableArray<SubtitleInfo> SubtitleStreams
+    ImmutableArray<SubtitleInfo> SubtitleStreams,
+    bool IsCorrupted = false
 )
 {
     public static MediaInfo Invalid { get; }
@@ -23,5 +24,6 @@ public record MediaInfo(
             TimeSpan.Zero,
             ImmutableArray<VideoInfo>.Empty,
             ImmutableArray<AudioInfo>.Empty,
-            ImmutableArray<SubtitleInfo>.Empty);
+            ImmutableArray<SubtitleInfo>.Empty,
+            true);
 }

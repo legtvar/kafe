@@ -128,7 +128,8 @@ public static class TransferMaps
             Duration: data.Duration,
             VideoStreams: data.VideoStreams.Select(ToVideoStreamDto).ToImmutableArray(),
             AudioStreams: data.AudioStreams.Select(ToAudioStreamDto).ToImmutableArray(),
-            SubtitleStreams: data.SubtitleStreams.Select(ToSubtitleStreamDto).ToImmutableArray());
+            SubtitleStreams: data.SubtitleStreams.Select(ToSubtitleStreamDto).ToImmutableArray(),
+            IsCorrupted: data.IsCorrupted);
     }
 
     public static VideoStreamDto ToVideoStreamDto(VideoInfo data)

@@ -34,3 +34,10 @@ public record ImageShardDetailDto(
 public record ShardCreationDto(
     ShardKind Kind,
     Hrib ArtifactId);
+
+public record ShardVariantMediaTypeDto(
+    Hrib ShardId,
+    string Variant,
+    string FileExtension,
+    string MimeType
+);

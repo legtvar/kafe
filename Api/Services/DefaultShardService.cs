@@ -117,8 +117,9 @@ public class DefaultShardService : IShardService
         return shardId;
     }
 
-    public async Task<Stream> OpenStream(Hrib id, string variant, CancellationToken token = default)
+    public async Task<Stream> OpenStream(Hrib id, string? variant, CancellationToken token = default)
     {
+        variant = SanitizeVariantName(variant);
         var shardKind = await GetShardKind(id, token);
 
         var shardKindDir = storageOptions.Value.GetShardDirectory(shardKind);
@@ -157,5 +158,43 @@ public class DefaultShardService : IShardService
         }
 
         return ((IShardCreated)firstEvent.Data).GetShardKind();
+    }
+
+    public async Task<ShardVariantMediaTypeDto?> GetShardVariantMediaType(
+        Hrib id,
+        string? variant,
+        CancellationToken token = default)
+    {
+        variant = SanitizeVariantName(variant);
+
+        // TODO: Get rid of this switch.
+        var shard = await Load(id, token);
+        if (shard is null)
+        {
+            return null;
+        }
+
+        return shard.Kind switch
+        {
+            ShardKind.Video => ((VideoShardDetailDto)shard).Variants.TryGetValue(variant, out var media)
+                ? new ShardVariantMediaTypeDto(
+                    ShardId: shard.Id,
+                    Variant: variant,
+                    FileExtension: media.FileExtension,
+                    MimeType: media.MimeType)
+                : null,
+            _ => throw new NotImplementedException()
+        };
+    }
+
+    private static string SanitizeVariantName(string? variant)
+    {
+        // "original" is always the default
+        variant ??= Const.OriginalShardVariant;
+
+        // ignore any file extension
+        variant = Path.GetFileNameWithoutExtension(variant);
+
+        return variant;
     }
 }

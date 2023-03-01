@@ -24,6 +24,13 @@ public static class MediaInfoExtensions
 
     public static string GetMimeType(this MediaInfo media)
     {
+        if (media is null
+            || string.IsNullOrEmpty(media.FileExtension)
+            || string.IsNullOrEmpty(media.FormatName))
+        {
+            return FallbackContentType;
+        }
+
         if (FormatNameMap.TryGetValue(media.FormatName, out var pair))
         {
             return pair.mime;

@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "Kafe.Migrator": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:51488;http://localhost:51489"
+    }
+  }
+}

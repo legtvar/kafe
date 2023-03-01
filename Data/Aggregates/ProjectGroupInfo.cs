@@ -1,0 +1,51 @@
+using Kafe.Data.Events;
+using Marten.Events;
+using Marten.Events.Aggregation;
+using System;
+
+namespace Kafe.Data.Aggregates;
+
+public record ProjectGroupInfo(
+    string Id,
+    CreationMethod CreationMethod,
+    LocalizedString Name,
+    LocalizedString? Description = null,
+    DateTimeOffset Deadline = default,
+    bool IsOpen = false
+) : IEntity;
+
+public class ProjectGroupInfoProjection : SingleStreamAggregation<ProjectGroupInfo>
+{
+    public ProjectGroupInfoProjection()
+    {
+    }
+
+    public ProjectGroupInfo Create(ProjectGroupCreated e)
+    {
+        return new ProjectGroupInfo(
+            Id: e.ProjectGroupId,
+            CreationMethod: e.CreationMethod,
+            Name: e.Name
+        );
+    }
+
+    public ProjectGroupInfo Apply(ProjectGroupInfoChanged e, ProjectGroupInfo g)
+    {
+        return g with
+        {
+            Name = e.Name ?? g.Name,
+            Description = e.Description ?? g.Description,
+            Deadline = e.Deadline ?? g.Deadline
+        };
+    }
+
+    public ProjectGroupInfo Apply(ProjectGroupOpened e, ProjectGroupInfo g)
+    {
+        return g with { IsOpen = true };
+    }
+
+    public ProjectGroupInfo Apply(ProjectGroupClosed e, ProjectGroupInfo g)
+    {
+        return g with { IsOpen = false };
+    }
+}

@@ -1,0 +1,7 @@
+{
+    "workbench.colorCustomizations": {
+        "activityBar.background": "#483f39",
+        "titleBar.activeBackground": "#362d26",
+        "titleBar.activeForeground": "#FFF8E7" // cosmic latte
+    }
+}

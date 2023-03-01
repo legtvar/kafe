@@ -8,17 +8,49 @@ build-api:
   stage: build
   script:
     - apk update
-    - apk add dotnet6-sdk
+    - apk add dotnet7-sdk
     - dotnet build Kafe.sln
   tags:
     - shared-fi
   cache:
     paths:
-      - $HOME/.nuget
+      - ~/.nuget
   only:
     - master
     - ci
     - api
+
+migrate-wma:
+  image: alpine:latest
+  stage: deploy
+  variables:
+    PGPASSWORD: postgres
+  timeout: 3h
+  script:
+    - apk update
+    - apk add dotnet7-sdk postgresql-client ffmpeg
+    #- cat /mnt/kafe/lemma-15-08-2022-all.sql | psql -h kafe-db -p 5432 -U postgres
+    - dotnet build Migrator
+    - cp "$APPSETTINGS_MIGRATOR" "./Migrator/appsettings.local.json"
+    - dotnet run --project Migrator --framework net7.0
+  only:
+    - api
+  tags:
+    - lemma-new-docker
+  when: manual
+
+publish-api-test:
+  stage: deploy
+  script:
+    - cp "$APPSETTINGS_TEST" "./Api/appsettings.local.json"
+    - docker-compose -f docker-compose.test.yml build
+    - docker-compose -f docker-compose.test.yml down
+    - docker-compose -f docker-compose.test.yml up -d
+  only:
+    - api
+  tags:
+    - lemma-new
+  when: manual
 
 build-web:
   image: alpine:latest

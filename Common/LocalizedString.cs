@@ -138,7 +138,7 @@ public class LocalizedStringJsonConverter : JsonConverter<LocalizedString>
 {
     public override LocalizedString? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        var dictionary = JsonSerializer.Deserialize<Dictionary<string, string>>(ref reader, options);
+        var dictionary = JsonSerializer.Deserialize<Dictionary<string, string>?>(ref reader, options);
         if (dictionary is null)
         {
             return null;

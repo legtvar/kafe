@@ -48,6 +48,7 @@ public static class TransferMaps
         return new AuthorDetailDto(
             Id: data.Id,
             Name: data.Name,
+            Bio: data.Bio,
             Uco: data.Uco,
             Email: data.Email,
             Phone: data.Phone);

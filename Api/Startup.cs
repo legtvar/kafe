@@ -20,6 +20,8 @@ using System.Linq;
 using System;
 using Microsoft.OpenApi.Any;
 using System.IO;
+using System.Collections.Immutable;
+using System.Collections.Generic;
 
 namespace Kafe.Api;
 
@@ -93,6 +95,18 @@ public class Startup
                 Type = "string",
                 Format = "time-span",
                 Example = new OpenApiString("00:00:00")
+            });
+            o.MapType<LocalizedString>(() => new OpenApiSchema
+            {
+                Title = "LocalizedString",
+                Type = "object",
+                Nullable = true,
+                Properties = new Dictionary<string, OpenApiSchema>
+                {
+                    ["iv"] = new OpenApiSchema() { Type = "string" },
+                    ["cs"] = new OpenApiSchema() { Type = "string", Nullable = true },
+                    ["en"] = new OpenApiSchema() { Type = "string", Nullable = true }
+                }
             });
             o.EnableAnnotations(
                 enableAnnotationsForInheritance: true,

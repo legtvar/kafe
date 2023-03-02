@@ -44,7 +44,10 @@
   },
   "generic": {
     "empty": "Je to zvláštní, ale nic tu není...",
-    "for": "pro"
+    "for": "pro",
+    "edit": "Upravit",
+    "save": "Uložit",
+    "cancel": "Zrušit"
   },
   "home": {
     "signin": "Přihlásit se"
@@ -129,7 +132,7 @@
     },
     "projects": {
       "detail": {
-        "title": "Detail projektu"
+        "title": "Upravit projekt"
       },
       "title": "Projekty"
     }

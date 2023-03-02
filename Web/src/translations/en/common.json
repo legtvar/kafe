@@ -44,7 +44,10 @@
   },
   "generic": {
     "empty": "It's empty in here...",
-    "for": "for"
+    "for": "for",
+    "edit": "Edit",
+    "save": "Save",
+    "cancel": "Cancel"
   },
   "home": {
     "signin": "Sign in"
@@ -129,7 +132,7 @@
     },
     "projects": {
       "detail": {
-        "title": "Project detail"
+        "title": "Edit project"
       },
       "title": "Projects"
     }

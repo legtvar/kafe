@@ -5,9 +5,6 @@ import {
     AccordionItem,
     AccordionPanel,
     Box,
-    FormControl,
-    FormLabel,
-    Input,
     ListItem,
     Stack,
     Text,
@@ -16,18 +13,15 @@ import {
 import { t } from 'i18next';
 import { useParams } from 'react-router-dom';
 import { Group } from '../../../data/Group';
-import { useColorScheme } from '../../../hooks/useColorScheme';
 import { AwaitAPI } from '../../utils/AwaitAPI';
 import { OutletOrChildren } from '../../utils/OutletOrChildren';
 import { Status } from '../../utils/Status';
-import { TextareaLimited } from '../../utils/TextareaLimited';
-import { UploadArtifact } from '../../utils/Upload/UploadArtifact';
+import { ProjectBasicInfo } from './create/ProjectBasicInfo';
 
 interface ICreateProjectProps {}
 
 export function CreateProject(props: ICreateProjectProps) {
     const { id } = useParams();
-    const { border, bg } = useColorScheme();
 
     if (!id) {
         return <Status statusCode={404} embeded />;
@@ -165,121 +159,20 @@ export function CreateProject(props: ICreateProjectProps) {
                             </Accordion>
                         </Box>
 
-                        <Stack spacing={8} direction="column">
-                            <FormControl>
-                                <FormLabel>{t('createProject.fields.name').toString()}</FormLabel>
-                                <Stack direction={{ base: 'column', md: 'row' }}>
-                                    <FormControl id="name.cs">
-                                        <Input
-                                            type="text"
-                                            borderColor={border}
-                                            bg={bg}
-                                            placeholder={`${t('createProject.fields.name').toString()} ${t(
-                                                'createProject.language.cs',
-                                            )}`}
-                                        />
-                                    </FormControl>
+                        <ProjectBasicInfo />
 
-                                    <FormControl id="name.en">
-                                        <Input
-                                            type="text"
-                                            borderColor={border}
-                                            bg={bg}
-                                            placeholder={`${t('createProject.fields.name').toString()} ${t(
-                                                'createProject.language.en',
-                                            )}`}
-                                        />
-                                    </FormControl>
-                                </Stack>
-                            </FormControl>
+                        <Box h={64}></Box>
 
-                            <FormControl>
-                                <FormLabel>{t('createProject.fields.genere').toString()}</FormLabel>
-                                <Stack direction={{ base: 'column', md: 'row' }}>
-                                    <FormControl id="name.cs">
-                                        <Input
-                                            type="text"
-                                            borderColor={border}
-                                            bg={bg}
-                                            placeholder={`${t('createProject.fields.genere').toString()} ${t(
-                                                'createProject.language.cs',
-                                            )}`}
-                                        />
-                                    </FormControl>
-
-                                    <FormControl id="name.en">
-                                        <Input
-                                            type="text"
-                                            borderColor={border}
-                                            bg={bg}
-                                            placeholder={`${t('createProject.fields.genere').toString()} ${t(
-                                                'createProject.language.en',
-                                            )}`}
-                                        />
-                                    </FormControl>
-                                </Stack>
-                            </FormControl>
-
-                            <FormControl>
-                                <FormLabel>{t('createProject.fields.description').toString()}</FormLabel>
-                                <Stack direction={{ base: 'column', md: 'row' }}>
-                                    <FormControl id="description.cs">
-                                        <TextareaLimited
-                                            placeholder={`${t('createProject.fields.description').toString()} ${t(
-                                                'createProject.language.cs',
-                                            )}`}
-                                            limit={250}
-                                            borderColor={border}
-                                            bg={bg}
-                                        />
-                                    </FormControl>
-
-                                    <FormControl id="description.en">
-                                        <TextareaLimited
-                                            placeholder={`${t('createProject.fields.description').toString()} ${t(
-                                                'createProject.language.en',
-                                            )}`}
-                                            limit={250}
-                                            borderColor={border}
-                                            bg={bg}
-                                        />
-                                    </FormControl>
-                                </Stack>
-                            </FormControl>
-
-                            <UploadArtifact
-                                projectId={'0INB9KB5bhz'}
-                                artifactFootprint={{
-                                    id: 'test',
-                                    name: {
-                                        iv: 'Film',
-                                    },
-                                    shards: [
-                                        {
-                                            id: 'aaaaa',
-                                            kind: 'Video',
-                                        },
-                                        {
-                                            id: 'bbbbb',
-                                            kind: 'Subtitles',
-                                        },
-                                    ],
-                                }}
-                            />
-
-                            <Box h={64}></Box>
-
-                            {/*
-                                    - Genre
-                                    - Name
-                                    - Description
-                                    ? Visibility
-                                    ? ReleaseDate
-                                    Crew
-                                    Cast
-                                    Artifacts
-                                */}
-                        </Stack>
+                        {/*
+                            - Genre
+                            - Name
+                            - Description
+                            ? Visibility
+                            ? ReleaseDate
+                            Crew
+                            Cast
+                            Artifacts
+                        */}
                     </Stack>
                 )}
             </AwaitAPI>

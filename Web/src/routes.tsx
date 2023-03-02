@@ -12,14 +12,15 @@ import {
 import { Navigate, RouteObject } from 'react-router-dom';
 import { Login } from './components/pages/account/Login';
 import { Register } from './components/pages/account/Register';
-import { CreateProject } from './components/pages/form/CreateProject';
 import { GoRedirect } from './components/pages/GoRedirect';
 import { Groups } from './components/pages/groups/Groups';
 import { GroupsDetail } from './components/pages/groups/GroupsDetail';
 import { PlaylistDetail } from './components/pages/playlists/PlaylistDetail';
 import { PlaylistGallery } from './components/pages/playlists/PlaylistGallery';
 import { PlaylistList } from './components/pages/playlists/PlaylistList';
+import { CreateProject } from './components/pages/projects/CreateProject';
 import { ProjectDetail } from './components/pages/projects/ProjectDetail';
+import { ProjectEdit } from './components/pages/projects/ProjectEdit';
 import { Projects } from './components/pages/projects/Projects';
 import { AccountRoot } from './components/pages/root/AccountRoot';
 import { AuthRoot } from './components/pages/root/AuthRoot';
@@ -107,6 +108,13 @@ export const authRoutes = (t: (id: string) => string): AppRoute[] => [
                 path: ':id',
                 title: t('route.projects.detail.title'),
                 element: <ProjectDetail />,
+                children: [
+                    {
+                        path: 'edit',
+                        title: t('route.projects.detail.title'),
+                        element: <ProjectEdit />,
+                    },
+                ],
             },
         ],
     },

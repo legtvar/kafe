@@ -1,6 +1,7 @@
 ﻿using Kafe.Data;
 using Kafe.Data.Aggregates;
 using Kafe.Data.Events;
+using Kafe.Media;
 using Marten;
 
 namespace Kafe.Migrator;
@@ -130,7 +131,7 @@ public sealed class KafeClient : IAsyncDisposable
 
     public async Task<(ArtifactInfo, VideoShardInfo)> CreateVideoArtifact(
         string name,
-        VideoShardVariant originalVariant,
+        MediaInfo originalVariant,
         Hrib? projectId = null,
         Hrib? artifactId = null,
         Hrib? shardId = null)
@@ -148,7 +149,7 @@ public sealed class KafeClient : IAsyncDisposable
             ShardId: shardId,
             CreationMethod: CreationMethod.Migrator,
             ArtifactId: artifactId,
-            OriginalVariant: originalVariant);
+            OriginalVariantInfo: originalVariant);
         session.Events.StartStream<VideoShardInfo>(shardId, shardCreated);
         LogEvent(shardId, shardCreated);
 

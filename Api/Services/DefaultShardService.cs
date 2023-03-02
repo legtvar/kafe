@@ -39,6 +39,11 @@ public class DefaultShardService : IShardService
     public async Task<ShardDetailBaseDto?> Load(Hrib id, CancellationToken token = default)
     {
         var shardKind = await GetShardKind(id, token);
+        if (shardKind == ShardKind.Invalid)
+        {
+            return null;
+        }
+
         ShardInfoBase? shard = shardKind switch
         {
             ShardKind.Video => await db.LoadAsync<VideoShardInfo>(id, token),
@@ -108,9 +113,7 @@ public class DefaultShardService : IShardService
             ShardId: shardId,
             CreationMethod: CreationMethod.Api,
             ArtifactId: dto.ArtifactId,
-            OriginalVariant: new(
-                Name: Const.OriginalShardVariant,
-                Info: mediaInfo));
+            OriginalVariantInfo: mediaInfo);
         db.Events.StartStream<VideoShardInfo>(created.ShardId, created);
 
         await db.SaveChangesAsync(token);

@@ -334,13 +334,13 @@ public static class Program
         await src.CopyToAsync(dst);
     }
 
-    private static async Task<VideoShardVariant> GetOriginalVariant(Hrib shardId)
+    private static async Task<MediaInfo> GetOriginalVariant(Hrib shardId)
     {
         var shardDir = new DirectoryInfo(Path.Combine(migratorOptions.KafeVideosDirectory!, shardId));
         if (!shardDir.Exists)
         {
             logger.LogError($"Shard directory '{shardId}' does not exist. Video will be migrated without MediaInfo.");
-            return new VideoShardVariant(Const.OriginalShardVariant, MediaInfo.Invalid);
+            return MediaInfo.Invalid;
         }
 
         var originalCandidates = shardDir.GetFiles($"{Const.OriginalShardVariant}.*");
@@ -350,7 +350,7 @@ public static class Program
         }
 
         var mediaInfo = await mediaService.GetInfo(originalCandidates.Single().FullName);
-        return new VideoShardVariant(Const.OriginalShardVariant, mediaInfo);
+        return mediaInfo;
     }
 
     private static async Task<Data.Aggregates.PlaylistInfo> MigratePlaylist(Playlist playlist)

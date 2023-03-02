@@ -58,7 +58,8 @@ public class FFmpegCoreService : IMediaService
                 .ToImmutableArray();
 
             var subtitleInfos = data.SubtitleStreams
-                .Select(s => new SubtitleInfo(
+                .Select(s => new SubtitlesInfo(
+                    Language: s.Language,
                     Codec: s.CodecName,
                     Bitrate: s.BitRate))
                 .ToImmutableArray();

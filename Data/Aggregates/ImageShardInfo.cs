@@ -2,6 +2,7 @@
 using Kafe.Media;
 using Marten.Events;
 using Marten.Events.Aggregation;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Globalization;
 using System.Linq;
@@ -12,7 +13,7 @@ public record ImageShardInfo(
     string Id,
     CreationMethod CreationMethod,
     Hrib ArtifactId,
-    ImmutableArray<ImageShardVariant> Variants
+    ImmutableDictionary<string, ImageInfo> Variants
 ) : ShardInfoBase(Id, CreationMethod, ArtifactId)
 {
     public override ShardKind Kind => ShardKind.Image;
@@ -31,14 +32,18 @@ public class ImageShardInfoProjection : SingleStreamAggregation<ImageShardInfo>
             Id: e.ShardId,
             CreationMethod: e.CreationMethod,
             ArtifactId: e.ArtifactId,
-            Variants: ImmutableArray.Create(e.OriginalVariant));
+            Variants: ImmutableDictionary.CreateRange(new KeyValuePair<string, ImageInfo>[]
+            {
+                new(Const.OriginalShardVariant, e.OriginalVariantInfo)
+            })
+        );
     }
 
     public ImageShardInfo Apply(ImageShardVariantsAdded e, ImageShardInfo s)
     {
         return s with
         {
-            Variants = s.Variants.Union(e.Variants).ToImmutableArray()
+            Variants = s.Variants.Remove(e.Name).Add(e.Name, e.Info)
         };
     }
 
@@ -46,7 +51,7 @@ public class ImageShardInfoProjection : SingleStreamAggregation<ImageShardInfo>
     {
         return s with
         {
-            Variants = s.Variants.Except(e.Variants).ToImmutableArray()
+            Variants = s.Variants.Remove(e.Name)
         };
     }
 }

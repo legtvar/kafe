@@ -20,12 +20,12 @@ public interface IShardCreated : IShardEvent
     Hrib ArtifactId { get; }
 }
 
-public interface IShardVariantsAdded : IShardEvent
+public interface IShardVariantAdded : IShardEvent
 {
-    IEnumerable<string> GetVariantNames();
+    string Name { get; }
 }
 
-public interface IShardVariantsRemoved : IShardEvent
+public interface IShardVariantRemoved : IShardEvent
 {
-    IEnumerable<string> GetVariantNames();
+    string Name { get; }
 }

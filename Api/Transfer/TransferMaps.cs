@@ -108,7 +108,7 @@ public static class TransferMaps
         return new ShardListDto(
             Id: data.ShardId,
             Kind: data.Kind,
-            Variants: data.Variants);
+            Variants: data.Variants.ToImmutableArray());
     }
 
     public static VideoShardDetailDto ToVideoShardDetailDto(VideoShardInfo data)
@@ -117,7 +117,7 @@ public static class TransferMaps
             Id: data.Id,
             Kind: data.Kind,
             ArtifactId: data.ArtifactId,
-            Variants: data.Variants.ToImmutableDictionary(v => v.Name, v => ToMediaInfoDto(v.Info)));
+            Variants: data.Variants.ToImmutableDictionary(v => v.Key, v => ToMediaInfoDto(v.Value)));
     }
 
     public static MediaDto ToMediaInfoDto(MediaInfo data)
@@ -151,7 +151,7 @@ public static class TransferMaps
             SampleRate: data.SampleRate);
     }
 
-    public static SubtitleStreamDto ToSubtitleStreamDto(SubtitleInfo data)
+    public static SubtitleStreamDto ToSubtitleStreamDto(SubtitlesInfo data)
     {
         return new SubtitleStreamDto(
             Codec: data.Codec,
@@ -164,7 +164,7 @@ public static class TransferMaps
             Id: data.Id,
             Kind: data.Kind,
             ArtifactId: data.ArtifactId,
-            Variants: data.Variants.ToImmutableDictionary(v => v.Name, v => ToImageDto(v.Info)));
+            Variants: data.Variants.ToImmutableDictionary(v => v.Key, v => ToImageDto(v.Value)));
     }
 
     public static ImageDto ToImageDto(ImageInfo data)

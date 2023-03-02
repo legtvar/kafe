@@ -55,7 +55,8 @@ public class XabeFFmpegService : IMediaService
             .ToImmutableArray();
 
         var subtitleInfos = data.SubtitleStreams
-            .Select(s => new SubtitleInfo(
+            .Select(s => new SubtitlesInfo(
+                Language: s.Language,
                 Codec: s.Codec,
                 Bitrate: default))
             .ToImmutableArray();

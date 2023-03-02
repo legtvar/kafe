@@ -1,19 +1,16 @@
-import mime from 'mime';
 import { localizedString } from '../schemas/generic';
 import { getPrefered } from '../utils/preferedLanguage';
+import { Shard } from './Shard';
 
-export class FileEntry {
+export class Artifact {
     // API object
     public id!: string;
     public name!: localizedString;
-    public path!: string;
+    public shards!: Shard[];
+    // containingProjectIds: (string)[];
 
     public constructor(struct: any) {
         Object.assign(this, struct);
-    }
-
-    public getMime() {
-        return mime.getType(this.path);
     }
 
     public getName() {

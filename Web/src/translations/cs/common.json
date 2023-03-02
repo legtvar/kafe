@@ -148,5 +148,11 @@
   },
   "textarea": {
     "characters": "znaků"
+  },
+  "visibility": {
+    "Unknown": "Neznámá viditelnost",
+    "Private": "Soukromé",
+    "Internal": "Neveřejné",
+    "Public": "Veřejné"
   }
 }

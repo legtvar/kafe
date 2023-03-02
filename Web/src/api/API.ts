@@ -12,10 +12,14 @@ export type ApiCredentials = {
 
 export class API {
     private credentials: ApiCredentials;
-    private apiUrl = 'https://wma.lemma.fi.muni.cz/api/v1/';
+    private apiUrl = '/api/v1/';
 
     public constructor(credentials: ApiCredentials) {
         this.credentials = credentials;
+
+        if (window.location.hostname.startsWith('localhost') || window.location.hostname.startsWith('127.0.0.1')) {
+            this.apiUrl = 'https://wma.lemma.fi.muni.cz/api/v1/';
+        }
     }
 
     // API fetch functions
@@ -87,6 +91,9 @@ export class API {
                 formData.append('artifactId', artifactId);
 
                 return await api.upload<FormData, string>(`shard`, formData, onUploadProgress);
+            },
+            streamUrl(id: string, variant: string) {
+                return `${api.apiUrl}shard/${id}/${variant}`;
             },
         };
     }

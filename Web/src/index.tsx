@@ -11,7 +11,6 @@ import { routerConfig } from './routes';
 import { ChakraProvider, ColorModeScript } from '@chakra-ui/react';
 import moment from 'moment';
 import 'moment/locale/cs';
-import 'video.js/dist/video-js.css';
 import theme from './theme';
 import { storageOrPrompt } from './utils/storageOrPrompt';
 

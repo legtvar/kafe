@@ -4,6 +4,9 @@
  */
 
 
+/** WithRequired type helpers */
+type WithRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] };
+
 export interface paths {
   "/api/v1/artifact": {
     post: {
@@ -21,6 +24,14 @@ export interface paths {
             "text/plain": string;
             "application/json": string;
             "text/json": string;
+          };
+        };
+        /** @description Bad Request */
+        400: {
+          content: {
+            "text/plain": components["schemas"]["ProblemDetails"];
+            "application/json": components["schemas"]["ProblemDetails"];
+            "text/json": components["schemas"]["ProblemDetails"];
           };
         };
       };
@@ -103,6 +114,27 @@ export interface paths {
             "text/plain": (components["schemas"]["PlaylistListDto"])[];
             "application/json": (components["schemas"]["PlaylistListDto"])[];
             "text/json": (components["schemas"]["PlaylistListDto"])[];
+          };
+        };
+      };
+    };
+  };
+  "/api/v1/project": {
+    post: {
+      requestBody?: {
+        content: {
+          "application/json": components["schemas"]["ProjectCreationDto"];
+          "text/json": components["schemas"]["ProjectCreationDto"];
+          "application/*+json": components["schemas"]["ProjectCreationDto"];
+        };
+      };
+      responses: {
+        /** @description Success */
+        200: {
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
           };
         };
       };
@@ -195,6 +227,8 @@ export interface paths {
       requestBody?: {
         content: {
           "multipart/form-data": {
+            Kind?: components["schemas"]["ShardKind"];
+            ArtifactId?: string;
             /** Format: binary */
             File?: string;
           };
@@ -239,7 +273,7 @@ export interface paths {
       };
     };
   };
-  "/api/v1/shard/{id}/{variant}": {
+  "/api/v1/shard-download/{id}/{variant}": {
     get: {
       parameters: {
         path: {
@@ -251,7 +285,53 @@ export interface paths {
         /** @description Success */
         200: {
           content: {
+            "video/mp4": string;
+            "video/x-matroska": string;
             "application/octet-stream": string;
+          };
+        };
+      };
+    };
+  };
+  "/api/v1/tmp-account/{token}": {
+    get: {
+      parameters: {
+        path: {
+          token: string;
+        };
+      };
+      responses: {
+        /** @description Success */
+        200: never;
+        /** @description Bad Request */
+        400: {
+          content: {
+            "text/plain": components["schemas"]["ProblemDetails"];
+            "application/json": components["schemas"]["ProblemDetails"];
+            "text/json": components["schemas"]["ProblemDetails"];
+          };
+        };
+      };
+    };
+  };
+  "/api/v1/tmp-account": {
+    post: {
+      requestBody?: {
+        content: {
+          "application/json": components["schemas"]["TemporaryAccountCreationDto"];
+          "text/json": components["schemas"]["TemporaryAccountCreationDto"];
+          "application/*+json": components["schemas"]["TemporaryAccountCreationDto"];
+        };
+      };
+      responses: {
+        /** @description Success */
+        200: never;
+        /** @description Bad Request */
+        400: {
+          content: {
+            "text/plain": components["schemas"]["ProblemDetails"];
+            "application/json": components["schemas"]["ProblemDetails"];
+            "text/json": components["schemas"]["ProblemDetails"];
           };
         };
       };
@@ -264,14 +344,32 @@ export type webhooks = Record<string, never>;
 export interface components {
   schemas: {
     ArtifactCreationDto: {
-      name: components["schemas"]["LocalizedString"];
-      /** Format: hrib */
+      /** LocalizedString */
+      name: {
+        iv: string;
+        cs?: string | null;
+        en?: string | null;
+      };
+      /**
+       * Format: hrib 
+       * @description Human-Readable Identifier Ballast 
+       * @example AAAAbadf00d
+       */
       containingProject?: string | null;
     };
     ArtifactDetailDto: {
-      /** Format: hrib */
+      /**
+       * Format: hrib 
+       * @description Human-Readable Identifier Ballast 
+       * @example AAAAbadf00d
+       */
       id: string;
-      name: components["schemas"]["LocalizedString"];
+      /** LocalizedString */
+      name: {
+        iv: string;
+        cs?: string | null;
+        en?: string | null;
+      };
       shards: (components["schemas"]["ShardListDto"])[];
       containingProjectIds: (string)[];
     };
@@ -287,6 +385,12 @@ export interface components {
     AuthorDetailDto: {
       id: string;
       name: string;
+      /** LocalizedString */
+      bio?: ({
+        iv: string;
+        cs?: string | null;
+        en?: string | null;
+      }) | null;
       uco?: string | null;
       email?: string | null;
       phone?: string | null;
@@ -302,30 +406,56 @@ export interface components {
       height: number;
       format: string;
     };
-    ImageShardDetailDto: ({
-      Kind: "ImageShardDetailDto";
+    ImageShardDetailDto: WithRequired<({
+      kind: "Image";
       variants: {
         [key: string]: components["schemas"]["ImageDto"] | undefined;
       };
-    }) & Omit<components["schemas"]["ShardDetailBaseDto"], "Kind">;
-    LocalizedString: Record<string, never>;
+    }) & Omit<components["schemas"]["ShardDetailBaseDto"], "kind">, "variants">;
     MediaDto: {
-      duration: components["schemas"]["TimeSpan"];
+      fileExtension: string;
+      mimeType: string;
+      /**
+       * Format: time-span 
+       * @example 00:00:00
+       */
+      duration: string;
       videoStreams: (components["schemas"]["VideoStreamDto"])[];
       audioStreams: (components["schemas"]["AudioStreamDto"])[];
       subtitleStreams: (components["schemas"]["SubtitleStreamDto"])[];
+      isCorrupted: boolean;
     };
     PlaylistDetailDto: {
       id: string;
-      name: components["schemas"]["LocalizedString"];
-      description: components["schemas"]["LocalizedString"];
+      /** LocalizedString */
+      name: {
+        iv: string;
+        cs?: string | null;
+        en?: string | null;
+      };
+      /** LocalizedString */
+      description?: ({
+        iv: string;
+        cs?: string | null;
+        en?: string | null;
+      }) | null;
       visibility: components["schemas"]["Visibility"];
       videos: (string)[];
     };
     PlaylistListDto: {
       id: string;
-      name: components["schemas"]["LocalizedString"];
-      description: components["schemas"]["LocalizedString"];
+      /** LocalizedString */
+      name: {
+        iv: string;
+        cs?: string | null;
+        en?: string | null;
+      };
+      /** LocalizedString */
+      description?: ({
+        iv: string;
+        cs?: string | null;
+        en?: string | null;
+      }) | null;
       visibility: components["schemas"]["Visibility"];
     };
     ProblemDetails: {
@@ -342,13 +472,70 @@ export interface components {
       name: string;
       roles: (string)[];
     };
-    ProjectDetailDto: {
+    ProjectCreationAuthorDto: {
       id: string;
+      roles: (string)[];
+    };
+    ProjectCreationDto: {
       projectGroupId: string;
-      projectGroupName: components["schemas"]["LocalizedString"];
-      genre: components["schemas"]["LocalizedString"];
-      name: components["schemas"]["LocalizedString"];
-      description: components["schemas"]["LocalizedString"];
+      /** LocalizedString */
+      name: {
+        iv: string;
+        cs?: string | null;
+        en?: string | null;
+      };
+      /** LocalizedString */
+      description?: ({
+        iv: string;
+        cs?: string | null;
+        en?: string | null;
+      }) | null;
+      /** LocalizedString */
+      genre?: ({
+        iv: string;
+        cs?: string | null;
+        en?: string | null;
+      }) | null;
+      crew: (components["schemas"]["ProjectCreationAuthorDto"])[];
+      cast: (components["schemas"]["ProjectCreationAuthorDto"])[];
+    };
+    ProjectDetailDto: {
+      /**
+       * Format: hrib 
+       * @description Human-Readable Identifier Ballast 
+       * @example AAAAbadf00d
+       */
+      id: string;
+      /**
+       * Format: hrib 
+       * @description Human-Readable Identifier Ballast 
+       * @example AAAAbadf00d
+       */
+      projectGroupId: string;
+      /** LocalizedString */
+      projectGroupName?: ({
+        iv: string;
+        cs?: string | null;
+        en?: string | null;
+      }) | null;
+      /** LocalizedString */
+      genre?: ({
+        iv: string;
+        cs?: string | null;
+        en?: string | null;
+      }) | null;
+      /** LocalizedString */
+      name: {
+        iv: string;
+        cs?: string | null;
+        en?: string | null;
+      };
+      /** LocalizedString */
+      description?: ({
+        iv: string;
+        cs?: string | null;
+        en?: string | null;
+      }) | null;
       visibility: components["schemas"]["Visibility"];
       /** Format: date-time */
       releaseDate: string;
@@ -358,41 +545,92 @@ export interface components {
     };
     ProjectGroupDetailDto: {
       id: string;
-      name: components["schemas"]["LocalizedString"];
-      description: components["schemas"]["LocalizedString"];
+      /** LocalizedString */
+      name: {
+        iv: string;
+        cs?: string | null;
+        en?: string | null;
+      };
+      /** LocalizedString */
+      description?: ({
+        iv: string;
+        cs?: string | null;
+        en?: string | null;
+      }) | null;
       /** Format: date-time */
       deadline: string;
       isOpen: boolean;
     };
     ProjectGroupListDto: {
       id: string;
-      name: components["schemas"]["LocalizedString"];
-      description: components["schemas"]["LocalizedString"];
+      /** LocalizedString */
+      name: {
+        iv: string;
+        cs?: string | null;
+        en?: string | null;
+      };
+      /** LocalizedString */
+      description?: ({
+        iv: string;
+        cs?: string | null;
+        en?: string | null;
+      }) | null;
       /** Format: date-time */
       deadline: string;
       isOpen: boolean;
     };
     ProjectListDto: {
+      /**
+       * Format: hrib 
+       * @description Human-Readable Identifier Ballast 
+       * @example AAAAbadf00d
+       */
       id: string;
+      /**
+       * Format: hrib 
+       * @description Human-Readable Identifier Ballast 
+       * @example AAAAbadf00d
+       */
       projectGroupId: string;
-      name: components["schemas"]["LocalizedString"];
-      description: components["schemas"]["LocalizedString"];
+      /** LocalizedString */
+      name: {
+        iv: string;
+        cs?: string | null;
+        en?: string | null;
+      };
+      /** LocalizedString */
+      description?: ({
+        iv: string;
+        cs?: string | null;
+        en?: string | null;
+      }) | null;
       visibility: components["schemas"]["Visibility"];
       /** Format: date-time */
       releaseDate: string;
     };
     ShardDetailBaseDto: {
-      Kind: string;
-      /** Format: hrib */
-      id: string;
       kind: components["schemas"]["ShardKind"];
-      /** Format: hrib */
+      /**
+       * Format: hrib 
+       * @description Human-Readable Identifier Ballast 
+       * @example AAAAbadf00d
+       */
+      id: string;
+      /**
+       * Format: hrib 
+       * @description Human-Readable Identifier Ballast 
+       * @example AAAAbadf00d
+       */
       artifactId: string;
     };
     /** @enum {string} */
     ShardKind: "Invalid" | "Video" | "Image" | "Subtitles";
     ShardListDto: {
-      /** Format: hrib */
+      /**
+       * Format: hrib 
+       * @description Human-Readable Identifier Ballast 
+       * @example AAAAbadf00d
+       */
       id: string;
       kind: components["schemas"]["ShardKind"];
       variants: (string)[];
@@ -402,44 +640,15 @@ export interface components {
       /** Format: int64 */
       bitrate: number;
     };
-    TimeSpan: {
-      /** Format: int64 */
-      ticks: number;
-      /** Format: int32 */
-      days: number;
-      /** Format: int32 */
-      hours: number;
-      /** Format: int32 */
-      milliseconds: number;
-      /** Format: int32 */
-      microseconds: number;
-      /** Format: int32 */
-      nanoseconds: number;
-      /** Format: int32 */
-      minutes: number;
-      /** Format: int32 */
-      seconds: number;
-      /** Format: double */
-      totalDays: number;
-      /** Format: double */
-      totalHours: number;
-      /** Format: double */
-      totalMilliseconds: number;
-      /** Format: double */
-      totalMicroseconds: number;
-      /** Format: double */
-      totalNanoseconds: number;
-      /** Format: double */
-      totalMinutes: number;
-      /** Format: double */
-      totalSeconds: number;
+    TemporaryAccountCreationDto: {
+      emailAddress: string;
     };
-    VideoShardDetailDto: ({
-      Kind: "VideoShardDetailDto";
+    VideoShardDetailDto: WithRequired<({
+      kind: "Video";
       variants: {
         [key: string]: components["schemas"]["MediaDto"] | undefined;
       };
-    }) & Omit<components["schemas"]["ShardDetailBaseDto"], "Kind">;
+    }) & Omit<components["schemas"]["ShardDetailBaseDto"], "kind">, "variants">;
     VideoStreamDto: {
       codec: string;
       /** Format: int64 */

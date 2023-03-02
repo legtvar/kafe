@@ -148,5 +148,11 @@
   },
   "textarea": {
     "characters": "characters"
+  },
+  "visibility": {
+    "Unknown": "Unknown visibility",
+    "Private": "Private",
+    "Internal": "Internal",
+    "Public": "Public"
   }
 }

@@ -23,12 +23,12 @@
     "react-dropzone": "^14.2.3",
     "react-i18next": "^11.18.6",
     "react-icons": "^4.7.1",
+    "react-player": "^2.11.2",
     "react-router-dom": "^6.4.1",
     "react-scripts": "5.0.1",
     "styled-components": "^5.3.6",
     "typescript": "^4.7.4",
     "uuid": "^8.3.2",
-    "video.js": "^7.20.3",
     "waitasecond": "^1.8.10",
     "web-vitals": "^2.1.4"
   },

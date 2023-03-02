@@ -9,9 +9,9 @@ import { ProjectAuthorList } from '../../utils/ProjectAuthorList';
 import { Status } from '../../utils/Status';
 import { VisibilityTag } from '../../utils/VisibilityTag';
 
-interface IProjectDetailProps {}
+interface IProjectEditProps {}
 
-export function ProjectDetail(props: IProjectDetailProps) {
+export function ProjectEdit(props: IProjectEditProps) {
     const { id } = useParams();
     const { bgDarker } = useColorScheme();
 

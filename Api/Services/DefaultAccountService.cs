@@ -135,6 +135,9 @@ public class DefaultAccountService : IAccountService, IDisposable
             return null;
         }
 
+        var closed = new TemporaryAccountClosed(account.Id);
+        db.Events.Append(account.Id, closed);
+        await db.SaveChangesAsync(token);
         return TransferMaps.ToTemporaryAccountInfoDto(account);
     }
 

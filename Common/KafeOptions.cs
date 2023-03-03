@@ -11,4 +11,6 @@ public record KafeOptions
 {
     [Url, Required]
     public string BaseUrl { get; init; } = null!;
+
+    public string? DebugAccountToken { get; init; }
 }

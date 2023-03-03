@@ -25,40 +25,45 @@ public static class Const
     public static readonly CultureInfo InvariantCulture = CultureInfo.InvariantCulture;
 
     public const string EnglishCultureName = "en";
-    public static readonly CultureInfo EnglishCulture = CultureInfo.CreateSpecificCulture(EnglishCultureName);
+    public static readonly CultureInfo EnglishCulture;
 
-    public const string CzechCultureName = "cz";
-    public static readonly CultureInfo CzechCulture = CultureInfo.CreateSpecificCulture(CzechCultureName);
+    public const string CzechCultureName = "cs";
+    public static readonly CultureInfo CzechCulture;
 
     public const string SlovakCultureName = "sk";
-    public static readonly CultureInfo SlovakCulture = CultureInfo.CreateSpecificCulture(SlovakCultureName);
+    public static readonly CultureInfo SlovakCulture;
 
-    public static readonly LocalizedString UnknownAuthor
-        = LocalizedString.Create(
+    public static readonly LocalizedString UnknownAuthor;
+    public static readonly LocalizedString UnknownProjectGroup;
+    public static readonly LocalizedString ConfirmationEmailSubject;
+    public static readonly LocalizedString ConfirmationEmailMessageTemplate;
+    public static readonly LocalizedString[] EmailSignOffs;
+
+    static Const()
+    {
+        EnglishCulture = CultureInfo.CreateSpecificCulture(EnglishCultureName);
+        CzechCulture = CultureInfo.CreateSpecificCulture(CzechCultureName);
+        SlovakCulture = CultureInfo.CreateSpecificCulture(SlovakCultureName);
+
+        UnknownAuthor = LocalizedString.Create(
             (InvariantCulture, "Unknown author"),
             (CzechCulture, "Neznámý autor"));
-
-    public static readonly LocalizedString UnknownProjectGroup
-        = LocalizedString.Create(
+        UnknownProjectGroup = LocalizedString.Create(
             (InvariantCulture, "Unknown project group"),
             (CzechCulture, "Neznámá skupina projektů"));
-
-    public static readonly LocalizedString ConfirmationEmailSubject
-        = LocalizedString.Create(
+        ConfirmationEmailSubject = LocalizedString.Create(
             (InvariantCulture, "[KAFE] Account Created"),
             (CzechCulture, "[KAFE] Účet vytvořen"),
             (SlovakCulture, "[KAFE] Účet vytvorený"));
-
-    public static readonly LocalizedString ConfirmationEmailMessageTemplate
-        = LocalizedString.Create(
+        ConfirmationEmailMessageTemplate = LocalizedString.Create(
             (InvariantCulture,
 @"Hello,
 
 Please click the following link to log into KAFE:
 
-{}
+{0}
 
-{}
+{1}
 
 Yours,
 KAFE
@@ -68,9 +73,9 @@ KAFE
 
 Prosím klikněte na následující odkaz pro přihlášení do KAFE:
 
-{}
+{0}
 
-{}
+{1}
 
 Vaše KAFE
 "),
@@ -79,30 +84,30 @@ Vaše KAFE
 
 Prosím kliknite na nasledujúci odkaz pre prihlásenie do KAFE:
 
-{}
+{0}
 
-{}
+{1}
 
 Vaše KAFE
 "));
-
-    public static readonly LocalizedString[] EmailSignOffs = new LocalizedString[]
-    {
-        LocalizedString.Create(
-            (InvariantCulture, "Live long and prosper."),
-            (CzechCulture, "Žijte dlouho a blaze."),
-            (SlovakCulture, "Žite dlho a blaho.")),
-        LocalizedString.Create(
-            (InvariantCulture, "May the Force be with you."),
-            (CzechCulture, "Ať je Síla s Vámi."),
-            (SlovakCulture, "Nech Vás Sila sprevádza.")),
-        LocalizedString.Create(
-            (InvariantCulture, "So long, and thanks for all the fish."),
-            (CzechCulture, "Sbohem a díky za všechny ryby."),
-            (SlovakCulture, "Zbohom a ďakujeme za ryby")),
-        LocalizedString.Create(
-            (InvariantCulture, "To infinity and beyond!"),
-            (CzechCulture, "Do nekonečna a ještě dál!"),
-            (SlovakCulture, "Do nekonečna a ešte ďalej!"))
-    };
+        EmailSignOffs = new LocalizedString[]
+        {
+            LocalizedString.Create(
+                (InvariantCulture, "Live long and prosper."),
+                (CzechCulture, "Žijte dlouho a blaze."),
+                (SlovakCulture, "Žite dlho a blaho.")),
+            LocalizedString.Create(
+                (InvariantCulture, "May the Force be with you."),
+                (CzechCulture, "Ať je Síla s Vámi."),
+                (SlovakCulture, "Nech Vás Sila sprevádza.")),
+            LocalizedString.Create(
+                (InvariantCulture, "So long, and thanks for all the fish."),
+                (CzechCulture, "Sbohem a díky za všechny ryby."),
+                (SlovakCulture, "Zbohom a ďakujeme za ryby")),
+            LocalizedString.Create(
+                (InvariantCulture, "To infinity and beyond!"),
+                (CzechCulture, "Do nekonečna a ještě dál!"),
+                (SlovakCulture, "Do nekonečna a ešte ďalej!"))
+        };
+    }
 }

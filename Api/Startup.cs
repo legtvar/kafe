@@ -1,7 +1,6 @@
 using System.Security.Claims;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using idunno.Authentication.Basic;
 using Kafe.Data;
 using Kafe.Api.Endpoints;
 using Microsoft.AspNetCore.Builder;

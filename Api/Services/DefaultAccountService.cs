@@ -7,6 +7,7 @@ using Marten;
 using Marten.Events;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -22,6 +23,7 @@ public class DefaultAccountService : IAccountService, IDisposable
 {
     public const string EmailConfirmationPurpose = "EmailConfirmation";
     public static readonly TimeSpan ConfirmationTokenExpiration = TimeSpan.FromHours(24);
+    public static readonly Hrib DebugAccountId = "AAAAbadf00d";
     
     // TODO: Obtain this from ASP.NET Core somehow.
     public const string EmailConfirmationEndpoint = "/api/v1/tmp-account/";
@@ -30,17 +32,20 @@ public class DefaultAccountService : IAccountService, IDisposable
     private readonly IDataProtector dataProtector;
     private readonly IDocumentSession db;
     private readonly IEmailService emailService;
+    private readonly IHostEnvironment environment;
     private readonly IOptions<KafeOptions> kafeOptions;
 
     public DefaultAccountService(
         IDocumentSession db,
         IDataProtectionProvider dataProtectionProvider,
         IEmailService emailService,
+        IHostEnvironment environment,
         IOptions<KafeOptions> kafeOptions)
     {
         dataProtector = dataProtectionProvider.CreateProtector(nameof(DefaultAccountService));
         this.db = db;
         this.emailService = emailService;
+        this.environment = environment;
         this.kafeOptions = kafeOptions;
     }
 
@@ -83,7 +88,7 @@ public class DefaultAccountService : IAccountService, IDisposable
         var emailMessage = string.Format(
             Const.ConfirmationEmailMessageTemplate[account!.PreferredCulture]!,
             confirmationUrl,
-            Const.EmailSignOffs[RandomNumberGenerator.GetInt32(0, Const.EmailSignOffs.Length)]);
+            Const.EmailSignOffs[RandomNumberGenerator.GetInt32(0, Const.EmailSignOffs.Length)][account!.PreferredCulture]);
         await emailService.SendEmail(account.EmailAddress, emailSubject, emailMessage);
     }
 
@@ -91,6 +96,16 @@ public class DefaultAccountService : IAccountService, IDisposable
         string confirmationToken,
         CancellationToken token = default)
     {
+        if (environment.IsDevelopment()
+            && !string.IsNullOrEmpty(kafeOptions.Value.DebugAccountToken)
+            && confirmationToken == kafeOptions.Value.DebugAccountToken)
+        {
+            return new TemporaryAccountInfoDto(
+                Id: DebugAccountId,
+                EmailAddress: "kafe@example.com",
+                PreferredCulture: Const.InvariantCultureCode);
+        }
+
         if (!TryDecodeAccountToken(confirmationToken, out var dto))
         {
             return null;

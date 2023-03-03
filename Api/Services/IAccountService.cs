@@ -10,7 +10,7 @@ public interface IAccountService
         TemporaryAccountCreationDto dto,
         CancellationToken token = default);
 
-    Task<TemporaryAccountInfoDto> ConfirmTemporaryAccount(
+    Task<TemporaryAccountInfoDto?> ConfirmTemporaryAccount(
         string confirmationToken,
         CancellationToken token = default);
 }

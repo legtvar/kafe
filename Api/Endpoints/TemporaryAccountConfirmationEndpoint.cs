@@ -40,6 +40,11 @@ public class TemporaryAccountConfirmationEndpoint : EndpointBaseAsync
         CancellationToken cancellationToken = default)
     {
         var account = await accounts.ConfirmTemporaryAccount(token, cancellationToken);
+        if (account is null)
+        {
+            return BadRequest();
+        }
+
         var claims = new List<Claim>()
         {
             new Claim(ClaimTypes.Name, account.EmailAddress),

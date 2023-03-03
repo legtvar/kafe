@@ -184,4 +184,12 @@ public static class TransferMaps
             _ => throw new NotSupportedException($"Shards of '{data.GetType()}' are not supported.")
         };
     }
+
+    public static TemporaryAccountInfoDto ToTemporaryAccountInfoDto(TemporaryAccountInfo account)
+    {
+        return new TemporaryAccountInfoDto(
+            Id: account.Id,
+            EmailAddress: account.EmailAddress,
+            PreferredCulture: account.PreferredCulture);
+    }
 }

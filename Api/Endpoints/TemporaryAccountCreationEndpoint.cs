@@ -31,6 +31,13 @@ public class TemporaryAccountCreationEndpoint : EndpointBaseAsync
         TemporaryAccountCreationDto dto,
         CancellationToken cancellationToken = default)
     {
+        if (string.IsNullOrWhiteSpace(dto.EmailAddress))
+        {
+            return BadRequest("Email address is null or white space.");
+        }
+
+        dto = dto with { EmailAddress = dto.EmailAddress.Trim() };
+
         await accounts.CreateTemporaryAccount(dto, cancellationToken);
         return Ok();
     }

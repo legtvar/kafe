@@ -1,3 +1,4 @@
+using Kafe.Common;
 using Kafe.Data.Aggregates;
 using Marten;
 using Marten.Events;
@@ -46,10 +47,12 @@ public static class Db
             options.Projections.Add<ProjectGroupInfoProjection>(ProjectionLifecycle.Inline);
             options.Projections.Add<VideoConversionInfoProjection>(ProjectionLifecycle.Inline);
             options.Projections.Add<ArtifactDetailProjection>(ProjectionLifecycle.Inline);
+            options.Projections.Add<TemporaryAccountInfoProjection>(ProjectionLifecycle.Inline);
             options.UseDefaultSerialization(serializerType: SerializerType.SystemTextJson);
         }
 
         services.AddMarten(ConfigureMarten);
         services.Configure<StorageOptions>(configuration.GetSection("Storage"));
+        services.Configure<KafeOptions>(configuration.GetSection("KAFE"));
     }
 }

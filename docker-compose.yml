@@ -23,11 +23,11 @@ services:
       dockerfile: Api.Dockerfile
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-    command: /kafe/Kafe.Api
     expose:
       - 80
     volumes:
       - videos:/mnt/kafe-videos
+      - secrets:/mnt/kafe-secrets
     depends_on:
       - db
     networks:
@@ -50,6 +50,7 @@ services:
 
 volumes:
   postgres_data:
+  secrets:
   videos:
     driver: local
     driver_opts:

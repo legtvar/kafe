@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,7 +10,11 @@ namespace Kafe.Data;
 
 public record StorageOptions
 {
-    public string? VideoShardsDirectory { get; init; }
+    [Required]
+    public string SecretsDirectory { get; init; } = null!;
+
+    [Required]
+    public string VideoShardsDirectory { get; init; } = null!;
 
     public string? ImageShardsDirectory { get; init; }
 

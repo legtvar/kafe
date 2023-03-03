@@ -22,6 +22,8 @@ using Microsoft.OpenApi.Any;
 using System.IO;
 using System.Collections.Immutable;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.DataProtection;
 
 namespace Kafe.Api;
 
@@ -38,109 +40,24 @@ public class Startup
 
     public void ConfigureServices(IServiceCollection services)
     {
-        services.AddAuthentication("basic")
-            .AddBasic("basic", o =>
-            {
-                o.Realm = "Basic Authentication";
-                o.AllowInsecureProtocol = true;
-                o.Events = new BasicAuthenticationEvents
-                {
-                    OnValidateCredentials = context =>
-                    {
-                        if (context.Username == Configuration["Authentication:Basic:Username"]
-                            && context.Password == Configuration["Authentication:Basic:Password"])
-                        {
-                            var claims = new[]
-                            {
-                                new Claim(
-                                    ClaimTypes.NameIdentifier,
-                                    context.Username,
-                                    ClaimValueTypes.String,
-                                    context.Options.ClaimsIssuer),
-                                new Claim(
-                                    ClaimTypes.Name,
-                                    context.Username,
-                                    ClaimValueTypes.String,
-                                    context.Options.ClaimsIssuer)
-                            };
-
-                            context.Principal = new ClaimsPrincipal(new ClaimsIdentity(claims, context.Scheme.Name));
-                            context.Success();
-                        }
-
-                        return Task.CompletedTask;
-                    }
-                };
-            })
+        services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
             .AddCookie();
+
         services.AddAuthorization();
+
+        ConfigureDataProtection(services);
+
         services.AddEndpointsApiExplorer();
+
         services.AddApiVersioning(o =>
         {
             o.ReportApiVersions = true;
             o.DefaultApiVersion = new ApiVersion(1);
         });
-        services.AddSwaggerGen(o =>
-        {
-            o.SwaggerDoc("v1", new OpenApiInfo { Title = "KAFE API", Version = "v1" });
-            o.SupportNonNullableReferenceTypes();
-            o.SchemaFilter<RequireNonNullablePropertiesSchemaFilter>();
-            o.MapType<Hrib>(() => new OpenApiSchema
-            {
-                Type = "string",
-                Format = "hrib",
-                Example = new OpenApiString("AAAAbadf00d")
-            });
-            o.MapType<TimeSpan>(() => new OpenApiSchema
-            {
-                Type = "string",
-                Format = "time-span",
-                Example = new OpenApiString("00:00:00")
-            });
-            o.MapType<LocalizedString>(() => new OpenApiSchema
-            {
-                Title = "LocalizedString",
-                Type = "object",
-                Nullable = true,
-                Properties = new Dictionary<string, OpenApiSchema>
-                {
-                    ["iv"] = new OpenApiSchema() { Type = "string" },
-                    ["cs"] = new OpenApiSchema() { Type = "string", Nullable = true },
-                    ["en"] = new OpenApiSchema() { Type = "string", Nullable = true }
-                }
-            });
-            o.EnableAnnotations(
-                enableAnnotationsForInheritance: true,
-                enableAnnotationsForPolymorphism: true);
-            o.OperationFilter<RemoveVersionParameter>();
-            o.DocumentFilter<ReplaceVersionWithDocVersion>();
-            o.DocInclusionPredicate((version, desc) =>
-            {
-                if (!desc.TryGetMethodInfo(out var method))
-                {
-                    return false;
-                }
-
-                var versions = method.DeclaringType!.GetCustomAttributes(true)
-                    .OfType<ApiVersionAttribute>()
-                    .SelectMany(attr => attr.Versions);
-
-                var maps = method.GetCustomAttributes(true)
-                    .OfType<MapToApiVersionAttribute>()
-                    .SelectMany(attr => attr.Versions)
-                    .ToArray();
-
-                return versions.Any(v => $"v{v}" == version) && (maps.Length == 0 || maps.Any(v => $"v{v}" == version));
-            });
-            o.UseOneOfForPolymorphism();
-            var xmlFiles = new DirectoryInfo(AppContext.BaseDirectory).GetFiles("*.xml");
-            foreach (var xmlFile in xmlFiles)
-            {
-                o.IncludeXmlComments(xmlFile.FullName);
-            }
-        });
+        services.AddSwaggerGen(ConfigureSwaggerGen);
 
         Db.AddDb(services, Configuration, Environment);
+
         services.AddControllers(o =>
         {
             o.Conventions.Add(new RoutePrefixConvention(new RouteAttribute("/api/v{version:apiVersion}")));
@@ -151,26 +68,12 @@ public class Startup
             o.JsonSerializerOptions.Converters.Add(new LocalizedStringJsonConverter());
         });
 
-        // KAFE services
-        services.AddSingleton<IMediaService, FFmpegCoreService>();
-        services.AddScoped<IProjectService, DefaultProjectService>();
-        services.AddScoped<IAuthorService, DefaultAuthorService>();
-        services.AddScoped<IArtifactService, DefaultArtifactService>();
-        services.AddScoped<IShardService, DefaultShardService>();
-        services.AddScoped<IAccountService, DefaultAccountService>();
+        RegisterKafe(services);
     }
 
     public void Configure(IApplicationBuilder app, IHostEnvironment environment)
     {
         app.UseHttpsRedirection();
-
-        app.UseRewriter(new RewriteOptions().AddRewrite("login", "login.html", true));
-        // app.Use(async (context, next) => {
-        //     if (context.Request.Path.Value == "/login") {
-
-        //     }
-        //     await next(context);
-        // });
 
         app.UseDefaultFiles();
         app.UseStaticFiles();
@@ -192,5 +95,96 @@ public class Startup
         {
             e.MapControllers();
         });
+    }
+
+    private void RegisterKafe(IServiceCollection services)
+    {
+        services.AddSingleton<IMediaService, FFmpegCoreService>();
+        services.AddSingleton<IEmailService, DebugEmailService>();
+        services.AddScoped<IProjectService, DefaultProjectService>();
+        services.AddScoped<IAuthorService, DefaultAuthorService>();
+        services.AddScoped<IArtifactService, DefaultArtifactService>();
+        services.AddScoped<IShardService, DefaultShardService>();
+        services.AddScoped<IAccountService, DefaultAccountService>();
+    }
+
+    private void ConfigureDataProtection(IServiceCollection services)
+    {
+        var secretsDirPath = Configuration.GetRequiredSection("Storage").Get<StorageOptions>()?.SecretsDirectory;
+        if (secretsDirPath is null)
+        {
+            throw new ArgumentException($"The {nameof(StorageOptions.SecretsDirectory)} is not set.");
+        }
+
+        var exeDir = new DirectoryInfo(Path.GetDirectoryName(typeof(Startup).Assembly.Location)!);
+        if (!exeDir.Exists)
+        {
+            throw new InvalidOperationException("Could not find the executable's directory.");
+        }
+
+        var secretsFullPath = Path.Combine(exeDir.FullName, secretsDirPath);
+
+        services.AddDataProtection()
+            .PersistKeysToFileSystem(new DirectoryInfo(secretsFullPath));
+    }
+
+    private void ConfigureSwaggerGen(SwaggerGenOptions o)
+    {
+        o.SwaggerDoc("v1", new OpenApiInfo { Title = "KAFE API", Version = "v1" });
+        o.SupportNonNullableReferenceTypes();
+        o.SchemaFilter<RequireNonNullablePropertiesSchemaFilter>();
+        o.MapType<Hrib>(() => new OpenApiSchema
+        {
+            Type = "string",
+            Format = "hrib",
+            Example = new OpenApiString("AAAAbadf00d")
+        });
+        o.MapType<TimeSpan>(() => new OpenApiSchema
+        {
+            Type = "string",
+            Format = "time-span",
+            Example = new OpenApiString("00:00:00")
+        });
+        o.MapType<LocalizedString>(() => new OpenApiSchema
+        {
+            Title = "LocalizedString",
+            Type = "object",
+            Nullable = true,
+            Properties = new Dictionary<string, OpenApiSchema>
+            {
+                ["iv"] = new OpenApiSchema() { Type = "string" },
+                ["cs"] = new OpenApiSchema() { Type = "string", Nullable = true },
+                ["en"] = new OpenApiSchema() { Type = "string", Nullable = true }
+            }
+        });
+        o.EnableAnnotations(
+            enableAnnotationsForInheritance: true,
+            enableAnnotationsForPolymorphism: true);
+        o.OperationFilter<RemoveVersionParameter>();
+        o.DocumentFilter<ReplaceVersionWithDocVersion>();
+        o.DocInclusionPredicate((version, desc) =>
+        {
+            if (!desc.TryGetMethodInfo(out var method))
+            {
+                return false;
+            }
+
+            var versions = method.DeclaringType!.GetCustomAttributes(true)
+                .OfType<ApiVersionAttribute>()
+                .SelectMany(attr => attr.Versions);
+
+            var maps = method.GetCustomAttributes(true)
+                .OfType<MapToApiVersionAttribute>()
+                .SelectMany(attr => attr.Versions)
+                .ToArray();
+
+            return versions.Any(v => $"v{v}" == version) && (maps.Length == 0 || maps.Any(v => $"v{v}" == version));
+        });
+        o.UseOneOfForPolymorphism();
+        var xmlFiles = new DirectoryInfo(AppContext.BaseDirectory).GetFiles("*.xml");
+        foreach (var xmlFile in xmlFiles)
+        {
+            o.IncludeXmlComments(xmlFile.FullName);
+        }
     }
 }

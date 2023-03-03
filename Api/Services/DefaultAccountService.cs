@@ -124,8 +124,8 @@ public class DefaultAccountService : IAccountService, IDisposable
 
         if (account.RefreshedOn + ConfirmationTokenExpiration < DateTimeOffset.UtcNow)
         {
-            var closed = new TemporaryAccountClosed(account.Id);
-            db.Events.Append(account.Id, closed);
+            var closedExpired = new TemporaryAccountClosed(account.Id);
+            db.Events.Append(account.Id, closedExpired);
             await db.SaveChangesAsync(token);
             return null;
         }
@@ -135,8 +135,8 @@ public class DefaultAccountService : IAccountService, IDisposable
             return null;
         }
 
-        var closed = new TemporaryAccountClosed(account.Id);
-        db.Events.Append(account.Id, closed);
+        var closedSuccessfully = new TemporaryAccountClosed(account.Id);
+        db.Events.Append(account.Id, closedSuccessfully);
         await db.SaveChangesAsync(token);
         return TransferMaps.ToTemporaryAccountInfoDto(account);
     }

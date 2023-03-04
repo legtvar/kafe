@@ -23,6 +23,7 @@ using System.Collections.Immutable;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
+using Kafe.Api.Options;
 
 namespace Kafe.Api;
 
@@ -54,8 +55,6 @@ public class Startup
             o.DefaultApiVersion = new ApiVersion(1);
         });
         services.AddSwaggerGen(ConfigureSwaggerGen);
-
-        Db.AddDb(services, Configuration, Environment);
 
         services.AddControllers(o =>
         {
@@ -98,6 +97,8 @@ public class Startup
 
     private void RegisterKafe(IServiceCollection services)
     {
+        Db.AddDb(services, Configuration, Environment);
+
         services.AddSingleton<IMediaService, FFmpegCoreService>();
         services.AddSingleton<IEmailService, DebugEmailService>();
         services.AddScoped<IProjectService, DefaultProjectService>();
@@ -105,6 +106,8 @@ public class Startup
         services.AddScoped<IArtifactService, DefaultArtifactService>();
         services.AddScoped<IShardService, DefaultShardService>();
         services.AddScoped<IAccountService, DefaultAccountService>();
+
+        services.Configure<EmailOptions>(Configuration.GetSection("Email"));
     }
 
     private void ConfigureDataProtection(IServiceCollection services)

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Kafe.Api.Services;
@@ -12,7 +13,7 @@ public class DebugEmailService : IEmailService
         this.logger = logger;
     }
 
-    public Task SendEmail(string to, string subject, string message)
+    public Task SendEmail(string to, string subject, string message, CancellationToken token = default)
     {
         logger.LogInformation("\tTo: {}\n\tSubject: {}\n\tMessage:\n\n{}",
             to,

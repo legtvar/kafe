@@ -26,7 +26,7 @@ services:
     expose:
       - 80
     volumes:
-      - videos:/mnt/kafe-videos
+      - cerit:/mnt/kafe-data
       - secrets:/mnt/kafe-secrets
     depends_on:
       - db
@@ -51,12 +51,12 @@ services:
 volumes:
   postgres_data:
   secrets:
-  videos:
+  cerit:
     driver: local
     driver_opts:
       type: nfs
       o: "addr=storage-brno1-cerit.metacentrum.cz,rw,tcp,nolock,rsize=32768,wsize=32768,intr,noatime,nfsvers=3,actimeo=3"
-      device: :/gpfs/vol1/nfs/lemma/kafe/videos
+      device: :/gpfs/vol1/nfs/lemma/kafe
 
 networks:
     backbone:

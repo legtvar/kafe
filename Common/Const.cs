@@ -56,9 +56,9 @@ public static class Const
             (InvariantCulture, "Unknown project group"),
             (CzechCulture, "Neznámá skupina projektů"));
         ConfirmationEmailSubject = LocalizedString.Create(
-            (InvariantCulture, "[KAFE] Account Created"),
-            (CzechCulture, "[KAFE] Účet vytvořen"),
-            (SlovakCulture, "[KAFE] Účet vytvorený"));
+            (InvariantCulture, "Login Request"),
+            (CzechCulture, "Přihlášení"),
+            (SlovakCulture, "Prihlásenie"));
         ConfirmationEmailMessageTemplate = LocalizedString.Create(
             (InvariantCulture,
 @"Hello,

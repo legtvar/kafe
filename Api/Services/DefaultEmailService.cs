@@ -32,7 +32,7 @@ public class DefaultEmailService : IEmailService, IDisposable
         mimeMessage.From.Add(new MailboxAddress(options.Value.FromName, options.Value.FromAddress));
         var toAddress = new MailboxAddress(string.Empty, to);
         mimeMessage.To.Add(toAddress);
-        mimeMessage.Subject = subject;
+        mimeMessage.Subject = $"[KAFE] {subject}";
         mimeMessage.Body = new TextPart("plain")
         {
             Text = message

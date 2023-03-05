@@ -15,12 +15,14 @@ public static class TransferMaps
                 (Const.InvariantCulture, "An FFFI MU registration"),
                 (Const.CzechCulture, "Přihláška na FFFI MU")
             ),
+            Description: null,
             ArtifactBlueprints: ImmutableArray.Create(
                 new ProjectArtifactBlueprintDto(
                     Name: LocalizedString.Create(
                         (Const.InvariantCulture, "Film"),
                         (Const.CzechCulture, "Film")
                     ),
+                    Description: null,
                     SlotName: "film",
                     Arity: ArgumentArity.ExactlyOne,
                     ShardBlueprints: ImmutableArray.Create(
@@ -29,6 +31,7 @@ public static class TransferMaps
                                 (Const.InvariantCulture, "Film file"),
                                 (Const.CzechCulture, "Soubor s filmem")
                             ),
+                            Description: null,
                             Kind: ShardKind.Video,
                             Arity: ArgumentArity.ExactlyOne),
                         new ProjectArtifactShardBlueprintDto(
@@ -36,22 +39,26 @@ public static class TransferMaps
                                 (Const.InvariantCulture, "English subtitles"),
                                 (Const.CzechCulture, "Anglické titulky")
                             ),
+                            Description: null,
                             Kind: ShardKind.Subtitles,
-                            Arity: ArgumentArity.ExactlyOne))
+                            Arity: ArgumentArity.ExactlyOne)
+                    )
                 ),
                 new ProjectArtifactBlueprintDto(
                     Name: LocalizedString.Create(
                         (Const.InvariantCulture, "Video-annotation"),
                         (Const.CzechCulture, "Videoanotace")
                     ),
+                    Description: null,
                     SlotName: "video-annotation",
-                    Arity: ArgumentArity.ZeroOrMore,
+                    Arity: ArgumentArity.ZeroOrOne,
                     ShardBlueprints: ImmutableArray.Create(
                         new ProjectArtifactShardBlueprintDto(
                             Name: LocalizedString.Create(
                                 (Const.InvariantCulture, "Video-annotation file"),
                                 (Const.CzechCulture, "Soubor s videoanotací")
                             ),
+                            Description: null,
                             Kind: ShardKind.Video,
                             Arity: ArgumentArity.ExactlyOne),
                         new ProjectArtifactShardBlueprintDto(
@@ -59,8 +66,29 @@ public static class TransferMaps
                                 (Const.InvariantCulture, "English subtitles"),
                                 (Const.CzechCulture, "Anglické titulky")
                             ),
+                            Description: null,
                             Kind: ShardKind.Subtitles,
-                            Arity: ArgumentArity.ExactlyOne))
+                            Arity: ArgumentArity.ExactlyOne)
+                    )
+                ),
+                new ProjectArtifactBlueprintDto(
+                    Name: LocalizedString.Create(
+                        (Const.InvariantCulture, "Cover photo"),
+                        (Const.CzechCulture, "Titulní fotografie")
+                    ),
+                    Description: null,
+                    SlotName: "cover-photo",
+                    Arity: new ArgumentArity(1, 5),
+                    ShardBlueprints: ImmutableArray.Create(
+                        new ProjectArtifactShardBlueprintDto(
+                            Name: LocalizedString.Create(
+                                (Const.InvariantCulture, "Cover photo file"),
+                                (Const.CzechCulture, "Soubor s titulní fotografií")
+                            ),
+                            Description: null,
+                            Kind: ShardKind.Image,
+                            Arity: ArgumentArity.ExactlyOne)
+                    )
                 )
             )
         );

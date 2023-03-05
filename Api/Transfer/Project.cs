@@ -45,11 +45,13 @@ public record ProjectArtifactDto(
 
 public record ProjectBlueprintDto(
     LocalizedString Name,
+    LocalizedString? Description,
     ImmutableArray<ProjectArtifactBlueprintDto> ArtifactBlueprints
 );
 
 public record ProjectArtifactBlueprintDto(
     LocalizedString Name,
+    LocalizedString? Description,
     string SlotName,
     ArgumentArity Arity,
     ImmutableArray<ProjectArtifactShardBlueprintDto> ShardBlueprints
@@ -57,6 +59,7 @@ public record ProjectArtifactBlueprintDto(
 
 public record ProjectArtifactShardBlueprintDto(
     LocalizedString Name,
+    LocalizedString? Description,
     ShardKind Kind,
     ArgumentArity Arity
 );

@@ -123,6 +123,7 @@ public sealed class KafeClient : IAsyncDisposable
             if (name is not null || uco is not null || email is not null || phone is not null)
             {
                 session.Events.Append(author.Id, infoChanged);
+                LogEvent(author.Id, infoChanged);
             }
         }
         await session.SaveChangesAsync();

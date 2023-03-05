@@ -206,12 +206,15 @@ public static class Program
 
             try
             {
-                using var stream = migrationInfoFile.OpenRead();
-                var migrationInfo = await JsonSerializer.DeserializeAsync<VideoShardMigrationInfo>(stream);
-                if (migrationInfo is null)
+                VideoShardMigrationInfo? migrationInfo;
+                using(var stream = migrationInfoFile.OpenRead())
                 {
-                    logger.LogWarning($"'{migrationInfoFile}' could not be deserialized from JSON.");
-                    continue;
+                    migrationInfo = await JsonSerializer.DeserializeAsync<VideoShardMigrationInfo>(stream);
+                    if (migrationInfo is null)
+                    {
+                        logger.LogWarning($"'{migrationInfoFile}' could not be deserialized from JSON.");
+                        continue;
+                    }
                 }
 
                 var wmaVideo = await wma.GetVideo(migrationInfo.WmaId);

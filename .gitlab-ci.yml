@@ -15,7 +15,7 @@ build-api:
     - shared-fi
   cache:
     paths:
-      - ~/.nuget
+      - $HOME/.nuget
   only:
     - master
     - api

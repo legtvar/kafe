@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,6 +11,7 @@ namespace Kafe.Media;
 public record MediaInfo(
     string FileExtension,
     string FormatName,
+    long FileLength,
     TimeSpan Duration,
     ImmutableArray<VideoInfo> VideoStreams,
     ImmutableArray<AudioInfo> AudioStreams,
@@ -21,6 +23,7 @@ public record MediaInfo(
         = new(
             Const.InvalidFileExtension,
             Const.InvalidFormatName,
+            -1,
             TimeSpan.Zero,
             ImmutableArray<VideoInfo>.Empty,
             ImmutableArray<AudioInfo>.Empty,

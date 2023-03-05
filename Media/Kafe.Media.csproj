@@ -7,7 +7,6 @@
 
   <ItemGroup>
     <PackageReference Include="FFMpegCore" Version="4.8.0" />
-    <PackageReference Include="Xabe.FFmpeg" Version="5.2.3" />
   </ItemGroup>
 
   <ItemGroup>

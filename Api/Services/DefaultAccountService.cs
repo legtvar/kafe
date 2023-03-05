@@ -1,5 +1,4 @@
 ﻿using Kafe.Api.Transfer;
-using Kafe.Common;
 using Kafe.Data;
 using Kafe.Data.Aggregates;
 using Kafe.Data.Events;

@@ -83,12 +83,17 @@ public class DefaultProjectService : IProjectService
         }
 
         var group = await db.LoadAsync<ProjectGroupInfo>(data.ProjectGroupId, token);
-        var artifactDetails = await db.LoadManyAsync<ArtifactDetail>(token, data.ArtifactIds);
+        var artifactDetails = await db.LoadManyAsync<ArtifactDetail>(token, data.Artifacts.Select(a => a.Id));
         var authors = await db.LoadManyAsync<AuthorInfo>(token, data.Authors.Select(a => a.Id));
         var dto = TransferMaps.ToProjectDetailDto(data) with
         {
             ProjectGroupName = group?.Name ?? Const.UnknownProjectGroup,
-            Artifacts = artifactDetails.Select(TransferMaps.ToArtifactDetailDto).ToImmutableArray(),
+            Artifacts = artifactDetails.Select(a =>
+                TransferMaps.ToProjectArtifactDto(a) with
+                {
+                    BlueprintSlot = data.Artifacts.SingleOrDefault(r => r.Id == a.Id)?.BlueprintSlot
+                })
+                .ToImmutableArray(),
             Cast = data.Authors.Where(a => a.Kind == ProjectAuthorKind.Cast)
                     .Select(a => new ProjectAuthorDto(
                         Id: a.Id,

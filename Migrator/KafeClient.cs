@@ -132,6 +132,7 @@ public sealed class KafeClient : IAsyncDisposable
     public async Task<(ArtifactInfo, VideoShardInfo)> CreateVideoArtifact(
         string name,
         MediaInfo originalVariant,
+        DateTimeOffset addedOn,
         Hrib? projectId = null,
         Hrib? artifactId = null,
         Hrib? shardId = null)
@@ -140,7 +141,8 @@ public sealed class KafeClient : IAsyncDisposable
         var artifactCreated = new ArtifactCreated(
             ArtifactId: artifactId,
             CreationMethod: CreationMethod.Migrator,
-            Name: (LocalizedString)name);
+            Name: (LocalizedString)name,
+            AddedOn: addedOn);
         session.Events.StartStream<ArtifactInfo>(artifactId, artifactCreated);
         LogEvent(artifactId, artifactCreated);
 
@@ -165,7 +167,7 @@ public sealed class KafeClient : IAsyncDisposable
 
     public async Task AddArtifactToProject(Hrib artifactId, Hrib projectId)
     {
-        var artifactAdded = new ProjectArtifactAdded(projectId, artifactId);
+        var artifactAdded = new ProjectArtifactAdded(projectId, artifactId, null);
         LogEvent(projectId, artifactAdded);
         session.Events.Append(projectId, artifactAdded);
 
@@ -215,7 +217,7 @@ public sealed class KafeClient : IAsyncDisposable
         Visibility visibility,
         Hrib projectGroupId,
         string? description = null,
-        DateTime? releaseDate = default,
+        DateTime? releasedOn = default,
         bool isLocked = true,
         IEnumerable<ProjectAuthor>? authors = default,
         Hrib? hrib = null)
@@ -231,8 +233,8 @@ public sealed class KafeClient : IAsyncDisposable
 
         var infoChanged = new ProjectInfoChanged(
             ProjectId: hrib,
-            ReleaseDate: releaseDate.HasValue
-                ? new DateTimeOffset(releaseDate.Value)
+            ReleasedOn: releasedOn.HasValue
+                ? new DateTimeOffset(releasedOn.Value).ToUniversalTime()
                 : null,
             Description: (LocalizedString?)description);
         LogEvent(hrib, infoChanged);

@@ -17,6 +17,7 @@ public record ArtifactDetail(
     string Id,
     CreationMethod CreationMethod,
     LocalizedString Name,
+    DateTimeOffset AddedOn,
     ImmutableArray<ArtifactShardInfo> Shards,
     ImmutableArray<Hrib> ContainingProjectIds
 );
@@ -45,6 +46,7 @@ public class ArtifactDetailProjection : MultiStreamAggregation<ArtifactDetail, s
             Id: e.ArtifactId,
             CreationMethod: e.CreationMethod,
             Name: e.Name,
+            AddedOn: e.AddedOn,
             Shards: ImmutableArray<ArtifactShardInfo>.Empty,
             ContainingProjectIds: ImmutableArray<Hrib>.Empty
         );

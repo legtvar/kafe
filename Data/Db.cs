@@ -1,4 +1,3 @@
-using Kafe.Common;
 using Kafe.Data.Aggregates;
 using Marten;
 using Marten.Events;

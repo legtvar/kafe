@@ -172,7 +172,7 @@ public static class Program
             visibility: project.Publicpseudosecret == true ? Visibility.Internal : Visibility.Private,
             projectGroupId: groupId,
             description: project.Desc,
-            releaseDate: project.ReleaseDate,
+            releasedOn: project.ReleaseDate,
             isLocked: project.Closed == true,
             authors: authors);
         projectMap.AddOrUpdate(project.Id, kafeProject.Id, (_, _) => kafeProject.Id);
@@ -214,13 +214,30 @@ public static class Program
                     continue;
                 }
 
+                var wmaVideo = await wma.GetVideo(migrationInfo.WmaId);
+                if (wmaVideo is null)
+                {
+                    logger.LogWarning("Could not find a video with id '{}' in the WMA DB. " +
+                        "This is a little weird since it was already migrated.", migrationInfo.WmaId);
+                }
+                else
+                {
+                    migrationInfo = migrationInfo with
+                    {
+                        Name = wmaVideo.Name,
+                        AddedOn = wmaVideo.Adddate
+                    };
+                    await SerializedVideoShardMigrationInfo(migrationInfo);
+                }
+
                 artifactMap.AddOrUpdate(migrationInfo.WmaId, migrationInfo.ArtifactId, (_, _) => migrationInfo.ArtifactId);
                 var originalVariant = await GetOriginalVariant(migrationInfo.VideoShardId);
                 await kafe.CreateVideoArtifact(
                     name: migrationInfo.Name,
                     originalVariant: originalVariant,
                     artifactId: migrationInfo.ArtifactId,
-                    shardId: migrationInfo.VideoShardId);
+                    shardId: migrationInfo.VideoShardId,
+                    addedOn: migrationInfo.AddedOn ?? default);
             }
             catch (JsonException e)
             {
@@ -254,6 +271,7 @@ public static class Program
         var shardId = Hrib.Create();
         await CopyVideo(
             name: video.Name,
+            addedOn: new DateTimeOffset(video.Adddate).ToUniversalTime(),
             wmaId: video.Id,
             artifactId: artifactId,
             shardId: shardId);
@@ -265,7 +283,8 @@ public static class Program
             originalVariant: originalVariant,
             projectId: projectMap.GetValueOrDefault(video.Project),
             artifactId: artifactId,
-            shardId: shardId);
+            shardId: shardId,
+            addedOn: new DateTimeOffset(video.Adddate).ToUniversalTime());
 
 
         artifactMap.AddOrUpdate(video.Id, artifactId, (_, _) => artifactId);
@@ -273,7 +292,7 @@ public static class Program
         return artifactId;
     }
 
-    private static async Task CopyVideo(string name, int wmaId, Hrib artifactId, Hrib shardId)
+    private static async Task CopyVideo(string name, DateTimeOffset addedOn, int wmaId, Hrib artifactId, Hrib shardId)
     {
         if (string.IsNullOrEmpty(migratorOptions.WmaVideosDirectory))
         {
@@ -319,12 +338,9 @@ public static class Program
             WmaId: wmaId,
             ArtifactId: artifactId,
             VideoShardId: shardId,
-            Name: name);
-        using var metadataFile = new FileStream(
-            Path.Combine(shardDir.FullName, MigrationInfoFileName),
-            FileMode.Create,
-            FileAccess.Write);
-        await JsonSerializer.SerializeAsync(metadataFile, migrationInfo);
+            Name: name,
+            AddedOn: addedOn);
+        await SerializedVideoShardMigrationInfo(migrationInfo);
 
         var src = originalFile.OpenRead();
         using var dst = new FileStream(
@@ -332,6 +348,23 @@ public static class Program
             FileMode.Create,
             FileAccess.Write);
         await src.CopyToAsync(dst);
+    }
+
+    private static async Task SerializedVideoShardMigrationInfo(VideoShardMigrationInfo migrationInfo)
+    {
+        var shardDir = new DirectoryInfo(Path.Combine(
+            migratorOptions.KafeVideosDirectory!,
+            migrationInfo.VideoShardId));
+        if (!shardDir.Exists)
+        {
+            throw new ArgumentException("Cannot serialize a migration info for video that is not migrated!");
+        }
+
+        using var metadataFile = new FileStream(
+            Path.Combine(shardDir.FullName, MigrationInfoFileName),
+            FileMode.Create,
+            FileAccess.Write);
+        await JsonSerializer.SerializeAsync(metadataFile, migrationInfo);
     }
 
     private static async Task<MediaInfo> GetOriginalVariant(Hrib shardId)

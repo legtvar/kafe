@@ -53,6 +53,11 @@ public sealed class WmaClient : IDisposable
             .ToListAsync();
     }
 
+    public Task<Video?> GetVideo(int id)
+    {
+        return wma.Videos.SingleOrDefaultAsync(v => v.Id == id);
+    }
+
     public void Dispose()
     {
         ((IDisposable)wma).Dispose();

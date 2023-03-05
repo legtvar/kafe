@@ -1,6 +1,7 @@
-using System;
+﻿using System;
 using System.Collections.Immutable;
 using System.Linq;
+using Kafe.Data;
 using Kafe.Data.Aggregates;
 using Kafe.Media;
 
@@ -8,6 +9,63 @@ namespace Kafe.Api.Transfer;
 
 public static class TransferMaps
 {
+    private static readonly ProjectBlueprintDto TemporaryProjectBlueprintMockup
+        = new(
+            Name: LocalizedString.Create(
+                (Const.InvariantCulture, "An FFFI MU registration"),
+                (Const.CzechCulture, "Přihláška na FFFI MU")
+            ),
+            ArtifactBlueprints: ImmutableArray.Create(
+                new ProjectArtifactBlueprintDto(
+                    Name: LocalizedString.Create(
+                        (Const.InvariantCulture, "Film"),
+                        (Const.CzechCulture, "Film")
+                    ),
+                    SlotName: "film",
+                    Arity: ArgumentArity.ExactlyOne,
+                    ShardBlueprints: ImmutableArray.Create(
+                        new ProjectArtifactShardBlueprintDto(
+                            Name: LocalizedString.Create(
+                                (Const.InvariantCulture, "Film file"),
+                                (Const.CzechCulture, "Soubor s filmem")
+                            ),
+                            Kind: ShardKind.Video,
+                            Arity: ArgumentArity.ExactlyOne),
+                        new ProjectArtifactShardBlueprintDto(
+                            Name: LocalizedString.Create(
+                                (Const.InvariantCulture, "English subtitles"),
+                                (Const.CzechCulture, "Anglické titulky")
+                            ),
+                            Kind: ShardKind.Subtitles,
+                            Arity: ArgumentArity.ExactlyOne))
+                ),
+                new ProjectArtifactBlueprintDto(
+                    Name: LocalizedString.Create(
+                        (Const.InvariantCulture, "Video-annotation"),
+                        (Const.CzechCulture, "Videoanotace")
+                    ),
+                    SlotName: "video-annotation",
+                    Arity: ArgumentArity.ZeroOrMore,
+                    ShardBlueprints: ImmutableArray.Create(
+                        new ProjectArtifactShardBlueprintDto(
+                            Name: LocalizedString.Create(
+                                (Const.InvariantCulture, "Video-annotation file"),
+                                (Const.CzechCulture, "Soubor s videoanotací")
+                            ),
+                            Kind: ShardKind.Video,
+                            Arity: ArgumentArity.ExactlyOne),
+                        new ProjectArtifactShardBlueprintDto(
+                            Name: LocalizedString.Create(
+                                (Const.InvariantCulture, "English subtitles"),
+                                (Const.CzechCulture, "Anglické titulky")
+                            ),
+                            Kind: ShardKind.Subtitles,
+                            Arity: ArgumentArity.ExactlyOne))
+                )
+            )
+        );
+
+
     public static ProjectListDto ToProjectListDto(ProjectInfo data)
     {
         return new ProjectListDto(
@@ -16,7 +74,7 @@ public static class TransferMaps
             Name: data.Name,
             Description: data.Description,
             Visibility: data.Visibility,
-            ReleaseDate: data.ReleaseDate);
+            ReleasedOn: data.ReleasedOn);
     }
 
     public static ProjectDetailDto ToProjectDetailDto(ProjectInfo data)
@@ -29,10 +87,11 @@ public static class TransferMaps
             Name: data.Name,
             Description: data.Description,
             Visibility: data.Visibility,
-            ReleaseDate: data.ReleaseDate,
+            ReleasedOn: data.ReleasedOn,
             Crew: ImmutableArray<ProjectAuthorDto>.Empty,
             Cast: ImmutableArray<ProjectAuthorDto>.Empty,
-            Artifacts: ImmutableArray<ArtifactDetailDto>.Empty
+            Artifacts: ImmutableArray<ProjectArtifactDto>.Empty,
+            Blueprint: TemporaryProjectBlueprintMockup
         );
     }
 
@@ -99,7 +158,19 @@ public static class TransferMaps
             Id: data.Id,
             Name: data.Name,
             Shards: data.Shards.Select(ToShardListDto).ToImmutableArray(),
-            ContainingProjectIds: data.ContainingProjectIds
+            ContainingProjectIds: data.ContainingProjectIds,
+            AddedOn: data.AddedOn
+        );
+    }
+
+    public static ProjectArtifactDto ToProjectArtifactDto(ArtifactDetail data)
+    {
+        return new ProjectArtifactDto(
+            Id: data.Id,
+            Name: data.Name,
+            AddedOn: data.AddedOn,
+            BlueprintSlot: null,
+            Shards: data.Shards.Select(ToShardListDto).ToImmutableArray()
         );
     }
 
@@ -125,6 +196,7 @@ public static class TransferMaps
         return new MediaDto(
             FileExtension: data.FileExtension,
             MimeType: data.GetMimeType(),
+            FileLength: data.FileLength,
             Duration: data.Duration,
             VideoStreams: data.VideoStreams.Select(ToVideoStreamDto).ToImmutableArray(),
             AudioStreams: data.AudioStreams.Select(ToAudioStreamDto).ToImmutableArray(),

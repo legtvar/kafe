@@ -38,6 +38,12 @@ public class FFmpegCoreService : IMediaService
     {
         try
         {
+            var fileInfo = new FileInfo(filePath);
+            if (!fileInfo.Exists)
+            {
+                return MediaInfo.Invalid;
+            }
+
             var data = await FFProbe.AnalyseAsync(filePath, cancellationToken: token);
 
             var videoInfos = data.VideoStreams
@@ -67,6 +73,7 @@ public class FFmpegCoreService : IMediaService
             return new MediaInfo(
                 FileExtension: Path.GetExtension(filePath),
                 FormatName: data.Format.FormatName,
+                FileLength: fileInfo.Length,
                 Duration: data.Duration,
                 VideoStreams: videoInfos,
                 AudioStreams: audioInfos,

@@ -54,14 +54,16 @@ public class DefaultArtifactService : IArtifactService
         var created = new ArtifactCreated(
             ArtifactId: Hrib.Create(),
             CreationMethod: CreationMethod.Api,
-            Name: dto.Name);
+            Name: dto.Name,
+            AddedOn: dto.AddedOn?.ToUniversalTime() ?? DateTimeOffset.UtcNow);
         db.Events.StartStream<ArtifactInfo>(created.ArtifactId, created);
 
         if (dto.ContainingProject is not null)
         {
             var artifactAdded = new ProjectArtifactAdded(
                 ProjectId: dto.ContainingProject,
-                ArtifactId: created.ArtifactId);
+                ArtifactId: created.ArtifactId,
+                BlueprintSlot: dto.BlueprintSlot);
             var projectStream = await db.Events.FetchForWriting<ProjectInfo>(dto.ContainingProject, token);
             projectStream.AppendOne(artifactAdded);
         }

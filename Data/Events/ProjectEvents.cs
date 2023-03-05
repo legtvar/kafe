@@ -29,13 +29,14 @@ public record ProjectInfoChanged(
     LocalizedString? Name = null,
     LocalizedString? Description = null,
     Visibility? Visibility = null,
-    DateTimeOffset? ReleaseDate = null,
+    DateTimeOffset? ReleasedOn = null,
     LocalizedString? Genre = null
 );
 
 public record ProjectArtifactAdded(
     Hrib ProjectId,
-    Hrib ArtifactId
+    Hrib ArtifactId,
+    string? BlueprintSlot
 );
 
 public record ProjectArtifactRemoved(

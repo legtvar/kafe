@@ -12,12 +12,12 @@ public record ProjectInfo(
     CreationMethod CreationMethod,
     string ProjectGroupId,
     ImmutableArray<ProjectAuthor> Authors,
-    ImmutableArray<string> ArtifactIds,
+    ImmutableArray<ProjectArtifact> Artifacts,
     LocalizedString Name,
     LocalizedString? Description = null,
     LocalizedString? Genre = null,
     Visibility Visibility = Visibility.Unknown,
-    DateTimeOffset ReleaseDate = default,
+    DateTimeOffset ReleasedOn = default,
     bool IsLocked = false
 ) : IEntity;
 
@@ -25,6 +25,11 @@ public record ProjectAuthor(
     string Id,
     ProjectAuthorKind Kind,
     ImmutableArray<string> Roles
+) : IEntity;
+
+public record ProjectArtifact(
+    string Id,
+    string? BlueprintSlot
 ) : IEntity;
 
 public class ProjectInfoProjection : SingleStreamAggregation<ProjectInfo>
@@ -40,7 +45,7 @@ public class ProjectInfoProjection : SingleStreamAggregation<ProjectInfo>
             CreationMethod: e.CreationMethod,
             ProjectGroupId: e.ProjectGroupId,
             Authors: ImmutableArray<ProjectAuthor>.Empty,
-            ArtifactIds: ImmutableArray<string>.Empty,
+            Artifacts: ImmutableArray<ProjectArtifact>.Empty,
             Name: e.Name,
             Visibility: e.Visibility);
     }
@@ -52,7 +57,7 @@ public class ProjectInfoProjection : SingleStreamAggregation<ProjectInfo>
             Name = e.Name ?? p.Name,
             Description = e.Description ?? p.Description,
             Visibility = e.Visibility ?? p.Visibility,
-            ReleaseDate = e.ReleaseDate ?? p.ReleaseDate,
+            ReleasedOn = e.ReleasedOn ?? p.ReleasedOn,
             Genre = e.Genre ?? p.Genre
         };
     }
@@ -128,28 +133,35 @@ public class ProjectInfoProjection : SingleStreamAggregation<ProjectInfo>
 
     public ProjectInfo Apply(ProjectArtifactAdded e, ProjectInfo p)
     {
-        if (p.ArtifactIds.IsDefault)
+        var projectArtifact = new ProjectArtifact(
+            Id: e.ArtifactId,
+            BlueprintSlot: e.BlueprintSlot);
+
+        if (p.Artifacts.IsDefault)
         {
-            p = p with { ArtifactIds = ImmutableArray<string>.Empty };
+            p = p with
+            {
+                Artifacts = ImmutableArray.Create(projectArtifact)
+            };
         }
 
         return p with
         {
-            ArtifactIds = p.ArtifactIds.RemoveAll(a => a == e.ArtifactId)
-                .Add(e.ArtifactId)
+            Artifacts = p.Artifacts.RemoveAll(a => a.Id == e.ArtifactId)
+                .Add(projectArtifact)
         };
     }
 
     public ProjectInfo Apply(ProjectArtifactRemoved e, ProjectInfo p)
     {
-        if (p.ArtifactIds.IsDefault)
+        if (p.Artifacts.IsDefault)
         {
             return p;
         }
 
         return p with
         {
-            ArtifactIds = p.ArtifactIds.RemoveAll(a => a == e.ArtifactId)
+            Artifacts = p.Artifacts.RemoveAll(a => a.Id == e.ArtifactId)
         };
     }
 

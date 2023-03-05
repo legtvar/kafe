@@ -6,6 +6,7 @@ namespace Kafe.Api.Transfer;
 public record MediaDto(
     string FileExtension,
     string MimeType,
+    long FileLength,
     TimeSpan Duration,
     ImmutableArray<VideoStreamDto> VideoStreams,
     ImmutableArray<AudioStreamDto> AudioStreams,

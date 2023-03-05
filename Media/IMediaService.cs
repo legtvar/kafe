@@ -18,11 +18,5 @@ public interface IMediaService
 
     Task<MediaInfo> GetInfo(string filePath, CancellationToken token = default);
 
-    Task Save(Hrib hrib, Stream data, CancellationToken cancellationToken = default);
-
-    Stream? Load(Hrib hrib, VideoQualityPreset preset = VideoQualityPreset.Original);
-
-    ImmutableArray<VideoQualityPreset> GetAvailablePresets(Hrib hrib);
-
-    Task<bool> ConvertToPreset(Hrib hrib, VideoQualityPreset preset, CancellationToken cancellationToken = default);
+    Task<MediaInfo> GetInfo(Stream stream, CancellationToken token = default);
 }

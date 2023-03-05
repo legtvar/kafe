@@ -5,12 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Kafe;
+namespace Kafe.Api.Options;
 
-public record KafeOptions
+public record ApiOptions
 {
     [Url, Required]
     public string BaseUrl { get; init; } = null!;
-
-    public string? DebugAccountToken { get; init; }
 }

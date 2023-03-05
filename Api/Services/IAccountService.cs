@@ -17,4 +17,8 @@ public interface IAccountService
     Task<AccountDetailDto?> Load(
         Hrib id,
         CancellationToken token = default);
+
+    Task<AccountDetailDto?> Load(
+        string emailAddress,
+        CancellationToken token = default);
 }

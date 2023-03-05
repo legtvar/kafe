@@ -1,4 +1,6 @@
 using Kafe.Data.Aggregates;
+using Kafe.Data.Options;
+using Kafe.Data.Services;
 using Marten;
 using Marten.Events;
 using Marten.Events.Projections;
@@ -51,7 +53,10 @@ public static class Db
         }
 
         services.AddMarten(ConfigureMarten);
+
+        services.AddSingleton<IStorageService, DefaultStorageService>();
+
         services.Configure<StorageOptions>(configuration.GetSection("Storage"));
-        services.Configure<KafeOptions>(configuration.GetSection("KAFE"));
+        services.Configure<SeedOptions>(configuration.GetSection("Seed"));
     }
 }

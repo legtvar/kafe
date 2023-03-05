@@ -2,6 +2,7 @@
 using Kafe.Data;
 using Kafe.Data.Aggregates;
 using Kafe.Data.Events;
+using Kafe.Data.Options;
 using Kafe.Media;
 using Marten;
 using Microsoft.Extensions.Options;

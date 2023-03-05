@@ -24,6 +24,8 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
 using Kafe.Api.Options;
+using Kafe.Data.Options;
+using Kafe.Api.Daemons;
 
 namespace Kafe.Api;
 
@@ -107,7 +109,11 @@ public class Startup
         services.AddScoped<IShardService, DefaultShardService>();
         services.AddScoped<IAccountService, DefaultAccountService>();
 
+        services.Configure<ApiOptions>(Configuration);
         services.Configure<EmailOptions>(Configuration.GetSection("Email"));
+        services.Configure<SeedOptions>(Configuration.GetSection("Seed"));
+
+        services.AddHostedService<SeedDaemon>();
     }
 
     private void ConfigureDataProtection(IServiceCollection services)

@@ -2,7 +2,7 @@
 
 public enum ShardKind
 {
-    Invalid = 0,
+    Unknown = 0,
     Video = 1,
     Image = 2,
     Subtitles = 3

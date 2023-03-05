@@ -1,4 +1,5 @@
-﻿using Kafe.Api.Transfer;
+﻿using Kafe.Api.Options;
+using Kafe.Api.Transfer;
 using Kafe.Data;
 using Kafe.Data.Aggregates;
 using Kafe.Data.Events;
@@ -9,6 +10,7 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
@@ -23,7 +25,6 @@ public class DefaultAccountService : IAccountService, IDisposable
 {
     public const string EmailConfirmationPurpose = "EmailConfirmation";
     public static readonly TimeSpan ConfirmationTokenExpiration = TimeSpan.FromHours(24);
-    public static readonly Hrib DebugAccountId = "AAAAbadf00d";
     
     // TODO: Obtain this from ASP.NET Core somehow.
     public const string EmailConfirmationEndpoint = "/api/v1/tmp-account/";
@@ -33,25 +34,44 @@ public class DefaultAccountService : IAccountService, IDisposable
     private readonly IDocumentSession db;
     private readonly IEmailService emailService;
     private readonly IHostEnvironment environment;
-    private readonly IOptions<KafeOptions> kafeOptions;
+    private readonly IOptions<ApiOptions> apiOptions;
 
     public DefaultAccountService(
         IDocumentSession db,
         IDataProtectionProvider dataProtectionProvider,
         IEmailService emailService,
         IHostEnvironment environment,
-        IOptions<KafeOptions> kafeOptions)
+        IOptions<ApiOptions> apiOptions)
     {
         dataProtector = dataProtectionProvider.CreateProtector(nameof(DefaultAccountService));
         this.db = db;
         this.emailService = emailService;
         this.environment = environment;
-        this.kafeOptions = kafeOptions;
+        this.apiOptions = apiOptions;
     }
 
     public async Task<AccountDetailDto?> Load(Hrib id, CancellationToken token = default)
     {
         var account = await db.LoadAsync<TemporaryAccountInfo>(id, token);
+        if (account is null)
+        {
+            return null;
+        }
+
+        var projects = await db.LoadManyAsync<ProjectInfo>(token, account.Projects.Cast<string>());
+        if (projects is null)
+        {
+            return null;
+        }
+
+        return TransferMaps.ToAccountDetailDto(account, projects);
+    }
+
+    public async Task<AccountDetailDto?> Load(string emailAddress, CancellationToken token = default)
+    {
+        var account = await db.Query<TemporaryAccountInfo>()
+            .SingleOrDefaultAsync(a => a.EmailAddress == emailAddress, token);
+
         if (account is null)
         {
             return null;
@@ -100,7 +120,7 @@ public class DefaultAccountService : IAccountService, IDisposable
         await db.SaveChangesAsync(token);
 
         var confirmationToken = EncodeAccountToken(new(id, EmailConfirmationPurpose, refreshed.SecurityStamp));
-        var confirmationUrl = new Uri(new Uri(kafeOptions.Value.BaseUrl), $"{EmailConfirmationEndpoint}{confirmationToken}");
+        var confirmationUrl = new Uri(new Uri(apiOptions.Value.BaseUrl), $"{EmailConfirmationEndpoint}{confirmationToken}");
         var emailSubject = Const.ConfirmationEmailSubject[account!.PreferredCulture]!;
         var emailMessage = string.Format(
             Const.ConfirmationEmailMessageTemplate[account!.PreferredCulture]!,
@@ -113,16 +133,6 @@ public class DefaultAccountService : IAccountService, IDisposable
         string confirmationToken,
         CancellationToken token = default)
     {
-        if (environment.IsDevelopment()
-            && !string.IsNullOrEmpty(kafeOptions.Value.DebugAccountToken)
-            && confirmationToken == kafeOptions.Value.DebugAccountToken)
-        {
-            return new TemporaryAccountInfoDto(
-                Id: DebugAccountId,
-                EmailAddress: "kafe@example.com",
-                PreferredCulture: Const.InvariantCultureCode);
-        }
-
         if (!TryDecodeAccountToken(confirmationToken, out var dto))
         {
             return null;

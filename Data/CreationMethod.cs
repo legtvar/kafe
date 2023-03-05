@@ -5,5 +5,6 @@ public enum CreationMethod
     Unknown,
     Manual,
     Migrator,
-    Api
+    Api,
+    Seed
 }

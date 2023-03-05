@@ -2,6 +2,8 @@
 using Kafe.Data;
 using Kafe.Data.Aggregates;
 using Kafe.Data.Events;
+using Kafe.Data.Options;
+using Kafe.Data.Services;
 using Kafe.Media;
 using Marten;
 using Microsoft.Extensions.Options;
@@ -16,30 +18,23 @@ namespace Kafe.Api.Services;
 public class DefaultShardService : IShardService
 {
     private readonly IDocumentSession db;
-    private readonly IOptions<StorageOptions> storageOptions;
+    private readonly IStorageService storageService;
     private readonly IMediaService mediaService;
 
     public DefaultShardService(
         IDocumentSession db,
-        IOptions<StorageOptions> storageOptions,
+        IStorageService storageService,
         IMediaService mediaService)
     {
         this.db = db;
-        this.storageOptions = storageOptions;
+        this.storageService = storageService;
         this.mediaService = mediaService;
-
-        if (storageOptions.Value.VideoShardsDirectory is null
-            || !Directory.Exists(storageOptions.Value.VideoShardsDirectory))
-        {
-            throw new ArgumentException($"VideoShard directory '{storageOptions.Value.VideoShardsDirectory}' is not " +
-                "configured or does not exist.");
-        }
     }
 
     public async Task<ShardDetailBaseDto?> Load(Hrib id, CancellationToken token = default)
     {
         var shardKind = await GetShardKind(id, token);
-        if (shardKind == ShardKind.Invalid)
+        if (shardKind == ShardKind.Unknown)
         {
             return null;
         }
@@ -91,23 +86,30 @@ public class DefaultShardService : IShardService
                 $"formats are supported.");
         }
 
-        var videoShardsDir = new DirectoryInfo(storageOptions.Value.VideoShardsDirectory!);
-        if (!videoShardsDir.Exists)
-        {
-            throw new InvalidOperationException($"VideoShard directory '{videoShardsDir.FullName}' " +
-                $"does not exist.");
-        }
-
         var shardId = Hrib.Create();
-        var shardDir = videoShardsDir.CreateSubdirectory(shardId);
         var originalFileExtension = mimeType == Const.MatroskaMimeType
             ? Const.MatroskaFileExtension
             : Const.Mp4FileExtension;
-        var originalPath = Path.Combine(shardDir.FullName, $"{Const.OriginalShardVariant}{originalFileExtension}");
-        using var originalStream = new FileStream(originalPath, FileMode.Create, FileAccess.Write);
-        await videoStream.CopyToAsync(originalStream, token);
+        await storageService.TryStoreShard(
+            dto.Kind,
+            shardId,
+            videoStream,
+            Const.OriginalShardVariant,
+            originalFileExtension,
+            token);
 
-        var mediaInfo = await mediaService.GetInfo(originalPath, token);
+        if (!storageService.TryOpenShardStream(
+            dto.Kind,
+            shardId,
+            Const.OriginalShardVariant,
+            out var shardStream,
+            out var shardFileExtension))
+        {
+            throw new ArgumentException("The shard stream could not be opened just after being saved.");
+        }
+
+        var mediaInfo = await mediaService.GetInfo(shardStream, token);
+        mediaInfo = mediaInfo with { FileExtension = shardFileExtension };
 
         var created = new VideoShardCreated(
             ShardId: shardId,
@@ -124,32 +126,12 @@ public class DefaultShardService : IShardService
     {
         variant = SanitizeVariantName(variant);
         var shardKind = await GetShardKind(id, token);
-
-        var shardKindDir = storageOptions.Value.GetShardDirectory(shardKind);
-        if (string.IsNullOrEmpty(shardKindDir))
+        if (!storageService.TryOpenShardStream(shardKind, id, variant, out var stream, out _))
         {
-            throw new InvalidOperationException($"Storage directory for ShardKind '{shardKind}' is not set.");
+            throw new ArgumentException($"A shard stream for the '{id}' shard could not be opened.");
         }
 
-        var shardDir = new DirectoryInfo(Path.Combine(shardKindDir, id));
-        if (!shardDir.Exists)
-        {
-            throw new ArgumentException($"Shard directory '{id}' could not be found.");
-        }
-
-        var variantFiles = shardDir.GetFiles($"{variant}.*");
-        if (variantFiles.Length == 0)
-        {
-            throw new ArgumentException($"The '{variant}' variant of shard '{id}' could not be found.");
-        }
-        else if (variantFiles.Length > 1)
-        {
-            throw new ArgumentException($"The '{variant}' variant of shard '{id}' has multiple source " +
-                "files. This is probably a bug.");
-        }
-
-        var variantFile = variantFiles.Single();
-        return variantFile.OpenRead();
+        return stream;
     }
 
     public async Task<ShardKind> GetShardKind(Hrib id, CancellationToken token = default)
@@ -157,7 +139,7 @@ public class DefaultShardService : IShardService
         var firstEvent = (await db.Events.FetchStreamAsync(id, 1, token: token)).SingleOrDefault();
         if (firstEvent is null)
         {
-            return ShardKind.Invalid;
+            return ShardKind.Unknown;
         }
 
         return ((IShardCreated)firstEvent.Data).GetShardKind();

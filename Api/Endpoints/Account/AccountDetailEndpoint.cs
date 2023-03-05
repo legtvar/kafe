@@ -13,7 +13,8 @@ using System.Threading.Tasks;
 namespace Kafe.Api.Endpoints.Account;
 
 [ApiVersion("1")]
-[Route("account/{id?}")]
+[Route("account")]
+[Route("account/{id}")]
 [Authorize]
 public class AccountDetailEndpoint : EndpointBaseAsync
     .WithRequest<string?>
@@ -26,12 +27,12 @@ public class AccountDetailEndpoint : EndpointBaseAsync
         this.accounts = accounts;
     }
 
-    [HttpPost]
+    [HttpGet]
     [SwaggerOperation(Tags = new[] { EndpointArea.Account })]
     [ProducesResponseType(200)]
     [ProducesResponseType(400)]
     public override async Task<ActionResult<AccountDetailDto?>> HandleAsync(
-        [FromRoute] string? id,
+        string? id,
         CancellationToken cancellationToken = default)
     {
         id ??= User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -42,6 +43,6 @@ public class AccountDetailEndpoint : EndpointBaseAsync
                 "This could be a bug.");
         }
 
-        return await accounts.Load(id, cancellationToken);
+        return await accounts.Load((Hrib)id, cancellationToken);
     }
 }

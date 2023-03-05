@@ -24,16 +24,6 @@ public class FFmpegCoreService : IMediaService
         GlobalFFOptions.Configure(new FFOptions { BinaryFolder = Path.GetDirectoryName(path)! });
     }
 
-    public Task<bool> ConvertToPreset(Hrib hrib, VideoQualityPreset preset, CancellationToken cancellationToken = default)
-    {
-        throw new NotImplementedException();
-    }
-
-    public ImmutableArray<VideoQualityPreset> GetAvailablePresets(Hrib hrib)
-    {
-        throw new NotImplementedException();
-    }
-
     public async Task<MediaInfo> GetInfo(string filePath, CancellationToken token = default)
     {
         try
@@ -45,8 +35,37 @@ public class FFmpegCoreService : IMediaService
             }
 
             var data = await FFProbe.AnalyseAsync(filePath, cancellationToken: token);
+            return GetMediaInfo(data) with
+            {
+                FileExtension = Path.GetExtension(filePath),
+                FileLength = fileInfo.Length
+            };
+        }
+        catch(FFMpegException)
+        {
+            return MediaInfo.Invalid;
+        }
+    }
 
-            var videoInfos = data.VideoStreams
+    public async Task<MediaInfo> GetInfo(Stream stream, CancellationToken token = default)
+    {
+        try
+        {
+            var data = await FFProbe.AnalyseAsync(stream, cancellationToken: token);
+            return GetMediaInfo(data) with
+            {
+                FileLength = stream.Length
+            };
+        }
+        catch (FFMpegException)
+        {
+            return MediaInfo.Invalid;
+        }
+    }
+
+    private MediaInfo GetMediaInfo(IMediaAnalysis data)
+    {
+        var videoInfos = data.VideoStreams
                 .Select(v => new VideoInfo(
                         Codec: v.CodecName,
                         Bitrate: v.BitRate,
@@ -55,43 +74,28 @@ public class FFmpegCoreService : IMediaService
                     Framerate: v.FrameRate))
                 .ToImmutableArray();
 
-            var audioInfos = data.AudioStreams
-                .Select(a => new AudioInfo(
-                    Codec: a.CodecName,
-                    Bitrate: a.BitRate,
-                    Channels: a.Channels,
-                    SampleRate: a.SampleRateHz))
-                .ToImmutableArray();
+        var audioInfos = data.AudioStreams
+            .Select(a => new AudioInfo(
+                Codec: a.CodecName,
+                Bitrate: a.BitRate,
+                Channels: a.Channels,
+                SampleRate: a.SampleRateHz))
+            .ToImmutableArray();
 
-            var subtitleInfos = data.SubtitleStreams
-                .Select(s => new SubtitlesInfo(
-                    Language: s.Language,
-                    Codec: s.CodecName,
-                    Bitrate: s.BitRate))
-                .ToImmutableArray();
+        var subtitleInfos = data.SubtitleStreams
+            .Select(s => new SubtitlesInfo(
+                Language: s.Language,
+                Codec: s.CodecName,
+                Bitrate: s.BitRate))
+            .ToImmutableArray();
 
-            return new MediaInfo(
-                FileExtension: Path.GetExtension(filePath),
-                FormatName: data.Format.FormatName,
-                FileLength: fileInfo.Length,
-                Duration: data.Duration,
-                VideoStreams: videoInfos,
-                AudioStreams: audioInfos,
-                SubtitleStreams: subtitleInfos);
-        }
-        catch(FFMpegException)
-        {
-            return MediaInfo.Invalid;
-        }
-    }
-
-    public Stream? Load(Hrib hrib, VideoQualityPreset preset = VideoQualityPreset.Original)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task Save(Hrib hrib, Stream data, CancellationToken cancellationToken = default)
-    {
-        throw new NotImplementedException();
+        return new MediaInfo(
+            FileExtension: Const.InvalidFileExtension,
+            FormatName: data.Format.FormatName,
+            FileLength: Const.InvalidFileLength,
+            Duration: data.Duration,
+            VideoStreams: videoInfos,
+            AudioStreams: audioInfos,
+            SubtitleStreams: subtitleInfos);
     }
 }

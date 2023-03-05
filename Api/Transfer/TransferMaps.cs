@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Security.Claims;
 using Kafe.Data;
 using Kafe.Data.Aggregates;
 using Kafe.Media;
@@ -291,5 +293,19 @@ public static class TransferMaps
             Id: account.Id,
             EmailAddress: account.EmailAddress,
             PreferredCulture: account.PreferredCulture);
+    }
+
+    public static AccountDetailDto ToAccountDetailDto(
+        TemporaryAccountInfo account,
+        IEnumerable<ProjectInfo> projects)
+    {
+        return new AccountDetailDto(
+            Id: account.Id,
+            Name: null,
+            Uco: null,
+            EmailAddress: account.EmailAddress,
+            PreferredCulture: account.PreferredCulture,
+            Projects: projects.Select(ToProjectListDto).ToImmutableArray()
+        );
     }
 }

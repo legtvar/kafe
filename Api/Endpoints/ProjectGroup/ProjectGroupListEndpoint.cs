@@ -9,10 +9,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Kafe.Api.Swagger;
 using Swashbuckle.AspNetCore.Annotations;
 
-namespace Kafe.Api.Endpoints;
+namespace Kafe.Api.Endpoints.ProjectGroup;
 
 [ApiVersion("1")]
 [Route("project-groups")]
@@ -27,10 +26,10 @@ public class ProjectGroupListEndpoint : EndpointBaseAsync
     {
         this.db = db;
     }
-    
+
     [HttpGet]
-    [SwaggerOperation(Tags = new[] { SwaggerTags.ProjectGroup })]
-    public override async Task<ActionResult<List<ProjectGroupListDto>>>HandleAsync(
+    [SwaggerOperation(Tags = new[] { EndpointArea.ProjectGroup })]
+    public override async Task<ActionResult<List<ProjectGroupListDto>>> HandleAsync(
         CancellationToken cancellationToken = default)
     {
         var projectGroups = await db.Query<ProjectGroupInfo>().ToListAsync(cancellationToken);

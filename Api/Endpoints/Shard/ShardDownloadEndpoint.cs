@@ -1,14 +1,13 @@
 ﻿using Ardalis.ApiEndpoints;
 using Asp.Versioning;
 using Kafe.Api.Services;
-using Kafe.Api.Swagger;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Kafe.Api.Endpoints;
+namespace Kafe.Api.Endpoints.Shard;
 
 [ApiVersion("1")]
 [Route("shard-download/{id}/{variant?}")]
@@ -25,7 +24,7 @@ public class ShardDownloadEndpoint : EndpointBaseAsync
     }
 
     [HttpGet]
-    [SwaggerOperation(Tags = new[] { SwaggerTags.Shard })]
+    [SwaggerOperation(Tags = new[] { EndpointArea.Shard })]
     [Produces("video/mp4", "video/x-matroska", "application/octet-stream", Type = typeof(FileStreamResult))]
     public override async Task<ActionResult> HandleAsync(
         [FromRoute] RequestData data,

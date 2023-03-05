@@ -1,7 +1,6 @@
 ﻿using Ardalis.ApiEndpoints;
 using Asp.Versioning;
 using Kafe.Api.Services;
-using Kafe.Api.Swagger;
 using Kafe.Api.Transfer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -9,7 +8,7 @@ using Swashbuckle.AspNetCore.Annotations;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Kafe.Api.Endpoints;
+namespace Kafe.Api.Endpoints.Shard;
 
 [ApiVersion("1")]
 [Route("shard/{id}")]
@@ -26,7 +25,7 @@ public class ShardDetailEndpoint : EndpointBaseAsync
     }
 
     [HttpGet]
-    [SwaggerOperation(Tags = new[] { SwaggerTags.Shard })]
+    [SwaggerOperation(Tags = new[] { EndpointArea.Shard })]
     [ProducesResponseType(typeof(ShardDetailBaseDto), 200)]
     [ProducesResponseType(404)]
     public override async Task<ActionResult<ShardDetailBaseDto?>> HandleAsync(

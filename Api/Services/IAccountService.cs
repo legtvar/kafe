@@ -13,4 +13,8 @@ public interface IAccountService
     Task<TemporaryAccountInfoDto?> ConfirmTemporaryAccount(
         string confirmationToken,
         CancellationToken token = default);
+
+    Task<AccountDetailDto?> Load(
+        Hrib id,
+        CancellationToken token = default);
 }

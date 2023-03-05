@@ -9,10 +9,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Kafe.Api.Swagger;
 using Swashbuckle.AspNetCore.Annotations;
 
-namespace Kafe.Api.Endpoints;
+namespace Kafe.Api.Endpoints.Playlist;
 
 [ApiVersion("1")]
 [Route("playlists")]
@@ -27,10 +26,10 @@ public class PlaylistListEndpoint : EndpointBaseAsync
     {
         this.db = db;
     }
-    
+
     [HttpGet]
-    [SwaggerOperation(Tags = new[] { SwaggerTags.Playlist })]
-    public override async Task<ActionResult<List<PlaylistListDto>>>HandleAsync(
+    [SwaggerOperation(Tags = new[] { EndpointArea.Playlist })]
+    public override async Task<ActionResult<List<PlaylistListDto>>> HandleAsync(
         CancellationToken cancellationToken = default)
     {
         var playlists = await db.Query<PlaylistInfo>().ToListAsync(cancellationToken);

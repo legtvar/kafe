@@ -11,11 +11,10 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Kafe.Api.Swagger;
 using Swashbuckle.AspNetCore.Annotations;
 using Kafe.Api.Services;
 
-namespace Kafe.Api.Endpoints;
+namespace Kafe.Api.Endpoints.Project;
 
 [ApiVersion("1")]
 [Route("project/{id}")]
@@ -32,7 +31,7 @@ public class ProjectDetailEndpoint : EndpointBaseAsync
     }
 
     [HttpGet]
-    [SwaggerOperation(Tags = new[] { SwaggerTags.Project })]
+    [SwaggerOperation(Tags = new[] { EndpointArea.Project })]
     [ProducesResponseType(typeof(ProjectDetailDto), 200)]
     [ProducesResponseType(404)]
     public override async Task<ActionResult<ProjectDetailDto>> HandleAsync(

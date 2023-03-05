@@ -9,12 +9,11 @@ using Kafe.Api.Transfer;
 using Marten;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Kafe.Api.Swagger;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Collections.Immutable;
 using Kafe.Api.Services;
 
-namespace Kafe.Api.Endpoints;
+namespace Kafe.Api.Endpoints.Project;
 
 [ApiVersion("1")]
 [Route("projects")]
@@ -31,8 +30,8 @@ public class ProjectListEndpoint : EndpointBaseAsync
     }
 
     [HttpGet]
-    [SwaggerOperation(Tags = new[] { SwaggerTags.Project })]
-    public override async Task<ActionResult<ImmutableArray<ProjectListDto>>>HandleAsync(
+    [SwaggerOperation(Tags = new[] { EndpointArea.Project })]
+    public override async Task<ActionResult<ImmutableArray<ProjectListDto>>> HandleAsync(
         CancellationToken cancellationToken = default)
     {
         return Ok(await projects.List(cancellationToken));

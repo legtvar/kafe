@@ -11,6 +11,7 @@ using Microsoft.Extensions.Options;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
@@ -46,6 +47,23 @@ public class DefaultAccountService : IAccountService, IDisposable
         this.emailService = emailService;
         this.environment = environment;
         this.kafeOptions = kafeOptions;
+    }
+
+    public async Task<AccountDetailDto?> Load(Hrib id, CancellationToken token = default)
+    {
+        var account = await db.LoadAsync<TemporaryAccountInfo>(id, token);
+        if (account is null)
+        {
+            return null;
+        }
+
+        var projects = await db.LoadManyAsync<ProjectInfo>(token, account.Projects.Cast<string>());
+        if (projects is null)
+        {
+            return null;
+        }
+
+        return TransferMaps.ToAccountDetailDto(account, projects);
     }
 
     public async Task CreateTemporaryAccount(

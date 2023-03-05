@@ -1,6 +1,5 @@
 ﻿using Ardalis.ApiEndpoints;
 using Asp.Versioning;
-using Kafe.Api.Swagger;
 using Kafe.Api.Transfer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -8,7 +7,7 @@ using Swashbuckle.AspNetCore.Annotations;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Kafe.Api.Endpoints;
+namespace Kafe.Api.Endpoints.Project;
 
 [ApiVersion("1")]
 [Route("project")]
@@ -18,7 +17,7 @@ public class ProjectCreationEndpoint : EndpointBaseAsync
     .WithActionResult<Hrib>
 {
     [HttpPost]
-    [SwaggerOperation(Tags = new[] { SwaggerTags.Project })]
+    [SwaggerOperation(Tags = new[] { EndpointArea.Project })]
     public override Task<ActionResult<Hrib>> HandleAsync(
         ProjectCreationDto request,
         CancellationToken cancellationToken = default)

@@ -13,6 +13,8 @@ public static class Const
     public const string InvalidPath = "invalid";
     public const string InvalidFileExtension = "invalid";
     public const string InvalidFormatName = "invalid";
+    public const string InvalidEmailAddress = "invalid@example.com";
+    public const string InvalidName = "Invalid";
     public const long ShardSizeLimit = 4_294_967_296;
 
     public const string MatroskaMimeType = "video/x-matroska";
@@ -32,6 +34,7 @@ public static class Const
 
     public const string SlovakCultureName = "sk";
     public static readonly CultureInfo SlovakCulture;
+
 
     public static readonly LocalizedString UnknownAuthor;
     public static readonly LocalizedString UnknownProjectGroup;

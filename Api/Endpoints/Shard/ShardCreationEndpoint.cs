@@ -1,7 +1,6 @@
 ﻿using Ardalis.ApiEndpoints;
 using Asp.Versioning;
 using Kafe.Api.Services;
-using Kafe.Api.Swagger;
 using Kafe.Api.Transfer;
 using Kafe.Data;
 using Microsoft.AspNetCore.Authorization;
@@ -12,7 +11,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Kafe.Api.Endpoints;
+namespace Kafe.Api.Endpoints.Shard;
 
 [ApiVersion("1")]
 [Route("shard")]
@@ -29,7 +28,7 @@ public class ShardCreationEndpoint : EndpointBaseAsync
     }
 
     [HttpPost]
-    [SwaggerOperation(Tags = new[] { SwaggerTags.Shard })]
+    [SwaggerOperation(Tags = new[] { EndpointArea.Shard })]
     [RequestSizeLimit(Const.ShardSizeLimit)]
     [RequestFormLimits(MultipartBodyLengthLimit = Const.ShardSizeLimit)]
     public override async Task<ActionResult<Hrib>> HandleAsync(

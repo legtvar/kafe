@@ -7,10 +7,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading;
 using System.Threading.Tasks;
-using Kafe.Api.Swagger;
 using Swashbuckle.AspNetCore.Annotations;
 
-namespace Kafe.Api.Endpoints;
+namespace Kafe.Api.Endpoints.Playlist;
 
 [ApiVersion("1")]
 [Route("playlist/{id}")]
@@ -27,7 +26,7 @@ public class PlaylistDetailEndpoint : EndpointBaseAsync
     }
 
     [HttpGet]
-    [SwaggerOperation(Tags = new[] { SwaggerTags.Playlist })]
+    [SwaggerOperation(Tags = new[] { EndpointArea.Playlist })]
     [ProducesResponseType(typeof(PlaylistDetailDto), 200)]
     [ProducesResponseType(404)]
     public override async Task<ActionResult<PlaylistDetailDto>> HandleAsync(

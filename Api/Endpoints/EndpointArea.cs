@@ -1,6 +1,6 @@
-﻿namespace Kafe.Api.Swagger;
+﻿namespace Kafe.Api.Endpoints;
 
-public static class SwaggerTags
+public static class EndpointArea
 {
     public const string Account = "Account";
     public const string Author = "Author";

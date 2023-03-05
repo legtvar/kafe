@@ -7,10 +7,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading;
 using System.Threading.Tasks;
-using Kafe.Api.Swagger;
 using Swashbuckle.AspNetCore.Annotations;
 
-namespace Kafe.Api.Endpoints;
+namespace Kafe.Api.Endpoints.ProjectGroup;
 
 [ApiVersion("1")]
 [Route("project-group/{id}")]
@@ -27,7 +26,7 @@ public class ProjectGroupDetailEndpoint : EndpointBaseAsync
     }
 
     [HttpGet]
-    [SwaggerOperation(Tags = new[] { SwaggerTags.ProjectGroup })]
+    [SwaggerOperation(Tags = new[] { EndpointArea.ProjectGroup })]
     [ProducesResponseType(typeof(ProjectGroupDetailDto), 200)]
     [ProducesResponseType(404)]
     public override async Task<ActionResult<ProjectGroupDetailDto>> HandleAsync(

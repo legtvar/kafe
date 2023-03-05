@@ -4,6 +4,8 @@ namespace Kafe.Api.Options;
 
 public record EmailOptions
 {
+    public EmailServiceType ServiceType { get; init; } = EmailServiceType.Default;
+
     [Required]
     public string Host { get; init; } = null!;
 
@@ -22,4 +24,17 @@ public record EmailOptions
     public string FromAddress { get; init; } = null!;
 
     public string? EnvelopeSender { get; init; }
+
+    [Required]
+    public string RelayUrl { get; init; } = null!;
+
+    [Required]
+    public string RelaySecret { get; init; } = null!;
+
+    public enum EmailServiceType
+    {
+        Default,
+        Debug,
+        Relayed
+    }
 }

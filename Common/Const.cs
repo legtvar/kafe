@@ -75,7 +75,7 @@ KAFE
             (CzechCulture,
 @"Dobrý den,
 
-Prosím klikněte na následující odkaz pro přihlášení do KAFE:
+prosím klikněte na následující odkaz pro přihlášení do KAFE:
 
 {0}
 
@@ -86,7 +86,7 @@ Vaše KAFE
             (SlovakCulture,
 @"Dobrý deň,
 
-Prosím kliknite na nasledujúci odkaz pre prihlásenie do KAFE:
+prosím kliknite na nasledujúci odkaz pre prihlásenie do KAFE:
 
 {0}
 

@@ -102,7 +102,6 @@ public class Startup
         Db.AddDb(services, Configuration, Environment);
 
         services.AddSingleton<IMediaService, FFmpegCoreService>();
-        services.AddSingleton<IEmailService, DebugEmailService>();
         services.AddScoped<IProjectService, DefaultProjectService>();
         services.AddScoped<IAuthorService, DefaultAuthorService>();
         services.AddScoped<IArtifactService, DefaultArtifactService>();
@@ -114,6 +113,22 @@ public class Startup
         services.Configure<SeedOptions>(Configuration.GetSection("Seed"));
 
         services.AddHostedService<SeedDaemon>();
+
+        var emailServiceType = Configuration.GetSection("Email").Get<EmailOptions>()?.ServiceType
+            ?? EmailOptions.EmailServiceType.Default;
+        switch (emailServiceType)
+        {
+            case EmailOptions.EmailServiceType.Debug:
+                services.AddSingleton<IEmailService, DebugEmailService>();
+                break;
+            case EmailOptions.EmailServiceType.Relayed:
+                services.AddSingleton<IEmailService, RelayedEmailService>();
+                break;
+            default:
+                services.AddSingleton<IEmailService, DefaultEmailService>();
+                break;
+        }
+
     }
 
     private void ConfigureDataProtection(IServiceCollection services)

@@ -1,4 +1,5 @@
-﻿using Kafe.Data.Events;
+﻿using Kafe.Data.Capabilities;
+using Kafe.Data.Events;
 using Marten.Events;
 using Marten.Events.Aggregation;
 using Marten.Schema;
@@ -11,9 +12,10 @@ using System.Threading.Tasks;
 
 namespace Kafe.Data.Aggregates;
 
-public record TemporaryAccountInfo(
+public record AccountInfo(
     string Id,
     CreationMethod CreationMethod,
+    AccountKind Kind,
 
     [property: UniqueIndex(IndexType = UniqueIndexType.Computed)]
     string EmailAddress,
@@ -21,29 +23,30 @@ public record TemporaryAccountInfo(
     string PreferredCulture,
     string? SecurityStamp,
     DateTimeOffset RefreshedOn,
-    ImmutableHashSet<Hrib> Projects
+    ImmutableHashSet<IAccountCapability> Capabilities
 );
 
-public class TemporaryAccountInfoProjection : SingleStreamAggregation<TemporaryAccountInfo>
+public class AccountInfoProjection : SingleStreamAggregation<AccountInfo>
 {
-    public TemporaryAccountInfoProjection()
+    public AccountInfoProjection()
     {
     }
 
-    public TemporaryAccountInfo Create(TemporaryAccountCreated e)
+    public AccountInfo Create(TemporaryAccountCreated e)
     {
         return new(
             Id: e.AccountId,
             CreationMethod: e.CreationMethod,
+            Kind: AccountKind.Temporary,
             EmailAddress: e.EmailAddress,
             PreferredCulture: e.PreferredCulture,
             SecurityStamp: null,
             RefreshedOn: default,
-            Projects: ImmutableHashSet<Hrib>.Empty
+            Capabilities: ImmutableHashSet<IAccountCapability>.Empty
         );
     }
 
-    public TemporaryAccountInfo Apply(IEvent<TemporaryAccountRefreshed> e, TemporaryAccountInfo a)
+    public AccountInfo Apply(IEvent<TemporaryAccountRefreshed> e, AccountInfo a)
     {
         return a with
         {
@@ -52,7 +55,7 @@ public class TemporaryAccountInfoProjection : SingleStreamAggregation<TemporaryA
         };
     }
 
-    public TemporaryAccountInfo Apply(TemporaryAccountClosed e, TemporaryAccountInfo a)
+    public AccountInfo Apply(TemporaryAccountClosed e, AccountInfo a)
     {
         return a with
         {
@@ -60,7 +63,7 @@ public class TemporaryAccountInfoProjection : SingleStreamAggregation<TemporaryA
         };
     }
 
-    public TemporaryAccountInfo Apply(TemporaryAccountInfoChanged e, TemporaryAccountInfo a)
+    public AccountInfo Apply(TemporaryAccountInfoChanged e, AccountInfo a)
     {
         return a with
         {
@@ -68,19 +71,19 @@ public class TemporaryAccountInfoProjection : SingleStreamAggregation<TemporaryA
         };
     }
 
-    public TemporaryAccountInfo Apply(AccountProjectAdded e, TemporaryAccountInfo a)
+    public AccountInfo Apply(AccountCapabilityAdded e, AccountInfo a)
     {
         return a with
         {
-            Projects = a.Projects.Add(e.ProjectId)
+            Capabilities = a.Capabilities.Add(e.Capability)
         };
     }
 
-    public TemporaryAccountInfo Apply(AccountProjectRemoved e, TemporaryAccountInfo a)
+    public AccountInfo Apply(AccountCapabilityRemoved e, AccountInfo a)
     {
         return a with
         {
-            Projects = a.Projects.Remove(e.ProjectId)
+            Capabilities = a.Capabilities.Remove(e.Capability)
         };
     }
 }

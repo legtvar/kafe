@@ -21,25 +21,28 @@ public class AccountDetailEndpoint : EndpointBaseAsync
     .WithActionResult<AccountDetailDto?>
 {
     private readonly IAccountService accounts;
+    private readonly ICurrentAccountProvider currentAccountProvider;
 
-    public AccountDetailEndpoint(IAccountService accounts)
+    public AccountDetailEndpoint(IAccountService accounts, ICurrentAccountProvider currentAccountProvider)
     {
         this.accounts = accounts;
+        this.currentAccountProvider = currentAccountProvider;
     }
 
     [HttpGet]
     [SwaggerOperation(Tags = new[] { EndpointArea.Account })]
     [ProducesResponseType(200)]
     [ProducesResponseType(400)]
+    [ProducesResponseType(404)]
     public override async Task<ActionResult<AccountDetailDto?>> HandleAsync(
         string? id,
         CancellationToken cancellationToken = default)
     {
-        id ??= User.FindFirstValue(ClaimTypes.NameIdentifier);
+        id ??= currentAccountProvider.User?.Id;
 
         if (id is null)
         {
-            throw new ArgumentException("No account ID was provided and the current user doesn't have any. " +
+            return NotFound("No account ID was provided and the current user doesn't have any. " +
                 "This could be a bug.");
         }
 

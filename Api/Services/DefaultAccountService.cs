@@ -2,6 +2,7 @@
 using Kafe.Api.Transfer;
 using Kafe.Data;
 using Kafe.Data.Aggregates;
+using Kafe.Data.Capabilities;
 using Kafe.Data.Events;
 using Marten;
 using Marten.Events;
@@ -14,6 +15,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
+using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
@@ -25,7 +27,7 @@ public class DefaultAccountService : IAccountService, IDisposable
 {
     public const string EmailConfirmationPurpose = "EmailConfirmation";
     public static readonly TimeSpan ConfirmationTokenExpiration = TimeSpan.FromHours(24);
-    
+
     // TODO: Obtain this from ASP.NET Core somehow.
     public const string EmailConfirmationEndpoint = "/api/v1/tmp-account/";
 
@@ -52,13 +54,15 @@ public class DefaultAccountService : IAccountService, IDisposable
 
     public async Task<AccountDetailDto?> Load(Hrib id, CancellationToken token = default)
     {
-        var account = await db.LoadAsync<TemporaryAccountInfo>(id, token);
+        var account = await db.LoadAsync<AccountInfo>(id, token);
         if (account is null)
         {
             return null;
         }
 
-        var projects = await db.LoadManyAsync<ProjectInfo>(token, account.Projects.Cast<string>());
+        var projects = await db.LoadManyAsync<ProjectInfo>(
+            token,
+            account.Capabilities.OfType<ProjectOwnerCapability>().Select(c => (string)c.ProjectId));
         if (projects is null)
         {
             return null;
@@ -69,7 +73,9 @@ public class DefaultAccountService : IAccountService, IDisposable
 
     public async Task<AccountDetailDto?> Load(string emailAddress, CancellationToken token = default)
     {
-        var account = await db.Query<TemporaryAccountInfo>()
+        // TODO: Dedupe with the overload above.
+
+        var account = await db.Query<AccountInfo>()
             .SingleOrDefaultAsync(a => a.EmailAddress == emailAddress, token);
 
         if (account is null)
@@ -77,7 +83,9 @@ public class DefaultAccountService : IAccountService, IDisposable
             return null;
         }
 
-        var projects = await db.LoadManyAsync<ProjectInfo>(token, account.Projects.Cast<string>());
+        var projects = await db.LoadManyAsync<ProjectInfo>(
+            token,
+            account.Capabilities.OfType<ProjectOwnerCapability>().Select(c => (string)c.ProjectId));
         if (projects is null)
         {
             return null;
@@ -86,11 +94,21 @@ public class DefaultAccountService : IAccountService, IDisposable
         return TransferMaps.ToAccountDetailDto(account, projects);
     }
 
+    public async Task<ApiAccount?> LoadApiAccount(Hrib id, CancellationToken token = default)
+    {
+        var account = await db.LoadAsync<AccountInfo>(id, token);
+        if (account is null)
+        {
+            return null;
+        }
+        return ApiAccount.FromAggregate(account);
+    }
+
     public async Task CreateTemporaryAccount(
         TemporaryAccountCreationDto dto,
         CancellationToken token = default)
     {
-        var account = await db.Query<TemporaryAccountInfo>()
+        var account = await db.Query<AccountInfo>()
             .SingleOrDefaultAsync(a => a.EmailAddress == dto.EmailAddress, token);
         Hrib? id;
         if (account is null)
@@ -101,16 +119,16 @@ public class DefaultAccountService : IAccountService, IDisposable
                 CreationMethod: CreationMethod.Api,
                 EmailAddress: dto.EmailAddress,
                 PreferredCulture: dto.PreferredCulture ?? Const.InvariantCultureCode);
-            db.Events.StartStream<TemporaryAccountInfo>(id, created);
+            db.Events.StartStream<AccountInfo>(id, created);
             await db.SaveChangesAsync(token);
-            account = await db.LoadAsync<TemporaryAccountInfo>(id, token)!;
+            account = await db.LoadAsync<AccountInfo>(id, token)!;
         }
         else
         {
             id = account.Id;
         }
 
-        var eventStream = await db.Events.FetchForExclusiveWriting<TemporaryAccountInfo>(id, token)
+        var eventStream = await db.Events.FetchForExclusiveWriting<AccountInfo>(id, token)
             ?? throw new InvalidOperationException($"Could not obtain the event stream for account '{id}' " +
                 "despite the account existing.");
         var refreshed = new TemporaryAccountRefreshed(
@@ -119,7 +137,7 @@ public class DefaultAccountService : IAccountService, IDisposable
         eventStream.AppendOne(refreshed);
         await db.SaveChangesAsync(token);
 
-        var confirmationToken = EncodeAccountToken(new(id, EmailConfirmationPurpose, refreshed.SecurityStamp));
+        var confirmationToken = EncodeToken(new(id, EmailConfirmationPurpose, refreshed.SecurityStamp));
         var confirmationUrl = new Uri(new Uri(apiOptions.Value.BaseUrl), $"{EmailConfirmationEndpoint}{confirmationToken}");
         var emailSubject = Const.ConfirmationEmailSubject[account!.PreferredCulture]!;
         var emailMessage = string.Format(
@@ -129,24 +147,19 @@ public class DefaultAccountService : IAccountService, IDisposable
         await emailService.SendEmail(account.EmailAddress, emailSubject, emailMessage);
     }
 
-    public async Task<TemporaryAccountInfoDto?> ConfirmTemporaryAccount(
-        string confirmationToken,
+    public async Task ConfirmTemporaryAccount(
+        TemporaryAccountTokenDto dto,
         CancellationToken token = default)
     {
-        if (!TryDecodeAccountToken(confirmationToken, out var dto))
-        {
-            return null;
-        }
-
         if (dto.Purpose != EmailConfirmationPurpose)
         {
-            return null;
+            throw new UnauthorizedAccessException("The token is meant for a different purpose.");
         }
 
-        var account = await db.LoadAsync<TemporaryAccountInfo>(dto.AccountId, token);
+        var account = await db.LoadAsync<AccountInfo>(dto.AccountId, token);
         if (account is null)
         {
-            return null;
+            throw new UnauthorizedAccessException("The account does not exist.");
         }
 
         if (account.RefreshedOn + ConfirmationTokenExpiration < DateTimeOffset.UtcNow)
@@ -154,18 +167,17 @@ public class DefaultAccountService : IAccountService, IDisposable
             var closedExpired = new TemporaryAccountClosed(account.Id);
             db.Events.Append(account.Id, closedExpired);
             await db.SaveChangesAsync(token);
-            return null;
+            throw new UnauthorizedAccessException("The token has expired.");
         }
 
         if (account.SecurityStamp != dto.SecurityStamp)
         {
-            return null;
+            throw new UnauthorizedAccessException("The token has been already used or revoked.");
         }
 
         var closedSuccessfully = new TemporaryAccountClosed(account.Id);
         db.Events.Append(account.Id, closedSuccessfully);
         await db.SaveChangesAsync(token);
-        return TransferMaps.ToTemporaryAccountInfoDto(account);
     }
 
     public void Dispose()
@@ -174,14 +186,14 @@ public class DefaultAccountService : IAccountService, IDisposable
         GC.SuppressFinalize(this);
     }
 
-    private string EncodeAccountToken(TemporaryAccountTokenDto dto)
+    public string EncodeToken(TemporaryAccountTokenDto dto)
     {
         var token = $"{dto.Purpose}:{dto.AccountId}:{dto.SecurityStamp}";
         var protectedBytes = dataProtector.Protect(Encoding.UTF8.GetBytes(token));
         return WebEncoders.Base64UrlEncode(protectedBytes);
     }
 
-    private bool TryDecodeAccountToken(string encodedToken, [NotNullWhen(true)] out TemporaryAccountTokenDto? dto)
+    public bool TryDecodeToken(string encodedToken, [NotNullWhen(true)] out TemporaryAccountTokenDto? dto)
     {
         try
         {

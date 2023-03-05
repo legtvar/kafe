@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Kafe.Data.Capabilities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,12 +7,10 @@ using System.Threading.Tasks;
 
 namespace Kafe.Data.Events;
 
-public record AccountProjectAdded(
-    Hrib AccountId,
-    Hrib ProjectId
+public record AccountCapabilityAdded(
+    IAccountCapability Capability
 );
 
-public record AccountProjectRemoved(
-    Hrib AccountId,
-    Hrib ProjectId
+public record AccountCapabilityRemoved(
+    IAccountCapability Capability
 );

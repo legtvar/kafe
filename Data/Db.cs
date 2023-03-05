@@ -48,7 +48,7 @@ public static class Db
             options.Projections.Add<ProjectGroupInfoProjection>(ProjectionLifecycle.Inline);
             options.Projections.Add<VideoConversionInfoProjection>(ProjectionLifecycle.Inline);
             options.Projections.Add<ArtifactDetailProjection>(ProjectionLifecycle.Inline);
-            options.Projections.Add<TemporaryAccountInfoProjection>(ProjectionLifecycle.Inline);
+            options.Projections.Add<AccountInfoProjection>(ProjectionLifecycle.Inline);
             options.UseDefaultSerialization(serializerType: SerializerType.SystemTextJson);
         }
 

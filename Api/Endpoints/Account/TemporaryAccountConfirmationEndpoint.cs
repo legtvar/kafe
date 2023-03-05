@@ -21,7 +21,6 @@ public class TemporaryAccountConfirmationEndpoint : EndpointBaseAsync
     .WithActionResult
 {
     public const string TemporaryAccountRole = "TemporaryAccount";
-    public static readonly TimeSpan CookieExpirationTime = new(30, 0, 0, 0);
 
     private readonly IAccountService accounts;
 
@@ -38,27 +37,27 @@ public class TemporaryAccountConfirmationEndpoint : EndpointBaseAsync
         [FromRoute] string token,
         CancellationToken cancellationToken = default)
     {
-        var account = await accounts.ConfirmTemporaryAccount(token, cancellationToken);
-        if (account is null)
+        if (!accounts.TryDecodeToken(token, out var tokenDto))
         {
-            return BadRequest();
+            return Unauthorized();
         }
 
-        var claims = new List<Claim>()
+        await accounts.ConfirmTemporaryAccount(tokenDto, cancellationToken);
+
+        var apiAccount = await accounts.LoadApiAccount(tokenDto.AccountId, cancellationToken);
+        if (apiAccount is null)
         {
-            new Claim(ClaimTypes.Name, account.EmailAddress),
-            new Claim(ClaimTypes.NameIdentifier, account.Id),
-            new Claim(ClaimTypes.Role, TemporaryAccountRole)
-        };
-        var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            return NotFound();
+        }
+
         var authProperties = new AuthenticationProperties
         {
             AllowRefresh = false,
             IssuedUtc = DateTimeOffset.UtcNow,
-            ExpiresUtc = DateTimeOffset.UtcNow.Add(CookieExpirationTime),
-            IsPersistent = true
+            ExpiresUtc = DateTimeOffset.UtcNow.Add(Const.AuthenticationCookieExpirationTime),
+            IsPersistent = true,
         };
 
-        return SignIn(new ClaimsPrincipal(claimsIdentity), authProperties);
+        return SignIn(apiAccount.ToPrincipal(CookieAuthenticationDefaults.AuthenticationScheme), authProperties);
     }
 }

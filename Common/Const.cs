@@ -18,6 +18,8 @@ public static class Const
     public const long InvalidFileLength = -1;
     public const long ShardSizeLimit = 4_294_967_296;
 
+    public static readonly TimeSpan AuthenticationCookieExpirationTime = new(30, 0, 0, 0);
+
     public const string MatroskaMimeType = "video/x-matroska";
     public const string MatroskaFileExtension = ".mkv";
 

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Security.Claims;
 using Kafe.Data;
 using Kafe.Data.Aggregates;
+using Kafe.Data.Capabilities;
 using Kafe.Media;
 
 namespace Kafe.Api.Transfer;
@@ -287,24 +288,24 @@ public static class TransferMaps
         };
     }
 
-    public static TemporaryAccountInfoDto ToTemporaryAccountInfoDto(TemporaryAccountInfo account)
+    public static TemporaryAccountInfoDto ToTemporaryAccountInfoDto(AccountInfo data)
     {
         return new TemporaryAccountInfoDto(
-            Id: account.Id,
-            EmailAddress: account.EmailAddress,
-            PreferredCulture: account.PreferredCulture);
+            Id: data.Id,
+            EmailAddress: data.EmailAddress,
+            PreferredCulture: data.PreferredCulture);
     }
 
     public static AccountDetailDto ToAccountDetailDto(
-        TemporaryAccountInfo account,
+        AccountInfo data,
         IEnumerable<ProjectInfo> projects)
     {
         return new AccountDetailDto(
-            Id: account.Id,
+            Id: data.Id,
             Name: null,
             Uco: null,
-            EmailAddress: account.EmailAddress,
-            PreferredCulture: account.PreferredCulture,
+            EmailAddress: data.EmailAddress,
+            PreferredCulture: data.PreferredCulture,
             Projects: projects.Select(ToProjectListDto).ToImmutableArray()
         );
     }

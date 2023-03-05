@@ -26,6 +26,8 @@ using Microsoft.AspNetCore.DataProtection;
 using Kafe.Api.Options;
 using Kafe.Data.Options;
 using Kafe.Api.Daemons;
+using Kafe.Api.Authorization;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Kafe.Api;
 
@@ -42,10 +44,15 @@ public class Startup
 
     public void ConfigureServices(IServiceCollection services)
     {
+        services.AddHttpContextAccessor();
+
         services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
             .AddCookie();
 
-        services.AddAuthorization();
+        services.AddAuthorization(o =>
+        {
+            o.AddPolicy(EndpointPolicy.AdministratorOnly, b => b.AddRequirements(new AdministratorRequirement()));
+        });
 
         ConfigureDataProtection(services);
 
@@ -102,11 +109,15 @@ public class Startup
         Db.AddDb(services, Configuration, Environment);
 
         services.AddSingleton<IMediaService, FFmpegCoreService>();
+
+        services.AddScoped<ICurrentAccountProvider, DefaultCurrentAccountProvider>();
         services.AddScoped<IProjectService, DefaultProjectService>();
         services.AddScoped<IAuthorService, DefaultAuthorService>();
         services.AddScoped<IArtifactService, DefaultArtifactService>();
         services.AddScoped<IShardService, DefaultShardService>();
         services.AddScoped<IAccountService, DefaultAccountService>();
+
+        services.AddScoped<IAuthorizationHandler, AdministratorHandler>();
 
         services.Configure<ApiOptions>(Configuration);
         services.Configure<EmailOptions>(Configuration.GetSection("Email"));

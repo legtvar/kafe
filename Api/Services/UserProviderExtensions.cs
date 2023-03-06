@@ -36,7 +36,7 @@ public static class UserProviderExtensions
             return q;
         }
 
-        var ownProjects = userProvider.GetOwnProjects();
+        var ownProjects = userProvider.GetOwnProjects().Select(i => (string)i).ToImmutableArray();
 
         return q.Where(p => p.Visibility == Visibility.Public || ownProjects.Contains(p.Id));
     }
@@ -88,16 +88,16 @@ public static class UserProviderExtensions
         return projectGroup.IsOpen;
     }
 
-    public static ImmutableHashSet<Hrib> GetOwnProjects(this IUserProvider p)
+    public static ImmutableArray<Hrib> GetOwnProjects(this IUserProvider p)
     {
         if (p.User is null)
         {
-            return ImmutableHashSet<Hrib>.Empty;
+            return ImmutableArray<Hrib>.Empty;
         }
 
         return p.User.Capabilities.OfType<ProjectOwnership>()
             .Select(c => c.ProjectId)
-            .ToImmutableHashSet();
+            .ToImmutableArray();
     }
 
     public static CultureInfo GetPreferredCulture(this IUserProvider p)

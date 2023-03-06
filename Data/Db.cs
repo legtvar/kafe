@@ -38,6 +38,7 @@ public static class Db
             });
 
             //options.Linq.FieldSources.Add(new LocalizedStringFieldSource());
+            //options.Linq.FieldSources.Add(new HribFieldSource());
 
             options.Projections.Add<AuthorInfoProjection>(ProjectionLifecycle.Inline);
             options.Projections.Add<ArtifactInfoProjection>(ProjectionLifecycle.Inline);

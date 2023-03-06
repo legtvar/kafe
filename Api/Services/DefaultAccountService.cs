@@ -107,14 +107,14 @@ public class DefaultAccountService : IAccountService, IDisposable
         return TransferMaps.ToAccountDetailDto(account, projects);
     }
 
+    /// <summary>
+    /// Gets an <see cref="ApiUser"/> for the account with <paramref name="id"/>.
+    /// </summary>
+    /// <remarks>
+    /// THIS METHOD DOES NOT CARE ABOUT AUTHORIZATION. Never return the result to the client.
+    /// </remarks>
     public async Task<ApiUser?> LoadApiAccount(Hrib id, CancellationToken token = default)
     {
-        if (id != userProvider.User?.Id
-            && !userProvider.IsAdministrator())
-        {
-            throw new UnauthorizedAccessException();
-        }
-
         var account = await db.LoadAsync<AccountInfo>(id, token);
         if (account is null)
         {
@@ -123,15 +123,15 @@ public class DefaultAccountService : IAccountService, IDisposable
         return ApiUser.FromAggregate(account);
     }
 
+    /// <summary>
+    /// Gets an <see cref="ApiUser"/> for the account with <paramref name="emailAddress"/>.
+    /// </summary>
+    /// <remarks>
+    /// THIS METHOD DOES NOT CARE ABOUT AUTHORIZATION. Never return the result to the client.
+    /// </remarks>
     public async Task<ApiUser?> LoadApiAccount(string emailAddress, CancellationToken token = default)
     {
         // TODO: Dedupe with the overload above.
-
-        if (emailAddress != userProvider.User?.EmailAddress
-            && !userProvider.IsAdministrator())
-        {
-            throw new UnauthorizedAccessException();
-        }
 
         var account = await db.Query<AccountInfo>()
             .SingleOrDefaultAsync(a => a.EmailAddress == emailAddress, token);

@@ -54,13 +54,16 @@ public class Startup
         services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
             .AddCookie(o =>
             {
-                Func<RedirectContext<CookieAuthenticationOptions>, Task> accessDenied = c =>
+                o.Events.OnRedirectToAccessDenied = c =>
                 {
                     c.Response.StatusCode = 403;
                     return Task.CompletedTask;
                 };
-                o.Events.OnRedirectToAccessDenied = accessDenied;
-                o.Events.OnRedirectToLogin = accessDenied;
+                o.Events.OnRedirectToLogin = c =>
+                {
+                    c.Response.StatusCode = 401;
+                    return Task.CompletedTask;
+                };
             });
 
         services.AddAuthorization(o =>
@@ -82,6 +85,7 @@ public class Startup
         services.AddControllers(o =>
         {
             o.Conventions.Add(new RoutePrefixConvention(new RouteAttribute("/api/v{version:apiVersion}")));
+            o.Filters.Add(typeof(SemanticExceptionFilter));
         })
         .AddJsonOptions(o =>
         {

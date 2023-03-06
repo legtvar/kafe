@@ -307,7 +307,8 @@ public static class TransferMaps
             Uco: null,
             EmailAddress: data.EmailAddress,
             PreferredCulture: data.PreferredCulture,
-            Projects: projects.Select(ToProjectListDto).ToImmutableArray()
+            Projects: projects.Select(ToProjectListDto).ToImmutableArray(),
+            Capabilities: data.Capabilities.Select(AccountCapability.Serialize).ToImmutableHashSet()
         );
     }
 }

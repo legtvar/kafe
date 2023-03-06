@@ -43,7 +43,7 @@ public abstract record AccountCapability
             Administration => nameof(Administration),
             ProjectReview r => $"{nameof(ProjectReview)}:{r.Role}",
             ProjectOwnership o => $"{nameof(ProjectOwnership)}:{o.ProjectId}",
-            _ => throw new NotSupportedException($"Capabilities of type '{capability.GetType()}' are not supported.")
+            _ => throw new NotImplementedException($"Serialization of '{capability.GetType()}' is not implemented.")
         };
     }
 
@@ -57,8 +57,7 @@ public abstract record AccountCapability
     {
         return capability is null ? null : Serialize(capability);
     }
-};
-
+}
 public record Administration : AccountCapability;
 
 public record ProjectReview : AccountCapability

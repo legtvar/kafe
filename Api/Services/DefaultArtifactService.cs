@@ -53,6 +53,11 @@ public class DefaultArtifactService : IArtifactService
 
     public async Task<ImmutableArray<ArtifactDetailDto?>> LoadMany(IEnumerable<Hrib> ids, CancellationToken token = default)
     {
+        if (!userProvider.IsAdministrator())
+        {
+            throw new UnauthorizedAccessException();
+        }
+
         var artifacts = await db.LoadManyAsync<ArtifactDetail>(token, ids.Cast<string>());
         return artifacts.Select(a => a is null ? null : TransferMaps.ToArtifactDetailDto(a))
             .ToImmutableArray();

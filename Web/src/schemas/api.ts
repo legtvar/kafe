@@ -8,6 +8,71 @@
 type WithRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] };
 
 export interface paths {
+  "/api/v1/account": {
+    get: {
+      responses: {
+        /** @description Success */
+        200: {
+          content: {
+            "text/plain": components["schemas"]["AccountDetailDto"];
+            "application/json": components["schemas"]["AccountDetailDto"];
+            "text/json": components["schemas"]["AccountDetailDto"];
+          };
+        };
+        /** @description Bad Request */
+        400: {
+          content: {
+            "text/plain": components["schemas"]["ProblemDetails"];
+            "application/json": components["schemas"]["ProblemDetails"];
+            "text/json": components["schemas"]["ProblemDetails"];
+          };
+        };
+        /** @description Not Found */
+        404: {
+          content: {
+            "text/plain": components["schemas"]["ProblemDetails"];
+            "application/json": components["schemas"]["ProblemDetails"];
+            "text/json": components["schemas"]["ProblemDetails"];
+          };
+        };
+      };
+    };
+  };
+  "/api/v1/account/{id}": {
+    get: {
+      parameters: {
+        path: {
+          id: string;
+        };
+      };
+      responses: {
+        /** @description Success */
+        200: {
+          content: {
+            "text/plain": components["schemas"]["AccountDetailDto"];
+            "application/json": components["schemas"]["AccountDetailDto"];
+            "text/json": components["schemas"]["AccountDetailDto"];
+          };
+        };
+        /** @description Bad Request */
+        400: {
+          content: {
+            "text/plain": components["schemas"]["ProblemDetails"];
+            "application/json": components["schemas"]["ProblemDetails"];
+            "text/json": components["schemas"]["ProblemDetails"];
+          };
+        };
+        /** @description Not Found */
+        404: {
+          content: {
+            "text/plain": components["schemas"]["ProblemDetails"];
+            "application/json": components["schemas"]["ProblemDetails"];
+            "text/json": components["schemas"]["ProblemDetails"];
+          };
+        };
+      };
+    };
+  };
   "/api/v1/artifact": {
     post: {
       requestBody?: {
@@ -162,6 +227,27 @@ export interface paths {
             "text/plain": components["schemas"]["ProblemDetails"];
             "application/json": components["schemas"]["ProblemDetails"];
             "text/json": components["schemas"]["ProblemDetails"];
+          };
+        };
+      };
+    };
+  };
+  "/api/v1/project-group": {
+    post: {
+      requestBody?: {
+        content: {
+          "application/json": components["schemas"]["ProjectGroupCreationDto"];
+          "text/json": components["schemas"]["ProjectGroupCreationDto"];
+          "application/*+json": components["schemas"]["ProjectGroupCreationDto"];
+        };
+      };
+      responses: {
+        /** @description Success */
+        200: {
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
           };
         };
       };
@@ -343,6 +429,38 @@ export type webhooks = Record<string, never>;
 
 export interface components {
   schemas: {
+    /** @description A detail of a user account. */
+    AccountDetailDto: {
+      /**
+       * Format: hrib 
+       * @description Human-Readable Identifier Ballast 
+       * @example AAAAbadf00d
+       */
+      id: string;
+      /** @description The name of the user. Null if the account is temporary. */
+      name?: string | null;
+      /** @description The uco of the user. Null if the account is temporary. */
+      uco?: string | null;
+      /** @description The email address of the user. */
+      emailAddress: string;
+      /** @description The preferred culture of the user. */
+      preferredCulture: string;
+      /** @description The projects this account is an owner of. */
+      projects: (components["schemas"]["ProjectListDto"])[];
+    };
+    /** @description The lower and upper bound for the count of something. */
+    ArgumentArity: {
+      /**
+       * Format: int32 
+       * @description The inclusive lower bound.
+       */
+      min: number;
+      /**
+       * Format: int32 
+       * @description The inclusive upper bound.
+       */
+      max: number;
+    };
     ArtifactCreationDto: {
       /** LocalizedString */
       name: {
@@ -350,28 +468,15 @@ export interface components {
         cs?: string | null;
         en?: string | null;
       };
+      /** Format: date-time */
+      addedOn?: string | null;
       /**
        * Format: hrib 
        * @description Human-Readable Identifier Ballast 
        * @example AAAAbadf00d
        */
       containingProject?: string | null;
-    };
-    ArtifactDetailDto: {
-      /**
-       * Format: hrib 
-       * @description Human-Readable Identifier Ballast 
-       * @example AAAAbadf00d
-       */
-      id: string;
-      /** LocalizedString */
-      name: {
-        iv: string;
-        cs?: string | null;
-        en?: string | null;
-      };
-      shards: (components["schemas"]["ShardListDto"])[];
-      containingProjectIds: (string)[];
+      blueprintSlot?: string | null;
     };
     AudioStreamDto: {
       codec: string;
@@ -415,6 +520,8 @@ export interface components {
     MediaDto: {
       fileExtension: string;
       mimeType: string;
+      /** Format: int64 */
+      fileLength: number;
       /**
        * Format: time-span 
        * @example 00:00:00
@@ -467,10 +574,81 @@ export interface components {
       instance?: string | null;
       [key: string]: unknown | undefined;
     };
+    ProjectArtifactBlueprintDto: {
+      /** LocalizedString */
+      name: {
+        iv: string;
+        cs?: string | null;
+        en?: string | null;
+      };
+      /** LocalizedString */
+      description?: ({
+        iv: string;
+        cs?: string | null;
+        en?: string | null;
+      }) | null;
+      slotName: string;
+      arity: components["schemas"]["ArgumentArity"];
+      shardBlueprints: (components["schemas"]["ProjectArtifactShardBlueprintDto"])[];
+    };
+    ProjectArtifactDto: {
+      /**
+       * Format: hrib 
+       * @description Human-Readable Identifier Ballast 
+       * @example AAAAbadf00d
+       */
+      id: string;
+      /** LocalizedString */
+      name: {
+        iv: string;
+        cs?: string | null;
+        en?: string | null;
+      };
+      /** Format: date-time */
+      addedOn: string;
+      blueprintSlot?: string | null;
+      shards: (components["schemas"]["ShardListDto"])[];
+    };
+    ProjectArtifactShardBlueprintDto: {
+      /** LocalizedString */
+      name: {
+        iv: string;
+        cs?: string | null;
+        en?: string | null;
+      };
+      /** LocalizedString */
+      description?: ({
+        iv: string;
+        cs?: string | null;
+        en?: string | null;
+      }) | null;
+      kind: components["schemas"]["ShardKind"];
+      arity: components["schemas"]["ArgumentArity"];
+    };
     ProjectAuthorDto: {
+      /**
+       * Format: hrib 
+       * @description Human-Readable Identifier Ballast 
+       * @example AAAAbadf00d
+       */
       id: string;
       name: string;
       roles: (string)[];
+    };
+    ProjectBlueprintDto: {
+      /** LocalizedString */
+      name: {
+        iv: string;
+        cs?: string | null;
+        en?: string | null;
+      };
+      /** LocalizedString */
+      description?: ({
+        iv: string;
+        cs?: string | null;
+        en?: string | null;
+      }) | null;
+      artifactBlueprints: (components["schemas"]["ProjectArtifactBlueprintDto"])[];
     };
     ProjectCreationAuthorDto: {
       id: string;
@@ -538,10 +716,27 @@ export interface components {
       }) | null;
       visibility: components["schemas"]["Visibility"];
       /** Format: date-time */
-      releaseDate: string;
+      releasedOn: string;
       crew: (components["schemas"]["ProjectAuthorDto"])[];
       cast: (components["schemas"]["ProjectAuthorDto"])[];
-      artifacts: (components["schemas"]["ArtifactDetailDto"])[];
+      artifacts: (components["schemas"]["ProjectArtifactDto"])[];
+      blueprint: components["schemas"]["ProjectBlueprintDto"];
+    };
+    ProjectGroupCreationDto: {
+      /** LocalizedString */
+      name: {
+        iv: string;
+        cs?: string | null;
+        en?: string | null;
+      };
+      /** LocalizedString */
+      description?: ({
+        iv: string;
+        cs?: string | null;
+        en?: string | null;
+      }) | null;
+      /** Format: date-time */
+      deadline: string;
     };
     ProjectGroupDetailDto: {
       id: string;
@@ -560,6 +755,7 @@ export interface components {
       /** Format: date-time */
       deadline: string;
       isOpen: boolean;
+      projects: (components["schemas"]["ProjectListDto"])[];
     };
     ProjectGroupListDto: {
       id: string;
@@ -606,7 +802,7 @@ export interface components {
       }) | null;
       visibility: components["schemas"]["Visibility"];
       /** Format: date-time */
-      releaseDate: string;
+      releasedOn: string;
     };
     ShardDetailBaseDto: {
       kind: components["schemas"]["ShardKind"];
@@ -624,7 +820,7 @@ export interface components {
       artifactId: string;
     };
     /** @enum {string} */
-    ShardKind: "Invalid" | "Video" | "Image" | "Subtitles";
+    ShardKind: "Unknown" | "Video" | "Image" | "Subtitles";
     ShardListDto: {
       /**
        * Format: hrib 
@@ -642,6 +838,7 @@ export interface components {
     };
     TemporaryAccountCreationDto: {
       emailAddress: string;
+      preferredCulture?: string | null;
     };
     VideoShardDetailDto: WithRequired<({
       kind: "Video";

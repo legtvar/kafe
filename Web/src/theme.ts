@@ -34,6 +34,11 @@ const theme = extendTheme({
             900: 'rgba(23,25,35,0.92)',
         },
     },
+    fonts: {
+        body: "'Open Sans', sans-serif",
+        heading: "'Open Sans', sans-serif",
+        mono: "Consolas, 'Courier New', sans-serif",
+    },
     styles: {
         global: (props: StyleProps) => ({
             body: {

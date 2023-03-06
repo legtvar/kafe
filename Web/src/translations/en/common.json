@@ -71,7 +71,9 @@
   "navbar": {
     "profile": "Profile",
     "settings": "Settings",
-    "signout": "Sign out"
+    "signout": "Sign out",
+    "language": "Language",
+    "colorMode": "Toggle color mode"
   },
   "playlists": {
     "play": "Play the playlist",
@@ -157,5 +159,10 @@
     "Private": "Private",
     "Internal": "Internal",
     "Public": "Public"
+  },
+  "temp": {
+    "back": "Request again",
+    "after": "We have sent information for activating a temporary account to your email address. Please click on the link in the email to continue to the KAFE.",
+    "after2": "If you did not receive the email, you can request it again."
   }
 }

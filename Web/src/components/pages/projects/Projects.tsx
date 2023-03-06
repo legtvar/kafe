@@ -19,9 +19,9 @@ export function Projects(props: IProjectsProps) {
                     <Flex direction="column" w="full" mt={-4}>
                         <Pagination
                             data={data.sort((a, b) =>
-                                a.releaseDate
-                                    ? b.releaseDate
-                                        ? b.releaseDate.getTime() - a.releaseDate.getTime()
+                                a.releasedOn
+                                    ? b.releasedOn
+                                        ? b.releasedOn.getTime() - a.releasedOn.getTime()
                                         : -1
                                     : 1,
                             )}
@@ -61,7 +61,7 @@ export function Projects(props: IProjectsProps) {
                                             }}
                                             color="gray.500"
                                         >
-                                            {project.releaseDate ? moment(project.releaseDate).calendar() : 'Neuvedeno'}
+                                            {project.releasedOn ? moment(project.releasedOn).calendar() : 'Neuvedeno'}
                                         </Text>
                                     </Flex>
                                 </Link>

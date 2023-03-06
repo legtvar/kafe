@@ -18,7 +18,8 @@ export function Video({ sources, ...rest }: IVideoProps) {
                 width={'100%'}
                 height={'calc(100% - 40px)'}
                 controls
-                url={[{ src: 'http://techslides.com/demos/sample-videos/small.mp4', type: 'video/mp4' }]}
+                url={sources[quality]}
+                onError={(error) => console.log(error)}
             />
             <HStack w="100%">
                 <Menu>
@@ -26,8 +27,9 @@ export function Video({ sources, ...rest }: IVideoProps) {
                         {capitalize(quality)}
                     </MenuButton>
                     <MenuList>
-                        {Object.keys(sources).map((source) => (
+                        {Object.keys(sources).map((source, key) => (
                             <MenuItem
+                                key={key}
                                 value={source}
                                 icon={source === quality ? <AiOutlineCheck /> : undefined}
                                 onClick={() => setQuality(source)}
@@ -40,8 +42,8 @@ export function Video({ sources, ...rest }: IVideoProps) {
                 <Menu>
                     <MenuButton as={IconButton} aria-label="Download" icon={<BsDownload />} variant="outline" />
                     <MenuList>
-                        {Object.keys(sources).map((source) => (
-                            <MenuItem as={'a'} value={source} href={`${sources[source]}`} target="_blank">
+                        {Object.keys(sources).map((source, key) => (
+                            <MenuItem key={key} as={'a'} value={source} href={`${sources[source]}`} target="_blank">
                                 {capitalize(source)}
                             </MenuItem>
                         ))}

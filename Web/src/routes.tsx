@@ -12,6 +12,8 @@ import {
 import { Navigate, RouteObject } from 'react-router-dom';
 import { Login } from './components/pages/account/Login';
 import { Register } from './components/pages/account/Register';
+import { TempAccount } from './components/pages/account/TempAccount';
+import { Token } from './components/pages/account/Token';
 import { GoRedirect } from './components/pages/GoRedirect';
 import { Groups } from './components/pages/groups/Groups';
 import { GroupsDetail } from './components/pages/groups/GroupsDetail';
@@ -179,6 +181,14 @@ export const accountRoutes = (t: (id: string) => string): RouteObject[] => [
     {
         path: 'register',
         element: <Register />,
+    },
+    {
+        path: 'temp',
+        element: <TempAccount />,
+    },
+    {
+        path: 'token/:token',
+        element: <Token />,
     },
 ];
 

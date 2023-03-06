@@ -1,5 +1,4 @@
 import i18next from 'i18next';
-import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { I18nextProvider } from 'react-i18next';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
@@ -11,8 +10,8 @@ import { routerConfig } from './routes';
 import { ChakraProvider, ColorModeScript } from '@chakra-ui/react';
 import moment from 'moment';
 import 'moment/locale/cs';
+import { CookiesProvider } from 'react-cookie';
 import theme from './theme';
-import { storageOrPrompt } from './utils/storageOrPrompt';
 
 (async () => {
     i18next.init(languageConfig);
@@ -24,24 +23,19 @@ import { storageOrPrompt } from './utils/storageOrPrompt';
         basename: '/',
     });
 
-    const apiCredentials = {
-        username: (await storageOrPrompt('dev_username')) as string,
-        password: (await storageOrPrompt('dev_password')) as string,
-    };
-
-    const caffeine = new Caffeine(new API(apiCredentials));
+    const caffeine = new Caffeine(new API());
 
     const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
     root.render(
-        <React.StrictMode>
-            <I18nextProvider i18n={i18next}>
+        <I18nextProvider i18n={i18next}>
+            <CookiesProvider>
                 <ChakraProvider theme={theme}>
                     <CaffeineProvider value={caffeine}>
                         <ColorModeScript initialColorMode={theme.config.initialColorMode} />
                         <RouterProvider router={router} />
                     </CaffeineProvider>
                 </ChakraProvider>
-            </I18nextProvider>
-        </React.StrictMode>,
+            </CookiesProvider>
+        </I18nextProvider>,
     );
 })();

@@ -9,14 +9,14 @@ export class Caffeine {
     public constructor(api: API) {
         this.api = api;
 
-        const user = new User();
-        user.email = 'rosecky.jonas@gmail.com';
-        user.id = '123456789';
-        user.name = 'Jonáš Rosecký';
-        user.role = 'admin';
+        // const user = new User();
+        // user.email = 'rosecky.jonas@gmail.com';
+        // user.id = '123456789';
+        // user.name = 'Jonáš Rosecký';
+        // user.role = 'admin';
 
-        //this.user = null;
-        this.user = user;
+        this.user = null;
+        // this.user = user;
     }
 }
 

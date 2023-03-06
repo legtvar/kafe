@@ -12,7 +12,7 @@ export class Project {
     public genere?: localizedString;
     public description?: localizedString;
     public visibility!: components['schemas']['Visibility'];
-    public releaseDate!: Date | null;
+    public releasedOn!: Date | null;
 
     // Authors
     public crew!: components['schemas']['ProjectAuthorDto'][];
@@ -22,8 +22,8 @@ export class Project {
 
     public constructor(struct: components['schemas']['ProjectListDto'] | components['schemas']['ProjectDetailDto']) {
         Object.assign(this, struct);
-        this.releaseDate = new Date(struct.releaseDate);
-        if (this.releaseDate.getTime() < 0) this.releaseDate = null;
+        this.releasedOn = new Date(struct.releasedOn);
+        if (this.releasedOn.getTime() < 0) this.releasedOn = null;
         if (this.artifacts) {
             this.artifacts = this.artifacts.map((artifact: any) => new Artifact(artifact));
         }

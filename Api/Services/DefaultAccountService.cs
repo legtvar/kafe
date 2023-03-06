@@ -229,6 +229,11 @@ public class DefaultAccountService : IAccountService, IDisposable
         IEnumerable<AccountCapability> capabilities,
         CancellationToken token = default)
     {
+        if (!userProvider.IsAdministrator())
+        {
+            throw new UnauthorizedAccessException();
+        }
+
         // TODO: Find a cheaper way of knowing that an account exists.
         var account = await db.LoadAsync<AccountInfo>(id, token);
         if (account is null)

@@ -21,19 +21,27 @@ public class DefaultArtifactService : IArtifactService
     private readonly IDocumentSession db;
     private readonly IOptions<StorageOptions> storageOptions;
     private readonly IMediaService mediaService;
+    private readonly IUserProvider userProvider;
 
     public DefaultArtifactService(
         IDocumentSession db,
         IOptions<StorageOptions> storageOptions,
-        IMediaService mediaService)
+        IMediaService mediaService,
+        IUserProvider userProvider)
     {
         this.db = db;
         this.storageOptions = storageOptions;
         this.mediaService = mediaService;
+        this.userProvider = userProvider;
     }
 
     public async Task<ArtifactDetailDto?> Load(Hrib id, CancellationToken token = default)
     {
+        if (!userProvider.IsAdministrator())
+        {
+            throw new UnauthorizedAccessException();
+        }
+
         var artifact = await db.LoadAsync<ArtifactDetail>(id, token);
         if (artifact is null)
         {

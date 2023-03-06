@@ -47,7 +47,7 @@ public class DefaultProjectGroupService : IProjectGroupService
 
     public async Task<ImmutableArray<ProjectGroupListDto>> List(CancellationToken token = default)
     {
-        var preferredCulture = userProvider.User!.PreferredCulture;
+        var preferredCulture = userProvider.User?.PreferredCulture ?? Const.InvariantCultureCode;
         var projectGroups = await db.Query<ProjectGroupInfo>()
             .WhereCanRead(userProvider)
             .ToListAsync(token);

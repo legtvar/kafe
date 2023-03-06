@@ -37,11 +37,13 @@ namespace Kafe.Api;
 public class Startup
 {
     public IConfiguration Configuration { get; }
+    public ApiOptions ApiOptions { get; }
     public IHostEnvironment Environment { get; }
 
     public Startup(IConfiguration configuration, IHostEnvironment environment)
     {
         Configuration = configuration;
+        ApiOptions = Configuration.Get<ApiOptions>()!;
         Environment = environment;
     }
 
@@ -87,6 +89,15 @@ public class Startup
             o.JsonSerializerOptions.Converters.Add(new LocalizedStringJsonConverter());
         });
 
+        services.AddCors(o =>
+        {
+            o.AddDefaultPolicy(p =>
+            {
+                p.WithOrigins(ApiOptions.AllowedOrigins.ToArray())
+                    .AllowCredentials();
+            });
+        });
+
         RegisterKafe(services);
     }
 
@@ -102,6 +113,8 @@ public class Startup
         app.UseStaticFiles();
 
         app.UseRouting();
+
+        app.UseCors();
 
         app.UseAuthentication();
         app.UseAuthorization();

@@ -17,4 +17,6 @@ public record ApiOptions
 
     [Required]
     public string AccountConfirmRedirectPath { get; init; } = "/auth";
+
+    public List<string> AllowedOrigins { get; init; } = new();
 }

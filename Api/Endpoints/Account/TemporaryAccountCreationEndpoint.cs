@@ -28,7 +28,7 @@ public class TemporaryAccountCreationEndpoint : EndpointBaseAsync
     [ProducesResponseType(400)]
     public override async Task<ActionResult> HandleAsync(
         TemporaryAccountCreationDto dto,
-        CancellationToken cancellationToken = default)  
+        CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(dto.EmailAddress))
         {

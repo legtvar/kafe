@@ -3,6 +3,7 @@ using Kafe.Data.Capabilities;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Globalization;
 using System.Security.Claims;
 using System.Text.Json;
 
@@ -12,7 +13,7 @@ public record ApiUser(
     Hrib Id,
     string? Name,
     string EmailAddress,
-    string PreferredCulture,
+    CultureInfo PreferredCulture,
     ImmutableHashSet<AccountCapability> Capabilities)
 {
     private static readonly JsonSerializerOptions JsonOptions;
@@ -25,13 +26,20 @@ public record ApiUser(
         };
     }
 
+    public static readonly ApiUser System = new(
+        Id: Hrib.Invalid,
+        Name: Const.SystemName,
+        EmailAddress: Const.InvalidEmailAddress,
+        PreferredCulture: Const.InvariantCulture,
+        Capabilities: ImmutableHashSet.Create<AccountCapability>(new Administration()));
+
     public static ApiUser FromAggregate(AccountInfo info)
     {
         return new ApiUser(
             Id: info.Id,
             Name: null,
             EmailAddress: info.EmailAddress,
-            PreferredCulture: info.PreferredCulture,
+            PreferredCulture: new CultureInfo(info.PreferredCulture),
             Capabilities: info.Capabilities);
     }
 
@@ -60,7 +68,8 @@ public record ApiUser(
             Name: principal.FindFirstValue(ClaimTypes.Name),
             EmailAddress: principal.FindFirstValue(ClaimTypes.Email)
                 ?? throw new ArgumentException("ClaimsPrincipal doesn't contain an Email."),
-            PreferredCulture: principal.FindFirstValue(ClaimTypes.StateOrProvince) ?? Const.InvariantCultureCode,
+            PreferredCulture: new CultureInfo(principal.FindFirstValue(ClaimTypes.StateOrProvince)
+                ?? Const.InvariantCultureCode),
             Capabilities: capabilityBuilder.ToImmutable()
         );
     }
@@ -73,9 +82,9 @@ public record ApiUser(
             new Claim(ClaimTypes.Email, EmailAddress)
         };
 
-        if (PreferredCulture != Const.InvariantCultureCode)
+        if (PreferredCulture.TwoLetterISOLanguageName != Const.InvariantCultureCode)
         {
-            claims.Add(new Claim(ClaimTypes.StateOrProvince, PreferredCulture));
+            claims.Add(new Claim(ClaimTypes.StateOrProvince, PreferredCulture.TwoLetterISOLanguageName));
         }
 
         if (!string.IsNullOrEmpty(Name))

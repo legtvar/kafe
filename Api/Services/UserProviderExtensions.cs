@@ -102,6 +102,6 @@ public static class UserProviderExtensions
 
     public static CultureInfo GetPreferredCulture(this IUserProvider p)
     {
-        return new CultureInfo(p.User?.PreferredCulture ?? Const.InvariantCultureCode);
+        return p.User?.PreferredCulture ?? Const.InvariantCulture;
     }
 }

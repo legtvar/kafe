@@ -35,23 +35,32 @@ public class DefaultAccountService : IAccountService, IDisposable
     private readonly IEmailService emailService;
     private readonly IHostEnvironment environment;
     private readonly IOptions<ApiOptions> apiOptions;
+    private readonly IUserProvider userProvider;
 
     public DefaultAccountService(
         IDocumentSession db,
         IDataProtectionProvider dataProtectionProvider,
         IEmailService emailService,
         IHostEnvironment environment,
-        IOptions<ApiOptions> apiOptions)
+        IOptions<ApiOptions> apiOptions,
+        IUserProvider userProvider)
     {
         dataProtector = dataProtectionProvider.CreateProtector(nameof(DefaultAccountService));
         this.db = db;
         this.emailService = emailService;
         this.environment = environment;
         this.apiOptions = apiOptions;
+        this.userProvider = userProvider;
     }
 
     public async Task<AccountDetailDto?> Load(Hrib id, CancellationToken token = default)
     {
+        if (id != userProvider.User?.Id
+            && !userProvider.IsAdministrator())
+        {
+            throw new UnauthorizedAccessException();
+        }
+
         var account = await db.LoadAsync<AccountInfo>(id, token);
         if (account is null)
         {
@@ -72,6 +81,12 @@ public class DefaultAccountService : IAccountService, IDisposable
     public async Task<AccountDetailDto?> Load(string emailAddress, CancellationToken token = default)
     {
         // TODO: Dedupe with the overload above.
+
+        if (emailAddress != userProvider.User?.EmailAddress
+            && !userProvider.IsAdministrator())
+        {
+            throw new UnauthorizedAccessException();
+        }
 
         var account = await db.Query<AccountInfo>()
             .SingleOrDefaultAsync(a => a.EmailAddress == emailAddress, token);
@@ -94,6 +109,12 @@ public class DefaultAccountService : IAccountService, IDisposable
 
     public async Task<ApiUser?> LoadApiAccount(Hrib id, CancellationToken token = default)
     {
+        if (id != userProvider.User?.Id
+            && !userProvider.IsAdministrator())
+        {
+            throw new UnauthorizedAccessException();
+        }
+
         var account = await db.LoadAsync<AccountInfo>(id, token);
         if (account is null)
         {
@@ -105,6 +126,12 @@ public class DefaultAccountService : IAccountService, IDisposable
     public async Task<ApiUser?> LoadApiAccount(string emailAddress, CancellationToken token = default)
     {
         // TODO: Dedupe with the overload above.
+
+        if (emailAddress != userProvider.User?.EmailAddress
+            && !userProvider.IsAdministrator())
+        {
+            throw new UnauthorizedAccessException();
+        }
 
         var account = await db.Query<AccountInfo>()
             .SingleOrDefaultAsync(a => a.EmailAddress == emailAddress, token);

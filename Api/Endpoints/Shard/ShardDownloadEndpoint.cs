@@ -10,7 +10,8 @@ using System.Threading.Tasks;
 namespace Kafe.Api.Endpoints.Shard;
 
 [ApiVersion("1")]
-[Route("shard-download/{id}/{variant?}")]
+[Route("shard-download/{id}")]
+[Route("shard-download/{id}/{variant}")]
 [Authorize]
 public class ShardDownloadEndpoint : EndpointBaseAsync
     .WithRequest<ShardDownloadEndpoint.RequestData>
@@ -42,5 +43,5 @@ public class ShardDownloadEndpoint : EndpointBaseAsync
 
     public record RequestData(
         [FromRoute] string Id,
-        [FromRoute] string? Variant);
+        string? Variant);
 }

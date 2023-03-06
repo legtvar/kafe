@@ -15,7 +15,6 @@ public class AccountLogoutEndpoint : EndpointBaseSync
     .WithActionResult
 {
     [HttpGet]
-    [HttpPost]
     [SwaggerOperation(Tags = new[] { EndpointArea.Account })]
     public override ActionResult Handle()
     {

@@ -23,7 +23,7 @@ public class AdministratorHandler : AuthorizationHandler<AdministratorRequiremen
         AdministratorRequirement requirement)
     {
         if (provider.User is null
-            || !provider.User.Capabilities.OfType<AdministratorCapability>().Any())
+            || !provider.User.Capabilities.OfType<Administration>().Any())
         {
             context.Fail(new AuthorizationFailureReason(this, "The user is not an administrator."));
         }

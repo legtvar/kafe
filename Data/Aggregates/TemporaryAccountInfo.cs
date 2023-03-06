@@ -23,7 +23,7 @@ public record AccountInfo(
     string PreferredCulture,
     string? SecurityStamp,
     DateTimeOffset RefreshedOn,
-    ImmutableHashSet<IAccountCapability> Capabilities
+    ImmutableHashSet<AccountCapability> Capabilities
 );
 
 public class AccountInfoProjection : SingleStreamAggregation<AccountInfo>
@@ -42,7 +42,7 @@ public class AccountInfoProjection : SingleStreamAggregation<AccountInfo>
             PreferredCulture: e.PreferredCulture,
             SecurityStamp: null,
             RefreshedOn: default,
-            Capabilities: ImmutableHashSet<IAccountCapability>.Empty
+            Capabilities: ImmutableHashSet<AccountCapability>.Empty
         );
     }
 

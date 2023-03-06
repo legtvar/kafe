@@ -60,7 +60,7 @@ public class DefaultAccountService : IAccountService, IDisposable
 
         var projects = await db.LoadManyAsync<ProjectInfo>(
             token,
-            account.Capabilities.OfType<ProjectOwnerCapability>().Select(c => (string)c.ProjectId));
+            account.Capabilities.OfType<ProjectOwnership>().Select(c => (string)c.ProjectId));
         if (projects is null)
         {
             return null;
@@ -83,7 +83,7 @@ public class DefaultAccountService : IAccountService, IDisposable
 
         var projects = await db.LoadManyAsync<ProjectInfo>(
             token,
-            account.Capabilities.OfType<ProjectOwnerCapability>().Select(c => (string)c.ProjectId));
+            account.Capabilities.OfType<ProjectOwnership>().Select(c => (string)c.ProjectId));
         if (projects is null)
         {
             return null;
@@ -199,7 +199,7 @@ public class DefaultAccountService : IAccountService, IDisposable
 
     public async Task AddCapabilities(
         Hrib id,
-        IEnumerable<IAccountCapability> capabilities,
+        IEnumerable<AccountCapability> capabilities,
         CancellationToken token = default)
     {
         // TODO: Find a cheaper way of knowing that an account exists.

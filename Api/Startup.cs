@@ -30,6 +30,7 @@ using Kafe.Api.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Authentication;
 
 namespace Kafe.Api;
 
@@ -49,7 +50,16 @@ public class Startup
         services.AddHttpContextAccessor();
 
         services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-            .AddCookie();
+            .AddCookie(o =>
+            {
+                Func<RedirectContext<CookieAuthenticationOptions>, Task> accessDenied = c =>
+                {
+                    c.Response.StatusCode = 403;
+                    return Task.CompletedTask;
+                };
+                o.Events.OnRedirectToAccessDenied = accessDenied;
+                o.Events.OnRedirectToLogin = accessDenied;
+            });
 
         services.AddAuthorization(o =>
         {

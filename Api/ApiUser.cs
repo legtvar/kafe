@@ -13,7 +13,7 @@ public record ApiUser(
     string? Name,
     string EmailAddress,
     string PreferredCulture,
-    ImmutableHashSet<IAccountCapability> Capabilities)
+    ImmutableHashSet<AccountCapability> Capabilities)
 {
     private static readonly JsonSerializerOptions JsonOptions;
 
@@ -35,12 +35,17 @@ public record ApiUser(
             Capabilities: info.Capabilities);
     }
 
-    public static ApiUser FromPrincipal(ClaimsPrincipal principal)
+    public static ApiUser? FromPrincipal(ClaimsPrincipal principal)
     {
-        var capabilityBuilder = ImmutableHashSet.CreateBuilder<IAccountCapability>();
+        if (principal.Identity is null || !principal.Identity.IsAuthenticated)
+        {
+            return null;
+        }
+
+        var capabilityBuilder = ImmutableHashSet.CreateBuilder<AccountCapability>();
         foreach (var roleClaim in principal.FindAll(ClaimTypes.Role))
         {
-            var capability = JsonSerializer.Deserialize<IAccountCapability>(roleClaim.Value);
+            var capability = JsonSerializer.Deserialize<AccountCapability>(roleClaim.Value);
             if (capability is null)
             {
                 throw new ArgumentException("Failed to deserilize an account capability.");

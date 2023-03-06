@@ -62,7 +62,7 @@ public class TemporaryAccountConfirmationEndpoint : EndpointBaseAsync
             IssuedUtc = DateTimeOffset.UtcNow,
             ExpiresUtc = DateTimeOffset.UtcNow.Add(Const.AuthenticationCookieExpirationTime),
             IsPersistent = true,
-            RedirectUri = options.Value.AccountConfirmRedirectPath
+            //RedirectUri = options.Value.AccountConfirmRedirectPath
         };
 
         return SignIn(apiAccount.ToPrincipal(CookieAuthenticationDefaults.AuthenticationScheme), authProperties);

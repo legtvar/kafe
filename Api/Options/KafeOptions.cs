@@ -13,7 +13,7 @@ public record ApiOptions
     public string BaseUrl { get; init; } = null!;
 
     [Required]
-    public string AccountConfirmPath { get; init; } = "/confirm";
+    public string AccountConfirmPath { get; init; } = "/account/token";
 
     [Required]
     public string AccountConfirmRedirectPath { get; init; } = "/auth";

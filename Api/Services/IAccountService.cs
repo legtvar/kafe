@@ -36,7 +36,7 @@ public interface IAccountService
 
     Task AddCapabilities(
         Hrib id,
-        IEnumerable<IAccountCapability> capabilities,
+        IEnumerable<AccountCapability> capabilities,
         CancellationToken token = default);
 
     string EncodeToken(TemporaryAccountTokenDto token);

@@ -12,7 +12,7 @@ public static class UserProviderExtensions
 {
     public static bool IsAdministrator(this IUserProvider p)
     {
-        return p.User is not null && p.User.Capabilities.Contains(new AdministratorCapability());
+        return p.User is not null && p.User.Capabilities.Contains(new Administration());
     }
 
     public static IQueryable<ProjectGroupInfo> WhereCanRead(
@@ -70,7 +70,7 @@ public static class UserProviderExtensions
 
         return project.Visibility switch
         {
-            Visibility.Private => p.User?.Capabilities.Contains(new ProjectOwnerCapability(project.Id)) == true,
+            Visibility.Private => p.User?.Capabilities.Contains(new ProjectOwnership(project.Id)) == true,
             _ => false
         };
     }
@@ -95,7 +95,7 @@ public static class UserProviderExtensions
             return ImmutableHashSet<Hrib>.Empty;
         }
 
-        return p.User.Capabilities.OfType<ProjectOwnerCapability>()
+        return p.User.Capabilities.OfType<ProjectOwnership>()
             .Select(c => c.ProjectId)
             .ToImmutableHashSet();
     }

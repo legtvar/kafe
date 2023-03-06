@@ -1,5 +1,7 @@
 ﻿using Kafe.Api.Transfer;
+using Kafe.Data;
 using Kafe.Data.Aggregates;
+using Kafe.Data.Events;
 using Marten;
 using System;
 using System.Collections.Generic;
@@ -23,9 +25,24 @@ public class DefaultProjectGroupService : IProjectGroupService
         this.userProvider = userProvider;
     }
 
-    public Task<Hrib> Create(ProjectGroupCreationDto dto, CancellationToken token = default)
+    public async Task<Hrib> Create(ProjectGroupCreationDto dto, CancellationToken token = default)
     {
-        throw new System.NotImplementedException();
+        var created = new ProjectGroupCreated(
+            ProjectGroupId: Hrib.Create(),
+            CreationMethod: CreationMethod.Api,
+            Name: dto.Name);
+
+        var changed = new ProjectGroupInfoChanged(
+            ProjectGroupId: created.ProjectGroupId,
+            Description: dto.Description,
+            Deadline: dto.Deadline);
+
+        var opened = new ProjectGroupOpened(
+            ProjectGroupId: created.ProjectGroupId);
+
+        db.Events.StartStream<ProjectGroupInfo>(created.ProjectGroupId, created, changed, opened);
+        await db.SaveChangesAsync(token);
+        return created.ProjectGroupId;
     }
 
     public async Task<ImmutableArray<ProjectGroupListDto>> List(CancellationToken token = default)
@@ -47,7 +64,7 @@ public class DefaultProjectGroupService : IProjectGroupService
             return null;
         }
 
-        if (userProvider.CanRead(projectGroup))
+        if (!userProvider.CanRead(projectGroup))
         {
             throw new UnauthorizedAccessException();
         }

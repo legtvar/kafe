@@ -1,5 +1,6 @@
 ﻿using Kafe.Api.Services;
 using Kafe.Data;
+using Kafe.Data.Aggregates;
 using Kafe.Data.Capabilities;
 using Kafe.Data.Events;
 using Kafe.Data.Options;
@@ -55,14 +56,12 @@ public class SeedDaemon : BackgroundService
                 logger.LogInformation("Seed account '{}' created.", account.EmailAddress);
             }
 
-            // TODO: THIS IS DUMB!!1! Configuration should just do its job properly
-            var capabilities = account.Capabilities
-                .Select(c => JsonSerializer.Deserialize<IAccountCapability>(c))
-                .Where(c => c is not null)
-                .Cast<IAccountCapability>()
-                .ToImmutableHashSet();
-
-            var missingCapabilities = capabilities.Except(data.Capabilities);
+            var missingCapabilities = account.Capabilities
+                .Select(c => AccountCapability.TryParse(c, out var capability)
+                    ? capability
+                    : throw new ArgumentException(c))
+                .ToImmutableHashSet()
+                .Except(data.Capabilities);
 
             if (missingCapabilities.Count > 0)
             {

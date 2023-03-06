@@ -32,7 +32,7 @@ export function TempAccount() {
                                 color={'white'}
                                 onClick={async () => {
                                     setState('submitting');
-                                    const response = await api.accounts.temporary.create(email, i18next.language);
+                                    await api.accounts.temporary.create(email, i18next.language);
                                     setState('submited');
                                 }}
                                 _hover={{

@@ -25,7 +25,7 @@ export function ContentViewer({ artifact }: IContentViewerProps) {
         switch (type.split('/')[0]) {
             case 'Video':
                 const video = artifact.shards.filter((shard) => shard.kind === 'Video')[0];
-                const subtitles = artifact.shards.filter((shard) => shard.kind === 'Subtitles')[0];
+                // const subtitles = artifact.shards.filter((shard) => shard.kind === 'Subtitles')[0];
 
                 const videoSources = video.variants.reduce(
                     (prev, curr) => ({

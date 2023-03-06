@@ -37,6 +37,8 @@ public static class Db
                     .ConnectionLimit(-1);
             });
 
+            //options.Linq.FieldSources.Add(new LocalizedStringFieldSource());
+
             options.Projections.Add<AuthorInfoProjection>(ProjectionLifecycle.Inline);
             options.Projections.Add<ArtifactInfoProjection>(ProjectionLifecycle.Inline);
             options.Projections.Add<VideoShardInfoProjection>(ProjectionLifecycle.Inline);

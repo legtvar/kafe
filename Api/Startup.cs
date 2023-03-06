@@ -110,7 +110,8 @@ public class Startup
 
         services.AddSingleton<IMediaService, FFmpegCoreService>();
 
-        services.AddScoped<ICurrentAccountProvider, DefaultCurrentAccountProvider>();
+        services.AddScoped<IUserProvider, DefaultUserProvider>();
+        services.AddScoped<IProjectGroupService, DefaultProjectGroupService>();
         services.AddScoped<IProjectService, DefaultProjectService>();
         services.AddScoped<IAuthorService, DefaultAuthorService>();
         services.AddScoped<IArtifactService, DefaultArtifactService>();

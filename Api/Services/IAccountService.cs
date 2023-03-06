@@ -24,7 +24,7 @@ public interface IAccountService
         string emailAddress,
         CancellationToken token = default);
 
-    Task<ApiAccount?> LoadApiAccount(
+    Task<ApiUser?> LoadApiAccount(
         Hrib id,
         CancellationToken token = default);
 

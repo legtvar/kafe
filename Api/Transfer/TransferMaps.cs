@@ -180,7 +180,8 @@ public static class TransferMaps
             Name: data.Name,
             Description: data.Description,
             Deadline: data.Deadline,
-            IsOpen: data.IsOpen);
+            IsOpen: data.IsOpen,
+            Projects: ImmutableArray<ProjectListDto>.Empty);
     }
 
     public static ArtifactDetailDto ToArtifactDetailDto(ArtifactDetail data)

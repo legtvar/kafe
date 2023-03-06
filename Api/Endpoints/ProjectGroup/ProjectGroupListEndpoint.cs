@@ -10,29 +10,30 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Swashbuckle.AspNetCore.Annotations;
+using Kafe.Api.Services;
+using System.Collections.Immutable;
 
 namespace Kafe.Api.Endpoints.ProjectGroup;
 
 [ApiVersion("1")]
 [Route("project-groups")]
-[Authorize]
 public class ProjectGroupListEndpoint : EndpointBaseAsync
     .WithoutRequest
-    .WithActionResult<List<ProjectGroupListDto>>
+    .WithActionResult<ImmutableArray<ProjectGroupListDto>>
 {
-    private readonly IQuerySession db;
+    private readonly IProjectGroupService projectGroupService;
 
-    public ProjectGroupListEndpoint(IQuerySession db)
+    public ProjectGroupListEndpoint(IProjectGroupService projectGroupService)
     {
-        this.db = db;
+        this.projectGroupService = projectGroupService;
     }
 
     [HttpGet]
     [SwaggerOperation(Tags = new[] { EndpointArea.ProjectGroup })]
-    public override async Task<ActionResult<List<ProjectGroupListDto>>> HandleAsync(
+    public override async Task<ActionResult<ImmutableArray<ProjectGroupListDto>>> HandleAsync(
         CancellationToken cancellationToken = default)
     {
-        var projectGroups = await db.Query<ProjectGroupInfo>().ToListAsync(cancellationToken);
-        return Ok(projectGroups.Select(TransferMaps.ToProjectGroupListDto).ToList());
+        var groups = await projectGroupService.List(cancellationToken);
+        return Ok(groups);
     }
 }

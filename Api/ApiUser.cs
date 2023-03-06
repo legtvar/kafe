@@ -8,7 +8,7 @@ using System.Text.Json;
 
 namespace Kafe.Api;
 
-public record ApiAccount(
+public record ApiUser(
     Hrib Id,
     string? Name,
     string EmailAddress,
@@ -17,7 +17,7 @@ public record ApiAccount(
 {
     private static readonly JsonSerializerOptions JsonOptions;
 
-    static ApiAccount()
+    static ApiUser()
     {
         JsonOptions = new JsonSerializerOptions
         {
@@ -25,9 +25,9 @@ public record ApiAccount(
         };
     }
 
-    public static ApiAccount FromAggregate(AccountInfo info)
+    public static ApiUser FromAggregate(AccountInfo info)
     {
-        return new ApiAccount(
+        return new ApiUser(
             Id: info.Id,
             Name: null,
             EmailAddress: info.EmailAddress,
@@ -35,7 +35,7 @@ public record ApiAccount(
             Capabilities: info.Capabilities);
     }
 
-    public static ApiAccount FromPrincipal(ClaimsPrincipal principal)
+    public static ApiUser FromPrincipal(ClaimsPrincipal principal)
     {
         var capabilityBuilder = ImmutableHashSet.CreateBuilder<IAccountCapability>();
         foreach (var roleClaim in principal.FindAll(ClaimTypes.Role))
@@ -49,7 +49,7 @@ public record ApiAccount(
             capabilityBuilder.Add(capability);
         }
 
-        return new ApiAccount(
+        return new ApiUser(
             Id: principal.FindFirstValue(ClaimTypes.NameIdentifier)
                 ?? throw new ArgumentException("ClaimsPrincipal doesn't contain a NameIdentifier."),
             Name: principal.FindFirstValue(ClaimTypes.Name),

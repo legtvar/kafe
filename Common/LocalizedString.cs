@@ -9,9 +9,9 @@ using System.Text.Json.Serialization;
 namespace Kafe;
 
 [JsonConverter(typeof(LocalizedStringJsonConverter))]
-public sealed class LocalizedString : IEquatable<LocalizedString>
+public sealed partial class LocalizedString : IEquatable<LocalizedString>
 {
-    private ImmutableDictionary<string, string> data;
+    private readonly ImmutableDictionary<string, string> data;
 
     public string? this[CultureInfo culture] => this[culture.TwoLetterISOLanguageName];
 

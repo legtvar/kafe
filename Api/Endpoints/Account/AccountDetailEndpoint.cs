@@ -21,9 +21,9 @@ public class AccountDetailEndpoint : EndpointBaseAsync
     .WithActionResult<AccountDetailDto?>
 {
     private readonly IAccountService accounts;
-    private readonly ICurrentAccountProvider currentAccountProvider;
+    private readonly IUserProvider currentAccountProvider;
 
-    public AccountDetailEndpoint(IAccountService accounts, ICurrentAccountProvider currentAccountProvider)
+    public AccountDetailEndpoint(IAccountService accounts, IUserProvider currentAccountProvider)
     {
         this.accounts = accounts;
         this.currentAccountProvider = currentAccountProvider;

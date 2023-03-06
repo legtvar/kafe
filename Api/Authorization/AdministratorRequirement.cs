@@ -11,9 +11,9 @@ public record AdministratorRequirement : IAuthorizationRequirement;
 
 public class AdministratorHandler : AuthorizationHandler<AdministratorRequirement>
 {
-    private readonly ICurrentAccountProvider provider;
+    private readonly IUserProvider provider;
 
-    public AdministratorHandler(ICurrentAccountProvider provider)
+    public AdministratorHandler(IUserProvider provider)
     {
         this.provider = provider;
     }

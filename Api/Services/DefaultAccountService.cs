@@ -94,14 +94,14 @@ public class DefaultAccountService : IAccountService, IDisposable
         return TransferMaps.ToAccountDetailDto(account, projects);
     }
 
-    public async Task<ApiAccount?> LoadApiAccount(Hrib id, CancellationToken token = default)
+    public async Task<ApiUser?> LoadApiAccount(Hrib id, CancellationToken token = default)
     {
         var account = await db.LoadAsync<AccountInfo>(id, token);
         if (account is null)
         {
             return null;
         }
-        return ApiAccount.FromAggregate(account);
+        return ApiUser.FromAggregate(account);
     }
 
     public async Task CreateTemporaryAccount(

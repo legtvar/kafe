@@ -1,19 +1,19 @@
-import { IconButton } from '@chakra-ui/react';
+import { IconButton, IconButtonProps } from '@chakra-ui/react';
 import { CZ, GB } from 'country-flag-icons/react/3x2';
 import i18next from 'i18next';
 import { useReload } from '../../hooks/useReload';
 
-interface ILanguageToggleProps {
-    onChange?: (lang: string) => void;
+interface ILanguageToggleProps extends IconButtonProps {
+    onLanguageToggled?: (lang: string) => void;
 }
 
-export function LanguageToggle(props: ILanguageToggleProps) {
+export function LanguageToggle({ onLanguageToggled: onLanguageChange, ...rest }: ILanguageToggleProps) {
     const reload = useReload();
 
     const changeLanguage = (lang: string) => {
         i18next.changeLanguage(lang);
         reload();
-        props.onChange && props.onChange(lang);
+        onLanguageChange && onLanguageChange(lang);
     };
 
     switch (i18next.language) {
@@ -22,10 +22,10 @@ export function LanguageToggle(props: ILanguageToggleProps) {
                 <IconButton
                     size="lg"
                     variant="ghost"
-                    aria-label="Language"
                     icon={<CZ />}
                     p={3}
                     onClick={() => changeLanguage('cs')}
+                    {...rest}
                 />
             );
 
@@ -34,23 +34,14 @@ export function LanguageToggle(props: ILanguageToggleProps) {
                 <IconButton
                     size="lg"
                     variant="ghost"
-                    aria-label="Language"
                     icon={<GB />}
                     p={3}
                     onClick={() => changeLanguage('en')}
+                    {...rest}
                 />
             );
     }
 
     // This should not happen :D
-    return (
-        <IconButton
-            size="lg"
-            variant="ghost"
-            aria-label="Language"
-            icon={<CZ />}
-            p={3}
-            onClick={() => changeLanguage('cs')}
-        />
-    );
+    return <IconButton size="lg" variant="ghost" icon={<CZ />} p={3} onClick={() => changeLanguage('cs')} {...rest} />;
 }

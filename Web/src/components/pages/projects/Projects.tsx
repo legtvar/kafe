@@ -1,4 +1,4 @@
-import { Avatar, Flex, HStack, Text, useColorModeValue } from '@chakra-ui/react';
+import { Flex, Text, useColorModeValue } from '@chakra-ui/react';
 import moment from 'moment';
 import { Link } from 'react-router-dom';
 import { Project } from '../../../data/Project';
@@ -19,9 +19,9 @@ export function Projects(props: IProjectsProps) {
                     <Flex direction="column" w="full" mt={-4}>
                         <Pagination
                             data={data.sort((a, b) =>
-                                a.releaseDate
-                                    ? b.releaseDate
-                                        ? b.releaseDate.getTime() - a.releaseDate.getTime()
+                                a.releasedOn
+                                    ? b.releasedOn
+                                        ? b.releasedOn.getTime() - a.releasedOn.getTime()
                                         : -1
                                     : 1,
                             )}
@@ -50,41 +50,6 @@ export function Projects(props: IProjectsProps) {
                                                 {project.getDescription()}
                                             </Text>
                                         </Flex>
-                                        <HStack
-                                            ml={{
-                                                base: 0,
-                                                md: 4,
-                                            }}
-                                            my={{
-                                                base: 4,
-                                                md: 0,
-                                            }}
-                                        >
-                                            <Avatar
-                                                size={'sm'}
-                                                src={
-                                                    'https://images.unsplash.com/photo-1619946794135-5bc917a27793?ixlib=rb-0.3.5&q=80&fm=jpg&crop=faces&fit=crop&h=200&w=200'
-                                                }
-                                            />
-                                            <Avatar
-                                                size={'sm'}
-                                                src={
-                                                    'https://images.unsplash.com/photo-1619946794135-5bc917a27793?ixlib=rb-0.3.5&q=80&fm=jpg&crop=faces&fit=crop&h=200&w=200'
-                                                }
-                                            />
-                                            <Avatar
-                                                size={'sm'}
-                                                src={
-                                                    'https://images.unsplash.com/photo-1619946794135-5bc917a27793?ixlib=rb-0.3.5&q=80&fm=jpg&crop=faces&fit=crop&h=200&w=200'
-                                                }
-                                            />
-                                            <Avatar
-                                                size={'sm'}
-                                                src={
-                                                    'https://images.unsplash.com/photo-1619946794135-5bc917a27793?ixlib=rb-0.3.5&q=80&fm=jpg&crop=faces&fit=crop&h=200&w=200'
-                                                }
-                                            />
-                                        </HStack>
                                         <Text
                                             flex={{
                                                 base: '1 0 0%',
@@ -96,7 +61,7 @@ export function Projects(props: IProjectsProps) {
                                             }}
                                             color="gray.500"
                                         >
-                                            {project.releaseDate ? moment(project.releaseDate).calendar() : 'Neuvedeno'}
+                                            {project.releasedOn ? moment(project.releasedOn).calendar() : 'Neuvedeno'}
                                         </Text>
                                     </Flex>
                                 </Link>

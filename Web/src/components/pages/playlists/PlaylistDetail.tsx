@@ -1,9 +1,7 @@
 import { AspectRatio, Box, Flex, Stack, Text, useColorModeValue } from '@chakra-ui/react';
 import { BsPlayFill } from 'react-icons/bs';
 import { useParams } from 'react-router-dom';
-import { FileEntry } from '../../../data/FileEntry';
 import { Playlist } from '../../../data/Playlist';
-import { ContentViewer } from '../../media/ContentViewer';
 import { AwaitAPI } from '../../utils/AwaitAPI';
 import { Status } from '../../utils/Status';
 
@@ -26,7 +24,7 @@ export function PlaylistDetail(props: IPlaylistDetailProps) {
                     <Stack direction={{ base: 'column', lg: 'row' }} spacing={4}>
                         <AspectRatio ratio={16 / 9} w="100%" alignSelf="start">
                             <Box>
-                                <ContentViewer
+                                {/* <ContentViewer
                                     file={
                                         new FileEntry({
                                             name: 'Video',
@@ -34,7 +32,7 @@ export function PlaylistDetail(props: IPlaylistDetailProps) {
                                             path: 'https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
                                         })
                                     }
-                                />
+                                /> */}
                             </Box>
                         </AspectRatio>
                         <Box borderWidth={1} w={{ base: '100%', lg: 'sm', xl: 'md' }} h="100%" py={3}>

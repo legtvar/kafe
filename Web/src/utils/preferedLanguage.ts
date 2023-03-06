@@ -11,8 +11,8 @@ export function preferedLanguage() {
     }
 }
 
-export function getPrefered(strings: localizedString) {
-    const lang = preferedLanguage();
+export function getPrefered(strings: localizedString, lang?: string) {
+    lang = lang || preferedLanguage();
 
     if (!strings) return '';
 

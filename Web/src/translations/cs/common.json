@@ -44,7 +44,10 @@
   },
   "generic": {
     "empty": "Je to zvláštní, ale nic tu není...",
-    "for": "pro"
+    "for": "pro",
+    "edit": "Upravit",
+    "save": "Uložit",
+    "cancel": "Zrušit"
   },
   "home": {
     "signin": "Přihlásit se"
@@ -68,7 +71,9 @@
   "navbar": {
     "profile": "Profil",
     "settings": "Nastavení",
-    "signout": "Odhlásit se"
+    "signout": "Odhlásit se",
+    "language": "Jazyk / Language",
+    "colorMode": "Přepnout barevný režim"
   },
   "playlists": {
     "play": "Přehrát playlist",
@@ -129,7 +134,7 @@
     },
     "projects": {
       "detail": {
-        "title": "Detail projektu"
+        "title": "Upravit projekt"
       },
       "title": "Projekty"
     }
@@ -148,5 +153,19 @@
   },
   "textarea": {
     "characters": "znaků"
+  },
+  "visibility": {
+    "Unknown": "Neznámá viditelnost",
+    "Private": "Soukromé",
+    "Internal": "Neveřejné",
+    "Public": "Veřejné"
+  },
+  "tempAccount": {
+    "title": "Vytvořte si dočasný účet"
+  },
+  "temp": {
+    "after": "Na Vaši emailovou adresu jsme odeslali informace pro aktivaci dočasného účtu. Prosím klikněte na odkaz v emailu pro pokračování do KAFE.",
+    "after2": "Pokud Vám email nepřišel, můžete si o něj zažádat znovu.",
+    "back": "Znovu požádat"
   }
 }

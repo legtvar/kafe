@@ -15,7 +15,7 @@ interface IUploadProps {
 }
 
 export function Upload(props: IUploadProps) {
-    const [status, setStatus] = useState<'ready' | 'uploading' | 'uploaded'>('ready');
+    const [status, setStatus] = useState<'ready' | 'uploading' | 'uploaded' | 'error'>('ready');
     const [progress, setProgress] = useState<number>(0);
     const api = useApi();
 
@@ -27,12 +27,16 @@ export function Upload(props: IUploadProps) {
 
         const artifactId = await props.getArtifactId();
 
-        const fileId = await api.shards.create(artifactId, files[0], 'Video', (event) =>
+        const response = await api.shards.create(artifactId, files[0], 'Video', (event) =>
             setProgress(event.progress || 0),
         );
 
-        setStatus('uploaded');
-        console.log(fileId);
+        if (response.status === 200) {
+            setStatus('uploaded');
+        } else {
+            setStatus('error');
+            // TODO: Display error
+        }
     }
 
     const animationKeyframes = keyframes`

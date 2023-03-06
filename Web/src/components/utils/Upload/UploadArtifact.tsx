@@ -39,8 +39,12 @@ export function UploadArtifact(props: IUploadArtifactProps) {
         if (artifactId) return artifactId;
 
         const result = await api.artifacts.create(name, projectId);
-        setArtifactId(result);
-        return result;
+
+        if (result.status !== 200) {
+            throw new Error(result.error as any);
+        }
+        setArtifactId(result.data);
+        return result.data;
     };
 
     return (

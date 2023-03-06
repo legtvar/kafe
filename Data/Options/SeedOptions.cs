@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Kafe.Data.Capabilities;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
@@ -19,7 +20,6 @@ public record SeedOptions
 
         public string PreferredCulture { get; init; } = Const.InvariantCultureCode;
 
-        public ImmutableArray<string> Capabilities { get; init; }
-            = ImmutableArray<string>.Empty;
+        public List<string> Capabilities { get; init; } = new();
     }
 }

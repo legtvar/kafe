@@ -2,7 +2,7 @@
 
 namespace Kafe.Data.Capabilities;
 
-[JsonPolymorphic(TypeDiscriminatorPropertyName = "type")]
+[JsonPolymorphic(TypeDiscriminatorPropertyName = "type", UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FailSerialization)]
 [JsonDerivedType(typeof(AdministratorCapability), nameof(AdministratorCapability))]
 [JsonDerivedType(typeof(ReviewerCapability), nameof(ReviewerCapability))]
 [JsonDerivedType(typeof(ProjectOwnerCapability), nameof(ProjectOwnerCapability))]

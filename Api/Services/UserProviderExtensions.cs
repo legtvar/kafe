@@ -1,6 +1,10 @@
 ﻿using Kafe.Data;
 using Kafe.Data.Aggregates;
 using Kafe.Data.Capabilities;
+using System;
+using System.Collections.Immutable;
+using System.Globalization;
+using System.Linq;
 
 namespace Kafe.Api.Services;
 
@@ -11,17 +15,53 @@ public static class UserProviderExtensions
         return p.User is not null && p.User.Capabilities.Contains(new AdministratorCapability());
     }
 
-    public static bool CanReadProject(this IUserProvider p, ProjectInfo project)
+    public static IQueryable<ProjectGroupInfo> WhereCanRead(
+        this IQueryable<ProjectGroupInfo> q,
+        IUserProvider p)
+    {
+        if (p.IsAdministrator())
+        {
+            return q;
+        }
+
+        return q.Where(g => g.IsOpen && g.Deadline < DateTimeOffset.UtcNow);
+    }
+
+    public static IQueryable<ProjectInfo> WhereCanRead(
+        this IQueryable<ProjectInfo> q,
+        IUserProvider userProvider)
+    {
+        if (userProvider.IsAdministrator())
+        {
+            return q;
+        }
+
+        var ownProjects = userProvider.GetOwnProjects();
+
+        return q.Where(p => p.Visibility == Visibility.Public || ownProjects.Contains(p.Id));
+    }
+
+    public static bool CanRead(this IUserProvider p, ProjectInfo project)
     {
         return project.Visibility switch
         {
             Visibility.Public => true,
             // TODO: Implement Visibility.Internal.
-            _ => CanEditProject(p, project),
+            _ => CanEdit(p, project),
         };
     }
 
-    public static bool CanEditProject(this IUserProvider p, ProjectInfo project)
+    public static bool CanRead(this IUserProvider p, ProjectGroupInfo projectGroup)
+    {
+        if (p.IsAdministrator())
+        {
+            return true;
+        }
+
+        return projectGroup.IsOpen && projectGroup.Deadline < DateTimeOffset.UtcNow;
+    }
+
+    public static bool CanEdit(this IUserProvider p, ProjectInfo project)
     {
         if (p.IsAdministrator())
         {
@@ -46,5 +86,22 @@ public static class UserProviderExtensions
         //       (PV110, PV113, etc).
 
         return projectGroup.IsOpen;
+    }
+
+    public static ImmutableHashSet<Hrib> GetOwnProjects(this IUserProvider p)
+    {
+        if (p.User is null)
+        {
+            return ImmutableHashSet<Hrib>.Empty;
+        }
+
+        return p.User.Capabilities.OfType<ProjectOwnerCapability>()
+            .Select(c => c.ProjectId)
+            .ToImmutableHashSet();
+    }
+
+    public static CultureInfo GetPreferredCulture(this IUserProvider p)
+    {
+        return new CultureInfo(p.User?.PreferredCulture ?? Const.InvariantCultureCode);
     }
 }

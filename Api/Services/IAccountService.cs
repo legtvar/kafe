@@ -1,4 +1,6 @@
 ﻿using Kafe.Api.Transfer;
+using Kafe.Data.Capabilities;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Security.Claims;
 using System.Threading;
@@ -8,7 +10,7 @@ namespace Kafe.Api.Services;
 
 public interface IAccountService
 {
-    Task CreateTemporaryAccount(
+    Task<Hrib> CreateTemporaryAccount(
         TemporaryAccountCreationDto dto,
         CancellationToken token = default);
 
@@ -26,6 +28,15 @@ public interface IAccountService
 
     Task<ApiUser?> LoadApiAccount(
         Hrib id,
+        CancellationToken token = default);
+
+    Task<ApiUser?> LoadApiAccount(
+        string emailAddress,
+        CancellationToken token = default);
+
+    Task AddCapabilities(
+        Hrib id,
+        IEnumerable<IAccountCapability> capabilities,
         CancellationToken token = default);
 
     string EncodeToken(TemporaryAccountTokenDto token);

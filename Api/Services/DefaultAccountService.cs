@@ -104,7 +104,22 @@ public class DefaultAccountService : IAccountService, IDisposable
         return ApiUser.FromAggregate(account);
     }
 
-    public async Task CreateTemporaryAccount(
+    public async Task<ApiUser?> LoadApiAccount(string emailAddress, CancellationToken token = default)
+    {
+        // TODO: Dedupe with the overload above.
+
+        var account = await db.Query<AccountInfo>()
+            .SingleOrDefaultAsync(a => a.EmailAddress == emailAddress, token);
+
+        if (account is null)
+        {
+            return null;
+        }
+
+        return ApiUser.FromAggregate(account);
+    }
+
+    public async Task<Hrib> CreateTemporaryAccount(
         TemporaryAccountCreationDto dto,
         CancellationToken token = default)
     {
@@ -144,7 +159,9 @@ public class DefaultAccountService : IAccountService, IDisposable
             Const.ConfirmationEmailMessageTemplate[account!.PreferredCulture]!,
             confirmationUrl,
             Const.EmailSignOffs[RandomNumberGenerator.GetInt32(0, Const.EmailSignOffs.Length)][account!.PreferredCulture]);
-        await emailService.SendEmail(account.EmailAddress, emailSubject, emailMessage);
+        await emailService.SendEmail(account.EmailAddress, emailSubject, emailMessage, token);
+
+        return id;
     }
 
     public async Task ConfirmTemporaryAccount(
@@ -180,10 +197,21 @@ public class DefaultAccountService : IAccountService, IDisposable
         await db.SaveChangesAsync(token);
     }
 
-    public void Dispose()
+    public async Task AddCapabilities(
+        Hrib id,
+        IEnumerable<IAccountCapability> capabilities,
+        CancellationToken token = default)
     {
-        ((IDisposable)rng).Dispose();
-        GC.SuppressFinalize(this);
+        // TODO: Find a cheaper way of knowing that an account exists.
+        var account = await db.LoadAsync<AccountInfo>(id, token);
+        if (account is null)
+        {
+            throw new ArgumentOutOfRangeException(nameof(id));
+        }
+
+        var eventStream = await db.Events.FetchForExclusiveWriting<AccountInfo>(account.Id, token);
+        eventStream.AppendMany(capabilities.Select(c => new AccountCapabilityAdded(account.Id, c)));
+        await db.SaveChangesAsync(token);
     }
 
     public string EncodeToken(TemporaryAccountTokenDto dto)
@@ -214,5 +242,11 @@ public class DefaultAccountService : IAccountService, IDisposable
             dto = null;
             return false;
         }
+    }
+
+    public void Dispose()
+    {
+        ((IDisposable)rng).Dispose();
+        GC.SuppressFinalize(this);
     }
 }

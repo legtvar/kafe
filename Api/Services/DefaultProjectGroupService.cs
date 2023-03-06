@@ -1,6 +1,7 @@
 ﻿using Kafe.Api.Transfer;
 using Kafe.Data.Aggregates;
 using Marten;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -31,14 +32,38 @@ public class DefaultProjectGroupService : IProjectGroupService
     {
         var preferredCulture = userProvider.User!.PreferredCulture;
         var projectGroups = await db.Query<ProjectGroupInfo>()
+            .WhereCanRead(userProvider)
             .ToListAsync(token);
 
         return projectGroups
             .Select(TransferMaps.ToProjectGroupListDto).ToImmutableArray();
     }
 
-    public Task<ProjectGroupDetailDto?> Load(Hrib id, CancellationToken token = default)
+    public async Task<ProjectGroupDetailDto?> Load(Hrib id, CancellationToken token = default)
     {
-        throw new System.NotImplementedException();
+        var projectGroup = await db.LoadAsync<ProjectGroupInfo>(id, token);
+        if (projectGroup is null)
+        {
+            return null;
+        }
+
+        if (userProvider.CanRead(projectGroup))
+        {
+            throw new UnauthorizedAccessException();
+        }
+
+        var dto = TransferMaps.ToProjectGroupDetailDto(projectGroup);
+        var projects = await db.Query<ProjectInfo>()
+            .Where(p => p.ProjectGroupId == projectGroup.Id)
+            .WhereCanRead(userProvider)
+            .ToListAsync(token);
+        var preferredCulture = userProvider.GetPreferredCulture();
+        return dto with
+        {
+            Projects = projects
+                .OrderBy(p => p.Name[preferredCulture])
+                .Select(TransferMaps.ToProjectListDto)
+                .ToImmutableArray()
+        };
     }
 }

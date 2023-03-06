@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Threading;
 using System.Threading.Tasks;
 using Swashbuckle.AspNetCore.Annotations;
+using Kafe.Api.Services;
 
 namespace Kafe.Api.Endpoints.ProjectGroup;
 
@@ -18,11 +19,11 @@ public class ProjectGroupDetailEndpoint : EndpointBaseAsync
     .WithRequest<string>
     .WithActionResult<ProjectGroupDetailDto>
 {
-    private readonly IQuerySession db;
+    private readonly IProjectGroupService projectGroups;
 
-    public ProjectGroupDetailEndpoint(IQuerySession db)
+    public ProjectGroupDetailEndpoint(IProjectGroupService projectGroups)
     {
-        this.db = db;
+        this.projectGroups = projectGroups;
     }
 
     [HttpGet]
@@ -33,12 +34,7 @@ public class ProjectGroupDetailEndpoint : EndpointBaseAsync
         string id,
         CancellationToken cancellationToken = default)
     {
-        var data = await db.LoadAsync<ProjectGroupInfo>(id, token: cancellationToken);
-        if (data is null)
-        {
-            return NotFound();
-        }
-
-        return Ok(TransferMaps.ToProjectGroupDetailDto(data));
+        var dto = await projectGroups.Load(id, cancellationToken);
+        return dto is null ? NotFound() : Ok(dto);
     }
 }

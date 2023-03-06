@@ -1,10 +1,12 @@
 ﻿using Ardalis.ApiEndpoints;
 using Asp.Versioning;
+using Kafe.Api.Options;
 using Kafe.Api.Services;
 using Kafe.Api.Transfer;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.Annotations;
 using System;
 using System.Collections.Generic;
@@ -23,10 +25,14 @@ public class TemporaryAccountConfirmationEndpoint : EndpointBaseAsync
     public const string TemporaryAccountRole = "TemporaryAccount";
 
     private readonly IAccountService accounts;
+    private readonly IOptions<ApiOptions> options;
 
-    public TemporaryAccountConfirmationEndpoint(IAccountService accounts)
+    public TemporaryAccountConfirmationEndpoint(
+        IAccountService accounts,
+        IOptions<ApiOptions> options)
     {
         this.accounts = accounts;
+        this.options = options;
     }
 
     [HttpGet]
@@ -56,6 +62,7 @@ public class TemporaryAccountConfirmationEndpoint : EndpointBaseAsync
             IssuedUtc = DateTimeOffset.UtcNow,
             ExpiresUtc = DateTimeOffset.UtcNow.Add(Const.AuthenticationCookieExpirationTime),
             IsPersistent = true,
+            RedirectUri = options.Value.AccountConfirmRedirectPath
         };
 
         return SignIn(apiAccount.ToPrincipal(CookieAuthenticationDefaults.AuthenticationScheme), authProperties);

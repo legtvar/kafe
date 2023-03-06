@@ -28,6 +28,8 @@ using Kafe.Data.Options;
 using Kafe.Api.Daemons;
 using Kafe.Api.Authorization;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
 
 namespace Kafe.Api;
 
@@ -81,6 +83,10 @@ public class Startup
     public void Configure(IApplicationBuilder app, IHostEnvironment environment)
     {
         app.UseHttpsRedirection();
+
+        var apiOptions = app.ApplicationServices.GetRequiredService<IOptions<ApiOptions>>();
+        app.UseRewriter(new RewriteOptions()
+            .AddRewrite($"^{apiOptions.Value.AccountConfirmPath.Trim('/')}/(.*)$", "api/v1/tmp-account/$1", true));
 
         app.UseDefaultFiles();
         app.UseStaticFiles();

@@ -7,6 +7,7 @@ using Kafe.Data.Events;
 using Marten;
 using Marten.Events;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
@@ -27,9 +28,6 @@ public class DefaultAccountService : IAccountService, IDisposable
 {
     public const string EmailConfirmationPurpose = "EmailConfirmation";
     public static readonly TimeSpan ConfirmationTokenExpiration = TimeSpan.FromHours(24);
-
-    // TODO: Obtain this from ASP.NET Core somehow.
-    public const string EmailConfirmationEndpoint = "/api/v1/tmp-account/";
 
     private readonly RandomNumberGenerator rng = RandomNumberGenerator.Create();
     private readonly IDataProtector dataProtector;
@@ -153,7 +151,9 @@ public class DefaultAccountService : IAccountService, IDisposable
         await db.SaveChangesAsync(token);
 
         var confirmationToken = EncodeToken(new(id, EmailConfirmationPurpose, refreshed.SecurityStamp));
-        var confirmationUrl = new Uri(new Uri(apiOptions.Value.BaseUrl), $"{EmailConfirmationEndpoint}{confirmationToken}");
+        var pathString = new PathString(apiOptions.Value.AccountConfirmPath)
+            .Add(new PathString("/" + confirmationToken));
+        var confirmationUrl = new Uri(new Uri(apiOptions.Value.BaseUrl), pathString);
         var emailSubject = Const.ConfirmationEmailSubject[account!.PreferredCulture]!;
         var emailMessage = string.Format(
             Const.ConfirmationEmailMessageTemplate[account!.PreferredCulture]!,

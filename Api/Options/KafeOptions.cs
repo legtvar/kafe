@@ -11,4 +11,10 @@ public record ApiOptions
 {
     [Url, Required]
     public string BaseUrl { get; init; } = null!;
+
+    [Required]
+    public string AccountConfirmPath { get; init; } = "/confirm";
+
+    [Required]
+    public string AccountConfirmRedirectPath { get; init; } = "/auth";
 }

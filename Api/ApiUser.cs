@@ -42,7 +42,7 @@ public record ApiUser(
             EmailAddress: info.EmailAddress,
             PreferredCulture: new CultureInfo(info.PreferredCulture),
             Capabilities: info.Capabilities
-                .Cast<AccountCapability>()
+                .Select(c => (AccountCapability)c)
                 .ToImmutableHashSet());
     }
 

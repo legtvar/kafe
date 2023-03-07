@@ -247,7 +247,7 @@ V případě technických problémů nás prosím kontaktujte na adrese: festiva
             Id: data.Id,
             Name: data.Name,
             Shards: data.Shards.Select(ToShardListDto).ToImmutableArray(),
-            ContainingProjectIds: data.ContainingProjectIds.Cast<Hrib>().ToImmutableArray(),
+            ContainingProjectIds: data.ContainingProjectIds.Select(i => (Hrib)i).ToImmutableArray(),
             AddedOn: data.AddedOn
         );
     }

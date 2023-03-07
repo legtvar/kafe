@@ -58,7 +58,7 @@ public class DefaultArtifactService : IArtifactService
             throw new UnauthorizedAccessException();
         }
 
-        var artifacts = await db.LoadManyAsync<ArtifactDetail>(token, ids.Cast<string>());
+        var artifacts = await db.LoadManyAsync<ArtifactDetail>(token, ids.Select(i => (string)i));
         return artifacts.Select(a => a is null ? null : TransferMaps.ToArtifactDetailDto(a))
             .ToImmutableArray();
     }

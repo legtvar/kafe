@@ -26,7 +26,7 @@ public static class Const
     public const string VideoAnnotationBlueprintSlot = "video-annotation";
     public const string CoverPhotoBlueprintSlot = "cover-photo";
     public const int CoverPhotoMinCount = 1;
-    public const int CoverPhotoMaxCount = 5;
+    public const int CoverPhotoMaxCount = 3;
 
     public const string SystemName = "System";
 

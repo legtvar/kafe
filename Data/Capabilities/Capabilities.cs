@@ -51,7 +51,7 @@ public abstract record AccountCapability
 
     public static bool IsValidCapabilitySubvalue(string value)
     {
-        return value.All(c => c != SubvalueSeparator && char.IsAsciiLetterOrDigit(c));
+        return value.All(c => c != SubvalueSeparator && c >= ' ' && c <= '~');
     }
 
     [return: NotNullIfNotNull(nameof(capability))]

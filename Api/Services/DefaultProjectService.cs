@@ -1,6 +1,7 @@
 ﻿using Kafe.Api.Transfer;
 using Kafe.Data;
 using Kafe.Data.Aggregates;
+using Kafe.Data.Capabilities;
 using Kafe.Data.Events;
 using Marten;
 using System;
@@ -16,13 +17,16 @@ public partial class DefaultProjectService : IProjectService
 {
     private readonly IDocumentSession db;
     private readonly IUserProvider userProvider;
+    private readonly IAccountService accounts;
 
     public DefaultProjectService(
         IDocumentSession db,
-        IUserProvider userProvider)
+        IUserProvider userProvider,
+        IAccountService accounts)
     {
         this.db = db;
         this.userProvider = userProvider;
+        this.accounts = accounts;
     }
 
     public async Task<Hrib> Create(ProjectCreationDto dto, CancellationToken token = default)
@@ -84,6 +88,15 @@ public partial class DefaultProjectService : IProjectService
 
         AddAuthors(dto.Cast, ProjectAuthorKind.Cast);
         AddAuthors(dto.Crew, ProjectAuthorKind.Crew);
+
+        if (userProvider.User is not null)
+        {
+            await accounts.AddCapabilities(
+                userProvider.User.Id,
+                new[] { new ProjectOwnership(created.ProjectId) },
+                token);
+            await userProvider.Refresh(token: token);
+        }
 
         await db.SaveChangesAsync(token);
         return created.ProjectId;

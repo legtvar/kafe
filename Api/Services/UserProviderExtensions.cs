@@ -138,7 +138,7 @@ public static class UserProviderExtensions
         // TODO: Implement internal project groups. Will require to implement account grouping as well
         //       (PV110, PV113, etc).
 
-        return projectGroup.IsOpen;
+        return projectGroup.IsOpen && projectGroup.Deadline > DateTimeOffset.UtcNow;
     }
 
     public static bool CanEdit(this IUserProvider p, AuthorInfo author)

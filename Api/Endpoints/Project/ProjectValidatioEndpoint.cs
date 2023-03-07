@@ -11,25 +11,25 @@ using System.Threading.Tasks;
 namespace Kafe.Api.Endpoints.Project;
 
 [ApiVersion("1")]
-[Route("project")]
+[Route("project-validation/{id}")]
 [Authorize]
-public class ProjectCreationEndpoint : EndpointBaseAsync
-    .WithRequest<ProjectCreationDto>
-    .WithActionResult<Hrib>
+public class ProjectValidatioEndpoint : EndpointBaseAsync
+    .WithRequest<string>
+    .WithActionResult<ProjectValidationDto>
 {
     private readonly IProjectService projects;
 
-    public ProjectCreationEndpoint(IProjectService projects)
+    public ProjectValidatioEndpoint(IProjectService projects)
     {
         this.projects = projects;
     }
 
-    [HttpPost]
+    [HttpGet]
     [SwaggerOperation(Tags = new[] { EndpointArea.Project })]
-    public override async Task<ActionResult<Hrib>> HandleAsync(
-        ProjectCreationDto request,
+    public override async Task<ActionResult<ProjectValidationDto>> HandleAsync(
+        string id,
         CancellationToken cancellationToken = default)
     {
-        return await projects.Create(request, cancellationToken);
+        return await projects.Validate(id, cancellationToken);
     }
 }

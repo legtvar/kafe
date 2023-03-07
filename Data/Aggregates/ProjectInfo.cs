@@ -11,8 +11,9 @@ public record ProjectInfo(
     string Id,
     CreationMethod CreationMethod,
     string ProjectGroupId,
-    ImmutableArray<ProjectAuthor> Authors,
-    ImmutableArray<ProjectArtifact> Artifacts,
+    ImmutableArray<ProjectAuthorInfo> Authors,
+    ImmutableArray<ProjectArtifactInfo> Artifacts,
+    ImmutableArray<ProjectReviewInfo> Reviews,
     LocalizedString Name,
     LocalizedString? Description = null,
     LocalizedString? Genre = null,
@@ -21,16 +22,22 @@ public record ProjectInfo(
     bool IsLocked = false
 ) : IEntity;
 
-public record ProjectAuthor(
+public record ProjectAuthorInfo(
     string Id,
     ProjectAuthorKind Kind,
     ImmutableArray<string> Roles
 ) : IEntity;
 
-public record ProjectArtifact(
+public record ProjectArtifactInfo(
     string Id,
     string? BlueprintSlot
 ) : IEntity;
+
+public record ProjectReviewInfo(
+    ReviewKind Kind,
+    string ReviewerRole,
+    LocalizedString? Comment
+);
 
 public class ProjectInfoProjection : SingleStreamAggregation<ProjectInfo>
 {
@@ -44,8 +51,9 @@ public class ProjectInfoProjection : SingleStreamAggregation<ProjectInfo>
             Id: e.ProjectId,
             CreationMethod: e.CreationMethod,
             ProjectGroupId: e.ProjectGroupId,
-            Authors: ImmutableArray<ProjectAuthor>.Empty,
-            Artifacts: ImmutableArray<ProjectArtifact>.Empty,
+            Authors: ImmutableArray<ProjectAuthorInfo>.Empty,
+            Artifacts: ImmutableArray<ProjectArtifactInfo>.Empty,
+            Reviews: ImmutableArray<ProjectReviewInfo>.Empty,
             Name: e.Name,
             Visibility: e.Visibility);
     }
@@ -66,7 +74,7 @@ public class ProjectInfoProjection : SingleStreamAggregation<ProjectInfo>
     {
         if (p.Authors.IsDefault)
         {
-            p = p with { Authors = ImmutableArray<ProjectAuthor>.Empty };
+            p = p with { Authors = ImmutableArray<ProjectAuthorInfo>.Empty };
         }
 
         var author = p.Authors.SingleOrDefault(a => a.Id == e.AuthorId);
@@ -78,7 +86,7 @@ public class ProjectInfoProjection : SingleStreamAggregation<ProjectInfo>
         }
         else
         {
-            author = new ProjectAuthor(
+            author = new ProjectAuthorInfo(
                 Id: e.AuthorId,
                 Kind: e.Kind,
                 Roles: e.Roles.HasValue && !e.Roles.Value.IsDefault
@@ -133,7 +141,7 @@ public class ProjectInfoProjection : SingleStreamAggregation<ProjectInfo>
 
     public ProjectInfo Apply(ProjectArtifactAdded e, ProjectInfo p)
     {
-        var projectArtifact = new ProjectArtifact(
+        var projectArtifact = new ProjectArtifactInfo(
             Id: e.ArtifactId,
             BlueprintSlot: e.BlueprintSlot);
 
@@ -173,5 +181,16 @@ public class ProjectInfoProjection : SingleStreamAggregation<ProjectInfo>
     public ProjectInfo Apply(ProjectUnlocked _, ProjectInfo p)
     {
         return p with { IsLocked = false };
+    }
+
+    public ProjectInfo Apply(ProjectReviewAdded e, ProjectInfo p)
+    {
+        return p with
+        {
+            Reviews = p.Reviews.Add(new ProjectReviewInfo(
+                Kind: e.Kind,
+                ReviewerRole: e.ReviewerRole,
+                Comment: e.Comment))
+        };
     }
 }

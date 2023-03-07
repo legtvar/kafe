@@ -18,6 +18,16 @@ public static class Const
     public const long InvalidFileLength = -1;
     public const long ShardSizeLimit = 4_294_967_296;
 
+    public const string TechReviewer = "tech";
+    public const string VisualReviewer = "visual";
+    public const string DramaturgyReviewer = "dramaturgy";
+
+    public const string FilmBlueprintSlot = "film";
+    public const string VideoAnnotationBlueprintSlot = "video-annotation";
+    public const string CoverPhotoBlueprintSlot = "cover-photo";
+    public const int CoverPhotoMinCount = 1;
+    public const int CoverPhotoMaxCount = 5;
+
     public const string SystemName = "System";
 
     public static readonly TimeSpan AuthenticationCookieExpirationTime = new(30, 0, 0, 0);

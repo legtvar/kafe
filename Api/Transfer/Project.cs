@@ -26,6 +26,7 @@ public record ProjectDetailDto(
     ImmutableArray<ProjectAuthorDto> Crew,
     ImmutableArray<ProjectAuthorDto> Cast,
     ImmutableArray<ProjectArtifactDto> Artifacts,
+    ImmutableArray<ProjectReviewDto> Reviews,
     ProjectBlueprintDto Blueprint
 );
 
@@ -43,9 +44,16 @@ public record ProjectArtifactDto(
     ImmutableArray<ShardListDto> Shards
 );
 
+public record ProjectReviewDto(
+    ReviewKind Kind,
+    string ReviewerRole,
+    LocalizedString? Comment
+);
+
 public record ProjectBlueprintDto(
     LocalizedString Name,
     LocalizedString? Description,
+    ImmutableArray<string> RequiredReviewers,
     ImmutableArray<ProjectArtifactBlueprintDto> ArtifactBlueprints
 );
 
@@ -76,4 +84,15 @@ public record ProjectCreationDto(
 public record ProjectCreationAuthorDto(
     string Id,
     ImmutableArray<string> Roles
+);
+
+public record ProjectValidationDto(
+    Hrib ProjectId,
+    DateTimeOffset ValidatedOn,
+    ImmutableArray<ProjectDiagnosticDto> Diagnostics
+);
+
+public record ProjectDiagnosticDto(
+    DiagnosticKind Kind,
+    LocalizedString Message
 );

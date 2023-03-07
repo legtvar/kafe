@@ -12,8 +12,13 @@ namespace Kafe.Api.Transfer;
 
 public static class TransferMaps
 {
-    private static readonly ProjectBlueprintDto TemporaryProjectBlueprintMockup
+    public static readonly ProjectBlueprintDto TemporaryProjectBlueprintMockup
         = new(
+            RequiredReviewers: ImmutableArray.Create(
+                Const.TechReviewer,
+                Const.VisualReviewer,
+                Const.DramaturgyReviewer
+            ),
             Name: LocalizedString.Create(
                 (Const.InvariantCulture, "Film registration to FFFI MU 2023"),
                 (Const.CzechCulture, "Přihlášení filmu na 23. FFFI MU")
@@ -56,7 +61,7 @@ V případě technických problémů nás prosím kontaktujte na adrese: festiva
                         (Const.InvariantCulture, "TODO"),
                         (Const.CzechCulture, "Soubor s filmem splňující technické požadavky")
                     ),
-                    SlotName: "film",
+                    SlotName: Const.FilmBlueprintSlot,
                     Arity: ArgumentArity.ExactlyOne,
                     ShardBlueprints: ImmutableArray.Create(
                         new ProjectArtifactShardBlueprintDto(
@@ -87,7 +92,7 @@ V případě technických problémů nás prosím kontaktujte na adrese: festiva
                         (Const.CzechCulture, "Volitelné představení filmu jeho tvůrci o délce maximálně 30 " +
                         "sekund. Technické požadavky jsou stejné jako u filmu.")
                     ),
-                    SlotName: "video-annotation",
+                    SlotName: Const.VideoAnnotationBlueprintSlot,
                     Arity: ArgumentArity.ZeroOrOne,
                     ShardBlueprints: ImmutableArray.Create(
                         new ProjectArtifactShardBlueprintDto(
@@ -117,8 +122,8 @@ V případě technických problémů nás prosím kontaktujte na adrese: festiva
                         (Const.InvariantCulture, "TODO"),
                         (Const.CzechCulture, "Nahrajte kvalitní screenshoty nebo fotografie ze scén, které váš film vystihují. Budou použity v medailonku vašeho filmu a do brožury festivalu.")
                     ),
-                    SlotName: "cover-photo",
-                    Arity: new ArgumentArity(1, 5),
+                    SlotName: Const.CoverPhotoBlueprintSlot,
+                    Arity: new ArgumentArity(Const.CoverPhotoMinCount, Const.CoverPhotoMaxCount),
                     ShardBlueprints: ImmutableArray.Create(
                         new ProjectArtifactShardBlueprintDto(
                             Name: LocalizedString.Create(
@@ -159,7 +164,17 @@ V případě technických problémů nás prosím kontaktujte na adrese: festiva
             Crew: ImmutableArray<ProjectAuthorDto>.Empty,
             Cast: ImmutableArray<ProjectAuthorDto>.Empty,
             Artifacts: ImmutableArray<ProjectArtifactDto>.Empty,
+            Reviews: data.Reviews.Select(ToProjectReviewDto).ToImmutableArray(),
             Blueprint: TemporaryProjectBlueprintMockup
+        );
+    }
+
+    public static ProjectReviewDto ToProjectReviewDto(ProjectReviewInfo review)
+    {
+        return new ProjectReviewDto(
+            Kind: review.Kind,
+            ReviewerRole: review.ReviewerRole,
+            Comment: review.Comment
         );
     }
 

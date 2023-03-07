@@ -132,7 +132,7 @@ public static class Program
 
     private static async Task<Data.Aggregates.ProjectInfo> MigrateProject(Project project, Hrib groupId)
     {
-        var authors = ImmutableArray.CreateBuilder<Data.Aggregates.ProjectAuthor>();
+        var authors = ImmutableArray.CreateBuilder<Data.Aggregates.ProjectAuthorInfo>();
 
         if (project.ExternalAuthorName is not null
             || project.ExternalAuthorMail is not null
@@ -144,7 +144,7 @@ public static class Program
                 project.ExternalAuthorUco,
                 project.ExternalAuthorMail,
                 project.ExternalAuthorPhone);
-            authors.Add(new Data.Aggregates.ProjectAuthor(
+            authors.Add(new Data.Aggregates.ProjectAuthorInfo(
                 Id: author.Id,
                 Kind: ProjectAuthorKind.Crew,
                 Roles: ImmutableArray<string>.Empty));
@@ -160,7 +160,7 @@ public static class Program
                 authorRole.Key.ToString(),
                 null,
                 null);
-            var projectAuthor = new Data.Aggregates.ProjectAuthor(
+            var projectAuthor = new Data.Aggregates.ProjectAuthorInfo(
                 Id: kafeAuthor.Id,
                 Kind: ProjectAuthorKind.Crew,
                 Roles: authorRole.Select(r => r.Name).ToImmutableArray());

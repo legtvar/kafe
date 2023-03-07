@@ -221,7 +221,7 @@ public sealed class KafeClient : IAsyncDisposable
         string? description = null,
         DateTime? releasedOn = default,
         bool isLocked = true,
-        IEnumerable<ProjectAuthor>? authors = default,
+        IEnumerable<ProjectAuthorInfo>? authors = default,
         Hrib? hrib = null)
     {
         hrib ??= Hrib.Create();
@@ -250,7 +250,7 @@ public sealed class KafeClient : IAsyncDisposable
             LogEvent(hrib, locked);
         }
 
-        authors ??= Enumerable.Empty<ProjectAuthor>();
+        authors ??= Enumerable.Empty<ProjectAuthorInfo>();
         foreach(var author in authors)
         {
             var authorAdded = new ProjectAuthorAdded(

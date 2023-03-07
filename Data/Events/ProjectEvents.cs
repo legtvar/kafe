@@ -52,6 +52,13 @@ public record ProjectUnlocked(
     Hrib ProjectId
 );
 
+public record ProjectReviewAdded(
+    Hrib ProjectId,
+    ReviewKind Kind,
+    string ReviewerRole,
+    LocalizedString? Comment
+);
+
 //public record ProjectPassedAutomaticValidation(
 //    Hrib ProjectId
 //);

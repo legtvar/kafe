@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Kafe.Api.Services;
 
-public class DefaultProjectService : IProjectService
+public partial class DefaultProjectService : IProjectService
 {
     private readonly IDocumentSession db;
     private readonly IUserProvider userProvider;

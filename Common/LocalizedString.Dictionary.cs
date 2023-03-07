@@ -10,7 +10,7 @@ public sealed partial class LocalizedString : IDictionary<string, string>
 
     ICollection<string> IDictionary<string, string>.Keys => ((IDictionary<string, string>)data).Keys;
 
-    ICollection<string> IDictionary<string, string>.Values => ((IDictionary<string, string>)data).Values;
+    public ICollection<string> Values => ((IDictionary<string, string>)data).Values;
 
     int ICollection<KeyValuePair<string, string>>.Count => data.Count;
 

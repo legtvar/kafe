@@ -37,8 +37,8 @@ public static class Db
                     .ConnectionLimit(-1);
             });
 
-            options.Linq.FieldSources.Add(new LocalizedStringFieldSource());
-            options.Linq.MethodCallParsers.Add(new DummyMethodCallParser());
+            //options.Linq.FieldSources.Add(new LocalizedStringFieldSource());
+            //options.Linq.MethodCallParsers.Add(new DummyMethodCallParser());
             //options.Linq.FieldSources.Add(new HribFieldSource());
 
             options.Projections.Add<AuthorInfoProjection>(ProjectionLifecycle.Inline);
@@ -53,7 +53,7 @@ public static class Db
             options.Projections.Add<VideoConversionInfoProjection>(ProjectionLifecycle.Inline);
             options.Projections.Add<ArtifactDetailProjection>(ProjectionLifecycle.Inline);
             options.Projections.Add<AccountInfoProjection>(ProjectionLifecycle.Inline);
-            options.UseDefaultSerialization(serializerType: SerializerType.SystemTextJson);
+            options.UseDefaultSerialization(serializerType: SerializerType.Newtonsoft);
         }
 
         services.AddMarten(ConfigureMarten);

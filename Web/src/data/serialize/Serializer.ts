@@ -1,4 +1,4 @@
-import { AbstractType } from './AbstractType';
+import { AbstractType } from '../AbstractType';
 
 export class Serializer<T extends AbstractType> {
     private obj: T;

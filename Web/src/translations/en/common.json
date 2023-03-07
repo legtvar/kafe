@@ -17,7 +17,7 @@
   "createProject": {
     "fields": {
       "description": "Description",
-      "genere": "Genere",
+      "genre": "genre",
       "movie": "Movie",
       "name": "Name of the movie",
       "videoannotation": "Video annotation",
@@ -36,6 +36,10 @@
         "Image": "Image file",
         "Subtitles": "Subtitles file"
       }
+    },
+    "button": {
+      "create": "Create project",
+      "update": "Save project"
     }
   },
   "error": {
@@ -50,7 +54,7 @@
     "for": "for",
     "edit": "Edit",
     "save": "Save",
-    "cancel": "Cancel"
+    "cancel": "Quit edit mode"
   },
   "home": {
     "signin": "Sign in"

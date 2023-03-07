@@ -18,7 +18,7 @@ interface IProjectBasicInfoProps {
 
 export function ProjectBasicInfo(props: IProjectBasicInfoProps) {
     const { border, bg } = useColorScheme();
-    // const update = !!props.project; // Todo accept updating the project
+    const update = !!props.project;
     const project = useConst(
         props.project ||
             new Project({
@@ -35,13 +35,13 @@ export function ProjectBasicInfo(props: IProjectBasicInfoProps) {
     return (
         <SendAPI
             onSubmited={(id) => {
-                navigate(`/auth/project/${id}`);
+                navigate(`/auth/projects/${id}`);
             }}
             value={project!}
             request={(api, value) => api.projects.create(value)}
         >
             {(onSubmit, status) => (
-                <Stack spacing={8} direction="column">
+                <Stack spacing={8} direction="column" mb={8}>
                     <FormControl>
                         <FormLabel>{t('createProject.fields.name').toString()}</FormLabel>
                         <Stack direction={{ base: 'column', md: 'row' }}>
@@ -88,21 +88,21 @@ export function ProjectBasicInfo(props: IProjectBasicInfoProps) {
                     </FormControl>
 
                     <FormControl>
-                        <FormLabel>{t('createProject.fields.genere').toString()}</FormLabel>
+                        <FormLabel>{t('createProject.fields.genre').toString()}</FormLabel>
                         <Stack direction={{ base: 'column', md: 'row' }}>
-                            <FormControl id="genere.cs">
+                            <FormControl id="genre.cs">
                                 <Input
                                     type="text"
                                     borderColor={border}
                                     bg={bg}
-                                    placeholder={`${t('createProject.fields.genere').toString()} ${t(
+                                    placeholder={`${t('createProject.fields.genre').toString()} ${t(
                                         'createProject.language.cs',
                                     )}`}
-                                    defaultValue={getPrefered(project.genere, 'cs')}
+                                    defaultValue={getPrefered(project.genre, 'cs')}
                                     onChange={(event) =>
                                         forceUpdate(
-                                            project.set('genere', {
-                                                ...project.genere,
+                                            project.set('genre', {
+                                                ...project.genre,
                                                 cs: event.target.value,
                                             }),
                                         )
@@ -110,19 +110,19 @@ export function ProjectBasicInfo(props: IProjectBasicInfoProps) {
                                 />
                             </FormControl>
 
-                            <FormControl id="genere.en">
+                            <FormControl id="genre.en">
                                 <Input
                                     type="text"
                                     borderColor={border}
                                     bg={bg}
-                                    placeholder={`${t('createProject.fields.genere').toString()} ${t(
+                                    placeholder={`${t('createProject.fields.genre').toString()} ${t(
                                         'createProject.language.en',
                                     )}`}
-                                    defaultValue={getPrefered(project.genere, 'en')}
+                                    defaultValue={getPrefered(project.genre, 'en')}
                                     onChange={(event) =>
                                         forceUpdate(
-                                            project.set('genere', {
-                                                ...project.genere,
+                                            project.set('genre', {
+                                                ...project.genre,
                                                 en: event.target.value,
                                             }),
                                         )
@@ -238,14 +238,16 @@ export function ProjectBasicInfo(props: IProjectBasicInfoProps) {
                             }
                         />
                     </FormControl>
-                    <HStack w="100%" pb={12}>
+                    <HStack w="100%">
                         <Button
                             colorScheme="blue"
                             ml="auto"
                             isDisabled={status === 'sending' || status === 'ok'}
                             onClick={onSubmit}
                         >
-                            Vytvořit projekt
+                            {update
+                                ? t('createProject.button.update').toString()
+                                : t('createProject.button.create').toString()}
                         </Button>
                     </HStack>
                 </Stack>

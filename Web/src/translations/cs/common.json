@@ -17,7 +17,7 @@
   "createProject": {
     "fields": {
       "description": "Anotace",
-      "genere": "Žánr",
+      "genre": "Žánr",
       "movie": "Film",
       "name": "Název filmu",
       "videoannotation": "Videoanotace",
@@ -36,6 +36,10 @@
         "Image": "Obrázkový soubor",
         "Subtitles": "Soubor titulků"
       }
+    },
+    "button": {
+      "create": "Vytvořit projekt",
+      "update": "Uložit projekt"
     }
   },
   "error": {
@@ -50,7 +54,7 @@
     "for": "pro",
     "edit": "Upravit",
     "save": "Uložit",
-    "cancel": "Zrušit"
+    "cancel": "Ukončit editaci"
   },
   "home": {
     "signin": "Přihlásit se"

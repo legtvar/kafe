@@ -1,7 +1,7 @@
 import { components } from '../schemas/api';
 import { localizedString } from '../schemas/generic';
 import { AbstractType } from './AbstractType';
-import { Serializer } from './Serializer';
+import { Serializer } from './serialize/Serializer';
 
 export class Author extends AbstractType {
     public name!: string;

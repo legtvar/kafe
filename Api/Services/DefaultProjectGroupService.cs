@@ -27,6 +27,11 @@ public class DefaultProjectGroupService : IProjectGroupService
 
     public async Task<Hrib> Create(ProjectGroupCreationDto dto, CancellationToken token = default)
     {
+        if (!userProvider.IsAdministrator())
+        {
+            throw new UnauthorizedAccessException();
+        }
+
         var created = new ProjectGroupCreated(
             ProjectGroupId: Hrib.Create(),
             CreationMethod: CreationMethod.Api,
@@ -47,8 +52,6 @@ public class DefaultProjectGroupService : IProjectGroupService
 
     public async Task<ImmutableArray<ProjectGroupListDto>> List(CancellationToken token = default)
     {
-        var preferredCulture = userProvider.User?.PreferredCulture.TwoLetterISOLanguageName
-            ?? Const.InvariantCultureCode;
         var projectGroups = await db.Query<ProjectGroupInfo>()
             .WhereCanRead(userProvider)
             .ToListAsync(token);

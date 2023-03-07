@@ -224,16 +224,17 @@ public class DefaultAccountService : IAccountService, IDisposable
         await db.SaveChangesAsync(token);
     }
 
+    /// <summary>
+    /// Gives the account the specified capabilities.
+    /// </summary>
+    /// <remarks>
+    /// THIS METHOD DOES NOT CARE ABOUT AUTHORIZATION. Never invoke directly from an endpoint.
+    /// </remarks>
     public async Task AddCapabilities(
         Hrib id,
         IEnumerable<AccountCapability> capabilities,
         CancellationToken token = default)
     {
-        if (!userProvider.IsAdministrator())
-        {
-            throw new UnauthorizedAccessException();
-        }
-
         // TODO: Find a cheaper way of knowing that an account exists.
         var account = await db.LoadAsync<AccountInfo>(id, token);
         if (account is null)

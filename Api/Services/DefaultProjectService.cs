@@ -15,18 +15,34 @@ namespace Kafe.Api.Services;
 public class DefaultProjectService : IProjectService
 {
     private readonly IDocumentSession db;
+    private readonly IUserProvider userProvider;
 
-    public DefaultProjectService(IDocumentSession db)
+    public DefaultProjectService(
+        IDocumentSession db,
+        IUserProvider userProvider)
     {
         this.db = db;
+        this.userProvider = userProvider;
     }
 
     public async Task<Hrib> Create(ProjectCreationDto dto, CancellationToken token = default)
     {
-        var group = await db.LoadAsync<ProjectGroupInfo>(dto.ProjectGroupId);
+        var group = await db.LoadAsync<ProjectGroupInfo>(dto.ProjectGroupId, token);
         if (group is null)
         {
-            throw new ArgumentException($"Project group '{dto.ProjectGroupId}' does not exist.");
+            throw new ArgumentOutOfRangeException(nameof(dto), $"Project group '{dto.ProjectGroupId}' does not exist.");
+        }
+
+        if (!userProvider.CanRead(group))
+        {
+            throw new UnauthorizedAccessException();
+        }
+
+        if (!group.IsOpen)
+        {
+            throw new ArgumentException(
+                $"Project group '{dto.ProjectGroupId}' is not open for submissions.",
+                nameof(dto));
         }
 
         var created = new ProjectCreated(
@@ -53,6 +69,11 @@ public class DefaultProjectService : IProjectService
                     throw new ArgumentException($"Author '{author.Id}' does not exist.");
                 }
 
+                if (!userProvider.CanRead(info))
+                {
+                    throw new UnauthorizedAccessException($"The user is not authorized to access user '{author.Id}'.");
+                }
+
                 authorsAdded.Add(new ProjectAuthorAdded(
                     ProjectId: created.ProjectId,
                     AuthorId: author.Id,
@@ -70,7 +91,9 @@ public class DefaultProjectService : IProjectService
 
     public async Task<ImmutableArray<ProjectListDto>> List(CancellationToken token = default)
     {
-        var projects = await db.Query<ProjectInfo>().ToListAsync(token);
+        var projects = await db.Query<ProjectInfo>()
+            .WhereCanRead(userProvider)
+            .ToListAsync(token);
         return projects.Select(TransferMaps.ToProjectListDto).ToImmutableArray();
     }
 
@@ -80,6 +103,11 @@ public class DefaultProjectService : IProjectService
         if (data is null)
         {
             return null;
+        }
+
+        if (!userProvider.CanRead(data))
+        {
+            throw new UnauthorizedAccessException();
         }
 
         var group = await db.LoadAsync<ProjectGroupInfo>(data.ProjectGroupId, token);

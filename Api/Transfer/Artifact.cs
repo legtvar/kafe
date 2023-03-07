@@ -13,6 +13,6 @@ public record ArtifactDetailDto(
 public record ArtifactCreationDto(
     LocalizedString Name,
     DateTimeOffset? AddedOn,
-    Hrib? ContainingProject,
+    Hrib ContainingProject,
     string? BlueprintSlot
 );

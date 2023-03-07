@@ -130,7 +130,8 @@ public static class TransferMaps
     {
         return new AuthorListDto(
             Id: data.Id,
-            Name: data.Name);
+            Name: data.Name,
+            Visibility: data.Visibility);
     }
 
     public static AuthorDetailDto ToAuthorDetailDto(AuthorInfo data)
@@ -138,6 +139,7 @@ public static class TransferMaps
         return new AuthorDetailDto(
             Id: data.Id,
             Name: data.Name,
+            Visibility: data.Visibility,
             Bio: data.Bio,
             Uco: data.Uco,
             Email: data.Email,

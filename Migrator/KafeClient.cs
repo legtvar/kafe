@@ -64,7 +64,8 @@ public sealed class KafeClient : IAsyncDisposable
         var created = new AuthorCreated(
             AuthorId: hrib,
             CreationMethod: CreationMethod.Migrator,
-            Name: name);
+            Name: name,
+            Visibility: Visibility.Internal);
         LogEvent(hrib, created);
 
         var infoChanged = new AuthorInfoChanged(

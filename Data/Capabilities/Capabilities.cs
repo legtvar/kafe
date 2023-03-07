@@ -30,7 +30,8 @@ public abstract record AccountCapability
         {
             nameof(Administration) => new Administration(),
             nameof(ProjectReview) => new ProjectReview(subvalues[1]),
-            nameof(ProjectOwnership) => new ProjectOwnership(subvalues[2]),
+            nameof(ProjectOwnership) => new ProjectOwnership(subvalues[1]),
+            nameof(AuthorManagement) => new AuthorManagement(subvalues[1]),
             _ => null
         };
         return capability != null;
@@ -43,6 +44,7 @@ public abstract record AccountCapability
             Administration => nameof(Administration),
             ProjectReview r => $"{nameof(ProjectReview)}:{r.Role}",
             ProjectOwnership o => $"{nameof(ProjectOwnership)}:{o.ProjectId}",
+            AuthorManagement a => $"{nameof(AuthorManagement)}:{a.AuthorId}",
             _ => throw new NotImplementedException($"Serialization of '{capability.GetType()}' is not implemented.")
         };
     }
@@ -84,6 +86,19 @@ public record ProjectOwnership : AccountCapability
             ? projectId
             : throw new ArgumentException($"Capability subvalues can contain only ASCII letters " +
                 $"and digits except '{SubvalueSeparator}'.", nameof(projectId));
+    }
+}
+
+public record AuthorManagement : AccountCapability
+{
+    public Hrib AuthorId { get; init; }
+
+    public AuthorManagement(Hrib authorId)
+    {
+        AuthorId = IsValidCapabilitySubvalue(authorId)
+            ? authorId
+            : throw new ArgumentException($"Capability subvalues can contain only ASCII letters " +
+                $"and digits except '{SubvalueSeparator}'.", nameof(authorId));
     }
 }
 

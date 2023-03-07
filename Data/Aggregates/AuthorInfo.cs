@@ -8,6 +8,7 @@ public record AuthorInfo(
     string Id,
     CreationMethod CreationMethod,
     string Name,
+    Visibility Visibility,
     LocalizedString? Bio = null,
     string? Uco = null,
     string? Email = null,
@@ -24,7 +25,8 @@ public class AuthorInfoProjection : SingleStreamAggregation<AuthorInfo>
         return new AuthorInfo(
             Id: e.AuthorId,
             CreationMethod: e.CreationMethod,
-            Name: e.Name);
+            Visibility: e.Visibility,
+            Name: e.Name);;
     }
 
     public AuthorInfo Apply(AuthorInfoChanged e, AuthorInfo a)
@@ -32,6 +34,7 @@ public class AuthorInfoProjection : SingleStreamAggregation<AuthorInfo>
         return a with
         {
             Name = e.Name ?? a.Name,
+            Visibility = e.Visibility ?? a.Visibility,
             Bio = e.Bio ?? a.Bio,
             Uco = e.Uco ?? a.Uco,
             Email = e.Email ?? a.Email,

@@ -33,6 +33,11 @@ public class ShardDetailEndpoint : EndpointBaseAsync
         CancellationToken cancellationToken = default)
     {
         var detail = await shards.Load(id, cancellationToken);
+        if (detail is null)
+        {
+            return NotFound();
+        }
+
         return Ok(detail);
     }
 }

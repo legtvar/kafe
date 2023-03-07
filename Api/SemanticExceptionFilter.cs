@@ -20,6 +20,7 @@ public class SemanticExceptionFilter : IExceptionFilter
         {
             UnauthorizedAccessException => 403,
             ArgumentOutOfRangeException => 404,
+            IndexOutOfRangeException => 404,
             ArgumentException => 400,
             NotImplementedException => 501,
             NotSupportedException => 500,

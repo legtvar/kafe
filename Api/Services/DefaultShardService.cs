@@ -8,6 +8,7 @@ using Kafe.Media;
 using Marten;
 using Microsoft.Extensions.Options;
 using System;
+using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -20,15 +21,18 @@ public class DefaultShardService : IShardService
     private readonly IDocumentSession db;
     private readonly IStorageService storageService;
     private readonly IMediaService mediaService;
+    private readonly IUserProvider userProvider;
 
     public DefaultShardService(
         IDocumentSession db,
         IStorageService storageService,
-        IMediaService mediaService)
+        IMediaService mediaService,
+        IUserProvider userProvider)
     {
         this.db = db;
         this.storageService = storageService;
         this.mediaService = mediaService;
+        this.userProvider = userProvider;
     }
 
     public async Task<ShardDetailBaseDto?> Load(Hrib id, CancellationToken token = default)
@@ -52,6 +56,8 @@ public class DefaultShardService : IShardService
             return null;
         }
 
+        await CheckAccess(shard.ArtifactId, token);
+
         return TransferMaps.ToShardDetailDto(shard);
     }
 
@@ -61,11 +67,8 @@ public class DefaultShardService : IShardService
         Stream stream,
         CancellationToken token = default)
     {
-        var artifact = await db.LoadAsync<ArtifactInfo>(dto.ArtifactId, token);
-        if (artifact is null)
-        {
-            throw new ArgumentException($"Artifact '{dto.ArtifactId}' does not exist.");
-        }
+
+        await CheckAccess(dto.ArtifactId, token);
 
         return dto.Kind switch
         {
@@ -181,5 +184,34 @@ public class DefaultShardService : IShardService
         variant = Path.GetFileNameWithoutExtension(variant);
 
         return variant;
+    }
+
+    private async Task CheckAccess(Hrib artifactId, CancellationToken token)
+    {
+        var artifact = await db.LoadAsync<ArtifactDetail>(artifactId, token);
+        if (artifact is null)
+        {
+            throw new ArgumentException($"Artifact '{artifactId}' does not exist.");
+        }
+
+        await CheckAccess(artifact, token);
+    }
+
+    private async Task CheckAccess(ArtifactDetail artifact, CancellationToken token)
+    {
+        if (!userProvider.IsAdministrator() && artifact.ContainingProjectIds.Length == 0)
+        {
+            throw new UnauthorizedAccessException();
+        }
+
+        var containingProjects = artifact.ContainingProjectIds.Select(p => (string)p).ToImmutableArray();
+        var projectCount = await db.Query<ProjectInfo>()
+            .Where(p => containingProjects.Contains(p.Id))
+            .WhereCanRead(userProvider)
+            .CountAsync(token);
+        if (!userProvider.IsAdministrator() && projectCount == 0)
+        {
+            throw new UnauthorizedAccessException();
+        }
     }
 }

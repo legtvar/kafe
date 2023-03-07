@@ -65,6 +65,17 @@ public class DefaultArtifactService : IArtifactService
 
     public async Task<Hrib> Create(ArtifactCreationDto dto, CancellationToken token = default)
     {
+        var containingProject = await db.LoadAsync<ProjectInfo>(dto.ContainingProject, token);
+        if (containingProject is null)
+        {
+            throw new ArgumentException($"Project '{dto.ContainingProject}' does not exist.");
+        }
+
+        if (!userProvider.CanEdit(containingProject))
+        {
+            throw new UnauthorizedAccessException($"The '{dto.ContainingProject}' project is not editable.");
+        }
+
         var created = new ArtifactCreated(
             ArtifactId: Hrib.Create(),
             CreationMethod: CreationMethod.Api,

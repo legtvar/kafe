@@ -55,6 +55,18 @@ public static class UserProviderExtensions
         return q.Where(p => p.Visibility == Visibility.Public || managedAuthors.Contains(p.Id));
     }
 
+    public static IQueryable<PlaylistInfo> WhereCanRead(
+        this IQueryable<PlaylistInfo> q,
+        IUserProvider userProvider)
+    {
+        if (userProvider.IsAdministrator())
+        {
+            return q;
+        }
+
+        return q.Where(p => p.Visibility == Visibility.Public);
+    }
+
     public static bool CanRead(this IUserProvider p, ProjectInfo project)
     {
         return project.Visibility switch
@@ -92,6 +104,23 @@ public static class UserProviderExtensions
         return CanEdit(p, author);
     }
 
+    public static bool CanRead(this IUserProvider p, PlaylistInfo playlist)
+    {
+        if (p.IsAdministrator())
+        {
+            return true;
+        }
+
+        if (playlist.Visibility == Visibility.Public)
+        {
+            return true;
+        }
+
+        // TODO: Internal visibility
+
+        return CanEdit(p, playlist);
+    }
+
     public static bool CanEdit(this IUserProvider p, ProjectInfo project)
     {
         return p.IsAdministrator()
@@ -120,6 +149,11 @@ public static class UserProviderExtensions
         }
 
         return p.IsAuthorManager(author.Id);
+    }
+
+    public static bool CanEdit(this IUserProvider p, PlaylistInfo playlist)
+    {
+        return p.IsAdministrator();
     }
 
     public static ImmutableArray<Hrib> GetManagedAuthors(this IUserProvider p)

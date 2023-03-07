@@ -1,13 +1,12 @@
 using Ardalis.ApiEndpoints;
 using Asp.Versioning;
-using Kafe.Data.Aggregates;
 using Kafe.Api.Transfer;
-using Marten;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading;
 using System.Threading.Tasks;
 using Swashbuckle.AspNetCore.Annotations;
+using Kafe.Api.Services;
 
 namespace Kafe.Api.Endpoints.Playlist;
 
@@ -18,11 +17,11 @@ public class PlaylistDetailEndpoint : EndpointBaseAsync
     .WithRequest<string>
     .WithActionResult<PlaylistDetailDto>
 {
-    private readonly IQuerySession db;
+    private readonly IPlaylistService playlists;
 
-    public PlaylistDetailEndpoint(IQuerySession db)
+    public PlaylistDetailEndpoint(IPlaylistService playlists)
     {
-        this.db = db;
+        this.playlists = playlists;
     }
 
     [HttpGet]
@@ -33,12 +32,12 @@ public class PlaylistDetailEndpoint : EndpointBaseAsync
         string id,
         CancellationToken cancellationToken = default)
     {
-        var data = await db.LoadAsync<PlaylistInfo>(id, token: cancellationToken);
-        if (data is null)
+        var dto = await playlists.Load(id, cancellationToken);
+        if (dto is null)
         {
             return NotFound();
         }
 
-        return Ok(TransferMaps.ToPlaylistDetailDto(data));
+        return Ok(dto);
     }
 }

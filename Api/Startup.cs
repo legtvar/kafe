@@ -149,6 +149,7 @@ public class Startup
         services.AddScoped<IAuthorService, DefaultAuthorService>();
         services.AddScoped<IArtifactService, DefaultArtifactService>();
         services.AddScoped<IShardService, DefaultShardService>();
+        services.AddScoped<IPlaylistService, DefaultPlaylistService>();
         services.AddScoped<IAccountService, DefaultAccountService>();
 
         services.AddScoped<IAuthorizationHandler, AdministratorHandler>();

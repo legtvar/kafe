@@ -164,7 +164,9 @@ V případě technických problémů nás prosím kontaktujte na adrese: festiva
             Crew: ImmutableArray<ProjectAuthorDto>.Empty,
             Cast: ImmutableArray<ProjectAuthorDto>.Empty,
             Artifacts: ImmutableArray<ProjectArtifactDto>.Empty,
-            Reviews: data.Reviews.Select(ToProjectReviewDto).ToImmutableArray(),
+            Reviews: data.Reviews.IsDefaultOrEmpty
+                ? ImmutableArray<ProjectReviewDto>.Empty
+                : data.Reviews.Select(ToProjectReviewDto).ToImmutableArray(),
             Blueprint: TemporaryProjectBlueprintMockup
         );
     }

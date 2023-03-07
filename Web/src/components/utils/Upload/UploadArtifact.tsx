@@ -19,7 +19,7 @@ export function UploadArtifact(props: IUploadArtifactProps) {
     const { border, bg } = useColorScheme();
     const api = useApi();
     const {
-        artifactBlueprint: { name, arity, slotName, description, shardBlueprints },
+        artifactBlueprint: { name, arity, /* slotName, */ description, shardBlueprints },
         projectId,
     } = props;
 

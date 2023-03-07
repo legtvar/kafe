@@ -1,7 +1,7 @@
 import { Box, Button, Flex, Heading, Stack, Tab, TabList, TabPanel, TabPanels, Tabs, Text } from '@chakra-ui/react';
 import { t } from 'i18next';
 import { AiOutlineUnlock } from 'react-icons/ai';
-import { BsCheck2, BsX } from 'react-icons/bs';
+import { BsX } from 'react-icons/bs';
 import { Link, useParams } from 'react-router-dom';
 import { Project } from '../../../data/Project';
 import { AwaitAPI } from '../../utils/AwaitAPI';
@@ -31,11 +31,6 @@ export function ProjectEdit(props: IProjectEditProps) {
                         <Link to="..">
                             <Button leftIcon={<BsX />} mr={4}>
                                 {t('generic.cancel').toString()}
-                            </Button>
-                        </Link>
-                        <Link to="..">
-                            <Button colorScheme="brand" leftIcon={<BsCheck2 />}>
-                                {t('generic.save').toString()}
                             </Button>
                         </Link>
                     </Flex>

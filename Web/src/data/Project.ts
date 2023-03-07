@@ -1,15 +1,19 @@
+import moment from 'moment';
 import { components } from '../schemas/api';
 import { localizedString } from '../schemas/generic';
 import { getPrefered } from '../utils/preferedLanguage';
+import { AbstractType } from './AbstractType';
 import { Artifact } from './Artifact';
+import { localizedMapper } from './serialize/localizedMapper';
+import { rolesMapper } from './serialize/rolesMapper';
+import { Serializer } from './serialize/Serializer';
 
-export class Project {
+export class Project extends AbstractType {
     // API object
-    public id!: string;
     public projectGroupId!: string;
     public projectGroupName!: localizedString;
     public name?: localizedString;
-    public genere?: localizedString;
+    public genre?: localizedString;
     public description?: localizedString;
     public visibility!: components['schemas']['Visibility'];
     public releasedOn!: Date | null;
@@ -21,6 +25,7 @@ export class Project {
     public artifacts!: Artifact[];
 
     public constructor(struct: components['schemas']['ProjectListDto'] | components['schemas']['ProjectDetailDto']) {
+        super();
         Object.assign(this, struct);
         this.releasedOn = new Date(struct.releasedOn);
         if (this.releasedOn.getTime() < 0) this.releasedOn = null;
@@ -41,7 +46,20 @@ export class Project {
         return getPrefered(this.projectGroupName);
     }
 
-    public getGenere() {
-        return getPrefered(this.genere);
+    public getgenre() {
+        return getPrefered(this.genre);
+    }
+
+    serialize(update: boolean = false): components['schemas']['ProjectCreationDto'] {
+        return new Serializer(this, update)
+            .addConditionaly(!update, 'projectGroupId')
+            .add('name', localizedMapper)
+            .add('genre', localizedMapper)
+            .add('description', localizedMapper)
+            .add('visibility')
+            .add('releasedOn', (date: Date | null) => moment(date).toISOString())
+            .add('crew', rolesMapper)
+            .add('cast', rolesMapper)
+            .build();
     }
 }

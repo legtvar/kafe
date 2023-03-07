@@ -1,5 +1,5 @@
 import { Box, Button, Center, Heading, Text } from '@chakra-ui/react';
-import { t } from 'i18next';
+import i18next, { t } from 'i18next';
 import React from 'react';
 import { useLinkClickHandler, useRouteError } from 'react-router-dom';
 import { Brand } from '../brand/Brand';
@@ -26,17 +26,19 @@ export const Status: React.FC<IStatusProps> = (props: IStatusProps) => {
                 <Heading display="block" fontSize="15rem" color="brand.500">
                     <Brand variant="broken" />
                 </Heading>
-                <Heading display="block" as="h2" size="4xl" bg="brand.500" backgroundClip="text">
+                <Heading display="block" as="h2" size="4xl" color="brand.500" mb={4}>
                     {statusCode}
                 </Heading>
-                <Text fontSize="18px" mt={3} mb={2}>
-                    {t(`status.${statusCode}.title`).toString()}
-                </Text>
-                <Text color={'gray.500'} mb={6}>
-                    {t(`status.${statusCode}.subtitle`).toString()}
-                </Text>
+                {i18next.exists(`status.${statusCode}.title`) && (
+                    <Text fontSize="18px" pt={3} pb={2}>
+                        {t(`status.${statusCode}.title`).toString()}
+                    </Text>
+                )}
+                {i18next.exists(`status.${statusCode}.subtitle`) && (
+                    <Text color={'gray.500'}>{t(`status.${statusCode}.subtitle`).toString()}</Text>
+                )}
 
-                <Button variant="solid" onClick={backlink as any}>
+                <Button variant="solid" onClick={backlink as any} mt={6}>
                     {t('status.backlink').toString()}
                 </Button>
             </Box>

@@ -1,10 +1,11 @@
 import axios, { Axios, AxiosProgressEvent, AxiosResponse } from 'axios';
+import { Author } from '../data/Author';
 import { Group } from '../data/Group';
 import { Playlist } from '../data/Playlist';
 import { Project } from '../data/Project';
 import { User } from '../data/User';
 import { components } from '../schemas/api';
-import { localizedString } from '../schemas/generic';
+import { HRIB, localizedString } from '../schemas/generic';
 
 export type ApiCredentials = {
     username: string;
@@ -50,6 +51,9 @@ export class API {
             async getById(id: string) {
                 return api.requestSingle(`project/${id}`, Project);
             },
+            async create(project: Project) {
+                return api.post<components['schemas']['ProjectCreationDto'], HRIB>(`project`, project.serialize());
+            },
         };
     }
 
@@ -75,6 +79,22 @@ export class API {
             },
             async getById(id: string) {
                 return api.requestSingle(`playlist/${id}`, Playlist);
+            },
+        };
+    }
+
+    public get authors() {
+        const api = this;
+
+        return {
+            async getAll() {
+                return api.requestArray(`authors`, Author);
+            },
+            async getById(id: string) {
+                return api.requestSingle(`author/${id}`, Author);
+            },
+            async create(author: Author) {
+                return api.post<components['schemas']['AuthorCreationDto'], HRIB>(`author`, author.serialize());
             },
         };
     }

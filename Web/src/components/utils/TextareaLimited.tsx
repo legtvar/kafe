@@ -1,32 +1,36 @@
-import { FormHelperText, Textarea, TextareaProps } from '@chakra-ui/react';
+import { FormHelperText, Text, Textarea, TextareaProps } from '@chakra-ui/react';
 import { t } from 'i18next';
 import { useState } from 'react';
 
 interface ITextareaLimitedProps extends TextareaProps {
-    limit: number;
+    min?: number;
+    max?: number;
 }
 
-export function TextareaLimited(props: ITextareaLimitedProps) {
-    const [value, setvalue] = useState(props.value || '');
+export function TextareaLimited({ min, max, onChange, value, defaultValue, ...rest }: ITextareaLimitedProps) {
+    const [stateValue, setvalue] = useState(defaultValue || value || '');
+
+    const tooLittle = min && (stateValue || '').toString().length < min;
 
     return (
         <>
             <Textarea
                 onChange={(event) => {
                     let newvalue = event.target.value;
-                    newvalue = newvalue.substring(0, props.limit);
+                    newvalue = newvalue.substring(0, max);
 
                     setvalue(newvalue);
-                    if (props.onChange) {
-                        props.onChange(event);
+                    if (onChange) {
+                        onChange(event);
                     }
                 }}
-                value={value}
-                {...props}
+                value={stateValue}
+                {...rest}
             />
             <FormHelperText>
                 <>
-                    {(value || '').toString().length}/{props.limit} {t('textarea.characters')}
+                    {(stateValue || '').toString().length}/{max} {t('textarea.characters')}{' '}
+                    {tooLittle && <Text as="span" color={'red.500'}>{`(${t('textarea.min')} ${min})`}</Text>}
                 </>
             </FormHelperText>
         </>

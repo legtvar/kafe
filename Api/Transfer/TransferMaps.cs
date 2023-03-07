@@ -26,7 +26,12 @@ public static class TransferMaps
             Description: LocalizedString.Create(
                 (Const.InvariantCulture, "TODO"),
                 (Const.CzechCulture,
-@"
+@"Točíš filmy? Nebojíš se překračovat hranice? Hledáš důvod proč realizovat svůj nápad?
+Tak to si tu správně! Natoč krátký film a přihlaš ho na 23. Filmový festival Fakulty Informatiky Masarykovy univerzity! Deadline je 9. dubna 2023, tak si pospěš!   
+S námi můžeš ukázat svoji tvorbu před stovkami lidí a pokud tvůj snímek zaujme porotu nebo diváky, budeš odměněný i cenami.
+Tak co, už přihlašuješ?
+Jestli jsme tě ještě nepřesvědčili? Pro více technických a organizačních detailů si přečti pravidla (a v případě potíží s přihlašováním prosím kontaktuj festival-tech@fi.muni.cz).
+
 Podmínky pro přijetí filmu na 23. Filmový festival Fakulty informatiky Masarykovy univerzity jsou:
 1. Do soutěže mohou být přijata amatérská audiovizuální díla libovolného žánru i formy zpracování (hraná, animovaná) v délce do 8 minut.
 2. Tvůrci filmu nesmí být profesionálové v tvorbě audiovizuálních děl.

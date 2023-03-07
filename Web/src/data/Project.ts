@@ -4,14 +4,16 @@ import { localizedString } from '../schemas/generic';
 import { getPrefered } from '../utils/preferedLanguage';
 import { AbstractType } from './AbstractType';
 import { Artifact } from './Artifact';
-import { Serializer } from './Serializer';
+import { localizedMapper } from './serialize/localizedMapper';
+import { rolesMapper } from './serialize/rolesMapper';
+import { Serializer } from './serialize/Serializer';
 
 export class Project extends AbstractType {
     // API object
     public projectGroupId!: string;
     public projectGroupName!: localizedString;
     public name?: localizedString;
-    public genere?: localizedString;
+    public genre?: localizedString;
     public description?: localizedString;
     public visibility!: components['schemas']['Visibility'];
     public releasedOn!: Date | null;
@@ -44,22 +46,16 @@ export class Project extends AbstractType {
         return getPrefered(this.projectGroupName);
     }
 
-    public getGenere() {
-        return getPrefered(this.genere);
+    public getgenre() {
+        return getPrefered(this.genre);
     }
 
     serialize(update: boolean = false): components['schemas']['ProjectCreationDto'] {
-        const rolesMapper = (people: components['schemas']['ProjectAuthorDto'][]) =>
-            (people || []).map((person) => ({
-                id: person.id,
-                roles: person.roles,
-            }));
-
         return new Serializer(this, update)
             .addConditionaly(!update, 'projectGroupId')
-            .add('name')
-            .add('genere')
-            .add('description')
+            .add('name', localizedMapper)
+            .add('genre', localizedMapper)
+            .add('description', localizedMapper)
             .add('visibility')
             .add('releasedOn', (date: Date | null) => moment(date).toISOString())
             .add('crew', rolesMapper)

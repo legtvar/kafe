@@ -186,6 +186,9 @@ public static class Program
             throw new InvalidOperationException("The 'KafeVideosDirectory' setting is not set.");
         }
 
+        var wmaVideos = (await wma.GetAllVideos())
+            .ToImmutableDictionary(v => v.Id);
+
         var videosDir = new DirectoryInfo(migratorOptions.KafeVideosDirectory);
         if (!videosDir.Exists)
         {
@@ -217,8 +220,7 @@ public static class Program
                     }
                 }
 
-                var wmaVideo = await wma.GetVideo(migrationInfo.WmaId);
-                if (wmaVideo is null)
+                if (!wmaVideos.TryGetValue(migrationInfo.WmaId, out var wmaVideo))
                 {
                     logger.LogWarning("Could not find a video with id '{}' in the WMA DB. " +
                         "This is a little weird since it was already migrated.", migrationInfo.WmaId);

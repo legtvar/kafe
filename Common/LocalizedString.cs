@@ -13,11 +13,16 @@ public sealed partial class LocalizedString : IEquatable<LocalizedString>
 {
     private readonly ImmutableDictionary<string, string> data;
 
-    public string? this[CultureInfo culture] => this[culture.TwoLetterISOLanguageName];
+    public string this[CultureInfo culture] => this[culture.TwoLetterISOLanguageName];
 
-    public string? this[string cultureCode]
+    public string this[string cultureCode]
         => data.GetValueOrDefault(cultureCode)
-        ?? data.GetValueOrDefault(CultureInfo.InvariantCulture.TwoLetterISOLanguageName);
+        ?? data.GetValueOrDefault(Const.InvariantCultureCode)
+        ?? data.GetValueOrDefault(Const.EnglishCultureName)
+        ?? data.GetValueOrDefault(Const.CzechCultureName)
+        ?? data.GetValueOrDefault(Const.SlovakCultureName)
+        ?? data.Values.FirstOrDefault() // return whatever is there
+        ?? throw new NullReferenceException("This localized string is empty."); // give up
 
     public ImmutableDictionary<string, string> GetRaw() => data;
 

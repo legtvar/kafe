@@ -1,4 +1,5 @@
 ﻿using Kafe.Api.Services;
+using Kafe.Api.Transfer;
 using Kafe.Data;
 using Kafe.Data.Aggregates;
 using Kafe.Data.Capabilities;
@@ -40,6 +41,8 @@ public class SeedDaemon : BackgroundService
     {
         using var scope = services.CreateScope();
         var accounts = scope.ServiceProvider.GetRequiredService<IAccountService>();
+        var projectGroups = scope.ServiceProvider.GetRequiredService<IProjectGroupService>();
+
         foreach (var account in options.Value.Accounts)
         {
             var data = await accounts.LoadApiAccount(account.EmailAddress, token);
@@ -68,6 +71,26 @@ public class SeedDaemon : BackgroundService
                 await accounts.AddCapabilities(data.Id, missingCapabilities, token);
                 logger.LogInformation("Capabilities of seed account '{}' updated.", account.EmailAddress);
             }
+        }
+
+        foreach (var group in options.Value.ProjectGroups)
+        {
+            if (group.Name is null)
+            {
+                continue;
+            }
+
+            var name = LocalizedString.CreateInvariant(group.Name);
+            var existing = await projectGroups.List(name, token);
+            if (existing.Length > 0)
+            {
+                continue;
+            }
+
+            var deadline = group.Deadline is null ? default : DateTimeOffset.Parse(group.Deadline);
+            var creationInfo = new ProjectGroupCreationDto(name, null, deadline);
+            var id = await projectGroups.Create(creationInfo, token);
+            logger.LogInformation($"Seed project group '{id}' created.");
         }
     }
 }

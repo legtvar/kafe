@@ -15,17 +15,47 @@ public static class TransferMaps
     private static readonly ProjectBlueprintDto TemporaryProjectBlueprintMockup
         = new(
             Name: LocalizedString.Create(
-                (Const.InvariantCulture, "An FFFI MU registration"),
-                (Const.CzechCulture, "Přihláška na FFFI MU")
+                (Const.InvariantCulture, "Film registration to FFFI MU 2023"),
+                (Const.CzechCulture, "Přihlášení filmu na 23. FFFI MU")
             ),
-            Description: null,
+            Description: LocalizedString.Create(
+                (Const.InvariantCulture, "TODO"),
+                (Const.CzechCulture,
+@"
+Podmínky pro přijetí filmu na 23. Filmový festival Fakulty informatiky Masarykovy univerzity jsou:
+1. Do soutěže mohou být přijata amatérská audiovizuální díla libovolného žánru i formy zpracování (hraná, animovaná) v délce do 8 minut.
+2. Tvůrci filmu nesmí být profesionálové v tvorbě audiovizuálních děl.
+3. Snímek nesmí být starší než 3 roky.
+4. Snímek nesmí porušovat žádná autorská práva.
+5. Film může přihlásit pouze jeden z jeho autorů, a to se souhlasem všech spoluautorů díla.
+
+Povinné technické specifikace pro filmy:
+- Formát (kodek) videa: H.264 (doporučený), MPEG-4 Part 2
+- Formát (kodek) audia: WAV, FLAC, MP3 (bitrate u MP3 alespoň 192 kbps)
+- Framerate videa: 24 fps
+- Titulky: anglické ve formátu SRT nebo ASS
+- Kontejner: MP4 (doporučené), MKV
+- Rozlišení: na šířku alespoň FullHD (t.j. 1920)
+- Bitrate: 10 - 20 Mbps
+- Hlasitost: max. -3 dB
+- Velikost každého souboru maximálně 2GB
+- Pokud je potřeba platformě YouTube doložit, že držíte licenční práva na použitý materiál, kontaktujte nás na festival-tech@fi.muni.cz.
+
+Úplné znění pravidel naleznete na http://festival.fi.muni.cz.
+
+V případě technických problémů nás prosím kontaktujte na adrese: festival-tech@fi.muni.cz.
+"
+            )),
             ArtifactBlueprints: ImmutableArray.Create(
                 new ProjectArtifactBlueprintDto(
                     Name: LocalizedString.Create(
                         (Const.InvariantCulture, "Film"),
                         (Const.CzechCulture, "Film")
                     ),
-                    Description: null,
+                    Description: LocalizedString.Create(
+                        (Const.InvariantCulture, "TODO"),
+                        (Const.CzechCulture, "Soubor s filmem splňující technické požadavky")
+                    ),
                     SlotName: "film",
                     Arity: ArgumentArity.ExactlyOne,
                     ShardBlueprints: ImmutableArray.Create(
@@ -52,7 +82,11 @@ public static class TransferMaps
                         (Const.InvariantCulture, "Video-annotation"),
                         (Const.CzechCulture, "Videoanotace")
                     ),
-                    Description: null,
+                    Description: LocalizedString.Create(
+                        (Const.InvariantCulture, "TODO"),
+                        (Const.CzechCulture, "Volitelné představení filmu jeho tvůrci o délce maximálně 30 " +
+                        "sekund. Technické požadavky jsou stejné jako u filmu.")
+                    ),
                     SlotName: "video-annotation",
                     Arity: ArgumentArity.ZeroOrOne,
                     ShardBlueprints: ImmutableArray.Create(
@@ -79,7 +113,10 @@ public static class TransferMaps
                         (Const.InvariantCulture, "Cover photo"),
                         (Const.CzechCulture, "Titulní fotografie")
                     ),
-                    Description: null,
+                    Description: LocalizedString.Create(
+                        (Const.InvariantCulture, "TODO"),
+                        (Const.CzechCulture, "Nahrajte kvalitní screenshoty nebo fotografie ze scén, které váš film vystihují. Budou použity v medailonku vašeho filmu a do brožury festivalu.")
+                    ),
                     SlotName: "cover-photo",
                     Arity: new ArgumentArity(1, 5),
                     ShardBlueprints: ImmutableArray.Create(

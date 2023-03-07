@@ -24,7 +24,7 @@ public static class UserProviderExtensions
             return q;
         }
 
-        return q.Where(g => g.IsOpen && g.Deadline < DateTimeOffset.UtcNow);
+        return q.Where(g => g.IsOpen && g.Deadline > DateTimeOffset.UtcNow);
     }
 
     public static IQueryable<ProjectInfo> WhereCanRead(

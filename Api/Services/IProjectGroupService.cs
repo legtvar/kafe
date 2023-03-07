@@ -9,6 +9,8 @@ public interface IProjectGroupService
 {
     Task<ProjectGroupDetailDto?> Load(Hrib id, CancellationToken token = default);
 
+    Task<ImmutableArray<ProjectGroupListDto>> List(LocalizedString name, CancellationToken token = default);
+
     Task<ImmutableArray<ProjectGroupListDto>> List(CancellationToken token = default);
 
     Task<Hrib> Create(ProjectGroupCreationDto dto, CancellationToken token = default);

@@ -11,15 +11,25 @@ namespace Kafe.Data.Options;
 
 public record SeedOptions
 {
-    public List<SeedAccount> Accounts { get; init; } = new();
+    public List<SeedAccount> Accounts { get; set; } = new();
+
+    public List<SeedProjectGroup> ProjectGroups { get; set; } = new();
 
     public record SeedAccount
     {
         [Required]
-        public string EmailAddress { get; init; } = null!;
+        public string EmailAddress { get; set; } = null!;
 
-        public string PreferredCulture { get; init; } = Const.InvariantCultureCode;
+        public string PreferredCulture { get; set; } = Const.InvariantCultureCode;
 
-        public List<string> Capabilities { get; init; } = new();
+        public List<string> Capabilities { get; set; } = new();
+    }
+
+    public record SeedProjectGroup
+    {
+        [Required]
+        public string Name { get; set; } = null!;
+
+        public string? Deadline { get; set; }
     }
 }

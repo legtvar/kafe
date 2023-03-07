@@ -30,6 +30,11 @@ public sealed partial class LocalizedString : IEquatable<LocalizedString>
         this.data = data;
     }
 
+    public static LocalizedString Create(IDictionary<string, string> data)
+    {
+        return new(data.ToImmutableDictionary());
+    }
+
     public static LocalizedString Create(IReadOnlyDictionary<string, string> data)
     {
         return new(data.ToImmutableDictionary());
@@ -55,7 +60,7 @@ public sealed partial class LocalizedString : IEquatable<LocalizedString>
         return Create((CultureInfo.InvariantCulture, invariantString), (localCulture, localString));
     }
 
-    public static LocalizedString Invariant(string invariantString)
+    public static LocalizedString CreateInvariant(string invariantString)
     {
         return Create((CultureInfo.InvariantCulture, invariantString));
     }
@@ -78,7 +83,7 @@ public sealed partial class LocalizedString : IEquatable<LocalizedString>
         {
             return null;
         }
-        return Invariant(invariantString);
+        return CreateInvariant(invariantString);
     }
 
     public static bool operator ==(LocalizedString? lhs, LocalizedString? rhs)
@@ -92,6 +97,27 @@ public sealed partial class LocalizedString : IEquatable<LocalizedString>
     }
 
     public static bool operator !=(LocalizedString? lhs, LocalizedString? rhs)
+    {
+        return !(lhs == rhs);
+    }
+
+    public static bool operator ==(LocalizedString? lhs, IDictionary<string, string>? rhs)
+    {
+        if (lhs is null && rhs is null)
+        {
+            return true;
+        }
+
+        if (rhs is null)
+        {
+            return false;
+        }
+
+        var rhsLocalizedString = Create(rhs);
+        return EqualityComparer<LocalizedString>.Default.Equals(lhs, rhsLocalizedString);
+    }
+
+    public static bool operator !=(LocalizedString? lhs, IDictionary<string, string>? rhs)
     {
         return !(lhs == rhs);
     }
@@ -144,7 +170,7 @@ public class LocalizedStringJsonConverter : JsonConverter<LocalizedString>
             return null;
         }
 
-        return LocalizedString.Create(dictionary);
+        return LocalizedString.Create((IDictionary<string, string>)dictionary);
     }
 
     public override void Write(Utf8JsonWriter writer, LocalizedString value, JsonSerializerOptions options)

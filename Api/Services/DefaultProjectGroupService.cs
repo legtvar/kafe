@@ -60,6 +60,19 @@ public class DefaultProjectGroupService : IProjectGroupService
             .Select(TransferMaps.ToProjectGroupListDto).ToImmutableArray();
     }
 
+    public async Task<ImmutableArray<ProjectGroupListDto>> List(
+        LocalizedString name,
+        CancellationToken token = default)
+    {
+        var projectGroups = await db.Query<ProjectGroupInfo>()
+            .WhereCanRead(userProvider)
+            .Where(g => g.Name[Const.InvariantCultureCode] == name[Const.InvariantCultureCode])
+            .ToListAsync(token);
+
+        return projectGroups
+            .Select(TransferMaps.ToProjectGroupListDto).ToImmutableArray();
+    }
+
     public async Task<ProjectGroupDetailDto?> Load(Hrib id, CancellationToken token = default)
     {
         var projectGroup = await db.LoadAsync<ProjectGroupInfo>(id, token);

@@ -158,26 +158,31 @@ public class DefaultAccountService : IAccountService, IDisposable
                 AccountId: id,
                 CreationMethod: CreationMethod.Api,
                 EmailAddress: dto.EmailAddress,
-                PreferredCulture: dto.PreferredCulture ?? Const.InvariantCultureCode);
-            db.Events.StartStream<AccountInfo>(id, created);
+                PreferredCulture: dto.PreferredCulture ?? Const.InvariantCultureCode
+            );
+            var refreshed = new TemporaryAccountRefreshed(
+                AccountId: id,
+                SecurityStamp: Guid.NewGuid().ToString()
+            );
+            db.Events.StartStream<AccountInfo>(id, created, refreshed);
             await db.SaveChangesAsync(token);
             account = await db.LoadAsync<AccountInfo>(id, token)!;
+            if (account is null)
+            {
+                throw new InvalidOperationException();
+            }
         }
         else
         {
             id = account.Id;
         }
 
-        var eventStream = await db.Events.FetchForExclusiveWriting<AccountInfo>(id, token)
-            ?? throw new InvalidOperationException($"Could not obtain the event stream for account '{id}' " +
-                "despite the account existing.");
-        var refreshed = new TemporaryAccountRefreshed(
-            AccountId: id,
-            SecurityStamp: Guid.NewGuid().ToString());
-        eventStream.AppendOne(refreshed);
-        await db.SaveChangesAsync(token);
+        if (account.SecurityStamp is null)
+        {
+            throw new InvalidOperationException();
+        }
 
-        var confirmationToken = EncodeToken(new(id, EmailConfirmationPurpose, refreshed.SecurityStamp));
+        var confirmationToken = EncodeToken(new(id, EmailConfirmationPurpose, account.SecurityStamp));
         var pathString = new PathString(apiOptions.Value.AccountConfirmPath)
             .Add(new PathString("/" + confirmationToken));
         var confirmationUrl = new Uri(new Uri(apiOptions.Value.BaseUrl), pathString);

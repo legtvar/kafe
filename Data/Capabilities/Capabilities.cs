@@ -32,6 +32,7 @@ public abstract record AccountCapability
             nameof(ProjectReview) => new ProjectReview(subvalues[1]),
             nameof(ProjectOwnership) => new ProjectOwnership(subvalues[1]),
             nameof(AuthorManagement) => new AuthorManagement(subvalues[1]),
+            nameof(OrganizeFestival) => new OrganizeFestival(),
             _ => null
         };
         return capability != null;
@@ -45,6 +46,7 @@ public abstract record AccountCapability
             ProjectReview r => $"{nameof(ProjectReview)}:{r.Role}",
             ProjectOwnership o => $"{nameof(ProjectOwnership)}:{o.ProjectId}",
             AuthorManagement a => $"{nameof(AuthorManagement)}:{a.AuthorId}",
+            OrganizeFestival => nameof(OrganizeFestival),
             _ => throw new NotImplementedException($"Serialization of '{capability.GetType()}' is not implemented.")
         };
     }
@@ -101,6 +103,12 @@ public record AuthorManagement : AccountCapability
                 $"and digits except '{SubvalueSeparator}'.", nameof(authorId));
     }
 }
+
+/// <summary>
+/// A temporary capability to hack around lack of time before FFFI MU 2023.
+/// TODO: Remove.
+/// </summary>
+public record OrganizeFestival : AccountCapability;
 
 public class AccountCapabilityConverter : JsonConverter<AccountCapability>
 {

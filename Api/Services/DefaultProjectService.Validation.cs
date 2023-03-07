@@ -1,6 +1,7 @@
 ﻿using Kafe.Api.Transfer;
 using Kafe.Data;
 using Kafe.Data.Aggregates;
+using Kafe.Data.Capabilities;
 using Kafe.Data.Events;
 using Kafe.Media;
 using Marten;
@@ -705,9 +706,52 @@ public partial class DefaultProjectService : IProjectService
         );
     }
 
-    public Task AddReview(Hrib projectId, ProjectReviewDto dto)
+    public async Task Review(ProjectReviewCreationDto dto, CancellationToken token = default)
     {
-        throw new NotImplementedException();
+        var project = await Load(dto.ProjectId, token);
+        if (project is null)
+        {
+            throw new IndexOutOfRangeException();
+        }
+
+        if (dto.Kind == ReviewKind.NotReviewed)
+        {
+            throw new ArgumentException("Review must be either accepting or rejecting.");
+        }
+
+        // TODO: Change after FFFIMU 2023
+        if (!userProvider.IsProjectReviewer(dto.ReviewerRole)
+            || (dto.ReviewerRole != Const.TechReviewer
+            && dto.ReviewerRole != Const.VisualReviewer
+            && dto.ReviewerRole != Const.DramaturgyReviewer))
+        {
+            throw new UnauthorizedAccessException();
+        }
+
+        var eventStream = await db.Events.FetchForExclusiveWriting<ProjectInfo>(dto.ProjectId, token);
+        var reviewAdded = new ProjectReviewAdded(dto.ProjectId, dto.Kind, dto.ReviewerRole, dto.Comment);
+        eventStream.AppendOne(reviewAdded);
+        await db.SaveChangesAsync(token);
+
+        var ownershipString = AccountCapability.Serialize(new ProjectOwnership(dto.ProjectId));
+        var owners = await db.Query<AccountInfo>()
+            .Where(a => a.Capabilities.Contains(new ProjectOwnership(dto.ProjectId)))
+            .ToListAsync(token);
+
+        if (dto.Comment is not null)
+        {
+            foreach(var owner in owners)
+            {
+                if (dto.Comment[owner.PreferredCulture] is not null)
+                {
+                    await emails.SendEmail(
+                        owner.EmailAddress,
+                        Const.ProjectReviewEmailSubject[owner.PreferredCulture]!,
+                        dto.Comment[owner.PreferredCulture]!,
+                        token);
+                }
+            }
+        }
     }
 
     private static IEnumerable<ProjectDiagnosticDto> ValidateVideo(

@@ -14,4 +14,6 @@ public interface IProjectService
     Task<Hrib> Create(ProjectCreationDto dto, CancellationToken token = default);
 
     Task<ProjectValidationDto> Validate(Hrib id, CancellationToken token = default);
+
+    Task Review(ProjectReviewCreationDto dto, CancellationToken token = default);
 }

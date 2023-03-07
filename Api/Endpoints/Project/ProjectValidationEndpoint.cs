@@ -13,13 +13,13 @@ namespace Kafe.Api.Endpoints.Project;
 [ApiVersion("1")]
 [Route("project-validation/{id}")]
 [Authorize]
-public class ProjectValidatioEndpoint : EndpointBaseAsync
+public class ProjectValidationEndpoint : EndpointBaseAsync
     .WithRequest<string>
     .WithActionResult<ProjectValidationDto>
 {
     private readonly IProjectService projects;
 
-    public ProjectValidatioEndpoint(IProjectService projects)
+    public ProjectValidationEndpoint(IProjectService projects)
     {
         this.projects = projects;
     }

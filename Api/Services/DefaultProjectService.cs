@@ -18,15 +18,18 @@ public partial class DefaultProjectService : IProjectService
     private readonly IDocumentSession db;
     private readonly IUserProvider userProvider;
     private readonly IAccountService accounts;
+    private readonly IEmailService emails;
 
     public DefaultProjectService(
         IDocumentSession db,
         IUserProvider userProvider,
-        IAccountService accounts)
+        IAccountService accounts,
+        IEmailService emails)
     {
         this.db = db;
         this.userProvider = userProvider;
         this.accounts = accounts;
+        this.emails = emails;
     }
 
     public async Task<Hrib> Create(ProjectCreationDto dto, CancellationToken token = default)

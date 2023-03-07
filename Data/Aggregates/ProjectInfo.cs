@@ -36,7 +36,8 @@ public record ProjectArtifactInfo(
 public record ProjectReviewInfo(
     ReviewKind Kind,
     string ReviewerRole,
-    LocalizedString? Comment
+    LocalizedString? Comment,
+    DateTimeOffset AddedOn
 );
 
 public class ProjectInfoProjection : SingleStreamAggregation<ProjectInfo>
@@ -183,14 +184,16 @@ public class ProjectInfoProjection : SingleStreamAggregation<ProjectInfo>
         return p with { IsLocked = false };
     }
 
-    public ProjectInfo Apply(ProjectReviewAdded e, ProjectInfo p)
+    public ProjectInfo Apply(IEvent<ProjectReviewAdded> e, ProjectInfo p)
     {
         return p with
         {
             Reviews = p.Reviews.Add(new ProjectReviewInfo(
-                Kind: e.Kind,
-                ReviewerRole: e.ReviewerRole,
-                Comment: e.Comment))
+                Kind: e.Data.Kind,
+                ReviewerRole: e.Data.ReviewerRole,
+                Comment: e.Data.Comment,
+                AddedOn: e.Timestamp)
+            )
         };
     }
 }

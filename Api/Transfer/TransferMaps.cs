@@ -176,7 +176,8 @@ V případě technických problémů nás prosím kontaktujte na adrese: festiva
         return new ProjectReviewDto(
             Kind: review.Kind,
             ReviewerRole: review.ReviewerRole,
-            Comment: review.Comment
+            Comment: review.Comment,
+            AddedOn: review.AddedOn
         );
     }
 

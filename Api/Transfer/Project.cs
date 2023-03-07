@@ -47,6 +47,14 @@ public record ProjectArtifactDto(
 public record ProjectReviewDto(
     ReviewKind Kind,
     string ReviewerRole,
+    LocalizedString? Comment,
+    DateTimeOffset AddedOn
+);
+
+public record ProjectReviewCreationDto(
+    string ProjectId,
+    ReviewKind Kind,
+    string ReviewerRole,
     LocalizedString? Comment
 );
 

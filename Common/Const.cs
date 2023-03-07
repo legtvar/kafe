@@ -55,6 +55,7 @@ public static class Const
     public static readonly LocalizedString UnknownProjectGroup;
     public static readonly LocalizedString ConfirmationEmailSubject;
     public static readonly LocalizedString ConfirmationEmailMessageTemplate;
+    public static readonly LocalizedString ProjectReviewEmailSubject;
     public static readonly LocalizedString[] EmailSignOffs;
 
     static Const()
@@ -73,6 +74,11 @@ public static class Const
             (InvariantCulture, "Login Request"),
             (CzechCulture, "Přihlášení"),
             (SlovakCulture, "Prihlásenie"));
+        ProjectReviewEmailSubject = LocalizedString.Create(
+            (InvariantCulture, "Project Review"),
+            (CzechCulture, "Posouzení projektu"),
+            (SlovakCulture, "Posúdenie projektu"));
+
         ConfirmationEmailMessageTemplate = LocalizedString.Create(
             (InvariantCulture,
 @"Hello,

@@ -15,6 +15,17 @@ public static class UserProviderExtensions
         return p.User is not null && p.User.Capabilities.Contains(new Administration());
     }
 
+    public static bool IsFestivalOrg(this IUserProvider p)
+    {
+        return p.User is not null && p.User.Capabilities.Contains(new OrganizeFestival());
+    }
+
+    public static bool IsProjectReviewer(this IUserProvider p, string role)
+    {
+        return p.IsAdministrator()
+            || (p.User is not null && p.User.Capabilities.Contains(new ProjectReview(role)));
+    }
+
     public static IQueryable<ProjectGroupInfo> WhereCanRead(
         this IQueryable<ProjectGroupInfo> q,
         IUserProvider p)
@@ -31,7 +42,7 @@ public static class UserProviderExtensions
         this IQueryable<ProjectInfo> q,
         IUserProvider userProvider)
     {
-        if (userProvider.IsAdministrator())
+        if (userProvider.IsAdministrator() || userProvider.IsFestivalOrg())
         {
             return q;
         }
@@ -45,7 +56,7 @@ public static class UserProviderExtensions
         this IQueryable<AuthorInfo> q,
         IUserProvider userProvider)
     {
-        if (userProvider.IsAdministrator())
+        if (userProvider.IsAdministrator() || userProvider.IsFestivalOrg())
         {
             return q;
         }
@@ -69,6 +80,11 @@ public static class UserProviderExtensions
 
     public static bool CanRead(this IUserProvider p, ProjectInfo project)
     {
+        if (p.IsFestivalOrg())
+        {
+            return true;
+        }
+
         return project.Visibility switch
         {
             Visibility.Public => true,
@@ -89,7 +105,7 @@ public static class UserProviderExtensions
 
     public static bool CanRead(this IUserProvider p, AuthorInfo author)
     {
-        if (p.IsAdministrator())
+        if (p.IsAdministrator() || p.IsFestivalOrg())
         {
             return true;
         }

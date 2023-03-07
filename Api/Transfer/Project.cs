@@ -94,5 +94,6 @@ public record ProjectValidationDto(
 
 public record ProjectDiagnosticDto(
     DiagnosticKind Kind,
-    LocalizedString Message
+    LocalizedString Message,
+    string ValidationStage
 );

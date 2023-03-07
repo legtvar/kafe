@@ -15,11 +15,28 @@ namespace Kafe.Api.Services;
 public partial class DefaultProjectService : IProjectService
 {
     public const int NameLengthLimit = 32;
-    public const int DescriptionLengthLimit = 270;
+    public const int DescriptionMinLength = 50;
+    public const int DescriptionMaxLength = 200;
     public const int GenreLengthLimit = 32;
+    public static readonly TimeSpan FilmMinLength = TimeSpan.FromSeconds(1);
+    public static readonly TimeSpan FilmMaxLength = TimeSpan.FromMinutes(8);
+    public static readonly TimeSpan VideoAnnotationMinLength = TimeSpan.FromSeconds(1);
+    public static readonly TimeSpan VideoAnnotationMaxLength = TimeSpan.FromSeconds(30);
+    public static long FilmMaxFileLength = 2 << 30; // 2 GiB
+    public static string FilmMaxFileLengthDescription = "2 GiB";
+
+    public static long VideoAnnotationMaxFileLength = 512 << 20; // 512 MiB
+    public static string VideoAnnotationMaxFileLengthDescription = "512 GiB";
+
+    public const string InfoStage = "info";
+    public const string FileStage = "file";
+    public const string TechReviewStage = "tech-review";
+    public const string VisualReviewStage = "visual-review";
+    public const string DramaturgyReviewStage = "dramaturgy-review";
 
     public static readonly ProjectDiagnosticDto InvalidName = new ProjectDiagnosticDto(
         Kind: DiagnosticKind.Error,
+        ValidationStage: InfoStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, $"The project must have a name that is at most {NameLengthLimit} characters long."),
             (Const.CzechCulture, $"Projekt musí mít název o nejvýše {NameLengthLimit} znacích.")
@@ -28,14 +45,18 @@ public partial class DefaultProjectService : IProjectService
 
     public static readonly ProjectDiagnosticDto InvalidDescription = new ProjectDiagnosticDto(
         Kind: DiagnosticKind.Error,
+        ValidationStage: InfoStage,
         Message: LocalizedString.Create(
-            (Const.InvariantCulture, $"The project must have a description that is at most {DescriptionLengthLimit} characters long."),
-            (Const.CzechCulture, $"Projekt musí mít anotaci o nejvýše {DescriptionLengthLimit} znacích.")
+            (Const.InvariantCulture, $"The project must have a description that is " +
+                $"between {DescriptionMinLength} and {DescriptionMaxLength} characters long."),
+            (Const.CzechCulture, $"Projekt musí mít anotaci o " +
+                $"délce {DescriptionMinLength} až {DescriptionMaxLength} znaků.")
         )
     );
 
     public static readonly ProjectDiagnosticDto MissingGenre = new ProjectDiagnosticDto(
         Kind: DiagnosticKind.Error,
+        ValidationStage: InfoStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, $"The project is missing a genre."),
             (Const.CzechCulture, $"Projektu chybí žánr.")
@@ -44,14 +65,16 @@ public partial class DefaultProjectService : IProjectService
 
     public static readonly ProjectDiagnosticDto GenreTooLong = new ProjectDiagnosticDto(
         Kind: DiagnosticKind.Error,
+        ValidationStage: InfoStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, $"The project genre must be at most {GenreLengthLimit} characters long."),
-            (Const.CzechCulture, $"Žánr projektu musí mít nejvýše {DescriptionLengthLimit} znaků.")
+            (Const.CzechCulture, $"Žánr projektu musí mít nejvýše {DescriptionMaxLength} znaků.")
         )
     );
 
     public static readonly ProjectDiagnosticDto MissingTechReview = new ProjectDiagnosticDto(
         Kind: DiagnosticKind.Error,
+        ValidationStage: TechReviewStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "This project is yet to be accepted by a festival technician."),
             (Const.CzechCulture, "Tento project ještě musí přijmout festivalový technik.")
@@ -60,6 +83,7 @@ public partial class DefaultProjectService : IProjectService
 
     public static readonly ProjectDiagnosticDto MissingVisualReview = new ProjectDiagnosticDto(
         Kind: DiagnosticKind.Error,
+        ValidationStage: VisualReviewStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "This project is yet to be accepted by a festival graphic designer."),
             (Const.CzechCulture, "Tento project ještě musí přijmout festivalový grafik.")
@@ -68,6 +92,7 @@ public partial class DefaultProjectService : IProjectService
 
     public static readonly ProjectDiagnosticDto MissingDramaturgyReview = new ProjectDiagnosticDto(
         Kind: DiagnosticKind.Error,
+        ValidationStage: DramaturgyReviewStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "This project is yet to be accepted by a festival jury."),
             (Const.CzechCulture, "Tento project ještě musí přijmout festivalová porota.")
@@ -76,6 +101,7 @@ public partial class DefaultProjectService : IProjectService
 
     public static readonly ProjectDiagnosticDto MissingCrew = new ProjectDiagnosticDto(
         Kind: DiagnosticKind.Error,
+        ValidationStage: InfoStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "At least one crew member is required."),
             (Const.CzechCulture, "Je vyžadován alespoň jeden člen štábu.")
@@ -84,6 +110,7 @@ public partial class DefaultProjectService : IProjectService
 
     public static readonly ProjectDiagnosticDto MissingFilm = new ProjectDiagnosticDto(
         Kind: DiagnosticKind.Error,
+        ValidationStage: FileStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "The film is required."),
             (Const.CzechCulture, "Film je povinnou součástí přihlášky.")
@@ -92,6 +119,7 @@ public partial class DefaultProjectService : IProjectService
 
     public static readonly ProjectDiagnosticDto TooManyFilms = new ProjectDiagnosticDto(
         Kind: DiagnosticKind.Error,
+        ValidationStage: FileStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "Only one film is permitted."),
             (Const.CzechCulture, "Součástí přihlášky může být pouze jeden film.")
@@ -100,6 +128,7 @@ public partial class DefaultProjectService : IProjectService
 
     public static readonly ProjectDiagnosticDto MissingVideoAnnotationVideo = new ProjectDiagnosticDto(
         Kind: DiagnosticKind.Error,
+        ValidationStage: FileStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "The video-annotation is missing the video file."),
             (Const.CzechCulture, "Videoanotaci chybí soubor s videem.")
@@ -108,6 +137,7 @@ public partial class DefaultProjectService : IProjectService
 
     public static readonly ProjectDiagnosticDto TooManyVideoAnnotations = new ProjectDiagnosticDto(
         Kind: DiagnosticKind.Error,
+        ValidationStage: FileStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "Only one video-annotation is permitted."),
             (Const.CzechCulture, "Součástí přihlášky může být pouze jedna videoanotace.")
@@ -116,6 +146,7 @@ public partial class DefaultProjectService : IProjectService
 
     public static readonly ProjectDiagnosticDto MissingFilmSubtitles = new ProjectDiagnosticDto(
         Kind: DiagnosticKind.Error,
+        ValidationStage: FileStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "English subtitles for the film file are required."),
             (Const.CzechCulture, "Anglické titulky pro film jsou povinné.")
@@ -124,6 +155,7 @@ public partial class DefaultProjectService : IProjectService
 
     public static readonly ProjectDiagnosticDto MissingVideoAnnotationSubtitles = new ProjectDiagnosticDto(
         Kind: DiagnosticKind.Error,
+        ValidationStage: FileStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "The video-annotation is missing English subtitles."),
             (Const.CzechCulture, "Videoanotaci chybí soubor s anglickými titulky.")
@@ -132,6 +164,7 @@ public partial class DefaultProjectService : IProjectService
 
     public static readonly ProjectDiagnosticDto TooManyFilmSubtitles = new ProjectDiagnosticDto(
         Kind: DiagnosticKind.Error,
+        ValidationStage: FileStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "Only one file with English subtitles for the film is permitted."),
             (Const.CzechCulture, "Pouze jedny anglické titulky k filmu mohou být součástí přihlášky.")
@@ -140,6 +173,7 @@ public partial class DefaultProjectService : IProjectService
 
     public static readonly ProjectDiagnosticDto TooManyVideoAnnotationSubtitles = new ProjectDiagnosticDto(
         Kind: DiagnosticKind.Error,
+        ValidationStage: FileStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "Only one file with English subtitles for the video-annotation is permitted."),
             (Const.CzechCulture, "Pouze jedny anglické titulky k videoanotaci mohou být součástí přihlášky.")
@@ -148,6 +182,7 @@ public partial class DefaultProjectService : IProjectService
 
     public static readonly ProjectDiagnosticDto TooFewCoverPhotos = new ProjectDiagnosticDto(
         Kind: DiagnosticKind.Error,
+        ValidationStage: FileStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "At least one cover photo is required."),
             (Const.CzechCulture, "Alespoň jedna titulní fotka je vyžadována.")
@@ -156,11 +191,103 @@ public partial class DefaultProjectService : IProjectService
 
     public static readonly ProjectDiagnosticDto TooManyCoverPhotos = new ProjectDiagnosticDto(
         Kind: DiagnosticKind.Error,
+        ValidationStage: FileStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "Too many cover photos have been provided."),
             (Const.CzechCulture, "Přihláška obsahuje příliš mnoho titulních fotek.")
         )
     );
+
+    public static readonly ProjectDiagnosticDto FilmTooShort = new ProjectDiagnosticDto(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: FileStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, $"The film is too short. Minimum length is '{FilmMinLength:c}'."),
+            (Const.CzechCulture, $"Film je příliš krátký. Minimální délka je '{FilmMinLength:c}'.")
+        )
+    );
+
+    public static readonly ProjectDiagnosticDto FilmTooLong = new ProjectDiagnosticDto(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: FileStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, $"The film is too long. Maximum length is '{FilmMaxLength:c}'."),
+            (Const.CzechCulture, $"Film je příliš krátký. Maximální délka je '{FilmMaxLength:c}'.")
+        )
+    );
+
+    public static readonly ProjectDiagnosticDto VideoAnnotationTooShort = new ProjectDiagnosticDto(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: FileStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, $"The video-annotation is too short. Minimum length is '{FilmMinLength:c}'."),
+            (Const.CzechCulture, $"Videoanotace je příliš krátká. Minimální délka je '{FilmMinLength:c}'.")
+        )
+    );
+
+    public static readonly ProjectDiagnosticDto VideoAnnotationTooLong = new ProjectDiagnosticDto(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: FileStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, $"The video-annotation is too long. Maximum length is '{FilmMaxLength:c}'."),
+            (Const.CzechCulture, $"Videoanotace je příliš krátká. Maximální délka je '{FilmMaxLength:c}'.")
+        )
+    );
+
+    public static readonly ProjectDiagnosticDto FilmHasZeroFileLength = new ProjectDiagnosticDto(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: FileStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, "The film file has zero file length."),
+            (Const.CzechCulture, "Soubor s filmem má nulovou velikost.")
+        )
+    );
+
+    public static readonly ProjectDiagnosticDto FilmIsTooLarge = new ProjectDiagnosticDto(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: FileStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, $"The film file is larger than {FilmMaxFileLengthDescription}."),
+            (Const.CzechCulture, $"Soubor s filmem je větší než {FilmMaxFileLengthDescription}.")
+        )
+    );
+
+    public static readonly ProjectDiagnosticDto VideoAnnotationHasZeroFileLength = new ProjectDiagnosticDto(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: FileStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, "The video-annotation file has zero file length."),
+            (Const.CzechCulture, "Soubor s videoanotací má nulovou velikost.")
+        )
+    );
+
+    public static readonly ProjectDiagnosticDto VideoAnnotationIsTooLarge = new ProjectDiagnosticDto(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: FileStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, $"The video-annotation file is larger than {VideoAnnotationMaxFileLengthDescription}."),
+            (Const.CzechCulture, $"Soubor s videoanotací je větší než {VideoAnnotationMaxFileLengthDescription}.")
+        )
+    );
+
+    public static readonly ProjectDiagnosticDto FilmCorrupted = new ProjectDiagnosticDto(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: FileStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, "The film file is corrupted."),
+            (Const.CzechCulture, "Soubor s filmem je poškozený.")
+        )
+    );
+
+    public static readonly ProjectDiagnosticDto VideoAnnotationCorrupted = new ProjectDiagnosticDto(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: FileStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, "The video-annotation file is corrupted."),
+            (Const.CzechCulture, "Soubor s videoanotací je poškozený.")
+        )
+    );
+
 
     // TODO: Blueprints instead of these hard-coded validation settings for FFFI MU 2023.
     public async Task<ProjectValidationDto> Validate(Hrib id, CancellationToken token = default)
@@ -184,7 +311,9 @@ public partial class DefaultProjectService : IProjectService
         }
 
         if (project.Description is null
-            || project.Description.Values.Any(n => string.IsNullOrWhiteSpace(n) || n.Length > DescriptionLengthLimit))
+            || project.Description.Values.Any(n => string.IsNullOrWhiteSpace(n)
+            || n.Length < DescriptionMinLength
+            || n.Length > DescriptionMaxLength))
         {
             diagnostics.Add(InvalidDescription);
         }
@@ -248,6 +377,28 @@ public partial class DefaultProjectService : IProjectService
             {
                 diagnostics.Add(TooManyFilms);
             }
+            else
+            {
+                var videoShard = await db.LoadAsync<VideoShardInfo>(videoShards[0].ShardId, token);
+                if (videoShard is null)
+                {
+                    diagnostics.Add(MissingFilm);
+                }
+                else
+                {
+                    diagnostics.AddRange(ValidateVideo(
+                        video: videoShard,
+                        maxFileLength: FilmMaxFileLength,
+                        minLength: FilmMinLength,
+                        maxLength: FilmMaxLength,
+                        corruptedError: FilmCorrupted,
+                        zeroFileLengthError: FilmHasZeroFileLength,
+                        tooLargeError: FilmHasZeroFileLength,
+                        tooShortError: FilmTooShort,
+                        tooLongError: FilmTooLong
+                    ));
+                }
+            }
 
             var subtitleShards = filmArtifacts.Single().info.Shards.Where(s => s.Kind == ShardKind.Subtitles)
                 .ToImmutableArray();
@@ -278,6 +429,28 @@ public partial class DefaultProjectService : IProjectService
             else if (videoShards.Length > 1)
             {
                 diagnostics.Add(TooManyVideoAnnotations);
+            }
+            else
+            {
+                var videoShard = await db.LoadAsync<VideoShardInfo>(videoShards[0].ShardId, token);
+                if (videoShard is null)
+                {
+                    diagnostics.Add(MissingFilm);
+                }
+                else
+                {
+                    diagnostics.AddRange(ValidateVideo(
+                        video: videoShard,
+                        maxFileLength: VideoAnnotationMaxFileLength,
+                        minLength: VideoAnnotationMinLength,
+                        maxLength: VideoAnnotationMaxLength,
+                        corruptedError: VideoAnnotationCorrupted,
+                        zeroFileLengthError: VideoAnnotationHasZeroFileLength,
+                        tooLargeError: VideoAnnotationHasZeroFileLength,
+                        tooShortError: VideoAnnotationTooShort,
+                        tooLongError: VideoAnnotationTooLong
+                    ));
+                }
             }
 
             var subtitleShards = videoAnnotationArtifacts.Single().info.Shards.Where(s => s.Kind == ShardKind.Subtitles)
@@ -310,8 +483,51 @@ public partial class DefaultProjectService : IProjectService
         );
     }
 
-    public async Task AddReview(Hrib projectId, ProjectReviewDto dto)
+    public Task AddReview(Hrib projectId, ProjectReviewDto dto)
     {
         throw new NotImplementedException();
+    }
+
+    private static IEnumerable<ProjectDiagnosticDto> ValidateVideo(
+        VideoShardInfo video,
+        long maxFileLength,
+        TimeSpan minLength,
+        TimeSpan maxLength,
+        ProjectDiagnosticDto corruptedError,
+        ProjectDiagnosticDto zeroFileLengthError,
+        ProjectDiagnosticDto tooLargeError,
+        ProjectDiagnosticDto tooShortError,
+        ProjectDiagnosticDto tooLongError)
+    {
+        if (!video.Variants.Keys.Contains(Const.OriginalShardVariant))
+        {
+            yield return MissingFilm;
+            yield break;
+        }
+
+        var originalVariant = video.Variants[Const.OriginalShardVariant];
+        if (originalVariant.IsCorrupted)
+        {
+            yield return corruptedError;
+            yield break;
+        }
+
+        if (originalVariant.FileLength == 0)
+        {
+            yield return zeroFileLengthError;
+        }
+        else if (originalVariant.FileLength > maxFileLength)
+        {
+            yield return tooLargeError;
+        }
+
+        if (originalVariant.Duration < minLength)
+        {
+            yield return tooShortError;
+        }
+        else if (originalVariant.Duration > maxLength)
+        {
+            yield return tooLongError;
+        }
     }
 }

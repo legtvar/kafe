@@ -20,7 +20,9 @@
       "genere": "Žánr",
       "movie": "Film",
       "name": "Název filmu",
-      "videoannotation": "Videoanotace"
+      "videoannotation": "Videoanotace",
+      "crew": "Štáb",
+      "cast": "Herci"
     },
     "language": {
       "cs": "česky",
@@ -40,10 +42,11 @@
     "invalidPath": "URL adresa je nesprávná",
     "projectDoesNotExist": "Projekt s daným ID neexistuje",
     "subtitle": "Omlouváme se za potíže. Pokud máte pocit, že se to nemělo stát (což pravděpodobně nemělo), pošlete nám prosím tento report",
-    "title": "Jejky, tak to nešlo podle plánu"
+    "title": "Jejky, tak to nešlo podle plánu",
+    "tokenInvalid": "Token není platný"
   },
   "generic": {
-    "empty": "Je to zvláštní, ale nic tu není...",
+    "empty": "Kde nic, tu nic...",
     "for": "pro",
     "edit": "Upravit",
     "save": "Uložit",
@@ -152,7 +155,8 @@
     "backlink": "Vrátit se zpět"
   },
   "textarea": {
-    "characters": "znaků"
+    "characters": "znaků",
+    "min": "min"
   },
   "visibility": {
     "Unknown": "Neznámá viditelnost",
@@ -167,5 +171,8 @@
     "after": "Na Vaši emailovou adresu jsme odeslali informace pro aktivaci dočasného účtu. Prosím klikněte na odkaz v emailu pro pokračování do KAFE.",
     "after2": "Pokud Vám email nepřišel, můžete si o něj zažádat znovu.",
     "back": "Znovu požádat"
+  },
+  "sendApi": {
+    "error": "Ve formuláři je chyba"
   }
 }

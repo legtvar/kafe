@@ -159,9 +159,7 @@ export function CreateProject(props: ICreateProjectProps) {
                             </Accordion>
                         </Box>
 
-                        <ProjectBasicInfo />
-
-                        <Box h={64}></Box>
+                        <ProjectBasicInfo groupId={id} />
 
                         {/*
                             - Genre

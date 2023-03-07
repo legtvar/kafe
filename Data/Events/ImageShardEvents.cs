@@ -7,19 +7,19 @@ public interface IImageShardEvent : IShardEvent
 }
 
 public record ImageShardCreated(
-    Hrib ShardId,
+    [Hrib] string ShardId,
     CreationMethod CreationMethod,
-    Hrib ArtifactId,
+    [Hrib] string ArtifactId,
     ImageInfo OriginalVariantInfo
 ) : IImageShardEvent, IShardCreated;
 
 public record ImageShardVariantsAdded(
-    Hrib ShardId,
+    [Hrib] string ShardId,
     string Name,
     ImageInfo Info
 ) : IImageShardEvent, IShardVariantAdded;
 
 public record ImageShardVariantsRemoved(
-    Hrib ShardId,
+    [Hrib] string ShardId,
     string Name
 ) : IImageShardEvent, IShardVariantRemoved;

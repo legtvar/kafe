@@ -1,16 +1,17 @@
 ﻿using System;
+using System.Collections.Immutable;
 
 namespace Kafe.Data.Events;
 
 public record ArtifactCreated(
-    Hrib ArtifactId,
+    [Hrib] string ArtifactId,
     CreationMethod CreationMethod,
-    LocalizedString Name,
+    [LocalizedString] ImmutableDictionary<string, string> Name,
     DateTimeOffset AddedOn
 );
 
 public record ArtifactInfoChanged(
-    Hrib ArtifactId,
-    LocalizedString? Name,
+    [Hrib] string ArtifactId,
+    [LocalizedString] ImmutableDictionary<string, string>? Name,
     DateTimeOffset? AddedOn
 );

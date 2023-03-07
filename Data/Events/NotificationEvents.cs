@@ -3,13 +3,12 @@ using System.Collections.Immutable;
 namespace Kafe.Data.Events;
 
 public record NotificationCreated(
-    Hrib NotificationId,
+    [Hrib] string NotificationId,
     CreationMethod CreationMethod,
     NotificationKind Kind,
     ImmutableArray<string>? Recipients,
-    Hrib? ProjectId,
-    Hrib? VideoId,
-    LocalizedString Description
+    [Hrib] string? ProjectId,
+    [LocalizedString] ImmutableDictionary<string, string> Description
 );
 
 public record NotificationSent;

@@ -1,15 +1,17 @@
+using System.Collections.Immutable;
+
 namespace Kafe.Data.Events;
 
 public record VideoConversionCreated(
-    Hrib ConversionId,
+    [Hrib] string ConversionId,
     string VideoId
 );
 
 public record VideoConversionCompleted(
-    Hrib ConversionId
+    [Hrib] string ConversionId
 );
 
 public record VideoConversionFailed(
-    Hrib ConversionId,
-    LocalizedString Reason
+    [Hrib] string ConversionId,
+    [LocalizedString] ImmutableDictionary<string, string> Reason
 );

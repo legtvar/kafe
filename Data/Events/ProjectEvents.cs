@@ -4,48 +4,48 @@ using System.Collections.Immutable;
 namespace Kafe.Data.Events;
 
 public record ProjectCreated(
-    Hrib ProjectId,
+    [Hrib] string ProjectId,
     CreationMethod CreationMethod,
     string ProjectGroupId,
-    LocalizedString Name,
+    [LocalizedString] ImmutableDictionary<string, string> Name,
     Visibility Visibility
 );
 
 public record ProjectAuthorAdded(
-    Hrib ProjectId,
-    Hrib AuthorId,
+    [Hrib] string ProjectId,
+    [Hrib] string AuthorId,
     ProjectAuthorKind Kind,
     ImmutableArray<string>? Roles = null
 );
 
 public record ProjectAuthorRemoved(
-    Hrib ProjectId,
-    Hrib AuthorId,
+    [Hrib] string ProjectId,
+    [Hrib] string AuthorId,
     ImmutableArray<string>? Roles = null
 );
 
 public record ProjectInfoChanged(
-    Hrib ProjectId,
-    LocalizedString? Name = null,
-    LocalizedString? Description = null,
+    [Hrib] string ProjectId,
+    [LocalizedString] ImmutableDictionary<string, string>? Name = null,
+    [LocalizedString] ImmutableDictionary<string, string>? Description = null,
     Visibility? Visibility = null,
     DateTimeOffset? ReleasedOn = null,
-    LocalizedString? Genre = null
+    [LocalizedString] ImmutableDictionary<string, string>? Genre = null
 );
 
 public record ProjectArtifactAdded(
-    Hrib ProjectId,
-    Hrib ArtifactId,
+    [Hrib] string ProjectId,
+    [Hrib] string ArtifactId,
     string? BlueprintSlot
 );
 
 public record ProjectArtifactRemoved(
-    Hrib ProjectId,
-    Hrib ArtifactId
+    [Hrib] string ProjectId,
+    [Hrib] string ArtifactId
 );
 
 public record ProjectLocked(
-    Hrib ProjectId
+    [Hrib] string ProjectId
 );
 
 public record ProjectUnlocked(

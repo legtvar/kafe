@@ -61,6 +61,19 @@ public abstract record AccountCapability
     {
         return capability is null ? null : Serialize(capability);
     }
+
+    [return: NotNullIfNotNull(nameof(capabilityString))]
+    public static explicit operator AccountCapability?(string? capabilityString)
+    {
+        return capabilityString is null
+            ? null
+            : TryParse(capabilityString, out var capability)
+                ? capability
+                : throw new ArgumentException(
+                    $"Could not parse as {nameof(AccountCapability)}.",
+                    nameof(capabilityString));
+    }
+
 }
 public record Administration : AccountCapability;
 

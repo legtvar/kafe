@@ -1,4 +1,5 @@
 ﻿using Kafe.Data.Capabilities;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,11 +9,11 @@ using System.Threading.Tasks;
 namespace Kafe.Data.Events;
 
 public record AccountCapabilityAdded(
-    Hrib AccountId,
-    AccountCapability Capability
+    [Hrib] string AccountId,
+    [AccountCapability] string Capability
 );
 
 public record AccountCapabilityRemoved(
-    Hrib AccountId,
-    AccountCapability Capability
+    [Hrib] string AccountId,
+    [AccountCapability] string Capability
 );

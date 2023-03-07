@@ -7,19 +7,19 @@ public interface ISubtitlesShardEvent : IShardEvent
 }
 
 public record SubtitlesShardCreated(
-    Hrib ShardId,
+    [Hrib] string ShardId,
     CreationMethod CreationMethod,
-    Hrib ArtifactId,
+    [Hrib] string ArtifactId,
     SubtitlesInfo OriginalVariantInfo
 ) : ISubtitlesShardEvent, IShardCreated;
 
 public record SubtitlesShardVariantsAdded(
-    Hrib ShardId,
+    [Hrib] string ShardId,
     string Name,
     SubtitlesInfo Info
 ) : ISubtitlesShardEvent, IShardVariantAdded;
 
 public record SubtitlesShardVariantsRemoved(
-    Hrib ShardId,
+    [Hrib] string ShardId,
     string Name
 ) : ISubtitlesShardEvent, IShardVariantRemoved;

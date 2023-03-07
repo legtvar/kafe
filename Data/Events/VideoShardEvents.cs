@@ -7,19 +7,19 @@ public interface IVideoShardEvent : IShardEvent
 }
 
 public record VideoShardCreated(
-    Hrib ShardId,
+    [Hrib] string ShardId,
     CreationMethod CreationMethod,
-    Hrib ArtifactId,
+    [Hrib] string ArtifactId,
     MediaInfo OriginalVariantInfo
 ) : IVideoShardEvent, IShardCreated;
 
 public record VideoShardVariantsAdded(
-    Hrib ShardId,
+    [Hrib] string ShardId,
     string Name,
     MediaInfo Info
 ) : IVideoShardEvent, IShardVariantAdded;
 
 public record VideoShardVariantsRemoved(
-    Hrib ShardId,
+    [Hrib] string ShardId,
     string Name
 ) : IVideoShardEvent, IShardVariantRemoved;

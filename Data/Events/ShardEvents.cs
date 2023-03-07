@@ -10,14 +10,16 @@ namespace Kafe.Data.Events;
 
 public interface IShardEvent
 {
-    Hrib ShardId { get; }
+    [Hrib]
+    string ShardId { get; }
 }
 
 public interface IShardCreated : IShardEvent
 {
     CreationMethod CreationMethod { get; }
 
-    Hrib ArtifactId { get; }
+    [Hrib]
+    string ArtifactId { get; }
 }
 
 public interface IShardVariantAdded : IShardEvent

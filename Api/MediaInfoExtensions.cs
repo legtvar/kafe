@@ -19,6 +19,7 @@ public static class MediaInfoExtensions
         {
             new("matroska,webm", (".mkv", "video/x-matroska")),
             new("mp4", (".mp4", "video/mp4")),
+            new("m4v", (".m4v", "video/mp4")),
             new("mov,mp4,m4a,3gp,3g2,mj2", (".mp4", "video/mp4"))
         });
 

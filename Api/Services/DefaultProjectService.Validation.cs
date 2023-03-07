@@ -2,6 +2,7 @@
 using Kafe.Data;
 using Kafe.Data.Aggregates;
 using Kafe.Data.Events;
+using Kafe.Media;
 using Marten;
 using System;
 using System.Collections.Generic;
@@ -24,6 +25,36 @@ public partial class DefaultProjectService : IProjectService
     public static readonly TimeSpan VideoAnnotationMaxLength = TimeSpan.FromSeconds(30);
     public static long FilmMaxFileLength = 2 << 30; // 2 GiB
     public static string FilmMaxFileLengthDescription = "2 GiB";
+    public const long VideoMinBitrate = 10_000_000;
+    public const string VideoMinBitrateDescription = "10 Mbps";
+    public const long VideoMaxBitrate = 20_000_000;
+    public const string VideoMaxBitrateDescription = "20 Mbps";
+    public const int VideoShorterSideResolution = 1080;
+    public static string[] AllowedContainers = new[]
+    {
+        "video/mp4",
+        "video/x-matroska"
+    };
+    public static string[] AllowedVideoCodecs = new[]
+    {
+        "h264",
+        "mpeg4"
+    };
+    public static string[] AllowedAudioCodecs = new[]
+    {
+        "aac",
+        "mp3",
+        "flac"
+    };
+    public static string[] AllowedSubtitleCodecs = new[]
+    {
+        "srt",
+        "ass"
+    };
+    public const long Mp3MinBitrate = 192000;
+    public const string Mp3MinBitrateDescription = "192 kbps";
+    public const double RequiredFramerate = 24.0;
+    public const string RequiredFramerateDescription = "24 fps";
 
     public static long VideoAnnotationMaxFileLength = 512 << 20; // 512 MiB
     public static string VideoAnnotationMaxFileLengthDescription = "512 GiB";
@@ -288,6 +319,179 @@ public partial class DefaultProjectService : IProjectService
         )
     );
 
+    public static readonly ProjectDiagnosticDto FilmUnsupportedContainerFormat = new ProjectDiagnosticDto(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: FileStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, "The film file uses an unsupported format. " +
+                "The supported formats are MP4, M4V, and MKV."),
+            (Const.CzechCulture, "Soubor s filmem použivá nepodporovaný kontejner. " +
+                "Podporovanými kontejnery jsou MP4, M4V a MKV.")
+        )
+    );
+
+    public static readonly ProjectDiagnosticDto VideoAnnotationUnsupportedContainerFormat = new ProjectDiagnosticDto(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: FileStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, "The video-annotation file uses an unsupported format. " +
+                "The supported formats are MP4, M4V, and MKV."),
+            (Const.CzechCulture, "Soubor s videoanotací použivá nepodporovaný kontejner. " +
+                "Podporovanými kontejnery jsou MP4, M4V a MKV.")
+        )
+    );
+
+    public static readonly ProjectDiagnosticDto FilmUnsupportedVideoCodec = new ProjectDiagnosticDto(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: FileStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, "The film file uses an unsupported video codec. " +
+                "The supported video codecs are H.264 and MPEG-4 Part 2."),
+            (Const.CzechCulture, "Soubor s filmem použivá nepodporovaný video kodek. " +
+                "Podporovanými video kodeky jsou H.264 a MPEG-4 Part 2.")
+        )
+    );
+
+    public static readonly ProjectDiagnosticDto VideoAnnotationUnsupportedVideoCodec = new ProjectDiagnosticDto(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: FileStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, "The video-annotation file uses an unsupported video codec. " +
+                "The supported video codecs are H.264 and MPEG-4 Part 2."),
+            (Const.CzechCulture, "Soubor s videoanotací použivá nepodporovaný video kodek. " +
+                "Podporovanými video kodeky jsou H.264 a MPEG-4 Part 2.")
+        )
+    );
+
+    public static readonly ProjectDiagnosticDto FilmUnsupportedAudioCodec = new ProjectDiagnosticDto(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: FileStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, "The film file uses an unsupported audio codec. " +
+                $"The supported audio codecs are AAC, FLAC, and MP3 with bitrate at least {Mp3MinBitrateDescription}."),
+            (Const.CzechCulture, "Soubor s filmem použivá nepodporovaný audio kodek. " +
+                $"Podporovanými audio kodeky jsou AAC, FLAC a MP3 s bitratem alespoň {Mp3MinBitrateDescription}.")
+        )
+    );
+
+    public static readonly ProjectDiagnosticDto VideoAnnotationUnsupportedAudioCodec = new ProjectDiagnosticDto(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: FileStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, "The video-annotation file uses an unsupported audio codec. " +
+                $"The supported audio codecs are AAC, FLAC, and MP3 with bitrate at least {Mp3MinBitrateDescription}."),
+            (Const.CzechCulture, "Soubor s videoanotací použivá nepodporovaný audio kodek. " +
+                $"Podporovanými audio kodeky jsou AAC, FLAC a MP3 s bitratem alespoň {Mp3MinBitrateDescription}.")
+        )
+    );
+
+    public static readonly ProjectDiagnosticDto FilmMp3BitrateTooLow = new ProjectDiagnosticDto(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: FileStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, $"The bitrate of the MP3 audio in the film file must be at least {Mp3MinBitrateDescription}."),
+            (Const.CzechCulture, $"Bitrate MP3 audia v souboru s filmem musí být alespoň {Mp3MinBitrateDescription}.")
+        )
+    );
+
+    public static readonly ProjectDiagnosticDto VideoAnnotationMp3BitrateTooLow = new ProjectDiagnosticDto(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: FileStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, $"The bitrate of the MP3 audio in the video-annotation file must be at least {Mp3MinBitrateDescription}."),
+            (Const.CzechCulture, $"Bitrate MP3 audia v souboru s videoanotací musí být alespoň {Mp3MinBitrateDescription}.")
+        )
+    );
+
+    public static readonly ProjectDiagnosticDto FilmUnsupportedFramerate = new ProjectDiagnosticDto(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: FileStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, $"The film file has an unsupported framerate. The required framerate is {RequiredFramerateDescription}."),
+            (Const.CzechCulture, $"Soubor s filmem má nepodporovaný framerate. Vyžadovaný framerate je {RequiredFramerateDescription}.")
+        )
+    );
+
+    public static readonly ProjectDiagnosticDto VideoAnnotationUnsupportedFramerate = new ProjectDiagnosticDto(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: FileStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, $"The video-annotation file has an unsupported framerate. The required framerate is {RequiredFramerateDescription}."),
+            (Const.CzechCulture, $"Soubor s videoanotací má nepodporovaný framerate. Vyžadovaný framerate je {RequiredFramerateDescription}.")
+        )
+    );
+
+    public static readonly ProjectDiagnosticDto FilmInvalidStreamCount = new ProjectDiagnosticDto(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: FileStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, "The film file must have only one video stream and one audio stream."),
+            (Const.CzechCulture, "Soubor s filmem musí mít pouze jeden video stream a jeden audio stream.")
+        )
+    );
+
+    public static readonly ProjectDiagnosticDto VideoAnnotationInvalidStreamCount = new ProjectDiagnosticDto(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: FileStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, "The video-annotation file must have only one video stream and one audio stream."),
+            (Const.CzechCulture, "Soubor s videoanotací musí mít pouze jeden video stream a jeden audio stream.")
+        )
+    );
+
+    public static readonly ProjectDiagnosticDto FilmWrongResolution = new ProjectDiagnosticDto(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: FileStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, $"The film file must have a shorter-side resolution of {VideoShorterSideResolution} pixels."),
+            (Const.CzechCulture, $"Soubor s filmem musí mít na kratší straně rozlišení {VideoShorterSideResolution} pixelů.")
+        )
+    );
+
+    public static readonly ProjectDiagnosticDto VideoAnnotationWrongResolution = new ProjectDiagnosticDto(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: FileStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, $"The video-annotation file must have a shorter-side resolution of {VideoShorterSideResolution} pixels."),
+            (Const.CzechCulture, $"Soubor s videoanotací musí mít na kratší straně rozlišení {VideoShorterSideResolution} pixelů.")
+        )
+    );
+
+    public static readonly ProjectDiagnosticDto FilmUnsupportedBitrate = new ProjectDiagnosticDto(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: FileStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, $"The film file must have a bitrate between {VideoMinBitrateDescription} and {VideoMaxBitrateDescription}."),
+            (Const.CzechCulture, $"Soubor s filmem musí mít bitrate mezi {VideoMinBitrateDescription} a {VideoMaxBitrateDescription}.")
+        )
+    );
+
+    public static readonly ProjectDiagnosticDto VideoAnnotationUnsupportedBitrate = new ProjectDiagnosticDto(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: FileStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, $"The video-annotation file must have a bitrate between {VideoMinBitrateDescription} and {VideoMaxBitrateDescription}."),
+            (Const.CzechCulture, $"Soubor s videoanotací musí mít bitrate mezi {VideoMinBitrateDescription} a {VideoMaxBitrateDescription}.")
+        )
+    );
+
+    public static readonly ProjectDiagnosticDto FilmSubtitlesUnsupportedCodec = new ProjectDiagnosticDto(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: FileStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, $"The film subtites have an unsupported format. The supported formats are SRT and ASS."),
+            (Const.CzechCulture, $"Titulky k filmu mají nepodporovaný formát. Podporovanými formáty jsou SRT a ASS.")
+        )
+    );
+
+    public static readonly ProjectDiagnosticDto VideoAnnotationSubtitlesUnsupportedCodec = new ProjectDiagnosticDto(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: FileStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, $"The video-annotation subtites have an unsupported format. The supported formats are SRT and ASS."),
+            (Const.CzechCulture, $"Titulky k videoanotaci mají nepodporovaný formát. Podporovanými formáty jsou SRT a ASS.")
+        )
+    );
 
     // TODO: Blueprints instead of these hard-coded validation settings for FFFI MU 2023.
     public async Task<ProjectValidationDto> Validate(Hrib id, CancellationToken token = default)
@@ -395,7 +599,16 @@ public partial class DefaultProjectService : IProjectService
                         zeroFileLengthError: FilmHasZeroFileLength,
                         tooLargeError: FilmHasZeroFileLength,
                         tooShortError: FilmTooShort,
-                        tooLongError: FilmTooLong
+                        tooLongError: FilmTooLong,
+                        streamMismatchError: FilmInvalidStreamCount,
+                        unsupportedContainerError: FilmUnsupportedContainerFormat,
+                        bitrateTooLowError: FilmUnsupportedBitrate,
+                        bitrateTooHighError: FilmUnsupportedBitrate,
+                        unsupportedVideoCodecError: FilmUnsupportedVideoCodec,
+                        unsupportedAudioCodecError: FilmUnsupportedAudioCodec,
+                        mp3BitrateTooLowError: FilmMp3BitrateTooLow,
+                        unsupportedFramerateError: FilmUnsupportedAudioCodec,
+                        wrongResolutionError: FilmWrongResolution
                     ));
                 }
             }
@@ -448,7 +661,16 @@ public partial class DefaultProjectService : IProjectService
                         zeroFileLengthError: VideoAnnotationHasZeroFileLength,
                         tooLargeError: VideoAnnotationHasZeroFileLength,
                         tooShortError: VideoAnnotationTooShort,
-                        tooLongError: VideoAnnotationTooLong
+                        tooLongError: VideoAnnotationTooLong,
+                        streamMismatchError: VideoAnnotationInvalidStreamCount,
+                        unsupportedContainerError: VideoAnnotationUnsupportedContainerFormat,
+                        bitrateTooLowError: VideoAnnotationUnsupportedBitrate,
+                        bitrateTooHighError: VideoAnnotationUnsupportedBitrate,
+                        unsupportedVideoCodecError: VideoAnnotationUnsupportedVideoCodec,
+                        unsupportedAudioCodecError: VideoAnnotationUnsupportedAudioCodec,
+                        mp3BitrateTooLowError: VideoAnnotationMp3BitrateTooLow,
+                        unsupportedFramerateError: VideoAnnotationUnsupportedAudioCodec,
+                        wrongResolutionError: VideoAnnotationWrongResolution
                     ));
                 }
             }
@@ -497,7 +719,16 @@ public partial class DefaultProjectService : IProjectService
         ProjectDiagnosticDto zeroFileLengthError,
         ProjectDiagnosticDto tooLargeError,
         ProjectDiagnosticDto tooShortError,
-        ProjectDiagnosticDto tooLongError)
+        ProjectDiagnosticDto tooLongError,
+        ProjectDiagnosticDto streamMismatchError,
+        ProjectDiagnosticDto unsupportedContainerError,
+        ProjectDiagnosticDto bitrateTooLowError,
+        ProjectDiagnosticDto bitrateTooHighError,
+        ProjectDiagnosticDto unsupportedVideoCodecError,
+        ProjectDiagnosticDto unsupportedAudioCodecError,
+        ProjectDiagnosticDto mp3BitrateTooLowError,
+        ProjectDiagnosticDto unsupportedFramerateError,
+        ProjectDiagnosticDto wrongResolutionError)
     {
         if (!video.Variants.Keys.Contains(Const.OriginalShardVariant))
         {
@@ -528,6 +759,58 @@ public partial class DefaultProjectService : IProjectService
         else if (originalVariant.Duration > maxLength)
         {
             yield return tooLongError;
+        }
+
+        var mimeType = originalVariant.GetMimeType();
+        if (mimeType is null || !AllowedContainers.Contains(mimeType))
+        {
+            yield return unsupportedContainerError;
+        }
+
+        if (originalVariant.VideoStreams.Length != 1
+            || originalVariant.AudioStreams.Length != 1
+            || originalVariant.SubtitleStreams.Length != 0)
+        {
+            yield return streamMismatchError;
+            yield break;
+        }
+
+        var videoStream = originalVariant.VideoStreams.Single();
+        var audioStream = originalVariant.AudioStreams.Single();
+        
+        if (videoStream.Bitrate < VideoMinBitrate)
+        {
+            yield return bitrateTooLowError;
+        }
+        else if (videoStream.Bitrate > VideoMaxBitrate)
+        {
+            yield return bitrateTooHighError;
+        }
+
+        if (!AllowedVideoCodecs.Contains(videoStream.Codec))
+        {
+            yield return unsupportedVideoCodecError;
+        }
+
+        if (!AllowedAudioCodecs.Contains(audioStream.Codec))
+        {
+            yield return unsupportedAudioCodecError;
+        }
+
+        if (audioStream.Codec == "mp3" && audioStream.Bitrate < Mp3MinBitrate)
+        {
+            yield return mp3BitrateTooLowError;
+        }
+
+        if (videoStream.Framerate != RequiredFramerate)
+        {
+            yield return unsupportedFramerateError;
+        }
+
+        var shorterSideResolution = Math.Min(videoStream.Width, videoStream.Height);
+        if (shorterSideResolution < VideoShorterSideResolution)
+        {
+            yield return wrongResolutionError;
         }
     }
 }

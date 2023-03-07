@@ -1,6 +1,7 @@
 import { Button, FormControl, FormLabel, HStack, Input, Stack, useConst, useForceUpdate } from '@chakra-ui/react';
 import { t } from 'i18next';
 import { useNavigate } from 'react-router-dom';
+import { API } from '../../../../api/API';
 import { Project } from '../../../../data/Project';
 import { useColorScheme } from '../../../../hooks/useColorScheme';
 import { HRIB } from '../../../../schemas/generic';
@@ -32,14 +33,24 @@ export function ProjectBasicInfo(props: IProjectBasicInfoProps) {
         fu();
     };
 
+    const sendApiProps = update
+        ? {
+              onSubmited: (id: HRIB) => {
+                  navigate(`/auth/projects/${id}/edit`);
+              },
+              value: project!,
+              request: (api: API, value: Project) => api.projects.update(value),
+          }
+        : {
+              onSubmited: (id: HRIB) => {
+                  navigate(`/auth/projects/${id}`);
+              },
+              value: project!,
+              request: (api: API, value: Project) => api.projects.create(value),
+          };
+
     return (
-        <SendAPI
-            onSubmited={(id) => {
-                navigate(`/auth/projects/${id}`);
-            }}
-            value={project!}
-            request={(api, value) => api.projects.create(value)}
-        >
+        <SendAPI {...sendApiProps}>
             {(onSubmit, status) => (
                 <Stack spacing={8} direction="column" mb={8}>
                     <FormControl>

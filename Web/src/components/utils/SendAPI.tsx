@@ -8,7 +8,7 @@ import { HRIB } from '../../schemas/generic';
 
 type SendAPIStatus = 'ready' | 'sending' | 'error' | 'ok';
 
-interface ISendAPIProps<T> {
+export interface ISendAPIProps<T> {
     request: (api: API, data: T) => Promise<ApiResponse<HRIB>>;
     value: T;
     children: (
@@ -41,12 +41,12 @@ export function SendAPI<T>({ request, value, children, onSubmited }: ISendAPIPro
     };
 
     return (
-        <>
+        <Box>
             {status === 'error' && (
                 <>
-                    <Box borderRadius={'lg'} border="1px" borderColor={border} bg={bg} px={5} py={4}>
+                    <Box borderRadius={'lg'} border="1px" borderColor={border} bg={bg} px={5} py={4} mb={8}>
                         <Heading as="h4" fontSize="lg" pb={4}>
-                            {t('sendApi.error').toString()}
+                            {error!.title ? t('sendApi.error').toString() : t('sendApi.unknownError').toString()}
                         </Heading>
                         {error?.errors ? (
                             Object.entries(error.errors).map(([field, problem]: any, i) => (
@@ -63,6 +63,6 @@ export function SendAPI<T>({ request, value, children, onSubmited }: ISendAPIPro
                 </>
             )}
             {children(onSubmit, status, error)}
-        </>
+        </Box>
     );
 }

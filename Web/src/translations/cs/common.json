@@ -177,6 +177,35 @@
     "back": "Znovu požádat"
   },
   "sendApi": {
-    "error": "Ve formuláři je chyba"
+    "error": "Ve formuláři je chyba",
+    "unknownError": "Došlo k chybě při odesílání formuláře"
+  },
+  "projectStatus": {
+    "info": "Základní informace jsou dostatečně vyplněny",
+    "file": "Soubory jsou nahrány a prošly automatizovanou kontrolou",
+    "tech-review": "Projekt prošel kontrolou technikem",
+    "visual-review": "Projekt prošel kontrolou grafikem",
+    "dramaturgy-review": "Projekt byl přijat"
+  },
+  "authorSelect": {
+    "button": "Přidat osobu",
+    "name": "Jméno",
+    "new": "Nový autor",
+    "uco": "UČO",
+    "email": "Email",
+    "phone": "Telefon",
+    "bio": "Biografie",
+    "selectRoles": "Vybrat role osoby",
+    "addRole": "Přidat roli",
+    "addButton": "Přidat",
+    "createButtom": "Vytvořit osobu"
+  },
+  "projectEdit": {
+    "tabs": {
+      "status": "Stav",
+      "info": "Základní informace",
+      "files": "Soubory",
+      "admin": "Přístup administrátora"
+    }
   }
 }

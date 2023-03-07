@@ -65,7 +65,7 @@ export function AuthorSelect(props: IAuthorSelectProps) {
             {(data: Author[]) => (
                 <>
                     <Button onClick={onOpen} mt={4}>
-                        Přidat osobu
+                        {t('authorSelect.button').toString()}
                     </Button>
 
                     <SendAPI
@@ -81,7 +81,7 @@ export function AuthorSelect(props: IAuthorSelectProps) {
                             <Modal initialFocusRef={initialRef} isOpen={isOpen} onClose={close}>
                                 <ModalOverlay />
                                 <ModalContent>
-                                    <ModalHeader>Přidat osobu</ModalHeader>
+                                    <ModalHeader>{t('authorSelect.button').toString()}</ModalHeader>
                                     <ModalCloseButton />
                                     <ModalBody pb={6}>
                                         {status === 'query' && (
@@ -95,7 +95,7 @@ export function AuthorSelect(props: IAuthorSelectProps) {
                                                             ref={initialRef}
                                                             value={name}
                                                             onChange={(event) => setName(event.target.value)}
-                                                            placeholder="Jméno nebo email"
+                                                            placeholder={t('authorSelect.name').toString()}
                                                         />
                                                     </InputGroup>
                                                 </FormControl>
@@ -135,7 +135,8 @@ export function AuthorSelect(props: IAuthorSelectProps) {
                                                                 setStatus('new');
                                                             }}
                                                         >
-                                                            <AiOutlinePlus /> <Text>Nový autor</Text>
+                                                            <AiOutlinePlus />{' '}
+                                                            <Text>{t('authorSelect.new').toString()}</Text>
                                                         </HStack>
                                                     </VStack>
                                                 )}
@@ -145,9 +146,9 @@ export function AuthorSelect(props: IAuthorSelectProps) {
                                         {status === 'new' && (
                                             <>
                                                 <FormControl mb={6}>
-                                                    <FormLabel>Jméno</FormLabel>
+                                                    <FormLabel>{t('authorSelect.name').toString()}</FormLabel>
                                                     <Input
-                                                        placeholder="Jméno"
+                                                        placeholder={t('authorSelect.name').toString()}
                                                         defaultValue={author!.name}
                                                         onChange={(event) =>
                                                             setAuthor(author!.set('name', event.target.value))
@@ -156,9 +157,9 @@ export function AuthorSelect(props: IAuthorSelectProps) {
                                                 </FormControl>
 
                                                 <FormControl mb={6}>
-                                                    <FormLabel>UČO</FormLabel>
+                                                    <FormLabel>{t('authorSelect.uco').toString()}</FormLabel>
                                                     <Input
-                                                        placeholder="UČO"
+                                                        placeholder={t('authorSelect.uco').toString()}
                                                         defaultValue={author!.uco}
                                                         onChange={(event) =>
                                                             setAuthor(author!.set('uco', event.target.value))
@@ -167,9 +168,9 @@ export function AuthorSelect(props: IAuthorSelectProps) {
                                                 </FormControl>
 
                                                 <FormControl mb={6}>
-                                                    <FormLabel>Email</FormLabel>
+                                                    <FormLabel>{t('authorSelect.email').toString()}</FormLabel>
                                                     <Input
-                                                        placeholder="Email"
+                                                        placeholder={t('authorSelect.email').toString()}
                                                         defaultValue={author!.uco}
                                                         onChange={(event) =>
                                                             setAuthor(author!.set('email', event.target.value))
@@ -178,9 +179,9 @@ export function AuthorSelect(props: IAuthorSelectProps) {
                                                 </FormControl>
 
                                                 <FormControl mb={6}>
-                                                    <FormLabel>Telefon</FormLabel>
+                                                    <FormLabel>{t('authorSelect.phone').toString()}</FormLabel>
                                                     <Input
-                                                        placeholder="Telefon"
+                                                        placeholder={t('authorSelect.phone').toString()}
                                                         defaultValue={author!.uco}
                                                         onChange={(event) =>
                                                             setAuthor(author!.set('phone', event.target.value))
@@ -189,9 +190,11 @@ export function AuthorSelect(props: IAuthorSelectProps) {
                                                 </FormControl>
 
                                                 <FormControl>
-                                                    <FormLabel>Biografie</FormLabel>
+                                                    <FormLabel>{t('authorSelect.bio').toString()}</FormLabel>
                                                     <TextareaLimited
-                                                        placeholder={`Biografie ${t('createProject.language.cs')}`}
+                                                        placeholder={`${t('authorSelect.bio').toString()} ${t(
+                                                            'createProject.language.cs',
+                                                        )}`}
                                                         max={200}
                                                         defaultValue={author!.bio?.cs}
                                                         onChange={(event) =>
@@ -205,7 +208,9 @@ export function AuthorSelect(props: IAuthorSelectProps) {
                                                         mb={4}
                                                     />
                                                     <TextareaLimited
-                                                        placeholder={`Biografie ${t('createProject.language.en')}`}
+                                                        placeholder={`${t('authorSelect.bio').toString()} ${t(
+                                                            'createProject.language.en',
+                                                        )}`}
                                                         max={200}
                                                         defaultValue={author!.bio?.en}
                                                         onChange={(event) =>
@@ -227,9 +232,9 @@ export function AuthorSelect(props: IAuthorSelectProps) {
                                                     {author!.name}
                                                 </Heading>
                                                 <FormControl mt={6}>
-                                                    <FormLabel>Vybrat role osoby</FormLabel>
+                                                    <FormLabel>{t('authorSelect.selectRoles').toString()}</FormLabel>
                                                     <TagInput
-                                                        placeholder="Přidat roli"
+                                                        placeholder={t('authorSelect.addRole').toString()}
                                                         tags={roles}
                                                         setTags={(tags) => setRoles(tags)}
                                                     />
@@ -249,7 +254,7 @@ export function AuthorSelect(props: IAuthorSelectProps) {
                                                     close();
                                                 }}
                                             >
-                                                Přidat
+                                                {t('authorSelect.addButton').toString()}
                                             </Button>
                                         )}
                                         {status === 'new' && (
@@ -260,10 +265,10 @@ export function AuthorSelect(props: IAuthorSelectProps) {
                                                 isDisabled={sendStatus === 'sending' || sendStatus === 'ok'}
                                                 isLoading={sendStatus === 'sending'}
                                             >
-                                                Vytvořit osobu
+                                                {t('authorSelect.addButton').toString()}
                                             </Button>
                                         )}
-                                        <Button onClick={close}>Zrušit</Button>
+                                        <Button onClick={close}>{t('generic.cancel').toString()}</Button>
                                     </ModalFooter>
                                 </ModalContent>
                             </Modal>

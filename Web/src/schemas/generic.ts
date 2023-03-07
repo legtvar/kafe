@@ -6,6 +6,10 @@ export type localizedString =
       }
     | undefined;
 
+export function toLocalizedString(input: any): localizedString {
+    return input;
+}
+
 export type ArtifactFootprint = {
     id: string;
     name: localizedString;

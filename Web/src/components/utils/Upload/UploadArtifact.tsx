@@ -1,27 +1,15 @@
-import {
-    Accordion,
-    AccordionButton,
-    AccordionIcon,
-    AccordionItem,
-    AccordionPanel,
-    Box,
-    FormControl,
-    FormLabel,
-    ListItem,
-    Stack,
-    Text,
-    UnorderedList,
-} from '@chakra-ui/react';
+import { Box, FormControl, FormHelperText, FormLabel, Stack } from '@chakra-ui/react';
 import { t } from 'i18next';
 import { useState } from 'react';
 import { useApi } from '../../../hooks/Caffeine';
 import { useColorScheme } from '../../../hooks/useColorScheme';
-import { ArtifactFootprint, HRIB } from '../../../schemas/generic';
+import { components } from '../../../schemas/api';
+import { HRIB, toLocalizedString } from '../../../schemas/generic';
 import { getPrefered } from '../../../utils/preferedLanguage';
 import { Upload } from './Upload';
 
 interface IUploadArtifactProps {
-    artifactFootprint: ArtifactFootprint;
+    artifactBlueprint: components['schemas']['ProjectArtifactBlueprintDto'];
     projectId: HRIB;
     artifactId?: HRIB;
 }
@@ -31,14 +19,14 @@ export function UploadArtifact(props: IUploadArtifactProps) {
     const { border, bg } = useColorScheme();
     const api = useApi();
     const {
-        artifactFootprint: { name, shards },
+        artifactBlueprint: { name, arity, /* slotName, */ description, shardBlueprints },
         projectId,
     } = props;
 
     const getArtifactId = async () => {
         if (artifactId) return artifactId;
 
-        const result = await api.artifacts.create(name, projectId);
+        const result = await api.artifacts.create(toLocalizedString(name), projectId);
 
         if (result.status !== 200) {
             throw new Error(result.error as any);
@@ -49,21 +37,29 @@ export function UploadArtifact(props: IUploadArtifactProps) {
 
     return (
         <FormControl>
-            <FormLabel>{getPrefered(name)}</FormLabel>
+            <FormLabel>{getPrefered(toLocalizedString(name))}</FormLabel>
+            <FormHelperText mb={6}>
+                {getPrefered(toLocalizedString(description))} ({arity.min}
+                {arity.min !== arity.max && '-' + arity.max}×)
+            </FormHelperText>
             <Stack direction="column" borderColor={border} bg={bg} borderWidth={1} borderRadius="md" p={4} spacing={12}>
-                {shards.map((shard) => (
+                {shardBlueprints.map((shard) => (
                     <Box>
-                        <FormLabel>{t(`createProject.upload.filetype.${shard.kind}`).toString()}</FormLabel>
+                        <FormLabel>{getPrefered(toLocalizedString(shard.name))}</FormLabel>
+                        <FormHelperText mb={6}>
+                            {getPrefered(toLocalizedString(shard.description))} ({arity.min}
+                            {arity.min !== arity.max && '-' + arity.max}×)
+                        </FormHelperText>
                         <Box w="100%" borderColor={border} bg={bg} borderWidth={1} borderRadius="md" py={4} px={6}>
                             <Upload
-                                title={`${t(`createProject.upload.filetype.${shard.kind}`).toString()} ${t(
+                                title={`${getPrefered(toLocalizedString(shard.name))} ${t(
                                     'generic.for',
-                                ).toString()} ${getPrefered(name)}`.toLowerCase()}
+                                ).toString()} ${getPrefered(toLocalizedString(name))}`.toLowerCase()}
                                 projectId={projectId}
                                 shardKind={shard.kind}
                                 getArtifactId={getArtifactId}
                             />
-                            <Accordion allowToggle mx={-6} my={-4}>
+                            {/* <Accordion allowToggle mx={-6} my={-4}>
                                 <AccordionItem borderWidth="0 !important">
                                     <AccordionButton>
                                         <Box as="span" flex="1" textAlign="left">
@@ -89,7 +85,7 @@ export function UploadArtifact(props: IUploadArtifactProps) {
                                         </UnorderedList>
                                     </AccordionPanel>
                                 </AccordionItem>
-                            </Accordion>
+                            </Accordion> */}
                         </Box>
                     </Box>
                 ))}

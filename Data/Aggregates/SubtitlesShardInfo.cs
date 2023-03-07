@@ -10,9 +10,9 @@ using System.Linq;
 namespace Kafe.Data.Aggregates;
 
 public record SubtitlesShardInfo(
-    string Id,
+    [Hrib] string Id,
     CreationMethod CreationMethod,
-    Hrib ArtifactId,
+    [Hrib] string ArtifactId,
     ImmutableDictionary<string, SubtitlesInfo> Variants
 ) : ShardInfoBase(Id, CreationMethod, ArtifactId)
 {

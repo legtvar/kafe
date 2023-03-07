@@ -71,19 +71,29 @@ public sealed partial class LocalizedString : IEquatable<LocalizedString>
     }
 
     [return: NotNullIfNotNull(nameof(localized))]
-    public static explicit operator string?(LocalizedString? localized)
-    {
-        return localized?[CultureInfo.InvariantCulture];
-    }
-
-    [return: NotNullIfNotNull(nameof(localized))]
-    public static explicit operator ImmutableDictionary<string, string>?(LocalizedString? localized)
+    public static implicit operator ImmutableDictionary<string, string>?(LocalizedString? localized)
     {
         if (localized is null)
         {
             return null;
         }
         return localized.data;
+    }
+
+    [return: NotNullIfNotNull(nameof(data))]
+    public static implicit operator LocalizedString?(ImmutableDictionary<string, string>? data)
+    {
+        if (data is null)
+        {
+            return null;
+        }
+        return new(data);
+    }
+
+    [return: NotNullIfNotNull(nameof(localized))]
+    public static explicit operator string?(LocalizedString? localized)
+    {
+        return localized?[CultureInfo.InvariantCulture];
     }
 
     [return: NotNullIfNotNull(nameof(invariantString))]

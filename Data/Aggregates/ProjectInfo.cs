@@ -8,35 +8,35 @@ using Marten.Events.Aggregation;
 namespace Kafe.Data.Aggregates;
 
 public record ProjectInfo(
-    string Id,
+    [Hrib] string Id,
     CreationMethod CreationMethod,
-    string ProjectGroupId,
+    [Hrib] string ProjectGroupId,
     ImmutableArray<ProjectAuthorInfo> Authors,
     ImmutableArray<ProjectArtifactInfo> Artifacts,
     ImmutableArray<ProjectReviewInfo> Reviews,
-    LocalizedString Name,
-    LocalizedString? Description = null,
-    LocalizedString? Genre = null,
+    [LocalizedString] ImmutableDictionary<string, string> Name,
+    [LocalizedString] ImmutableDictionary<string, string>? Description = null,
+    [LocalizedString] ImmutableDictionary<string, string>? Genre = null,
     Visibility Visibility = Visibility.Unknown,
     DateTimeOffset ReleasedOn = default,
     bool IsLocked = false
 ) : IEntity;
 
 public record ProjectAuthorInfo(
-    string Id,
+    [Hrib] string Id,
     ProjectAuthorKind Kind,
     ImmutableArray<string> Roles
 ) : IEntity;
 
 public record ProjectArtifactInfo(
-    string Id,
+    [Hrib] string Id,
     string? BlueprintSlot
 ) : IEntity;
 
 public record ProjectReviewInfo(
     ReviewKind Kind,
     string ReviewerRole,
-    LocalizedString? Comment,
+    [LocalizedString] ImmutableDictionary<string, string>? Comment,
     DateTimeOffset AddedOn
 );
 

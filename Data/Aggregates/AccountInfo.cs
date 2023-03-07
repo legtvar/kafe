@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace Kafe.Data.Aggregates;
 
 public record AccountInfo(
-    string Id,
+    [Hrib] string Id,
     CreationMethod CreationMethod,
     AccountKind Kind,
 
@@ -23,7 +23,8 @@ public record AccountInfo(
     string PreferredCulture,
     string? SecurityStamp,
     DateTimeOffset RefreshedOn,
-    ImmutableHashSet<AccountCapability> Capabilities
+    [KafeType(typeof(ImmutableHashSet<AccountCapability>))]
+    ImmutableHashSet<string> Capabilities
 );
 
 public class AccountInfoProjection : SingleStreamAggregation<AccountInfo>
@@ -42,7 +43,7 @@ public class AccountInfoProjection : SingleStreamAggregation<AccountInfo>
             PreferredCulture: e.PreferredCulture,
             SecurityStamp: null,
             RefreshedOn: default,
-            Capabilities: ImmutableHashSet<AccountCapability>.Empty
+            Capabilities: ImmutableHashSet<string>.Empty
         );
     }
 

@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Globalization;
+using System.Linq;
 using System.Security.Claims;
 using System.Text.Json;
 
@@ -40,7 +41,9 @@ public record ApiUser(
             Name: null,
             EmailAddress: info.EmailAddress,
             PreferredCulture: new CultureInfo(info.PreferredCulture),
-            Capabilities: info.Capabilities);
+            Capabilities: info.Capabilities
+                .Cast<AccountCapability>()
+                .ToImmutableHashSet());
     }
 
     public static ApiUser? FromPrincipal(ClaimsPrincipal principal)

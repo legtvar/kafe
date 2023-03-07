@@ -10,9 +10,9 @@ using System.Linq;
 namespace Kafe.Data.Aggregates;
 
 public record ImageShardInfo(
-    string Id,
+    [Hrib] string Id,
     CreationMethod CreationMethod,
-    Hrib ArtifactId,
+    [Hrib] string ArtifactId,
     ImmutableDictionary<string, ImageInfo> Variants
 ) : ShardInfoBase(Id, CreationMethod, ArtifactId)
 {

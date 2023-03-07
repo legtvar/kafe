@@ -35,11 +35,11 @@ public class DefaultProjectGroupService : IProjectGroupService
         var created = new ProjectGroupCreated(
             ProjectGroupId: Hrib.Create(),
             CreationMethod: CreationMethod.Api,
-            Name: dto.Name);
+            Name: dto.Name.GetRaw());
 
         var changed = new ProjectGroupInfoChanged(
             ProjectGroupId: created.ProjectGroupId,
-            Description: dto.Description,
+            Description: dto.Description?.GetRaw(),
             Deadline: dto.Deadline);
 
         var opened = new ProjectGroupOpened(
@@ -91,7 +91,7 @@ public class DefaultProjectGroupService : IProjectGroupService
             .Where(p => p.ProjectGroupId == projectGroup.Id)
             .WhereCanRead(userProvider)
             .ToListAsync(token);
-        var preferredCulture = userProvider.GetPreferredCulture();
+        var preferredCulture = userProvider.GetPreferredCulture().TwoLetterISOLanguageName;
         return dto with
         {
             Projects = projects

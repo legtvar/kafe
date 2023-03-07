@@ -6,13 +6,12 @@ using Marten.Events.Aggregation;
 namespace Kafe.Data.Aggregates;
 
 public record NotificationInfo(
-    string Id,
+    [Hrib] string Id,
     CreationMethod CreationMethod,
     NotificationKind Kind,
     ImmutableArray<string> Recipients,
-    string? ProjectId,
-    string? VideoId,
-    LocalizedString Description,
+    [Hrib] string? ProjectId,
+    [LocalizedString] ImmutableDictionary<string, string> Description,
     bool IsSent = false
 ) : IEntity;
 
@@ -33,7 +32,6 @@ public class NotificationInfoProjection : SingleStreamAggregation<NotificationIn
                 ? ImmutableArray.Create<string>()
                 : e.Recipients.Value,
             ProjectId: e.ProjectId,
-            VideoId: e.VideoId,
             Description: e.Description
         );
     }

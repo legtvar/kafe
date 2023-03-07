@@ -43,7 +43,7 @@ public class DefaultAuthorService : IAuthorService
         {
             var infoChanged = new AuthorInfoChanged(
                 AuthorId: created.AuthorId,
-                Bio: dto.Bio,
+                Bio: (ImmutableDictionary<string, string>?)dto.Bio,
                 Uco: dto.Uco,
                 Email: dto.Email,
                 Phone: dto.Phone);

@@ -14,16 +14,16 @@ using System.Threading.Tasks;
 namespace Kafe.Data.Aggregates;
 
 public record ArtifactDetail(
-    string Id,
+    [Hrib] string Id,
     CreationMethod CreationMethod,
-    LocalizedString Name,
+    [LocalizedString] ImmutableDictionary<string, string> Name,
     DateTimeOffset AddedOn,
     ImmutableArray<ArtifactShardInfo> Shards,
-    ImmutableArray<Hrib> ContainingProjectIds
+    [KafeType(typeof(ImmutableArray<Hrib>))] ImmutableArray<string> ContainingProjectIds
 );
 
 public record ArtifactShardInfo(
-    string ShardId,
+    [Hrib] string ShardId,
     ShardKind Kind,
     ImmutableHashSet<string> Variants
 );
@@ -48,7 +48,7 @@ public class ArtifactDetailProjection : MultiStreamAggregation<ArtifactDetail, s
             Name: e.Name,
             AddedOn: e.AddedOn,
             Shards: ImmutableArray<ArtifactShardInfo>.Empty,
-            ContainingProjectIds: ImmutableArray<Hrib>.Empty
+            ContainingProjectIds: ImmutableArray<string>.Empty
         );
     }
 

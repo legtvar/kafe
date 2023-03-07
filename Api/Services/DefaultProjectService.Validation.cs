@@ -733,14 +733,14 @@ public partial class DefaultProjectService : IProjectService
         eventStream.AppendOne(reviewAdded);
         await db.SaveChangesAsync(token);
 
-        var ownershipString = AccountCapability.Serialize(new ProjectOwnership(dto.ProjectId));
+        var ownershipString = (string)new ProjectOwnership(dto.ProjectId);
         var owners = await db.Query<AccountInfo>()
-            .Where(a => a.Capabilities.Contains(new ProjectOwnership(dto.ProjectId)))
+            .Where(a => a.Capabilities.Contains(ownershipString))
             .ToListAsync(token);
 
         if (dto.Comment is not null)
         {
-            foreach(var owner in owners)
+            foreach (var owner in owners)
             {
                 if (dto.Comment[owner.PreferredCulture] is not null)
                 {
@@ -821,7 +821,7 @@ public partial class DefaultProjectService : IProjectService
 
         var videoStream = originalVariant.VideoStreams.Single();
         var audioStream = originalVariant.AudioStreams.Single();
-        
+
         if (videoStream.Bitrate < VideoMinBitrate)
         {
             yield return bitrateTooLowError;

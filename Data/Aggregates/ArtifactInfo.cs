@@ -1,13 +1,14 @@
 ﻿using Kafe.Data.Events;
 using Marten.Events.Aggregation;
 using System;
+using System.Collections.Immutable;
 
 namespace Kafe.Data.Aggregates;
 
 public record ArtifactInfo(
-    string Id,
+    [Hrib] string Id,
     CreationMethod CreationMethod,
-    LocalizedString Name,
+    [LocalizedString] ImmutableDictionary<string, string> Name,
     DateTimeOffset AddedOn
 ) : IEntity;
 

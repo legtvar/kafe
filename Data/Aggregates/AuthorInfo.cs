@@ -1,15 +1,16 @@
 using Marten.Events.Aggregation;
 using Kafe.Data.Events;
 using Marten.Events;
+using System.Collections.Immutable;
 
 namespace Kafe.Data.Aggregates;
 
 public record AuthorInfo(
-    string Id,
+    [Hrib] string Id,
     CreationMethod CreationMethod,
     string Name,
     Visibility Visibility,
-    LocalizedString? Bio = null,
+    [LocalizedString] ImmutableDictionary<string, string>? Bio = null,
     string? Uco = null,
     string? Email = null,
     string? Phone = null) : IEntity;

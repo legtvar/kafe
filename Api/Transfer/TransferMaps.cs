@@ -144,7 +144,7 @@ V případě technických problémů nás prosím kontaktujte na adrese: festiva
         return new ProjectListDto(
             Id: data.Id,
             ProjectGroupId: data.ProjectGroupId,
-            Name: data.Name,
+            Name: (LocalizedString)data.Name,
             Description: data.Description,
             Visibility: data.Visibility,
             ReleasedOn: data.ReleasedOn);
@@ -247,7 +247,7 @@ V případě technických problémů nás prosím kontaktujte na adrese: festiva
             Id: data.Id,
             Name: data.Name,
             Shards: data.Shards.Select(ToShardListDto).ToImmutableArray(),
-            ContainingProjectIds: data.ContainingProjectIds,
+            ContainingProjectIds: data.ContainingProjectIds.Cast<Hrib>().ToImmutableArray(),
             AddedOn: data.AddedOn
         );
     }
@@ -365,7 +365,7 @@ V případě technických problémů nás prosím kontaktujte na adrese: festiva
             EmailAddress: data.EmailAddress,
             PreferredCulture: data.PreferredCulture,
             Projects: projects.Select(ToProjectListDto).ToImmutableArray(),
-            Capabilities: data.Capabilities.Select(AccountCapability.Serialize).ToImmutableHashSet()
+            Capabilities: data.Capabilities
         );
     }
 }

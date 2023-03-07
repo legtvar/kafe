@@ -49,14 +49,14 @@ public record ProjectLocked(
 );
 
 public record ProjectUnlocked(
-    Hrib ProjectId
+    [Hrib] string ProjectId
 );
 
 public record ProjectReviewAdded(
-    Hrib ProjectId,
+    [Hrib] string ProjectId,
     ReviewKind Kind,
     string ReviewerRole,
-    LocalizedString? Comment
+    [LocalizedString] ImmutableDictionary<string, string>? Comment
 );
 
 //public record ProjectPassedAutomaticValidation(

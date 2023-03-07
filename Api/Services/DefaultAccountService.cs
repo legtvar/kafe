@@ -148,6 +148,8 @@ public class DefaultAccountService : IAccountService, IDisposable
         TemporaryAccountCreationDto dto,
         CancellationToken token = default)
     {
+        // TODO: Add a "ticket" entity that will be identified by a guid, and will be one-time only instead of these
+        //       tokens.
         var account = await db.Query<AccountInfo>()
             .SingleOrDefaultAsync(a => a.EmailAddress == dto.EmailAddress, token);
         Hrib? id;
@@ -179,7 +181,19 @@ public class DefaultAccountService : IAccountService, IDisposable
 
         if (account.SecurityStamp is null)
         {
-            throw new InvalidOperationException();
+            var eventStream = await db.Events.FetchForExclusiveWriting<AccountInfo>(account.Id, token);
+            if (eventStream is null)
+            {
+                throw new InvalidOperationException();
+            }
+
+            var refreshed = new TemporaryAccountRefreshed(
+                AccountId: id,
+                SecurityStamp: Guid.NewGuid().ToString()
+            );
+            eventStream.AppendOne(refreshed);
+            await db.SaveChangesAsync(token);
+            account = account with { SecurityStamp = refreshed.SecurityStamp };
         }
 
         var confirmationToken = EncodeToken(new(id, EmailConfirmationPurpose, account.SecurityStamp));
@@ -200,6 +214,9 @@ public class DefaultAccountService : IAccountService, IDisposable
         TemporaryAccountTokenDto dto,
         CancellationToken token = default)
     {
+        // TODO: Add a "ticket" entity that will be identified by a guid, and will be one-time only instead of these
+        //       tokens.
+
         if (dto.Purpose != EmailConfirmationPurpose)
         {
             throw new UnauthorizedAccessException("The token is meant for a different purpose.");
@@ -224,9 +241,9 @@ public class DefaultAccountService : IAccountService, IDisposable
             throw new UnauthorizedAccessException("The token has been already used or revoked.");
         }
 
-        var closedSuccessfully = new TemporaryAccountClosed(account.Id);
-        db.Events.Append(account.Id, closedSuccessfully);
-        await db.SaveChangesAsync(token);
+        //var closedSuccessfully = new TemporaryAccountClosed(account.Id);
+        //db.Events.Append(account.Id, closedSuccessfully);
+        //await db.SaveChangesAsync(token);
     }
 
     /// <summary>

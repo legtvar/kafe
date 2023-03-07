@@ -24,6 +24,9 @@ export class Project extends AbstractType {
 
     public artifacts!: Artifact[];
 
+    public reviews!: components['schemas']['ProjectReviewDto'][];
+    public blueprint!: components['schemas']['ProjectBlueprintDto'];
+
     public constructor(struct: components['schemas']['ProjectListDto'] | components['schemas']['ProjectDetailDto']) {
         super();
         Object.assign(this, struct);
@@ -32,6 +35,8 @@ export class Project extends AbstractType {
         if (this.artifacts) {
             this.artifacts = this.artifacts.map((artifact: any) => new Artifact(artifact));
         }
+
+        console.log(this.blueprint);
     }
 
     public getName() {

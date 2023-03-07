@@ -52,8 +52,7 @@ export function Upload(props: IUploadProps) {
             <Dropzone onDrop={upload} maxFiles={1}>
                 {({ getRootProps, getInputProps, isDragActive, isFileDialogActive }) => (
                     <Center
-                        py={16}
-                        h="300px"
+                        py={8}
                         {...getRootProps()}
                         textColor={isDragActive || isFileDialogActive ? undefined : 'gray.500'}
                         cursor="pointer"

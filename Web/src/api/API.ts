@@ -52,8 +52,14 @@ export class API {
             async getById(id: string) {
                 return api.requestSingle(`project/${id}`, Project);
             },
+            async validationById(id: string) {
+                return api.getSimple<components['schemas']['ProjectValidationDto']>(`project-validation/${id}`);
+            },
             async create(project: Project) {
                 return api.post<components['schemas']['ProjectCreationDto'], HRIB>(`project`, project.serialize());
+            },
+            async update(project: Project) {
+                return api.patch<components['schemas']['ProjectCreationDto'], HRIB>(`project`, project.serialize(true));
             },
         };
     }
@@ -215,6 +221,14 @@ export class API {
 
     private async post<Req, Res>(path: string, body: Req, auth: boolean = true): Promise<ApiResponse<Res>> {
         const response = await this.client.post(path, body, {
+            withCredentials: auth,
+        });
+
+        return this.handleError<Res>(response);
+    }
+
+    private async patch<Req, Res>(path: string, body: Req, auth: boolean = true): Promise<ApiResponse<Res>> {
+        const response = await this.client.patch(path, body, {
             withCredentials: auth,
         });
 

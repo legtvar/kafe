@@ -6,6 +6,7 @@ import { Project } from '../data/Project';
 import { User } from '../data/User';
 import { components } from '../schemas/api';
 import { HRIB, localizedString } from '../schemas/generic';
+import { IntRange } from '../utils/IntRange';
 
 export type ApiCredentials = {
     username: string;
@@ -19,7 +20,7 @@ export type ApiResponse<T> =
           data: T;
       }
     | {
-          status: 400 | 403;
+          status: IntRange<400, 499>;
           response: AxiosResponse<any>;
           error: components['schemas']['ProblemDetails'];
       };
@@ -36,7 +37,7 @@ export class API {
         this.client = axios.create({
             baseURL: this.apiUrl,
             withCredentials: true,
-            validateStatus: (status) => [200, 400, 403, 404].includes(status),
+            validateStatus: (status) => [200].includes(status) || (status >= 400 && status < 500),
         });
     }
 
@@ -238,38 +239,13 @@ export class API {
     }
 
     private handleError<T>(response: AxiosResponse<any>): ApiResponse<T> {
-        if (response.status === 400) {
+        if (response.status !== 200) {
             return {
-                status: 400,
+                status: response.status as any,
                 error: response.data,
                 response: response,
             };
         }
-
-        if (response.status === 403) {
-            return {
-                status: 403,
-                error: {
-                    type: 'unauthenticated',
-                    title: 'User not authenticated',
-                    status: 403,
-                },
-                response: response,
-            };
-        }
-
-        if (response.status === 403) {
-            return {
-                status: 403,
-                error: {
-                    type: 'not found',
-                    title: 'File not found',
-                    status: 404,
-                },
-                response: response,
-            };
-        }
-
         return { data: response.data as T, response: response, status: 200 };
     }
 }

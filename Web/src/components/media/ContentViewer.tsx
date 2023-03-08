@@ -36,8 +36,6 @@ export function ContentViewer({ artifact }: IContentViewerProps) {
                     {} as { [key: string]: string },
                 );
 
-                console.log(videoSources);
-
                 return <Video sources={videoSources} minW="100%" maxW="100%" h="60vmin" />;
             case 'Image':
                 return (

@@ -58,7 +58,12 @@ public partial class DefaultProjectService : IProjectService
             ProjectGroupId: dto.ProjectGroupId,
             Name: dto.Name,
             Visibility: Visibility.Private);
-        db.Events.StartStream<ProjectInfo>(created.ProjectId, created);
+        var infoChanged = new ProjectInfoChanged(
+            ProjectId: Hrib.Create(),
+            Name: dto.Name,
+            Description: dto.Description,
+            Genre: dto.Genre);
+        db.Events.StartStream<ProjectInfo>(created.ProjectId, created, infoChanged);
 
         var authorInfos = (await db.LoadManyAsync<AuthorInfo>(
             dto.Cast.Select(a => a.Id)
@@ -85,12 +90,16 @@ public partial class DefaultProjectService : IProjectService
                     ProjectId: created.ProjectId,
                     AuthorId: author.Id,
                     Kind: ProjectAuthorKind.Cast,
-                    Roles: author.Roles));
+                    Roles: author.Roles.IsDefaultOrEmpty
+                        ? ImmutableArray<string>.Empty
+                        : author.Roles));
             }
         }
 
         AddAuthors(dto.Cast, ProjectAuthorKind.Cast);
         AddAuthors(dto.Crew, ProjectAuthorKind.Crew);
+        db.Events.Append(created.ProjectId, authorsAdded);
+        await db.SaveChangesAsync(token);
 
         if (userProvider.User is not null)
         {
@@ -101,7 +110,6 @@ public partial class DefaultProjectService : IProjectService
             await userProvider.Refresh(token: token);
         }
 
-        await db.SaveChangesAsync(token);
         return created.ProjectId;
     }
 

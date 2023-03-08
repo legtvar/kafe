@@ -95,7 +95,7 @@ public class DefaultProjectGroupService : IProjectGroupService
         return dto with
         {
             Projects = projects
-                .OrderBy(p => p.Name[preferredCulture])
+                .OrderBy(p => ((LocalizedString)p.Name)[preferredCulture])
                 .Select(TransferMaps.ToProjectListDto)
                 .ToImmutableArray()
         };

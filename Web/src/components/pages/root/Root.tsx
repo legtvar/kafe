@@ -17,7 +17,7 @@ export function Root(props: IRootProps) {
             if (status === 'request') {
                 setStatus('requesting');
                 const self = await api.accounts.info.getSelf();
-                console.log(self);
+                // console.log(self);
                 if (self.status === 200) {
                     setUser(self.data);
                 }
@@ -30,7 +30,7 @@ export function Root(props: IRootProps) {
         return <Loading center large />;
     }
 
-    console.log(user);
+    // console.log(user);
 
     let authRequested = false;
     if (matches && matches.length > 1) {

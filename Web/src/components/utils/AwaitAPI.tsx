@@ -1,4 +1,4 @@
-import { useConst } from '@chakra-ui/react';
+import { useState } from 'react';
 import { API, ApiResponse } from '../../api/API';
 import { useApi } from '../../hooks/Caffeine';
 import { Await } from './Await';
@@ -14,7 +14,7 @@ interface IAwaitAPIProps<T> {
 
 export function AwaitAPI<T>(props: IAwaitAPIProps<T>) {
     const api = useApi();
-    const request = useConst(props.request(api));
+    const [request] = useState(props.request(api));
 
     return (
         <Await

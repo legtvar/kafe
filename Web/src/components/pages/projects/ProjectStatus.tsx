@@ -25,8 +25,8 @@ export function ProjectStatus(props: IProjectStatusProps) {
                         <>
                             <StatusGroup stage="info" diagnostics={validation.diagnostics} />
                             <StatusGroup stage="file" diagnostics={validation.diagnostics} />
-                            {project.blueprint.requiredReviewers.map((stage) => (
-                                <StatusGroup stage={stage} reviews={project.reviews} />
+                            {project.blueprint.requiredReviewers.map((stage, i) => (
+                                <StatusGroup stage={stage} reviews={project.reviews} key={i} />
                             ))}
                         </>
                     )}
@@ -57,8 +57,8 @@ function StatusGroup(props: IStatusGroupProps) {
                     details={
                         props.useUnset ? undefined : (
                             <>
-                                {inStage.map((diag) => (
-                                    <Text>{getPrefered(diag.message as any as localizedString)}</Text>
+                                {inStage.map((diag, i) => (
+                                    <Text key={i}>{getPrefered(diag.message as any as localizedString)}</Text>
                                 ))}
                             </>
                         )

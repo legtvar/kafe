@@ -36,7 +36,8 @@ export function ProjectBasicInfo(props: IProjectBasicInfoProps) {
     const sendApiProps = update
         ? {
               onSubmited: (id: HRIB) => {
-                  navigate(`/auth/projects/${id}/edit`);
+                  if (update) navigate(0);
+                  else navigate(`/auth/projects/${id}/edit`);
               },
               value: project!,
               request: (api: API, value: Project) => api.projects.update(value),

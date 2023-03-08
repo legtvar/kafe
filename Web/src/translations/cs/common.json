@@ -131,7 +131,25 @@
     "releaseDate": {
       "na": "Neuvedeno"
     },
-    "unknownGroup": "Neznámá skupina projektů"
+    "unknownGroup": "Neznámá skupina projektů",
+    "admin": {
+      "emailContent": "Obsah emailu",
+      "title": "Posudky",
+      "role": {
+        "tech": "Posudek technika",
+        "visual": "Posudek grafika",
+        "dramaturgy": "Posudek z dramaturgie",
+        "placeholder": "-- vyberte roli --"
+      },
+      "submit": "Odeslat posudek",
+      "kind": {
+        "accepted": "Přijmout",
+        "rejected": "Zamítnout"
+      },
+      "confirm": "Pozor! tohle odešle mail autorovi projektu! Tato operace je nevratná!",
+      "new": "Nový posudek",
+      "archive": "Archiv posudků"
+    }
   },
   "projectEdit": {
     "quit": "Ukončit editaci",

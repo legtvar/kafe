@@ -131,7 +131,25 @@
     "releaseDate": {
       "na": "Not specified"
     },
-    "unknownGroup": "Unknown group"
+    "unknownGroup": "Unknown group",
+    "admin": {
+      "emailContent": "Email content",
+      "title": "Reviews",
+      "role": {
+        "tech": "Technician review",
+        "visual": "Visual review",
+        "dramaturgy": "Dramaturgy review",
+        "placeholder": "-- select a role --"
+      },
+      "submit": "Submit the review",
+      "kind": {
+        "accepted": "Accept",
+        "rejected": "Reject"
+      },
+      "confirm": "Careful! This will send an email to the project author! This operation is irreversible!",
+      "new": "New review",
+      "archive": "Review archive"
+    }
   },
   "projectEdit": {
     "quit": "Quit edit mode",
@@ -212,7 +230,7 @@
     "back": "Request again"
   },
   "tempAccount": {
-    "title": "common:tempAccount.title"
+    "title": "Create a temporary account"
   },
   "textarea": {
     "characters": "characters",

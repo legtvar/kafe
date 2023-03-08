@@ -17,18 +17,19 @@ public record MediaInfo(
     ImmutableArray<VideoStreamInfo> VideoStreams,
     ImmutableArray<AudioStreamInfo> AudioStreams,
     ImmutableArray<SubtitleStreamInfo> SubtitleStreams,
-    bool IsCorrupted = false
+    bool IsCorrupted = false,
+    string? Error = null
 )
 {
-    public static MediaInfo Invalid { get; }
-        = new(
-            Const.InvalidFileExtension,
-            Const.InvalidFormatName,
-            Const.InvalidMimeType,
-            -1,
-            TimeSpan.Zero,
-            ImmutableArray<VideoStreamInfo>.Empty,
-            ImmutableArray<AudioStreamInfo>.Empty,
-            ImmutableArray<SubtitleStreamInfo>.Empty,
-            true);
+    public static MediaInfo Invalid { get; } = new(
+        FileExtension: Const.InvalidFileExtension,
+        FormatName: Const.InvalidFormatName,
+        MimeType: Const.InvalidMimeType,
+        FileLength: -1,
+        Duration: TimeSpan.Zero,
+        VideoStreams: ImmutableArray<VideoStreamInfo>.Empty,
+        AudioStreams: ImmutableArray<AudioStreamInfo>.Empty,
+        SubtitleStreams: ImmutableArray<SubtitleStreamInfo>.Empty,
+        IsCorrupted: true,
+        Error: "This MediaInfo is Invalid.");
 }

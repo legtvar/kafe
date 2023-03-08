@@ -11,7 +11,8 @@ public record MediaDto(
     ImmutableArray<VideoStreamDto> VideoStreams,
     ImmutableArray<AudioStreamDto> AudioStreams,
     ImmutableArray<SubtitleStreamDto> SubtitleStreams,
-    bool IsCorrupted);
+    bool IsCorrupted,
+    string? Error);
 
 public record VideoStreamDto(
     string Codec,

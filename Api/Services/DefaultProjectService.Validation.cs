@@ -254,7 +254,7 @@ public partial class DefaultProjectService : IProjectService
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, $"The film is too long. Maximum length is '{FilmMaxLength:c}'."),
-            (Const.CzechCulture, $"Film je příliš krátký. Maximální délka je '{FilmMaxLength:c}'.")
+            (Const.CzechCulture, $"Film je příliš dlouhý. Maximální délka je '{FilmMaxLength:c}'.")
         )
     );
 

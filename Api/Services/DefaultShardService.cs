@@ -274,7 +274,7 @@ public class DefaultShardService : IShardService
         var artifact = await db.LoadAsync<ArtifactDetail>(artifactId, token);
         if (artifact is null)
         {
-            throw new ArgumentException($"Artifact '{artifactId}' does not exist.");
+            throw new IndexOutOfRangeException($"Artifact '{artifactId}' does not exist.");
         }
 
         await CheckAccess(artifact, token);

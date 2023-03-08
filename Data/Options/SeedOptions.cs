@@ -27,6 +27,9 @@ public record SeedOptions
 
     public record SeedProjectGroup
     {
+        [Hrib, Required]
+        public string Id { get; set; } = null!;
+
         [Required]
         public string Name { get; set; } = null!;
 

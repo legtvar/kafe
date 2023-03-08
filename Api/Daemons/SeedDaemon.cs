@@ -81,15 +81,16 @@ public class SeedDaemon : BackgroundService
             }
 
             var name = LocalizedString.CreateInvariant(group.Name);
-            var existing = await projectGroups.List(name, token);
-            if (existing.Length > 0)
+            var existing = await projectGroups.Load(group.Id, token);
+            if (existing is not null)
             {
                 continue;
             }
 
             var deadline = group.Deadline is null ? default : DateTimeOffset.Parse(group.Deadline);
             var creationInfo = new ProjectGroupCreationDto(name, null, deadline);
-            var id = await projectGroups.Create(creationInfo, token);
+            // TODO: Remove the internal Create overload.
+            var id = await ((DefaultProjectGroupService)projectGroups).Create(creationInfo, group.Id, token);
             logger.LogInformation($"Seed project group '{id}' created.");
         }
     }

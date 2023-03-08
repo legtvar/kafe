@@ -25,7 +25,13 @@ public class DefaultProjectGroupService : IProjectGroupService
         this.userProvider = userProvider;
     }
 
-    public async Task<Hrib> Create(ProjectGroupCreationDto dto, CancellationToken token = default)
+    public Task<Hrib> Create(ProjectGroupCreationDto dto, CancellationToken token = default)
+    {
+        return Create(dto, Hrib.Create(), token);
+    }
+
+    // TODO: Remove the internal Create overload.
+    internal async Task<Hrib> Create(ProjectGroupCreationDto dto, Hrib id, CancellationToken token = default)
     {
         if (!userProvider.IsAdministrator())
         {
@@ -33,7 +39,7 @@ public class DefaultProjectGroupService : IProjectGroupService
         }
 
         var created = new ProjectGroupCreated(
-            ProjectGroupId: Hrib.Create(),
+            ProjectGroupId: id,
             CreationMethod: CreationMethod.Api,
             Name: dto.Name.GetRaw());
 

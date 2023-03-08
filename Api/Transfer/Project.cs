@@ -69,13 +69,12 @@ public record ProjectArtifactBlueprintDto(
     LocalizedString Name,
     LocalizedString? Description,
     ArgumentArity Arity,
-    ImmutableArray<ProjectArtifactShardBlueprintDto> ShardBlueprints
+    ImmutableDictionary<ShardKind, ProjectArtifactShardBlueprintDto> ShardBlueprints
 );
 
 public record ProjectArtifactShardBlueprintDto(
     LocalizedString Name,
     LocalizedString? Description,
-    ShardKind Kind,
     ArgumentArity Arity
 );
 

@@ -33,24 +33,23 @@ public static class TransferMaps
                     ),
                     Description: null,
                     Arity: ArgumentArity.ExactlyOne,
-                    ShardBlueprints: ImmutableArray.Create(
-                        new ProjectArtifactShardBlueprintDto(
+                    ShardBlueprints: new Dictionary<ShardKind, ProjectArtifactShardBlueprintDto> {
+                        [ShardKind.Video] = new ProjectArtifactShardBlueprintDto(
                             Name: LocalizedString.Create(
                                 (Const.InvariantCulture, "Film file"),
                                 (Const.CzechCulture, "Soubor s filmem")
                             ),
                             Description: null,
-                            Kind: ShardKind.Video,
                             Arity: ArgumentArity.ExactlyOne),
-                        new ProjectArtifactShardBlueprintDto(
+                        [ShardKind.Subtitles] = new ProjectArtifactShardBlueprintDto(
                             Name: LocalizedString.Create(
                                 (Const.InvariantCulture, "English subtitles"),
                                 (Const.CzechCulture, "Anglické titulky")
                             ),
                             Description: null,
-                            Kind: ShardKind.Subtitles,
                             Arity: ArgumentArity.ExactlyOne)
-                    )
+                    }
+                    .ToImmutableDictionary()
                 ),
                 [Const.VideoAnnotationBlueprintSlot] = new ProjectArtifactBlueprintDto(
                     Name: LocalizedString.Create(
@@ -59,24 +58,23 @@ public static class TransferMaps
                     ),
                     Description: null,
                     Arity: ArgumentArity.ZeroOrOne,
-                    ShardBlueprints: ImmutableArray.Create(
-                        new ProjectArtifactShardBlueprintDto(
+                    ShardBlueprints: new Dictionary<ShardKind, ProjectArtifactShardBlueprintDto> {
+                        [ShardKind.Video] = new ProjectArtifactShardBlueprintDto(
                             Name: LocalizedString.Create(
                                 (Const.InvariantCulture, "Video-annotation file"),
                                 (Const.CzechCulture, "Soubor s videoanotací")
                             ),
                             Description: null,
-                            Kind: ShardKind.Video,
                             Arity: ArgumentArity.ExactlyOne),
-                        new ProjectArtifactShardBlueprintDto(
+                        [ShardKind.Subtitles] = new ProjectArtifactShardBlueprintDto(
                             Name: LocalizedString.Create(
                                 (Const.InvariantCulture, "English subtitles"),
                                 (Const.CzechCulture, "Anglické titulky")
                             ),
                             Description: null,
-                            Kind: ShardKind.Subtitles,
                             Arity: ArgumentArity.ExactlyOne)
-                    )
+                    }
+                    .ToImmutableDictionary()
                 ),
                 [Const.CoverPhotoBlueprintSlot] = new ProjectArtifactBlueprintDto(
                     Name: LocalizedString.Create(
@@ -85,16 +83,16 @@ public static class TransferMaps
                     ),
                     Description: null,
                     Arity: new ArgumentArity(Const.CoverPhotoMinCount, Const.CoverPhotoMaxCount),
-                    ShardBlueprints: ImmutableArray.Create(
-                        new ProjectArtifactShardBlueprintDto(
+                    ShardBlueprints: new Dictionary<ShardKind, ProjectArtifactShardBlueprintDto> {
+                        [ShardKind.Image] = new ProjectArtifactShardBlueprintDto(
                             Name: LocalizedString.Create(
                                 (Const.InvariantCulture, "Cover photo file"),
                                 (Const.CzechCulture, "Soubor s titulní fotografií")
                             ),
                             Description: null,
-                            Kind: ShardKind.Image,
                             Arity: ArgumentArity.ExactlyOne)
-                    )
+                    }
+                    .ToImmutableDictionary()
                 )
             }
             .ToImmutableDictionary()

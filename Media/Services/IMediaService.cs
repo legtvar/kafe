@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Kafe.Media;
+namespace Kafe.Media.Services;
 
 public interface IMediaService
 {

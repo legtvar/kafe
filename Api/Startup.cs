@@ -12,7 +12,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Kafe.Api.Swagger;
 using Kafe.Api.Services;
-using Kafe.Media;
 using Asp.Versioning;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Linq;
@@ -31,6 +30,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Authentication;
+using Kafe.Media.Services;
 
 namespace Kafe.Api;
 
@@ -139,9 +139,8 @@ public class Startup
 
     private void RegisterKafe(IServiceCollection services)
     {
-        Db.AddDb(services, Configuration, Environment);
-
-        services.AddSingleton<IMediaService, FFmpegCoreService>();
+        services.AddKafeMedia();
+        services.AddKafeData();
 
         services.AddScoped<IUserProvider, DefaultUserProvider>();
         services.AddScoped<IProjectGroupService, DefaultProjectGroupService>();
@@ -156,7 +155,6 @@ public class Startup
 
         services.Configure<ApiOptions>(Configuration);
         services.Configure<EmailOptions>(Configuration.GetSection("Email"));
-        services.Configure<SeedOptions>(Configuration.GetSection("Seed"));
 
         services.AddHostedService<SeedDaemon>();
 

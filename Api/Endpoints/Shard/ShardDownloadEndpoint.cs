@@ -26,7 +26,7 @@ public class ShardDownloadEndpoint : EndpointBaseAsync
 
     [HttpGet]
     [SwaggerOperation(Tags = new[] { EndpointArea.Shard })]
-    [Produces("video/mp4", "video/x-matroska", "application/octet-stream", Type = typeof(FileStreamResult))]
+    [Produces(typeof(FileStreamResult))]
     public override async Task<ActionResult> HandleAsync(
         [FromRoute] RequestData data,
         CancellationToken cancellationToken = default)

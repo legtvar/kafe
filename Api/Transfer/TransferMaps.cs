@@ -336,9 +336,12 @@ V případě technických problémů nás prosím kontaktujte na adrese: festiva
     public static ImageDto ToImageDto(ImageInfo data)
     {
         return new ImageDto(
+            FileExtension: data.FileExtension,
+            FormatName: data.FormatName,
+            MimeType: data.MimeType,
             Width: data.Width,
             Height: data.Height,
-            Format: data.Format);
+            IsCorrupted: data.IsCorrupted);
     }
 
     public static ShardDetailBaseDto ToShardDetailDto(ShardInfoBase data)

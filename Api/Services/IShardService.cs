@@ -24,5 +24,4 @@ public interface IShardService
         CancellationToken token = default);
 
     Task<Stream> OpenStream(Hrib id, string? variant, CancellationToken token = default);
-
 }

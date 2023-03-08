@@ -1,4 +1,4 @@
-using Kafe.Data.Aggregates;
+﻿using Kafe.Data.Aggregates;
 using Kafe.Data.Options;
 using Kafe.Data.Services;
 using Marten;
@@ -6,19 +6,27 @@ using Marten.Events;
 using Marten.Events.Projections;
 using Marten.Services.Json;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using Weasel.Core;
 
-namespace Kafe.Data;
+namespace Microsoft.Extensions.DependencyInjection;
 
-public static class Db
+public static class ServiceCollectionExtensions
 {
-    public static void AddDb(IServiceCollection services, IConfiguration configuration, IHostEnvironment environment)
+    public static IServiceCollection AddKafeData(this IServiceCollection services)
     {
-        void ConfigureMarten(StoreOptions options)
+        StoreOptions ConfigureMarten(IServiceProvider services)
         {
+            var configuration = services.GetRequiredService<IConfiguration>();
+            var environment = services.GetRequiredService<IHostEnvironment>();
+
+            var options = new StoreOptions();
+
             options.Connection(configuration.GetConnectionString("KAFE")
                 ?? throw new ArgumentException("The KAFE connection string is missing!"));
             options.Events.StreamIdentity = StreamIdentity.AsString;
@@ -54,13 +62,20 @@ public static class Db
             options.Projections.Add<ArtifactDetailProjection>(ProjectionLifecycle.Inline);
             options.Projections.Add<AccountInfoProjection>(ProjectionLifecycle.Inline);
             options.UseDefaultSerialization(serializerType: SerializerType.Newtonsoft);
+
+            return options;
         }
 
         services.AddMarten(ConfigureMarten);
 
         services.AddSingleton<IStorageService, DefaultStorageService>();
 
-        services.Configure<StorageOptions>(configuration.GetSection("Storage"));
-        services.Configure<SeedOptions>(configuration.GetSection("Seed"));
+        services.AddOptions<StorageOptions>()
+            .BindConfiguration("Storage");
+
+        services.AddOptions<SeedOptions>()
+            .BindConfiguration("Seed");
+
+        return services;
     }
 }

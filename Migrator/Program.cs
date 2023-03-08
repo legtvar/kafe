@@ -2,6 +2,7 @@
 using Kafe.Data.Events;
 using Kafe.Lemma;
 using Kafe.Media;
+using Kafe.Media.Services;
 using Marten;
 using Npgsql;
 using System.Collections.Concurrent;

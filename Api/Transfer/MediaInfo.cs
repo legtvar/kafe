@@ -34,7 +34,10 @@ public record SubtitleStreamDto(
 );
 
 public record ImageDto(
+    string FileExtension,
+    string FormatName,
+    string MimeType,
     int Width,
     int Height,
-    string Format
+    bool IsCorrupted
 );

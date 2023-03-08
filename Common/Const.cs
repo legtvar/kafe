@@ -11,10 +11,11 @@ public static class Const
 {
     public const string OriginalShardVariant = "original";
     public const string InvalidPath = "invalid";
-    public const string InvalidFileExtension = "invalid";
+    public const string InvalidFileExtension = ".invalid";
     public const string InvalidFormatName = "invalid";
     public const string InvalidEmailAddress = "invalid@example.com";
     public const string InvalidName = "Invalid";
+    public const string InvalidMimeType = "invalid/invalid";
     public const long InvalidFileLength = -1;
     public const long ShardSizeLimit = 4_294_967_296;
 

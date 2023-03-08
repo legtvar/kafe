@@ -67,7 +67,6 @@ public class DefaultShardService : IShardService
 
     public async Task<Hrib?> Create(
         ShardCreationDto dto,
-        string mimeType,
         Stream stream,
         CancellationToken token = default)
     {
@@ -75,66 +74,45 @@ public class DefaultShardService : IShardService
 
         return dto.Kind switch
         {
-            ShardKind.Video => await CreateVideo(dto, mimeType, stream, token),
-            ShardKind.Image => await CreateImage(dto, mimeType, stream, token),
+            ShardKind.Video => await CreateVideo(dto, stream, token),
+            ShardKind.Image => await CreateImage(dto, stream, token),
+            ShardKind.Subtitles => await CreateSubtitles(dto, stream, token),
             _ => throw new NotSupportedException($"Creation of '{dto.Kind}' shards is not supported yet.")
         };
     }
 
     private async Task<Hrib?> CreateVideo(
         ShardCreationDto dto,
-        string mimeType,
         Stream videoStream,
         CancellationToken token = default)
     {
-        if (mimeType != Const.MatroskaMimeType && mimeType != Const.Mp4MimeType)
-        {
-            throw new ArgumentException($"Only '{Const.MatroskaMimeType}' and '{Const.Mp4MimeType}' video container " +
-                $"formats are supported.");
-        }
+        var mediaInfo = await mediaService.GetInfo(videoStream, token);
+        videoStream.Seek(0, SeekOrigin.Begin);
 
-        var shardId = Hrib.Create();
-        var originalFileExtension = mimeType == Const.MatroskaMimeType
-            ? Const.MatroskaFileExtension
-            : Const.Mp4FileExtension;
+        var created = new VideoShardCreated(
+            ShardId: Hrib.Create(),
+            CreationMethod: CreationMethod.Api,
+            ArtifactId: dto.ArtifactId,
+            OriginalVariantInfo: mediaInfo);
+        db.Events.StartStream<VideoShardInfo>(created.ShardId, created);
+        await db.SaveChangesAsync(token);
+
         if (!await storageService.TryStoreShard(
             dto.Kind,
-            shardId,
+            created.ShardId,
             videoStream,
             Const.OriginalShardVariant,
-            originalFileExtension,
+            mediaInfo.FileExtension,
             token))
         {
             throw new InvalidOperationException();
         }
 
-        if (!storageService.TryOpenShardStream(
-            dto.Kind,
-            shardId,
-            Const.OriginalShardVariant,
-            out var shardStream,
-            out var shardFileExtension))
-        {
-            throw new ArgumentException("The shard stream could not be opened just after being saved.");
-        }
-
-        var mediaInfo = await mediaService.GetInfo(shardStream, token);
-        mediaInfo = mediaInfo with { FileExtension = shardFileExtension };
-
-        var created = new VideoShardCreated(
-            ShardId: shardId,
-            CreationMethod: CreationMethod.Api,
-            ArtifactId: dto.ArtifactId,
-            OriginalVariantInfo: mediaInfo);
-        db.Events.StartStream<VideoShardInfo>(created.ShardId, created);
-
-        await db.SaveChangesAsync(token);
-        return shardId;
+        return created.ShardId;
     }
 
     private async Task<Hrib?> CreateImage(
         ShardCreationDto dto,
-        string mimeType,
         Stream imageStream,
         CancellationToken token = default)
     {
@@ -160,6 +138,56 @@ public class DefaultShardService : IShardService
         }
 
         db.Events.StartStream<VideoShardInfo>(created.ShardId, created);
+
+        await db.SaveChangesAsync(token);
+        return created.ShardId;
+    }
+
+    private async Task<Hrib?> CreateSubtitles(
+        ShardCreationDto dto,
+        Stream subtitlesStream,
+        CancellationToken token = default)
+    {
+        var mediaInfo = await mediaService.GetInfo(subtitlesStream, token);
+
+        subtitlesStream.Seek(0, SeekOrigin.Begin);
+
+        if (mediaInfo.SubtitleStreams.IsDefaultOrEmpty)
+        {
+            throw new ArgumentException("The file contains no subtitle streams.");
+        }
+
+        if (mediaInfo.SubtitleStreams.Length > 1)
+        {
+            throw new ArgumentException("The file contains more than one subtitle stream.");
+        }
+
+        var ssInfo = mediaInfo.SubtitleStreams.Single();
+        var info = new SubtitlesInfo(
+            FileExtension: FFmpegFormat.GetFileExtension(mediaInfo.FormatName) ?? Const.InvalidFileExtension,
+            MimeType: FFmpegFormat.GetMimeType(mediaInfo.FormatName) ?? Const.InvalidMimeType,
+            Language: ssInfo.Language,
+            Codec: ssInfo.Codec,
+            Bitrate: ssInfo.Bitrate);
+
+        var created = new SubtitlesShardCreated(
+            ShardId: Hrib.Create(),
+            CreationMethod: CreationMethod.Api,
+            ArtifactId: dto.ArtifactId,
+            OriginalVariantInfo: info);
+
+        if (!await storageService.TryStoreShard(
+            ShardKind.Subtitles,
+            created.ShardId,
+            subtitlesStream,
+            Const.OriginalShardVariant,
+            info.FileExtension,
+            token))
+        {
+            throw new InvalidOperationException("The subtitles could not be stored.");
+        }
+
+        db.Events.StartStream<SubtitlesShardInfo>(created.ShardId, created);
 
         await db.SaveChangesAsync(token);
         return created.ShardId;
@@ -212,6 +240,13 @@ public class DefaultShardService : IShardService
                     MimeType: media.MimeType)
                 : null,
             ShardKind.Image => ((ImageShardDetailDto)shard).Variants.TryGetValue(variant, out var image)
+                ? new ShardVariantMediaTypeDto(
+                    ShardId: shard.Id,
+                    Variant: variant,
+                    FileExtension: image.FileExtension,
+                    MimeType: image.MimeType)
+                : null,
+            ShardKind.Subtitles => ((SubtitlesShardDetailDto)shard).Variants.TryGetValue(variant, out var image)
                 ? new ShardVariantMediaTypeDto(
                     ShardId: shard.Id,
                     Variant: variant,

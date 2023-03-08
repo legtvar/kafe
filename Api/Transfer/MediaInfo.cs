@@ -40,3 +40,11 @@ public record ImageDto(
     int Height,
     bool IsCorrupted
 );
+
+public record SubtitlesDto(
+    string FileExtension,
+    string MimeType,
+    string? Language,
+    string Codec,
+    long Bitrate
+);

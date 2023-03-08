@@ -66,7 +66,7 @@ public class FFmpegCoreService : IMediaService
     private MediaInfo GetMediaInfo(IMediaAnalysis data)
     {
         var videoInfos = data.VideoStreams
-                .Select(v => new VideoInfo(
+                .Select(v => new VideoStreamInfo(
                         Codec: v.CodecName,
                         Bitrate: v.BitRate,
                     Width: v.Width,
@@ -75,7 +75,7 @@ public class FFmpegCoreService : IMediaService
                 .ToImmutableArray();
 
         var audioInfos = data.AudioStreams
-            .Select(a => new AudioInfo(
+            .Select(a => new AudioStreamInfo(
                 Codec: a.CodecName,
                 Bitrate: a.BitRate,
                 Channels: a.Channels,
@@ -83,8 +83,7 @@ public class FFmpegCoreService : IMediaService
             .ToImmutableArray();
 
         var subtitleInfos = data.SubtitleStreams
-            .Select(s => new SubtitlesInfo(
-                FileExtension: FFmpegFormat.GetFileExtension(s.CodecName) ?? Const.InvalidFileExtension,
+            .Select(s => new SubtitleStreamInfo(
                 Language: s.Language,
                 Codec: s.CodecName,
                 Bitrate: s.BitRate))

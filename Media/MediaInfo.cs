@@ -14,9 +14,9 @@ public record MediaInfo(
     string MimeType,
     long FileLength,
     TimeSpan Duration,
-    ImmutableArray<VideoInfo> VideoStreams,
-    ImmutableArray<AudioInfo> AudioStreams,
-    ImmutableArray<SubtitlesInfo> SubtitleStreams,
+    ImmutableArray<VideoStreamInfo> VideoStreams,
+    ImmutableArray<AudioStreamInfo> AudioStreams,
+    ImmutableArray<SubtitleStreamInfo> SubtitleStreams,
     bool IsCorrupted = false
 )
 {
@@ -27,8 +27,8 @@ public record MediaInfo(
             Const.InvalidMimeType,
             -1,
             TimeSpan.Zero,
-            ImmutableArray<VideoInfo>.Empty,
-            ImmutableArray<AudioInfo>.Empty,
-            ImmutableArray<SubtitlesInfo>.Empty,
+            ImmutableArray<VideoStreamInfo>.Empty,
+            ImmutableArray<AudioStreamInfo>.Empty,
+            ImmutableArray<SubtitleStreamInfo>.Empty,
             true);
 }

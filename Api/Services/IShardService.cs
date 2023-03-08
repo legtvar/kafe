@@ -12,7 +12,6 @@ public interface IShardService
 
     Task<Hrib?> Create(
         ShardCreationDto dto,
-        string mimeType,
         Stream stream,
         CancellationToken token = default);
 

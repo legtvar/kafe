@@ -33,7 +33,8 @@ public static class TransferMaps
                     ),
                     Description: null,
                     Arity: ArgumentArity.ExactlyOne,
-                    ShardBlueprints: new Dictionary<ShardKind, ProjectArtifactShardBlueprintDto> {
+                    ShardBlueprints: new Dictionary<ShardKind, ProjectArtifactShardBlueprintDto>
+                    {
                         [ShardKind.Video] = new ProjectArtifactShardBlueprintDto(
                             Name: LocalizedString.Create(
                                 (Const.InvariantCulture, "Film file"),
@@ -58,7 +59,8 @@ public static class TransferMaps
                     ),
                     Description: null,
                     Arity: ArgumentArity.ZeroOrOne,
-                    ShardBlueprints: new Dictionary<ShardKind, ProjectArtifactShardBlueprintDto> {
+                    ShardBlueprints: new Dictionary<ShardKind, ProjectArtifactShardBlueprintDto>
+                    {
                         [ShardKind.Video] = new ProjectArtifactShardBlueprintDto(
                             Name: LocalizedString.Create(
                                 (Const.InvariantCulture, "Video-annotation file"),
@@ -83,7 +85,8 @@ public static class TransferMaps
                     ),
                     Description: null,
                     Arity: new ArgumentArity(Const.CoverPhotoMinCount, Const.CoverPhotoMaxCount),
-                    ShardBlueprints: new Dictionary<ShardKind, ProjectArtifactShardBlueprintDto> {
+                    ShardBlueprints: new Dictionary<ShardKind, ProjectArtifactShardBlueprintDto>
+                    {
                         [ShardKind.Image] = new ProjectArtifactShardBlueprintDto(
                             Name: LocalizedString.Create(
                                 (Const.InvariantCulture, "Cover photo file"),
@@ -253,7 +256,7 @@ public static class TransferMaps
             IsCorrupted: data.IsCorrupted);
     }
 
-    public static VideoStreamDto ToVideoStreamDto(VideoInfo data)
+    public static VideoStreamDto ToVideoStreamDto(VideoStreamInfo data)
     {
         return new VideoStreamDto(
             Codec: data.Codec,
@@ -263,7 +266,7 @@ public static class TransferMaps
             Framerate: data.Framerate);
     }
 
-    public static AudioStreamDto ToAudioStreamDto(AudioInfo data)
+    public static AudioStreamDto ToAudioStreamDto(AudioStreamInfo data)
     {
         return new AudioStreamDto(
             Codec: data.Codec,
@@ -272,7 +275,7 @@ public static class TransferMaps
             SampleRate: data.SampleRate);
     }
 
-    public static SubtitleStreamDto ToSubtitleStreamDto(SubtitlesInfo data)
+    public static SubtitleStreamDto ToSubtitleStreamDto(SubtitleStreamInfo data)
     {
         return new SubtitleStreamDto(
             Codec: data.Codec,
@@ -304,8 +307,28 @@ public static class TransferMaps
         {
             VideoShardInfo v => ToVideoShardDetailDto(v),
             ImageShardInfo i => ToImageShardDetailDto(i),
+            SubtitlesShardInfo s => ToSubtitlesShardDetailDto(s),
             _ => throw new NotSupportedException($"Shards of '{data.GetType()}' are not supported.")
         };
+    }
+
+    public static SubtitlesShardDetailDto ToSubtitlesShardDetailDto(SubtitlesShardInfo data)
+    {
+        return new SubtitlesShardDetailDto(
+            Id: data.Id,
+            Kind: data.Kind,
+            ArtifactId: data.ArtifactId,
+            Variants: data.Variants.ToImmutableDictionary(p => p.Key, p => ToSubtitlesDto(p.Value)));
+    }
+
+    public static SubtitlesDto ToSubtitlesDto(SubtitlesInfo data)
+    {
+        return new SubtitlesDto(
+            FileExtension: data.FileExtension,
+            MimeType: data.MimeType,
+            Language: data.Language,
+            Codec: data.Codec,
+            Bitrate: data.Bitrate);
     }
 
     public static TemporaryAccountInfoDto ToTemporaryAccountInfoDto(AccountInfo data)

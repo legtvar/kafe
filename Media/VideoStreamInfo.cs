@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Kafe.Media;
 
-public record VideoInfo(
+public record VideoStreamInfo(
     string Codec,
     long Bitrate,
     int Width,

@@ -11,4 +11,5 @@ public record SubtitlesInfo(
     string MimeType,
     string? Language,
     string Codec,
-    long Bitrate);
+    long Bitrate,
+    bool IsCorrupted);

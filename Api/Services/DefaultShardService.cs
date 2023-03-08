@@ -168,7 +168,8 @@ public class DefaultShardService : IShardService
             MimeType: FFmpegFormat.GetMimeType(mediaInfo.FormatName) ?? Const.InvalidMimeType,
             Language: ssInfo.Language,
             Codec: ssInfo.Codec,
-            Bitrate: ssInfo.Bitrate);
+            Bitrate: ssInfo.Bitrate,
+            IsCorrupted: mediaInfo.IsCorrupted);
 
         var created = new SubtitlesShardCreated(
             ShardId: Hrib.Create(),

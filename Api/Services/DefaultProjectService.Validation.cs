@@ -31,6 +31,11 @@ public partial class DefaultProjectService : IProjectService
     public const long VideoMaxBitrate = 20_000_000;
     public const string VideoMaxBitrateDescription = "20 Mbps";
     public const int VideoShorterSideResolution = 1080;
+    public const int CoverPhotoShorterSideResolution = 1080;
+    public const double CoverPhotoMaxRatio = 16 / 9.0;
+    public const string CoverPhotoMaxRatioDescription = "16:9";
+    public const double CoverPhotoMinRatio = 4 / 3.0;
+    public const string CoverPhotoMinRatioDescription = "4:3";
     public static string[] AllowedContainers = new[]
     {
         "video/mp4",
@@ -51,6 +56,11 @@ public partial class DefaultProjectService : IProjectService
     {
         "srt",
         "ass"
+    };
+    public static string[] AllowedImageMimeTypes = new[]
+    {
+        "image/jpeg",
+        "image/png"
     };
     public const long Mp3MinBitrate = 192000;
     public const string Mp3MinBitrateDescription = "192 kbps";
@@ -320,6 +330,24 @@ public partial class DefaultProjectService : IProjectService
         )
     );
 
+    public static readonly ProjectDiagnosticDto CoverPhotoCorrupted = new ProjectDiagnosticDto(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: FileStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, "A cover photo file is corrupted."),
+            (Const.CzechCulture, "Některá z titulních fotek je poškozená.")
+        )
+    );
+
+    public static readonly ProjectDiagnosticDto SubtitlesCorrupted = new ProjectDiagnosticDto(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: FileStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, "A subtitles file is corrupted."),
+            (Const.CzechCulture, "Některý ze souborů s titulky je poškozený.")
+        )
+    );
+
     public static readonly ProjectDiagnosticDto FilmUnsupportedContainerFormat = new ProjectDiagnosticDto(
         Kind: DiagnosticKind.Error,
         ValidationStage: FileStage,
@@ -453,8 +481,35 @@ public partial class DefaultProjectService : IProjectService
         Kind: DiagnosticKind.Error,
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
-            (Const.InvariantCulture, $"The video-annotation file must have a shorter-side resolution of {VideoShorterSideResolution} pixels."),
-            (Const.CzechCulture, $"Soubor s videoanotací musí mít na kratší straně rozlišení {VideoShorterSideResolution} pixelů.")
+            (Const.InvariantCulture, $"The video-annotation file must have a shorter-side resolution of at least {VideoShorterSideResolution} pixels."),
+            (Const.CzechCulture, $"Soubor s videoanotací musí mít na kratší straně rozlišení alespoň {VideoShorterSideResolution} pixelů.")
+        )
+    );
+
+    public static readonly ProjectDiagnosticDto CoverPhotoWrongResolution = new ProjectDiagnosticDto(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: FileStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, $"All cover photo images must have a shorter-side resolution of at least {CoverPhotoShorterSideResolution}."),
+            (Const.CzechCulture, $"Všechny titulní fotky musí mít na kratší straně rozlišení alespoň {CoverPhotoShorterSideResolution} pixelů.")
+        )
+    );
+
+    public static readonly ProjectDiagnosticDto CoverPhotoWrongFormat = new ProjectDiagnosticDto(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: FileStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, $"All cover photo images must be in the JPEG or PNG format."),
+            (Const.CzechCulture, $"Všechny titulní fotky musí být buď ve formátu JPEG, nebo PNG.")
+        )
+    );
+
+    public static readonly ProjectDiagnosticDto SubtitlesWrongFormat = new ProjectDiagnosticDto(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: FileStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, $"All subtitles must be in the SRT or ASS format."),
+            (Const.CzechCulture, $"Všechny titulky musí být buď ve formátu SRT, nebo ASS.")
         )
     );
 
@@ -491,6 +546,35 @@ public partial class DefaultProjectService : IProjectService
         Message: LocalizedString.Create(
             (Const.InvariantCulture, $"The video-annotation subtites have an unsupported format. The supported formats are SRT and ASS."),
             (Const.CzechCulture, $"Titulky k videoanotaci mají nepodporovaný formát. Podporovanými formáty jsou SRT a ASS.")
+        )
+    );
+
+    public static readonly ProjectDiagnosticDto MissingCoverPhotoFile = new ProjectDiagnosticDto(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: FileStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, $"A cover photo is missing the image file."),
+            (Const.CzechCulture, $"Některé z titulních fotek chybí obrazový soubor.")
+        )
+    );
+
+    public static readonly ProjectDiagnosticDto MissingSubtitlesFile = new ProjectDiagnosticDto(
+    Kind: DiagnosticKind.Error,
+    ValidationStage: FileStage,
+    Message: LocalizedString.Create(
+        (Const.InvariantCulture, $"Some subtitles are missing the subtitles file."),
+        (Const.CzechCulture, $"Některým z titulků chybí soubor s titulky.")
+    )
+);
+
+    public static readonly ProjectDiagnosticDto CoverPhotoWrongRatio = new ProjectDiagnosticDto(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: FileStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, $"All cover photos must have aspect ratio between " +
+                $"{CoverPhotoMinRatioDescription} and {CoverPhotoMaxRatioDescription}."),
+            (Const.CzechCulture, $"Všechny titulní fotky musí mít poměr stran mezi " +
+                $"{CoverPhotoMinRatioDescription} a {CoverPhotoMaxRatioDescription}.")
         )
     );
 
@@ -624,6 +708,18 @@ public partial class DefaultProjectService : IProjectService
             {
                 diagnostics.Add(TooManyFilmSubtitles);
             }
+            else
+            {
+                var subtitleShard = await db.LoadAsync<SubtitlesShardInfo>(subtitleShards[0].ShardId, token);
+                if (subtitleShard is null)
+                {
+                    diagnostics.Add(MissingFilmSubtitles);
+                }
+                else
+                {
+                    diagnostics.AddRange(ValidateSubtitles(subtitleShard));
+                }
+            }
         }
 
         var videoAnnotationArtifacts = artifacts.Where(a => a.projectArtifact.BlueprintSlot == Const.VideoAnnotationBlueprintSlot)
@@ -686,6 +782,18 @@ public partial class DefaultProjectService : IProjectService
             {
                 diagnostics.Add(TooManyVideoAnnotationSubtitles);
             }
+            else
+            {
+                var subtitleShard = await db.LoadAsync<SubtitlesShardInfo>(subtitleShards[0].ShardId, token);
+                if (subtitleShard is null)
+                {
+                    diagnostics.Add(MissingVideoAnnotationSubtitles);
+                }
+                else
+                {
+                    diagnostics.AddRange(ValidateSubtitles(subtitleShard));
+                }
+            }
         }
 
         var coverPhotoArtifacts = artifacts.Where(a => a.projectArtifact.BlueprintSlot == Const.CoverPhotoBlueprintSlot)
@@ -694,9 +802,30 @@ public partial class DefaultProjectService : IProjectService
         {
             diagnostics.Add(TooFewCoverPhotos);
         }
-        else if (coverPhotoArtifacts.Length > 5)
+        else if (coverPhotoArtifacts.Length > Const.CoverPhotoMaxCount)
         {
             diagnostics.Add(TooManyCoverPhotos);
+        }
+        else
+        {
+            foreach (var coverPhotoArtifact in coverPhotoArtifacts)
+            {
+                if (coverPhotoArtifact.info.Shards.Length != 1)
+                {
+                    diagnostics.Add(MissingCoverPhotoFile);
+                    continue;
+                }
+
+                var imageShard = await db.LoadAsync<ImageShardInfo>(
+                    coverPhotoArtifact.info.Shards.Single().ShardId,
+                    token);
+                if (imageShard is null)
+                {
+                    diagnostics.Add(MissingCoverPhotoFile);
+                    continue;
+                }
+                diagnostics.AddRange(ValidateImage(imageShard));
+            }
         }
 
         return new(
@@ -774,7 +903,7 @@ public partial class DefaultProjectService : IProjectService
         ProjectDiagnosticDto unsupportedFramerateError,
         ProjectDiagnosticDto wrongResolutionError)
     {
-        if (!video.Variants.Keys.Contains(Const.OriginalShardVariant))
+        if (!video.Variants.ContainsKey(Const.OriginalShardVariant))
         {
             yield return MissingFilm;
             yield break;
@@ -855,6 +984,59 @@ public partial class DefaultProjectService : IProjectService
         if (shorterSideResolution < VideoShorterSideResolution)
         {
             yield return wrongResolutionError;
+        }
+    }
+
+    private static IEnumerable<ProjectDiagnosticDto> ValidateImage(ImageShardInfo image)
+    {
+        if (!image.Variants.ContainsKey(Const.OriginalShardVariant))
+        {
+            yield return MissingCoverPhotoFile;
+        }
+
+        var originalVariant = image.Variants[Const.OriginalShardVariant];
+
+        if (originalVariant.IsCorrupted)
+        {
+            yield return CoverPhotoCorrupted;
+        }
+
+        var shorterSideResolution = Math.Min(originalVariant.Width, originalVariant.Height);
+        if (shorterSideResolution < CoverPhotoShorterSideResolution)
+        {
+            yield return CoverPhotoWrongResolution;
+        }
+
+        var aspectRatio = (double)originalVariant.Width / originalVariant.Height;
+        if (aspectRatio + 0.001 < CoverPhotoMinRatio
+            || aspectRatio - 0.001 > CoverPhotoMaxRatio)
+        {
+            yield return CoverPhotoWrongRatio;
+        }
+
+        if (!AllowedImageMimeTypes.Contains(originalVariant.MimeType))
+        {
+            yield return CoverPhotoWrongFormat;
+        }
+    }
+
+    private static IEnumerable<ProjectDiagnosticDto> ValidateSubtitles(SubtitlesShardInfo subtitles)
+    {
+        if (!subtitles.Variants.ContainsKey(Const.OriginalShardVariant))
+        {
+            yield return MissingSubtitlesFile;
+        }
+
+        var originalVariant = subtitles.Variants[Const.OriginalShardVariant];
+
+        if (originalVariant.IsCorrupted)
+        {
+            yield return SubtitlesCorrupted;
+        }
+
+        if (!AllowedSubtitleCodecs.Contains(originalVariant.Codec))
+        {
+            yield return SubtitlesWrongFormat;
         }
     }
 }

@@ -26,13 +26,17 @@ public class DefaultEmailService : IEmailService, IDisposable
         GC.SuppressFinalize(this);
     }
 
-    public async Task SendEmail(string to, string subject, string message, CancellationToken token = default)
+    public async Task SendEmail(string to, string subject, string message, string? secretCopy = null, CancellationToken token = default)
     {
         var mimeMessage = new MimeMessage();
         mimeMessage.From.Add(new MailboxAddress(options.Value.FromName, options.Value.FromAddress));
         var toAddress = new MailboxAddress(string.Empty, to);
         mimeMessage.To.Add(toAddress);
         mimeMessage.Subject = $"[KAFE] {subject}";
+        if (secretCopy is not null)
+        {
+            mimeMessage.Bcc.Add(new MailboxAddress(string.Empty, secretCopy));
+        }
         mimeMessage.Body = new TextPart("plain")
         {
             Text = message

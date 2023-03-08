@@ -27,9 +27,9 @@ public class RelayedEmailService : IEmailService, IDisposable
         client = new HttpClient();
     }
 
-    public async Task SendEmail(string to, string subject, string message, CancellationToken token = default)
+    public async Task SendEmail(string to, string subject, string message, string? secretCopy = null, CancellationToken token = default)
     {
-        var dto = new RelayedMessageDto(to, $"[KAFE] {subject}", message);
+        var dto = new RelayedMessageDto(to, $"[KAFE] {subject}", message, secretCopy);
         var request = new HttpRequestMessage(HttpMethod.Post, new Uri(options.Value.RelayUrl));
         var jsonOptions = new JsonSerializerOptions
         {
@@ -54,5 +54,5 @@ public class RelayedEmailService : IEmailService, IDisposable
         GC.SuppressFinalize(this);
     }
 
-    private record RelayedMessageDto(string To, string Subject, string Message);
+    private record RelayedMessageDto(string To, string Subject, string Message, string? SecretCopy);
 }

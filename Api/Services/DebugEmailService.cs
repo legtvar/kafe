@@ -13,7 +13,7 @@ public class DebugEmailService : IEmailService
         this.logger = logger;
     }
 
-    public Task SendEmail(string to, string subject, string message, CancellationToken token = default)
+    public Task SendEmail(string to, string subject, string message, string? secretCopy = null, CancellationToken token = default)
     {
         logger.LogInformation("\tTo: {}\n\tSubject: {}\n\tMessage:\n\n{}", 
             to,

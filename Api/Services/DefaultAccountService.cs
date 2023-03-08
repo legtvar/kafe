@@ -205,7 +205,7 @@ public class DefaultAccountService : IAccountService, IDisposable
             Const.ConfirmationEmailMessageTemplate[account!.PreferredCulture]!,
             confirmationUrl,
             Const.EmailSignOffs[RandomNumberGenerator.GetInt32(0, Const.EmailSignOffs.Length)][account!.PreferredCulture]);
-        await emailService.SendEmail(account.EmailAddress, emailSubject, emailMessage, token);
+        await emailService.SendEmail(account.EmailAddress, emailSubject, emailMessage, null, token);
 
         return id;
     }

@@ -5,5 +5,5 @@ namespace Kafe.Api.Services;
 
 public interface IEmailService
 {
-    Task SendEmail(string to, string subject, string message, CancellationToken token = default);
+    Task SendEmail(string to, string subject, string message, string? secretCopy = null, CancellationToken token = default);
 }

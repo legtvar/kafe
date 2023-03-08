@@ -877,6 +877,7 @@ public partial class DefaultProjectService : IProjectService
                         owner.EmailAddress,
                         Const.ProjectReviewEmailSubject[owner.PreferredCulture]!,
                         dto.Comment[owner.PreferredCulture]!,
+                        userProvider.User?.EmailAddress,
                         token);
                 }
             }

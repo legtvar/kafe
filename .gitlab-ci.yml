@@ -53,13 +53,15 @@ migrate-wma:
     PGPASSWORD: postgres
   timeout: 3h
   script:
-    - apk update
-    - apk add dotnet7-sdk postgresql-client ffmpeg
-    - psql -h kafe-db -p 5432 -U postgres -c "DROP DATABASE lemma"
-    - cat /mnt/kafe/lemma-08-03-2023-all.sql | psql -h kafe-db -p 5432 -U postgres
-    - dotnet build Migrator
-    - cp "$APPSETTINGS_MIGRATOR" "./Migrator/appsettings.local.json"
-    - dotnet run --project Migrator --framework net7.0
+    #- apk update
+    #- apk add dotnet7-sdk postgresql-client ffmpeg
+    #- psql -h kafe-db -p 5432 -U postgres -c "DROP DATABASE lemma"
+    #- cat /mnt/kafe/lemma-08-03-2023-all.sql | psql -h kafe-db -p 5432 -U postgres
+    #- dotnet build Migrator
+    #- cp "$APPSETTINGS_MIGRATOR" "./Migrator/appsettings.local.json"
+    #- dotnet run --project Migrator --framework net7.0
+    - echo "This job has been crippled on purpose."
+    - exit 1
   only:
     - master
     - api

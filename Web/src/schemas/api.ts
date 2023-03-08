@@ -364,6 +364,21 @@ export interface paths {
       };
     };
   };
+  "/api/v1/project-review": {
+    post: {
+      requestBody?: {
+        content: {
+          "application/json": components["schemas"]["ProjectReviewCreationDto"];
+          "text/json": components["schemas"]["ProjectReviewCreationDto"];
+          "application/*+json": components["schemas"]["ProjectReviewCreationDto"];
+        };
+      };
+      responses: {
+        /** @description Success */
+        200: never;
+      };
+    };
+  };
   "/api/v1/project-validation/{id}": {
     get: {
       parameters: {
@@ -445,9 +460,9 @@ export interface paths {
         /** @description Success */
         200: {
           content: {
-            "video/mp4": string;
-            "video/x-matroska": string;
-            "application/octet-stream": string;
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
           };
         };
       };
@@ -465,9 +480,9 @@ export interface paths {
         /** @description Success */
         200: {
           content: {
-            "video/mp4": string;
-            "video/x-matroska": string;
-            "application/octet-stream": string;
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
           };
         };
       };
@@ -618,11 +633,14 @@ export interface components {
     /** @enum {string} */
     DiagnosticKind: "Unknown" | "Info" | "Warning" | "Error";
     ImageDto: {
+      fileExtension: string;
+      formatName: string;
+      mimeType: string;
       /** Format: int32 */
       width: number;
       /** Format: int32 */
       height: number;
-      format: string;
+      isCorrupted: boolean;
     };
     ImageShardDetailDto: WithRequired<({
       kind: "Image";
@@ -929,6 +947,17 @@ export interface components {
       /** Format: date-time */
       releasedOn: string;
     };
+    ProjectReviewCreationDto: {
+      projectId: string;
+      kind: components["schemas"]["ReviewKind"];
+      reviewerRole: string;
+      /** LocalizedString */
+      comment?: ({
+        iv: string;
+        cs?: string | null;
+        en?: string | null;
+      }) | null;
+    };
     ProjectReviewDto: {
       kind: components["schemas"]["ReviewKind"];
       reviewerRole: string;
@@ -938,6 +967,8 @@ export interface components {
         cs?: string | null;
         en?: string | null;
       }) | null;
+      /** Format: date-time */
+      addedOn: string;
     };
     ProjectValidationDto: {
       /**

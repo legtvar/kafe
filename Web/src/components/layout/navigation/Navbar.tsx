@@ -23,6 +23,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useApi, useAuth } from '../../../hooks/Caffeine';
 import { avatarUrl } from '../../../utils/avatarUrl';
 import { LanguageToggle } from '../../utils/LanguageToggle';
+import { BetaWarning } from '../BetaWarning';
 import { Logo } from '../Logo';
 
 interface INavbarProps extends FlexProps {
@@ -68,10 +69,13 @@ export function Navbar({ onOpen, forceReload, signedIn, ...rest }: INavbarProps)
                 />
             )}
 
+            <BetaWarning />
+
             {signedIn && <Spacer />}
             <Link to="/">
                 <Logo display={signedIn ? { base: 'flex', md: 'none' } : 'flex'} ml={6} />
             </Link>
+
             <Spacer />
 
             <HStack spacing={1}>

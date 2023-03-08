@@ -29,7 +29,7 @@ export function ProjectEdit(props: IProjectEditProps) {
                         </Heading>
                         <Link to="..">
                             <Button leftIcon={<BsX />} mr={4}>
-                                {t('generic.cancel').toString()}
+                                {t('projectEdit.quit').toString()}
                             </Button>
                         </Link>
                     </Flex>

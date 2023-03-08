@@ -1,8 +1,11 @@
 {
   "beta": {
-    "description": "Vývoj této aplikace právě začal. Prosím buďte shovívaví zatímco za vás proléváme krev, pot a kafe.",
+    "description": "Právě probíhá vývoj této aplikace. Prosím buďte shovívaví k případným problémům zatímco za vás proléváme krev, pot a kafe.",
     "title": "Právě probíhá vývoj...",
-    "toggleLanguage": "Přepnout na {{language}}"
+    "toggleLanguage": "Přepnout na {{language}}",
+    "warning": "KAFE je v testovacím provozu",
+    "button": "Chápu",
+    "contactus": "V případě jakýchkoli potíží nás prosím kontaktujte emailem na"
   },
   "common": {
     "backHome": "Zpět na domovskou stránku",
@@ -54,7 +57,7 @@
     "for": "pro",
     "edit": "Upravit",
     "save": "Uložit",
-    "cancel": "Ukončit editaci"
+    "cancel": "Zrušit"
   },
   "home": {
     "signin": "Přihlásit se"
@@ -183,9 +186,9 @@
   "projectStatus": {
     "info": "Základní informace jsou dostatečně vyplněny",
     "file": "Soubory jsou nahrány a prošly automatizovanou kontrolou",
-    "tech-review": "Projekt prošel kontrolou technikem",
-    "visual-review": "Projekt prošel kontrolou grafikem",
-    "dramaturgy-review": "Projekt byl přijat"
+    "tech": "Projekt prošel kontrolou technikem",
+    "visual": "Projekt prošel kontrolou grafikem",
+    "dramaturgy": "Projekt byl přijat na festival"
   },
   "authorSelect": {
     "button": "Přidat osobu",
@@ -206,6 +209,16 @@
       "info": "Základní informace",
       "files": "Soubory",
       "admin": "Přístup administrátora"
-    }
+    },
+    "quit": "Ukončit editaci"
+  },
+  "homeFestival": {
+    "title": "Nezapomeňte přihlásit svůj film na"
+  },
+  "countdown": {
+    "days": "dní",
+    "hours": "hodin",
+    "minutes": "minut",
+    "seconds": "sekund"
   }
 }

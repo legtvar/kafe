@@ -7,6 +7,7 @@ import { Brand } from '../brand/Brand';
 export interface IStatusProps {
     statusCode?: string | number;
     embeded?: true; // !standalone
+    log?: any;
 }
 
 export const Status: React.FC<IStatusProps> = (props: IStatusProps) => {
@@ -19,6 +20,8 @@ export const Status: React.FC<IStatusProps> = (props: IStatusProps) => {
     }
 
     routeError && console.error(routeError);
+
+    props.log && console.log(props.log);
 
     return (
         <Center w={props.embeded ? '100%' : '100vw'} h={props.embeded ? '100%' : '100vh'}>

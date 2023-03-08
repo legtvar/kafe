@@ -1,8 +1,11 @@
 {
   "beta": {
-    "description": "The development has just started. Please hold tight as we build the app with our sweat, tears and covfefe.",
+    "description": "This application is currently under development. Please be patient with any issues while we build the app with our sweat, tears and coffee.",
     "title": "Development in progress...",
-    "toggleLanguage": "Switch to {{language}}"
+    "toggleLanguage": "Switch to {{language}}",
+    "warning": "KAFE is in beta",
+    "button": "I understand",
+    "contactus": "In case of any problems, please contact us via email at"
   },
   "common": {
     "backHome": "Back Home",
@@ -54,7 +57,7 @@
     "for": "for",
     "edit": "Edit",
     "save": "Save",
-    "cancel": "Quit edit mode"
+    "cancel": "Cancel"
   },
   "home": {
     "signin": "Sign in"
@@ -180,9 +183,9 @@
   "projectStatus": {
     "info": "Basic information is sufficiently filled in",
     "file": "Files are uploaded and have passed the automated check",
-    "tech-review": "Project has been reviewed by a technician",
-    "visual-review": "The project has been reviewed by the graphic designer",
-    "dramaturgy-review": "Project has been accepted"
+    "tech": "Project has been reviewed by a technician",
+    "visual": "The project has been reviewed by the graphic designer",
+    "dramaturgy": "Project has been accepted"
   },
   "authorSelect": {
     "button": "Add a person",
@@ -202,6 +205,16 @@
       "status": "State",
       "info": "Basic information",
       "files": "Files"
-    }
+    },
+    "quit": "Quit edit mode"
+  },
+  "homeFestival": {
+    "title": "Don't forget to submit your movie to"
+  },
+  "countdown": {
+    "days": "days",
+    "hours": "hours",
+    "minutes": "minutes",
+    "seconds": "seconds"
   }
 }

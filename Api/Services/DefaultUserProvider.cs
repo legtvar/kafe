@@ -54,7 +54,7 @@ public class DefaultUserProvider : IUserProvider
             throw new InvalidOperationException("The system user cannot be refreshed.");
         }
 
-        var account = await db.LoadAsync<AccountInfo>(User.Id, token);
+        var account = await db.Events.AggregateStreamAsync<AccountInfo>(User.Id, token: token);
         if (account is null)
         {
             throw new IndexOutOfRangeException("Cannot refresh the current account because it no longer exists.");

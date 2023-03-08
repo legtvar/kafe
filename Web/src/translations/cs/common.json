@@ -251,5 +251,9 @@
   },
   "tagInput": {
     "note": "Role oddělujte čárkou, nebo novým řádkem"
+  },
+  "artifact": {
+    "delete": "Odstranit artefakt",
+    "deleteWarn": "Opravdu chcete odstranit vybraný artefatk? Tato operace je nevratná!"
   }
 }

@@ -17,6 +17,11 @@ export class Serializer<T extends AbstractType> {
         return this;
     }
 
+    public addAlways<U extends keyof T>(key: U, mapper: (value: T[U]) => any = (value) => value): any {
+        this.result[key] = mapper(this.obj[key]);
+        return this;
+    }
+
     public addConditionaly<U extends keyof T>(
         add: boolean,
         key: U,

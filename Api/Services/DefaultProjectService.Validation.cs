@@ -16,10 +16,10 @@ namespace Kafe.Api.Services;
 
 public partial class DefaultProjectService : IProjectService
 {
-    public const int NameLengthLimit = 32;
+    public const int NameMaxLength = 32;
     public const int DescriptionMinLength = 50;
     public const int DescriptionMaxLength = 200;
-    public const int GenreLengthLimit = 32;
+    public const int GenreMaxLength = 32;
     public static readonly TimeSpan FilmMinLength = TimeSpan.FromSeconds(1);
     public static readonly TimeSpan FilmMaxLength = TimeSpan.FromMinutes(8);
     public static readonly TimeSpan VideoAnnotationMinLength = TimeSpan.FromSeconds(1);
@@ -70,8 +70,8 @@ public partial class DefaultProjectService : IProjectService
         Kind: DiagnosticKind.Error,
         ValidationStage: InfoStage,
         Message: LocalizedString.Create(
-            (Const.InvariantCulture, $"The project must have a name that is at most {NameLengthLimit} characters long."),
-            (Const.CzechCulture, $"Projekt musí mít název o nejvýše {NameLengthLimit} znacích.")
+            (Const.InvariantCulture, $"The project must have a name that is at most {NameMaxLength} characters long."),
+            (Const.CzechCulture, $"Projekt musí mít název o nejvýše {NameMaxLength} znacích.")
         )
     );
 
@@ -99,7 +99,7 @@ public partial class DefaultProjectService : IProjectService
         Kind: DiagnosticKind.Error,
         ValidationStage: InfoStage,
         Message: LocalizedString.Create(
-            (Const.InvariantCulture, $"The project genre must be at most {GenreLengthLimit} characters long."),
+            (Const.InvariantCulture, $"The project genre must be at most {GenreMaxLength} characters long."),
             (Const.CzechCulture, $"Žánr projektu musí mít nejvýše {DescriptionMaxLength} znaků.")
         )
     );
@@ -510,7 +510,7 @@ public partial class DefaultProjectService : IProjectService
 
         var diagnostics = ImmutableArray.CreateBuilder<ProjectDiagnosticDto>();
 
-        if (project.Name.Values.Any(n => string.IsNullOrWhiteSpace(n) || n.Length > NameLengthLimit))
+        if (project.Name.Values.Any(n => string.IsNullOrWhiteSpace(n) || n.Length > NameMaxLength))
         {
             diagnostics.Add(InvalidName);
         }
@@ -530,7 +530,7 @@ public partial class DefaultProjectService : IProjectService
         }
 
         if (project.Genre is not null
-            && project.Genre.Values.Any(g => g.Length > GenreLengthLimit))
+            && project.Genre.Values.Any(g => g.Length > GenreMaxLength))
         {
             diagnostics.Add(GenreTooLong);
         }

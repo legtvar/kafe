@@ -23,49 +23,14 @@ public static class TransferMaps
                 (Const.InvariantCulture, "Film registration to FFFI MU 2023"),
                 (Const.CzechCulture, "Přihlášení filmu na 23. FFFI MU")
             ),
-            Description: LocalizedString.Create(
-                (Const.InvariantCulture, "TODO"),
-                (Const.CzechCulture,
-@"Točíš filmy? Nebojíš se překračovat hranice? Hledáš důvod proč realizovat svůj nápad?
-Tak to si tu správně! Natoč krátký film a přihlaš ho na 23. Filmový festival Fakulty Informatiky Masarykovy univerzity! Deadline je 9. dubna 2023, tak si pospěš!   
-S námi můžeš ukázat svoji tvorbu před stovkami lidí a pokud tvůj snímek zaujme porotu nebo diváky, budeš odměněný i cenami.
-Tak co, už přihlašuješ?
-Jestli jsme tě ještě nepřesvědčili? Pro více technických a organizačních detailů si přečti pravidla (a v případě potíží s přihlašováním prosím kontaktuj festival-tech@fi.muni.cz).
-
-Podmínky pro přijetí filmu na 23. Filmový festival Fakulty informatiky Masarykovy univerzity jsou:
-1. Do soutěže mohou být přijata amatérská audiovizuální díla libovolného žánru i formy zpracování (hraná, animovaná) v délce do 8 minut.
-2. Tvůrci filmu nesmí být profesionálové v tvorbě audiovizuálních děl.
-3. Snímek nesmí být starší než 3 roky.
-4. Snímek nesmí porušovat žádná autorská práva.
-5. Film může přihlásit pouze jeden z jeho autorů, a to se souhlasem všech spoluautorů díla.
-
-Povinné technické specifikace pro filmy:
-- Formát (kodek) videa: H.264 (doporučený), MPEG-4 Part 2
-- Formát (kodek) audia: WAV, FLAC, MP3 (bitrate u MP3 alespoň 192 kbps)
-- Framerate videa: 24 fps
-- Titulky: anglické ve formátu SRT nebo ASS
-- Kontejner: MP4 (doporučené), MKV
-- Rozlišení: na šířku alespoň FullHD (t.j. 1920)
-- Bitrate: 10 - 20 Mbps
-- Hlasitost: max. -3 dB
-- Velikost každého souboru maximálně 2GB
-- Pokud je potřeba platformě YouTube doložit, že držíte licenční práva na použitý materiál, kontaktujte nás na festival-tech@fi.muni.cz.
-
-Úplné znění pravidel naleznete na http://festival.fi.muni.cz.
-
-V případě technických problémů nás prosím kontaktujte na adrese: festival-tech@fi.muni.cz.
-"
-            )),
+            Description: null,
             ArtifactBlueprints: ImmutableArray.Create(
                 new ProjectArtifactBlueprintDto(
                     Name: LocalizedString.Create(
                         (Const.InvariantCulture, "Film"),
                         (Const.CzechCulture, "Film")
                     ),
-                    Description: LocalizedString.Create(
-                        (Const.InvariantCulture, "TODO"),
-                        (Const.CzechCulture, "Soubor s filmem splňující technické požadavky")
-                    ),
+                    Description: null,
                     SlotName: Const.FilmBlueprintSlot,
                     Arity: ArgumentArity.ExactlyOne,
                     ShardBlueprints: ImmutableArray.Create(
@@ -92,11 +57,7 @@ V případě technických problémů nás prosím kontaktujte na adrese: festiva
                         (Const.InvariantCulture, "Video-annotation"),
                         (Const.CzechCulture, "Videoanotace")
                     ),
-                    Description: LocalizedString.Create(
-                        (Const.InvariantCulture, "TODO"),
-                        (Const.CzechCulture, "Volitelné představení filmu jeho tvůrci o délce maximálně 30 " +
-                        "sekund. Technické požadavky jsou stejné jako u filmu.")
-                    ),
+                    Description: null,
                     SlotName: Const.VideoAnnotationBlueprintSlot,
                     Arity: ArgumentArity.ZeroOrOne,
                     ShardBlueprints: ImmutableArray.Create(
@@ -123,10 +84,7 @@ V případě technických problémů nás prosím kontaktujte na adrese: festiva
                         (Const.InvariantCulture, "Cover photo"),
                         (Const.CzechCulture, "Titulní fotografie")
                     ),
-                    Description: LocalizedString.Create(
-                        (Const.InvariantCulture, "TODO"),
-                        (Const.CzechCulture, "Nahrajte kvalitní screenshoty nebo fotografie ze scén, které váš film vystihují. Budou použity v medailonku vašeho filmu a do brožury festivalu.")
-                    ),
+                    Description: null,
                     SlotName: Const.CoverPhotoBlueprintSlot,
                     Arity: new ArgumentArity(Const.CoverPhotoMinCount, Const.CoverPhotoMaxCount),
                     ShardBlueprints: ImmutableArray.Create(

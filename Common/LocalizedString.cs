@@ -75,6 +75,16 @@ public sealed partial class LocalizedString : IEquatable<LocalizedString>
         return value is null || value.data.Values.All(string.IsNullOrEmpty);
     }
 
+    public static bool IsTooLong(LocalizedString? value, int maxLength = 8 << 10)
+    {
+        return value is not null && value.Values.Any(v => v.Length > maxLength);
+    }
+
+    public static bool IsNullEmptyOrLong([NotNullWhen(false)] LocalizedString? value, int maxLength = 8 << 10)
+    {
+        return IsNullOrEmpty(value) || IsTooLong(value, maxLength);
+    }
+
     [return: NotNullIfNotNull(nameof(localized))]
     public static implicit operator ImmutableDictionary<string, string>?(LocalizedString? localized)
     {

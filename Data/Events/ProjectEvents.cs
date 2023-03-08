@@ -18,9 +18,17 @@ public record ProjectAuthorAdded(
     ImmutableArray<string>? Roles = null
 );
 
+/// <summary>
+/// Removes an author from a project.
+/// </summary>
+/// <param name="ProjectId">Hrib of the project.</param>
+/// <param name="AuthorId">Hrib of the author to be removed.</param>
+/// <param name="Kind">The kind of author. If null, removes from all kinds.</param>
+/// <param name="Roles">The roles to remove. If null, removes author altogether.</param>
 public record ProjectAuthorRemoved(
     [Hrib] string ProjectId,
     [Hrib] string AuthorId,
+    ProjectAuthorKind? Kind = null,
     ImmutableArray<string>? Roles = null
 );
 

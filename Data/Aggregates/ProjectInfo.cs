@@ -78,7 +78,7 @@ public class ProjectInfoProjection : SingleStreamAggregation<ProjectInfo>
             p = p with { Authors = ImmutableArray<ProjectAuthorInfo>.Empty };
         }
 
-        var author = p.Authors.SingleOrDefault(a => a.Id == e.AuthorId);
+        var author = p.Authors.SingleOrDefault(a => a.Id == e.AuthorId && a.Kind == e.Kind);
         if (author is not null && e.Roles.HasValue && !e.Roles.Value.IsDefault)
         {
             author.Roles
@@ -97,8 +97,7 @@ public class ProjectInfoProjection : SingleStreamAggregation<ProjectInfo>
 
         return p with
         {
-            Authors = p.Authors.RemoveAll(a => a.Id == e.AuthorId)
-                .Add(author)
+            Authors = p.Authors.Add(author)
         };
     }
 
@@ -113,30 +112,28 @@ public class ProjectInfoProjection : SingleStreamAggregation<ProjectInfo>
         {
             return p with
             {
-                Authors = p.Authors.RemoveAll(a => a.Id == e.AuthorId)
+                Authors = p.Authors.RemoveAll(a => a.Id == e.AuthorId && a.Kind == (e.Kind ?? a.Kind))
             };
         }
-        else
-        {
-            return p with
-            {
-                Authors = p.Authors
-                    .Select(a =>
-                    {
-                        if (a.Id != e.AuthorId)
-                        {
-                            return a;
-                        }
 
-                        return a with
-                        {
-                            Roles = a.Roles.RemoveAll(r => e.Roles.Value.Contains(r))
-                                .ToImmutableArray()
-                        };
-                    })
-                    .ToImmutableArray()
-            };
-        }
+        return p with
+        {
+            Authors = p.Authors
+                .Select(a =>
+                {
+                    if (a.Id != e.AuthorId || a.Kind != (e.Kind ?? a.Kind))
+                    {
+                        return a;
+                    }
+
+                    return a with
+                    {
+                        Roles = a.Roles.RemoveAll(r => e.Roles.Value.Contains(r))
+                    };
+                })
+                .Where(a => a.Roles.Length > 0)
+                .ToImmutableArray()
+        };
 
     }
 

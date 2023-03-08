@@ -89,6 +89,15 @@ public record ProjectCreationDto(
     ImmutableArray<ProjectCreationAuthorDto> Cast
 );
 
+public record ProjectEditDto(
+    string Id,
+    LocalizedString? Name,
+    LocalizedString? Description,
+    LocalizedString? Genre,
+    ImmutableArray<ProjectCreationAuthorDto>? Crew,
+    ImmutableArray<ProjectCreationAuthorDto>? Cast
+);
+
 public record ProjectCreationAuthorDto(
     string Id,
     ImmutableArray<string> Roles

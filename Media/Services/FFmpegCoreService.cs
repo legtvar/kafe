@@ -59,7 +59,7 @@ public class FFmpegCoreService : IMediaService
         }
         catch (FFMpegException)
         {
-            return MediaInfo.Invalid;
+            return MediaInfo.Invalid with { Error = e.Message }; ;
         }
     }
 

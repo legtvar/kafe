@@ -19,19 +19,13 @@ namespace Kafe.Api.Services;
 public class DefaultArtifactService : IArtifactService
 {
     private readonly IDocumentSession db;
-    private readonly IOptions<StorageOptions> storageOptions;
-    private readonly IMediaService mediaService;
     private readonly IUserProvider userProvider;
 
     public DefaultArtifactService(
         IDocumentSession db,
-        IOptions<StorageOptions> storageOptions,
-        IMediaService mediaService,
         IUserProvider userProvider)
     {
         this.db = db;
-        this.storageOptions = storageOptions;
-        this.mediaService = mediaService;
         this.userProvider = userProvider;
     }
 
@@ -65,15 +59,23 @@ public class DefaultArtifactService : IArtifactService
 
     public async Task<Hrib> Create(ArtifactCreationDto dto, CancellationToken token = default)
     {
-        var containingProject = await db.LoadAsync<ProjectInfo>(dto.ContainingProject, token);
-        if (containingProject is null)
+        if (!userProvider.IsAdministrator())
         {
-            throw new ArgumentException($"Project '{dto.ContainingProject}' does not exist.");
-        }
+            if (dto.ContainingProject is null)
+            {
+                throw new UnauthorizedAccessException("Only administrators can create artifacts without projects.");
+            }
 
-        if (!userProvider.CanEdit(containingProject))
-        {
-            throw new UnauthorizedAccessException($"The '{dto.ContainingProject}' project is not editable.");
+            var containingProject = await db.LoadAsync<ProjectInfo>(dto.ContainingProject, token);
+            if (containingProject is null)
+            {
+                throw new ArgumentException($"Project '{dto.ContainingProject}' does not exist.");
+            }
+
+            if (!userProvider.CanEdit(containingProject))
+            {
+                throw new UnauthorizedAccessException($"The '{dto.ContainingProject}' project is not editable.");
+            }
         }
 
         var created = new ArtifactCreated(

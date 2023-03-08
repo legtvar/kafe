@@ -18,17 +18,20 @@ public partial class DefaultProjectService : IProjectService
     private readonly IDocumentSession db;
     private readonly IUserProvider userProvider;
     private readonly IAccountService accounts;
+    private readonly IArtifactService artifacts;
     private readonly IEmailService emails;
 
     public DefaultProjectService(
         IDocumentSession db,
         IUserProvider userProvider,
         IAccountService accounts,
+        IArtifactService artifacts,
         IEmailService emails)
     {
         this.db = db;
         this.userProvider = userProvider;
         this.accounts = accounts;
+        this.artifacts = artifacts;
         this.emails = emails;
     }
 
@@ -156,6 +159,32 @@ public partial class DefaultProjectService : IProjectService
                     Roles: a.Roles));
             eventStream.AppendMany(authorsAdded);
         }
+
+        if (dto.Artifacts is not null)
+        {
+            foreach(var artifact in project.Artifacts)
+            {
+                eventStream.AppendOne(new ProjectArtifactRemoved(dto.Id, artifact.Id));
+            }
+
+            foreach(var artifact in dto.Artifacts)
+            {
+                var artifactInfo = await artifacts.Load(artifact.Id, token);
+                if (artifactInfo is null)
+                {
+                    throw new IndexOutOfRangeException($"Artifact '{artifact.Id}' does not exist.");
+                }
+
+                if (artifact.BlueprintSlot is not null
+                    && !project.Blueprint.ArtifactBlueprints.TryGetValue(artifact.BlueprintSlot, out var _))
+                {
+                    throw new IndexOutOfRangeException($"BlueprintSlot '{artifact.BlueprintSlot}' is not defined.");
+                }
+
+                eventStream.AppendOne(new ProjectArtifactAdded(dto.Id, artifact.Id, artifact.BlueprintSlot));
+            }
+        }
+
         await db.SaveChangesAsync(token);
     }
 

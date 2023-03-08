@@ -62,13 +62,12 @@ public record ProjectBlueprintDto(
     LocalizedString Name,
     LocalizedString? Description,
     ImmutableArray<string> RequiredReviewers,
-    ImmutableArray<ProjectArtifactBlueprintDto> ArtifactBlueprints
+    ImmutableDictionary<string, ProjectArtifactBlueprintDto> ArtifactBlueprints
 );
 
 public record ProjectArtifactBlueprintDto(
     LocalizedString Name,
     LocalizedString? Description,
-    string SlotName,
     ArgumentArity Arity,
     ImmutableArray<ProjectArtifactShardBlueprintDto> ShardBlueprints
 );
@@ -95,7 +94,8 @@ public record ProjectEditDto(
     LocalizedString? Description,
     LocalizedString? Genre,
     ImmutableArray<ProjectCreationAuthorDto>? Crew,
-    ImmutableArray<ProjectCreationAuthorDto>? Cast
+    ImmutableArray<ProjectCreationAuthorDto>? Cast,
+    ImmutableArray<ProjectArtifactAdditionDto>? Artifacts
 );
 
 public record ProjectCreationAuthorDto(
@@ -113,4 +113,9 @@ public record ProjectDiagnosticDto(
     DiagnosticKind Kind,
     LocalizedString Message,
     string ValidationStage
+);
+
+public record ProjectArtifactAdditionDto(
+    string Id,
+    string? BlueprintSlot
 );

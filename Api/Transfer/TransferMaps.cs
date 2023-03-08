@@ -24,14 +24,14 @@ public static class TransferMaps
                 (Const.CzechCulture, "Přihlášení filmu na 23. FFFI MU")
             ),
             Description: null,
-            ArtifactBlueprints: ImmutableArray.Create(
-                new ProjectArtifactBlueprintDto(
+            ArtifactBlueprints: new Dictionary<string, ProjectArtifactBlueprintDto>
+            {
+                [Const.FilmBlueprintSlot] = new ProjectArtifactBlueprintDto(
                     Name: LocalizedString.Create(
                         (Const.InvariantCulture, "Film"),
                         (Const.CzechCulture, "Film")
                     ),
                     Description: null,
-                    SlotName: Const.FilmBlueprintSlot,
                     Arity: ArgumentArity.ExactlyOne,
                     ShardBlueprints: ImmutableArray.Create(
                         new ProjectArtifactShardBlueprintDto(
@@ -52,13 +52,12 @@ public static class TransferMaps
                             Arity: ArgumentArity.ExactlyOne)
                     )
                 ),
-                new ProjectArtifactBlueprintDto(
+                [Const.VideoAnnotationBlueprintSlot] = new ProjectArtifactBlueprintDto(
                     Name: LocalizedString.Create(
                         (Const.InvariantCulture, "Video-annotation"),
                         (Const.CzechCulture, "Videoanotace")
                     ),
                     Description: null,
-                    SlotName: Const.VideoAnnotationBlueprintSlot,
                     Arity: ArgumentArity.ZeroOrOne,
                     ShardBlueprints: ImmutableArray.Create(
                         new ProjectArtifactShardBlueprintDto(
@@ -79,13 +78,12 @@ public static class TransferMaps
                             Arity: ArgumentArity.ExactlyOne)
                     )
                 ),
-                new ProjectArtifactBlueprintDto(
+                [Const.CoverPhotoBlueprintSlot] = new ProjectArtifactBlueprintDto(
                     Name: LocalizedString.Create(
                         (Const.InvariantCulture, "Cover photo"),
                         (Const.CzechCulture, "Titulní fotografie")
                     ),
                     Description: null,
-                    SlotName: Const.CoverPhotoBlueprintSlot,
                     Arity: new ArgumentArity(Const.CoverPhotoMinCount, Const.CoverPhotoMaxCount),
                     ShardBlueprints: ImmutableArray.Create(
                         new ProjectArtifactShardBlueprintDto(
@@ -98,7 +96,8 @@ public static class TransferMaps
                             Arity: ArgumentArity.ExactlyOne)
                     )
                 )
-            )
+            }
+            .ToImmutableDictionary()
         );
 
 

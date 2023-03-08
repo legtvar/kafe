@@ -51,7 +51,7 @@ export function HomeFestival(props: IHomeFestivalProps) {
                                                 {group.deadline && (
                                                     <Box>
                                                         <Box fontWeight="bold" mt={12}>
-                                                            Nepropásni to! Do konce přihlašování už zbývá jen
+                                                            {t('createProject.doNotforget').toString()}
                                                         </Box>
                                                         <Countdown
                                                             date={new Date(group.deadline)}
@@ -77,7 +77,9 @@ export function HomeFestival(props: IHomeFestivalProps) {
 
                                                 <Flex direction="row" my={12}>
                                                     <Link to={`/auth/groups/${group.id}/create`}>
-                                                        <Button colorScheme="brand">Přihlásit film</Button>
+                                                        <Button colorScheme="brand">
+                                                            {t('createProject.signUp').toString()}
+                                                        </Button>
                                                     </Link>
                                                     <Spacer />
                                                 </Flex>

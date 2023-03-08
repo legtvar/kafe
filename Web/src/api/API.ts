@@ -120,6 +120,28 @@ export class API {
         };
     }
 
+    public get review() {
+        const api = this;
+
+        return {
+            async create(
+                projectId: HRIB,
+                kind: components['schemas']['ReviewKind'],
+                reviewerRole: string,
+                comment: string,
+            ) {
+                return await api.post<any, HRIB>(`project-review`, {
+                    projectId,
+                    kind,
+                    reviewerRole,
+                    comment: {
+                        iv: comment,
+                    },
+                });
+            },
+        };
+    }
+
     public get shards() {
         const api = this;
 
@@ -140,6 +162,9 @@ export class API {
             streamUrl(id: string, variant: string) {
                 return `${api.apiUrl}shard-download/${id}/${variant}`;
             },
+            defaultStreamUrl(id: string) {
+                return `${api.apiUrl}shard-download/${id}`;
+            },
         };
     }
 
@@ -159,7 +184,7 @@ export class API {
                     );
                 },
                 async confirm(token: string) {
-                    return await api.getSimple(`tmp-account/${token}`);
+                    return api.getSimple(`tmp-account/${token}`);
                 },
             },
             info: {
@@ -171,8 +196,7 @@ export class API {
                 },
             },
             async logout() {
-                // TODO: Add endpoint
-                return null;
+                return api.getSimple(`account/logout`);
             },
         };
     }

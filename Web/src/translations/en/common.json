@@ -63,7 +63,9 @@
       },
       "specs": "Technical requirements",
       "newArtefact": "Create a new artifact"
-    }
+    },
+    "signUp": "Submit a movie",
+    "doNotforget": "Don't miss it! Until the end of the registration remains"
   },
   "error": {
     "invalidPath": "URL path is invalid",
@@ -87,9 +89,9 @@
     "title": "Don't forget to submit your movie to"
   },
   "introText": {
-    "details": "<0>Filmový festival Fakulty informatiky Masarykovy univerzity je festival krátkých amatérských filmů. Festivalový večer se bude konat na Fakultě informatiky MU, v Univerzitním kině Scala a zároveň se bude streamovat pro diváky na YouTube a to v pátek 19. května 2023 od 19 hodin.</0><1>Podmínky pro přijetí filmu na 23. Filmový festival FI MU jsou:</1><2><0>Do soutěže mohou být přijata amatérská audiovizuální díla libovolného žánru i formy zpracování (hraná, animovaná) v délce do 8 minut</0><1>Tvůrci filmu nesmí být profesionálové v tvorbě audiovizuálních děl</1><2>Snímek nesmí být starší než 3 roky</2><3>Snímek nesmí porušovat žádná autorská práva</3><4>Film může přihlásit pouze jeden z jeho autorů, a to se souhlasem všech spoluautorů díla</4><5>Přihlášení je zdarma.</5></2><3>Soutěžní snímky budou hodnoceny dvěma způsoby:</3><4>Hlasováním odborné poroty</4><5>Diváckou anketou</5><6>Snímky je nutné přihlásit do 9. dubna 2023 pomocí online formuláře přes odkaz výše. Každý příspěvek musí mít výstižný název. Součástí přihlášky musí být též doprovodný text se stručnou anotací snímku. Pořadatelé festivalu si vyhrazují právo bez předání k posouzení Programovému výboru vyloučit příspěvky, které nesplňují výše uvedené podmínky, nebo příspěvky, které jsou obsahově v rozporu s českou legislativou. Každý autor/autorský kolektiv může přihlásit na festival maximálně tři samostatné snímky. Výběr snímků k projekci a dramaturgii večera určí ředitel festivalu s vyučujícími předmětu PV113 Produkce filmového díla. Tato interní porota není shodná s odbornou porotou, která finálně určí vítězné pozice. Na zařazení do programu festivalu není právní nárok.</6><7>Autoři budou o přijetí či nepřijetí díla k projekci na festivalu informování pomocí kontaktů uvedených v přihlášce. Snímky vybrané Programovým výborem budou během 23. Filmového festivalu Fakulty informatiky Masarykovy univerzity promítány na plátnech v Brně.</7><8>Na výhru v soutěži nemá soutěžící právní nárok a nepeněžní ceny nelze ani alternativně plnit či proměnit v penězích. Ceny budou vydány na základě oboustranné dohody autora s pořadateli 23. Filmového festivalu Fakulty informatiky MU.</8><9>Přihlášením audiovizuálního díla (filmu) přihlašující prohlašuje, že disponuje právem dílo takto užít a že disponuje oprávněními k dílům ve filmu užitým.</9><10>Přihlášením filmu přihlašující poskytuje pořadateli bezplatnou licenci k promítnutí díla v rámci Filmového festivalu Fakulty informatiky MU.</10><11>Autor přihlášením snímku dále MU poskytuje nevýhradní bezplatnou licenci k uchování rozmnoženiny k případnému promítání díla v rámci výuky a propagaci FFFI MU a k neveřejnému promítání pro akademickou obec MU. Územní a množstevní rozsah licence je neomezený. Oprávnění jsou udělována na celou dobu trvání příslušných práv.</11><12>Doporučení:</12><13>Včas ověřte, že platforma YouTube nedetekuje ve vašem filmu porušení autorských práv.</13><14>Pokud je potřeba platformě YouTube doložit, že držíte licenční práva na použitý materiál, kontaktujte nás na festival-tech@fi.muni.cz.</14>",
-    "detailsTitle": "Detailed instructions",
-    "general": "<0>Točíš filmy? Nebojíš se překračovat hranice? Hledáš důvod proč realizovat svůj nápad?</0><1>Tak to si tu správně! Natoč krátký film a přihlaš ho na 23. Filmový festival Fakulty Informatiky Masarykovy univerzity! Deadline je 9. dubna 2023, tak si pospěš!</1><2>S námi můžeš ukázat svoji tvorbu před stovkami lidí a pokud tvůj snímek zaujme porotu nebo diváky, budeš odměněný i cenami.</2><3>Tak co, už přihlašuješ?</3>"
+    "details": "<0>Film Festival of the Faculty of Informatics MU is a festival of short amateur flims. Festival evening will be held on May 19, 2023, from 7 p. m., at Faculty of Informatics MU and in University Cinema Scala.</0><1>Conditions for admission of a flim to the 23rd Film festival FI MU:</1><2><0>Accepted flims can be only amateur audiovisual creations of any genre and form of production (live action or animated) in a total length of 8 minutes</0><1>Creators must not be professionals in the creation of audiovisual pieces</1><2>A flim must not be older than 3 years</2><3>A flim must not violate any copyright</3><4>A flim can be registered by only one of the authors and also with the consent of all co-authors of the work</4><5>Registration is free</5></2><3>Competition flims will be rated in two ways:</3><4>Voting of professional jury</4><5>Audience poll</5><6>Films must be registered until April 9, 2023, via an online form through the link above. Every flim must have an accurate name. Part of registration must also be accompanying text with a brief annotation of a flim. Organisers of the festival reserve the right to exclude contributions that do not meet the above conditions or contributions whose content conflicts with Czech legislation without submitting them to the Program Committee for assessment. Every author/author’s collective can register for the festival, maximally three separate flims. The festival director and teachers of PV113 Production of Audiovisual Artefacts will select flims for projection and dramaturgy of the festival evening. This intern jury differs from the professional jury, which will determine the winners. There is no legal right to be included in the festival program.</6><7>Authors will be informed about acceptance or rejection through contacts listed in flim registration. Films selected by the Program Committee will be projected on screens in Brno during the 23rd Film Festival of the Faculty of Informatics MU.</7><8>The contestant has no legal right to win the competition, and non-monetary prizes cannot be redeemed or converted into money. The prizes will be issued based on a mutual agreement between the author and the organisers of the 23rd Film Festival of the Faculty of Informatics MU.</8><9>By registering an audiovisual work (flim), the applicant declares that he has the right to use the work in this way and that he has the rights to the works used in the film.</9><10>By submitting a flim, the applicant grants the organiser a free license to screen the work as part of the 23rd Film Festival of the Faculty of Informatics MU.</10><11>By registering the flim, the author also grants MU a non-exclusive, free license to preserve the copy for possible screening of the work as part of teaching and promotion of FFFI MU and for non-public screening for the MU academic community. The territorial and quantitative scope of the license is unlimited. Authorisations are granted for the entire duration of the respective rights.</11><12>Recommendation:</12><13>Verify in time that the YouTube platform does not detect copyright infringement in your video</13><14>If you need to prove to the YouTube platform that you hold the license rights to the used material, contact us at festival-tech@fi.muni.cz</14>",
+    "detailsTitle": "Detailed information for",
+    "general": "<0>Do you make flims? Are you not worried about standing on the edge? Do you have an idea you want to realise?</0><1>You are in the right place! Film a short flim and register it for the 23rd Film Festival of the Faculty of Informatics MU (FFFIMU)! The deadline is until April 9, 2023, so hurry!</1><2>With us, you can show your flim in front of hundreds of people and even win prizes if your flim interests jury or audience.</2><3>Are you ready to register?</3>"
   },
   "layout": {
     "footer": {
@@ -129,7 +131,25 @@
     "releaseDate": {
       "na": "Not specified"
     },
-    "unknownGroup": "Unknown group"
+    "unknownGroup": "Unknown group",
+    "admin": {
+      "emailContent": "Email content",
+      "title": "Reviews",
+      "role": {
+        "tech": "Technician review",
+        "visual": "Visual review",
+        "dramaturgy": "Dramaturgy review",
+        "placeholder": "-- select a role --"
+      },
+      "submit": "Submit the review",
+      "kind": {
+        "accepted": "Accept",
+        "rejected": "Reject"
+      },
+      "confirm": "Careful! This will send an email to the project author! This operation is irreversible!",
+      "new": "New review",
+      "archive": "Review archive"
+    }
   },
   "projectEdit": {
     "quit": "Quit edit mode",
@@ -210,7 +230,7 @@
     "back": "Request again"
   },
   "tempAccount": {
-    "title": "common:tempAccount.title"
+    "title": "Create a temporary account"
   },
   "textarea": {
     "characters": "characters",
@@ -227,5 +247,8 @@
     "Private": "Private",
     "Public": "Public",
     "Unknown": "Unknown visibility"
+  },
+  "tagInput": {
+    "note": "Separate the roles with a comma or a new line"
   }
 }

@@ -1,23 +1,30 @@
-import { Box, Button, Flex, Heading, Stack, Tab, TabList, TabPanel, TabPanels, Tabs } from '@chakra-ui/react';
+import { Box, Button, Flex, Heading, Stack, Tab, TabList, TabPanel, TabPanels, Tabs, Text } from '@chakra-ui/react';
 import { t } from 'i18next';
+import { AiOutlineUnlock } from 'react-icons/ai';
 import { BsX } from 'react-icons/bs';
 import { Link, useParams } from 'react-router-dom';
 import { Project } from '../../../data/Project';
+import { useAuth } from '../../../hooks/Caffeine';
 import { AwaitAPI } from '../../utils/AwaitAPI';
 import { Status } from '../../utils/Status';
 import { ArtifactGroupUpload } from '../../utils/Upload/ArtifactGroup';
+import { AddReview } from './AddReview';
 import { ProjectBasicInfo } from './create/ProjectBasicInfo';
 import { ProjectStatus } from './ProjectStatus';
 import { ProjectTags } from './ProjectTags';
+import { ReviewList } from './ReviewList';
 
 interface IProjectEditProps {}
 
 export function ProjectEdit(props: IProjectEditProps) {
     const { id } = useParams();
+    const { user } = useAuth();
 
     if (!id) {
         return <Status statusCode={404} embeded />;
     }
+
+    const tagsForAdmin = ['ProjectReview', 'Administration'];
 
     return (
         <AwaitAPI request={(api) => api.projects.getById(id)} error={<Status statusCode={404} embeded />}>
@@ -39,15 +46,23 @@ export function ProjectEdit(props: IProjectEditProps) {
                             <Tab>{t('projectEdit.tabs.status').toString()}</Tab>
                             <Tab>{t('projectEdit.tabs.info').toString()}</Tab>
                             <Tab>{t('projectEdit.tabs.files').toString()}</Tab>
-                            {/* <Tab>
-                                <AiOutlineUnlock />
-                                <Text pl={2}>{t('projectEdit.tabs.admin').toString()}</Text>
-                            </Tab> */}
+                            {user &&
+                                user.capabilities.some((cap) => tagsForAdmin.some((tag) => cap.startsWith(tag))) && (
+                                    <Tab>
+                                        <AiOutlineUnlock />
+                                        <Text pl={2}>{t('projectEdit.tabs.admin').toString()}</Text>
+                                    </Tab>
+                                )}
                         </TabList>
 
                         <TabPanels pt={6}>
                             <TabPanel mt={-4}>
                                 <ProjectStatus projectId={id} />
+
+                                <Heading as="h2" fontSize="lg" mb={4} pt={24}>
+                                    {t('project.admin.archive').toString()}
+                                </Heading>
+                                <ReviewList project={project} />
                             </TabPanel>
                             <TabPanel>
                                 <ProjectBasicInfo project={project} />
@@ -65,7 +80,16 @@ export function ProjectEdit(props: IProjectEditProps) {
                                     )}
                                 </Stack>
                             </TabPanel>
-                            <TabPanel></TabPanel>
+                            <TabPanel>
+                                <Heading as="h2" fontSize="lg" mb={4}>
+                                    {t('project.admin.new').toString()}
+                                </Heading>
+                                <AddReview project={project} />
+                                <Heading as="h2" fontSize="lg" mb={4} mt={8}>
+                                    {t('project.admin.archive').toString()}
+                                </Heading>
+                                <ReviewList project={project} />
+                            </TabPanel>
                         </TabPanels>
                     </Tabs>
                 </Box>

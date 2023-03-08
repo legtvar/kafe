@@ -1,4 +1,5 @@
 import { Box, Button, Flex, Spacer, Stack } from '@chakra-ui/react';
+import { t } from 'i18next';
 import { Link, useParams } from 'react-router-dom';
 import { Group } from '../../../data/Group';
 import { AwaitAPI } from '../../utils/AwaitAPI';
@@ -35,7 +36,7 @@ export function GroupsDetail(props: IGroupsDetailProps) {
 
                                 <Flex direction="row" pb={12}>
                                     <Link to="create">
-                                        <Button colorScheme="brand">Přihlásit film</Button>
+                                        <Button colorScheme="brand">{t('createProject.signUp').toString()}</Button>
                                     </Link>
                                     <Spacer />
                                 </Flex>

@@ -51,12 +51,14 @@ export function Upload(props: IUploadProps) {
                 }
             } else {
                 setStatus('error');
+                console.warn(response);
                 if (props.repeatable) {
                     reset();
                 }
             }
-        } catch {
+        } catch (e) {
             setStatus('error');
+            console.warn(e);
             if (props.repeatable) {
                 reset();
             }

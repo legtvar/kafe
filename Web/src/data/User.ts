@@ -9,6 +9,7 @@ export class User {
     public preferredCulture!: string;
     public projects!: Project[];
     public role!: 'admin' | 'temp' | 'user';
+    public capabilities!: string[];
 
     /*
         id: string;

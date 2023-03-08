@@ -10,8 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="C:\dev\marten\src\Marten\Marten.csproj" />
-    <!-- <PackageReference Include="Marten" Version="5.11.0" /> -->
+    <PackageReference Include="Marten" Version="5.11.0" /> 
     <PackageReference Include="Microsoft.Extensions.Options" Version="7.0.0" />
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="7.0.0" />
   </ItemGroup>

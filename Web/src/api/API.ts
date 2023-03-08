@@ -162,6 +162,9 @@ export class API {
             streamUrl(id: string, variant: string) {
                 return `${api.apiUrl}shard-download/${id}/${variant}`;
             },
+            defaultStreamUrl(id: string) {
+                return `${api.apiUrl}shard-download/${id}`;
+            },
         };
     }
 

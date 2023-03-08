@@ -38,13 +38,14 @@ export function ContentViewer({ artifact }: IContentViewerProps) {
 
                 return <Video sources={videoSources} minW="100%" maxW="100%" h="60vmin" />;
             case 'Image':
+                const image = artifact.shards.filter((shard) => shard.kind === 'Image')[0];
                 return (
                     <img
-                        src={'https://video-react.js.org/assets/poster.png'}
+                        src={api.shards.defaultStreamUrl(image.id)}
                         alt={artifact.getName()}
                         style={{
                             width: '100%',
-                            height: '100%',
+                            height: '60vmin',
                             objectFit: 'contain',
                             objectPosition: 'center center',
                         }}

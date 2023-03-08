@@ -1,22 +1,21 @@
 import { Box, BoxProps, FormHelperText, Input, InputGroup, Tag, TagCloseButton, TagLabel } from '@chakra-ui/react';
 import { t } from 'i18next';
-import { useState } from 'react';
 import { forAnimationFrame } from 'waitasecond';
 
 interface ITagInputProps extends BoxProps {
     placeholder: string;
     tags: string[];
     setTags: (tags: string[]) => void;
+    value: string;
+    setValue: (value: string) => void;
 }
 
-export function TagInput({ placeholder, tags, setTags, ...rest }: ITagInputProps) {
-    const [value, setvalue] = useState<string>('');
-
+export function TagInput({ placeholder, tags, setTags, value, setValue, ...rest }: ITagInputProps) {
     const addRole = async (tag: string) => {
         if (tag.length === 0) return;
         setTags([...tags, tag]);
         await forAnimationFrame();
-        setvalue('');
+        setValue('');
     };
 
     const deleteRole = (id: number) => {
@@ -37,7 +36,7 @@ export function TagInput({ placeholder, tags, setTags, ...rest }: ITagInputProps
                 <Input
                     placeholder={placeholder}
                     value={value}
-                    onChange={(event) => setvalue(event.target.value)}
+                    onChange={(event) => setValue(event.target.value)}
                     onKeyDown={(event) =>
                         (event.key === 'Enter' || event.key === ',') &&
                         addRole((event.target as HTMLInputElement).value)

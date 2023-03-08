@@ -40,6 +40,7 @@ export function AuthorSelect(props: IAuthorSelectProps) {
     const [key, setKey] = useState(Math.random());
     const [author, setAuthor] = useState<Author | null>(null);
     const [roles, setRoles] = useState<string[]>([]);
+    const [roleString, setRoleString] = useState<string>('');
     const [status, setStatus] = useState<'query' | 'new' | 'role'>('query');
     const { bg, lighten } = useColorScheme();
 
@@ -237,6 +238,8 @@ export function AuthorSelect(props: IAuthorSelectProps) {
                                                         placeholder={t('authorSelect.addRole').toString()}
                                                         tags={roles}
                                                         setTags={(tags) => setRoles(tags)}
+                                                        value={roleString}
+                                                        setValue={(str) => setRoleString(str)}
                                                     />
                                                 </FormControl>
                                             </>
@@ -250,7 +253,11 @@ export function AuthorSelect(props: IAuthorSelectProps) {
                                                 mr={3}
                                                 isDisabled={status !== 'role'}
                                                 onClick={() => {
-                                                    props.onSelect(author!.id, roles);
+                                                    if (roleString.length > 0) {
+                                                        props.onSelect(author!.id, [...roles, roleString]);
+                                                    } else {
+                                                        props.onSelect(author!.id, roles);
+                                                    }
                                                     close();
                                                 }}
                                             >

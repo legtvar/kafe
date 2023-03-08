@@ -5,7 +5,6 @@ import { BsX } from 'react-icons/bs';
 import { Link, useParams } from 'react-router-dom';
 import { Project } from '../../../data/Project';
 import { useAuth } from '../../../hooks/Caffeine';
-import { useColorScheme } from '../../../hooks/useColorScheme';
 import { AwaitAPI } from '../../utils/AwaitAPI';
 import { Status } from '../../utils/Status';
 import { ArtifactGroupUpload } from '../../utils/Upload/ArtifactGroup';
@@ -20,7 +19,6 @@ interface IProjectEditProps {}
 export function ProjectEdit(props: IProjectEditProps) {
     const { id } = useParams();
     const { user } = useAuth();
-    const { border, bg } = useColorScheme();
 
     if (!id) {
         return <Status statusCode={404} embeded />;

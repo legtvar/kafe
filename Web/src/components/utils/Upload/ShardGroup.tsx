@@ -7,7 +7,7 @@ import {
     FormHelperText,
     FormLabel,
     Icon,
-    Text,
+    Text
 } from '@chakra-ui/react';
 import { AiOutlinePlus } from 'react-icons/ai';
 import { Artifact } from '../../../data/Artifact';
@@ -67,7 +67,7 @@ export function ShardGroupUpload(props: IShardGroupUploadProps) {
                     </Text>
                 </Box>
             ))}
-            <Box w="100%" borderColor={border} bg={bg} borderWidth={1} borderRadius="md" py={4} px={4}>
+            {(filesInGroup.length < arity.max) && <Box w="100%" borderColor={border} bg={bg} borderWidth={1} borderRadius="md" py={4} px={4}>
                 <Accordion allowToggle m={-4}>
                     <AccordionItem borderWidth="0 !important">
                         <AccordionButton color={'gray.500'}>
@@ -98,7 +98,7 @@ export function ShardGroupUpload(props: IShardGroupUploadProps) {
                         </AccordionPanel>
                     </AccordionItem>
                 </Accordion>
-            </Box>
+            </Box>}
         </Box>
     );
 }

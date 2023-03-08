@@ -36,8 +36,6 @@ export function AddReview(props: IAddReviewProps) {
     const { isOpen, onOpen, onClose } = useDisclosure();
     const cancelRef = createRef<HTMLButtonElement>();
 
-    console.log(emailContent, kind, role);
-
     const roles = user!.capabilities.includes('Administration')
         ? ['tech', 'visual', 'dramaturgy']
         : user!.capabilities.filter((cap) => cap.startsWith('ProjectReview')).map((cap) => cap.split(':')[1]);

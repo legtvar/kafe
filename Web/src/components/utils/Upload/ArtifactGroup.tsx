@@ -59,24 +59,26 @@ export function ArtifactGroupUpload(props: IArtifactGroupUploadProps) {
                         <ArtifactUpload artifact={artifact} key={key} {...props} />
                     ))}
 
-                    <Box
-                        borderColor={border}
-                        bg={bg}
-                        borderWidth={1}
-                        borderRadius="md"
-                        px={4}
-                        py={2}
-                        mb={2}
-                        color={'gray.500'}
-                        cursor="pointer"
-                        onClick={onSubmit}
-                    >
-                        <Icon fontSize="1.2em">
-                            <AiOutlinePlus />
-                        </Icon>{' '}
-                        {t('createProject.upload.newArtefact').toString()}
-                        {status === 'sending' && <Spinner ml={6} size="sm" />}
-                    </Box>
+                    {artifactsInSlot.length < arity.max && (
+                        <Box
+                            borderColor={border}
+                            bg={bg}
+                            borderWidth={1}
+                            borderRadius="md"
+                            px={4}
+                            py={2}
+                            mb={2}
+                            color={'gray.500'}
+                            cursor="pointer"
+                            onClick={onSubmit}
+                        >
+                            <Icon fontSize="1.2em">
+                                <AiOutlinePlus />
+                            </Icon>{' '}
+                            {t('createProject.upload.newArtefact').toString()}
+                            {status === 'sending' && <Spinner ml={6} size="sm" />}
+                        </Box>
+                    )}
                 </FormControl>
             )}
         </SendAPI>

@@ -54,7 +54,7 @@ public partial class DefaultProjectService : IProjectService
     };
     public static string[] AllowedSubtitleCodecs = new[]
     {
-        "srt",
+        "subrip",
         "ass"
     };
     public static string[] AllowedImageMimeTypes = new[]

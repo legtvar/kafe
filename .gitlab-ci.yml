@@ -55,7 +55,7 @@ migrate-wma:
   script:
     - apk update
     - apk add dotnet7-sdk postgresql-client ffmpeg
-    - psql -g kafe-db -p 5432 -U postgres -c "DROP DATABASE lemma"
+    - psql -h kafe-db -p 5432 -U postgres -c "DROP DATABASE lemma"
     - cat /mnt/kafe/lemma-08-03-2023-all.sql | psql -h kafe-db -p 5432 -U postgres
     - dotnet build Migrator
     - cp "$APPSETTINGS_MIGRATOR" "./Migrator/appsettings.local.json"

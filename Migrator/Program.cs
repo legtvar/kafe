@@ -1,4 +1,5 @@
 ﻿using Kafe.Data;
+using Kafe.Data.Aggregates;
 using Kafe.Data.Events;
 using Kafe.Lemma;
 using Kafe.Media;
@@ -45,14 +46,25 @@ public static class Program
         configuration = host.Services.GetRequiredService<IConfiguration>();
         migratorOptions = configuration.Get<MigratorOptions>()!;
         logger = host.Services.GetRequiredService<ILogger<Migrator>>();
-        if (TryDropDb(host))
-        {
-            logger.LogInformation("Database dropped.");
-        }
+        //if (TryDropDb(host))
+        //{
+        //    logger.LogInformation("Database dropped.");
+        //}
 
         wma = host.Services.GetRequiredService<WmaClient>();
         kafe = host.Services.GetRequiredService<KafeClient>();
         await kafe.Initialize();
+
+        var db = host.Services.GetRequiredService<IQuerySession>();
+        var formats = await db.Query<VideoShardInfo>()
+            .Where(v => v.Variants.Keys.Contains("original"))
+            .Select(v => v.Variants["original"].FormatName)
+            .ToListAsync();
+        foreach(var format in formats)
+        {
+            Console.WriteLine(format);
+        }
+        return;
 
         await MigrateAllAuthors();
         await MigrateAllProjectGroups();

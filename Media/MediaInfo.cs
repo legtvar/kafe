@@ -11,6 +11,7 @@ namespace Kafe.Media;
 public record MediaInfo(
     string FileExtension,
     string FormatName,
+    string MimeType,
     long FileLength,
     TimeSpan Duration,
     ImmutableArray<VideoInfo> VideoStreams,
@@ -23,6 +24,7 @@ public record MediaInfo(
         = new(
             Const.InvalidFileExtension,
             Const.InvalidFormatName,
+            Const.InvalidMimeType,
             -1,
             TimeSpan.Zero,
             ImmutableArray<VideoInfo>.Empty,

@@ -84,14 +84,16 @@ public class FFmpegCoreService : IMediaService
 
         var subtitleInfos = data.SubtitleStreams
             .Select(s => new SubtitlesInfo(
+                FileExtension: FFmpegFormat.GetFileExtension(s.CodecName) ?? Const.InvalidFileExtension,
                 Language: s.Language,
                 Codec: s.CodecName,
                 Bitrate: s.BitRate))
             .ToImmutableArray();
 
         return new MediaInfo(
-            FileExtension: Const.InvalidFileExtension,
+            FileExtension: FFmpegFormat.GetMimeType(data.Format.FormatName) ?? Const.InvalidFileExtension,
             FormatName: data.Format.FormatName,
+            MimeType: FFmpegFormat.GetMimeType(data.Format.FormatName) ?? Const.InvalidMimeType,
             FileLength: Const.InvalidFileLength,
             Duration: data.Duration,
             VideoStreams: videoInfos,

@@ -246,7 +246,7 @@ public static class TransferMaps
     {
         return new MediaDto(
             FileExtension: data.FileExtension,
-            MimeType: data.GetMimeType(),
+            MimeType: data.MimeType,
             FileLength: data.FileLength,
             Duration: data.Duration,
             VideoStreams: data.VideoStreams.Select(ToVideoStreamDto).ToImmutableArray(),
@@ -294,7 +294,6 @@ public static class TransferMaps
     {
         return new ImageDto(
             FileExtension: data.FileExtension,
-            FormatName: data.FormatName,
             MimeType: data.MimeType,
             Width: data.Width,
             Height: data.Height,

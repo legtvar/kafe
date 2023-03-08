@@ -805,7 +805,7 @@ public partial class DefaultProjectService : IProjectService
             yield return tooLongError;
         }
 
-        var mimeType = originalVariant.GetMimeType();
+        var mimeType = originalVariant.MimeType;
         if (mimeType is null || !AllowedContainers.Contains(mimeType))
         {
             yield return unsupportedContainerError;

@@ -57,7 +57,7 @@ public class FFmpegCoreService : IMediaService
                 FileLength = stream.Length
             };
         }
-        catch (FFMpegException)
+        catch (FFMpegException e)
         {
             return MediaInfo.Invalid with { Error = e.Message }; ;
         }

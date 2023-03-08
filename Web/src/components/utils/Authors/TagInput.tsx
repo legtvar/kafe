@@ -1,4 +1,5 @@
 import { Box, BoxProps, FormHelperText, Input, InputGroup, Tag, TagCloseButton, TagLabel } from '@chakra-ui/react';
+import { t } from 'i18next';
 import { useState } from 'react';
 import { forAnimationFrame } from 'waitasecond';
 
@@ -43,7 +44,7 @@ export function TagInput({ placeholder, tags, setTags, ...rest }: ITagInputProps
                     }
                 />
             </InputGroup>
-            <FormHelperText>Role oddělujte čárkou, nebo novým řádkem</FormHelperText>
+            <FormHelperText>{t('tagInput.note').toString()}</FormHelperText>
         </Box>
     );
 }

@@ -794,7 +794,7 @@ public partial class DefaultProjectService : IProjectService
                     diagnostics.AddRange(ValidateSubtitles(subtitleShard));
                 }
             }
-        }
+        } 
 
         var coverPhotoArtifacts = artifacts.Where(a => a.projectArtifact.BlueprintSlot == Const.CoverPhotoBlueprintSlot)
             .ToImmutableArray();

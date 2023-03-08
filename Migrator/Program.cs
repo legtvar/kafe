@@ -37,7 +37,7 @@ public static class Program
             .ConfigureServices((context, services) =>
             {
                 WmaClient.AddWmaDb(services);
-                Db.AddDb(services, context.Configuration, context.HostingEnvironment);
+                services.AddKafeData();
                 services.AddSingleton<WmaClient>();
                 services.AddSingleton<KafeClient>();
             })

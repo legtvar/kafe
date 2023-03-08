@@ -5,7 +5,7 @@ import { Link, useParams } from 'react-router-dom';
 import { Project } from '../../../data/Project';
 import { AwaitAPI } from '../../utils/AwaitAPI';
 import { Status } from '../../utils/Status';
-import { UploadArtifact } from '../../utils/Upload/UploadArtifact';
+import { ArtifactGroupUpload } from '../../utils/Upload/ArtifactGroup';
 import { ProjectBasicInfo } from './create/ProjectBasicInfo';
 import { ProjectStatus } from './ProjectStatus';
 import { ProjectTags } from './ProjectTags';
@@ -29,7 +29,7 @@ export function ProjectEdit(props: IProjectEditProps) {
                         </Heading>
                         <Link to="..">
                             <Button leftIcon={<BsX />} mr={4}>
-                                {t('generic.cancel').toString()}
+                                {t('projectEdit.quit').toString()}
                             </Button>
                         </Link>
                     </Flex>
@@ -54,9 +54,15 @@ export function ProjectEdit(props: IProjectEditProps) {
                             </TabPanel>
                             <TabPanel>
                                 <Stack spacing={8} direction="column">
-                                    {project.blueprint.artifactBlueprints.map((blueprint) => (
-                                        <UploadArtifact projectId={id} artifactBlueprint={blueprint} />
-                                    ))}
+                                    {Object.entries(project.blueprint.artifactBlueprints).map(
+                                        ([slotName, blueprint]) => (
+                                            <ArtifactGroupUpload
+                                                project={project}
+                                                artifactBlueprint={blueprint!}
+                                                slotName={slotName}
+                                            />
+                                        ),
+                                    )}
                                 </Stack>
                             </TabPanel>
                             <TabPanel></TabPanel>

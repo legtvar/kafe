@@ -36,7 +36,18 @@ export class Project extends AbstractType {
             this.artifacts = this.artifacts.map((artifact: any) => new Artifact(artifact));
         }
 
-        console.log(this.blueprint);
+        // Temporary
+        // this.blueprint.artifactBlueprints = (
+        //     this.blueprint.artifactBlueprints as any as components['schemas']['ProjectArtifactBlueprintDto'][]
+        // ).reduce(
+        //     (prev, curr) => ({
+        //         ...prev,
+        //         [(curr as any).slotName]: (
+        //             curr.shardBlueprints as any as components['schemas']['ProjectArtifactShardBlueprintDto'][]
+        //         ).reduce((pr, c) => ({ ...pr, [(c as any).kind]: c }), {}),
+        //     }),
+        //     {},
+        // );
     }
 
     public getName() {

@@ -20,7 +20,7 @@ export type ApiResponse<T> =
           data: T;
       }
     | {
-          status: IntRange<400, 499>;
+          status: IntRange<400, 500>;
           response: AxiosResponse<any>;
           error: components['schemas']['ProblemDetails'];
       };
@@ -110,10 +110,11 @@ export class API {
         const api = this;
 
         return {
-            async create(name: localizedString, projectId: string) {
+            async create(name: localizedString, projectId: string, blueprintSlot: string) {
                 return await api.post<components['schemas']['ArtifactCreationDto'], string>(`artifact`, {
                     containingProject: projectId as any,
                     name: name as any,
+                    blueprintSlot,
                 });
             },
         };
@@ -131,7 +132,7 @@ export class API {
             ) {
                 const formData = new FormData();
                 formData.append('file', file, file.name);
-                formData.append('shardKind', shardKind);
+                formData.append('kind', shardKind);
                 formData.append('artifactId', artifactId);
 
                 return await api.upload<FormData, string>(`shard`, formData, onUploadProgress);

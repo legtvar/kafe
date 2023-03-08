@@ -260,6 +260,19 @@ export interface paths {
         };
       };
     };
+    patch: {
+      requestBody?: {
+        content: {
+          "application/json": components["schemas"]["ProjectEditDto"];
+          "text/json": components["schemas"]["ProjectEditDto"];
+          "application/*+json": components["schemas"]["ProjectEditDto"];
+        };
+      };
+      responses: {
+        /** @description Success */
+        200: never;
+      };
+    };
   };
   "/api/v1/project/{id}": {
     get: {
@@ -364,6 +377,21 @@ export interface paths {
       };
     };
   };
+  "/api/v1/project-review": {
+    post: {
+      requestBody?: {
+        content: {
+          "application/json": components["schemas"]["ProjectReviewCreationDto"];
+          "text/json": components["schemas"]["ProjectReviewCreationDto"];
+          "application/*+json": components["schemas"]["ProjectReviewCreationDto"];
+        };
+      };
+      responses: {
+        /** @description Success */
+        200: never;
+      };
+    };
+  };
   "/api/v1/project-validation/{id}": {
     get: {
       parameters: {
@@ -445,9 +473,9 @@ export interface paths {
         /** @description Success */
         200: {
           content: {
-            "video/mp4": string;
-            "video/x-matroska": string;
-            "application/octet-stream": string;
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
           };
         };
       };
@@ -465,9 +493,9 @@ export interface paths {
         /** @description Success */
         200: {
           content: {
-            "video/mp4": string;
-            "video/x-matroska": string;
-            "application/octet-stream": string;
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
           };
         };
       };
@@ -571,7 +599,7 @@ export interface components {
        * @description Human-Readable Identifier Ballast 
        * @example AAAAbadf00d
        */
-      containingProject: string;
+      containingProject?: string | null;
       blueprintSlot?: string | null;
     };
     AudioStreamDto: {
@@ -618,11 +646,13 @@ export interface components {
     /** @enum {string} */
     DiagnosticKind: "Unknown" | "Info" | "Warning" | "Error";
     ImageDto: {
+      fileExtension: string;
+      mimeType: string;
       /** Format: int32 */
       width: number;
       /** Format: int32 */
       height: number;
-      format: string;
+      isCorrupted: boolean;
     };
     ImageShardDetailDto: WithRequired<({
       kind: "Image";
@@ -687,6 +717,10 @@ export interface components {
       instance?: string | null;
       [key: string]: unknown | undefined;
     };
+    ProjectArtifactAdditionDto: {
+      id: string;
+      blueprintSlot?: string | null;
+    };
     ProjectArtifactBlueprintDto: {
       /** LocalizedString */
       name: {
@@ -700,9 +734,10 @@ export interface components {
         cs?: string | null;
         en?: string | null;
       }) | null;
-      slotName: string;
       arity: components["schemas"]["ArgumentArity"];
-      shardBlueprints: (components["schemas"]["ProjectArtifactShardBlueprintDto"])[];
+      shardBlueprints: {
+        [key: string]: components["schemas"]["ProjectArtifactShardBlueprintDto"] | undefined;
+      };
     };
     ProjectArtifactDto: {
       /**
@@ -735,7 +770,6 @@ export interface components {
         cs?: string | null;
         en?: string | null;
       }) | null;
-      kind: components["schemas"]["ShardKind"];
       arity: components["schemas"]["ArgumentArity"];
     };
     ProjectAuthorDto: {
@@ -762,7 +796,9 @@ export interface components {
         en?: string | null;
       }) | null;
       requiredReviewers: (string)[];
-      artifactBlueprints: (components["schemas"]["ProjectArtifactBlueprintDto"])[];
+      artifactBlueprints: {
+        [key: string]: components["schemas"]["ProjectArtifactBlueprintDto"] | undefined;
+      };
     };
     ProjectCreationAuthorDto: {
       id: string;
@@ -847,6 +883,30 @@ export interface components {
       };
       validationStage: string;
     };
+    ProjectEditDto: {
+      id: string;
+      /** LocalizedString */
+      name?: ({
+        iv: string;
+        cs?: string | null;
+        en?: string | null;
+      }) | null;
+      /** LocalizedString */
+      description?: ({
+        iv: string;
+        cs?: string | null;
+        en?: string | null;
+      }) | null;
+      /** LocalizedString */
+      genre?: ({
+        iv: string;
+        cs?: string | null;
+        en?: string | null;
+      }) | null;
+      crew?: (components["schemas"]["ProjectCreationAuthorDto"])[] | null;
+      cast?: (components["schemas"]["ProjectCreationAuthorDto"])[] | null;
+      artifacts?: (components["schemas"]["ProjectArtifactAdditionDto"])[] | null;
+    };
     ProjectGroupCreationDto: {
       /** LocalizedString */
       name: {
@@ -929,6 +989,17 @@ export interface components {
       /** Format: date-time */
       releasedOn: string;
     };
+    ProjectReviewCreationDto: {
+      projectId: string;
+      kind: components["schemas"]["ReviewKind"];
+      reviewerRole: string;
+      /** LocalizedString */
+      comment?: ({
+        iv: string;
+        cs?: string | null;
+        en?: string | null;
+      }) | null;
+    };
     ProjectReviewDto: {
       kind: components["schemas"]["ReviewKind"];
       reviewerRole: string;
@@ -938,6 +1009,8 @@ export interface components {
         cs?: string | null;
         en?: string | null;
       }) | null;
+      /** Format: date-time */
+      addedOn: string;
     };
     ProjectValidationDto: {
       /**

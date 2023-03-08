@@ -1,3 +1,4 @@
+import { Text } from '@chakra-ui/react';
 import { t } from 'i18next';
 import { Artifact } from '../../data/Artifact';
 import { useApi } from '../../hooks/Caffeine';
@@ -54,5 +55,5 @@ export function ContentViewer({ artifact }: IContentViewerProps) {
         }
     }
 
-    return <>{t('content.unknownType').toString()}</>;
+    return <Text color="gray.500">{t('content.unknownType').toString()}</Text>;
 }

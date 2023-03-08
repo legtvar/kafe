@@ -4,6 +4,8 @@ import { Group } from '../../../data/Group';
 import { AwaitAPI } from '../../utils/AwaitAPI';
 import { OutletOrChildren } from '../../utils/OutletOrChildren';
 import { Status } from '../../utils/Status';
+import { IntroText } from '../projects/create/IntroText';
+import { ProjectListComponent } from '../projects/ProjectListComponent';
 
 interface IGroupsDetailProps {}
 
@@ -16,19 +18,30 @@ export function GroupsDetail(props: IGroupsDetailProps) {
 
     return (
         <OutletOrChildren>
-            <AwaitAPI request={(api) => api.groups.getById(id)} error={<Status statusCode={404} embeded />}>
+            <AwaitAPI
+                request={(api) => api.groups.getById(id)}
+                error={(error) => <Status statusCode={404} embeded log={error} />}
+            >
                 {(group: Group) => (
-                    <Stack spacing={4} m={6} direction="column">
+                    <Stack spacing={4} m={6} direction="column" pb={16}>
                         <Box fontSize="4xl" fontWeight="semibold" as="h2" lineHeight="tight" isTruncated>
                             {group.getName()}
                         </Box>
                         <Box>{group.getDescription()}</Box>
-                        <Flex direction="row">
-                            <Link to="create">
-                                <Button>Přihlásit film</Button>
-                            </Link>
-                            <Spacer />
-                        </Flex>
+
+                        {group.isOpen && (
+                            <>
+                                <IntroText groupName={group.getName()} />
+
+                                <Flex direction="row" pb={12}>
+                                    <Link to="create">
+                                        <Button colorScheme="brand">Přihlásit film</Button>
+                                    </Link>
+                                    <Spacer />
+                                </Flex>
+                            </>
+                        )}
+                        <ProjectListComponent projects={group.projects} />
                     </Stack>
                 )}
             </AwaitAPI>

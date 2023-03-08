@@ -17,9 +17,10 @@ export interface ISendAPIProps<T> {
         error: components['schemas']['ProblemDetails'] | null,
     ) => JSX.Element;
     onSubmited: (id: HRIB) => void;
+    repeatable?: boolean;
 }
 
-export function SendAPI<T>({ request, value, children, onSubmited }: ISendAPIProps<T>) {
+export function SendAPI<T>({ request, value, children, onSubmited, repeatable }: ISendAPIProps<T>) {
     const api = useApi();
     const [status, setStatus] = useState<SendAPIStatus>('ready');
     const [error, setError] = useState<components['schemas']['ProblemDetails'] | null>(null);
@@ -32,7 +33,11 @@ export function SendAPI<T>({ request, value, children, onSubmited }: ISendAPIPro
         const result = await request(api, value);
 
         if (result.status === 200) {
-            setStatus('ok');
+            if (repeatable) {
+                setStatus('ready');
+            } else {
+                setStatus('ok');
+            }
             onSubmited(result.data);
         } else {
             setStatus('error');

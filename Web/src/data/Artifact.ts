@@ -7,10 +7,13 @@ export class Artifact {
     public id!: string;
     public name!: localizedString;
     public shards!: Shard[];
+    public addedOn!: Date | null;
+    public blueprintSlot!: string | null;
     // containingProjectIds: (string)[];
 
     public constructor(struct: any) {
         Object.assign(this, struct);
+        this.addedOn = new Date(struct.addedOn);
     }
 
     public getName() {

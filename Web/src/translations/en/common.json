@@ -250,5 +250,9 @@
   },
   "tagInput": {
     "note": "Separate the roles with a comma or a new line"
+  },
+  "artifact": {
+    "delete": "Delete the artifact",
+    "deleteWarn": "Are you sure you want to delete the selected artifact? \nThis operation is irreversible!"
   }
 }

@@ -131,6 +131,7 @@ export function AuthorSelect(props: IAuthorSelectProps) {
                                                                 setAuthor(
                                                                     new Author({
                                                                         name,
+                                                                        visibility: 'Private',
                                                                     } as any),
                                                                 );
                                                                 setStatus('new');

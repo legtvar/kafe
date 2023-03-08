@@ -8,6 +8,7 @@ interface IErrorProps {
 }
 
 export function Error(props: IErrorProps) {
+    console.warn(props.error);
     return (
         <>
             <Box textAlign="center" py={10} px={6}>

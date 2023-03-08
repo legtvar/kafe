@@ -27,20 +27,11 @@ proxy.on('proxyRes', (proxyRes, req, res) => {
         res.writeHead(200, res.getHeaders());
     }
 
-    console.log('========== RESPONSE =========');
-    console.log(req.method);
-    console.log(req.url);
-    console.log(res.statusCode);
-    console.log('=============================');
-    console.log();
+    console.log(`localhost [<- ] ${target.host}    ${req.method} ${req.url} ${res.statusCode}`);
 });
 
 proxy.on('proxyReq', (proxyReq, req) => {
-    console.log('========== REQUEST ==========');
-    console.log(req.method);
-    console.log(req.url);
-    console.log('=============================');
-    console.log();
+    console.log(`localhost [ ->] ${target.host}    ${req.method} ${req.url}`);
 });
 
 var server = http.createServer((req, res) => {

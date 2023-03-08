@@ -90,7 +90,7 @@ public class FFmpegCoreService : IMediaService
             .ToImmutableArray();
 
         return new MediaInfo(
-            FileExtension: FFmpegFormat.GetMimeType(data.Format.FormatName) ?? Const.InvalidFileExtension,
+            FileExtension: FFmpegFormat.GetFileExtension(data.Format.FormatName) ?? Const.InvalidFileExtension,
             FormatName: data.Format.FormatName,
             MimeType: FFmpegFormat.GetMimeType(data.Format.FormatName) ?? Const.InvalidMimeType,
             FileLength: Const.InvalidFileLength,

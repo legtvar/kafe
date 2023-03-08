@@ -13,7 +13,7 @@ namespace Kafe.Api.Endpoints.Artifact;
 
 [ApiVersion("1")]
 [Route("artifact/{id}")]
-[Authorize(Policy = EndpointPolicy.AdministratorOnly)]
+[Authorize]
 public class ArtifactDetailEndpoint : EndpointBaseAsync
     .WithRequest<string>
     .WithActionResult<ArtifactDetailDto>

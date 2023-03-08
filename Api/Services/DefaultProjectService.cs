@@ -169,7 +169,7 @@ public partial class DefaultProjectService : IProjectService
 
             foreach(var artifact in dto.Artifacts)
             {
-                var artifactInfo = await artifacts.Load(artifact.Id, token);
+                var artifactInfo = await db.LoadAsync<ArtifactInfo>(artifact.Id, token);
                 if (artifactInfo is null)
                 {
                     throw new IndexOutOfRangeException($"Artifact '{artifact.Id}' does not exist.");

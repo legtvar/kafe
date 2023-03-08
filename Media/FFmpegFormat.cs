@@ -35,8 +35,12 @@ public static class FFmpegFormat
                 = new(".3g2", "video/3gpp2"),
             ["avi"]
                 = new(".avi", "video/x-msvideo"),
-
-
+            ["asf"]
+                = new(".asf", "video/x-ms-asf"),
+            ["mpeg"]
+                = new(".mpg", "video/mpeg"),
+            ["flv"]
+                = new(".flv", "video/x-flv"),
         }.ToImmutableDictionary();
 
     public static string? GetFileExtension(string fileFormat)

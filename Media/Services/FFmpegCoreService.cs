@@ -95,6 +95,7 @@ public class FFmpegCoreService : IMediaService
             MimeType: FFmpegFormat.GetMimeType(data.Format.FormatName) ?? Const.InvalidMimeType,
             FileLength: Const.InvalidFileLength,
             Duration: data.Duration,
+            Bitrate: data.Format.BitRate,
             VideoStreams: videoInfos,
             AudioStreams: audioInfos,
             SubtitleStreams: subtitleInfos);

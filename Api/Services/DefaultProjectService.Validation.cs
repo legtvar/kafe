@@ -949,17 +949,18 @@ public partial class DefaultProjectService : IProjectService
             yield break;
         }
 
-        var videoStream = originalVariant.VideoStreams.Single();
-        var audioStream = originalVariant.AudioStreams.Single();
-
-        if (videoStream.Bitrate < VideoMinBitrate)
+        if (originalVariant.Bitrate < VideoMinBitrate)
         {
             yield return bitrateTooLowError;
         }
-        else if (videoStream.Bitrate > VideoMaxBitrate)
+        else if (originalVariant.Bitrate > VideoMaxBitrate)
         {
             yield return bitrateTooHighError;
         }
+
+        var videoStream = originalVariant.VideoStreams.Single();
+        var audioStream = originalVariant.AudioStreams.Single();
+
 
         if (!AllowedVideoCodecs.Contains(videoStream.Codec))
         {

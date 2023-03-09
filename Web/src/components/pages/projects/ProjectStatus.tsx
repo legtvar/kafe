@@ -57,6 +57,11 @@ function StatusGroup(props: IStatusGroupProps) {
                     details={
                         props.useUnset ? undefined : (
                             <>
+                                {props.stage === 'file' && (
+                                    <Text key={-1} pb={4} fontStyle="italic">
+                                        {t('projectStatus.disclaimer').toString()}
+                                    </Text>
+                                )}
                                 {inStage.map((diag, i) => (
                                     <Text key={i}>{getPrefered(diag.message as any as localizedString)}</Text>
                                 ))}

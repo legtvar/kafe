@@ -24,7 +24,7 @@ public partial class DefaultProjectService : IProjectService
     public static readonly TimeSpan FilmMaxLength = TimeSpan.FromMinutes(8);
     public static readonly TimeSpan VideoAnnotationMinLength = TimeSpan.FromSeconds(1);
     public static readonly TimeSpan VideoAnnotationMaxLength = TimeSpan.FromSeconds(30);
-    public const long FilmMaxFileLength = 2 << 30; // 2 GiB
+    public const long FilmMaxFileLength = 2L << 30; // 2 GiB
     public const string FilmMaxFileLengthDescription = "2 GiB";
     public const long VideoMinBitrate = 10_000_000;
     public const string VideoMinBitrateDescription = "10 Mbps";

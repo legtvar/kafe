@@ -24,8 +24,8 @@ public partial class DefaultProjectService : IProjectService
     public static readonly TimeSpan FilmMaxLength = TimeSpan.FromMinutes(8);
     public static readonly TimeSpan VideoAnnotationMinLength = TimeSpan.FromSeconds(1);
     public static readonly TimeSpan VideoAnnotationMaxLength = TimeSpan.FromSeconds(30);
-    public static long FilmMaxFileLength = 2 << 30; // 2 GiB
-    public static string FilmMaxFileLengthDescription = "2 GiB";
+    public const long FilmMaxFileLength = 2 << 30; // 2 GiB
+    public const string FilmMaxFileLengthDescription = "2 GiB";
     public const long VideoMinBitrate = 10_000_000;
     public const string VideoMinBitrateDescription = "10 Mbps";
     public const long VideoMaxBitrate = 20_000_000;
@@ -36,28 +36,28 @@ public partial class DefaultProjectService : IProjectService
     public const string CoverPhotoMaxRatioDescription = "16:9";
     public const double CoverPhotoMinRatio = 4 / 3.0;
     public const string CoverPhotoMinRatioDescription = "4:3";
-    public static string[] AllowedContainers = new[]
+    public static readonly string[] AllowedContainers = new[]
     {
         "video/mp4",
         "video/x-matroska"
     };
-    public static string[] AllowedVideoCodecs = new[]
+    public static readonly string[] AllowedVideoCodecs = new[]
     {
         "h264",
         "mpeg4"
     };
-    public static string[] AllowedAudioCodecs = new[]
+    public static readonly string[] AllowedAudioCodecs = new[]
     {
         "aac",
         "mp3",
         "flac"
     };
-    public static string[] AllowedSubtitleCodecs = new[]
+    public static readonly string[] AllowedSubtitleCodecs = new[]
     {
         "subrip",
         "ass"
     };
-    public static string[] AllowedImageMimeTypes = new[]
+    public static readonly string[] AllowedImageMimeTypes = new[]
     {
         "image/jpeg",
         "image/png"
@@ -472,8 +472,8 @@ public partial class DefaultProjectService : IProjectService
         Kind: DiagnosticKind.Error,
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
-            (Const.InvariantCulture, $"The film file must have a shorter-side resolution of {VideoShorterSideResolution} pixels."),
-            (Const.CzechCulture, $"Soubor s filmem musí mít na kratší straně rozlišení {VideoShorterSideResolution} pixelů.")
+            (Const.InvariantCulture, $"The film file must have a shorter-side resolution of at least {VideoShorterSideResolution} pixels."),
+            (Const.CzechCulture, $"Soubor s filmem musí mít na kratší straně rozlišení alespoň {VideoShorterSideResolution} pixelů.")
         )
     );
 
@@ -682,7 +682,7 @@ public partial class DefaultProjectService : IProjectService
                         maxLength: FilmMaxLength,
                         corruptedError: FilmCorrupted,
                         zeroFileLengthError: FilmHasZeroFileLength,
-                        tooLargeError: FilmHasZeroFileLength,
+                        tooLargeError: FilmIsTooLarge,
                         tooShortError: FilmTooShort,
                         tooLongError: FilmTooLong,
                         streamMismatchError: FilmInvalidStreamCount,
@@ -756,7 +756,7 @@ public partial class DefaultProjectService : IProjectService
                         maxLength: VideoAnnotationMaxLength,
                         corruptedError: VideoAnnotationCorrupted,
                         zeroFileLengthError: VideoAnnotationHasZeroFileLength,
-                        tooLargeError: VideoAnnotationHasZeroFileLength,
+                        tooLargeError: VideoAnnotationIsTooLarge,
                         tooShortError: VideoAnnotationTooShort,
                         tooLongError: VideoAnnotationTooLong,
                         streamMismatchError: VideoAnnotationInvalidStreamCount,

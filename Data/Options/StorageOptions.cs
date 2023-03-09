@@ -16,5 +16,8 @@ public record StorageOptions
     public string SecretsDirectory { get; init; } = null!;
 
     [Required]
+    public string TempDirectory { get; init; } = null!;
+
+    [Required]
     public Dictionary<ShardKind, string> ShardDirectories { get; init; } = new();
 }

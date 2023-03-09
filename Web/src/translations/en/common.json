@@ -169,7 +169,8 @@
     "file": "Files are uploaded and have passed the automated check",
     "info": "Basic information is sufficiently filled in",
     "tech": "Project has been reviewed by a technician",
-    "visual": "The project has been reviewed by the graphic designer"
+    "visual": "The project has been reviewed by the graphic designer",
+    "disclaimer": "The automatic validation is still in development. Please take the results with a grain of salt."
   },
   "register": {
     "button": "Sign up",

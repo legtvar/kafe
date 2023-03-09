@@ -170,7 +170,8 @@
     "file": "Soubory jsou nahrány a prošly automatizovanou kontrolou",
     "info": "Základní informace jsou dostatečně vyplněny",
     "tech": "Projekt prošel kontrolou technikem",
-    "visual": "Projekt prošel kontrolou grafikem"
+    "visual": "Projekt prošel kontrolou grafikem",
+    "disclaimer": "Automatická kontrola je zatím ve stádiu vývoje. Výsledky prosím berte s rezervou."
   },
   "register": {
     "button": "Zaregistrovat se",

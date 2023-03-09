@@ -50,20 +50,19 @@ public class ShardCreationEndpoint : EndpointBaseAsync
 
         var tmpFile = new FileInfo(Path.Combine(options.Value.TempDirectory, $"{Hrib.Create()}.tmp"));
         Hrib? id = null;
-        using (var tmpFileStream = new FileStream(tmpFile.FullName, FileMode.Create, FileAccess.ReadWrite))
+        using (var tmpFileStream = new FileStream(tmpFile.FullName, FileMode.Create, FileAccess.Write))
         {
-            using (var stream = request.File.OpenReadStream())
-            {
-                await stream.CopyToAsync(tmpFileStream, cancellationToken);
-            }
+            using var stream = request.File.OpenReadStream();
+            await stream.CopyToAsync(tmpFileStream, cancellationToken);
+        }
 
-            tmpFileStream.Seek(0, SeekOrigin.Begin);
+        using (var tmpFileStream = new FileStream(tmpFile.FullName, FileMode.Open, FileAccess.Read))
+        {
 
             id = await shards.Create(
                 new ShardCreationDto(request.Kind, request.ArtifactId),
                 tmpFileStream,
                 cancellationToken);
-
         }
 
         tmpFile.Delete();

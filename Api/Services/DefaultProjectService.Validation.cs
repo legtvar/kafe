@@ -692,7 +692,7 @@ public partial class DefaultProjectService : IProjectService
                         unsupportedVideoCodecError: FilmUnsupportedVideoCodec,
                         unsupportedAudioCodecError: FilmUnsupportedAudioCodec,
                         mp3BitrateTooLowError: FilmMp3BitrateTooLow,
-                        unsupportedFramerateError: FilmUnsupportedAudioCodec,
+                        unsupportedFramerateError: FilmUnsupportedFramerate,
                         wrongResolutionError: FilmWrongResolution
                     ));
                 }
@@ -766,7 +766,7 @@ public partial class DefaultProjectService : IProjectService
                         unsupportedVideoCodecError: VideoAnnotationUnsupportedVideoCodec,
                         unsupportedAudioCodecError: VideoAnnotationUnsupportedAudioCodec,
                         mp3BitrateTooLowError: VideoAnnotationMp3BitrateTooLow,
-                        unsupportedFramerateError: VideoAnnotationUnsupportedAudioCodec,
+                        unsupportedFramerateError: VideoAnnotationUnsupportedFramerate,
                         wrongResolutionError: VideoAnnotationWrongResolution
                     ));
                 }

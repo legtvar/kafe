@@ -39,6 +39,7 @@ public class ShardCreationEndpoint : EndpointBaseAsync
         var id = await shards.Create(
             new ShardCreationDto(request.Kind, request.ArtifactId),
             stream,
+            request.File.ContentType,
             cancellationToken);
         if (id is null)
         {

@@ -13,6 +13,7 @@ public interface IShardService
     Task<Hrib?> Create(
         ShardCreationDto dto,
         Stream stream,
+        string mimeType,
         CancellationToken token = default);
 
     Task<ShardKind> GetShardKind(Hrib id, CancellationToken token = default);

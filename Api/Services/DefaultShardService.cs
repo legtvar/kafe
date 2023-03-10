@@ -68,13 +68,14 @@ public class DefaultShardService : IShardService
     public async Task<Hrib?> Create(
         ShardCreationDto dto,
         Stream stream,
+        string mimeType,
         CancellationToken token = default)
     {
         await CheckAccess(dto.ArtifactId, token);
 
         return dto.Kind switch
         {
-            ShardKind.Video => await CreateVideo(dto, stream, token),
+            ShardKind.Video => await CreateVideo(dto, stream, mimeType, token),
             ShardKind.Image => await CreateImage(dto, stream, token),
             ShardKind.Subtitles => await CreateSubtitles(dto, stream, token),
             _ => throw new NotSupportedException($"Creation of '{dto.Kind}' shards is not supported yet.")
@@ -84,29 +85,49 @@ public class DefaultShardService : IShardService
     private async Task<Hrib?> CreateVideo(
         ShardCreationDto dto,
         Stream videoStream,
+        string mimeType,
         CancellationToken token = default)
     {
-        var mediaInfo = await mediaService.GetInfo(videoStream, token);
-        videoStream.Seek(0, SeekOrigin.Begin);
+        if (mimeType != Const.MatroskaMimeType && mimeType != Const.Mp4MimeType)
+        {
+            throw new ArgumentException($"Only '{Const.MatroskaMimeType}' and '{Const.Mp4MimeType}' video container " +
+                $"formats are supported.");
+        }
+
+        var shardId = Hrib.Create();
+        var originalFileExtension = mimeType == Const.MatroskaMimeType
+            ? Const.MatroskaFileExtension
+            : Const.Mp4FileExtension;
+        if (!await storageService.TryStoreShard(
+            dto.Kind,
+            shardId,
+            videoStream,
+            Const.OriginalShardVariant,
+            originalFileExtension,
+            token))
+        {
+            throw new InvalidOperationException();
+        }
+
+        if (!storageService.TryOpenShardStream(
+            dto.Kind,
+            shardId,
+            Const.OriginalShardVariant,
+            out var shardStream,
+            out _))
+        {
+            throw new ArgumentException("The shard stream could not be opened just after being saved.");
+        }
+
+        var mediaInfo = await mediaService.GetInfo(shardStream, token);
 
         var created = new VideoShardCreated(
-            ShardId: Hrib.Create(),
+            ShardId: shardId,
             CreationMethod: CreationMethod.Api,
             ArtifactId: dto.ArtifactId,
             OriginalVariantInfo: mediaInfo);
         db.Events.StartStream<VideoShardInfo>(created.ShardId, created);
         await db.SaveChangesAsync(token);
-
-        if (!await storageService.TryStoreShard(
-            dto.Kind,
-            created.ShardId,
-            videoStream,
-            Const.OriginalShardVariant,
-            mediaInfo.FileExtension,
-            token))
-        {
-            throw new InvalidOperationException();
-        }
 
         return created.ShardId;
     }

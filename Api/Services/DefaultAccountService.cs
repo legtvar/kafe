@@ -162,38 +162,23 @@ public class DefaultAccountService : IAccountService, IDisposable
                 EmailAddress: dto.EmailAddress,
                 PreferredCulture: dto.PreferredCulture ?? Const.InvariantCultureCode
             );
-            var refreshed = new TemporaryAccountRefreshed(
-                AccountId: id,
-                SecurityStamp: Guid.NewGuid().ToString()
-            );
-            db.Events.StartStream<AccountInfo>(id, created, refreshed);
-            await db.SaveChangesAsync(token);
-            account = await db.LoadAsync<AccountInfo>(id, token)!;
-            if (account is null)
-            {
-                throw new InvalidOperationException();
-            }
+            db.Events.StartStream<AccountInfo>(id, created);
         }
         else
         {
             id = account.Id;
         }
 
-        if (account.SecurityStamp is null)
+        var refreshed = new TemporaryAccountRefreshed(
+            AccountId: id,
+            SecurityStamp: account?.SecurityStamp ?? Guid.NewGuid().ToString()
+        );
+        db.Events.Append(id, refreshed);
+        await db.SaveChangesAsync(token);
+        account = await db.Events.AggregateStreamAsync<AccountInfo>(id, token: token);
+        if (account is null || account.SecurityStamp is null)
         {
-            var eventStream = await db.Events.FetchForExclusiveWriting<AccountInfo>(account.Id, token);
-            if (eventStream is null)
-            {
-                throw new InvalidOperationException();
-            }
-
-            var refreshed = new TemporaryAccountRefreshed(
-                AccountId: id,
-                SecurityStamp: Guid.NewGuid().ToString()
-            );
-            eventStream.AppendOne(refreshed);
-            await db.SaveChangesAsync(token);
-            account = account with { SecurityStamp = refreshed.SecurityStamp };
+            throw new InvalidOperationException();
         }
 
         var confirmationToken = EncodeToken(new(id, EmailConfirmationPurpose, account.SecurityStamp));

@@ -1,10 +1,24 @@
 import { Box, useColorModeValue } from '@chakra-ui/react';
+import { components } from '../../schemas/api';
 
 interface IErrorContentProps {
     error: any;
 }
 
 export function ErrorContent(props: IErrorContentProps) {
+    let title = '';
+    let description = '';
+
+    if (props.error.title) {
+        const as400Response = props.error as components['schemas']['ProblemDetails'];
+
+        title = as400Response.title || 'API error';
+        description = as400Response.detail! || '';
+    } else {
+        title = props.error.toString();
+        description = props.error.stack.toString();
+    }
+
     return (
         <Box
             borderRadius={'lg'}
@@ -18,10 +32,10 @@ export function ErrorContent(props: IErrorContentProps) {
             overflow="auto"
             mb={10}
         >
-            <strong>{props.error.toString()}</strong>
+            <strong>{title}</strong>
             <br />
             <br />
-            {props.error.stack.toString()}
+            {description}
         </Box>
     );
 }

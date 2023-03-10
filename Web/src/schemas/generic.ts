@@ -6,6 +6,34 @@ export type localizedString =
       }
     | undefined;
 
+export function toLocalizedString(input: any): localizedString {
+    return input;
+}
+
+export const concat = (...parts: (localizedString | string)[]) => {
+    let result = {
+        iv: '',
+        cs: '',
+        en: '',
+    };
+
+    for (let i = 0; i < parts.length; i++) {
+        let part = parts[i];
+        if (typeof part === 'string') {
+            part = {
+                iv: part,
+                en: part,
+                cs: part,
+            };
+        }
+        result.iv += part!.iv;
+        result.cs += part!.cs || part!.cs;
+        result.en += part!.en || part!.en;
+    }
+
+    return result as localizedString;
+};
+
 export type ArtifactFootprint = {
     id: string;
     name: localizedString;

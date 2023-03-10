@@ -1,8 +1,24 @@
 {
+  "authorSelect": {
+    "addButton": "Add",
+    "addRole": "Add a role",
+    "bio": "Bio",
+    "button": "Add a person",
+    "createButtom": "Create a person",
+    "email": "Email",
+    "name": "Name",
+    "new": "New author",
+    "phone": "Phone",
+    "selectRoles": "Select person roles",
+    "uco": "UCO"
+  },
   "beta": {
-    "description": "The development has just started. Please hold tight as we build the app with our sweat, tears and covfefe.",
+    "button": "I understand",
+    "contactus": "In case of any problems, please contact us via email at",
+    "description": "This application is currently under development. Please be patient with any issues while we build the app with our sweat, tears and coffee.",
     "title": "Development in progress...",
-    "toggleLanguage": "Switch to {{language}}"
+    "toggleLanguage": "Switch to {{language}}",
+    "warning": "KAFE is in beta"
   },
   "common": {
     "backHome": "Back Home",
@@ -14,10 +30,22 @@
     "noFileSelected": "No file selected",
     "unknownType": "Unknown file type"
   },
+  "countdown": {
+    "days": "days",
+    "hours": "hours",
+    "minutes": "minutes",
+    "seconds": "seconds"
+  },
   "createProject": {
+    "button": {
+      "create": "Create project",
+      "update": "Save project"
+    },
     "fields": {
+      "cast": "Cast",
+      "crew": "Crew",
       "description": "Description",
-      "genere": "Genere",
+      "genre": "genre",
       "movie": "Movie",
       "name": "Name of the movie",
       "videoannotation": "Video annotation"
@@ -28,26 +56,42 @@
     },
     "title": "Create a new project in the project group",
     "upload": {
-      "specs": "Technical requirements",
       "filetype": {
-        "Video": "Video file",
         "Image": "Image file",
-        "Subtitles": "Subtitles file"
-      }
-    }
+        "Subtitles": "Subtitles file",
+        "Video": "Video file"
+      },
+      "specs": "Technical requirements",
+      "newArtefact": "Create a new artifact"
+    },
+    "signUp": "Submit a movie",
+    "doNotforget": "Don't miss it! Until the end of the registration remains"
   },
   "error": {
     "invalidPath": "URL path is invalid",
     "projectDoesNotExist": "Project with the given ID does not exist",
     "subtitle": "We are terribly sorry for the inconvenience. If you feel like this was not supposed to happen (which it probably wasn't), please send us the report bellow",
-    "title": "Whops, something went wrong"
+    "title": "Whops, something went wrong",
+    "tokenInvalid": "Token is invalid"
   },
   "generic": {
+    "cancel": "Cancel",
+    "edit": "Edit",
     "empty": "It's empty in here...",
-    "for": "for"
+    "for": "for",
+    "save": "Save",
+    "files": "files"
   },
   "home": {
     "signin": "Sign in"
+  },
+  "homeFestival": {
+    "title": "Don't forget to submit your movie to"
+  },
+  "introText": {
+    "details": "<0>Film Festival of the Faculty of Informatics MU is a festival of short amateur flims. Festival evening will be held on May 19, 2023, from 7 p. m., at Faculty of Informatics MU and in University Cinema Scala.</0><1>Conditions for admission of a flim to the 23rd Film festival FI MU:</1><2><0>Accepted flims can be only amateur audiovisual creations of any genre and form of production (live action or animated) in a total length of 8 minutes</0><1>Creators must not be professionals in the creation of audiovisual pieces</1><2>A flim must not be older than 3 years</2><3>A flim must not violate any copyright</3><4>A flim can be registered by only one of the authors and also with the consent of all co-authors of the work</4><5>Registration is free</5></2><3>Competition flims will be rated in two ways:</3><4>Voting of professional jury</4><5>Audience poll</5><6>Films must be registered until April 9, 2023, via an online form through the link above. Every flim must have an accurate name. Part of registration must also be accompanying text with a brief annotation of a flim. Organisers of the festival reserve the right to exclude contributions that do not meet the above conditions or contributions whose content conflicts with Czech legislation without submitting them to the Program Committee for assessment. Every author/author’s collective can register for the festival, maximally three separate flims. The festival director and teachers of PV113 Production of Audiovisual Artefacts will select flims for projection and dramaturgy of the festival evening. This intern jury differs from the professional jury, which will determine the winners. There is no legal right to be included in the festival program.</6><7>Authors will be informed about acceptance or rejection through contacts listed in flim registration. Films selected by the Program Committee will be projected on screens in Brno during the 23rd Film Festival of the Faculty of Informatics MU.</7><8>The contestant has no legal right to win the competition, and non-monetary prizes cannot be redeemed or converted into money. The prizes will be issued based on a mutual agreement between the author and the organisers of the 23rd Film Festival of the Faculty of Informatics MU.</8><9>By registering an audiovisual work (flim), the applicant declares that he has the right to use the work in this way and that he has the rights to the works used in the film.</9><10>By submitting a flim, the applicant grants the organiser a free license to screen the work as part of the 23rd Film Festival of the Faculty of Informatics MU.</10><11>By registering the flim, the author also grants MU a non-exclusive, free license to preserve the copy for possible screening of the work as part of teaching and promotion of FFFI MU and for non-public screening for the MU academic community. The territorial and quantitative scope of the license is unlimited. Authorisations are granted for the entire duration of the respective rights.</11><12>Recommendation:</12><13>Verify in time that the YouTube platform does not detect copyright infringement in your video</13><14>If you need to prove to the YouTube platform that you hold the license rights to the used material, contact us at festival-tech@fi.muni.cz</14>",
+    "detailsTitle": "Detailed information for",
+    "general": "<0>Do you make flims? Are you not worried about standing on the edge? Do you have an idea you want to realise?</0><1>You are in the right place! Film a short flim and register it for the 23rd Film Festival of the Faculty of Informatics MU (FFFIMU)! The deadline is until April 9, 2023, so hurry!</1><2>With us, you can show your flim in front of hundreds of people and even win prizes if your flim interests jury or audience.</2><3>Are you ready to register?</3>"
   },
   "layout": {
     "footer": {
@@ -66,6 +110,8 @@
     "title": "Sign in"
   },
   "navbar": {
+    "colorMode": "Toggle color mode",
+    "language": "Language",
     "profile": "Profile",
     "settings": "Settings",
     "signout": "Sign out"
@@ -85,12 +131,46 @@
     "releaseDate": {
       "na": "Not specified"
     },
-    "unknownGroup": "Unknown group"
+    "unknownGroup": "Unknown group",
+    "admin": {
+      "emailContent": "Email content",
+      "title": "Reviews",
+      "role": {
+        "tech": "Technician review",
+        "visual": "Visual review",
+        "dramaturgy": "Dramaturgy review",
+        "placeholder": "-- select a role --"
+      },
+      "submit": "Submit the review",
+      "kind": {
+        "accepted": "Accept",
+        "rejected": "Reject"
+      },
+      "confirm": "Careful! This will send an email to the project author! This operation is irreversible!",
+      "new": "New review",
+      "archive": "Review archive"
+    }
+  },
+  "projectEdit": {
+    "quit": "Quit edit mode",
+    "tabs": {
+      "files": "Files",
+      "info": "Basic information",
+      "status": "State"
+    }
   },
   "projects": {
     "detail": "Detail",
     "empty": "No projects",
     "title": "My projects"
+  },
+  "projectStatus": {
+    "dramaturgy": "Project has been accepted",
+    "file": "Files are uploaded and have passed the automated check",
+    "info": "Basic information is sufficiently filled in",
+    "tech": "Project has been reviewed by a technician",
+    "visual": "The project has been reviewed by the graphic designer",
+    "disclaimer": "The automatic validation is still in development. Please take the results with a grain of salt."
   },
   "register": {
     "button": "Sign up",
@@ -129,15 +209,14 @@
     },
     "projects": {
       "detail": {
-        "title": "Project detail"
+        "title": "Edit project"
       },
       "title": "Projects"
     }
   },
-  "upload": {
-    "ready": "Drag the <1>{{title}}</1> here<2></2>or click to select the file from your computer<4></4>",
-    "uploading": "<0>Uploading the file</0><1></1>{{progress}}% uploaded",
-    "uploaded": "<0>Successfully uploaded</0><1></1>You can now submit the form"
+  "sendApi": {
+    "error": "There is a problem with the form",
+    "unknownError": "An error occurred while submitting the form"
   },
   "status": {
     "404": {
@@ -146,7 +225,35 @@
     },
     "backlink": "Go to Home"
   },
+  "temp": {
+    "after": "We have sent information for activating a temporary account to your email address. Please click on the link in the email to continue to the KAFE.",
+    "after2": "If you did not receive the email, you can request it again.",
+    "back": "Request again"
+  },
+  "tempAccount": {
+    "title": "Create a temporary account"
+  },
   "textarea": {
-    "characters": "characters"
+    "characters": "characters",
+    "min": "min"
+  },
+  "upload": {
+    "ready": "Drag the <1>{{title}}</1> here<2></2>or click to select the file from your computer<4></4>",
+    "uploaded": "<0>Successfully uploaded</0><1></1>You can now submit the form",
+    "failed": "<0>Upload failed</0><1></1>Are you uploading the correct file type?",
+    "uploading": "<0>Uploading the file</0><1></1>{{progress}}% uploaded"
+  },
+  "visibility": {
+    "Internal": "Internal",
+    "Private": "Private",
+    "Public": "Public",
+    "Unknown": "Unknown visibility"
+  },
+  "tagInput": {
+    "note": "Separate the roles with a comma or a new line"
+  },
+  "artifact": {
+    "delete": "Delete the artifact",
+    "deleteWarn": "Are you sure you want to delete the selected artifact? \nThis operation is irreversible!"
   }
 }

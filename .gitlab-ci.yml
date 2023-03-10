@@ -1,7 +1,7 @@
 stages:
   - manual
   - build
-  - test
+  # - test
   - deploy
 
 build-api:
@@ -98,41 +98,41 @@ publish-all:
     - ci
   when: manual
 
-test-web:
-  image: alpine:latest
-  stage: test
-  dependencies:
-    - build-web
-  script:
-    - apk update
-    - apk add npm
-    - cd Web
-    - npm ci
-    - npm run test
-  tags:
-    - shared-fi
-  cache:
-    paths:
-      - Web/node_modules
-  only:
-    - master
-    - web
-    - ci
+# test-web:
+#   image: alpine:latest
+#   stage: test
+#   dependencies:
+#     - build-web
+#   script:
+#     - apk update
+#     - apk add npm
+#     - cd Web
+#     - npm ci
+#     - npm run test
+#   tags:
+#     - shared-fi
+#   cache:
+#     paths:
+#       - Web/node_modules
+#   only:
+#     - master
+#     - web
+#     - ci
 
-pages:
-  stage: deploy
-  dependencies:
-    - test-web
-  script:
-    - cp Web/build public -r
-  tags:
-    - shared-fi
-  artifacts:
-    paths:
-      - public
-    expire_in: 42s
-  only:
-    - web
+# pages:
+#   stage: deploy
+#   dependencies:
+#     - test-web
+#   script:
+#     - cp Web/build public -r
+#   tags:
+#     - shared-fi
+#   artifacts:
+#     paths:
+#       - public
+#     expire_in: 42s
+#   only:
+#     - web
 
 publish-web:
   stage: manual

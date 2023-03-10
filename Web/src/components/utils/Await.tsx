@@ -34,7 +34,7 @@ export function Await<T>(props: IAwaitProps<T>) {
             }
             return props.children;
         case 'rejected':
-            console.warn(error);
+            // console.warn(error);
             if (props.error) return props.error(error);
             return <></>;
     }

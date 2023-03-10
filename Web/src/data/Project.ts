@@ -1,29 +1,53 @@
+import moment from 'moment';
 import { components } from '../schemas/api';
 import { localizedString } from '../schemas/generic';
 import { getPrefered } from '../utils/preferedLanguage';
-import { FileEntry } from './FileEntry';
+import { AbstractType } from './AbstractType';
+import { Artifact } from './Artifact';
+import { localizedMapper } from './serialize/localizedMapper';
+import { rolesMapper } from './serialize/rolesMapper';
+import { Serializer } from './serialize/Serializer';
 
-export class Project {
+export class Project extends AbstractType {
     // API object
-    public id!: string;
     public projectGroupId!: string;
     public projectGroupName!: localizedString;
     public name?: localizedString;
-    public genere?: localizedString;
+    public genre?: localizedString;
     public description?: localizedString;
     public visibility!: components['schemas']['Visibility'];
-    public releaseDate!: Date | null;
+    public releasedOn!: Date | null;
 
     // Authors
     public crew!: components['schemas']['ProjectAuthorDto'][];
     public cast!: components['schemas']['ProjectAuthorDto'][];
 
-    public artifacts!: components['schemas']['ArtifactDetailDto'][];
+    public artifacts!: Artifact[];
+
+    public reviews!: components['schemas']['ProjectReviewDto'][];
+    public blueprint!: components['schemas']['ProjectBlueprintDto'];
 
     public constructor(struct: components['schemas']['ProjectListDto'] | components['schemas']['ProjectDetailDto']) {
+        super();
         Object.assign(this, struct);
-        this.releaseDate = new Date(struct.releaseDate);
-        if (this.releaseDate.getTime() < 0) this.releaseDate = null;
+        this.releasedOn = new Date(struct.releasedOn);
+        if (this.releasedOn.getTime() < 0) this.releasedOn = null;
+        if (this.artifacts) {
+            this.artifacts = this.artifacts.map((artifact: any) => new Artifact(artifact));
+        }
+
+        // Temporary
+        // this.blueprint.artifactBlueprints = (
+        //     this.blueprint.artifactBlueprints as any as components['schemas']['ProjectArtifactBlueprintDto'][]
+        // ).reduce(
+        //     (prev, curr) => ({
+        //         ...prev,
+        //         [(curr as any).slotName]: (
+        //             curr.shardBlueprints as any as components['schemas']['ProjectArtifactShardBlueprintDto'][]
+        //         ).reduce((pr, c) => ({ ...pr, [(c as any).kind]: c }), {}),
+        //     }),
+        //     {},
+        // );
     }
 
     public getName() {
@@ -38,28 +62,23 @@ export class Project {
         return getPrefered(this.projectGroupName);
     }
 
-    public getFiles() {
-        return [
-            new FileEntry({
-                id: '1337_video1',
-                name: { iv: 'Trailer' },
-                path: 'https://samplelib.com/lib/preview/mp4/sample-5s.mp4',
-            }),
-            new FileEntry({
-                id: '1337_video2',
-                name: { iv: 'Film' },
-                path: 'https://samplelib.com/lib/preview/mp4/sample-20s.mp4',
-            }),
-            new FileEntry({
-                id: '1337_poster',
-                name: { iv: 'Plakát' },
-                path: 'https://api.lorem.space/image/movie?w=300&h=400&.png',
-            }),
-            new FileEntry({
-                id: '1337_crew',
-                name: { iv: 'Crew' },
-                path: 'https://api.lorem.space/image/face?w=600&h=400&.png',
-            }),
-        ];
+    public getgenre() {
+        return getPrefered(this.genre);
+    }
+
+    serialize(update: boolean = false): components['schemas']['ProjectCreationDto'] {
+        return new Serializer(this, update)
+            .addConditionaly(!update, 'projectGroupId')
+            .add('name', localizedMapper)
+            .add('genre', localizedMapper)
+            .add('description', localizedMapper)
+            .add('visibility')
+            .add('artifacts', (artifacts: Artifact[]) =>
+                artifacts ? artifacts.map((artifact) => artifact.serialize(false)) : undefined,
+            )
+            .add('releasedOn', (date: Date | null) => moment(date).toISOString())
+            .add('crew', rolesMapper)
+            .add('cast', rolesMapper)
+            .build();
     }
 }

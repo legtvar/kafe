@@ -1,55 +1,58 @@
-import axios from 'axios';
+import { Text } from '@chakra-ui/react';
 import { t } from 'i18next';
-import { FileEntry } from '../../data/FileEntry';
-import { Await } from '../utils/Await';
-import { VideoJS } from './VideoJS';
+import { Artifact } from '../../data/Artifact';
+import { useApi } from '../../hooks/Caffeine';
+import { Video } from './Player/Video';
 
 interface IContentViewerProps {
-    file: FileEntry;
+    artifact: Artifact;
 }
 
-export function ContentViewer(props: IContentViewerProps) {
-    if (props.file) {
-        const type = props.file.getMime();
+type ContentType = 'Video' | 'Image' | 'Unknown';
 
-        if (type) {
-            switch (type.split('/')[0]) {
-                case 'video':
-                    return (
-                        <VideoJS
-                            options={{
-                                autoplay: false,
-                                controls: true,
-                                responsive: true,
-                                fill: true,
-                                sources: [
-                                    {
-                                        src: props.file.path,
-                                        type: props.file.getMime()!,
-                                    },
-                                ],
-                            }}
-                        />
-                    );
-                case 'image':
-                    return (
-                        <img
-                            src={props.file.path}
-                            alt={props.file.getName()}
-                            style={{
-                                width: '100%',
-                                height: '100%',
-                                objectFit: 'contain',
-                                objectPosition: 'center center',
-                            }}
-                        />
-                    );
-                case 'text':
-                    return <Await for={axios.get(props.file.path)}>{(response) => response.data}</Await>;
-            }
-        }
+export function ContentViewer({ artifact }: IContentViewerProps) {
+    const api = useApi();
 
-        return <>{t('content.unknownType').toString()}</>;
+    let type: ContentType = 'Unknown';
+
+    // Determine the type of the content
+    if (artifact.shards.some((shard) => shard.kind === 'Video')) {
+        type = 'Video';
+    } else if (artifact.shards.some((shard) => shard.kind === 'Image')) {
+        type = 'Image';
     }
-    return <>{t('content.noFileSelected').toString()}</>;
+
+    if (type) {
+        switch (type.split('/')[0]) {
+            case 'Video':
+                const video = artifact.shards.filter((shard) => shard.kind === 'Video')[0];
+                // const subtitles = artifact.shards.filter((shard) => shard.kind === 'Subtitles')[0];
+
+                const videoSources = video.variants.reduce(
+                    (prev, curr) => ({
+                        ...prev,
+                        [curr]: api.shards.streamUrl(video.id, curr),
+                    }),
+                    {} as { [key: string]: string },
+                );
+
+                return <Video sources={videoSources} minW="100%" maxW="100%" h="60vmin" />;
+            case 'Image':
+                const image = artifact.shards.filter((shard) => shard.kind === 'Image')[0];
+                return (
+                    <img
+                        src={api.shards.defaultStreamUrl(image.id)}
+                        alt={artifact.getName()}
+                        style={{
+                            width: '100%',
+                            height: '60vmin',
+                            objectFit: 'contain',
+                            objectPosition: 'center center',
+                        }}
+                    />
+                );
+        }
+    }
+
+    return <Text color="gray.500">{t('content.unknownType').toString()}</Text>;
 }

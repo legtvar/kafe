@@ -43,7 +43,7 @@ export function Sidebar({ onClose, ...rest }: ISidebarProps) {
 
             return (
                 <>
-                    <Link to={'/auth/' + fullPath}>
+                    <Link to={'/auth' + fullPath}>
                         <NavItem
                             key={i}
                             icon={

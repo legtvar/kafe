@@ -14,12 +14,9 @@ import {
 import { t } from 'i18next';
 import { Trans } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { User } from '../../../data/User';
-import { useAuth } from '../../../hooks/Caffeine';
 
 export function Login() {
     const navigate = useNavigate();
-    const { setUser } = useAuth();
 
     return (
         <>
@@ -52,13 +49,13 @@ export function Login() {
                             bg={'blue.400'}
                             color={'white'}
                             onClick={() => {
-                                const user = new User();
-                                user.email = 'rosecky.jonas@gmail.com';
-                                user.id = '123456789';
-                                user.name = 'Jonáš Rosecký';
-                                user.role = 'admin';
+                                // const user = new User();
+                                // user.email = 'rosecky.jonas@gmail.com';
+                                // user.id = '123456789';
+                                // user.name = 'Jonáš Rosecký';
+                                // user.role = 'admin';
 
-                                setUser(user);
+                                // setUser(user);
 
                                 navigate('/auth');
                             }}

@@ -1,21 +1,44 @@
-import axios, { AxiosProgressEvent } from 'axios';
+import axios, { Axios, AxiosProgressEvent, AxiosResponse } from 'axios';
+import { Author } from '../data/Author';
 import { Group } from '../data/Group';
 import { Playlist } from '../data/Playlist';
 import { Project } from '../data/Project';
+import { User } from '../data/User';
 import { components } from '../schemas/api';
-import { localizedString } from '../schemas/generic';
+import { HRIB, localizedString } from '../schemas/generic';
+import { IntRange } from '../utils/IntRange';
 
 export type ApiCredentials = {
     username: string;
     password: string;
 };
 
-export class API {
-    private credentials: ApiCredentials;
-    private apiUrl = 'https://wma.lemma.fi.muni.cz/api/v1/';
+export type ApiResponse<T> =
+    | {
+          status: 200;
+          response: AxiosResponse<any>;
+          data: T;
+      }
+    | {
+          status: IntRange<400, 500>;
+          response: AxiosResponse<any>;
+          error: components['schemas']['ProblemDetails'];
+      };
 
-    public constructor(credentials: ApiCredentials) {
-        this.credentials = credentials;
+export class API {
+    private apiUrl = '/api/v1/';
+    private client: Axios;
+
+    public constructor() {
+        if (window.location.hostname.startsWith('localhost') || window.location.hostname.startsWith('127.0.0.1')) {
+            this.apiUrl = 'http://localhost:8000' + this.apiUrl;
+        }
+
+        this.client = axios.create({
+            baseURL: this.apiUrl,
+            withCredentials: true,
+            validateStatus: (status) => [200].includes(status) || (status >= 400 && status < 500),
+        });
     }
 
     // API fetch functions
@@ -28,6 +51,15 @@ export class API {
             },
             async getById(id: string) {
                 return api.requestSingle(`project/${id}`, Project);
+            },
+            async validationById(id: string) {
+                return api.getSimple<components['schemas']['ProjectValidationDto']>(`project-validation/${id}`);
+            },
+            async create(project: Project) {
+                return api.post<components['schemas']['ProjectCreationDto'], HRIB>(`project`, project.serialize());
+            },
+            async update(project: Project) {
+                return api.patch<components['schemas']['ProjectCreationDto'], HRIB>(`project`, project.serialize(true));
             },
         };
     }
@@ -58,14 +90,53 @@ export class API {
         };
     }
 
+    public get authors() {
+        const api = this;
+
+        return {
+            async getAll() {
+                return api.requestArray(`authors`, Author);
+            },
+            async getById(id: string) {
+                return api.requestSingle(`author/${id}`, Author);
+            },
+            async create(author: Author) {
+                return api.post<components['schemas']['AuthorCreationDto'], HRIB>(`author`, author.serialize());
+            },
+        };
+    }
+
     public get artifacts() {
         const api = this;
 
         return {
-            async create(name: localizedString, projectId: string) {
+            async create(name: localizedString, projectId: string, blueprintSlot: string) {
                 return await api.post<components['schemas']['ArtifactCreationDto'], string>(`artifact`, {
                     containingProject: projectId as any,
                     name: name as any,
+                    blueprintSlot,
+                });
+            },
+        };
+    }
+
+    public get review() {
+        const api = this;
+
+        return {
+            async create(
+                projectId: HRIB,
+                kind: components['schemas']['ReviewKind'],
+                reviewerRole: string,
+                comment: string,
+            ) {
+                return await api.post<any, HRIB>(`project-review`, {
+                    projectId,
+                    kind,
+                    reviewerRole,
+                    comment: {
+                        iv: comment,
+                    },
                 });
             },
         };
@@ -83,72 +154,137 @@ export class API {
             ) {
                 const formData = new FormData();
                 formData.append('file', file, file.name);
-                formData.append('shardKind', shardKind);
+                formData.append('kind', shardKind);
                 formData.append('artifactId', artifactId);
 
                 return await api.upload<FormData, string>(`shard`, formData, onUploadProgress);
+            },
+            streamUrl(id: string, variant: string) {
+                return `${api.apiUrl}shard-download/${id}/${variant}`;
+            },
+            defaultStreamUrl(id: string) {
+                return `${api.apiUrl}shard-download/${id}`;
+            },
+        };
+    }
+
+    public get accounts() {
+        const api = this;
+
+        return {
+            temporary: {
+                async create(email: string, culture: string) {
+                    return await api.post<components['schemas']['TemporaryAccountCreationDto'], {}>(
+                        `tmp-account`,
+                        {
+                            emailAddress: email,
+                            preferredCulture: culture,
+                        },
+                        false,
+                    );
+                },
+                async confirm(token: string) {
+                    return api.getSimple(`tmp-account/${token}`);
+                },
+            },
+            info: {
+                async getSelf() {
+                    return api.requestSingle(`account`, User);
+                },
+                async getById(id: string) {
+                    return api.requestSingle(`account/${id}`, User);
+                },
+            },
+            async logout() {
+                return api.getSimple(`account/logout`);
             },
         };
     }
 
     // END
 
+    // Api utils
+
     private async requestSingle<Class>(path: string, type: new (response: any) => Class) {
-        return this.get(path, type, false) as Promise<Class>;
+        return this.get(path, type, false) as Promise<ApiResponse<Class>>;
     }
 
     private async requestArray<Class>(path: string, type: new (response: any) => Class) {
-        return this.get(path, type, true) as Promise<Class[]>;
+        return this.get(path, type, true) as Promise<ApiResponse<Class[]>>;
     }
 
-    private async get<Class>(path: string, type: new (response: any) => Class, isArray: boolean) {
-        const response = (
-            await axios.get(this.apiUrl + path, {
-                auth: {
-                    username: this.credentials.username,
-                    password: this.credentials.password,
-                },
-            })
-        ).data;
+    private async get<Class>(
+        path: string,
+        type: new (response: any) => Class,
+        isArray: boolean,
+        auth: boolean = true,
+    ): Promise<ApiResponse<Class | Class[]>> {
+        const response = await this.client.get(path, {
+            withCredentials: auth,
+        });
 
-        if (isArray) {
-            return response.map((s: any) => new type(s)) as Class[];
-        } else {
-            return new type(response) as Class;
+        const res = this.handleError<any>(response);
+
+        if (res.status === 200) {
+            if (isArray) {
+                res.data = res.data.map((s: any) => new type(s)) as Class[];
+            } else {
+                res.data = new type(response.data) as Class;
+            }
         }
+
+        return res;
     }
 
-    private async post<Req, Res>(path: string, body: Req) {
-        const response = (
-            await axios.post(this.apiUrl + path, body, {
-                auth: {
-                    username: this.credentials.username,
-                    password: this.credentials.password,
-                },
-            })
-        ).data;
+    private async getSimple<Res>(path: string, auth: boolean = true): Promise<ApiResponse<any>> {
+        const response = await this.client.get(path, {
+            withCredentials: auth,
+        });
 
-        return response as Res;
+        return this.handleError<Res>(response);
+    }
+
+    private async post<Req, Res>(path: string, body: Req, auth: boolean = true): Promise<ApiResponse<Res>> {
+        const response = await this.client.post(path, body, {
+            withCredentials: auth,
+        });
+
+        return this.handleError<Res>(response);
+    }
+
+    private async patch<Req, Res>(path: string, body: Req, auth: boolean = true): Promise<ApiResponse<Res>> {
+        const response = await this.client.patch(path, body, {
+            withCredentials: auth,
+        });
+
+        return this.handleError<Res>(response);
     }
 
     private async upload<Req, Res>(
         path: string,
         body: Req,
         onUploadProgress?: (progressEvent: AxiosProgressEvent) => void,
-    ) {
-        const response = (
-            await axios.post(this.apiUrl + path, body, {
-                auth: {
-                    username: this.credentials.username,
-                    password: this.credentials.password,
-                },
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-                onUploadProgress,
-            })
-        ).data;
+        auth: boolean = true,
+    ): Promise<ApiResponse<Res>> {
+        const response = await this.client.post(path, body, {
+            withCredentials: auth,
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+            onUploadProgress,
+        });
 
-        return response as Res;
+        return this.handleError<Res>(response);
+    }
+
+    private handleError<T>(response: AxiosResponse<any>): ApiResponse<T> {
+        if (response.status !== 200) {
+            return {
+                status: response.status as any,
+                error: response.data,
+                response: response,
+            };
+        }
+        return { data: response.data as T, response: response, status: 200 };
     }
 }

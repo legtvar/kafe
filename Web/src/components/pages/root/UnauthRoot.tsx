@@ -1,19 +1,19 @@
-import { Box } from '@chakra-ui/react';
-import { Outlet } from 'react-router-dom';
-import { useReload } from '../../../hooks/useReload';
-import { Navbar } from '../../layout/navigation/Navbar';
+import { Navigate } from 'react-router-dom';
 
 interface IUnauthRootProps {}
 
 export function UnauthRoot(props: IUnauthRootProps) {
-    const reload = useReload();
+    // const reload = useReload();
 
-    return (
-        <>
-            <Navbar forceReload={() => reload()} signedIn={false} />
-            <Box w="100%" mt={20} p={6} fontSize="xl">
-                <Outlet />
-            </Box>
-        </>
-    );
+    // TODO: Temporary
+    return <Navigate to={'/account/temp'} />;
+
+    // return (
+    //     <>
+    //         <Navbar forceReload={() => reload()} signedIn={false} />
+    //         <Box w="100%" mt={20} p={6} fontSize="xl">
+    //             <Outlet />
+    //         </Box>
+    //     </>
+    // );
 }

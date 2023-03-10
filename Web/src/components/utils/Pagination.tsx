@@ -62,37 +62,39 @@ export function Pagination<T>(props: IPaginationProps<T>) {
     return (
         <>
             <>{currentPage.map(children)}</>
-            <HStack my={7} overflowX="auto">
-                <IconButton
-                    size="md"
-                    variant="solid"
-                    onClick={() => setPage(Math.max(page - 1, 0))}
-                    aria-label={'Previous'}
-                    icon={<AiOutlineLeft />}
-                    isDisabled={page === 0}
-                    key={-1}
-                />
-                {visiblePages.map((id) => (
+            {pagesInData > 1 && (
+                <HStack my={7} overflowX="auto">
                     <IconButton
                         size="md"
                         variant="solid"
-                        colorScheme={id === page ? 'brand' : undefined}
-                        onClick={() => setPage(id)}
-                        aria-label={`Page ${(id + 1).toString()}`}
-                        icon={<>{id + 1}</>}
-                        key={id}
+                        onClick={() => setPage(Math.max(page - 1, 0))}
+                        aria-label={'Previous'}
+                        icon={<AiOutlineLeft />}
+                        isDisabled={page === 0}
+                        key={-1}
                     />
-                ))}
-                <IconButton
-                    size="md"
-                    variant="solid"
-                    onClick={() => setPage(Math.min(page + 1, pagesInData - 1))}
-                    aria-label={'Next'}
-                    icon={<AiOutlineRight />}
-                    isDisabled={page === pagesInData - 1}
-                    key={-2}
-                />
-            </HStack>
+                    {visiblePages.map((id) => (
+                        <IconButton
+                            size="md"
+                            variant="solid"
+                            colorScheme={id === page ? 'brand' : undefined}
+                            onClick={() => setPage(id)}
+                            aria-label={`Page ${(id + 1).toString()}`}
+                            icon={<>{id + 1}</>}
+                            key={id}
+                        />
+                    ))}
+                    <IconButton
+                        size="md"
+                        variant="solid"
+                        onClick={() => setPage(Math.min(page + 1, pagesInData - 1))}
+                        aria-label={'Next'}
+                        icon={<AiOutlineRight />}
+                        isDisabled={page === pagesInData - 1}
+                        key={-2}
+                    />
+                </HStack>
+            )}
         </>
     );
 }

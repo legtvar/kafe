@@ -1,12 +1,36 @@
+import { useEffect, useState } from 'react';
 import { Navigate, useMatches, useOutlet } from 'react-router-dom';
-import { useAuth } from '../../../hooks/Caffeine';
+import { useApi, useAuth } from '../../../hooks/Caffeine';
+import { Loading } from '../../utils/Loading';
 
 interface IRootProps {}
 
 export function Root(props: IRootProps) {
-    const { user } = useAuth();
+    const { user, setUser } = useAuth();
+    const [status, setStatus] = useState<'ready' | 'request' | 'requesting'>('request');
     const outlet = useOutlet();
     const matches = useMatches();
+    const api = useApi();
+
+    useEffect(() => {
+        (async () => {
+            if (status === 'request') {
+                setStatus('requesting');
+                const self = await api.accounts.info.getSelf();
+                // console.log(self);
+                if (self.status === 200) {
+                    setUser(self.data);
+                }
+                setStatus('ready');
+            }
+        })();
+    });
+
+    if (status !== 'ready') {
+        return <Loading center large />;
+    }
+
+    // console.log(user);
 
     let authRequested = false;
     if (matches && matches.length > 1) {

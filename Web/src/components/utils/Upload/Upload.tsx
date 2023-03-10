@@ -3,21 +3,31 @@ import { motion } from 'framer-motion';
 import { useState } from 'react';
 import Dropzone from 'react-dropzone';
 import { Trans } from 'react-i18next';
-import { BsCloudArrowUp, BsCloudArrowUpFill, BsCloudCheckFill } from 'react-icons/bs';
+import { BsCloudArrowUp, BsCloudArrowUpFill, BsCloudCheckFill, BsCloudSlashFill } from 'react-icons/bs';
+import { forTime } from 'waitasecond';
 import { useApi } from '../../../hooks/Caffeine';
 import { components } from '../../../schemas/api';
+import { HRIB } from '../../../schemas/generic';
 
 interface IUploadProps {
     title: string;
     projectId: string;
     shardKind: components['schemas']['ShardKind'];
-    getArtifactId: () => Promise<string>;
+    artifactId: string;
+    onUploaded?: (id: HRIB) => void;
+    repeatable?: boolean;
 }
 
 export function Upload(props: IUploadProps) {
-    const [status, setStatus] = useState<'ready' | 'uploading' | 'uploaded'>('ready');
+    const [status, setStatus] = useState<'ready' | 'uploading' | 'uploaded' | 'error'>('ready');
     const [progress, setProgress] = useState<number>(0);
     const api = useApi();
+
+    async function reset() {
+        await forTime(2000);
+        setStatus('ready');
+        setProgress(0);
+    }
 
     async function upload<T extends File>(files: T[]) {
         if (status !== 'ready') return;
@@ -25,14 +35,34 @@ export function Upload(props: IUploadProps) {
 
         setStatus('uploading');
 
-        const artifactId = await props.getArtifactId();
+        const artifactId = props.artifactId;
 
-        const fileId = await api.shards.create(artifactId, files[0], 'Video', (event) =>
-            setProgress(event.progress || 0),
-        );
+        try {
+            const response = await api.shards.create(artifactId, files[0], props.shardKind, (event) =>
+                setProgress(event.progress || 0),
+            );
 
-        setStatus('uploaded');
-        console.log(fileId);
+            if (response.status === 200) {
+                props.onUploaded && props.onUploaded(response.data);
+                setStatus('uploaded');
+
+                if (props.repeatable) {
+                    reset();
+                }
+            } else {
+                setStatus('error');
+                console.warn(response);
+                if (props.repeatable) {
+                    reset();
+                }
+            }
+        } catch (e) {
+            setStatus('error');
+            console.warn(e);
+            if (props.repeatable) {
+                reset();
+            }
+        }
     }
 
     const animationKeyframes = keyframes`
@@ -48,8 +78,7 @@ export function Upload(props: IUploadProps) {
             <Dropzone onDrop={upload} maxFiles={1}>
                 {({ getRootProps, getInputProps, isDragActive, isFileDialogActive }) => (
                     <Center
-                        py={16}
-                        h="300px"
+                        py={8}
                         {...getRootProps()}
                         textColor={isDragActive || isFileDialogActive ? undefined : 'gray.500'}
                         cursor="pointer"
@@ -77,7 +106,7 @@ export function Upload(props: IUploadProps) {
 
     if (status === 'uploading')
         return (
-            <Center py={16} h="300px">
+            <Center py={8}>
                 <Flex direction="column" alignItems="center">
                     <Box as={motion.div} fontSize={96} animation={animation}>
                         <BsCloudArrowUpFill />
@@ -95,8 +124,29 @@ export function Upload(props: IUploadProps) {
             </Center>
         );
 
+    if (status === 'error') {
+        return (
+            <Center py={8}>
+                <Flex direction="column" alignItems="center">
+                    <Box fontSize={96} color="red.500">
+                        <BsCloudSlashFill />
+                    </Box>
+                    <Text align="center">
+                        <Trans i18nKey="upload.failed">
+                            <Text display="inline" fontWeight="bold">
+                                Nahrávání se nezdařilo
+                            </Text>
+                            <br />
+                            Prosíme, zkuste to znovu
+                        </Trans>
+                    </Text>
+                </Flex>
+            </Center>
+        );
+    }
+
     return (
-        <Center py={16} h="300px">
+        <Center py={8}>
             <Flex direction="column" alignItems="center">
                 <Box fontSize={96} color="green.500">
                     <BsCloudCheckFill />

@@ -12,14 +12,18 @@ import {
 import { Navigate, RouteObject } from 'react-router-dom';
 import { Login } from './components/pages/account/Login';
 import { Register } from './components/pages/account/Register';
-import { CreateProject } from './components/pages/form/CreateProject';
+import { TempAccount } from './components/pages/account/TempAccount';
+import { Token } from './components/pages/account/Token';
 import { GoRedirect } from './components/pages/GoRedirect';
 import { Groups } from './components/pages/groups/Groups';
 import { GroupsDetail } from './components/pages/groups/GroupsDetail';
+import { HomeFestival } from './components/pages/home/HomeFestival';
 import { PlaylistDetail } from './components/pages/playlists/PlaylistDetail';
 import { PlaylistGallery } from './components/pages/playlists/PlaylistGallery';
 import { PlaylistList } from './components/pages/playlists/PlaylistList';
+import { CreateProject } from './components/pages/projects/CreateProject';
 import { ProjectDetail } from './components/pages/projects/ProjectDetail';
+import { ProjectEdit } from './components/pages/projects/ProjectEdit';
 import { Projects } from './components/pages/projects/Projects';
 import { AccountRoot } from './components/pages/root/AccountRoot';
 import { AuthRoot } from './components/pages/root/AuthRoot';
@@ -80,13 +84,17 @@ export const routerConfig = (t: (id: string) => string): RouteObject[] => [
             },
         ],
     },
+    {
+        path: '/account/token/:token',
+        element: <Token />,
+    },
 ];
 
 export const authRoutes = (t: (id: string) => string): AppRoute[] => [
     {
         path: '',
         title: t('route.home.title'),
-        element: <PlaylistGallery />,
+        element: <HomeFestival />,
         inMenu: true,
         icon: {
             default: IoHomeOutline,
@@ -107,6 +115,13 @@ export const authRoutes = (t: (id: string) => string): AppRoute[] => [
                 path: ':id',
                 title: t('route.projects.detail.title'),
                 element: <ProjectDetail />,
+                children: [
+                    {
+                        path: 'edit',
+                        title: t('route.projects.detail.title'),
+                        element: <ProjectEdit />,
+                    },
+                ],
             },
         ],
     },
@@ -171,6 +186,10 @@ export const accountRoutes = (t: (id: string) => string): RouteObject[] => [
     {
         path: 'register',
         element: <Register />,
+    },
+    {
+        path: 'temp',
+        element: <TempAccount />,
     },
 ];
 

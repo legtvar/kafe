@@ -17,12 +17,13 @@ import {
     useColorModeValue,
     VStack,
 } from '@chakra-ui/react';
-import { t } from 'i18next';
-import { FiBell, FiChevronDown, FiMenu, FiMoon, FiSun } from 'react-icons/fi';
+import i18next, { t } from 'i18next';
+import { FiChevronDown, FiMenu, FiMoon, FiSun } from 'react-icons/fi';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../../hooks/Caffeine';
+import { useApi, useAuth } from '../../../hooks/Caffeine';
 import { avatarUrl } from '../../../utils/avatarUrl';
 import { LanguageToggle } from '../../utils/LanguageToggle';
+import { BetaWarning } from '../BetaWarning';
 import { Logo } from '../Logo';
 
 interface INavbarProps extends FlexProps {
@@ -34,6 +35,13 @@ export function Navbar({ onOpen, forceReload, signedIn, ...rest }: INavbarProps)
     const { colorMode, toggleColorMode } = useColorMode();
     const { user, setUser } = useAuth();
     const navigate = useNavigate();
+    const api = useApi();
+
+    const toggleLanguage = () => {
+        const lang = i18next.language === 'en' ? 'cs' : 'en';
+        i18next.changeLanguage(lang);
+        forceReload();
+    };
 
     return (
         <Flex
@@ -61,15 +69,23 @@ export function Navbar({ onOpen, forceReload, signedIn, ...rest }: INavbarProps)
                 />
             )}
 
+            <BetaWarning />
+
             {signedIn && <Spacer />}
             <Link to="/">
                 <Logo display={signedIn ? { base: 'flex', md: 'none' } : 'flex'} ml={6} />
             </Link>
+
             <Spacer />
 
             <HStack spacing={1}>
-                <LanguageToggle onChange={() => forceReload()} />
+                <LanguageToggle
+                    aria-label="Language"
+                    onLanguageToggled={() => forceReload()}
+                    display={{ base: 'none', md: 'flex' }}
+                />
                 <IconButton
+                    display={{ base: 'none', md: 'flex' }}
                     size="lg"
                     variant="ghost"
                     aria-label="Toggle Color Mode"
@@ -83,7 +99,6 @@ export function Navbar({ onOpen, forceReload, signedIn, ...rest }: INavbarProps)
                 )}
                 {signedIn && (
                     <>
-                        <IconButton size="lg" variant="ghost" aria-label="Notifications" icon={<FiBell />} />
                         <Flex alignItems={'center'}>
                             <Menu>
                                 <MenuButton
@@ -95,7 +110,7 @@ export function Navbar({ onOpen, forceReload, signedIn, ...rest }: INavbarProps)
                                     fontWeight="normal"
                                 >
                                     <HStack>
-                                        <Avatar size={'sm'} src={avatarUrl(user!.email)} />
+                                        <Avatar size={'sm'} src={avatarUrl(user!.emailAddress, user!.id)} />
                                         <VStack
                                             display={{ base: 'none', md: 'flex' }}
                                             alignItems="flex-start"
@@ -103,8 +118,10 @@ export function Navbar({ onOpen, forceReload, signedIn, ...rest }: INavbarProps)
                                             ml="2"
                                             w={150}
                                         >
-                                            <Text fontSize="sm">{user?.name}</Text>
-                                            <Text fontSize="xs" color={'gray.500'}>
+                                            <Text maxW="100%" fontSize="sm" isTruncated>
+                                                {user?.name}
+                                            </Text>
+                                            <Text maxW="100%" fontSize="xs" isTruncated color={'gray.500'}>
                                                 {t(`role.${user?.role}`).toString()}
                                             </Text>
                                         </VStack>
@@ -114,12 +131,17 @@ export function Navbar({ onOpen, forceReload, signedIn, ...rest }: INavbarProps)
                                     </HStack>
                                 </MenuButton>
                                 <MenuList>
-                                    <MenuItem>{t('navbar.profile').toString()}</MenuItem>
-                                    <MenuItem>{t('navbar.settings').toString()}</MenuItem>
-                                    <MenuDivider />
+                                    <MenuItem display={{ base: 'flex', md: 'none' }} onClick={() => toggleLanguage()}>
+                                        {t('navbar.language').toString()}
+                                    </MenuItem>
+                                    <MenuItem display={{ base: 'flex', md: 'none' }} onClick={toggleColorMode}>
+                                        {t('navbar.colorMode').toString()}
+                                    </MenuItem>
+                                    <MenuDivider display={{ base: 'block', md: 'none' }} />
                                     <MenuItem
                                         onClick={() => {
                                             setUser(null);
+                                            api.accounts.logout();
                                             navigate('/');
                                         }}
                                     >

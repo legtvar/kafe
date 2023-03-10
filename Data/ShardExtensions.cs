@@ -29,7 +29,7 @@ public static class ShardExtensions
             IVideoShardEvent => ShardKind.Video,
             IImageShardEvent => ShardKind.Image,
             ISubtitlesShardEvent => ShardKind.Subtitles,
-            _ => ShardKind.Invalid
+            _ => ShardKind.Unknown
         };
     }
 

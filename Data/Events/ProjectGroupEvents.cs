@@ -1,23 +1,24 @@
 using System;
+using System.Collections.Immutable;
 
 namespace Kafe.Data.Events;
 
 public record ProjectGroupCreated(
-    Hrib ProjectGroupId,
+    [Hrib] string ProjectGroupId,
     CreationMethod CreationMethod,
-    LocalizedString Name
+    [LocalizedString] ImmutableDictionary<string, string> Name
 );
 
 public record ProjectGroupInfoChanged(
-    Hrib ProjectGroupId,
-    LocalizedString? Name = null,
-    LocalizedString? Description = null,
+    [Hrib] string ProjectGroupId,
+    [LocalizedString] ImmutableDictionary<string, string>? Name = null,
+    [LocalizedString] ImmutableDictionary<string, string>? Description = null,
     DateTimeOffset? Deadline = null);
 
 public record ProjectGroupOpened(
-    Hrib ProjectGroupId
+    [Hrib] string ProjectGroupId
 );
 
 public record ProjectGroupClosed(
-    Hrib ProjectGroupId
+    [Hrib] string ProjectGroupId
 );

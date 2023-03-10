@@ -2,14 +2,15 @@ using Kafe.Data.Events;
 using Marten.Events;
 using Marten.Events.Aggregation;
 using System;
+using System.Collections.Immutable;
 
 namespace Kafe.Data.Aggregates;
 
 public record ProjectGroupInfo(
-    string Id,
+    [Hrib] string Id,
     CreationMethod CreationMethod,
-    LocalizedString Name,
-    LocalizedString? Description = null,
+    [LocalizedString] ImmutableDictionary<string, string> Name,
+    [LocalizedString] ImmutableDictionary<string, string>? Description = null,
     DateTimeOffset Deadline = default,
     bool IsOpen = false
 ) : IEntity;

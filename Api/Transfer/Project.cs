@@ -10,7 +10,7 @@ public record ProjectListDto(
     LocalizedString Name,
     LocalizedString? Description,
     Visibility Visibility,
-    DateTimeOffset ReleaseDate
+    DateTimeOffset ReleasedOn
     // TODO: Thumbnail
 );
 
@@ -22,16 +22,60 @@ public record ProjectDetailDto(
     LocalizedString Name,
     LocalizedString? Description,
     Visibility Visibility,
-    DateTimeOffset ReleaseDate,
+    DateTimeOffset ReleasedOn,
     ImmutableArray<ProjectAuthorDto> Crew,
     ImmutableArray<ProjectAuthorDto> Cast,
-    ImmutableArray<ArtifactDetailDto> Artifacts
+    ImmutableArray<ProjectArtifactDto> Artifacts,
+    ImmutableArray<ProjectReviewDto> Reviews,
+    ProjectBlueprintDto Blueprint
 );
 
 public record ProjectAuthorDto(
-    string Id,
+    Hrib Id,
     string Name,
     ImmutableArray<string> Roles
+);
+
+public record ProjectArtifactDto(
+    Hrib Id,
+    LocalizedString Name,
+    DateTimeOffset AddedOn,
+    string? BlueprintSlot,
+    ImmutableArray<ShardListDto> Shards
+);
+
+public record ProjectReviewDto(
+    ReviewKind Kind,
+    string ReviewerRole,
+    LocalizedString? Comment,
+    DateTimeOffset AddedOn
+);
+
+public record ProjectReviewCreationDto(
+    string ProjectId,
+    ReviewKind Kind,
+    string ReviewerRole,
+    LocalizedString? Comment
+);
+
+public record ProjectBlueprintDto(
+    LocalizedString Name,
+    LocalizedString? Description,
+    ImmutableArray<string> RequiredReviewers,
+    ImmutableDictionary<string, ProjectArtifactBlueprintDto> ArtifactBlueprints
+);
+
+public record ProjectArtifactBlueprintDto(
+    LocalizedString Name,
+    LocalizedString? Description,
+    ArgumentArity Arity,
+    ImmutableDictionary<ShardKind, ProjectArtifactShardBlueprintDto> ShardBlueprints
+);
+
+public record ProjectArtifactShardBlueprintDto(
+    LocalizedString Name,
+    LocalizedString? Description,
+    ArgumentArity Arity
 );
 
 public record ProjectCreationDto(
@@ -43,7 +87,34 @@ public record ProjectCreationDto(
     ImmutableArray<ProjectCreationAuthorDto> Cast
 );
 
+public record ProjectEditDto(
+    string Id,
+    LocalizedString? Name,
+    LocalizedString? Description,
+    LocalizedString? Genre,
+    ImmutableArray<ProjectCreationAuthorDto>? Crew,
+    ImmutableArray<ProjectCreationAuthorDto>? Cast,
+    ImmutableArray<ProjectArtifactAdditionDto>? Artifacts
+);
+
 public record ProjectCreationAuthorDto(
     string Id,
     ImmutableArray<string> Roles
+);
+
+public record ProjectValidationDto(
+    Hrib ProjectId,
+    DateTimeOffset ValidatedOn,
+    ImmutableArray<ProjectDiagnosticDto> Diagnostics
+);
+
+public record ProjectDiagnosticDto(
+    DiagnosticKind Kind,
+    LocalizedString Message,
+    string ValidationStage
+);
+
+public record ProjectArtifactAdditionDto(
+    string Id,
+    string? BlueprintSlot
 );

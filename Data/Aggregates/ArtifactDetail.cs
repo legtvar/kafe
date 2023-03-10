@@ -14,17 +14,18 @@ using System.Threading.Tasks;
 namespace Kafe.Data.Aggregates;
 
 public record ArtifactDetail(
-    string Id,
+    [Hrib] string Id,
     CreationMethod CreationMethod,
-    LocalizedString Name,
+    [LocalizedString] ImmutableDictionary<string, string> Name,
+    DateTimeOffset AddedOn,
     ImmutableArray<ArtifactShardInfo> Shards,
-    ImmutableArray<Hrib> ContainingProjectIds
+    [KafeType(typeof(ImmutableArray<Hrib>))] ImmutableArray<string> ContainingProjectIds
 );
 
 public record ArtifactShardInfo(
-    string ShardId,
+    [Hrib] string ShardId,
     ShardKind Kind,
-    ImmutableArray<string> Variants
+    ImmutableHashSet<string> Variants
 );
 
 public class ArtifactDetailProjection : MultiStreamAggregation<ArtifactDetail, string>
@@ -45,8 +46,9 @@ public class ArtifactDetailProjection : MultiStreamAggregation<ArtifactDetail, s
             Id: e.ArtifactId,
             CreationMethod: e.CreationMethod,
             Name: e.Name,
+            AddedOn: e.AddedOn,
             Shards: ImmutableArray<ArtifactShardInfo>.Empty,
-            ContainingProjectIds: ImmutableArray<Hrib>.Empty
+            ContainingProjectIds: ImmutableArray<string>.Empty
         );
     }
 
@@ -57,30 +59,30 @@ public class ArtifactDetailProjection : MultiStreamAggregation<ArtifactDetail, s
             Shards = a.Shards.Add(new ArtifactShardInfo(
                 ShardId: e.ShardId,
                 Kind: e.GetShardKind(),
-                Variants: ImmutableArray.Create(Const.OriginalShardVariant)))
+                Variants: ImmutableHashSet.Create(Const.OriginalShardVariant)))
         };
     }
 
-    public ArtifactDetail Apply(IShardVariantsAdded e, ArtifactDetail a)
+    public ArtifactDetail Apply(IShardVariantAdded e, ArtifactDetail a)
     {
         var oldShard = a.Shards.Single(s => s.ShardId == e.ShardId);
         return a with
         {
             Shards = a.Shards.Replace(oldShard, oldShard with
             {
-                Variants = oldShard.Variants.AddRange(e.GetVariantNames())
+                Variants = oldShard.Variants.Add(e.Name)
             })
         };
     }
 
-    public ArtifactDetail Apply(IShardVariantsRemoved e, ArtifactDetail a)
+    public ArtifactDetail Apply(IShardVariantRemoved e, ArtifactDetail a)
     {
         var oldShard = a.Shards.Single(s => s.ShardId == e.ShardId);
         return a with
         {
             Shards = a.Shards.Replace(oldShard, oldShard with
             {
-                Variants = oldShard.Variants.RemoveRange(e.GetVariantNames())
+                Variants = oldShard.Variants.Remove(e.Name)
             })
         };
     }
@@ -105,8 +107,8 @@ public class ArtifactDetailProjection : MultiStreamAggregation<ArtifactDetail, s
     {
         public async Task Group(IQuerySession session, IEnumerable<IEvent> events, ITenantSliceGroup<string> grouping)
         {
-            var filteredEvents = events.Where(e => e.EventType.IsAssignableTo(typeof(IShardVariantsAdded))
-                || e.EventType.IsAssignableTo(typeof(IShardVariantsRemoved)))
+            var filteredEvents = events.Where(e => e.EventType.IsAssignableTo(typeof(IShardVariantAdded))
+                || e.EventType.IsAssignableTo(typeof(IShardVariantRemoved)))
                 .ToList();
             if (!filteredEvents.Any())
             {

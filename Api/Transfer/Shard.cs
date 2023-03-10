@@ -31,6 +31,20 @@ public record ImageShardDetailDto(
     ImmutableDictionary<string, ImageDto> Variants
 ) : ShardDetailBaseDto(Id, Kind, ArtifactId);
 
+public record SubtitlesShardDetailDto(
+    Hrib Id,
+    ShardKind Kind,
+    Hrib ArtifactId,
+    ImmutableDictionary<string, SubtitlesDto> Variants
+) : ShardDetailBaseDto(Id, Kind, ArtifactId);
+
 public record ShardCreationDto(
     ShardKind Kind,
     Hrib ArtifactId);
+
+public record ShardVariantMediaTypeDto(
+    Hrib ShardId,
+    string Variant,
+    string FileExtension,
+    string MimeType
+);

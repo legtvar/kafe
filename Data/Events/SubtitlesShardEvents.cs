@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Linq;
+﻿using Kafe.Media;
 
 namespace Kafe.Data.Events;
 
@@ -9,30 +7,19 @@ public interface ISubtitlesShardEvent : IShardEvent
 }
 
 public record SubtitlesShardCreated(
-    Hrib ShardId,
+    [Hrib] string ShardId,
     CreationMethod CreationMethod,
-    Hrib ArtifactId,
-    SubtitlesShardVariant OriginalVariant
+    [Hrib] string ArtifactId,
+    SubtitlesInfo OriginalVariantInfo
 ) : ISubtitlesShardEvent, IShardCreated;
 
 public record SubtitlesShardVariantsAdded(
-    Hrib ShardId,
-    ImmutableArray<SubtitlesShardVariant> Variants
-) : ISubtitlesShardEvent, IShardVariantsAdded
-{
-    public IEnumerable<string> GetVariantNames()
-    {
-        return Variants.Select(v => v.Name);
-    }
-}
+    [Hrib] string ShardId,
+    string Name,
+    SubtitlesInfo Info
+) : ISubtitlesShardEvent, IShardVariantAdded;
 
 public record SubtitlesShardVariantsRemoved(
-    Hrib ShardId,
-    ImmutableArray<SubtitlesShardVariant> Variants
-) : ISubtitlesShardEvent, IShardVariantsRemoved
-{
-    public IEnumerable<string> GetVariantNames()
-    {
-        return Variants.Select(v => v.Name);
-    }
-}
+    [Hrib] string ShardId,
+    string Name
+) : ISubtitlesShardEvent, IShardVariantRemoved;

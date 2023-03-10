@@ -6,11 +6,11 @@ using Marten.Events.Aggregation;
 namespace Kafe.Data.Aggregates;
 
 public record PlaylistInfo(
-    string Id,
+    [Hrib] string Id,
     CreationMethod CreationMethod,
-    ImmutableArray<string> VideoIds,
-    LocalizedString Name,
-    LocalizedString? Description = null,
+    [KafeType(typeof(ImmutableArray<Hrib>))] ImmutableArray<string> VideoIds,
+    [LocalizedString] ImmutableDictionary<string, string> Name,
+    [LocalizedString] ImmutableDictionary<string, string>? Description = null,
     Visibility Visibility = Visibility.Unknown
 ) : IEntity;
 

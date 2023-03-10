@@ -2,6 +2,7 @@
 using Kafe.Media;
 using Marten.Events;
 using Marten.Events.Aggregation;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Globalization;
 using System.Linq;
@@ -9,10 +10,10 @@ using System.Linq;
 namespace Kafe.Data.Aggregates;
 
 public record SubtitlesShardInfo(
-    string Id,
+    [Hrib] string Id,
     CreationMethod CreationMethod,
-    Hrib ArtifactId,
-    ImmutableArray<SubtitlesShardVariant> Variants
+    [Hrib] string ArtifactId,
+    ImmutableDictionary<string, SubtitlesInfo> Variants
 ) : ShardInfoBase(Id, CreationMethod, ArtifactId)
 {
     public override ShardKind Kind => ShardKind.Subtitles;
@@ -31,14 +32,18 @@ public class SubtitlesShardInfoProjection : SingleStreamAggregation<SubtitlesSha
             Id: e.ShardId,
             CreationMethod: e.CreationMethod,
             ArtifactId: e.ArtifactId,
-            Variants: ImmutableArray.Create(e.OriginalVariant));
+            Variants: ImmutableDictionary.CreateRange(new KeyValuePair<string, SubtitlesInfo>[]
+            {
+                new(Const.OriginalShardVariant, e.OriginalVariantInfo)
+            })
+        );
     }
 
     public SubtitlesShardInfo Apply(SubtitlesShardVariantsAdded e, SubtitlesShardInfo s)
     {
         return s with
         {
-            Variants = s.Variants.Union(e.Variants).ToImmutableArray()
+            Variants = s.Variants.Remove(e.Name).Add(e.Name, e.Info)
         };
     }
 
@@ -46,7 +51,7 @@ public class SubtitlesShardInfoProjection : SingleStreamAggregation<SubtitlesSha
     {
         return s with
         {
-            Variants = s.Variants.Except(e.Variants).ToImmutableArray()
+            Variants = s.Variants.Remove(e.Name)
         };
     }
 }

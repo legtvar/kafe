@@ -1,6 +1,7 @@
 ﻿using Kafe.Data;
 using Kafe.Data.Aggregates;
 using Kafe.Data.Events;
+using Kafe.Media;
 using Marten;
 
 namespace Kafe.Migrator;
@@ -63,7 +64,8 @@ public sealed class KafeClient : IAsyncDisposable
         var created = new AuthorCreated(
             AuthorId: hrib,
             CreationMethod: CreationMethod.Migrator,
-            Name: name);
+            Name: name,
+            Visibility: Visibility.Internal);
         LogEvent(hrib, created);
 
         var infoChanged = new AuthorInfoChanged(
@@ -122,6 +124,7 @@ public sealed class KafeClient : IAsyncDisposable
             if (name is not null || uco is not null || email is not null || phone is not null)
             {
                 session.Events.Append(author.Id, infoChanged);
+                LogEvent(author.Id, infoChanged);
             }
         }
         await session.SaveChangesAsync();
@@ -130,7 +133,8 @@ public sealed class KafeClient : IAsyncDisposable
 
     public async Task<(ArtifactInfo, VideoShardInfo)> CreateVideoArtifact(
         string name,
-        VideoShardVariant originalVariant,
+        MediaInfo originalVariant,
+        DateTimeOffset addedOn,
         Hrib? projectId = null,
         Hrib? artifactId = null,
         Hrib? shardId = null)
@@ -139,7 +143,8 @@ public sealed class KafeClient : IAsyncDisposable
         var artifactCreated = new ArtifactCreated(
             ArtifactId: artifactId,
             CreationMethod: CreationMethod.Migrator,
-            Name: (LocalizedString)name);
+            Name: (LocalizedString)name,
+            AddedOn: addedOn);
         session.Events.StartStream<ArtifactInfo>(artifactId, artifactCreated);
         LogEvent(artifactId, artifactCreated);
 
@@ -148,7 +153,7 @@ public sealed class KafeClient : IAsyncDisposable
             ShardId: shardId,
             CreationMethod: CreationMethod.Migrator,
             ArtifactId: artifactId,
-            OriginalVariant: originalVariant);
+            OriginalVariantInfo: originalVariant);
         session.Events.StartStream<VideoShardInfo>(shardId, shardCreated);
         LogEvent(shardId, shardCreated);
 
@@ -164,7 +169,7 @@ public sealed class KafeClient : IAsyncDisposable
 
     public async Task AddArtifactToProject(Hrib artifactId, Hrib projectId)
     {
-        var artifactAdded = new ProjectArtifactAdded(projectId, artifactId);
+        var artifactAdded = new ProjectArtifactAdded(projectId, artifactId, null);
         LogEvent(projectId, artifactAdded);
         session.Events.Append(projectId, artifactAdded);
 
@@ -214,9 +219,9 @@ public sealed class KafeClient : IAsyncDisposable
         Visibility visibility,
         Hrib projectGroupId,
         string? description = null,
-        DateTime? releaseDate = default,
+        DateTime? releasedOn = default,
         bool isLocked = true,
-        IEnumerable<ProjectAuthor>? authors = default,
+        IEnumerable<ProjectAuthorInfo>? authors = default,
         Hrib? hrib = null)
     {
         hrib ??= Hrib.Create();
@@ -230,8 +235,8 @@ public sealed class KafeClient : IAsyncDisposable
 
         var infoChanged = new ProjectInfoChanged(
             ProjectId: hrib,
-            ReleaseDate: releaseDate.HasValue
-                ? new DateTimeOffset(releaseDate.Value)
+            ReleasedOn: releasedOn.HasValue
+                ? new DateTimeOffset(releasedOn.Value).ToUniversalTime()
                 : null,
             Description: (LocalizedString?)description);
         LogEvent(hrib, infoChanged);
@@ -245,7 +250,7 @@ public sealed class KafeClient : IAsyncDisposable
             LogEvent(hrib, locked);
         }
 
-        authors ??= Enumerable.Empty<ProjectAuthor>();
+        authors ??= Enumerable.Empty<ProjectAuthorInfo>();
         foreach(var author in authors)
         {
             var authorAdded = new ProjectAuthorAdded(

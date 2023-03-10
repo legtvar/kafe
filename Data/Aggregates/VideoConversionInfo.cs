@@ -1,15 +1,16 @@
 using Kafe.Data.Events;
 using Marten.Events;
 using Marten.Events.Aggregation;
+using System.Collections.Immutable;
 
 namespace Kafe.Data.Aggregates;
 
 public record VideoConversionInfo(
-    string Id,
+    [Hrib] string Id,
     string VideoId,
     bool IsCompleted = false,
     bool HasFailed = false,
-    LocalizedString? Error = null
+    [LocalizedString] ImmutableDictionary<string, string>? Error = null
 );
 
 public class VideoConversionInfoProjection : SingleStreamAggregation<VideoConversionInfo>

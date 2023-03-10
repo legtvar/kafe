@@ -1,6 +1,7 @@
 ﻿using Kafe.Api.Transfer;
 using Kafe.Data;
 using Kafe.Data.Aggregates;
+using Kafe.Data.Capabilities;
 using Kafe.Data.Events;
 using Marten;
 using System;
@@ -12,21 +13,46 @@ using System.Threading.Tasks;
 
 namespace Kafe.Api.Services;
 
-public class DefaultProjectService : IProjectService
+public partial class DefaultProjectService : IProjectService
 {
     private readonly IDocumentSession db;
+    private readonly IUserProvider userProvider;
+    private readonly IAccountService accounts;
+    private readonly IArtifactService artifacts;
+    private readonly IEmailService emails;
 
-    public DefaultProjectService(IDocumentSession db)
+    public DefaultProjectService(
+        IDocumentSession db,
+        IUserProvider userProvider,
+        IAccountService accounts,
+        IArtifactService artifacts,
+        IEmailService emails)
     {
         this.db = db;
+        this.userProvider = userProvider;
+        this.accounts = accounts;
+        this.artifacts = artifacts;
+        this.emails = emails;
     }
 
     public async Task<Hrib> Create(ProjectCreationDto dto, CancellationToken token = default)
     {
-        var group = await db.LoadAsync<ProjectGroupInfo>(dto.ProjectGroupId);
+        var group = await db.LoadAsync<ProjectGroupInfo>(dto.ProjectGroupId, token);
         if (group is null)
         {
-            throw new ArgumentException($"Project group '{dto.ProjectGroupId}' does not exist.");
+            throw new ArgumentOutOfRangeException(nameof(dto), $"Project group '{dto.ProjectGroupId}' does not exist.");
+        }
+
+        if (!userProvider.CanRead(group))
+        {
+            throw new UnauthorizedAccessException();
+        }
+
+        if (!group.IsOpen)
+        {
+            throw new ArgumentException(
+                $"Project group '{dto.ProjectGroupId}' is not open for submissions.",
+                nameof(dto));
         }
 
         var created = new ProjectCreated(
@@ -35,42 +61,138 @@ public class DefaultProjectService : IProjectService
             ProjectGroupId: dto.ProjectGroupId,
             Name: dto.Name,
             Visibility: Visibility.Private);
-        db.Events.StartStream<ProjectInfo>(created.ProjectId, created);
+        var infoChanged = new ProjectInfoChanged(
+            ProjectId: Hrib.Create(),
+            Name: dto.Name,
+            Description: dto.Description,
+            Genre: dto.Genre);
 
-        var authorInfos = (await db.LoadManyAsync<AuthorInfo>(
-            dto.Cast.Select(a => a.Id)
-                .Concat(dto.Crew.Select(a => a.Id))))
-            .ToImmutableDictionary(a => a.Id);
+        var authorsAdded = (await GetProjectAuthors(dto.Crew, dto.Cast, token))
+            .Select(a => new ProjectAuthorAdded(
+                ProjectId: created.ProjectId,
+                AuthorId: a.Id,
+                Kind: a.Kind,
+                Roles: a.Roles));
 
-        var authorsAdded = new List<ProjectAuthorAdded>();
+        db.Events.StartStream<ProjectInfo>(created.ProjectId, created, infoChanged);
+        db.Events.Append(created.ProjectId, authorsAdded);
+        await db.SaveChangesAsync(token);
 
-        void AddAuthors(IEnumerable<ProjectCreationAuthorDto> authors, ProjectAuthorKind kind)
+        if (userProvider.User is not null)
         {
-            foreach (var author in authors)
+            await accounts.AddCapabilities(
+                userProvider.User.Id,
+                new[] { new ProjectOwnership(created.ProjectId) },
+                token);
+            await userProvider.Refresh(token: token);
+        }
+
+        return created.ProjectId;
+    }
+
+    public async Task Edit(ProjectEditDto dto, CancellationToken token = default)
+    {
+        var project = await Load(dto.Id, token);
+        if (project is null)
+        {
+            throw new ArgumentOutOfRangeException(nameof(dto));
+        }
+
+        if (LocalizedString.IsTooLong(dto.Name, NameMaxLength))
+        {
+            throw new ArgumentException("Name is too long.", nameof(dto));
+        }
+
+        if (LocalizedString.IsTooLong(dto.Genre, GenreMaxLength))
+        {
+            throw new ArgumentException("Genre is too long.", nameof(dto));
+        }
+
+        if (LocalizedString.IsTooLong(dto.Description, DescriptionMaxLength))
+        {
+            throw new ArgumentException("Description is too long.", nameof(dto));
+        }
+
+        var eventStream = await db.Events.FetchForExclusiveWriting<ProjectInfo>(dto.Id, token);
+
+        if (!LocalizedString.IsNullOrEmpty(dto.Name)
+            || !LocalizedString.IsNullOrEmpty(dto.Description)
+            || !LocalizedString.IsNullOrEmpty(dto.Genre))
+        {
+            var infoChanged = new ProjectInfoChanged(
+                ProjectId: dto.Id,
+                Name: dto.Name,
+                Description: dto.Description,
+                Genre: dto.Genre);
+            eventStream.AppendOne(infoChanged);
+        }
+
+        // TODO: Proper author diffing
+        // TODO: Send "Authors" instead of the stupid "Cast" and "Crew" to the client
+        //       (change in dto)
+
+        if (dto.Crew is not null)
+        {
+            var authorsRemoved = project.Crew.Select(c => c.Id)
+                .Select(i => new ProjectAuthorRemoved(dto.Id, i, ProjectAuthorKind.Crew));
+            eventStream.AppendMany(authorsRemoved);
+        }
+
+        if (dto.Cast is not null)
+        {
+            var authorsRemoved = project.Cast.Select(c => c.Id)
+                .Select(i => new ProjectAuthorRemoved(dto.Id, i, ProjectAuthorKind.Cast));
+            eventStream.AppendMany(authorsRemoved);
+        }
+
+        if (dto.Crew is not null || dto.Cast is not null)
+        {
+            var newAuthors = await GetProjectAuthors(
+                dto.Crew ?? Enumerable.Empty<ProjectCreationAuthorDto>(),
+                dto.Cast ?? Enumerable.Empty<ProjectCreationAuthorDto>(),
+                token);
+            var authorsAdded = newAuthors
+                .Select(a => new ProjectAuthorAdded(
+                    ProjectId: dto.Id,
+                    AuthorId: a.Id,
+                    Kind: a.Kind,
+                    Roles: a.Roles));
+            eventStream.AppendMany(authorsAdded);
+        }
+
+        if (dto.Artifacts is not null)
+        {
+            foreach(var artifact in project.Artifacts)
             {
-                if (!authorInfos.TryGetValue(author.Id, out var info))
+                eventStream.AppendOne(new ProjectArtifactRemoved(dto.Id, artifact.Id));
+            }
+
+            foreach(var artifact in dto.Artifacts)
+            {
+                var artifactInfo = await db.LoadAsync<ArtifactInfo>(artifact.Id, token);
+                if (artifactInfo is null)
                 {
-                    throw new ArgumentException($"Author '{author.Id}' does not exist.");
+                    throw new IndexOutOfRangeException($"Artifact '{artifact.Id}' does not exist.");
                 }
 
-                authorsAdded.Add(new ProjectAuthorAdded(
-                    ProjectId: created.ProjectId,
-                    AuthorId: author.Id,
-                    Kind: ProjectAuthorKind.Cast,
-                    Roles: author.Roles));
+                if (artifact.BlueprintSlot is not null
+                    && !project.Blueprint.ArtifactBlueprints.TryGetValue(artifact.BlueprintSlot, out var _))
+                {
+                    throw new IndexOutOfRangeException($"BlueprintSlot '{artifact.BlueprintSlot}' is not defined.");
+                }
+
+                eventStream.AppendOne(new ProjectArtifactAdded(dto.Id, artifact.Id, artifact.BlueprintSlot));
             }
         }
 
-        AddAuthors(dto.Cast, ProjectAuthorKind.Cast);
-        AddAuthors(dto.Crew, ProjectAuthorKind.Crew);
-
         await db.SaveChangesAsync(token);
-        return created.ProjectId;
     }
 
     public async Task<ImmutableArray<ProjectListDto>> List(CancellationToken token = default)
     {
-        var projects = await db.Query<ProjectInfo>().ToListAsync(token);
+        var projects = await db.Query<ProjectInfo>()
+            .WhereCanRead(userProvider)
+            .ToListAsync(token);
         return projects.Select(TransferMaps.ToProjectListDto).ToImmutableArray();
     }
 
@@ -82,13 +204,23 @@ public class DefaultProjectService : IProjectService
             return null;
         }
 
+        if (!userProvider.CanRead(data))
+        {
+            throw new UnauthorizedAccessException();
+        }
+
         var group = await db.LoadAsync<ProjectGroupInfo>(data.ProjectGroupId, token);
-        var artifactDetails = await db.LoadManyAsync<ArtifactDetail>(token, data.ArtifactIds);
+        var artifactDetails = await db.LoadManyAsync<ArtifactDetail>(token, data.Artifacts.Select(a => a.Id));
         var authors = await db.LoadManyAsync<AuthorInfo>(token, data.Authors.Select(a => a.Id));
         var dto = TransferMaps.ToProjectDetailDto(data) with
         {
             ProjectGroupName = group?.Name ?? Const.UnknownProjectGroup,
-            Artifacts = artifactDetails.Select(TransferMaps.ToArtifactDetailDto).ToImmutableArray(),
+            Artifacts = artifactDetails.Select(a =>
+                TransferMaps.ToProjectArtifactDto(a) with
+                {
+                    BlueprintSlot = data.Artifacts.SingleOrDefault(r => r.Id == a.Id)?.BlueprintSlot
+                })
+                .ToImmutableArray(),
             Cast = data.Authors.Where(a => a.Kind == ProjectAuthorKind.Cast)
                     .Select(a => new ProjectAuthorDto(
                         Id: a.Id,
@@ -104,5 +236,43 @@ public class DefaultProjectService : IProjectService
         };
 
         return dto;
+    }
+
+    private async Task<ImmutableArray<ProjectAuthorInfo>> GetProjectAuthors(
+        IEnumerable<ProjectCreationAuthorDto> crew,
+        IEnumerable<ProjectCreationAuthorDto> cast,
+        CancellationToken token = default)
+    {
+        var authors = crew.Select(c => new ProjectAuthorInfo(
+            Id: c.Id,
+            Kind: ProjectAuthorKind.Crew,
+            Roles: c.Roles.IsDefaultOrEmpty
+                ? ImmutableArray<string>.Empty
+                : c.Roles))
+            .Concat(cast.Select(c => new ProjectAuthorInfo(
+                Id: c.Id,
+                Kind: ProjectAuthorKind.Cast,
+                Roles: c.Roles.IsDefaultOrEmpty
+                    ? ImmutableArray<string>.Empty
+                    : c.Roles)))
+            .ToImmutableArray();
+
+        var ids = authors.Select(d => d.Id).ToImmutableArray();
+
+        var infos = (await db.Query<AuthorInfo>()
+            .WhereCanRead(userProvider)
+            .Where(a => ids.Contains(a.Id))
+            .ToListAsync(token))
+            .ToImmutableDictionary(a => a.Id);
+
+        foreach (var author in authors)
+        {
+            if (!infos.TryGetValue(author.Id, out _))
+            {
+                throw new IndexOutOfRangeException($"Author '{author.Id}' either doesn't exist or is not accessible.");
+            }
+        }
+
+        return authors;
     }
 }

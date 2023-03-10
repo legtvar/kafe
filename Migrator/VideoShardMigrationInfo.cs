@@ -4,4 +4,5 @@ public record VideoShardMigrationInfo(
     int WmaId,
     string ArtifactId,
     string VideoShardId,
-    string Name);
+    string Name,
+    DateTimeOffset? AddedOn);

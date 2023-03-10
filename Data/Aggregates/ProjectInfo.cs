@@ -8,24 +8,37 @@ using Marten.Events.Aggregation;
 namespace Kafe.Data.Aggregates;
 
 public record ProjectInfo(
-    string Id,
+    [Hrib] string Id,
     CreationMethod CreationMethod,
-    string ProjectGroupId,
-    ImmutableArray<ProjectAuthor> Authors,
-    ImmutableArray<string> ArtifactIds,
-    LocalizedString Name,
-    LocalizedString? Description = null,
-    LocalizedString? Genre = null,
+    [Hrib] string ProjectGroupId,
+    ImmutableArray<ProjectAuthorInfo> Authors,
+    ImmutableArray<ProjectArtifactInfo> Artifacts,
+    ImmutableArray<ProjectReviewInfo> Reviews,
+    [LocalizedString] ImmutableDictionary<string, string> Name,
+    [LocalizedString] ImmutableDictionary<string, string>? Description = null,
+    [LocalizedString] ImmutableDictionary<string, string>? Genre = null,
     Visibility Visibility = Visibility.Unknown,
-    DateTimeOffset ReleaseDate = default,
+    DateTimeOffset ReleasedOn = default,
     bool IsLocked = false
 ) : IEntity;
 
-public record ProjectAuthor(
-    string Id,
+public record ProjectAuthorInfo(
+    [Hrib] string Id,
     ProjectAuthorKind Kind,
     ImmutableArray<string> Roles
 ) : IEntity;
+
+public record ProjectArtifactInfo(
+    [Hrib] string Id,
+    string? BlueprintSlot
+) : IEntity;
+
+public record ProjectReviewInfo(
+    ReviewKind Kind,
+    string ReviewerRole,
+    [LocalizedString] ImmutableDictionary<string, string>? Comment,
+    DateTimeOffset AddedOn
+);
 
 public class ProjectInfoProjection : SingleStreamAggregation<ProjectInfo>
 {
@@ -39,8 +52,9 @@ public class ProjectInfoProjection : SingleStreamAggregation<ProjectInfo>
             Id: e.ProjectId,
             CreationMethod: e.CreationMethod,
             ProjectGroupId: e.ProjectGroupId,
-            Authors: ImmutableArray<ProjectAuthor>.Empty,
-            ArtifactIds: ImmutableArray<string>.Empty,
+            Authors: ImmutableArray<ProjectAuthorInfo>.Empty,
+            Artifacts: ImmutableArray<ProjectArtifactInfo>.Empty,
+            Reviews: ImmutableArray<ProjectReviewInfo>.Empty,
             Name: e.Name,
             Visibility: e.Visibility);
     }
@@ -52,7 +66,7 @@ public class ProjectInfoProjection : SingleStreamAggregation<ProjectInfo>
             Name = e.Name ?? p.Name,
             Description = e.Description ?? p.Description,
             Visibility = e.Visibility ?? p.Visibility,
-            ReleaseDate = e.ReleaseDate ?? p.ReleaseDate,
+            ReleasedOn = e.ReleasedOn ?? p.ReleasedOn,
             Genre = e.Genre ?? p.Genre
         };
     }
@@ -61,10 +75,10 @@ public class ProjectInfoProjection : SingleStreamAggregation<ProjectInfo>
     {
         if (p.Authors.IsDefault)
         {
-            p = p with { Authors = ImmutableArray<ProjectAuthor>.Empty };
+            p = p with { Authors = ImmutableArray<ProjectAuthorInfo>.Empty };
         }
 
-        var author = p.Authors.SingleOrDefault(a => a.Id == e.AuthorId);
+        var author = p.Authors.SingleOrDefault(a => a.Id == e.AuthorId && a.Kind == e.Kind);
         if (author is not null && e.Roles.HasValue && !e.Roles.Value.IsDefault)
         {
             author.Roles
@@ -73,7 +87,7 @@ public class ProjectInfoProjection : SingleStreamAggregation<ProjectInfo>
         }
         else
         {
-            author = new ProjectAuthor(
+            author = new ProjectAuthorInfo(
                 Id: e.AuthorId,
                 Kind: e.Kind,
                 Roles: e.Roles.HasValue && !e.Roles.Value.IsDefault
@@ -83,8 +97,7 @@ public class ProjectInfoProjection : SingleStreamAggregation<ProjectInfo>
 
         return p with
         {
-            Authors = p.Authors.RemoveAll(a => a.Id == e.AuthorId)
-                .Add(author)
+            Authors = p.Authors.Add(author)
         };
     }
 
@@ -99,57 +112,62 @@ public class ProjectInfoProjection : SingleStreamAggregation<ProjectInfo>
         {
             return p with
             {
-                Authors = p.Authors.RemoveAll(a => a.Id == e.AuthorId)
+                Authors = p.Authors.RemoveAll(a => a.Id == e.AuthorId && a.Kind == (e.Kind ?? a.Kind))
             };
         }
-        else
-        {
-            return p with
-            {
-                Authors = p.Authors
-                    .Select(a =>
-                    {
-                        if (a.Id != e.AuthorId)
-                        {
-                            return a;
-                        }
 
-                        return a with
-                        {
-                            Roles = a.Roles.RemoveAll(r => e.Roles.Value.Contains(r))
-                                .ToImmutableArray()
-                        };
-                    })
-                    .ToImmutableArray()
-            };
-        }
+        return p with
+        {
+            Authors = p.Authors
+                .Select(a =>
+                {
+                    if (a.Id != e.AuthorId || a.Kind != (e.Kind ?? a.Kind))
+                    {
+                        return a;
+                    }
+
+                    return a with
+                    {
+                        Roles = a.Roles.RemoveAll(r => e.Roles.Value.Contains(r))
+                    };
+                })
+                .Where(a => a.Roles.Length > 0)
+                .ToImmutableArray()
+        };
 
     }
 
     public ProjectInfo Apply(ProjectArtifactAdded e, ProjectInfo p)
     {
-        if (p.ArtifactIds.IsDefault)
+        var projectArtifact = new ProjectArtifactInfo(
+            Id: e.ArtifactId,
+            BlueprintSlot: e.BlueprintSlot);
+
+        if (p.Artifacts.IsDefault)
         {
-            p = p with { ArtifactIds = ImmutableArray<string>.Empty };
+            p = p with
+            {
+                Artifacts = ImmutableArray.Create(projectArtifact)
+            };
         }
 
         return p with
         {
-            ArtifactIds = p.ArtifactIds.RemoveAll(a => a == e.ArtifactId)
-                .Add(e.ArtifactId)
+            Artifacts = p.Artifacts.RemoveAll(a => a.Id == e.ArtifactId)
+                .Add(projectArtifact)
         };
     }
 
     public ProjectInfo Apply(ProjectArtifactRemoved e, ProjectInfo p)
     {
-        if (p.ArtifactIds.IsDefault)
+        if (p.Artifacts.IsDefault)
         {
             return p;
         }
 
         return p with
         {
-            ArtifactIds = p.ArtifactIds.RemoveAll(a => a == e.ArtifactId)
+            Artifacts = p.Artifacts.RemoveAll(a => a.Id == e.ArtifactId)
         };
     }
 
@@ -161,5 +179,18 @@ public class ProjectInfoProjection : SingleStreamAggregation<ProjectInfo>
     public ProjectInfo Apply(ProjectUnlocked _, ProjectInfo p)
     {
         return p with { IsLocked = false };
+    }
+
+    public ProjectInfo Apply(IEvent<ProjectReviewAdded> e, ProjectInfo p)
+    {
+        return p with
+        {
+            Reviews = p.Reviews.Add(new ProjectReviewInfo(
+                Kind: e.Data.Kind,
+                ReviewerRole: e.Data.ReviewerRole,
+                Comment: e.Data.Comment,
+                AddedOn: e.Timestamp)
+            )
+        };
     }
 }

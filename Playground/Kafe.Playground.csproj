@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <!--<ProjectReference Include="..\Api\Kafe.Api.csproj" />-->
+    <ProjectReference Include="..\Media\Kafe.Media.csproj" />
     <ProjectReference Include="..\Ruv\Kafe.Ruv.csproj" />
   </ItemGroup>
 

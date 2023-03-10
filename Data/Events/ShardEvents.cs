@@ -10,22 +10,24 @@ namespace Kafe.Data.Events;
 
 public interface IShardEvent
 {
-    Hrib ShardId { get; }
+    [Hrib]
+    string ShardId { get; }
 }
 
 public interface IShardCreated : IShardEvent
 {
     CreationMethod CreationMethod { get; }
 
-    Hrib ArtifactId { get; }
+    [Hrib]
+    string ArtifactId { get; }
 }
 
-public interface IShardVariantsAdded : IShardEvent
+public interface IShardVariantAdded : IShardEvent
 {
-    IEnumerable<string> GetVariantNames();
+    string Name { get; }
 }
 
-public interface IShardVariantsRemoved : IShardEvent
+public interface IShardVariantRemoved : IShardEvent
 {
-    IEnumerable<string> GetVariantNames();
+    string Name { get; }
 }

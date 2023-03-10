@@ -4,51 +4,67 @@ using System.Collections.Immutable;
 namespace Kafe.Data.Events;
 
 public record ProjectCreated(
-    Hrib ProjectId,
+    [Hrib] string ProjectId,
     CreationMethod CreationMethod,
     string ProjectGroupId,
-    LocalizedString Name,
+    [LocalizedString] ImmutableDictionary<string, string> Name,
     Visibility Visibility
 );
 
 public record ProjectAuthorAdded(
-    Hrib ProjectId,
-    Hrib AuthorId,
+    [Hrib] string ProjectId,
+    [Hrib] string AuthorId,
     ProjectAuthorKind Kind,
     ImmutableArray<string>? Roles = null
 );
 
+/// <summary>
+/// Removes an author from a project.
+/// </summary>
+/// <param name="ProjectId">Hrib of the project.</param>
+/// <param name="AuthorId">Hrib of the author to be removed.</param>
+/// <param name="Kind">The kind of author. If null, removes from all kinds.</param>
+/// <param name="Roles">The roles to remove. If null, removes author altogether.</param>
 public record ProjectAuthorRemoved(
-    Hrib ProjectId,
-    Hrib AuthorId,
+    [Hrib] string ProjectId,
+    [Hrib] string AuthorId,
+    ProjectAuthorKind? Kind = null,
     ImmutableArray<string>? Roles = null
 );
 
 public record ProjectInfoChanged(
-    Hrib ProjectId,
-    LocalizedString? Name = null,
-    LocalizedString? Description = null,
+    [Hrib] string ProjectId,
+    [LocalizedString] ImmutableDictionary<string, string>? Name = null,
+    [LocalizedString] ImmutableDictionary<string, string>? Description = null,
     Visibility? Visibility = null,
-    DateTimeOffset? ReleaseDate = null,
-    LocalizedString? Genre = null
+    DateTimeOffset? ReleasedOn = null,
+    [LocalizedString] ImmutableDictionary<string, string>? Genre = null
 );
 
 public record ProjectArtifactAdded(
-    Hrib ProjectId,
-    Hrib ArtifactId
+    [Hrib] string ProjectId,
+    [Hrib] string ArtifactId,
+    string? BlueprintSlot
 );
 
 public record ProjectArtifactRemoved(
-    Hrib ProjectId,
-    Hrib ArtifactId
+    [Hrib] string ProjectId,
+    [Hrib] string ArtifactId
 );
 
 public record ProjectLocked(
-    Hrib ProjectId
+    [Hrib] string ProjectId
 );
 
 public record ProjectUnlocked(
-    Hrib ProjectId
+    [Hrib] string ProjectId
+);
+
+public record ProjectReviewAdded(
+    [Hrib] string ProjectId,
+    ReviewKind Kind,
+    string ReviewerRole,
+    [LocalizedString] ImmutableDictionary<string, string>? Comment
 );
 
 //public record ProjectPassedAutomaticValidation(

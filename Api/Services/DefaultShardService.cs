@@ -109,17 +109,16 @@ public class DefaultShardService : IShardService
             throw new InvalidOperationException();
         }
 
-        if (!storageService.TryOpenShardStream(
+        if (!storageService.TryGetFilePath(
             dto.Kind,
             shardId,
             Const.OriginalShardVariant,
-            out var shardStream,
-            out _))
+            out var shardFilePath))
         {
             throw new ArgumentException("The shard stream could not be opened just after being saved.");
         }
 
-        var mediaInfo = await mediaService.GetInfo(shardStream, token);
+        var mediaInfo = await mediaService.GetInfo(shardFilePath, token);
 
         var created = new VideoShardCreated(
             ShardId: shardId,

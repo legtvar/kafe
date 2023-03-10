@@ -25,4 +25,10 @@ public interface IStorageService
         string? variant,
         [NotNullWhen(true)] out Stream? stream,
         [NotNullWhen(true)] out string? fileExtension);
+
+    bool TryGetFilePath(
+        ShardKind kind,
+        Hrib id,
+        string? variant,
+        [NotNullWhen(true)] out string? filePath);
 }

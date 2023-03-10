@@ -37,7 +37,7 @@ public class DefaultStorageService : IStorageService
             using var originalStream = new FileStream(originalPath, FileMode.Create, FileAccess.Write);
             await stream.CopyToAsync(originalStream, token);
         }
-        catch(IOException)
+        catch (IOException)
         {
             return false;
         }
@@ -51,6 +51,30 @@ public class DefaultStorageService : IStorageService
         string? variant,
         [NotNullWhen(true)] out Stream? stream,
         [NotNullWhen(true)] out string? fileExtension)
+    {
+        if (!TryGetFilePath(kind, id, variant, out var filePath))
+        {
+            stream = null;
+            fileExtension = null;
+            return false;
+        }
+
+        try
+        {
+            var info = new FileInfo(filePath);
+            stream = info.OpenRead();
+            fileExtension = info.Extension;
+            return true;
+        }
+        catch (Exception e) when (e is UnauthorizedAccessException || e is IOException)
+        {
+            stream = null;
+            fileExtension = null;
+            return false;
+        }
+    }
+
+    public bool TryGetFilePath(ShardKind kind, Hrib id, string? variant, out string filePath)
     {
         variant ??= Const.OriginalShardVariant;
 
@@ -73,19 +97,9 @@ public class DefaultStorageService : IStorageService
                 "files. This is probably a bug.");
         }
 
-        try
-        {
-            var variantFile = variantFiles.Single();
-            stream = variantFile.OpenRead();
-            fileExtension = variantFile.Extension;
-            return true;
-        }
-        catch (Exception e) when (e is UnauthorizedAccessException || e is IOException)
-        {
-            stream = null;
-            fileExtension = null;
-            return false;
-        }
+        var variantFile = variantFiles.Single();
+        filePath = variantFile.FullName;
+        return true;
     }
 
     private DirectoryInfo RequireShardDirectory(ShardKind kind, bool create = true)

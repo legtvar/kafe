@@ -16,7 +16,7 @@ export function GoRedirect(props: IGoRedirectProps) {
 
     switch (slug) {
         case 'fffi2023':
-            return <Navigate to="/auth/groups/cdrXLt_pOwb/create" />;
+            return <Navigate to="/auth/groups/CafMk2sO9fL/create" />;
 
         default:
             return <Navigate to="/" />;

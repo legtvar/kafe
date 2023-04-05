@@ -148,7 +148,12 @@
       },
       "confirm": "Pozor! tohle odešle mail autorovi projektu! Tato operace je nevratná!",
       "new": "Nový posudek",
-      "archive": "Archiv posudků"
+      "archive": "Archiv posudků",
+      "template": {
+        "ok": "Šablona přijato",
+        "nok": "Šablona problém",
+        "custom": "Vlastní"
+      }
     }
   },
   "projectEdit": {

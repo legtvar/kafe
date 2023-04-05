@@ -26,6 +26,24 @@ interface IAddReviewProps {
     project: Project;
 }
 
+const messages = {
+    ok: [
+        'Dobrý den,',
+        'Vámi přihlášený film prošel technickou kontrolou a postupuje do dramaturgie Filmového festivalu Fakulty informatiky Masarykovy univerzity.',
+        'Dramaturgie se uskuteční 12.04.2023 a odborná porota na ní vyhodnotí, zda Váš snímek postoupí do festivalové soutěže a bude promítnut 19.05.2023 v kině Scala a na Fakultě informatiky MU.',
+        'Děkujeme Vám za přihlášení do festivalu a brzy na viděnou s výsledky dramaturgie,',
+        'Za FFFFI MU, tým techniky.',
+    ],
+    nok: [
+        'Dobrý den,',
+        'Vámi přihlášený film neprošel technickou kontrolou a nemůže postoupit do dramaturgie Filmového festivalu Fakulty informatiky Masarykovy univerzity.  ',
+        'Prosíme Vás o dodání _____, abychom Váš film mohli úspěšně přijmout a promítnout odborné porotě na dramaturgii, která se uskuteční 12.04.2023. Deadline pro doplnění všech parametrů je stále čas do 09.04.2023. ',
+        'Děkujeme Vám za přihlášení do festivalu,',
+        'Za FFFFI MU, tým techniky.',
+    ],
+    custom: [],
+};
+
 export function AddReview(props: IAddReviewProps) {
     const { border, bg } = useColorScheme();
     const [emailContent, setEmailContent] = useState('');
@@ -72,6 +90,13 @@ export function AddReview(props: IAddReviewProps) {
                             <option value={'Rejected'}>{t(`project.admin.kind.rejected`).toString()}</option>
                         </Select>
                     </FormControl>
+                    <HStack w="100%">
+                        {Object.entries(messages).map(([id, text], key) => (
+                            <Button key={key} onClick={() => setEmailContent(text.join('\n\n'))}>
+                                {t(`project.admin.template.${id}`).toString()}
+                            </Button>
+                        ))}
+                    </HStack>
                     <FormControl>
                         <Textarea
                             borderColor={border}

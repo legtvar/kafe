@@ -12,7 +12,7 @@ namespace Kafe.Api.Endpoints.Shard;
 [ApiVersion("1")]
 [Route("shard-download/{id}")]
 [Route("shard-download/{id}/{variant}")]
-[Authorize]
+// [Authorize]
 public class ShardDownloadEndpoint : EndpointBaseAsync
     .WithRequest<ShardDownloadEndpoint.RequestData>
     .WithActionResult

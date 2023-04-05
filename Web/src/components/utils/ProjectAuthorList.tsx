@@ -15,13 +15,15 @@ interface IProjectAuthorListProps {
 export function ProjectAuthorList(props: IProjectAuthorListProps) {
     return (
         <SimpleGrid alignItems="start" spacing={4} columns={{ base: 1, md: 2, lg: 3, xl: 4 }}>
-            {props.authors.map((author) =>
+            {props.authors.map((author, i) =>
                 props.requestDetails ? (
-                    <AwaitAPI request={(api) => api.authors.getById(author.id)}>
-                        {(data: Author) => <SimpleProjectAuthorList {...props} author={{ ...author, ...data }} />}
+                    <AwaitAPI key={author.id} request={(api) => api.authors.getById(author.id)}>
+                        {(data: Author) => (
+                            <SimpleProjectAuthorList key={i} {...props} author={{ ...author, ...data }} />
+                        )}
                     </AwaitAPI>
                 ) : (
-                    <SimpleProjectAuthorList {...props} author={author} />
+                    <SimpleProjectAuthorList key={i} {...props} author={author} />
                 ),
             )}
         </SimpleGrid>

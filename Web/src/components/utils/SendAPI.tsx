@@ -41,6 +41,7 @@ export function SendAPI<T>({ request, value, children, onSubmited, repeatable }:
             onSubmited(result.data);
         } else {
             setStatus('error');
+            console.log(result);
             setError(result.error);
         }
     };
@@ -51,8 +52,16 @@ export function SendAPI<T>({ request, value, children, onSubmited, repeatable }:
                 <>
                     <Box borderRadius={'lg'} border="1px" borderColor={border} bg={bg} px={5} py={4} mb={8}>
                         <Heading as="h4" fontSize="lg" pb={4}>
-                            {error!.title ? t('sendApi.error').toString() : t('sendApi.unknownError').toString()}
+                            {t('sendApi.error').toString()}
                         </Heading>
+                        {typeof error === 'string' && (
+                            <Text>
+                                {(error as string)
+                                    .split('\n')[0]
+                                    .replace('System.ArgumentException: ', '')
+                                    .replace(" (Parameter 'dto')", '')}
+                            </Text>
+                        )}
                         {error?.errors ? (
                             Object.entries(error.errors).map(([field, problem]: any, i) => (
                                 <Text key={i}>

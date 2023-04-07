@@ -5,14 +5,17 @@ export const localizedMapper = (localized: localizedString) => {
 
     const cs = localized['cs'] && localized['cs'].length > 0 ? localized['cs'] : undefined;
     const en = localized['en'] && localized['en'].length > 0 ? localized['en'] : undefined;
-    const iv = localized['iv'] && localized['iv'].length > 0 ? localized['iv'] : en || cs || undefined;
+
+    // Force set invariant to english for now...
+    // const iv = localized['iv'] && localized['iv'].length > 0 ? localized['iv'] : cs || en || undefined;
+    const iv = localized['en'] || localized['cs'] || '';
 
     if (!iv) return undefined;
 
     const res: localizedString = { iv };
 
-    if (cs) res['cs'] = cs;
-    if (en) res['en'] = en;
+    if (cs && iv !== cs) res['cs'] = cs;
+    if (en && iv !== en) res['en'] = en;
 
     return res;
 };

@@ -13,6 +13,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
@@ -288,5 +289,17 @@ public class DefaultAccountService : IAccountService, IDisposable
     {
         ((IDisposable)rng).Dispose();
         GC.SuppressFinalize(this);
+    }
+
+    public async Task<ImmutableArray<AccountListDto>> List(CancellationToken token = default)
+    {
+        if (!userProvider.IsAdministrator())
+        {
+            throw new UnauthorizedAccessException();
+        }
+
+        var authors = await db.Query<AccountInfo>()
+            .ToListAsync(token);
+        return authors.Select(TransferMaps.ToAccountListDto).ToImmutableArray();
     }
 }

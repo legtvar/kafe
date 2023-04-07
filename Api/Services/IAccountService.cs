@@ -1,6 +1,7 @@
 ﻿using Kafe.Api.Transfer;
 using Kafe.Data.Capabilities;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Security.Claims;
 using System.Threading;
@@ -42,4 +43,6 @@ public interface IAccountService
     string EncodeToken(TemporaryAccountTokenDto token);
 
     bool TryDecodeToken(string encodedToken, [NotNullWhen(true)] out TemporaryAccountTokenDto? dto);
+
+    Task<ImmutableArray<AccountListDto>> List(CancellationToken token = default);
 }

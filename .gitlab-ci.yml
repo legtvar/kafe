@@ -19,7 +19,7 @@ build-api:
     paths:
       - .nuget/
   rules:
-    - if: $IS_CLEANUP != true && ($CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "api")
+    - if: $IS_CLEANUP != "true" && ($CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "api")
 
 build-web:
   image: alpine:latest
@@ -40,7 +40,7 @@ build-web:
       - Web/build
     expire_in: 42s
   rules:
-    - if: $IS_CLEANUP != true && ($CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "web")
+    - if: $IS_CLEANUP != "true" && ($CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "web")
 
 migrate-wma:
   image: alpine:latest
@@ -62,7 +62,7 @@ migrate-wma:
     - lemma-new-docker
   when: manual
   rules:
-    - if: $IS_CLEANUP != true && ($CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "api")
+    - if: $IS_CLEANUP != "true" && ($CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "api")
 
 publish-api:
   stage: manual
@@ -74,7 +74,7 @@ publish-api:
     - lemma-new
   when: manual
   rules:
-    - if: $IS_CLEANUP != true && ($CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "api")
+    - if: $IS_CLEANUP != "true" && ($CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "api")
 
 publish-all:
   stage: manual
@@ -87,7 +87,7 @@ publish-all:
     - lemma-new
   when: manual
   rules:
-    - if: $IS_CLEANUP != true && $CI_COMMIT_BRANCH == "master"
+    - if: $IS_CLEANUP != "true" && $CI_COMMIT_BRANCH == "master"
 
 publish-web:
   stage: manual
@@ -98,7 +98,7 @@ publish-web:
     - lemma-new
   when: manual
   rules:
-    - if: $IS_CLEANUP != true && ($CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "api" || $CI_COMMIT_BRANCH == "web")
+    - if: $IS_CLEANUP != "true" && ($CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "api" || $CI_COMMIT_BRANCH == "web")
 
 cleanup-images:
   stage: manual
@@ -107,4 +107,4 @@ cleanup-images:
   tags:
     - lemma-new
   rules:
-    - if: $IS_CLEANUP == true
+    - if: $IS_CLEANUP == "true"

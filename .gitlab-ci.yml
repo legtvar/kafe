@@ -18,10 +18,9 @@ build-api:
   cache:
     paths:
       - .nuget/
-  only:
-    - master
-    - api
-    - ci
+  rules:
+    - if: $IS_CLEANUP != "true" && ($CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "api")
+    - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH
 
 build-web:
   image: alpine:latest
@@ -41,10 +40,9 @@ build-web:
     paths:
       - Web/build
     expire_in: 42s
-  only:
-    - master
-    - web
-    - ci
+  rules:
+    - if: $IS_CLEANUP != "true" && ($CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "web")
+    - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH
 
 migrate-wma:
   image: alpine:latest
@@ -62,13 +60,11 @@ migrate-wma:
     #- dotnet run --project Migrator --framework net7.0
     - echo "This job has been crippled on purpose."
     - exit 1
-  only:
-    - master
-    - api
-    - ci
   tags:
     - lemma-new-docker
   when: manual
+  rules:
+    - if: $IS_CLEANUP != "true" && ($CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "api")
 
 publish-api:
   stage: manual
@@ -78,11 +74,9 @@ publish-api:
     - docker-compose -f docker-compose.yml up -d api
   tags:
     - lemma-new
-  only:
-    - master
-    - api
-    - ci
   when: manual
+  rules:
+    - if: $IS_CLEANUP != "true" && ($CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "api")
 
 publish-all:
   stage: manual
@@ -93,46 +87,9 @@ publish-all:
     - docker-compose -f docker-compose.yml up -d
   tags:
     - lemma-new
-  only:
-    - master
-    - ci
   when: manual
-
-# test-web:
-#   image: alpine:latest
-#   stage: test
-#   dependencies:
-#     - build-web
-#   script:
-#     - apk update
-#     - apk add npm
-#     - cd Web
-#     - npm ci
-#     - npm run test
-#   tags:
-#     - shared-fi
-#   cache:
-#     paths:
-#       - Web/node_modules
-#   only:
-#     - master
-#     - web
-#     - ci
-
-# pages:
-#   stage: deploy
-#   dependencies:
-#     - test-web
-#   script:
-#     - cp Web/build public -r
-#   tags:
-#     - shared-fi
-#   artifacts:
-#     paths:
-#       - public
-#     expire_in: 42s
-#   only:
-#     - web
+  rules:
+    - if: $IS_CLEANUP != "true" && $CI_COMMIT_BRANCH == "master"
 
 publish-web:
   stage: manual
@@ -141,8 +98,16 @@ publish-web:
     - docker-compose -f docker-compose.yml up -d web
   tags:
     - lemma-new
-  only:
-    - master
-    - api
-    - ci
   when: manual
+  rules:
+    - if: $IS_CLEANUP != "true" && ($CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "api" || $CI_COMMIT_BRANCH == "web")
+
+cleanup-images:
+  stage: manual
+  timeout: 1h
+  script:
+    - docker image prune --force
+  tags:
+    - lemma-new
+  rules:
+    - if: $IS_CLEANUP == "true"

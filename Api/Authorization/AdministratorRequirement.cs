@@ -27,6 +27,10 @@ public class AdministratorHandler : AuthorizationHandler<AdministratorRequiremen
         {
             context.Fail(new AuthorizationFailureReason(this, "The user is not an administrator."));
         }
+        else
+        {
+            context.Succeed(requirement);
+        }
 
         return Task.CompletedTask;
     }

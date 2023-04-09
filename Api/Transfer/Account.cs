@@ -21,3 +21,10 @@ public record AccountDetailDto(
     ImmutableArray<ProjectListDto> Projects,
     ImmutableHashSet<string> Capabilities
 );
+
+public record AccountListDto(
+    Hrib Id,
+    string EmailAddress,
+    string PreferredCulture,
+    ImmutableHashSet<string> Capabilities
+);

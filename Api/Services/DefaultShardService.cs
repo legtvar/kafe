@@ -60,7 +60,7 @@ public class DefaultShardService : IShardService
             return null;
         }
 
-        await CheckAccess(shard.ArtifactId, token);
+        // await CheckAccess(shard.ArtifactId, token);
 
         return TransferMaps.ToShardDetailDto(shard);
     }

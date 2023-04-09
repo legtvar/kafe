@@ -16,7 +16,7 @@ namespace Kafe.Api.Services;
 
 public partial class DefaultProjectService : IProjectService
 {
-    public const int NameMaxLength = 32;
+    public const int NameMaxLength = 42;
     public const int DescriptionMinLength = 50;
     public const int DescriptionMaxLength = 200;
     public const int GenreMaxLength = 32;
@@ -24,6 +24,7 @@ public partial class DefaultProjectService : IProjectService
     public static readonly TimeSpan FilmMaxLength = TimeSpan.FromMinutes(8);
     public static readonly TimeSpan VideoAnnotationMinLength = TimeSpan.FromSeconds(1);
     public static readonly TimeSpan VideoAnnotationMaxLength = TimeSpan.FromSeconds(30);
+    public static readonly TimeSpan AcceptableDurationError = TimeSpan.FromSeconds(1);
     public const long FilmMaxFileLength = 2L << 30; // 2 GiB
     public const string FilmMaxFileLengthDescription = "2 GiB";
     public const long VideoMinBitrate = 10_000_000;
@@ -926,11 +927,11 @@ public partial class DefaultProjectService : IProjectService
             yield return tooLargeError;
         }
 
-        if (originalVariant.Duration < minLength)
+        if (originalVariant.Duration + AcceptableDurationError < minLength)
         {
             yield return tooShortError;
         }
-        else if (originalVariant.Duration > maxLength)
+        else if (originalVariant.Duration - AcceptableDurationError > maxLength)
         {
             yield return tooLongError;
         }

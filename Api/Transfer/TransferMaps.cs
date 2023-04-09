@@ -354,4 +354,15 @@ public static class TransferMaps
             Capabilities: data.Capabilities
         );
     }
+
+    public static AccountListDto ToAccountListDto(
+        AccountInfo data)
+    {
+        return new AccountListDto(
+            Id: data.Id,
+            EmailAddress: data.EmailAddress,
+            PreferredCulture: data.PreferredCulture,
+            Capabilities: data.Capabilities
+        );
+    }
 }

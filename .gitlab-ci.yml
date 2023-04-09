@@ -20,6 +20,7 @@ build-api:
       - .nuget/
   rules:
     - if: $IS_CLEANUP != true && ($CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "api")
+    - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH
 
 build-web:
   image: alpine:latest
@@ -41,6 +42,7 @@ build-web:
     expire_in: 42s
   rules:
     - if: $IS_CLEANUP != true && ($CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "web")
+    - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH
 
 migrate-wma:
   image: alpine:latest
@@ -102,6 +104,7 @@ publish-web:
 
 cleanup-images:
   stage: manual
+  timeout: 1h
   script:
     - docker image prune --force
   tags:

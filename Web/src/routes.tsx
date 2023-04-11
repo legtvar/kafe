@@ -69,39 +69,19 @@ export const routerConfig = (t: (id: string) => string): RouteObject[] => [
                 element: <AccountRoot />,
                 children: accountRoutes(t),
             },
-            {
-                path: 'go',
-                element: (
-                    <OutletOrChildren>
-                        <Navigate to="/" />
-                    </OutletOrChildren>
-                ),
-                children: [
-                    {
-                        path: ':slug',
-                        element: <GoRedirect />,
-                    },
-                ],
-            },
-            {
-                path: 'play',
-                element: (
-                    <OutletOrChildren>
-                        <Navigate to="/" />
-                    </OutletOrChildren>
-                ),
-                children: [
-                    {
-                        path: ':slug',
-                        element: <Player />,
-                    },
-                ],
-            },
         ],
     },
     {
         path: '/account/token/:token',
         element: <Token />,
+    },
+    {
+        path: '/go/:slug',
+        element: <GoRedirect />,
+    },
+    {
+        path: '/play/:slug',
+        element: <Player />,
     },
 ];
 

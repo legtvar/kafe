@@ -18,6 +18,7 @@ import { GoRedirect } from './components/pages/GoRedirect';
 import { Groups } from './components/pages/groups/Groups';
 import { GroupsDetail } from './components/pages/groups/GroupsDetail';
 import { HomeFestival } from './components/pages/home/HomeFestival';
+import { Player } from './components/pages/Player';
 import { PlaylistDetail } from './components/pages/playlists/PlaylistDetail';
 import { PlaylistGallery } from './components/pages/playlists/PlaylistGallery';
 import { PlaylistList } from './components/pages/playlists/PlaylistList';
@@ -79,6 +80,20 @@ export const routerConfig = (t: (id: string) => string): RouteObject[] => [
                     {
                         path: ':slug',
                         element: <GoRedirect />,
+                    },
+                ],
+            },
+            {
+                path: 'play',
+                element: (
+                    <OutletOrChildren>
+                        <Navigate to="/" />
+                    </OutletOrChildren>
+                ),
+                children: [
+                    {
+                        path: ':slug',
+                        element: <Player />,
                     },
                 ],
             },

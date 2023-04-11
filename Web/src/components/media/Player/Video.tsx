@@ -16,14 +16,14 @@ export function Video({ sources, ...rest }: IVideoProps) {
         <VStack {...rest} role="group" spacing={4}>
             <ReactPlayer
                 width={'100%'}
-                height={'calc(100% - 40px)'}
+                height={'calc(100% - 72px)'}
                 controls
                 url={sources[quality]}
                 onError={(error) => console.log(error)}
             />
-            <HStack w="100%">
+            <HStack w="100%" px={5}>
                 <Menu>
-                    <MenuButton as={Button} aria-label="Quality" leftIcon={<BsGear />} variant="outline">
+                    <MenuButton as={Button} aria-label="Quality" leftIcon={<BsGear />}>
                         {capitalize(quality)}
                     </MenuButton>
                     <MenuList>
@@ -40,7 +40,7 @@ export function Video({ sources, ...rest }: IVideoProps) {
                     </MenuList>
                 </Menu>
                 <Menu>
-                    <MenuButton as={IconButton} aria-label="Download" icon={<BsDownload />} variant="outline" />
+                    <MenuButton as={IconButton} aria-label="Download" icon={<BsDownload />} />
                     <MenuList>
                         {Object.keys(sources).map((source, key) => (
                             <MenuItem key={key} as={'a'} value={source} href={`${sources[source]}`} target="_blank">

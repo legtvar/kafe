@@ -152,6 +152,9 @@
       "template": {
         "ok": "Šablona přijato",
         "nok": "Šablona problém",
+        "pass": "Šablona soutěžní blok",
+        "reject": "Šablona odmítnut dramaturg",
+        "bonus": "Šablona bonus blok",
         "custom": "Vlastní"
       }
     }

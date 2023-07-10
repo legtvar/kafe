@@ -148,7 +148,15 @@
       },
       "confirm": "Careful! This will send an email to the project author! This operation is irreversible!",
       "new": "New review",
-      "archive": "Review archive"
+      "archive": "Review archive",
+      "template": {
+        "ok": "Template accepted",
+        "nok": "Template issue",
+        "pass": "Template competing block",
+        "reject": "Template rejected by dramaturge",
+        "bonus": "Template bonus block",
+        "custom": "Vlastní"
+      }
     }
   },
   "projectEdit": {

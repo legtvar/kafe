@@ -41,6 +41,24 @@ const messages = {
         'Děkujeme Vám za přihlášení do festivalu,',
         'Za FFFFI MU, tým techniky.',
     ],
+    pass: [
+        'Dobrý den,',
+        'gratulujeme, Váš film byl přijat do soutěžní sekce na 23. Filmový festival Fakulty informatiky MU. Těšíme se na Vás 19. 5. 2023 na festivalovém večeru.',
+        'Děkujeme za Vaši přízeň,',
+        'Za FFFFI MU, tým techniky.',
+    ],
+    reject: [
+        'Dobrý den,',
+        's lítostí Vám oznamujeme, že Váš film nebyl vybrán porotou na 23. Filmový festival Fakulty informatiky MU, konkurence byla letos vysoká. Přesto děkujeme za Váš zájem o festival a srdečně Vás zveme na festivalový večer 19. 5. 2023.',
+        'Děkujeme za Vaši přízeň,',
+        'Za FFFFI MU, tým techniky.',
+    ],
+    bonus: [
+        'Dobrý den,',
+        'gratulujeme, Váš film byl přijat do bonusové sekce na 23. Filmový festival Fakulty informatiky MU. To znamená, že pro něj nebude možné hlasovat, ale stále si ho diváci užijí na velkém plátně. Těšíme se na Vás 19. 5. 2023 na festivalovém večeru.',
+        'Děkujeme za Vaši přízeň,',
+        'Za FFFFI MU, tým techniky.',
+    ],
     custom: [],
 };
 

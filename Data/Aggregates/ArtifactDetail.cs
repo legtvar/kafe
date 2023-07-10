@@ -28,7 +28,7 @@ public record ArtifactShardInfo(
     ImmutableHashSet<string> Variants
 );
 
-public class ArtifactDetailProjection : MultiStreamAggregation<ArtifactDetail, string>
+public class ArtifactDetailProjection : MultiStreamProjection<ArtifactDetail, string>
 {
     public ArtifactDetailProjection()
     {

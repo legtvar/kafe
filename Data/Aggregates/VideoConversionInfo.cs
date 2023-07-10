@@ -13,7 +13,7 @@ public record VideoConversionInfo(
     [LocalizedString] ImmutableDictionary<string, string>? Error = null
 );
 
-public class VideoConversionInfoProjection : SingleStreamAggregation<VideoConversionInfo>
+public class VideoConversionInfoProjection : SingleStreamProjection<VideoConversionInfo>
 {
     public VideoConversionInfoProjection()
     {

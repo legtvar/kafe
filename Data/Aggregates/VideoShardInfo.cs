@@ -20,7 +20,7 @@ public record VideoShardInfo(
 }
 
 
-public class VideoShardInfoProjection : SingleStreamAggregation<VideoShardInfo>
+public class VideoShardInfoProjection : SingleStreamProjection<VideoShardInfo>
 {
     public VideoShardInfoProjection()
     {

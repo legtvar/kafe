@@ -40,7 +40,7 @@ public record ProjectReviewInfo(
     DateTimeOffset AddedOn
 );
 
-public class ProjectInfoProjection : SingleStreamAggregation<ProjectInfo>
+public class ProjectInfoProjection : SingleStreamProjection<ProjectInfo>
 {
     public ProjectInfoProjection()
     {

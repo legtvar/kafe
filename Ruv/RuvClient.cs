@@ -21,9 +21,9 @@ public class RuvClient : IDisposable
         {
             MaxTimeout = -1,
             UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:108.0) Gecko/20100101 Firefox/108.0",
-            CookieContainer = cookieJar
+            CookieContainer = cookieJar,
+            EncodeQuery = HttpUtility.UrlEncode
         });
-        client = client.UseQueryEncoder(HttpUtility.UrlEncode);
     }
 
     public async Task LogIn(string username, string password)

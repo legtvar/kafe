@@ -20,7 +20,7 @@ public record ImageShardInfo(
 }
 
 
-public class ImageShardInfoProjection : SingleStreamAggregation<ImageShardInfo>
+public class ImageShardInfoProjection : SingleStreamProjection<ImageShardInfo>
 {
     public ImageShardInfoProjection()
     {

@@ -27,7 +27,7 @@ public record AccountInfo(
     ImmutableHashSet<string> Capabilities
 );
 
-public class AccountInfoProjection : SingleStreamAggregation<AccountInfo>
+public class AccountInfoProjection : SingleStreamProjection<AccountInfo>
 {
     public AccountInfoProjection()
     {

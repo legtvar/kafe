@@ -20,7 +20,7 @@ public record SubtitlesShardInfo(
 }
 
 
-public class SubtitlesShardInfoProjection : SingleStreamAggregation<SubtitlesShardInfo>
+public class SubtitlesShardInfoProjection : SingleStreamProjection<SubtitlesShardInfo>
 {
     public SubtitlesShardInfoProjection()
     {

@@ -71,13 +71,14 @@ public class Startup
                 };
             })
             .AddOpenIdConnect("oidc", o => {
-                o.Authority = "https://samples.auth0.com";
+                o.Authority = "http://localhost:5273";
                 o.Scope.Add("openid");
                 o.Scope.Add("profile");
                 o.Scope.Add("email");
-                o.ClientId = "kbyuFDidLLm280LIwVFiazOqjO3ty8KH";
-                o.ClientSecret = "60Op4HFM0I8ajz0WdiStAbziZ-VFQttXuxixHHs2R7r7-CW8GR79l-mmLqMhc-Sa";
+                o.ClientId = "KAFE";
+                o.ClientSecret = "42";
                 o.ResponseType = OpenIdConnectResponseType.Code;
+                o.RequireHttpsMetadata = false;
             });
 
         services.AddAuthorization(o =>

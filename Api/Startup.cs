@@ -31,6 +31,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Authentication;
 using Kafe.Media.Services;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 
 namespace Kafe.Api;
 
@@ -51,7 +52,11 @@ public class Startup
     {
         services.AddHttpContextAccessor();
 
-        services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+        services.AddAuthentication(o =>
+            {
+                o.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                o.DefaultChallengeScheme = "oidc";
+            })
             .AddCookie(o =>
             {
                 o.Events.OnRedirectToAccessDenied = c =>
@@ -64,6 +69,15 @@ public class Startup
                     c.Response.StatusCode = 401;
                     return Task.CompletedTask;
                 };
+            })
+            .AddOpenIdConnect("oidc", o => {
+                o.Authority = "https://samples.auth0.com";
+                o.Scope.Add("openid");
+                o.Scope.Add("profile");
+                o.Scope.Add("email");
+                o.ClientId = "kbyuFDidLLm280LIwVFiazOqjO3ty8KH";
+                o.ClientSecret = "60Op4HFM0I8ajz0WdiStAbziZ-VFQttXuxixHHs2R7r7-CW8GR79l-mmLqMhc-Sa";
+                o.ResponseType = OpenIdConnectResponseType.Code;
             });
 
         services.AddAuthorization(o =>

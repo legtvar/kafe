@@ -247,7 +247,7 @@ public static class Program
             catch (JsonException e)
             {
                 logger.LogCritical(e, $"Could not read '{migrationInfoFile}'.");
-                throw e;
+                throw;
             }
         }
     }

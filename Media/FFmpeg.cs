@@ -22,6 +22,11 @@ public static class FFmpeg
             {
                 foreach (var file in dir.EnumerateFiles("ffmpeg*"))
                 {
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                        && file.Extension != ".exe")
+                    {
+                        continue;
+                    }
                     return file.FullName;
                 }
             }

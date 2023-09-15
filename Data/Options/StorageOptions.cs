@@ -19,5 +19,16 @@ public record StorageOptions
     public string TempDirectory { get; init; } = null!;
 
     [Required]
-    public Dictionary<ShardKind, string> ShardDirectories { get; init; } = new();
+    public string ArchiveDirectory { get; init; } = null!;
+
+    [Required]
+    public string GeneratedDirectory { get; init; } = null!;
+
+    public Dictionary<ShardKind, string> ShardDirectories { get; init; } = new()
+    {
+        [ShardKind.Image] = "images",
+        [ShardKind.Video] = "videos",
+        [ShardKind.Subtitles] = "subtitles",
+        [ShardKind.Unknown] = "unknown"
+    };
 }

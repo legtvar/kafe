@@ -19,4 +19,10 @@ public interface IMediaService
     Task<MediaInfo> GetInfo(string filePath, CancellationToken token = default);
 
     Task<MediaInfo> GetInfo(Stream stream, CancellationToken token = default);
+    
+    Task<MediaInfo> CreateVariant(
+        string filePath,
+        VideoQualityPreset preset,
+        string? outputDir = null,
+        CancellationToken token = default);
 }

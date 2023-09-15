@@ -102,14 +102,23 @@ public class DefaultStorageService : IStorageService
         return true;
     }
 
-    private DirectoryInfo RequireShardDirectory(ShardKind kind, bool create = true)
+    private DirectoryInfo RequireShardDirectory(
+        ShardKind kind,
+        string? variant = Const.OriginalShardVariant,
+        bool create = true)
     {
-        if (!options.Value.ShardDirectories.TryGetValue(kind, out var dirPath))
+        var baseDir = variant == Const.OriginalShardVariant
+            ? options.Value.ArchiveDirectory
+            : options.Value.GeneratedDirectory;
+
+        if (!options.Value.ShardDirectories.TryGetValue(kind, out var shardDir))
         {
             throw new ArgumentNullException($"The storage directory for the '{kind}' shard kind is not set.");
         }
 
-        var info = new DirectoryInfo(dirPath);
+        var fullDir = Path.Combine(baseDir, shardDir);
+
+        var info = new DirectoryInfo(fullDir);
         if (!info.Exists)
         {
             if (create)
@@ -118,7 +127,7 @@ public class DefaultStorageService : IStorageService
             }
             else
             {
-                throw new ArgumentException($"The '{dirPath}' '{kind}' shard storage directory does not exist.");
+                throw new ArgumentException($"The '{kind}' shard storage directory does not exist at '{fullDir}'.");
             }
         }
 

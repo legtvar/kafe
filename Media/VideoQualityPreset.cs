@@ -14,3 +14,18 @@ public enum VideoQualityPreset
     HD = 3,
     FullHD = 4
 }
+
+public static class VideoQualityPresetExtensions
+{
+    public static string? ToFileName(this VideoQualityPreset preset)
+    {
+        return preset switch
+        {
+            VideoQualityPreset.Original => "original",
+            VideoQualityPreset.SD => "sd",
+            VideoQualityPreset.HD => "hd",
+            VideoQualityPreset.FullHD => "fullhd",
+            _ => null
+        };
+    }
+}

@@ -1,11 +1,11 @@
 ﻿using FFMpegCore;
+using FFMpegCore.Enums;
 using FFMpegCore.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -61,6 +61,62 @@ public class FFmpegCoreService : IMediaService
         {
             return MediaInfo.Invalid with { Error = e.Message }; ;
         }
+    }
+
+    public async Task<MediaInfo> CreateVariant(
+        string filePath,
+        VideoQualityPreset preset,
+        string? outputDir = null,
+        CancellationToken token = default)
+    {
+        var name = preset.ToFileName();
+        if (name is null)
+        {
+            throw new ArgumentException($"Preset '{preset}' is not valid.");
+        }
+
+        outputDir ??= Path.GetDirectoryName(filePath);
+        if (outputDir is null || !Directory.Exists(outputDir))
+        {
+            throw new ArgumentException($"Output directory '{outputDir}' does not exist.");
+        }
+
+        var outputPath = Path.Combine(outputDir, $"{name}.webm");
+        if (File.Exists(outputPath))
+        {   
+            throw new ArgumentException($"Variant '{preset}' already exists at '{outputPath}'.");
+        }
+
+        var size = preset switch
+        {
+            VideoQualityPreset.Original => VideoSize.Original,
+            VideoQualityPreset.FullHD => VideoSize.FullHd,
+            VideoQualityPreset.HD => VideoSize.Hd,
+            VideoQualityPreset.SD => VideoSize.Ed,
+            _ => VideoSize.Original
+        };
+
+        try
+        {
+            await FFMpegArguments
+                .FromFileInput(filePath)
+                .OutputToFile(outputPath, true, o =>
+                    o.WithVideoCodec("libvpx-vp9")
+                    .WithAudioCodec("libopus")
+                    .ForceFormat("webm")
+                    .WithVideoFilters(f =>
+                        f.Scale(size))
+                    .WithFastStart())
+                .NotifyOnProgress(p => Console.WriteLine($"Percentage: '{p}'"))
+                .ProcessAsynchronously(true);
+        }
+        catch (Exception)
+        {
+            File.Delete(outputPath);
+            throw;
+        }
+
+        return await GetInfo(outputPath, token);
     }
 
     private MediaInfo GetMediaInfo(IMediaAnalysis data)

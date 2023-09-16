@@ -1,4 +1,5 @@
 ﻿using FFMpegCore;
+using FFMpegCore.Arguments;
 using FFMpegCore.Enums;
 using FFMpegCore.Exceptions;
 using System;
@@ -84,15 +85,6 @@ public class FFmpegCoreService : IMediaService
 
         var outputPath = Path.Combine(outputDir, $"{name}.webm");
 
-        var size = preset switch
-        {
-            VideoQualityPreset.Original => VideoSize.Original,
-            VideoQualityPreset.FullHD => VideoSize.FullHd,
-            VideoQualityPreset.HD => VideoSize.Hd,
-            VideoQualityPreset.SD => VideoSize.Ed,
-            _ => VideoSize.Original
-        };
-
         try
         {
             await FFMpegArguments
@@ -101,8 +93,7 @@ public class FFmpegCoreService : IMediaService
                     o.WithVideoCodec("libvpx-vp9")
                     .WithAudioCodec("libopus")
                     .ForceFormat("webm")
-                    .WithVideoFilters(f =>
-                        f.Scale(size))
+                    .WithVideoFilters(f => f.Scale(-2, preset.ToHeight()))
                     .WithFastStart())
                 .NotifyOnProgress(p => Console.WriteLine($"Percentage: '{p}'"))
                 .ProcessAsynchronously(true);

@@ -28,4 +28,15 @@ public static class VideoQualityPresetExtensions
             _ => null
         };
     }
+    
+    public static int ToHeight(this VideoQualityPreset preset)
+    {
+        return preset switch
+        {
+            VideoQualityPreset.SD => 480,
+            VideoQualityPreset.HD => 720,
+            VideoQualityPreset.FullHD => 1080,
+            _ => -1
+        };
+    }
 }

@@ -1,8 +1,11 @@
 using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Kafe.Data.Aggregates;
+using Kafe.Media;
 using Marten;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -52,10 +55,23 @@ public class VideoConversionDaemon : BackgroundService
         
         var today = DateTimeOffset.UtcNow.Date;
         var videosOfToday = await db.Query<VideoShardInfo>()
-            .Where(v => ((string)(object)v.CreatedAt).StartsWith(today.ToString("yyyy-MM-dd"))
-                && v.Variants.Keys.Count() == 1 && v.Variants.ContainsKey("original"))
+            .Where(v => ((string)(object)v.CreatedAt).StartsWith(today.ToString("yyyy-MM-dd")))
             .ToListAsync();
 
         return null;
+    }
+
+    private static ImmutableArray<string> GetMissingVariants(VideoShardInfo video)
+    {
+        if (!video.Variants.TryGetValue(Const.OriginalShardVariant, out var originalVariant))
+        {
+            throw new ArgumentException($"VideoShhard '{video.Id}' is missing the 'original' variant.");
+        }
+        
+        var desiredVariants = Video.GetApplicablePresets(originalVariant);
+        var missingVariants = video.Variants.Keys
+            .Except(desiredVariants.Select(p => p.ToFileName()!))
+            .Where(v => v is not null);
+        return missingVariants.ToImmutableArray();
     }
 }

@@ -6,7 +6,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Kafe.Data.Aggregates;
 using Kafe.Data.Events;
+using Kafe.Data.Services;
 using Kafe.Media;
+using Kafe.Media.Services;
 using Marten;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -19,13 +21,19 @@ public class VideoConversionDaemon : BackgroundService
 {
     private readonly IServiceProvider serviceProvider;
     private readonly ILogger<VideoConversionDaemon> logger;
+    private readonly IMediaService mediaService;
+    private readonly IStorageService storageService;
 
     public VideoConversionDaemon(
         IServiceProvider serviceProvider,
-        ILogger<VideoConversionDaemon> logger)
+        ILogger<VideoConversionDaemon> logger,
+        IMediaService mediaService,
+        IStorageService storageService)
     {
         this.serviceProvider = serviceProvider;
         this.logger = logger;
+        this.mediaService = mediaService;
+        this.storageService = storageService;
     }
 
     protected override async Task ExecuteAsync(CancellationToken ct)
@@ -36,7 +44,10 @@ public class VideoConversionDaemon : BackgroundService
             if (video is null)
             {
                 await Task.Delay(TimeSpan.FromHours(1), ct);
+                continue;
             }
+            
+            // TODO: Invoke the conversion itself.
         }
     }
 

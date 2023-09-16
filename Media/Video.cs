@@ -34,4 +34,16 @@ public static class Video
 
         return presets.ToImmutable();
     }
+    
+    public static VideoQualityPreset GetPresetFromFileName(string fileName)
+    {
+        return fileName switch
+        {
+            Const.OriginalShardVariant => VideoQualityPreset.Original,
+            "fullhd" => VideoQualityPreset.FullHD,
+            "hd" => VideoQualityPreset.HD,
+            "sd" => VideoQualityPreset.SD,
+            _ => VideoQualityPreset.Invalid
+        };
+    }
 }

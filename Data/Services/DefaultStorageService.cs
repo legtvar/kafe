@@ -31,7 +31,7 @@ public class DefaultStorageService : IStorageService
         try
         {
             variant ??= Const.OriginalShardVariant;
-            var storageDir = RequireShardDirectory(kind, create: true);
+            var storageDir = GetShardDirectory(kind, create: true);
             var shardDir = storageDir.CreateSubdirectory(id);
             var originalPath = Path.Combine(shardDir.FullName, $"{variant}{fileExtension}");
             using var originalStream = new FileStream(originalPath, FileMode.Create, FileAccess.Write);
@@ -78,7 +78,7 @@ public class DefaultStorageService : IStorageService
     {
         variant ??= Const.OriginalShardVariant;
 
-        var storageDir = RequireShardDirectory(kind, create: false);
+        var storageDir = GetShardDirectory(kind, create: false);
 
         var shardDir = new DirectoryInfo(Path.Combine(storageDir.FullName, id));
         if (!shardDir.Exists)
@@ -121,9 +121,9 @@ public class DefaultStorageService : IStorageService
         return false;
     }
 
-    private DirectoryInfo RequireShardDirectory(
+    public DirectoryInfo GetShardDirectory(
         ShardKind kind,
-        string? variant = Const.OriginalShardVariant,
+        string variant = Const.OriginalShardVariant,
         bool create = true)
     {
         var baseDir = variant == Const.OriginalShardVariant

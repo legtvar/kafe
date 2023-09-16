@@ -172,6 +172,7 @@ public class Startup
         services.Configure<EmailOptions>(Configuration.GetSection("Email"));
 
         services.AddHostedService<SeedDaemon>();
+        services.AddHostedService<VideoConversionDaemon>();
 
         var emailServiceType = Configuration.GetSection("Email").Get<EmailOptions>()?.ServiceType
             ?? EmailOptions.EmailServiceType.Default;

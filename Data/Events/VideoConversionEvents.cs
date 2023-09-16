@@ -4,7 +4,8 @@ namespace Kafe.Data.Events;
 
 public record VideoConversionCreated(
     [Hrib] string ConversionId,
-    string VideoId
+    string VideoId,
+    string Variant
 );
 
 public record VideoConversionCompleted(

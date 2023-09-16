@@ -102,6 +102,25 @@ public class DefaultStorageService : IStorageService
         return true;
     }
 
+    public bool TryDeleteShard(
+        ShardKind kind,
+        Hrib id,
+        string variant)
+    {
+        if (variant == Const.OriginalShardVariant)
+        {
+            throw new InvalidOperationException("An original shard cannot be deleted.");
+        }
+
+        if (TryGetFilePath(kind, id, variant, out var path))
+        {
+            File.Delete(path);
+            return true;
+        }
+
+        return false;
+    }
+
     private DirectoryInfo RequireShardDirectory(
         ShardKind kind,
         string? variant = Const.OriginalShardVariant,

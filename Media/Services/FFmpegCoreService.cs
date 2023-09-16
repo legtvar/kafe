@@ -67,6 +67,7 @@ public class FFmpegCoreService : IMediaService
         string filePath,
         VideoQualityPreset preset,
         string? outputDir = null,
+        bool overwrite = false,
         CancellationToken token = default)
     {
         var name = preset.ToFileName();
@@ -82,10 +83,6 @@ public class FFmpegCoreService : IMediaService
         }
 
         var outputPath = Path.Combine(outputDir, $"{name}.webm");
-        if (File.Exists(outputPath))
-        {   
-            throw new ArgumentException($"Variant '{preset}' already exists at '{outputPath}'.");
-        }
 
         var size = preset switch
         {
@@ -100,7 +97,7 @@ public class FFmpegCoreService : IMediaService
         {
             await FFMpegArguments
                 .FromFileInput(filePath)
-                .OutputToFile(outputPath, true, o =>
+                .OutputToFile(outputPath, overwrite, o =>
                     o.WithVideoCodec("libvpx-vp9")
                     .WithAudioCodec("libopus")
                     .ForceFormat("webm")

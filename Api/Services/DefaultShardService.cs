@@ -106,7 +106,7 @@ public class DefaultShardService : IShardService
             originalFileExtension,
             token))
         {
-            throw new InvalidOperationException();
+            throw new InvalidOperationException($"Failed to store shard '{shardId}'.");
         }
 
         if (!storageService.TryGetFilePath(

@@ -29,6 +29,9 @@ public static class Video
             presets.Add(VideoQualityPreset.SD);
         }
 
+        // Reverse the presets so that the smallest resolution is first.
+        presets.Reverse();
+
         return presets.ToImmutable();
     }
 }

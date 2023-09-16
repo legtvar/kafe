@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Kafe.Data.Aggregates;
+using Kafe.Data.Events;
 using Kafe.Media;
 using Marten;
 using Microsoft.Extensions.DependencyInjection;
@@ -32,6 +33,10 @@ public class VideoConversionDaemon : BackgroundService
         while (!ct.IsCancellationRequested)
         {
             var video = await FindVideoToConvert();
+            if (video is null)
+            {
+                await Task.Delay(TimeSpan.FromHours(1), ct);
+            }
         }
     }
 
@@ -54,9 +59,58 @@ public class VideoConversionDaemon : BackgroundService
         }
         
         var today = DateTimeOffset.UtcNow.Date;
-        var videosOfToday = await db.Query<VideoShardInfo>()
+        var todayVideos = await db.Query<VideoShardInfo>()
             .Where(v => ((string)(object)v.CreatedAt).StartsWith(today.ToString("yyyy-MM-dd")))
             .ToListAsync();
+        var candidateTodayVideo = todayVideos.Select(v => (video: v, missingVariants: GetMissingVariants(v)))
+            .FirstOrDefault(p => p.missingVariants.Length > 0);
+        if (candidateTodayVideo.video is not null)
+        {
+            logger.LogDebug("Found today's video '{}' with missing variants.", candidateTodayVideo.video.Id);
+            var id = Hrib.Create();
+            var created = new VideoConversionCreated(
+                id,
+                candidateTodayVideo.video.Id,
+                candidateTodayVideo.missingVariants.First());
+            db.Events.StartStream<VideoConversionInfo>(id, created);
+            await db.SaveChangesAsync();
+            return await db.Events.AggregateStreamAsync<VideoConversionInfo>(id);
+        }
+        
+        var yearVideos = await db.Query<VideoShardInfo>()
+            .Where(v => ((string)(object)v.CreatedAt).StartsWith(today.ToString("yyyy")))
+            .ToListAsync();
+        var candidateYearVideo = todayVideos.Select(v => (video: v, missingVariants: GetMissingVariants(v)))
+            .FirstOrDefault(p => p.missingVariants.Length > 0);
+        if (candidateYearVideo.video is not null)
+        {
+            logger.LogDebug("Found this year's video '{}' with missing variants.", candidateYearVideo.video.Id);
+            var id = Hrib.Create();
+            var created = new VideoConversionCreated(
+                id,
+                candidateYearVideo.video.Id,
+                candidateYearVideo.missingVariants.First());
+            db.Events.StartStream<VideoConversionInfo>(id, created);
+            await db.SaveChangesAsync();
+            return await db.Events.AggregateStreamAsync<VideoConversionInfo>(id);
+        }
+        
+        var allTimeVideos = await db.Query<VideoShardInfo>()
+            .ToListAsync();
+        var candidateAllTimeVideo = todayVideos.Select(v => (video: v, missingVariants: GetMissingVariants(v)))
+            .FirstOrDefault(p => p.missingVariants.Length > 0);
+        if (candidateAllTimeVideo.video is not null)
+        {
+            logger.LogDebug("Found this year's video '{}' with missing variants.", candidateAllTimeVideo.video.Id);
+            var id = Hrib.Create();
+            var created = new VideoConversionCreated(
+                id,
+                candidateAllTimeVideo.video.Id,
+                candidateAllTimeVideo.missingVariants.First());
+            db.Events.StartStream<VideoConversionInfo>(id, created);
+            await db.SaveChangesAsync();
+            return await db.Events.AggregateStreamAsync<VideoConversionInfo>(id);
+        }
 
         return null;
     }
@@ -65,13 +119,13 @@ public class VideoConversionDaemon : BackgroundService
     {
         if (!video.Variants.TryGetValue(Const.OriginalShardVariant, out var originalVariant))
         {
-            throw new ArgumentException($"VideoShhard '{video.Id}' is missing the 'original' variant.");
+            throw new ArgumentException($"VideoShard '{video.Id}' is missing the 'original' variant.");
         }
         
         var desiredVariants = Video.GetApplicablePresets(originalVariant);
-        var missingVariants = video.Variants.Keys
-            .Except(desiredVariants.Select(p => p.ToFileName()!))
-            .Where(v => v is not null);
+        var missingVariants = desiredVariants.Select(p => p.ToFileName()!)
+            .Where(v => v is not null)
+            .Except(video.Variants.Keys);
         return missingVariants.ToImmutableArray();
     }
 }

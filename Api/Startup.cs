@@ -55,7 +55,7 @@ public class Startup
         services.AddAuthentication(o =>
             {
                 o.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                o.DefaultChallengeScheme = "oidc";
+                // o.DefaultChallengeScheme = "oidc";
             })
             .AddCookie(o =>
             {
@@ -69,17 +69,17 @@ public class Startup
                     c.Response.StatusCode = 401;
                     return Task.CompletedTask;
                 };
-            })
-            .AddOpenIdConnect("oidc", o => {
-                o.Authority = "http://localhost:5273";
-                o.Scope.Add("openid");
-                o.Scope.Add("profile");
-                o.Scope.Add("email");
-                o.ClientId = "KAFE";
-                o.ClientSecret = "42";
-                o.ResponseType = OpenIdConnectResponseType.Code;
-                o.RequireHttpsMetadata = false;
             });
+            // .AddOpenIdConnect("oidc", o => {
+            //     o.Authority = "http://localhost:5273";
+            //     o.Scope.Add("openid");
+            //     o.Scope.Add("profile");
+            //     o.Scope.Add("email");
+            //     o.ClientId = "KAFE";
+            //     o.ClientSecret = "42";
+            //     o.ResponseType = OpenIdConnectResponseType.Code;
+            //     o.RequireHttpsMetadata = false;
+            // });
 
         services.AddAuthorization(o =>
         {

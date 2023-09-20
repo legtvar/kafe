@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Kafe.Data;
 using Kafe.Data.Aggregates;
 using Kafe.Data.Events;
 using Kafe.Data.Services;
@@ -14,6 +15,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Org.BouncyCastle.Asn1;
+using Weasel.Postgresql.SqlGeneration;
 
 namespace Kafe.Api.Daemons;
 
@@ -40,14 +43,62 @@ public class VideoConversionDaemon : BackgroundService
     {
         while (!ct.IsCancellationRequested)
         {
-            var video = await FindVideoToConvert();
-            if (video is null)
+            var conversion = await FindVideoToConvert();
+            if (conversion is null)
             {
+                logger.LogInformation("Found no videos to convert. Waiting.");
                 await Task.Delay(TimeSpan.FromHours(1), ct);
                 continue;
             }
-            
-            // TODO: Invoke the conversion itself.
+
+            try
+            {
+                if (!storageService.TryGetFilePath(
+                    ShardKind.Video,
+                    conversion.VideoId,
+                    Const.OriginalShardVariant,
+                    out var originalPath))
+                {
+                    throw new InvalidOperationException(
+                        $"Cannot convert video '${conversion.VideoId}' because it has no original variant.");
+                }
+
+                var shardDir = storageService.GetShardDirectory(ShardKind.Video, conversion.Variant);
+                if (shardDir is null || !shardDir.Exists)
+                {
+                    throw new InvalidOperationException($"The directory for the '{conversion.Variant}' variant of video " +
+                        "'{video.VideoId}' could not be found.");
+                }
+
+                var conversionResult = await mediaService.CreateVariant(
+                    filePath: originalPath,
+                    preset: Video.GetPresetFromFileName(conversion.Variant),
+                    outputDir: shardDir.FullName,
+                    overwrite: true,
+                    token: ct);
+                if (!string.IsNullOrEmpty(conversionResult.Error))
+                {
+                    throw new InvalidOperationException($"Conversion resulted in an error: {conversion.Error}.");
+                }
+
+                using var scope = serviceProvider.CreateScope();
+                using var db = scope.ServiceProvider.GetRequiredService<IDocumentSession>();
+                await db.Events.AppendExclusive(conversion.Id, new VideoConversionCompleted(conversion.Id));
+                await db.Events.AppendExclusive(conversion.VideoId, new VideoShardVariantAdded(
+                    conversion.VideoId,
+                    conversion.Variant,
+                    conversionResult));
+                await db.SaveChangesAsync(ct);
+            }
+            catch (Exception e)
+            {
+                using var scope = serviceProvider.CreateScope();
+                using var db = scope.ServiceProvider.GetRequiredService<IDocumentSession>();
+                await db.Events.AppendExclusive(conversion.Id, new VideoConversionFailed(
+                    conversion.Id,
+                    LocalizedString.CreateInvariant(e.Message)));
+                await db.SaveChangesAsync(ct);
+            }
         }
     }
 
@@ -68,7 +119,7 @@ public class VideoConversionDaemon : BackgroundService
                 conversion.Variant);
             return conversion;
         }
-        
+
         var today = DateTimeOffset.UtcNow.Date;
         var todayVideos = await db.Query<VideoShardInfo>()
             .Where(v => ((string)(object)v.CreatedAt).StartsWith(today.ToString("yyyy-MM-dd")))
@@ -87,7 +138,7 @@ public class VideoConversionDaemon : BackgroundService
             await db.SaveChangesAsync();
             return await db.Events.AggregateStreamAsync<VideoConversionInfo>(id);
         }
-        
+
         var yearVideos = await db.Query<VideoShardInfo>()
             .Where(v => ((string)(object)v.CreatedAt).StartsWith(today.ToString("yyyy")))
             .ToListAsync();
@@ -105,7 +156,7 @@ public class VideoConversionDaemon : BackgroundService
             await db.SaveChangesAsync();
             return await db.Events.AggregateStreamAsync<VideoConversionInfo>(id);
         }
-        
+
         var allTimeVideos = await db.Query<VideoShardInfo>()
             .ToListAsync();
         var candidateAllTimeVideo = todayVideos.Select(v => (video: v, missingVariants: GetMissingVariants(v)))
@@ -132,7 +183,7 @@ public class VideoConversionDaemon : BackgroundService
         {
             throw new ArgumentException($"VideoShard '{video.Id}' is missing the 'original' variant.");
         }
-        
+
         var desiredVariants = Video.GetApplicablePresets(originalVariant);
         var missingVariants = desiredVariants.Select(p => p.ToFileName()!)
             .Where(v => v is not null)

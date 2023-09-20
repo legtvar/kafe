@@ -66,7 +66,8 @@ public static class ServiceCollectionExtensions
             return options;
         }
 
-        services.AddMarten(ConfigureMarten);
+        services.AddMarten(ConfigureMarten)
+            .ApplyAllDatabaseChangesOnStartup();
 
         services.AddSingleton<IStorageService, DefaultStorageService>();
 

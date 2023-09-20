@@ -48,6 +48,17 @@ public static class FFmpegFormat
         return FormatNameMap.GetValueOrDefault(fileFormat).FileExtension;
     }
 
+    // TODO: Figure out a way to handle the webm format correctly
+    public static string? GetMimeType(string extension, string fileFormat)
+    {
+        if (extension == ".mkv" && fileFormat == "matroska,webm")
+        {
+            return "video/webm";
+        }
+
+        return FormatNameMap.GetValueOrDefault(fileFormat).MimeType;
+    }
+
     public static string? GetMimeType(string fileFormat)
     {
         return FormatNameMap.GetValueOrDefault(fileFormat).MimeType;

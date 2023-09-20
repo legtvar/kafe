@@ -42,7 +42,7 @@ public class VideoShardInfoProjection : SingleStreamProjection<VideoShardInfo>
         );
     }
 
-    public VideoShardInfo Apply(VideoShardVariantsAdded e, VideoShardInfo s)
+    public VideoShardInfo Apply(VideoShardVariantAdded e, VideoShardInfo s)
     {
         return s with
         {
@@ -50,7 +50,7 @@ public class VideoShardInfoProjection : SingleStreamProjection<VideoShardInfo>
         };
     }
 
-    public VideoShardInfo Apply(VideoShardVariantsRemoved e, VideoShardInfo s)
+    public VideoShardInfo Apply(VideoShardVariantRemoved e, VideoShardInfo s)
     {
         return s with
         {

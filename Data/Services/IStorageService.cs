@@ -37,7 +37,7 @@ public interface IStorageService
         Hrib id,
         string variant);
         
-    DirectoryInfo GetShardDirectory(
+    DirectoryInfo GetShardKindDirectory(
         ShardKind kind,
         string variant = Const.OriginalShardVariant,
         bool create = true);

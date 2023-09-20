@@ -50,6 +50,7 @@ public class VideoConversionDaemon : BackgroundService
                 await Task.Delay(TimeSpan.FromHours(1), ct);
                 continue;
             }
+            logger.LogInformation("Converting video '{}' ({}).", conversion.VideoId, conversion.Variant);
 
             try
             {
@@ -63,12 +64,14 @@ public class VideoConversionDaemon : BackgroundService
                         $"Cannot convert video '${conversion.VideoId}' because it has no original variant.");
                 }
 
-                var shardDir = storageService.GetShardDirectory(ShardKind.Video, conversion.Variant);
-                if (shardDir is null || !shardDir.Exists)
+                var videosDir = storageService.GetShardKindDirectory(ShardKind.Video, conversion.Variant);
+                if (videosDir is null || !videosDir.Exists)
                 {
                     throw new InvalidOperationException($"The directory for the '{conversion.Variant}' variant of video " +
                         "'{video.VideoId}' could not be found.");
                 }
+
+                var shardDir = videosDir.CreateSubdirectory(conversion.VideoId);
 
                 var conversionResult = await mediaService.CreateVariant(
                     filePath: originalPath,
@@ -89,9 +92,11 @@ public class VideoConversionDaemon : BackgroundService
                     conversion.Variant,
                     conversionResult));
                 await db.SaveChangesAsync(ct);
+                logger.LogInformation("Conversion '{}' ({}) succeeded.", conversion.VideoId, conversion.Variant);
             }
             catch (Exception e)
             {
+                logger.LogError(e, "Conversion '{}' ({}) failed.", conversion.VideoId, conversion.Variant);
                 using var scope = serviceProvider.CreateScope();
                 using var db = scope.ServiceProvider.GetRequiredService<IDocumentSession>();
                 await db.Events.AppendExclusive(conversion.Id, new VideoConversionFailed(

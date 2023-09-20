@@ -142,7 +142,7 @@ public class VideoConversionDaemon : BackgroundService
         var yearVideos = await db.Query<VideoShardInfo>()
             .Where(v => ((string)(object)v.CreatedAt).StartsWith(today.ToString("yyyy")))
             .ToListAsync();
-        var candidateYearVideo = todayVideos.Select(v => (video: v, missingVariants: GetMissingVariants(v)))
+        var candidateYearVideo = yearVideos.Select(v => (video: v, missingVariants: GetMissingVariants(v)))
             .FirstOrDefault(p => p.missingVariants.Length > 0);
         if (candidateYearVideo.video is not null)
         {
@@ -159,7 +159,7 @@ public class VideoConversionDaemon : BackgroundService
 
         var allTimeVideos = await db.Query<VideoShardInfo>()
             .ToListAsync();
-        var candidateAllTimeVideo = todayVideos.Select(v => (video: v, missingVariants: GetMissingVariants(v)))
+        var candidateAllTimeVideo = allTimeVideos.Select(v => (video: v, missingVariants: GetMissingVariants(v)))
             .FirstOrDefault(p => p.missingVariants.Length > 0);
         if (candidateAllTimeVideo.video is not null)
         {

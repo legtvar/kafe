@@ -30,7 +30,8 @@ public interface IStorageService
         ShardKind kind,
         Hrib id,
         string? variant,
-        [NotNullWhen(true)] out string? filePath);
+        [NotNullWhen(true)] out string? filePath,
+        bool shouldThrow = false);
 
     bool TryDeleteShard(
         ShardKind kind,

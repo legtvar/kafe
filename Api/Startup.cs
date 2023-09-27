@@ -32,6 +32,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Authentication;
 using Kafe.Media.Services;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using System.Security.Cryptography;
 
 namespace Kafe.Api;
 
@@ -54,7 +55,7 @@ public class Startup
 
         services.AddAuthentication(o =>
             {
-                o.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                // o.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                 // o.DefaultChallengeScheme = "oidc";
             })
             .AddCookie(o =>
@@ -69,17 +70,19 @@ public class Startup
                     c.Response.StatusCode = 401;
                     return Task.CompletedTask;
                 };
+            })
+            .AddOpenIdConnect("oidc", o =>
+            {
+                var oidcConfig = Configuration.GetRequiredSection("Oidc").Get<OidcOptions>()
+                    ?? throw new ArgumentException("OIDC is not configured well.");
+                o.Authority = "https://oidc.muni.cz/";
+                o.Scope.Add("openid");
+                o.Scope.Add("profile");
+                o.Scope.Add("email");
+                o.ClientId = oidcConfig.ClientId;
+                o.ClientSecret = oidcConfig.ClientSecret;
+                o.ResponseType = OpenIdConnectResponseType.Code;
             });
-            // .AddOpenIdConnect("oidc", o => {
-            //     o.Authority = "http://localhost:5273";
-            //     o.Scope.Add("openid");
-            //     o.Scope.Add("profile");
-            //     o.Scope.Add("email");
-            //     o.ClientId = "KAFE";
-            //     o.ClientSecret = "42";
-            //     o.ResponseType = OpenIdConnectResponseType.Code;
-            //     o.RequireHttpsMetadata = false;
-            // });
 
         services.AddAuthorization(o =>
         {

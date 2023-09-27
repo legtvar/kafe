@@ -1,4 +1,5 @@
-﻿using Kafe.Data.Options;
+﻿using JasperFx.CodeGeneration.Frames;
+using Kafe.Data.Options;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
@@ -74,27 +75,39 @@ public class DefaultStorageService : IStorageService
         }
     }
 
-    public bool TryGetFilePath(ShardKind kind, Hrib id, string? variant, out string filePath)
+    public bool TryGetFilePath(
+        ShardKind kind,
+        Hrib id,
+        string? variant,
+        [NotNullWhen(true)] out string? filePath,
+        bool shouldThrow = false)
     {
         variant ??= Const.OriginalShardVariant;
+        filePath = null;
 
         var storageDir = GetShardKindDirectory(kind, create: false);
 
         var shardDir = new DirectoryInfo(Path.Combine(storageDir.FullName, id));
         if (!shardDir.Exists)
         {
-            throw new ArgumentException($"Shard directory '{id}' could not be found.");
+            return shouldThrow
+                ? throw new ArgumentException($"Shard directory '{id}' could not be found.")
+                : false;
         }
 
         var variantFiles = shardDir.GetFiles($"{variant}.*");
         if (variantFiles.Length == 0)
         {
-            throw new ArgumentException($"The '{variant}' variant of shard '{id}' could not be found.");
+            return shouldThrow
+                ? throw new ArgumentException($"The '{variant}' variant of shard '{id}' could not be found.")
+                : false;
         }
         else if (variantFiles.Length > 1)
         {
-            throw new ArgumentException($"The '{variant}' variant of shard '{id}' has multiple source " +
-                "files. This is probably a bug.");
+            return shouldThrow ?
+                throw new ArgumentException($"The '{variant}' variant of shard '{id}' has multiple source " +
+                    "files. This is probably a bug.")
+                : false;
         }
 
         var variantFile = variantFiles.Single();

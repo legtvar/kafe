@@ -33,6 +33,7 @@ using Microsoft.AspNetCore.Authentication;
 using Kafe.Media.Services;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using System.Security.Cryptography;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 
 namespace Kafe.Api;
 
@@ -55,10 +56,10 @@ public class Startup
 
         services.AddAuthentication(o =>
             {
-                // o.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                // o.DefaultChallengeScheme = "oidc";
+                o.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                o.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
             })
-            .AddCookie(o =>
+            .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, o =>
             {
                 o.Events.OnRedirectToAccessDenied = c =>
                 {
@@ -71,17 +72,22 @@ public class Startup
                     return Task.CompletedTask;
                 };
             })
-            .AddOpenIdConnect("oidc", o =>
+            .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, o =>
             {
+                o.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                
                 var oidcConfig = Configuration.GetRequiredSection("Oidc").Get<OidcOptions>()
                     ?? throw new ArgumentException("OIDC is not configured well.");
+
                 o.Authority = oidcConfig.Authority;
-                o.Scope.Add("openid");
-                o.Scope.Add("profile");
-                o.Scope.Add("email");
                 o.ClientId = oidcConfig.ClientId;
                 o.ClientSecret = oidcConfig.ClientSecret;
                 o.ResponseType = OpenIdConnectResponseType.Code;
+                o.Scope.Add("openid");
+                o.Scope.Add("profile");
+                o.Scope.Add("email");
+                o.CallbackPath = new PathString("/signin-oidc");
+                o.SaveTokens = true;
             });
 
         services.AddAuthorization(o =>

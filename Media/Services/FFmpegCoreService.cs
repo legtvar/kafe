@@ -108,6 +108,7 @@ public class FFmpegCoreService : IMediaService
                     .WithFastStart())
                 .NotifyOnProgress(p => logger.LogDebug($"Progress {Path.GetFileName(filePath)} ({name}): '{p}'"))
                 .NotifyOnOutput(p => logger.LogError(p))
+                .CancellableThrough(token, 1_000)
                 .ProcessAsynchronously(true);
         }
         catch (Exception)

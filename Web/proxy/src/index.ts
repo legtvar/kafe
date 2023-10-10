@@ -1,22 +1,27 @@
 import http from 'http';
 import httpProxy from 'http-proxy';
 
+const sourcePort = 8000;
+const sourceAddress = 'localhost';
+const targetPort = 443;
+const targetAddress = 'kafe.fi.muni.cz';
+
 const target = {
     protocol: 'https:',
-    host: 'kafe.fi.muni.cz',
-    port: 443,
+    host: targetAddress,
+    port: targetPort,
 };
 
 var proxy = httpProxy.createProxyServer({
     target,
     changeOrigin: true,
     cookieDomainRewrite: {
-        'kafe.fi.muni.cz': 'localhost',
+        [targetAddress]: sourceAddress,
     },
 });
 
 proxy.on('proxyRes', (proxyRes, req, res) => {
-    res.setHeader('X-Proxy', target.host);
+    res.setHeader('X-Proxy', targetAddress);
     res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
     res.setHeader('Access-Control-Allow-Credentials', 'true');
 
@@ -27,16 +32,18 @@ proxy.on('proxyRes', (proxyRes, req, res) => {
         res.writeHead(200, res.getHeaders());
     }
 
-    console.log(`localhost [<- ] ${target.host}    ${req.method} ${req.url} ${res.statusCode}`);
+    console.log(`${sourceAddress} [<- ] ${targetAddress}    ${req.method} ${req.url} ${res.statusCode}`);
 });
 
 proxy.on('proxyReq', (proxyReq, req) => {
-    console.log(`localhost [ ->] ${target.host}    ${req.method} ${req.url}`);
+    console.log(`${sourceAddress} [ ->] ${targetAddress}    ${req.method} ${req.url}`);
 });
 
 var server = http.createServer((req, res) => {
     proxy.web(req, res);
 });
 
-console.log('listening on port 8000');
-server.listen(8000);
+console.log('Proxy running');
+console.log(`${sourceAddress}:${sourcePort} <-> ${targetAddress}:${targetPort}`);
+console.log('');
+server.listen(sourcePort);

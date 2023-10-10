@@ -263,5 +263,14 @@
   "artifact": {
     "delete": "Delete the artifact",
     "deleteWarn": "Are you sure you want to delete the selected artifact? \nThis operation is irreversible!"
+  },
+  "projectList": {
+    "search": "Filter projects"
+  },
+  "playlistList": {
+    "search": "Filter playlists"
+  },
+  "groupsList": {
+    "search": "Filter project groups"
   }
 }

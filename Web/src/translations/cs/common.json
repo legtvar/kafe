@@ -264,5 +264,14 @@
   "artifact": {
     "delete": "Odstranit artefakt",
     "deleteWarn": "Opravdu chcete odstranit vybraný artefatk? Tato operace je nevratná!"
+  },
+  "projectList": {
+    "search": "Hledat projekty"
+  },
+  "playlistList": {
+    "search": "Hledat playlisty"
+  },
+  "groupsList": {
+    "search": "Hledat skupiny projektů"
   }
 }

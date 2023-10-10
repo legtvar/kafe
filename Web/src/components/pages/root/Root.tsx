@@ -16,12 +16,14 @@ export function Root(props: IRootProps) {
         (async () => {
             if (status === 'request') {
                 setStatus('requesting');
-                const self = await api.accounts.info.getSelf();
-                // console.log(self);
-                if (self.status === 200) {
-                    setUser(self.data);
+                try {
+                    const self = await api.accounts.info.getSelf();
+                    if (self.status === 200) {
+                        setUser(self.data);
+                    }
+                } finally {
+                    setStatus('ready');
                 }
-                setStatus('ready');
             }
         })();
     });

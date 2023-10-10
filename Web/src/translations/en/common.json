@@ -109,7 +109,8 @@
     "register": "Don't have an account? <1>Register now!</1>",
     "remember": "Remember me",
     "subtitle": "to your account to access all the features of the system",
-    "title": "Sign in"
+    "title": "Log in to Kafe",
+    "error": "There was an error logging in, please try again!"
   },
   "navbar": {
     "colorMode": "Toggle color mode",
@@ -352,5 +353,8 @@
   "textareaMarkdown": {
     "allowMarkdown": "This field allows you to enter Markdown formatted text",
     "preview": "Preview"
+  },
+  "munilogin": {
+    "button": "Login through MUNI"
   }
 }

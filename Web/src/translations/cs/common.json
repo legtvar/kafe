@@ -110,7 +110,8 @@
     "register": "Nemáte ještě účet? <1>Zaregistrujte se!</1>",
     "remember": "Zapamatuj si mě",
     "subtitle": "ke svému účtu pro přístup ke všem funkcím Kafe",
-    "title": "Přihlaste se"
+    "title": "Přihlaste se do Kafe",
+    "error": "Při přihlašování došlo k chybě, zkuste to prosím znovu!"
   },
   "navbar": {
     "colorMode": "Přepnout barevný režim",
@@ -354,5 +355,8 @@
   "textareaMarkdown": {
     "allowMarkdown": "Toto pole umožňuje zadat text formátovaný Markdownem",
     "preview": "Náhled"
+  },
+  "munilogin": {
+    "button": "Přihlásit se přes MUNI"
   }
 }

@@ -3,43 +3,70 @@ import i18next, { t } from 'i18next';
 import { useState } from 'react';
 import { useApi } from '../../../hooks/Caffeine';
 import { Loading } from '../../utils/Loading';
+import { MuniIcon } from '../../utils/MuniIcon';
 
 export function TempAccount() {
     const [state, setState] = useState<'ready' | 'submitting' | 'submited' | 'error'>('ready');
     const [email, setEmail] = useState<string>('');
     const api = useApi();
 
+    const login = async () => {
+        setState('submitting');
+        try {
+            await api.accounts.temporary.create(email, i18next.language);
+            setState('submited');
+        } catch (e) {
+            setState('error');
+        }
+    };
+
     return (
         <>
             <Stack align={'center'}>
-                <Heading fontSize={'4xl'}>{t('tempAccount.title').toString()}</Heading>
+                <Heading fontSize={'4xl'}>{t('login.title').toString()}</Heading>
                 <Text fontSize={'lg'} color={'gray.600'}>
                     {t('register.subtitle').toString()}
                 </Text>
             </Stack>
             <Box rounded={'lg'} bg={useColorModeValue('white', 'gray.700')} boxShadow={'lg'} p={8}>
-                {state === 'ready' && (
+                {(state === 'ready' || state === 'error') && (
                     <Stack spacing={4}>
                         <FormControl id="email" isRequired>
                             <FormLabel>{t('register.email').toString()}</FormLabel>
-                            <Input type="email" value={email} onChange={(event) => setEmail(event.target.value)} />
+                            <form onSubmit={() => login()}>
+                                <Input type="email" value={email} onChange={(event) => setEmail(event.target.value)} />
+                            </form>
                         </FormControl>
+                        {state === 'error' && (
+                            <Text as="p" color="red.500">
+                                {t('login.error').toString()}
+                            </Text>
+                        )}
                         <Stack spacing={10} pt={2}>
                             <Button
                                 loadingText="Submitting"
                                 size="lg"
                                 bg={'blue.400'}
                                 color={'white'}
-                                onClick={async () => {
-                                    setState('submitting');
-                                    await api.accounts.temporary.create(email, i18next.language);
-                                    setState('submited');
-                                }}
+                                onClick={() => login()}
                                 _hover={{
                                     bg: 'blue.500',
                                 }}
                             >
                                 {t('register.button').toString()}
+                            </Button>
+                            <hr />
+                            <Button
+                                size="lg"
+                                bg={'white'}
+                                color={'#0000dc'}
+                                onClick={() => alert('MUNI login sucks dicks!')}
+                                _hover={{
+                                    bg: 'whiteAlpha.900',
+                                }}
+                                leftIcon={<MuniIcon />}
+                            >
+                                {t('munilogin.button').toString()}
                             </Button>
                         </Stack>
                     </Stack>

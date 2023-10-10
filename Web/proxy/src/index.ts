@@ -43,7 +43,25 @@ var server = http.createServer((req, res) => {
     proxy.web(req, res);
 });
 
-console.log('Proxy running');
+console.log('===== Proxy running =====');
 console.log(`${sourceAddress}:${sourcePort} <-> ${targetAddress}:${targetPort}`);
+console.log('Press ENTER to pause/resume proxy');
 console.log('');
+
+process.openStdin().addListener('data', (data) => {
+    if (data.toString().trim() === '') {
+        if (server.listening) {
+            server.close();
+            console.log('===== Proxy paused =====');
+            console.log('Press ENTER to pause/resume proxy');
+            console.log('');
+        } else {
+            server.listen(sourcePort);
+            console.log('===== Proxy resumed =====');
+            console.log('Press ENTER to pause/resume proxy');
+            console.log('');
+        }
+    }
+});
+
 server.listen(sourcePort);

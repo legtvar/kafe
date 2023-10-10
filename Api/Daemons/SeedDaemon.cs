@@ -1,10 +1,12 @@
-﻿using Kafe.Api.Services;
+﻿using JasperFx.Core;
+using Kafe.Api.Services;
 using Kafe.Api.Transfer;
 using Kafe.Data;
 using Kafe.Data.Aggregates;
 using Kafe.Data.Capabilities;
 using Kafe.Data.Events;
 using Kafe.Data.Options;
+using Kafe.Data.Services;
 using Marten;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -40,16 +42,19 @@ public class SeedDaemon : BackgroundService
     protected override async Task ExecuteAsync(CancellationToken token)
     {
         using var scope = services.CreateScope();
-        var accounts = scope.ServiceProvider.GetRequiredService<IAccountService>();
+        var accounts = scope.ServiceProvider.GetRequiredService<AccountService>();
         var projectGroups = scope.ServiceProvider.GetRequiredService<IProjectGroupService>();
 
         foreach (var account in options.Value.Accounts)
         {
-            var data = await accounts.LoadApiAccount(account.EmailAddress, token);
+            var data = await accounts.Load(account.EmailAddress, token);
             if (data is null)
             {
-                var id = await accounts.CreateTemporaryAccount(new(account.EmailAddress, account.PreferredCulture), token);
-                data = await accounts.LoadApiAccount(id, token);
+                var id = (await accounts.CreateTemporaryAccount(
+                    account.EmailAddress,
+                    account.PreferredCulture,
+                    token)).Id;
+                data = await accounts.Load(id, token);
                 if (data is null)
                 {
                     logger.LogError("Seed account '{}' could not be created.", account.EmailAddress);
@@ -59,17 +64,15 @@ public class SeedDaemon : BackgroundService
                 logger.LogInformation("Seed account '{}' created.", account.EmailAddress);
             }
 
-            var missingCapabilities = account.Capabilities
-                .Select(c => AccountCapability.TryParse(c, out var capability)
-                    ? capability
-                    : throw new ArgumentException(c))
-                .ToImmutableHashSet()
-                .Except(data.Capabilities);
+            var missingPermissions = account.Permissions
+                .Except(data.Permissions)
+                .Select(kv => (kv.Key, kv.Value))
+                .ToImmutableArray();
 
-            if (missingCapabilities.Count > 0)
+            if (missingPermissions.Length > 0)
             {
-                await accounts.AddCapabilities(data.Id, missingCapabilities, token);
-                logger.LogInformation("Capabilities of seed account '{}' updated.", account.EmailAddress);
+                await accounts.AddPermissions(data.Id, missingPermissions, token);
+                logger.LogInformation("Permissions of seed account '{}' updated.", account.EmailAddress);
             }
         }
 

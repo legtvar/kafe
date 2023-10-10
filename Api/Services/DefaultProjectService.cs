@@ -4,6 +4,7 @@ using Kafe.Data;
 using Kafe.Data.Aggregates;
 using Kafe.Data.Capabilities;
 using Kafe.Data.Events;
+using Kafe.Data.Services;
 using Marten;
 using System;
 using System.Collections.Generic;
@@ -18,25 +19,25 @@ public partial class DefaultProjectService : IProjectService
 {
     private readonly IDocumentSession db;
     private readonly IUserProvider userProvider;
-    private readonly IAccountService accounts;
+    private readonly AccountService accountService;
     private readonly IArtifactService artifacts;
     private readonly IEmailService emails;
 
     public DefaultProjectService(
         IDocumentSession db,
         IUserProvider userProvider,
-        IAccountService accounts,
+        AccountService accountService,
         IArtifactService artifacts,
         IEmailService emails)
     {
         this.db = db;
         this.userProvider = userProvider;
-        this.accounts = accounts;
+        this.accountService = accountService;
         this.artifacts = artifacts;
         this.emails = emails;
     }
 
-    public async Task<Hrib> Create(ProjectCreationDto dto, CancellationToken token = default)
+    public async Task<ProjectInfo> Create(ProjectCreationDto dto, Hrib? ownerId, CancellationToken token = default)
     {
         var group = await db.LoadAsync<ProjectGroupInfo>(dto.ProjectGroupId, token);
         if (group is null)
@@ -79,16 +80,21 @@ public partial class DefaultProjectService : IProjectService
         db.Events.Append(created.ProjectId, authorsAdded);
         await db.SaveChangesAsync(token);
 
-        if (userProvider.User is not null)
+        if (ownerId is not null)
         {
-            await accounts.AddCapabilities(
-                userProvider.User.Id,
-                new[] { new ProjectOwnership(created.ProjectId) },
+            await accountService.AddPermissions(
+                ownerId,
+                new[] { (created.ProjectId, Permission.All) },
                 token);
-            await userProvider.Refresh(token: token);
         }
 
-        return created.ProjectId;
+        var project = await db.Events.AggregateStreamAsync<ProjectInfo>(created.ProjectId, token: token);
+        if (project is null)
+        {
+            throw new InvalidOperationException($"Could not persist a project with id '{created.ProjectId}'.");
+        }
+
+        return project;
     }
 
     public async Task Edit(ProjectEditDto dto, CancellationToken token = default)
@@ -163,12 +169,12 @@ public partial class DefaultProjectService : IProjectService
 
         if (dto.Artifacts is not null)
         {
-            foreach(var artifact in project.Artifacts)
+            foreach (var artifact in project.Artifacts)
             {
                 eventStream.AppendOne(new ProjectArtifactRemoved(dto.Id, artifact.Id));
             }
 
-            foreach(var artifact in dto.Artifacts)
+            foreach (var artifact in dto.Artifacts)
             {
                 var artifactInfo = await db.LoadAsync<ArtifactInfo>(artifact.Id, token);
                 if (artifactInfo is null)
@@ -238,7 +244,7 @@ public partial class DefaultProjectService : IProjectService
 
         return dto;
     }
-    
+
     public async Task<ImmutableArray<ProjectInfo>> LoadMany(ImmutableArray<Hrib> ids, CancellationToken token = default)
     {
         var results = await Task.WhenAll(ids.Map(i => db.Events.AggregateStreamAsync<ProjectInfo>(i, token: token)));

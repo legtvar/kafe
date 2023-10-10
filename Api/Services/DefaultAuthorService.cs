@@ -3,7 +3,9 @@ using Kafe.Data;
 using Kafe.Data.Aggregates;
 using Kafe.Data.Capabilities;
 using Kafe.Data.Events;
+using Kafe.Data.Services;
 using Marten;
+using Org.BouncyCastle.Asn1;
 using System;
 using System.Collections.Immutable;
 using System.Linq;
@@ -16,19 +18,19 @@ public class DefaultAuthorService : IAuthorService
 {
     private readonly IDocumentSession db;
     private readonly IUserProvider userProvider;
-    private readonly IAccountService accountService;
+    private readonly AccountService accountService;
 
     public DefaultAuthorService(
         IDocumentSession db,
         IUserProvider userProvider,
-        IAccountService accountService)
+        AccountService accountService)
     {
         this.db = db;
         this.userProvider = userProvider;
         this.accountService = accountService;
     }
 
-    public async Task<Hrib> Create(AuthorCreationDto dto, CancellationToken token = default)
+    public async Task<AuthorInfo> Create(AuthorCreationDto dto, Hrib? ownerId, CancellationToken token = default)
     {
         var created = new AuthorCreated(
             AuthorId: Hrib.Create(),
@@ -49,19 +51,23 @@ public class DefaultAuthorService : IAuthorService
                 Phone: dto.Phone);
             db.Events.Append(created.AuthorId, infoChanged);
         }
-
         await db.SaveChangesAsync(token);
 
-        if (userProvider.User is not null)
+        if (ownerId is not null)
         {
-            await accountService.AddCapabilities(
-                userProvider.User.Id,
-                new[] { new AuthorManagement(created.AuthorId) },
+            await accountService.AddPermissions(
+                ownerId,
+                new [] { (created.AuthorId, Permission.All) },
                 token);
-            await userProvider.Refresh(token: token);
         }
 
-        return created.AuthorId;
+        var author = await db.Events.AggregateStreamAsync<AuthorInfo>(created.AuthorId, token: token);
+        if (author is null)
+        {
+            throw new InvalidOperationException($"Could not persist an author with id '{created.AuthorId}'.");
+        }
+
+        return author;
     }
 
     public async Task<ImmutableArray<AuthorListDto>> List(CancellationToken token = default)

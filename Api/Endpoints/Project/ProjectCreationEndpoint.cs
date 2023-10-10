@@ -18,10 +18,14 @@ public class ProjectCreationEndpoint : EndpointBaseAsync
     .WithActionResult<Hrib>
 {
     private readonly IProjectService projects;
+    private readonly IUserProvider userProvider;
 
-    public ProjectCreationEndpoint(IProjectService projects)
+    public ProjectCreationEndpoint(
+        IProjectService projects,
+        IUserProvider userProvider)
     {
         this.projects = projects;
+        this.userProvider = userProvider;
     }
 
     [HttpPost]
@@ -30,6 +34,7 @@ public class ProjectCreationEndpoint : EndpointBaseAsync
         ProjectCreationDto request,
         CancellationToken cancellationToken = default)
     {
-        return await projects.Create(request, cancellationToken);
+        var project = await projects.Create(request, userProvider.Account?.Id, cancellationToken);
+        return Ok(project.Id);
     }
 }

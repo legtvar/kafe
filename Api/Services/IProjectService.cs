@@ -14,7 +14,7 @@ public interface IProjectService
 
     Task<ImmutableArray<ProjectListDto>> List(CancellationToken token = default);
 
-    Task<Hrib> Create(ProjectCreationDto dto, CancellationToken token = default);
+    Task<ProjectInfo> Create(ProjectCreationDto dto, Hrib? ownerId, CancellationToken token = default);
 
     Task Edit(ProjectEditDto dto, CancellationToken token = default);
 

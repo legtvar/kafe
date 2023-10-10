@@ -18,10 +18,14 @@ public class AuthorCreationEndpoint : EndpointBaseAsync
     .WithActionResult<Hrib?>
 {
     private readonly IAuthorService authors;
+    private readonly IUserProvider userProvider;
 
-    public AuthorCreationEndpoint(IAuthorService authors)
+    public AuthorCreationEndpoint(
+        IAuthorService authors,
+        IUserProvider userProvider)
     {
         this.authors = authors;
+        this.userProvider = userProvider;
     }
 
     [HttpPost]
@@ -30,12 +34,12 @@ public class AuthorCreationEndpoint : EndpointBaseAsync
         AuthorCreationDto dto,
         CancellationToken cancellationToken = default)
     {
-        var id = await authors.Create(dto, cancellationToken);
-        if (id is null)
+        var author = await authors.Create(dto, userProvider.Account?.Id, cancellationToken);
+        if (author is null)
         {
             return BadRequest();
         }
 
-        return Ok(id);
+        return Ok(author);
     }
 }

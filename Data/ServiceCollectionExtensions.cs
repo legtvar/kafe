@@ -45,10 +45,6 @@ public static class ServiceCollectionExtensions
                     .ConnectionLimit(-1);
             });
 
-            //options.Linq.FieldSources.Add(new LocalizedStringFieldSource());
-            //options.Linq.MethodCallParsers.Add(new DummyMethodCallParser());
-            //options.Linq.FieldSources.Add(new HribFieldSource());
-
             options.Projections.Add<AuthorInfoProjection>(ProjectionLifecycle.Inline);
             options.Projections.Add<ArtifactInfoProjection>(ProjectionLifecycle.Inline);
             options.Projections.Add<VideoShardInfoProjection>(ProjectionLifecycle.Inline);
@@ -67,9 +63,11 @@ public static class ServiceCollectionExtensions
         }
 
         services.AddMarten(ConfigureMarten)
-            .ApplyAllDatabaseChangesOnStartup();
+            .ApplyAllDatabaseChangesOnStartup()
+            .UseIdentitySessions();
 
         services.AddSingleton<StorageService>();
+        services.AddScoped<AccountService>();
 
         services.AddOptions<StorageOptions>()
             .BindConfiguration("Storage");

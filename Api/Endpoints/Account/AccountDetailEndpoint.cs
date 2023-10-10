@@ -2,6 +2,7 @@
 using Asp.Versioning;
 using Kafe.Api.Services;
 using Kafe.Api.Transfer;
+using Kafe.Data.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -17,16 +18,16 @@ public class AccountDetailEndpoint : EndpointBaseAsync
     .WithRequest<string?>
     .WithActionResult<AccountDetailDto?>
 {
-    private readonly IAccountService accounts;
+    private readonly AccountService accountService;
     private readonly IAuthorizationService authorization;
     private readonly IUserProvider userProvider;
 
     public AccountDetailEndpoint(
-        IAccountService accounts,
+        AccountService accounts,
         IAuthorizationService authorization,
         IUserProvider userProvider)
     {
-        this.accounts = accounts;
+        this.accountService = accounts;
         this.authorization = authorization;
         this.userProvider = userProvider;
     }
@@ -47,7 +48,7 @@ public class AccountDetailEndpoint : EndpointBaseAsync
             return NotFound();
         }
 
-        var account = await accounts.Load2((Hrib)id, token);
+        var account = await accountService.Load((Hrib)id, token);
         if (account is null)
         {
             return NotFound();

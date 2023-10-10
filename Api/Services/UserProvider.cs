@@ -1,5 +1,6 @@
 ﻿using Kafe.Data;
 using Kafe.Data.Aggregates;
+using Kafe.Data.Services;
 using Marten;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -14,16 +15,16 @@ using System.Threading.Tasks;
 
 namespace Kafe.Api.Services;
 
-public class DefaultUserProvider : IUserProvider
+public class UserProvider : IUserProvider
 {
     private readonly IHttpContextAccessor contextAccessor;
-    private readonly IAccountService accountService;
-    private readonly ILogger<DefaultUserProvider> logger;
+    private readonly AccountService accountService;
+    private readonly ILogger<UserProvider> logger;
 
-    public DefaultUserProvider(
+    public UserProvider(
         IHttpContextAccessor contextAccessor,
-        IAccountService accountService,
-        ILogger<DefaultUserProvider> logger)
+        AccountService accountService,
+        ILogger<UserProvider> logger)
     {
         this.contextAccessor = contextAccessor;
         this.accountService = accountService;
@@ -75,14 +76,58 @@ public class DefaultUserProvider : IUserProvider
             return;
         }
 
-        var account = await accountService.Load2(id, token: token);
+        var account = await accountService.Load(id, token: token);
         if (account is null)
         {
             throw new IndexOutOfRangeException($"Account with id '{id}' does not exist.");
         }
-        
+
         logger.LogDebug("Account '{}' ({}) found.", account.EmailAddress, account.Id);
 
         Account = account;
+    }
+
+    public async Task SignIn(AccountInfo account)
+    {
+        var authProperties = new AuthenticationProperties
+        {
+            AllowRefresh = false,
+            IssuedUtc = DateTimeOffset.UtcNow,
+            ExpiresUtc = DateTimeOffset.UtcNow.Add(Const.AuthenticationCookieExpirationTime),
+            IsPersistent = true
+            //RedirectUri = options.Value.AccountConfirmRedirectPath
+        };
+
+        if (contextAccessor.HttpContext is null)
+        {
+            throw new InvalidOperationException("Cannot sign in outside of a request.");
+        }
+
+        await contextAccessor.HttpContext.SignInAsync(GetClaimsPrincipal(account), authProperties);
+        Account = account;
+    }
+
+    public static ClaimsPrincipal GetClaimsPrincipal(AccountInfo account, string? authenticationScheme = null)
+    {
+        var claims = new List<Claim>()
+        {
+            new Claim(ClaimTypes.NameIdentifier, account.Id),
+            new Claim(ClaimTypes.Email, account.EmailAddress)
+        };
+
+        if (account.PreferredCulture != Const.InvariantCultureCode)
+        {
+            claims.Add(new Claim(ClaimTypes.StateOrProvince, account.PreferredCulture));
+        }
+
+        // TODO: Let accounts have Name
+        // if (!string.IsNullOrEmpty(account.Name))
+        // {
+        //     claims.Add(new Claim(ClaimTypes.Name, Name));
+        // }
+        claims.Add(new Claim(ClaimTypes.Name, account.EmailAddress));
+
+        var claimsIdentity = new ClaimsIdentity(claims, authenticationScheme);
+        return new ClaimsPrincipal(claimsIdentity);
     }
 }

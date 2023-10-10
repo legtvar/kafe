@@ -1,4 +1,5 @@
 ﻿using Kafe.Api.Transfer;
+using Kafe.Data.Aggregates;
 using System.Collections.Immutable;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,5 +12,5 @@ public interface IAuthorService
 
     Task<ImmutableArray<AuthorListDto>> List(CancellationToken token = default);
 
-    Task<Hrib> Create(AuthorCreationDto dto, CancellationToken token = default);
+    Task<AuthorInfo> Create(AuthorCreationDto dto, Hrib? ownerId, CancellationToken token = default);
 }

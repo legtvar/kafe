@@ -34,7 +34,6 @@ using Kafe.Media.Services;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using System.Security.Cryptography;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Kafe.Api.Services.Account;
 
 namespace Kafe.Api;
 
@@ -176,14 +175,13 @@ public class Startup
         services.AddKafeMedia();
         services.AddKafeData();
 
-        services.AddScoped<IUserProvider, DefaultUserProvider>();
+        services.AddScoped<IUserProvider, UserProvider>();
         services.AddScoped<IProjectGroupService, DefaultProjectGroupService>();
         services.AddScoped<IProjectService, DefaultProjectService>();
         services.AddScoped<IAuthorService, DefaultAuthorService>();
         services.AddScoped<IArtifactService, DefaultArtifactService>();
         services.AddScoped<IShardService, DefaultShardService>();
         services.AddScoped<IPlaylistService, DefaultPlaylistService>();
-        services.AddScoped<IAccountService, DefaultAccountService>();
 
         services.AddScoped<IAuthorizationHandler, AdministratorHandler>();
         services.AddScoped<IAuthorizationHandler, PermissionHandler>();

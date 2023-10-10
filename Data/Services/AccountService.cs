@@ -1,7 +1,6 @@
 ﻿using Kafe.Data.Aggregates;
 using Kafe.Data.Events;
 using Marten;
-using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -15,14 +14,10 @@ public class AccountService
 {
     public static readonly TimeSpan ConfirmationTokenExpiration = TimeSpan.FromHours(24);
     private readonly IDocumentSession db;
-    private readonly IHostEnvironment environment;
 
-    public AccountService(
-        IDocumentSession db,
-        IHostEnvironment environment)
+    public AccountService(IDocumentSession db)
     {
         this.db = db;
-        this.environment = environment;
     }
 
     public async Task<AccountInfo?> Load(Hrib id, CancellationToken token = default)

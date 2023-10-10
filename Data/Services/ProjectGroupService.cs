@@ -1,10 +1,7 @@
-﻿using Kafe.Api.Transfer;
-using Kafe.Data;
-using Kafe.Data.Aggregates;
+﻿using Kafe.Data.Aggregates;
 using Kafe.Data.Events;
 using Marten;
 using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
@@ -15,39 +12,30 @@ namespace Kafe.Data.Services;
 public class ProjectGroupService
 {
     private readonly IDocumentSession db;
-    private readonly IUserProvider userProvider;
 
-    public ProjectGroupService(
-        IDocumentSession db,
-        IUserProvider userProvider)
+    public ProjectGroupService(IDocumentSession db)
     {
         this.db = db;
-        this.userProvider = userProvider;
     }
 
-    public Task<Hrib> Create(ProjectGroupCreationDto dto, CancellationToken token = default)
+    public async Task<Hrib> Create(
+        LocalizedString name,
+        LocalizedString? description,
+        DateTimeOffset deadline,
+        Hrib? id = null,
+        CancellationToken token = default)
     {
-        return Create(dto, Hrib.Create(), token);
-    }
-
-    // TODO: Remove the internal Create overload.
-    internal async Task<Hrib> Create(ProjectGroupCreationDto dto, Hrib id, CancellationToken token = default)
-    {
-        if (!userProvider.IsAdministrator())
-        {
-            throw new UnauthorizedAccessException();
-        }
-
+        id ??= Hrib.Create();
         var created = new ProjectGroupCreated(
             ProjectGroupId: id,
             CreationMethod: CreationMethod.Api,
-            Name: dto.Name.GetRaw(),
+            Name: name,
             Visibility: Visibility.Unknown);
 
         var changed = new ProjectGroupInfoChanged(
             ProjectGroupId: created.ProjectGroupId,
-            Description: dto.Description?.GetRaw(),
-            Deadline: dto.Deadline);
+            Description: description,
+            Deadline: deadline);
 
         var opened = new ProjectGroupOpened(
             ProjectGroupId: created.ProjectGroupId);
@@ -57,54 +45,50 @@ public class ProjectGroupService
         return created.ProjectGroupId;
     }
 
-    public async Task<ImmutableArray<ProjectGroupListDto>> List(CancellationToken token = default)
+    public async Task<ImmutableArray<ProjectGroupInfo>> List(CancellationToken token = default)
     {
-        var projectGroups = await db.Query<ProjectGroupInfo>()
-            .WhereCanRead(userProvider)
-            .ToListAsync(token);
-
-        return projectGroups
-            .Select(TransferMaps.ToProjectGroupListDto).ToImmutableArray();
+        return (await db.Query<ProjectGroupInfo>().ToListAsync(token)).ToImmutableArray();
     }
 
-    public async Task<ImmutableArray<ProjectGroupListDto>> List(
-        LocalizedString name,
-        CancellationToken token = default)
-    {
-        var projectGroups = await db.Query<ProjectGroupInfo>()
-            .WhereCanRead(userProvider)
-            .Where(g => g.Name[Const.InvariantCultureCode] == name[Const.InvariantCultureCode])
-            .ToListAsync(token);
+    // TODO: Search
+    // public async Task<ImmutableArray<ProjectGroupListDto>> List(
+    //     LocalizedString name,
+    //     CancellationToken token = default)
+    // {
+    //     var projectGroups = await db.Query<ProjectGroupInfo>()
+    //         .WhereCanRead(userProvider)
+    //         .Where(g => g.Name[Const.InvariantCultureCode] == name[Const.InvariantCultureCode])
+    //         .ToListAsync(token);
 
-        return projectGroups
-            .Select(TransferMaps.ToProjectGroupListDto).ToImmutableArray();
-    }
+    //     return projectGroups
+    //         .Select(TransferMaps.ToProjectGroupListDto).ToImmutableArray();
+    // }
 
-    public async Task<ProjectGroupDetailDto?> Load(Hrib id, CancellationToken token = default)
-    {
-        var projectGroup = await db.LoadAsync<ProjectGroupInfo>(id, token);
-        if (projectGroup is null)
-        {
-            return null;
-        }
+    // public async Task<ProjectGroupDetailDto?> Load(Hrib id, CancellationToken token = default)
+    // {
+    //     var projectGroup = await db.LoadAsync<ProjectGroupInfo>(id, token);
+    //     if (projectGroup is null)
+    //     {
+    //         return null;
+    //     }
 
-        // if (!userProvider.CanRead(projectGroup))
-        // {
-        //     throw new UnauthorizedAccessException();
-        // }
+    //     // if (!userProvider.CanRead(projectGroup))
+    //     // {
+    //     //     throw new UnauthorizedAccessException();
+    //     // }
 
-        var dto = TransferMaps.ToProjectGroupDetailDto(projectGroup);
-        var projects = await db.Query<ProjectInfo>()
-            .Where(p => p.ProjectGroupId == projectGroup.Id)
-            .WhereCanRead(userProvider)
-            .ToListAsync(token);
-        var preferredCulture = userProvider.GetPreferredCulture().TwoLetterISOLanguageName;
-        return dto with
-        {
-            Projects = projects
-                .OrderBy(p => ((LocalizedString)p.Name)[preferredCulture])
-                .Select(TransferMaps.ToProjectListDto)
-                .ToImmutableArray()
-        };
-    }
+    //     var dto = TransferMaps.ToProjectGroupDetailDto(projectGroup);
+    //     var projects = await db.Query<ProjectInfo>()
+    //         .Where(p => p.ProjectGroupId == projectGroup.Id)
+    //         .WhereCanRead(userProvider)
+    //         .ToListAsync(token);
+    //     var preferredCulture = userProvider.GetPreferredCulture().TwoLetterISOLanguageName;
+    //     return dto with
+    //     {
+    //         Projects = projects
+    //             .OrderBy(p => ((LocalizedString)p.Name)[preferredCulture])
+    //             .Select(TransferMaps.ToProjectListDto)
+    //             .ToImmutableArray()
+    //     };
+    // }
 }

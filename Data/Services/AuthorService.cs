@@ -1,14 +1,8 @@
-﻿using Kafe.Api.Transfer;
-using Kafe.Data;
-using Kafe.Data.Aggregates;
-using Kafe.Data.Capabilities;
+﻿using Kafe.Data.Aggregates;
 using Kafe.Data.Events;
-using Kafe.Data.Services;
 using Marten;
-using Org.BouncyCastle.Asn1;
 using System;
 using System.Collections.Immutable;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -17,38 +11,43 @@ namespace Kafe.Data.Services;
 public class AuthorService
 {
     private readonly IDocumentSession db;
-    private readonly IUserProvider userProvider;
     private readonly AccountService accountService;
 
     public AuthorService(
         IDocumentSession db,
-        IUserProvider userProvider,
         AccountService accountService)
     {
         this.db = db;
-        this.userProvider = userProvider;
         this.accountService = accountService;
     }
 
-    public async Task<AuthorInfo> Create(AuthorCreationDto dto, Hrib? ownerId, CancellationToken token = default)
+    public async Task<AuthorInfo> Create(
+        string name,
+        Visibility visibility,
+        LocalizedString? bio,
+        string? uco,
+        string? email,
+        string? phone,
+        Hrib? ownerId,
+        CancellationToken token = default)
     {
         var created = new AuthorCreated(
             AuthorId: Hrib.Create(),
             CreationMethod: CreationMethod.Api,
-            Name: dto.Name,
-            Visibility: dto.Visibility);
+            Name: name,
+            Visibility: visibility);
         db.Events.StartStream<AuthorInfo>(created.AuthorId, created);
-        if (!string.IsNullOrEmpty(dto.Uco)
-            || LocalizedString.IsNullOrEmpty(dto.Bio)
-            || !string.IsNullOrEmpty(dto.Email)
-            || !string.IsNullOrEmpty(dto.Phone))
+        if (!string.IsNullOrEmpty(uco)
+            || LocalizedString.IsNullOrEmpty(bio)
+            || !string.IsNullOrEmpty(email)
+            || !string.IsNullOrEmpty(phone))
         {
             var infoChanged = new AuthorInfoChanged(
                 AuthorId: created.AuthorId,
-                Bio: (ImmutableDictionary<string, string>?)dto.Bio,
-                Uco: dto.Uco,
-                Email: dto.Email,
-                Phone: dto.Phone);
+                Bio: bio,
+                Uco: uco,
+                Email: email,
+                Phone: phone);
             db.Events.Append(created.AuthorId, infoChanged);
         }
         await db.SaveChangesAsync(token);
@@ -70,27 +69,13 @@ public class AuthorService
         return author;
     }
 
-    public async Task<ImmutableArray<AuthorListDto>> List(CancellationToken token = default)
+    public async Task<ImmutableArray<AuthorInfo>> List(CancellationToken token = default)
     {
-        var authors = await db.Query<AuthorInfo>()
-            .WhereCanRead(userProvider)
-            .ToListAsync(token);
-        return authors.Select(TransferMaps.ToAuthorListDto).ToImmutableArray();
+        return (await db.Query<AuthorInfo>().ToListAsync(token)).ToImmutableArray();
     }
 
-    public async Task<AuthorDetailDto?> Load(Hrib id, CancellationToken token = default)
+    public async Task<AuthorInfo?> Load(Hrib id, CancellationToken token = default)
     {
-        var author = await db.LoadAsync<AuthorInfo>(id, token);
-        if (author is null)
-        {
-            return null;
-        }
-
-        if (!userProvider.CanRead(author))
-        {
-            throw new UnauthorizedAccessException();
-        }
-
-        return TransferMaps.ToAuthorDetailDto(author);
+        return await db.LoadAsync<AuthorInfo>(id, token);
     }
 }

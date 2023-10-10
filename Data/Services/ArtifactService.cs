@@ -1,15 +1,9 @@
-﻿using Kafe.Api.Transfer;
-using Kafe.Data;
-using Kafe.Data.Aggregates;
+﻿using Kafe.Data.Aggregates;
 using Kafe.Data.Events;
-using Kafe.Data.Options;
-using Kafe.Media.Services;
 using Marten;
-using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,81 +13,55 @@ namespace Kafe.Data.Services;
 public class ArtifactService
 {
     private readonly IDocumentSession db;
-    private readonly IUserProvider userProvider;
 
-    public ArtifactService(
-        IDocumentSession db,
-        IUserProvider userProvider)
+    public ArtifactService(IDocumentSession db)
     {
         this.db = db;
-        this.userProvider = userProvider;
     }
 
-    public async Task<ArtifactDetailDto?> Load(Hrib id, CancellationToken token = default)
+    public async Task<ArtifactDetail?> Load(Hrib id, CancellationToken token = default)
     {
-        if (!userProvider.IsAdministrator())
-        {
-            throw new UnauthorizedAccessException();
-        }
-
         var artifact = await db.LoadAsync<ArtifactDetail>(id, token);
         if (artifact is null)
         {
             return null;
         }
 
-        return TransferMaps.ToArtifactDetailDto(artifact);
+        return artifact;
     }
 
-    public async Task<ImmutableArray<ArtifactDetailDto?>> LoadMany(IEnumerable<Hrib> ids, CancellationToken token = default)
+    public async Task<ImmutableArray<ArtifactDetail>> LoadMany(
+        IEnumerable<Hrib> ids,
+        CancellationToken token = default)
     {
-        if (!userProvider.IsAdministrator())
-        {
-            throw new UnauthorizedAccessException();
-        }
-
-        var artifacts = await db.LoadManyAsync<ArtifactDetail>(token, ids.Select(i => (string)i));
-        return artifacts.Select(a => a is null ? null : TransferMaps.ToArtifactDetailDto(a))
+        return (await db.LoadManyAsync<ArtifactDetail>(token, ids.Select(i => (string)i)))
+            .Where(a => a is not null)
             .ToImmutableArray();
     }
 
-    public async Task<Hrib> Create(ArtifactCreationDto dto, CancellationToken token = default)
+    public async Task<Hrib> Create(
+        LocalizedString name,
+        DateTimeOffset? addedOn,
+        Hrib? containingProject,
+        string? blueprintSlot,
+        CancellationToken token = default)
     {
-        if (!userProvider.IsAdministrator())
-        {
-            if (dto.ContainingProject is null)
-            {
-                throw new UnauthorizedAccessException("Only administrators can create artifacts without projects.");
-            }
-
-            var containingProject = await db.LoadAsync<ProjectInfo>(dto.ContainingProject, token);
-            if (containingProject is null)
-            {
-                throw new ArgumentException($"Project '{dto.ContainingProject}' does not exist.");
-            }
-
-            if (!userProvider.CanEdit(containingProject))
-            {
-                throw new UnauthorizedAccessException($"The '{dto.ContainingProject}' project is not editable.");
-            }
-        }
-
         var created = new ArtifactCreated(
             ArtifactId: Hrib.Create(),
             CreationMethod: CreationMethod.Api,
-            Name: dto.Name,
-            AddedOn: dto.AddedOn?.ToUniversalTime() ?? DateTimeOffset.UtcNow,
+            Name: name,
+            AddedOn: addedOn?.ToUniversalTime() ?? DateTimeOffset.UtcNow,
             Visibility: Visibility.Public // artifact can be reference from any project or playlist
         );
         db.Events.StartStream<ArtifactInfo>(created.ArtifactId, created);
 
-        if (dto.ContainingProject is not null)
+        if (containingProject is not null)
         {
             var artifactAdded = new ProjectArtifactAdded(
-                ProjectId: dto.ContainingProject,
+                ProjectId: containingProject,
                 ArtifactId: created.ArtifactId,
-                BlueprintSlot: dto.BlueprintSlot);
-            var projectStream = await db.Events.FetchForWriting<ProjectInfo>(dto.ContainingProject, token);
+                BlueprintSlot: blueprintSlot);
+            var projectStream = await db.Events.FetchForWriting<ProjectInfo>(containingProject, token);
             projectStream.AppendOne(artifactAdded);
         }
 

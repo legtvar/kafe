@@ -1,9 +1,6 @@
-﻿using Kafe.Api.Transfer;
-using Kafe.Data;
-using Kafe.Data.Aggregates;
+﻿using Kafe.Data.Aggregates;
 using Kafe.Data.Capabilities;
 using Kafe.Data.Events;
-using Kafe.Media;
 using Marten;
 using System;
 using System.Collections.Generic;
@@ -77,7 +74,7 @@ public partial class ProjectService
     public const string VisualReviewStage = "visual-review";
     public const string DramaturgyReviewStage = "dramaturgy-review";
 
-    public static readonly ProjectDiagnosticDto InvalidName = new ProjectDiagnosticDto(
+    public static readonly Diagnostic InvalidName = new Diagnostic(
         Kind: DiagnosticKind.Error,
         ValidationStage: InfoStage,
         Message: LocalizedString.Create(
@@ -86,7 +83,7 @@ public partial class ProjectService
         )
     );
 
-    public static readonly ProjectDiagnosticDto InvalidDescription = new ProjectDiagnosticDto(
+    public static readonly Diagnostic InvalidDescription = new Diagnostic(
         Kind: DiagnosticKind.Error,
         ValidationStage: InfoStage,
         Message: LocalizedString.Create(
@@ -97,7 +94,7 @@ public partial class ProjectService
         )
     );
 
-    public static readonly ProjectDiagnosticDto MissingGenre = new ProjectDiagnosticDto(
+    public static readonly Diagnostic MissingGenre = new Diagnostic(
         Kind: DiagnosticKind.Error,
         ValidationStage: InfoStage,
         Message: LocalizedString.Create(
@@ -106,7 +103,7 @@ public partial class ProjectService
         )
     );
 
-    public static readonly ProjectDiagnosticDto GenreTooLong = new ProjectDiagnosticDto(
+    public static readonly Diagnostic GenreTooLong = new Diagnostic(
         Kind: DiagnosticKind.Error,
         ValidationStage: InfoStage,
         Message: LocalizedString.Create(
@@ -115,7 +112,7 @@ public partial class ProjectService
         )
     );
 
-    public static readonly ProjectDiagnosticDto MissingTechReview = new ProjectDiagnosticDto(
+    public static readonly Diagnostic MissingTechReview = new Diagnostic(
         Kind: DiagnosticKind.Error,
         ValidationStage: TechReviewStage,
         Message: LocalizedString.Create(
@@ -124,7 +121,7 @@ public partial class ProjectService
         )
     );
 
-    public static readonly ProjectDiagnosticDto MissingVisualReview = new ProjectDiagnosticDto(
+    public static readonly Diagnostic MissingVisualReview = new Diagnostic(
         Kind: DiagnosticKind.Error,
         ValidationStage: VisualReviewStage,
         Message: LocalizedString.Create(
@@ -133,7 +130,7 @@ public partial class ProjectService
         )
     );
 
-    public static readonly ProjectDiagnosticDto MissingDramaturgyReview = new ProjectDiagnosticDto(
+    public static readonly Diagnostic MissingDramaturgyReview = new Diagnostic(
         Kind: DiagnosticKind.Error,
         ValidationStage: DramaturgyReviewStage,
         Message: LocalizedString.Create(
@@ -142,7 +139,7 @@ public partial class ProjectService
         )
     );
 
-    public static readonly ProjectDiagnosticDto MissingCrew = new ProjectDiagnosticDto(
+    public static readonly Diagnostic MissingCrew = new Diagnostic(
         Kind: DiagnosticKind.Error,
         ValidationStage: InfoStage,
         Message: LocalizedString.Create(
@@ -151,7 +148,7 @@ public partial class ProjectService
         )
     );
 
-    public static readonly ProjectDiagnosticDto MissingFilm = new ProjectDiagnosticDto(
+    public static readonly Diagnostic MissingFilm = new Diagnostic(
         Kind: DiagnosticKind.Error,
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
@@ -160,7 +157,7 @@ public partial class ProjectService
         )
     );
 
-    public static readonly ProjectDiagnosticDto TooManyFilms = new ProjectDiagnosticDto(
+    public static readonly Diagnostic TooManyFilms = new Diagnostic(
         Kind: DiagnosticKind.Error,
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
@@ -169,7 +166,7 @@ public partial class ProjectService
         )
     );
 
-    public static readonly ProjectDiagnosticDto MissingVideoAnnotationVideo = new ProjectDiagnosticDto(
+    public static readonly Diagnostic MissingVideoAnnotationVideo = new Diagnostic(
         Kind: DiagnosticKind.Error,
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
@@ -178,7 +175,7 @@ public partial class ProjectService
         )
     );
 
-    public static readonly ProjectDiagnosticDto TooManyVideoAnnotations = new ProjectDiagnosticDto(
+    public static readonly Diagnostic TooManyVideoAnnotations = new Diagnostic(
         Kind: DiagnosticKind.Error,
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
@@ -187,7 +184,7 @@ public partial class ProjectService
         )
     );
 
-    public static readonly ProjectDiagnosticDto MissingFilmSubtitles = new ProjectDiagnosticDto(
+    public static readonly Diagnostic MissingFilmSubtitles = new Diagnostic(
         Kind: DiagnosticKind.Error,
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
@@ -196,7 +193,7 @@ public partial class ProjectService
         )
     );
 
-    public static readonly ProjectDiagnosticDto MissingVideoAnnotationSubtitles = new ProjectDiagnosticDto(
+    public static readonly Diagnostic MissingVideoAnnotationSubtitles = new Diagnostic(
         Kind: DiagnosticKind.Error,
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
@@ -205,7 +202,7 @@ public partial class ProjectService
         )
     );
 
-    public static readonly ProjectDiagnosticDto TooManyFilmSubtitles = new ProjectDiagnosticDto(
+    public static readonly Diagnostic TooManyFilmSubtitles = new Diagnostic(
         Kind: DiagnosticKind.Error,
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
@@ -214,7 +211,7 @@ public partial class ProjectService
         )
     );
 
-    public static readonly ProjectDiagnosticDto TooManyVideoAnnotationSubtitles = new ProjectDiagnosticDto(
+    public static readonly Diagnostic TooManyVideoAnnotationSubtitles = new Diagnostic(
         Kind: DiagnosticKind.Error,
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
@@ -223,7 +220,7 @@ public partial class ProjectService
         )
     );
 
-    public static readonly ProjectDiagnosticDto TooFewCoverPhotos = new ProjectDiagnosticDto(
+    public static readonly Diagnostic TooFewCoverPhotos = new Diagnostic(
         Kind: DiagnosticKind.Error,
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
@@ -232,7 +229,7 @@ public partial class ProjectService
         )
     );
 
-    public static readonly ProjectDiagnosticDto TooManyCoverPhotos = new ProjectDiagnosticDto(
+    public static readonly Diagnostic TooManyCoverPhotos = new Diagnostic(
         Kind: DiagnosticKind.Error,
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
@@ -241,7 +238,7 @@ public partial class ProjectService
         )
     );
 
-    public static readonly ProjectDiagnosticDto FilmTooShort = new ProjectDiagnosticDto(
+    public static readonly Diagnostic FilmTooShort = new Diagnostic(
         Kind: DiagnosticKind.Error,
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
@@ -250,7 +247,7 @@ public partial class ProjectService
         )
     );
 
-    public static readonly ProjectDiagnosticDto FilmTooLong = new ProjectDiagnosticDto(
+    public static readonly Diagnostic FilmTooLong = new Diagnostic(
         Kind: DiagnosticKind.Error,
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
@@ -259,7 +256,7 @@ public partial class ProjectService
         )
     );
 
-    public static readonly ProjectDiagnosticDto VideoAnnotationTooShort = new ProjectDiagnosticDto(
+    public static readonly Diagnostic VideoAnnotationTooShort = new Diagnostic(
         Kind: DiagnosticKind.Error,
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
@@ -268,7 +265,7 @@ public partial class ProjectService
         )
     );
 
-    public static readonly ProjectDiagnosticDto VideoAnnotationTooLong = new ProjectDiagnosticDto(
+    public static readonly Diagnostic VideoAnnotationTooLong = new Diagnostic(
         Kind: DiagnosticKind.Error,
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
@@ -277,7 +274,7 @@ public partial class ProjectService
         )
     );
 
-    public static readonly ProjectDiagnosticDto FilmHasZeroFileLength = new ProjectDiagnosticDto(
+    public static readonly Diagnostic FilmHasZeroFileLength = new Diagnostic(
         Kind: DiagnosticKind.Error,
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
@@ -286,7 +283,7 @@ public partial class ProjectService
         )
     );
 
-    public static readonly ProjectDiagnosticDto FilmIsTooLarge = new ProjectDiagnosticDto(
+    public static readonly Diagnostic FilmIsTooLarge = new Diagnostic(
         Kind: DiagnosticKind.Error,
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
@@ -295,7 +292,7 @@ public partial class ProjectService
         )
     );
 
-    public static readonly ProjectDiagnosticDto VideoAnnotationHasZeroFileLength = new ProjectDiagnosticDto(
+    public static readonly Diagnostic VideoAnnotationHasZeroFileLength = new Diagnostic(
         Kind: DiagnosticKind.Error,
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
@@ -304,7 +301,7 @@ public partial class ProjectService
         )
     );
 
-    public static readonly ProjectDiagnosticDto VideoAnnotationIsTooLarge = new ProjectDiagnosticDto(
+    public static readonly Diagnostic VideoAnnotationIsTooLarge = new Diagnostic(
         Kind: DiagnosticKind.Error,
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
@@ -313,7 +310,7 @@ public partial class ProjectService
         )
     );
 
-    public static readonly ProjectDiagnosticDto FilmCorrupted = new ProjectDiagnosticDto(
+    public static readonly Diagnostic FilmCorrupted = new Diagnostic(
         Kind: DiagnosticKind.Error,
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
@@ -322,7 +319,7 @@ public partial class ProjectService
         )
     );
 
-    public static readonly ProjectDiagnosticDto VideoAnnotationCorrupted = new ProjectDiagnosticDto(
+    public static readonly Diagnostic VideoAnnotationCorrupted = new Diagnostic(
         Kind: DiagnosticKind.Error,
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
@@ -331,7 +328,7 @@ public partial class ProjectService
         )
     );
 
-    public static readonly ProjectDiagnosticDto CoverPhotoCorrupted = new ProjectDiagnosticDto(
+    public static readonly Diagnostic CoverPhotoCorrupted = new Diagnostic(
         Kind: DiagnosticKind.Error,
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
@@ -340,7 +337,7 @@ public partial class ProjectService
         )
     );
 
-    public static readonly ProjectDiagnosticDto SubtitlesCorrupted = new ProjectDiagnosticDto(
+    public static readonly Diagnostic SubtitlesCorrupted = new Diagnostic(
         Kind: DiagnosticKind.Error,
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
@@ -349,7 +346,7 @@ public partial class ProjectService
         )
     );
 
-    public static readonly ProjectDiagnosticDto FilmUnsupportedContainerFormat = new ProjectDiagnosticDto(
+    public static readonly Diagnostic FilmUnsupportedContainerFormat = new Diagnostic(
         Kind: DiagnosticKind.Error,
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
@@ -360,7 +357,7 @@ public partial class ProjectService
         )
     );
 
-    public static readonly ProjectDiagnosticDto VideoAnnotationUnsupportedContainerFormat = new ProjectDiagnosticDto(
+    public static readonly Diagnostic VideoAnnotationUnsupportedContainerFormat = new Diagnostic(
         Kind: DiagnosticKind.Error,
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
@@ -371,7 +368,7 @@ public partial class ProjectService
         )
     );
 
-    public static readonly ProjectDiagnosticDto FilmUnsupportedVideoCodec = new ProjectDiagnosticDto(
+    public static readonly Diagnostic FilmUnsupportedVideoCodec = new Diagnostic(
         Kind: DiagnosticKind.Error,
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
@@ -382,7 +379,7 @@ public partial class ProjectService
         )
     );
 
-    public static readonly ProjectDiagnosticDto VideoAnnotationUnsupportedVideoCodec = new ProjectDiagnosticDto(
+    public static readonly Diagnostic VideoAnnotationUnsupportedVideoCodec = new Diagnostic(
         Kind: DiagnosticKind.Error,
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
@@ -393,7 +390,7 @@ public partial class ProjectService
         )
     );
 
-    public static readonly ProjectDiagnosticDto FilmUnsupportedAudioCodec = new ProjectDiagnosticDto(
+    public static readonly Diagnostic FilmUnsupportedAudioCodec = new Diagnostic(
         Kind: DiagnosticKind.Error,
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
@@ -404,7 +401,7 @@ public partial class ProjectService
         )
     );
 
-    public static readonly ProjectDiagnosticDto VideoAnnotationUnsupportedAudioCodec = new ProjectDiagnosticDto(
+    public static readonly Diagnostic VideoAnnotationUnsupportedAudioCodec = new Diagnostic(
         Kind: DiagnosticKind.Error,
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
@@ -415,7 +412,7 @@ public partial class ProjectService
         )
     );
 
-    public static readonly ProjectDiagnosticDto FilmMp3BitrateTooLow = new ProjectDiagnosticDto(
+    public static readonly Diagnostic FilmMp3BitrateTooLow = new Diagnostic(
         Kind: DiagnosticKind.Error,
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
@@ -424,7 +421,7 @@ public partial class ProjectService
         )
     );
 
-    public static readonly ProjectDiagnosticDto VideoAnnotationMp3BitrateTooLow = new ProjectDiagnosticDto(
+    public static readonly Diagnostic VideoAnnotationMp3BitrateTooLow = new Diagnostic(
         Kind: DiagnosticKind.Error,
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
@@ -433,7 +430,7 @@ public partial class ProjectService
         )
     );
 
-    public static readonly ProjectDiagnosticDto FilmUnsupportedFramerate = new ProjectDiagnosticDto(
+    public static readonly Diagnostic FilmUnsupportedFramerate = new Diagnostic(
         Kind: DiagnosticKind.Error,
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
@@ -442,7 +439,7 @@ public partial class ProjectService
         )
     );
 
-    public static readonly ProjectDiagnosticDto VideoAnnotationUnsupportedFramerate = new ProjectDiagnosticDto(
+    public static readonly Diagnostic VideoAnnotationUnsupportedFramerate = new Diagnostic(
         Kind: DiagnosticKind.Error,
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
@@ -451,7 +448,7 @@ public partial class ProjectService
         )
     );
 
-    public static readonly ProjectDiagnosticDto FilmInvalidStreamCount = new ProjectDiagnosticDto(
+    public static readonly Diagnostic FilmInvalidStreamCount = new Diagnostic(
         Kind: DiagnosticKind.Error,
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
@@ -460,7 +457,7 @@ public partial class ProjectService
         )
     );
 
-    public static readonly ProjectDiagnosticDto VideoAnnotationInvalidStreamCount = new ProjectDiagnosticDto(
+    public static readonly Diagnostic VideoAnnotationInvalidStreamCount = new Diagnostic(
         Kind: DiagnosticKind.Error,
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
@@ -469,7 +466,7 @@ public partial class ProjectService
         )
     );
 
-    public static readonly ProjectDiagnosticDto FilmWrongResolution = new ProjectDiagnosticDto(
+    public static readonly Diagnostic FilmWrongResolution = new Diagnostic(
         Kind: DiagnosticKind.Error,
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
@@ -478,7 +475,7 @@ public partial class ProjectService
         )
     );
 
-    public static readonly ProjectDiagnosticDto VideoAnnotationWrongResolution = new ProjectDiagnosticDto(
+    public static readonly Diagnostic VideoAnnotationWrongResolution = new Diagnostic(
         Kind: DiagnosticKind.Error,
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
@@ -487,7 +484,7 @@ public partial class ProjectService
         )
     );
 
-    public static readonly ProjectDiagnosticDto CoverPhotoWrongResolution = new ProjectDiagnosticDto(
+    public static readonly Diagnostic CoverPhotoWrongResolution = new Diagnostic(
         Kind: DiagnosticKind.Error,
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
@@ -496,7 +493,7 @@ public partial class ProjectService
         )
     );
 
-    public static readonly ProjectDiagnosticDto CoverPhotoWrongFormat = new ProjectDiagnosticDto(
+    public static readonly Diagnostic CoverPhotoWrongFormat = new Diagnostic(
         Kind: DiagnosticKind.Error,
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
@@ -505,7 +502,7 @@ public partial class ProjectService
         )
     );
 
-    public static readonly ProjectDiagnosticDto SubtitlesWrongFormat = new ProjectDiagnosticDto(
+    public static readonly Diagnostic SubtitlesWrongFormat = new Diagnostic(
         Kind: DiagnosticKind.Error,
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
@@ -514,7 +511,7 @@ public partial class ProjectService
         )
     );
 
-    public static readonly ProjectDiagnosticDto FilmUnsupportedBitrate = new ProjectDiagnosticDto(
+    public static readonly Diagnostic FilmUnsupportedBitrate = new Diagnostic(
         Kind: DiagnosticKind.Error,
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
@@ -523,7 +520,7 @@ public partial class ProjectService
         )
     );
 
-    public static readonly ProjectDiagnosticDto VideoAnnotationUnsupportedBitrate = new ProjectDiagnosticDto(
+    public static readonly Diagnostic VideoAnnotationUnsupportedBitrate = new Diagnostic(
         Kind: DiagnosticKind.Error,
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
@@ -532,7 +529,7 @@ public partial class ProjectService
         )
     );
 
-    public static readonly ProjectDiagnosticDto FilmSubtitlesUnsupportedCodec = new ProjectDiagnosticDto(
+    public static readonly Diagnostic FilmSubtitlesUnsupportedCodec = new Diagnostic(
         Kind: DiagnosticKind.Error,
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
@@ -541,7 +538,7 @@ public partial class ProjectService
         )
     );
 
-    public static readonly ProjectDiagnosticDto VideoAnnotationSubtitlesUnsupportedCodec = new ProjectDiagnosticDto(
+    public static readonly Diagnostic VideoAnnotationSubtitlesUnsupportedCodec = new Diagnostic(
         Kind: DiagnosticKind.Error,
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
@@ -550,7 +547,7 @@ public partial class ProjectService
         )
     );
 
-    public static readonly ProjectDiagnosticDto MissingCoverPhotoFile = new ProjectDiagnosticDto(
+    public static readonly Diagnostic MissingCoverPhotoFile = new Diagnostic(
         Kind: DiagnosticKind.Error,
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
@@ -559,7 +556,7 @@ public partial class ProjectService
         )
     );
 
-    public static readonly ProjectDiagnosticDto MissingSubtitlesFile = new ProjectDiagnosticDto(
+    public static readonly Diagnostic MissingSubtitlesFile = new Diagnostic(
     Kind: DiagnosticKind.Error,
     ValidationStage: FileStage,
     Message: LocalizedString.Create(
@@ -568,7 +565,7 @@ public partial class ProjectService
     )
 );
 
-    public static readonly ProjectDiagnosticDto CoverPhotoWrongRatio = new ProjectDiagnosticDto(
+    public static readonly Diagnostic CoverPhotoWrongRatio = new Diagnostic(
         Kind: DiagnosticKind.Error,
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
@@ -580,7 +577,7 @@ public partial class ProjectService
     );
 
     // TODO: Blueprints instead of these hard-coded validation settings for FFFI MU 2023.
-    public async Task<ProjectValidationDto> Validate(Hrib id, CancellationToken token = default)
+    public async Task<ProjectReport> Validate(Hrib id, CancellationToken token = default)
     {
         var project = await db.LoadAsync<ProjectInfo>(id, token);
         if (project is null)
@@ -588,12 +585,7 @@ public partial class ProjectService
             throw new IndexOutOfRangeException();
         }
 
-        if (!userProvider.CanRead(project))
-        {
-            throw new UnauthorizedAccessException();
-        }
-
-        var diagnostics = ImmutableArray.CreateBuilder<ProjectDiagnosticDto>();
+        var diagnostics = ImmutableArray.CreateBuilder<Diagnostic>();
 
         if (project.Name.Values.Any(n => string.IsNullOrWhiteSpace(n) || n.Length > NameMaxLength))
         {
@@ -850,13 +842,6 @@ public partial class ProjectService
         }
 
         // TODO: Change after FFFIMU 2023
-        if (!userProvider.IsProjectReviewer(dto.ReviewerRole)
-            || (dto.ReviewerRole != Const.TechReviewer
-            && dto.ReviewerRole != Const.VisualReviewer
-            && dto.ReviewerRole != Const.DramaturgyReviewer))
-        {
-            throw new UnauthorizedAccessException();
-        }
 
         var eventStream = await db.Events.FetchForExclusiveWriting<ProjectInfo>(dto.ProjectId, token);
         var reviewAdded = new ProjectReviewAdded(dto.ProjectId, dto.Kind, dto.ReviewerRole, dto.Comment);
@@ -885,25 +870,25 @@ public partial class ProjectService
         }
     }
 
-    private static IEnumerable<ProjectDiagnosticDto> ValidateVideo(
+    private static IEnumerable<Diagnostic> ValidateVideo(
         VideoShardInfo video,
         long maxFileLength,
         TimeSpan minLength,
         TimeSpan maxLength,
-        ProjectDiagnosticDto corruptedError,
-        ProjectDiagnosticDto zeroFileLengthError,
-        ProjectDiagnosticDto tooLargeError,
-        ProjectDiagnosticDto tooShortError,
-        ProjectDiagnosticDto tooLongError,
-        ProjectDiagnosticDto streamMismatchError,
-        ProjectDiagnosticDto unsupportedContainerError,
-        ProjectDiagnosticDto bitrateTooLowError,
-        ProjectDiagnosticDto bitrateTooHighError,
-        ProjectDiagnosticDto unsupportedVideoCodecError,
-        ProjectDiagnosticDto unsupportedAudioCodecError,
-        ProjectDiagnosticDto mp3BitrateTooLowError,
-        ProjectDiagnosticDto unsupportedFramerateError,
-        ProjectDiagnosticDto wrongResolutionError)
+        Diagnostic corruptedError,
+        Diagnostic zeroFileLengthError,
+        Diagnostic tooLargeError,
+        Diagnostic tooShortError,
+        Diagnostic tooLongError,
+        Diagnostic streamMismatchError,
+        Diagnostic unsupportedContainerError,
+        Diagnostic bitrateTooLowError,
+        Diagnostic bitrateTooHighError,
+        Diagnostic unsupportedVideoCodecError,
+        Diagnostic unsupportedAudioCodecError,
+        Diagnostic mp3BitrateTooLowError,
+        Diagnostic unsupportedFramerateError,
+        Diagnostic wrongResolutionError)
     {
         if (!video.Variants.ContainsKey(Const.OriginalShardVariant))
         {
@@ -990,7 +975,7 @@ public partial class ProjectService
         }
     }
 
-    private static IEnumerable<ProjectDiagnosticDto> ValidateImage(ImageShardInfo image)
+    private static IEnumerable<Diagnostic> ValidateImage(ImageShardInfo image)
     {
         if (!image.Variants.ContainsKey(Const.OriginalShardVariant))
         {
@@ -1023,7 +1008,7 @@ public partial class ProjectService
         }
     }
 
-    private static IEnumerable<ProjectDiagnosticDto> ValidateSubtitles(SubtitlesShardInfo subtitles)
+    private static IEnumerable<Diagnostic> ValidateSubtitles(SubtitlesShardInfo subtitles)
     {
         if (!subtitles.Variants.ContainsKey(Const.OriginalShardVariant))
         {

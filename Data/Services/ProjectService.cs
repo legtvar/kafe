@@ -1,14 +1,10 @@
-﻿using JasperFx.Core;
-using Kafe.Api.Transfer;
-using Kafe.Data;
-using Kafe.Data.Aggregates;
-using Kafe.Data.Capabilities;
+﻿using Kafe.Data.Aggregates;
 using Kafe.Data.Events;
-using Kafe.Data.Services;
 using Marten;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Data;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,66 +14,52 @@ namespace Kafe.Data.Services;
 public partial class ProjectService
 {
     private readonly IDocumentSession db;
-    private readonly IUserProvider userProvider;
     private readonly AccountService accountService;
-    private readonly IArtifactService artifacts;
-    private readonly IEmailService emails;
+    private readonly ArtifactService artifactService;
 
     public ProjectService(
         IDocumentSession db,
-        IUserProvider userProvider,
         AccountService accountService,
-        IArtifactService artifacts,
-        IEmailService emails)
+        ArtifactService artifactService)
     {
         this.db = db;
-        this.userProvider = userProvider;
         this.accountService = accountService;
-        this.artifacts = artifacts;
-        this.emails = emails;
+        this.artifactService = artifactService;
     }
 
-    public async Task<ProjectInfo> Create(ProjectCreationDto dto, Hrib? ownerId, CancellationToken token = default)
+    public async Task<ProjectInfo> Create(
+        string projectGroupId,
+        LocalizedString name,
+        LocalizedString? description,
+        LocalizedString? genre,
+        Hrib? ownerId,
+        CancellationToken token = default)
     {
-        var group = await db.LoadAsync<ProjectGroupInfo>(dto.ProjectGroupId, token);
+        var group = await db.LoadAsync<ProjectGroupInfo>(projectGroupId, token);
         if (group is null)
         {
-            throw new ArgumentOutOfRangeException(nameof(dto), $"Project group '{dto.ProjectGroupId}' does not exist.");
-        }
-
-        if (!userProvider.CanRead(group))
-        {
-            throw new UnauthorizedAccessException();
+            throw new ArgumentOutOfRangeException($"Project group '{projectGroupId}' does not exist.");
         }
 
         if (!group.IsOpen)
         {
-            throw new ArgumentException(
-                $"Project group '{dto.ProjectGroupId}' is not open for submissions.",
-                nameof(dto));
+            throw new ArgumentException($"Project group '{projectGroupId}' is not open.");
         }
 
         var created = new ProjectCreated(
             ProjectId: Hrib.Create(),
             CreationMethod: CreationMethod.Api,
-            ProjectGroupId: dto.ProjectGroupId,
-            Name: dto.Name,
+            ProjectGroupId: projectGroupId,
+            Name: name,
             Visibility: Visibility.Private);
+
         var infoChanged = new ProjectInfoChanged(
             ProjectId: Hrib.Create(),
-            Name: dto.Name,
-            Description: dto.Description,
-            Genre: dto.Genre);
-
-        var authorsAdded = (await GetProjectAuthors(dto.Crew, dto.Cast, token))
-            .Select(a => new ProjectAuthorAdded(
-                ProjectId: created.ProjectId,
-                AuthorId: a.Id,
-                Kind: a.Kind,
-                Roles: a.Roles));
+            Name: name,
+            Description: description,
+            Genre: genre);
 
         db.Events.StartStream<ProjectInfo>(created.ProjectId, created, infoChanged);
-        db.Events.Append(created.ProjectId, authorsAdded);
         await db.SaveChangesAsync(token);
 
         if (ownerId is not null)
@@ -95,6 +77,34 @@ public partial class ProjectService
         }
 
         return project;
+    }
+
+    public async Task AddAuthors(
+        Hrib projectId,
+        IEnumerable<(string id, ProjectAuthorKind kind, ImmutableArray<string> roles)> authors)
+    {
+        var authorsAdded = authors
+            .Select(a => new ProjectAuthorAdded(
+                ProjectId: projectId,
+                AuthorId: a.id,
+                Kind: a.kind,
+                Roles: a.roles));
+        db.Events.Append(projectId, authorsAdded);
+        await db.SaveChangesAsync();
+    }
+    
+    public async Task RemoveAuthors(
+        Hrib projectId,
+        IEnumerable<(string id, ProjectAuthorKind kind, ImmutableArray<string> roles)> authors)
+    {
+        var authorsAdded = authors
+            .Select(a => new ProjectAuthorRemoved(
+                ProjectId: projectId,
+                AuthorId: a.id,
+                Kind: a.kind,
+                Roles: a.roles));
+        db.Events.Append(projectId, authorsAdded);
+        await db.SaveChangesAsync();
     }
 
     public async Task Edit(ProjectEditDto dto, CancellationToken token = default)
@@ -195,25 +205,17 @@ public partial class ProjectService
         await db.SaveChangesAsync(token);
     }
 
-    public async Task<ImmutableArray<ProjectListDto>> List(CancellationToken token = default)
+    public async Task<ImmutableArray<ProjectInfo>> List(CancellationToken token = default)
     {
-        var projects = await db.Query<ProjectInfo>()
-            .WhereCanRead(userProvider)
-            .ToListAsync(token);
-        return projects.Select(TransferMaps.ToProjectListDto).ToImmutableArray();
+        return (await db.Query<ProjectInfo>().ToListAsync(token)).ToImmutableArray();
     }
 
-    public async Task<ProjectDetailDto?> Load(Hrib id, CancellationToken token = default)
+    public async Task<ProjectInfo?> Load(Hrib id, CancellationToken token = default)
     {
         var data = await db.LoadAsync<ProjectInfo>(id, token);
         if (data is null)
         {
             return null;
-        }
-
-        if (!userProvider.CanRead(data))
-        {
-            throw new UnauthorizedAccessException();
         }
 
         var group = await db.LoadAsync<ProjectGroupInfo>(data.ProjectGroupId, token);

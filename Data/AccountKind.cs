@@ -4,11 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Kafe.Data
+namespace Kafe.Data;
+
+public enum AccountKind
 {
-    public enum AccountKind
-    {
-        Unknown,
-        Temporary
-    }
+    Unknown,
+    Temporary
 }

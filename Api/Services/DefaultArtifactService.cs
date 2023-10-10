@@ -82,7 +82,9 @@ public class DefaultArtifactService : IArtifactService
             ArtifactId: Hrib.Create(),
             CreationMethod: CreationMethod.Api,
             Name: dto.Name,
-            AddedOn: dto.AddedOn?.ToUniversalTime() ?? DateTimeOffset.UtcNow);
+            AddedOn: dto.AddedOn?.ToUniversalTime() ?? DateTimeOffset.UtcNow,
+            Visibility: Visibility.Public // artifact can be reference from any project or playlist
+        );
         db.Events.StartStream<ArtifactInfo>(created.ArtifactId, created);
 
         if (dto.ContainingProject is not null)

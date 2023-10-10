@@ -23,9 +23,9 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Kafe.Api.Services;
+namespace Kafe.Api.Services.Account;
 
-public class DefaultAccountService : IAccountService, IDisposable
+public class SystemAccountService : IAccountService, IDisposable
 {
     public const string EmailConfirmationPurpose = "EmailConfirmation";
     public static readonly TimeSpan ConfirmationTokenExpiration = TimeSpan.FromHours(24);
@@ -38,7 +38,7 @@ public class DefaultAccountService : IAccountService, IDisposable
     private readonly IOptions<ApiOptions> apiOptions;
     private readonly IUserProvider userProvider;
 
-    public DefaultAccountService(
+    public SystemAccountService(
         IDocumentSession db,
         IDataProtectionProvider dataProtectionProvider,
         IEmailService emailService,
@@ -46,7 +46,7 @@ public class DefaultAccountService : IAccountService, IDisposable
         IOptions<ApiOptions> apiOptions,
         IUserProvider userProvider)
     {
-        dataProtector = dataProtectionProvider.CreateProtector(nameof(DefaultAccountService));
+        dataProtector = dataProtectionProvider.CreateProtector(nameof(SystemAccountService));
         this.db = db;
         this.emailService = emailService;
         this.environment = environment;

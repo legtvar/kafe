@@ -144,7 +144,8 @@ public sealed class KafeClient : IAsyncDisposable
             ArtifactId: artifactId,
             CreationMethod: CreationMethod.Migrator,
             Name: (LocalizedString)name,
-            AddedOn: addedOn);
+            AddedOn: addedOn,
+            Visibility: Visibility.Public);
         session.Events.StartStream<ArtifactInfo>(artifactId, artifactCreated);
         LogEvent(artifactId, artifactCreated);
 
@@ -274,7 +275,8 @@ public sealed class KafeClient : IAsyncDisposable
         var created = new ProjectGroupCreated(
             ProjectGroupId: hrib,
             CreationMethod.Migrator,
-            (LocalizedString)name);
+            (LocalizedString)name,
+            Visibility: Visibility.Internal);
         LogEvent(hrib, created);
 
         session.Events.StartStream<ProjectGroupInfo>(hrib, created);

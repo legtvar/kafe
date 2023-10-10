@@ -17,3 +17,14 @@ public record AccountCapabilityRemoved(
     [Hrib] string AccountId,
     [AccountCapability] string Capability
 );
+
+public record AccountPermissionSet(
+    [Hrib] string AccountId,
+    string EntityId,
+    Permission Permission
+);
+
+public record AccountPermissionUnset(
+    [Hrib] string AccountId,
+    string EntityId
+);

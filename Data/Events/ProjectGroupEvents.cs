@@ -6,7 +6,8 @@ namespace Kafe.Data.Events;
 public record ProjectGroupCreated(
     [Hrib] string ProjectGroupId,
     CreationMethod CreationMethod,
-    [LocalizedString] ImmutableDictionary<string, string> Name
+    [LocalizedString] ImmutableDictionary<string, string> Name,
+    Visibility Visibility
 );
 
 public record ProjectGroupInfoChanged(

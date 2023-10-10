@@ -12,8 +12,9 @@ public record ProjectGroupInfo(
     [LocalizedString] ImmutableDictionary<string, string> Name,
     [LocalizedString] ImmutableDictionary<string, string>? Description = null,
     DateTimeOffset Deadline = default,
-    bool IsOpen = false
-) : IEntity;
+    bool IsOpen = false,
+    Visibility Visibility = Visibility.Unknown
+) : IVisibleEntity;
 
 public class ProjectGroupInfoProjection : SingleStreamProjection<ProjectGroupInfo>
 {
@@ -26,7 +27,8 @@ public class ProjectGroupInfoProjection : SingleStreamProjection<ProjectGroupInf
         return new ProjectGroupInfo(
             Id: e.ProjectGroupId,
             CreationMethod: e.CreationMethod,
-            Name: e.Name
+            Name: e.Name,
+            Visibility: e.Visibility
         );
     }
 

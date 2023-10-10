@@ -41,7 +41,8 @@ public class DefaultProjectGroupService : IProjectGroupService
         var created = new ProjectGroupCreated(
             ProjectGroupId: id,
             CreationMethod: CreationMethod.Api,
-            Name: dto.Name.GetRaw());
+            Name: dto.Name.GetRaw(),
+            Visibility: Visibility.Unknown);
 
         var changed = new ProjectGroupInfoChanged(
             ProjectGroupId: created.ProjectGroupId,

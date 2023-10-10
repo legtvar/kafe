@@ -20,7 +20,7 @@ public record ProjectInfo(
     Visibility Visibility = Visibility.Unknown,
     DateTimeOffset ReleasedOn = default,
     bool IsLocked = false
-) : IEntity;
+) : IVisibleEntity;
 
 public record ProjectAuthorInfo(
     [Hrib] string Id,

@@ -15,6 +15,7 @@ public record Hrib
     public const int Length = 11;
 
     public const string Invalid = "Invalid HRIB";
+    public const string System = "*";
 
     private static readonly Random Random = new Random();
 

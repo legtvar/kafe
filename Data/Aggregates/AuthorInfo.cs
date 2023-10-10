@@ -13,7 +13,7 @@ public record AuthorInfo(
     [LocalizedString] ImmutableDictionary<string, string>? Bio = null,
     string? Uco = null,
     string? Email = null,
-    string? Phone = null) : IEntity;
+    string? Phone = null) : IVisibleEntity;
 
 public class AuthorInfoProjection : SingleStreamProjection<AuthorInfo>
 {

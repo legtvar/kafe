@@ -1,10 +1,12 @@
-﻿using Kafe.Data.Aggregates;
+﻿using Kafe.Data;
+using Kafe.Data.Aggregates;
 using Marten;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -41,6 +43,28 @@ public class DefaultUserProvider : IUserProvider
     }
 
     public ApiUser? User { get; private set; }
+    
+    public AccountInfo? Account { get; private set; }
+
+    public bool HasExplicitPermission(Hrib entityId, Permission permission)
+    {
+        return Account is not null && Account.Permissions.GetValueOrDefault(entityId) >= permission;
+    }
+
+    public bool HasPermission(IVisibleEntity entity, Permission permission)
+    {
+        if (permission == Permission.Read && entity.Visibility == Visibility.Public)
+        {
+            return true;
+        }
+        
+        if (permission == Permission.Read && entity.Visibility == Visibility.Internal && Account is not null)
+        {
+            return true;
+        }
+        
+        return HasExplicitPermission(entity.Id, permission);
+    }
 
     public async Task Refresh(bool shouldSignIn = true, CancellationToken token = default)
     {

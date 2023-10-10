@@ -7,7 +7,8 @@ public record ArtifactCreated(
     [Hrib] string ArtifactId,
     CreationMethod CreationMethod,
     [LocalizedString] ImmutableDictionary<string, string> Name,
-    DateTimeOffset AddedOn
+    DateTimeOffset AddedOn,
+    Visibility Visibility
 );
 
 public record ArtifactInfoChanged(

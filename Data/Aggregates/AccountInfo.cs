@@ -24,7 +24,8 @@ public record AccountInfo(
     string? SecurityStamp,
     DateTimeOffset RefreshedOn,
     [KafeType(typeof(ImmutableHashSet<AccountCapability>))]
-    ImmutableHashSet<string> Capabilities
+    ImmutableHashSet<string> Capabilities,
+    ImmutableDictionary<string, Permission> Permissions
 );
 
 public class AccountInfoProjection : SingleStreamProjection<AccountInfo>
@@ -43,7 +44,8 @@ public class AccountInfoProjection : SingleStreamProjection<AccountInfo>
             PreferredCulture: e.PreferredCulture,
             SecurityStamp: null,
             RefreshedOn: default,
-            Capabilities: ImmutableHashSet<string>.Empty
+            Capabilities: ImmutableHashSet<string>.Empty,
+            Permissions: ImmutableDictionary<string, Permission>.Empty
         );
     }
 
@@ -87,6 +89,22 @@ public class AccountInfoProjection : SingleStreamProjection<AccountInfo>
         return a with
         {
             Capabilities = a.Capabilities.Remove(e.Capability)
+        };
+    }
+    
+    public AccountInfo Apply(AccountPermissionSet e, AccountInfo a)
+    {
+        return a with
+        {
+            Permissions = a.Permissions.SetItem(e.EntityId, e.Permission)
+        };
+    }
+
+    public AccountInfo Apply(AccountPermissionUnset e, AccountInfo a)
+    {
+        return a with
+        {
+            Permissions = a.Permissions.Remove(e.EntityId)
         };
     }
 }

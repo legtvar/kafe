@@ -12,7 +12,7 @@ public record PlaylistInfo(
     [LocalizedString] ImmutableDictionary<string, string> Name,
     [LocalizedString] ImmutableDictionary<string, string>? Description = null,
     Visibility Visibility = Visibility.Unknown
-) : IEntity;
+) : IVisibleEntity;
 
 public class PlaylistInfoProjection : SingleStreamProjection<PlaylistInfo>
 {

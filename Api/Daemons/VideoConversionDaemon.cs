@@ -21,13 +21,13 @@ public class VideoConversionDaemon : BackgroundService
     private readonly IServiceProvider serviceProvider;
     private readonly ILogger<VideoConversionDaemon> logger;
     private readonly IMediaService mediaService;
-    private readonly IStorageService storageService;
+    private readonly StorageService storageService;
 
     public VideoConversionDaemon(
         IServiceProvider serviceProvider,
         ILogger<VideoConversionDaemon> logger,
         IMediaService mediaService,
-        IStorageService storageService)
+        StorageService storageService)
     {
         this.serviceProvider = serviceProvider;
         this.logger = logger;

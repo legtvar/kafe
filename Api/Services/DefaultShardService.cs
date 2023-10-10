@@ -20,14 +20,14 @@ namespace Kafe.Api.Services;
 public class DefaultShardService : IShardService
 {
     private readonly IDocumentSession db;
-    private readonly IStorageService storageService;
+    private readonly StorageService storageService;
     private readonly IMediaService mediaService;
     private readonly IImageService imageService;
     private readonly IUserProvider userProvider;
 
     public DefaultShardService(
         IDocumentSession db,
-        IStorageService storageService,
+        StorageService storageService,
         IMediaService mediaService,
         IImageService imageService,
         IUserProvider userProvider)

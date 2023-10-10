@@ -69,7 +69,7 @@ public static class ServiceCollectionExtensions
         services.AddMarten(ConfigureMarten)
             .ApplyAllDatabaseChangesOnStartup();
 
-        services.AddSingleton<IStorageService, DefaultStorageService>();
+        services.AddSingleton<StorageService>();
 
         services.AddOptions<StorageOptions>()
             .BindConfiguration("Storage");

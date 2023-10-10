@@ -12,11 +12,11 @@ using System.Threading.Tasks;
 
 namespace Kafe.Data.Services;
 
-public class DefaultStorageService : IStorageService
+public class StorageService
 {
     private readonly IOptions<StorageOptions> options;
 
-    public DefaultStorageService(IOptions<StorageOptions> options)
+    public StorageService(IOptions<StorageOptions> options)
     {
         this.options = options;
     }

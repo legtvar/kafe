@@ -80,7 +80,9 @@
     "empty": "It's empty in here...",
     "for": "for",
     "save": "Save",
-    "files": "files"
+    "files": "files",
+    "quitEdit": "Ukončit editaci",
+    "construction": "This section is under construction..."
   },
   "home": {
     "signin": "Sign in"
@@ -164,7 +166,9 @@
     "tabs": {
       "files": "Files",
       "info": "Basic information",
-      "status": "State"
+      "status": "State",
+      "admin": "Admin access",
+      "rights": "Rights"
     }
   },
   "projects": {
@@ -199,12 +203,18 @@
   "route": {
     "groups": {
       "create": {
-        "title": "Create a new projece"
+        "title": "Create a new project group"
       },
       "detail": {
         "title": "Project group detail"
       },
-      "title": "Project groups"
+      "title": "Project groups",
+      "edit": {
+        "title": "Edit project group"
+      },
+      "createProject": {
+        "title": "Create a new project"
+      }
     },
     "home": {
       "title": "Home"
@@ -220,6 +230,9 @@
         "title": "Edit project"
       },
       "title": "Projects"
+    },
+    "system": {
+      "title": "System"
     }
   },
   "sendApi": {
@@ -271,6 +284,73 @@
     "search": "Filter playlists"
   },
   "groupsList": {
-    "search": "Filter project groups"
+    "search": "Filter project groups",
+    "create": "Create new group"
+  },
+  "system": {
+    "title": "System settings",
+    "warning": "Please be careful! Anything you change here can have a catastrophic impact on the final taste of Kafe! Proceed with caution!",
+    "rights": "Rights",
+    "homepage": "Homepage",
+    "autosave": "Changes are saved immediately and automatically! Permissions also apply to inherited items!"
+  },
+  "rights": {
+    "read": "View",
+    "write": "Edit",
+    "append": "Append",
+    "special": {
+      "anyone": {
+        "title": "Anyone on the Internet",
+        "warning": "Beware, any user will have these rights even on inherited items!"
+      },
+      "new": {
+        "title": "Add a user (email)"
+      }
+    },
+    "none": "No rights",
+    "groups": {
+      "system": {
+        "read": "View these settings",
+        "append": "Create new projects, project groups and playlists",
+        "write": "Change rights and system settings",
+        "inspect": "View all projects, project groups and playlists"
+      },
+      "project": {
+        "append": "Add new files to the project",
+        "read": "View the project and its metadata",
+        "write": "Edit project metadata and permissions",
+        "inspect": "View project files"
+      },
+      "group": {
+        "read": "See this group of projects",
+        "write": "Change metadata and group settings",
+        "inspect": "View all projects in the project group",
+        "append": "Create a new project in this group"
+      }
+    },
+    "inspect": "Inspect"
+  },
+  "groupsEdit": {
+    "tabs": {
+      "rights": "Rights"
+    }
+  },
+  "createGroup": {
+    "fields": {
+      "propositions": "Propositions",
+      "description": "Project group annotation",
+      "name": "The name of the project group"
+    },
+    "button": {
+      "create": "Create a project group",
+      "update": "Save a group of projects"
+    }
+  },
+  "groupsCreate": {
+    "title": "Create a project group"
+  },
+  "textareaMarkdown": {
+    "allowMarkdown": "This field allows you to enter Markdown formatted text",
+    "preview": "Preview"
   }
 }

@@ -23,19 +23,19 @@ export function ProjectListComponent({ projects }: IProjectListComponentProps) {
 
     return (
         <>
-            <Box mx={-4} px={4} pb={4} borderBottomWidth="1px" borderBottomColor={borderColor}>
-                <FormControl>
-                    <Input
-                        type="text"
-                        borderColor={border}
-                        bg={bg}
-                        placeholder={`${t('projectList.search').toString()}`}
-                        value={filter}
-                        onChange={(event) => setFilter(event.target.value.toLowerCase())}
-                    />
-                </FormControl>
-            </Box>
             <Flex direction="column" w="full">
+                <Box mx={-4} px={4} pb={4} borderBottomWidth="1px" borderBottomColor={borderColor}>
+                    <FormControl>
+                        <Input
+                            type="text"
+                            borderColor={border}
+                            bg={bg}
+                            placeholder={`${t('projectList.search').toString()}`}
+                            value={filter}
+                            onChange={(event) => setFilter(event.target.value.toLowerCase())}
+                        />
+                    </FormControl>
+                </Box>
                 <Pagination
                     data={projects
                         .filter(

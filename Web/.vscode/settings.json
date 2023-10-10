@@ -14,5 +14,6 @@
     },
     "i18n-ally.localesPaths": ["src/translations"],
     "i18n-ally.keystyle": "nested",
-    "i18n-ally.sourceLanguage": "cs"
+    "i18n-ally.sourceLanguage": "cs",
+    "typescript.tsdk": "node_modules\\typescript\\lib"
 }

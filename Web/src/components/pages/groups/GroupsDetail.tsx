@@ -1,5 +1,6 @@
-import { Box, Button, Flex, Spacer, Stack } from '@chakra-ui/react';
+import { Box, Button, Flex, Heading, Spacer, Stack } from '@chakra-ui/react';
 import { t } from 'i18next';
+import { AiOutlineEdit } from 'react-icons/ai';
 import { Link, useParams } from 'react-router-dom';
 import { Group } from '../../../data/Group';
 import { AwaitAPI } from '../../utils/AwaitAPI';
@@ -25,9 +26,14 @@ export function GroupsDetail(props: IGroupsDetailProps) {
             >
                 {(group: Group) => (
                     <Stack spacing={4} m={6} direction="column" pb={16}>
-                        <Box fontSize="4xl" fontWeight="semibold" as="h2" lineHeight="tight" isTruncated>
-                            {group.getName()}
-                        </Box>
+                        <Flex mb={2}>
+                            <Heading fontSize="4xl" fontWeight="semibold" as="h2" lineHeight="tight" mr="auto">
+                                {group.getName()}
+                            </Heading>
+                            <Link to="edit">
+                                <Button leftIcon={<AiOutlineEdit />}>{t('generic.edit').toString()}</Button>
+                            </Link>
+                        </Flex>
                         <Box>{group.getDescription()}</Box>
 
                         {group.isOpen && (

@@ -6,6 +6,7 @@ import { Link, useParams } from 'react-router-dom';
 import { Project } from '../../../data/Project';
 import { useAuth } from '../../../hooks/Caffeine';
 import { AwaitAPI } from '../../utils/AwaitAPI';
+import { RightsEditor } from '../../utils/RightsEditor';
 import { Status } from '../../utils/Status';
 import { ArtifactGroupUpload } from '../../utils/Upload/ArtifactGroup';
 import { AddReview } from './AddReview';
@@ -35,9 +36,7 @@ export function ProjectEdit(props: IProjectEditProps) {
                             {project.getName()}
                         </Heading>
                         <Link to="..">
-                            <Button leftIcon={<BsX />} mr={4}>
-                                {t('projectEdit.quit').toString()}
-                            </Button>
+                            <Button leftIcon={<BsX />}>{t('projectEdit.quit').toString()}</Button>
                         </Link>
                     </Flex>
                     <ProjectTags project={project} />
@@ -46,6 +45,7 @@ export function ProjectEdit(props: IProjectEditProps) {
                             <Tab>{t('projectEdit.tabs.status').toString()}</Tab>
                             <Tab>{t('projectEdit.tabs.info').toString()}</Tab>
                             <Tab>{t('projectEdit.tabs.files').toString()}</Tab>
+                            <Tab>{t('projectEdit.tabs.rights').toString()}</Tab>
                             {user &&
                                 user.capabilities.some((cap) => tagsForAdmin.some((tag) => cap.startsWith(tag))) && (
                                     <Tab>
@@ -79,6 +79,17 @@ export function ProjectEdit(props: IProjectEditProps) {
                                         ),
                                     )}
                                 </Stack>
+                            </TabPanel>
+                            <TabPanel>
+                                <RightsEditor
+                                    item={project}
+                                    explanation={{
+                                        read: t('rights.groups.project.read').toString(),
+                                        write: t('rights.groups.project.write').toString(),
+                                        inspect: t('rights.groups.project.inspect').toString(),
+                                        append: t('rights.groups.project.append').toString(),
+                                    }}
+                                />
                             </TabPanel>
                             <TabPanel>
                                 <Heading as="h2" fontSize="lg" mb={4}>

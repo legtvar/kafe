@@ -74,6 +74,12 @@ export class API {
             async getById(id: string) {
                 return api.requestSingle(`project-group/${id}`, Group);
             },
+            async create(group: Group) {
+                return api.post<components['schemas']['GroupCreationDto'], HRIB>(`group`, group.serialize());
+            },
+            async update(group: Group) {
+                return api.patch<components['schemas']['GroupCreationDto'], HRIB>(`group`, group.serialize(true));
+            },
         };
     }
 

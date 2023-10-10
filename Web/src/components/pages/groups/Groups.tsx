@@ -1,6 +1,7 @@
-import { Box, Flex, FormControl, Highlight, Input, Text, useColorModeValue } from '@chakra-ui/react';
+import { Button, Flex, FormControl, Highlight, Input, Text, useColorModeValue } from '@chakra-ui/react';
 import { t } from 'i18next';
 import { useState } from 'react';
+import { IoAdd } from 'react-icons/io5';
 import { Link } from 'react-router-dom';
 import { Group } from '../../../data/Group';
 import { useColorScheme, useHighlightStyle } from '../../../hooks/useColorScheme';
@@ -24,7 +25,14 @@ export function Groups(props: IGroupsProps) {
             <AwaitAPI request={(api) => api.groups.getAll()}>
                 {(data: Group[]) => (
                     <>
-                        <Box mx={-4} px={4} pb={4} borderBottomWidth="1px" borderBottomColor={borderColor}>
+                        <Flex
+                            direction="row"
+                            mx={-4}
+                            px={4}
+                            pb={4}
+                            borderBottomWidth="1px"
+                            borderBottomColor={borderColor}
+                        >
                             <FormControl>
                                 <Input
                                     type="text"
@@ -35,7 +43,12 @@ export function Groups(props: IGroupsProps) {
                                     onChange={(event) => setFilter(event.target.value.toLowerCase())}
                                 />
                             </FormControl>
-                        </Box>
+                            <Link to="create">
+                                <Button ml={4} leftIcon={<IoAdd />} colorScheme="blue">
+                                    {t('groupsList.create').toString()}
+                                </Button>
+                            </Link>
+                        </Flex>
                         <Flex direction="column" w="full">
                             <Pagination
                                 data={data.filter(

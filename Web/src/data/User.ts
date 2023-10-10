@@ -1,9 +1,8 @@
 import { components } from '../schemas/api';
-import { HRIB } from '../schemas/generic';
+import { AbstractType } from './AbstractType';
 import { Project } from './Project';
 
-export class User {
-    public id!: HRIB;
+export class User extends AbstractType {
     public name!: string | null;
     public emailAddress!: string;
     public preferredCulture!: string;
@@ -21,6 +20,7 @@ export class User {
     */
 
     public constructor(struct: components['schemas']['AccountDetailDto']) {
+        super();
         Object.assign(this, struct);
         this.projects = (this.projects as any[]).map((project) => new Project(project));
         this.role = this.name ? 'user' : 'temp';

@@ -6,6 +6,8 @@ import {
     IoHomeOutline,
     IoListCircle,
     IoListCircleOutline,
+    IoSettingsOutline,
+    IoSettingsSharp,
     IoVideocam,
     IoVideocamOutline,
 } from 'react-icons/io5';
@@ -16,7 +18,9 @@ import { TempAccount } from './components/pages/account/TempAccount';
 import { Token } from './components/pages/account/Token';
 import { GoRedirect } from './components/pages/GoRedirect';
 import { Groups } from './components/pages/groups/Groups';
+import { GroupsCreate } from './components/pages/groups/GroupsCreate';
 import { GroupsDetail } from './components/pages/groups/GroupsDetail';
+import { GroupsEdit } from './components/pages/groups/GroupsEdit';
 import { HomeFestival } from './components/pages/home/HomeFestival';
 import { Player } from './components/pages/Player';
 import { PlaylistDetail } from './components/pages/playlists/PlaylistDetail';
@@ -30,6 +34,7 @@ import { AccountRoot } from './components/pages/root/AccountRoot';
 import { AuthRoot } from './components/pages/root/AuthRoot';
 import { Root } from './components/pages/root/Root';
 import { UnauthRoot } from './components/pages/root/UnauthRoot';
+import { SystemComponent } from './components/pages/system/SystemComponent';
 import { OutletOrChildren } from './components/utils/OutletOrChildren';
 import { Status } from './components/utils/Status';
 
@@ -131,14 +136,24 @@ export const authRoutes = (t: (id: string) => string): AppRoute[] => [
         },
         children: [
             {
+                path: 'create',
+                title: t('route.groups.create.title'),
+                element: <GroupsCreate />,
+            },
+            {
                 path: ':id',
                 title: t('route.groups.detail.title'),
                 element: <GroupsDetail />,
                 children: [
                     {
                         path: 'create',
-                        title: t('route.groups.create.title'),
+                        title: t('route.groups.createProject.title'),
                         element: <CreateProject />,
+                    },
+                    {
+                        path: 'edit',
+                        title: t('route.groups.edit.title'),
+                        element: <GroupsEdit />,
                     },
                 ],
             },
@@ -152,6 +167,17 @@ export const authRoutes = (t: (id: string) => string): AppRoute[] => [
         icon: {
             default: IoListCircleOutline,
             selected: IoListCircle,
+        },
+        children: playlistChildRoutes(t),
+    },
+    {
+        path: 'system',
+        title: t('route.system.title'),
+        element: <SystemComponent />,
+        inMenu: true,
+        icon: {
+            default: IoSettingsOutline,
+            selected: IoSettingsSharp,
         },
         children: playlistChildRoutes(t),
     },

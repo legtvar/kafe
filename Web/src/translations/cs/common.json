@@ -80,7 +80,10 @@
     "empty": "Kde nic, tu nic...",
     "for": "pro",
     "save": "Uložit",
-    "files": "souborů"
+    "files": "souborů",
+    "quitEdit": "Ukončit editaci",
+    "construction": "Kde nic tu nic, tato stránka se připravuje...",
+    "allowMarkdown": "Toto pole umožňuje zadat text formátovaný, jako Markdown"
   },
   "home": {
     "signin": "Přihlásit se"
@@ -165,7 +168,8 @@
       "admin": "Přístup administrátora",
       "files": "Soubory",
       "info": "Základní informace",
-      "status": "Stav"
+      "status": "Stav",
+      "rights": "Oprávnění"
     }
   },
   "projects": {
@@ -200,12 +204,18 @@
   "route": {
     "groups": {
       "create": {
-        "title": "Vytvořte nový projekt"
+        "title": "Vytvořte novou skupinu projektů"
       },
       "detail": {
         "title": "Detail skupiny projektů"
       },
-      "title": "Skupiny projektů"
+      "title": "Skupiny projektů",
+      "edit": {
+        "title": "Upravit skupinu projektů"
+      },
+      "createProject": {
+        "title": "Vytvořit nový projekt"
+      }
     },
     "home": {
       "title": "Domů"
@@ -221,6 +231,9 @@
         "title": "Upravit projekt"
       },
       "title": "Projekty"
+    },
+    "system": {
+      "title": "Systém"
     }
   },
   "sendApi": {
@@ -272,6 +285,74 @@
     "search": "Hledat playlisty"
   },
   "groupsList": {
-    "search": "Hledat skupiny projektů"
+    "search": "Hledat skupiny projektů",
+    "create": "Vytvořit skupinu"
+  },
+  "system": {
+    "title": "Systémová nastavení",
+    "warning": "Prosím pozor! Cokoliv změníš tady může mít katastrofický dopad na finální chuť Kafe! Postupujte opatrně!",
+    "rights": "Oprávnění",
+    "homepage": "Domovská obrazovka",
+    "autosave": "Změny se ukládají ihned a automaticky! Oprávnění se vztahují i na zděděné položky!"
+  },
+  "rights": {
+    "read": "Zobrazit",
+    "write": "Upravit",
+    "append": "Přidat",
+    "special": {
+      "anyone": {
+        "title": "Kdokoli v internetu",
+        "warning": "Pozor, jakýkoli uživatel bude mít tato práva i na zděděné položky!"
+      },
+      "new": {
+        "title": "Přidat uživatele (email)"
+      }
+    },
+    "none": "Žádná práva",
+    "groups": {
+      "system": {
+        "read": "Zobrazit tato nastavení",
+        "append": "Vytvářet nové projekty, skupiny projektů a playlisty",
+        "write": "Měnit práva a systémová nastavení",
+        "inspect": "Zobrazit všechny projekty, skupiny projektů a playlisty"
+      },
+      "project": {
+        "append": "Přidávat nové soubory do projektu",
+        "read": "Zobrazit projekt a jeho metadata",
+        "write": "Upravovat metadata a oprávnění projektu",
+        "inspect": "Zobrazit soubory projektu"
+      },
+      "group": {
+        "read": "Vidět tuto skupinu projektů",
+        "write": "Měnit metadata a nastavení skupiny",
+        "inspect": "Zobrazit všechny projekty ve skupině projektů",
+        "append": "Vytvořit nový projekt v této skupině"
+      }
+    },
+    "inspect": "Prohlížet"
+  },
+  "groupsEdit": {
+    "tabs": {
+      "info": "Základní informace",
+      "rights": "Oprávnění"
+    }
+  },
+  "createGroup": {
+    "fields": {
+      "name": "Název skupiny projektů",
+      "description": "Anotace skupiny projektů",
+      "propositions": "Propozice"
+    },
+    "button": {
+      "update": "Uložit skupinu projektů",
+      "create": "Vytvořit skupinu projektů"
+    }
+  },
+  "groupsCreate": {
+    "title": "Vytvořit skupinu projektů"
+  },
+  "textareaMarkdown": {
+    "allowMarkdown": "Toto pole umožňuje zadat text formátovaný Markdownem",
+    "preview": "Náhled"
   }
 }

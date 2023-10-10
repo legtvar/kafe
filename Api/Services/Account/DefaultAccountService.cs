@@ -25,7 +25,7 @@ using System.Threading.Tasks;
 
 namespace Kafe.Api.Services.Account;
 
-public class SystemAccountService : IAccountService, IDisposable
+public class DefaultAccountService : IAccountService, IDisposable
 {
     public const string EmailConfirmationPurpose = "EmailConfirmation";
     public static readonly TimeSpan ConfirmationTokenExpiration = TimeSpan.FromHours(24);
@@ -36,59 +36,41 @@ public class SystemAccountService : IAccountService, IDisposable
     private readonly IEmailService emailService;
     private readonly IHostEnvironment environment;
     private readonly IOptions<ApiOptions> apiOptions;
-    private readonly IUserProvider userProvider;
 
-    public SystemAccountService(
+    public DefaultAccountService(
         IDocumentSession db,
         IDataProtectionProvider dataProtectionProvider,
         IEmailService emailService,
         IHostEnvironment environment,
-        IOptions<ApiOptions> apiOptions,
-        IUserProvider userProvider)
+        IOptions<ApiOptions> apiOptions)
     {
-        dataProtector = dataProtectionProvider.CreateProtector(nameof(SystemAccountService));
+        dataProtector = dataProtectionProvider.CreateProtector(nameof(DefaultAccountService));
         this.db = db;
         this.emailService = emailService;
         this.environment = environment;
         this.apiOptions = apiOptions;
-        this.userProvider = userProvider;
+    }
+
+    public async Task<AccountInfo?> Load2(Hrib id, CancellationToken token = default)
+    {
+        return await db.Events.AggregateStreamAsync<AccountInfo>(id, token: token);
     }
 
     public async Task<AccountDetailDto?> Load(Hrib id, CancellationToken token = default)
     {
-        if (id != userProvider.User?.Id
-            && !userProvider.IsAdministrator())
-        {
-            throw new UnauthorizedAccessException();
-        }
-
         var account = await db.LoadAsync<AccountInfo>(id, token);
         if (account is null)
         {
             return null;
         }
 
-        var projects = await db.LoadManyAsync<ProjectInfo>(
-            token,
-            account.Capabilities.OfType<ProjectOwnership>().Select(c => (string)c.ProjectId));
-        if (projects is null)
-        {
-            return null;
-        }
-
-        return TransferMaps.ToAccountDetailDto(account, projects);
+        return TransferMaps.ToAccountDetailDto(account);
     }
 
     public async Task<AccountDetailDto?> Load(string emailAddress, CancellationToken token = default)
     {
         // TODO: Dedupe with the overload above.
-
-        if (emailAddress != userProvider.User?.EmailAddress
-            && !userProvider.IsAdministrator())
-        {
-            throw new UnauthorizedAccessException();
-        }
-
+        
         var account = await db.Query<AccountInfo>()
             .SingleOrDefaultAsync(a => a.EmailAddress == emailAddress, token);
 
@@ -97,23 +79,12 @@ public class SystemAccountService : IAccountService, IDisposable
             return null;
         }
 
-        var projects = await db.LoadManyAsync<ProjectInfo>(
-            token,
-            account.Capabilities.OfType<ProjectOwnership>().Select(c => (string)c.ProjectId));
-        if (projects is null)
-        {
-            return null;
-        }
-
-        return TransferMaps.ToAccountDetailDto(account, projects);
+        return TransferMaps.ToAccountDetailDto(account);
     }
 
     /// <summary>
     /// Gets an <see cref="ApiUser"/> for the account with <paramref name="id"/>.
     /// </summary>
-    /// <remarks>
-    /// THIS METHOD DOES NOT CARE ABOUT AUTHORIZATION. Never return the result to the client.
-    /// </remarks>
     public async Task<ApiUser?> LoadApiAccount(Hrib id, CancellationToken token = default)
     {
         var account = await db.LoadAsync<AccountInfo>(id, token);
@@ -127,9 +98,6 @@ public class SystemAccountService : IAccountService, IDisposable
     /// <summary>
     /// Gets an <see cref="ApiUser"/> for the account with <paramref name="emailAddress"/>.
     /// </summary>
-    /// <remarks>
-    /// THIS METHOD DOES NOT CARE ABOUT AUTHORIZATION. Never return the result to the client.
-    /// </remarks>
     public async Task<ApiUser?> LoadApiAccount(string emailAddress, CancellationToken token = default)
     {
         // TODO: Dedupe with the overload above.
@@ -151,6 +119,7 @@ public class SystemAccountService : IAccountService, IDisposable
     {
         // TODO: Add a "ticket" entity that will be identified by a guid, and will be one-time only instead of these
         //       tokens.
+
         var account = await db.Query<AccountInfo>()
             .SingleOrDefaultAsync(a => a.EmailAddress == dto.EmailAddress, token);
         Hrib? id;
@@ -163,7 +132,8 @@ public class SystemAccountService : IAccountService, IDisposable
                 EmailAddress: dto.EmailAddress,
                 PreferredCulture: dto.PreferredCulture ?? Const.InvariantCultureCode
             );
-            db.Events.StartStream<AccountInfo>(id, created);
+            var selfPermissionSet = new AccountPermissionSet(id, id, Permission.All);
+            db.Events.StartStream<AccountInfo>(id, created, selfPermissionSet);
         }
         else
         {
@@ -293,11 +263,6 @@ public class SystemAccountService : IAccountService, IDisposable
 
     public async Task<ImmutableArray<AccountListDto>> List(CancellationToken token = default)
     {
-        if (!userProvider.IsAdministrator())
-        {
-            throw new UnauthorizedAccessException();
-        }
-
         var authors = await db.Query<AccountInfo>()
             .ToListAsync(token);
         return authors.Select(TransferMaps.ToAccountListDto).ToImmutableArray();

@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System.Security.Claims;
+using System.Threading;
 using System.Threading.Tasks;
 using Kafe.Data;
 using Kafe.Data.Aggregates;
@@ -16,4 +17,6 @@ public interface IUserProvider
     bool HasExplicitPermission(Hrib entityId, Permission permission);
 
     bool HasPermission(IVisibleEntity entity, Permission permission);
+    
+    Task RefreshAccount(ClaimsPrincipal? user = null, CancellationToken token = default);
 }

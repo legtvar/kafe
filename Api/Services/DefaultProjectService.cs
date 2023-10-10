@@ -1,4 +1,5 @@
-﻿using Kafe.Api.Transfer;
+﻿using JasperFx.Core;
+using Kafe.Api.Transfer;
 using Kafe.Data;
 using Kafe.Data.Aggregates;
 using Kafe.Data.Capabilities;
@@ -236,6 +237,13 @@ public partial class DefaultProjectService : IProjectService
         };
 
         return dto;
+    }
+    
+    public async Task<ImmutableArray<ProjectInfo>> LoadMany(ImmutableArray<Hrib> ids, CancellationToken token = default)
+    {
+        var results = await Task.WhenAll(ids.Map(i => db.Events.AggregateStreamAsync<ProjectInfo>(i, token: token)));
+        return results.Where(r => r is not null)
+            .ToImmutableArray()!;
     }
 
     private async Task<ImmutableArray<ProjectAuthorInfo>> GetProjectAuthors(

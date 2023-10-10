@@ -1,7 +1,9 @@
+using System;
 using Npgsql.Replication;
 
 namespace Kafe.Data;
 
+[Flags]
 public enum Permission
 {
     /// <summary>
@@ -12,15 +14,22 @@ public enum Permission
     /// <summary>
     /// The entity can be viewed.
     /// </summary>
-    Read = 1,
+    Read = 1 << 0,
 
     /// <summary>
-    /// The entity can be "appended to" (e.g., a project can be added to a project group). Implies <see cref="Read"/>.
+    /// The entity can be "appended to" (e.g., a project can be added to a project group).
     /// </summary>
-    Append = 2,
+    Append = 1 << 1,
+    
+    /// <summary>
+    /// The contents of the entity can be viewed.
+    /// </summary>
+    Inspect = 1 << 2,
 
     /// <summary>
-    /// The entity can be written and overriden. Implies <see cref="Append"/>.
+    /// The entity can be written to and archived.
     /// </summary>
-    Write = 3
+    Write = 1 << 3,
+
+    All = Read | Append | Inspect | Write
 }

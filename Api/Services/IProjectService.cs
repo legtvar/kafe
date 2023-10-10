@@ -1,4 +1,5 @@
 ﻿using Kafe.Api.Transfer;
+using Kafe.Data.Aggregates;
 using System.Collections.Immutable;
 using System.Threading;
 using System.Threading.Tasks;
@@ -8,6 +9,8 @@ namespace Kafe.Api.Services;
 public interface IProjectService
 {
     Task<ProjectDetailDto?> Load(Hrib id, CancellationToken token = default);
+    
+    Task<ImmutableArray<ProjectInfo>> LoadMany(ImmutableArray<Hrib> ids, CancellationToken token = default);
 
     Task<ImmutableArray<ProjectListDto>> List(CancellationToken token = default);
 

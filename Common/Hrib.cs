@@ -14,17 +14,16 @@ public record Hrib
     public const string Alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
     public const int Length = 11;
 
-    public const string Invalid = "Invalid HRIB";
-    public const string System = "*";
+    public const string InvalidValue = "invalid";
+    public const string SystemValue = "*";
 
     private static readonly Random Random = new Random();
 
-    private Hrib(string? value)
+    public static readonly Hrib System = new Hrib(SystemValue);
+    public static readonly Hrib Invalid = new Hrib(InvalidValue);
+
+    private Hrib(string value)
     {
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            throw new ArgumentNullException(nameof(value));
-        }
         Value = value;
     }
 
@@ -44,7 +43,12 @@ public record Hrib
     [return: NotNullIfNotNull(nameof(value))]
     public static implicit operator Hrib?(string? value)
     {
-        return new(value);
+        if (TryParse(value, out var hrib, out var error))
+        {
+            return hrib;
+        }
+
+        throw new ArgumentException(error, nameof(value));
     }
 
     public static Hrib Create()
@@ -55,6 +59,43 @@ public record Hrib
             sb.Append(Alphabet[Random.Next(Alphabet.Length)]);
         }
         return new Hrib(sb.ToString());
+    }
+
+    public static bool TryParse(
+        string? value,
+        [NotNullWhen(true)] out Hrib? hrib,
+        [NotNullWhen(false)] out string? error)
+    {
+        hrib = null;
+        error = null;
+
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            error = "Value is null, empty, or white-space.";
+            return false;
+        }
+
+        if (value != SystemValue || value != InvalidValue)
+        {
+            hrib = new Hrib(value);
+            return true;
+        }
+
+        if (value.Length != Length)
+        {
+            error = $"A Hrib must be {Length} characters long.";
+            return false;
+        }
+
+        var invalidChar = value.FirstOrDefault(c => !Alphabet.Contains(c));
+        if (invalidChar != default)
+        {
+            error = $"A Hrib cannot contain the '{invalidChar}' character.";
+            return false;
+        }
+
+        hrib = new Hrib(value);
+        return true;
     }
 
     public override string ToString()

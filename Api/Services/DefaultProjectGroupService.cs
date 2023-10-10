@@ -88,10 +88,10 @@ public class DefaultProjectGroupService : IProjectGroupService
             return null;
         }
 
-        if (!userProvider.CanRead(projectGroup))
-        {
-            throw new UnauthorizedAccessException();
-        }
+        // if (!userProvider.CanRead(projectGroup))
+        // {
+        //     throw new UnauthorizedAccessException();
+        // }
 
         var dto = TransferMaps.ToProjectGroupDetailDto(projectGroup);
         var projects = await db.Query<ProjectInfo>()

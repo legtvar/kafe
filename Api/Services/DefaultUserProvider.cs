@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -16,34 +17,21 @@ namespace Kafe.Api.Services;
 public class DefaultUserProvider : IUserProvider
 {
     private readonly IHttpContextAccessor contextAccessor;
-    private readonly IDocumentSession db;
+    private readonly IAccountService accountService;
     private readonly ILogger<DefaultUserProvider> logger;
 
     public DefaultUserProvider(
         IHttpContextAccessor contextAccessor,
-        IDocumentSession db,
+        IAccountService accountService,
         ILogger<DefaultUserProvider> logger)
     {
-        if (contextAccessor.HttpContext is null)
-        {
-            User = ApiUser.System;
-            logger.LogWarning($"A scope without a request has been created. " +
-                $"Ignore this message if this is intended (e.g. a daemon did it).");
-        }
-        else
-        {
-            User = contextAccessor.HttpContext.User.Identities.Any()
-                ? ApiUser.FromPrincipal(contextAccessor.HttpContext.User)
-                : null;
-        }
-
         this.contextAccessor = contextAccessor;
-        this.db = db;
+        this.accountService = accountService;
         this.logger = logger;
     }
 
     public ApiUser? User { get; private set; }
-    
+
     public AccountInfo? Account { get; private set; }
 
     public bool HasExplicitPermission(Hrib entityId, Permission permission)
@@ -57,42 +45,42 @@ public class DefaultUserProvider : IUserProvider
         {
             return true;
         }
-        
+
         if (permission == Permission.Read && entity.Visibility == Visibility.Internal && Account is not null)
         {
             return true;
         }
-        
+
         return HasExplicitPermission(entity.Id, permission);
     }
 
     public async Task Refresh(bool shouldSignIn = true, CancellationToken token = default)
     {
-        if (User is null)
+        throw new NotSupportedException();
+    }
+
+    public async Task RefreshAccount(ClaimsPrincipal? user = null, CancellationToken token = default)
+    {
+        user ??= contextAccessor.HttpContext?.User;
+        if (user is null)
         {
-            throw new InvalidOperationException("Cannot refresh the currrent account because nobody is logged in.");
+            Account = null;
+            return;
         }
 
-        if (User == ApiUser.System)
+        var id = user.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(id))
         {
-            throw new InvalidOperationException("The system user cannot be refreshed.");
+            Account = null;
+            return;
         }
 
-        var account = await db.Events.AggregateStreamAsync<AccountInfo>(User.Id, token: token);
+        var account = await accountService.Load2(id, token: token);
         if (account is null)
         {
-            throw new IndexOutOfRangeException("Cannot refresh the current account because it no longer exists.");
+            throw new IndexOutOfRangeException($"Account with id '{id}' does not exist.");
         }
 
-        User = ApiUser.FromAggregate(account);
-
-        if (shouldSignIn && contextAccessor.HttpContext is not null)
-        {
-            // TODO: Pass the current authentication scheme.
-            await contextAccessor.HttpContext
-                .SignInAsync(User.ToPrincipal(CookieAuthenticationDefaults.AuthenticationScheme));
-        }
-
-        logger.LogInformation("The current user has been refreshed.");
+        Account = account;
     }
 }

@@ -10,7 +10,6 @@ namespace Kafe.Api.Transfer;
 /// <param name="Uco">The uco of the user. Null if the account is temporary.</param>
 /// <param name="EmailAddress">The email address of the user.</param>
 /// <param name="PreferredCulture">The preferred culture of the user.</param>
-/// <param name="Projects">The projects this account is an owner of.</param>
 /// <param name="Capabilities">The capabilities this user has been granted.</param>
 public record AccountDetailDto(
     Hrib Id,
@@ -18,7 +17,6 @@ public record AccountDetailDto(
     string? Uco,
     string EmailAddress,
     string PreferredCulture,
-    ImmutableArray<ProjectListDto> Projects,
     ImmutableHashSet<string> Capabilities
 );
 

@@ -26,7 +26,7 @@ public record AccountInfo(
     [KafeType(typeof(ImmutableHashSet<AccountCapability>))]
     ImmutableHashSet<string> Capabilities,
     ImmutableDictionary<string, Permission> Permissions
-);
+) : IEntity;
 
 public class AccountInfoProjection : SingleStreamProjection<AccountInfo>
 {

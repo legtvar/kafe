@@ -28,7 +28,7 @@ public record ApiUser(
     }
 
     public static readonly ApiUser System = new(
-        Id: Hrib.Invalid,
+        Id: Hrib.InvalidValue,
         Name: Const.SystemName,
         EmailAddress: Const.InvalidEmailAddress,
         PreferredCulture: Const.InvariantCulture,

@@ -341,8 +341,7 @@ public static class TransferMaps
     }
 
     public static AccountDetailDto ToAccountDetailDto(
-        AccountInfo data,
-        IEnumerable<ProjectInfo> projects)
+        AccountInfo data)
     {
         return new AccountDetailDto(
             Id: data.Id,
@@ -350,7 +349,6 @@ public static class TransferMaps
             Uco: null,
             EmailAddress: data.EmailAddress,
             PreferredCulture: data.PreferredCulture,
-            Projects: projects.Select(ToProjectListDto).ToImmutableArray(),
             Capabilities: data.Capabilities
         );
     }

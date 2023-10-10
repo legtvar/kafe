@@ -76,7 +76,7 @@ public class Startup
             .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, o =>
             {
                 o.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                
+
                 var oidcConfig = Configuration.GetRequiredSection("Oidc").Get<OidcOptions>()
                     ?? throw new ArgumentException("OIDC is not configured well.");
 
@@ -94,6 +94,10 @@ public class Startup
         services.AddAuthorization(o =>
         {
             o.AddPolicy(EndpointPolicy.AdministratorOnly, b => b.AddRequirements(new AdministratorRequirement()));
+            o.AddPolicy(EndpointPolicy.Read, b => b.AddRequirements(new PermissionRequirement(Permission.Read)));
+            o.AddPolicy(EndpointPolicy.Write, b => b.AddRequirements(new PermissionRequirement(Permission.Write)));
+            o.AddPolicy(EndpointPolicy.Append, b => b.AddRequirements(new PermissionRequirement(Permission.Append)));
+            o.AddPolicy(EndpointPolicy.Inspect, b => b.AddRequirements(new PermissionRequirement(Permission.Inspect)));
         });
 
         ConfigureDataProtection(services);
@@ -146,6 +150,11 @@ public class Startup
         app.UseCors();
 
         app.UseAuthentication();
+        app.Use(async (ctx, next) =>
+        {
+            await ctx.RequestServices.GetRequiredService<IUserProvider>().RefreshAccount();
+            await next();
+        });
         app.UseAuthorization();
 
         if (environment.IsDevelopment())
@@ -174,10 +183,10 @@ public class Startup
         services.AddScoped<IArtifactService, DefaultArtifactService>();
         services.AddScoped<IShardService, DefaultShardService>();
         services.AddScoped<IPlaylistService, DefaultPlaylistService>();
-        services.AddScoped<SystemAccountService>();
-        services.AddScoped<IAccountService, UserAccountService>();
+        services.AddScoped<IAccountService, DefaultAccountService>();
 
         services.AddScoped<IAuthorizationHandler, AdministratorHandler>();
+        services.AddScoped<IAuthorizationHandler, PermissionHandler>();
 
         services.Configure<ApiOptions>(Configuration);
         services.Configure<EmailOptions>(Configuration.GetSection("Email"));

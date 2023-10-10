@@ -1,4 +1,5 @@
 ﻿using Kafe.Api.Transfer;
+using Kafe.Data.Aggregates;
 using Kafe.Data.Capabilities;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -17,6 +18,10 @@ public interface IAccountService
 
     Task ConfirmTemporaryAccount(
         TemporaryAccountTokenDto confirmationToken,
+        CancellationToken token = default);
+
+    Task<AccountInfo?> Load2(
+        Hrib id,
         CancellationToken token = default);
 
     Task<AccountDetailDto?> Load(

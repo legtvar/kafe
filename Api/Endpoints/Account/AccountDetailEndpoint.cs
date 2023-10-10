@@ -5,10 +5,6 @@ using Kafe.Api.Transfer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
-using System;
-using System.Collections.Immutable;
-using System.Linq;
-using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -24,18 +20,15 @@ public class AccountDetailEndpoint : EndpointBaseAsync
     private readonly IAccountService accounts;
     private readonly IAuthorizationService authorization;
     private readonly IUserProvider userProvider;
-    private readonly IProjectService projectService;
 
     public AccountDetailEndpoint(
         IAccountService accounts,
         IAuthorizationService authorization,
-        IUserProvider userProvider,
-        IProjectService projectService)
+        IUserProvider userProvider)
     {
         this.accounts = accounts;
         this.authorization = authorization;
         this.userProvider = userProvider;
-        this.projectService = projectService;
     }
 
     [HttpGet]
@@ -51,7 +44,7 @@ public class AccountDetailEndpoint : EndpointBaseAsync
 
         if (id is null)
         {
-            return NotFound("No account ID was provided and no user is logged in.");
+            return NotFound();
         }
 
         var account = await accounts.Load2((Hrib)id, token);
@@ -65,6 +58,7 @@ public class AccountDetailEndpoint : EndpointBaseAsync
         {
             return Unauthorized();
         }
+
         return TransferMaps.ToAccountDetailDto(account);
     }
 }

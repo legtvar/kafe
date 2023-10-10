@@ -22,17 +22,12 @@ public class TemporaryAccountConfirmationEndpoint : EndpointBaseAsync
     .WithRequest<string>
     .WithActionResult
 {
-    public const string TemporaryAccountRole = "TemporaryAccount";
-
     private readonly IAccountService accounts;
-    private readonly IOptions<ApiOptions> options;
 
     public TemporaryAccountConfirmationEndpoint(
-        IAccountService accounts,
-        IOptions<ApiOptions> options)
+        IAccountService accounts)
     {
         this.accounts = accounts;
-        this.options = options;
     }
 
     [HttpGet]

@@ -80,6 +80,8 @@ public class DefaultUserProvider : IUserProvider
         {
             throw new IndexOutOfRangeException($"Account with id '{id}' does not exist.");
         }
+        
+        logger.LogDebug("Account '{}' ({}) found.", account.EmailAddress, account.Id);
 
         Account = account;
     }

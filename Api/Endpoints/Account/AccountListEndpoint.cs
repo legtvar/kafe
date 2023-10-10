@@ -13,7 +13,7 @@ namespace Kafe.Api.Endpoints;
 
 [ApiVersion("1")]
 [Route("accounts")]
-[Authorize(Policy = EndpointPolicy.AdministratorOnly)]
+[Authorize(Policy = EndpointPolicy.Read)]
 public class AccountListEndpoint : EndpointBaseAsync
     .WithoutRequest
     .WithActionResult<ImmutableArray<AccountListDto>>

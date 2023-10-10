@@ -7,14 +7,14 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Kafe.Api.Services;
+namespace Kafe.Data.Services;
 
-public class DefaultPlaylistService : IPlaylistService
+public class PlaylistService
 {
     private readonly IDocumentSession db;
     private readonly IUserProvider userProvider;
 
-    public DefaultPlaylistService(
+    public PlaylistService(
         IDocumentSession db,
         IUserProvider userProvider)
     {

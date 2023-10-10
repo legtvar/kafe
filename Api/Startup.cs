@@ -176,13 +176,6 @@ public class Startup
         services.AddKafeData();
 
         services.AddScoped<UserProvider>();
-        services.AddScoped<IUserProvider, UserProvider>();
-        services.AddScoped<IProjectGroupService, DefaultProjectGroupService>();
-        services.AddScoped<IProjectService, DefaultProjectService>();
-        services.AddScoped<IAuthorService, DefaultAuthorService>();
-        services.AddScoped<IArtifactService, DefaultArtifactService>();
-        services.AddScoped<IShardService, DefaultShardService>();
-        services.AddScoped<IPlaylistService, DefaultPlaylistService>();
 
         services.AddScoped<IAuthorizationHandler, AdministratorHandler>();
         services.AddScoped<IAuthorizationHandler, PermissionHandler>();

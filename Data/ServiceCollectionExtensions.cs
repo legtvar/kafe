@@ -67,7 +67,14 @@ public static class ServiceCollectionExtensions
             .UseIdentitySessions();
 
         services.AddSingleton<StorageService>();
+        
         services.AddScoped<AccountService>();
+        services.AddScoped<ProjectGroupService>();
+        services.AddScoped<ProjectService>();
+        services.AddScoped<AuthorService>();
+        services.AddScoped<ArtifactService>();
+        services.AddScoped<ShardService>();
+        services.AddScoped<PlaylistService>();
 
         services.AddOptions<StorageOptions>()
             .BindConfiguration("Storage");

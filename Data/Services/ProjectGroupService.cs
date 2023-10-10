@@ -10,14 +10,14 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Kafe.Api.Services;
+namespace Kafe.Data.Services;
 
-public class DefaultProjectGroupService : IProjectGroupService
+public class ProjectGroupService
 {
     private readonly IDocumentSession db;
     private readonly IUserProvider userProvider;
 
-    public DefaultProjectGroupService(
+    public ProjectGroupService(
         IDocumentSession db,
         IUserProvider userProvider)
     {

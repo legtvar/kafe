@@ -12,15 +12,15 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Kafe.Api.Services;
+namespace Kafe.Data.Services;
 
-public class DefaultAuthorService : IAuthorService
+public class AuthorService
 {
     private readonly IDocumentSession db;
     private readonly IUserProvider userProvider;
     private readonly AccountService accountService;
 
-    public DefaultAuthorService(
+    public AuthorService(
         IDocumentSession db,
         IUserProvider userProvider,
         AccountService accountService)

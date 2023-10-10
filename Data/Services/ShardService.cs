@@ -15,22 +15,22 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Kafe.Api.Services;
+namespace Kafe.Data.Services;
 
-public class DefaultShardService : IShardService
+public class ShardService
 {
     private readonly IDocumentSession db;
     private readonly StorageService storageService;
     private readonly IMediaService mediaService;
     private readonly IImageService imageService;
-    private readonly IUserProvider userProvider;
+    private readonly UserProvider userProvider;
 
-    public DefaultShardService(
+    public ShardService(
         IDocumentSession db,
         StorageService storageService,
         IMediaService mediaService,
         IImageService imageService,
-        IUserProvider userProvider)
+        UserProvider userProvider)
     {
         this.db = db;
         this.storageService = storageService;

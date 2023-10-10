@@ -13,9 +13,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Kafe.Api.Services;
+namespace Kafe.Data.Services;
 
-public partial class DefaultProjectService : IProjectService
+public partial class ProjectService
 {
     private readonly IDocumentSession db;
     private readonly IUserProvider userProvider;
@@ -23,7 +23,7 @@ public partial class DefaultProjectService : IProjectService
     private readonly IArtifactService artifacts;
     private readonly IEmailService emails;
 
-    public DefaultProjectService(
+    public ProjectService(
         IDocumentSession db,
         IUserProvider userProvider,
         AccountService accountService,

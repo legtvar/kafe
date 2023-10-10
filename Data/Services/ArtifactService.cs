@@ -14,14 +14,14 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Kafe.Api.Services;
+namespace Kafe.Data.Services;
 
-public class DefaultArtifactService : IArtifactService
+public class ArtifactService
 {
     private readonly IDocumentSession db;
     private readonly IUserProvider userProvider;
 
-    public DefaultArtifactService(
+    public ArtifactService(
         IDocumentSession db,
         IUserProvider userProvider)
     {

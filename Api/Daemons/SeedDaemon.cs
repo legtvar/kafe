@@ -94,7 +94,7 @@ public class SeedDaemon : BackgroundService
             var deadline = group.Deadline is null ? default : DateTimeOffset.Parse(group.Deadline);
             var creationInfo = new ProjectGroupCreationDto(name, null, deadline);
             // TODO: Remove the internal Create overload.
-            var id = await ((DefaultProjectGroupService)projectGroups).Create(creationInfo, group.Id, token);
+            var id = await ((ProjectGroupService)projectGroups).Create(creationInfo, group.Id, token);
             logger.LogInformation($"Seed project group '{id}' created.");
         }
     }

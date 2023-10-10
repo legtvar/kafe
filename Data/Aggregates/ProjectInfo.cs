@@ -20,7 +20,12 @@ public record ProjectInfo(
     Visibility Visibility = Visibility.Unknown,
     DateTimeOffset ReleasedOn = default,
     bool IsLocked = false
-) : IVisibleEntity;
+) : IVisibleEntity, IHierarchicalEntity
+{
+    [System.Text.Json.Serialization.JsonIgnore]
+    [Newtonsoft.Json.JsonIgnore]
+    public string ParentId => ProjectGroupId;
+}
 
 public record ProjectAuthorInfo(
     [Hrib] string Id,

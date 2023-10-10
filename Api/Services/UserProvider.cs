@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading;
@@ -15,20 +16,23 @@ using System.Threading.Tasks;
 
 namespace Kafe.Api.Services;
 
-public class UserProvider : IUserProvider
+public class UserProvider
 {
     private readonly IHttpContextAccessor contextAccessor;
     private readonly AccountService accountService;
+    private readonly IQuerySession query;
     private readonly ILogger<UserProvider> logger;
 
     public UserProvider(
         IHttpContextAccessor contextAccessor,
         AccountService accountService,
-        ILogger<UserProvider> logger)
+        ILogger<UserProvider> logger,
+        IQuerySession query)
     {
         this.contextAccessor = contextAccessor;
         this.accountService = accountService;
         this.logger = logger;
+        this.query = query;
     }
 
     public ApiUser? User { get; private set; }
@@ -37,10 +41,13 @@ public class UserProvider : IUserProvider
 
     public bool HasExplicitPermission(Hrib entityId, Permission permission)
     {
-        return Account is not null && Account.Permissions.GetValueOrDefault(entityId) >= permission;
+        return Account is not null && (Account.Permissions.GetValueOrDefault(entityId) & permission) == permission;
     }
 
-    public bool HasPermission(IVisibleEntity entity, Permission permission)
+    public async Task<bool> HasPermission(
+        IVisibleEntity entity,
+        Permission permission,
+        CancellationToken token = default)
     {
         if (permission == Permission.Read && entity.Visibility == Visibility.Public)
         {
@@ -52,12 +59,21 @@ public class UserProvider : IUserProvider
             return true;
         }
 
-        return HasExplicitPermission(entity.Id, permission);
-    }
+        if (HasExplicitPermission(entity.Id, permission))
+        {
+            return true;
+        }
 
-    public async Task Refresh(bool shouldSignIn = true, CancellationToken token = default)
-    {
-        throw new NotSupportedException();
+        if (entity is IHierarchicalEntity hierarchicalEntity)
+        {
+            var cascade = await GetCascadingPermission(hierarchicalEntity, token);
+            if ((cascade & permission) == permission)
+            {
+                return true;
+            }
+        }
+        
+        return false;
     }
 
     public async Task RefreshAccount(ClaimsPrincipal? user = null, CancellationToken token = default)
@@ -132,5 +148,36 @@ public class UserProvider : IUserProvider
 
         var claimsIdentity = new ClaimsIdentity(claims, authenticationScheme);
         return new ClaimsPrincipal(claimsIdentity);
+    }
+
+    private async Task<Permission> GetCascadingPermission(IHierarchicalEntity entity, CancellationToken token)
+    {
+        if (Account is null)
+        {
+            return Permission.None;
+        }
+
+        var mask = Permission.None;
+        IEntity? current = entity;
+        while (current is IHierarchicalEntity hierarchicalCurrent)
+        {
+            mask |= Account.Permissions.GetValueOrDefault(current.Id);
+
+            var parentState = await query.Events.FetchStreamStateAsync(hierarchicalCurrent.ParentId);
+            if (parentState?.AggregateType is null)
+            {
+                return mask;
+            }
+
+            current = (await query.QueryAsync(
+                parentState.AggregateType,
+                "where data ->> Id = ?",
+                token,
+                parentState.Id))
+                    .Cast<IEntity>()
+                    .FirstOrDefault();
+        }
+
+        return mask;
     }
 }

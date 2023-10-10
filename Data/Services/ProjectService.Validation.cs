@@ -12,9 +12,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Kafe.Api.Services;
+namespace Kafe.Data.Services;
 
-public partial class DefaultProjectService : IProjectService
+public partial class ProjectService
 {
     public const int NameMaxLength = 42;
     public const int DescriptionMinLength = 50;

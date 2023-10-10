@@ -17,8 +17,6 @@ public record Hrib
     public const string InvalidValue = "invalid";
     public const string SystemValue = "*";
 
-    private static readonly Random Random = new Random();
-
     public static readonly Hrib System = new Hrib(SystemValue);
     public static readonly Hrib Invalid = new Hrib(InvalidValue);
 
@@ -56,7 +54,7 @@ public record Hrib
         var sb = new StringBuilder(Length);
         for (int i = 0; i < Length; i++)
         {
-            sb.Append(Alphabet[Random.Next(Alphabet.Length)]);
+            sb.Append(Alphabet[RandomNumberGenerator.GetInt32(Alphabet.Length)]);
         }
         return new Hrib(sb.ToString());
     }

@@ -75,7 +75,7 @@ public class Startup
             {
                 var oidcConfig = Configuration.GetRequiredSection("Oidc").Get<OidcOptions>()
                     ?? throw new ArgumentException("OIDC is not configured well.");
-                o.Authority = "https://oidc.muni.cz/";
+                o.Authority = oidcConfig.Authority;
                 o.Scope.Add("openid");
                 o.Scope.Add("profile");
                 o.Scope.Add("email");

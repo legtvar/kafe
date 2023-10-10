@@ -1,16 +1,21 @@
 import { Text } from '@chakra-ui/react';
 import { t } from 'i18next';
+import { ReactPlayerProps } from 'react-player';
 import { Artifact } from '../../data/Artifact';
 import { useApi } from '../../hooks/Caffeine';
 import { Video } from './Player/Video';
 
 interface IContentViewerProps {
     artifact: Artifact;
+    autoplay?: boolean;
+    videoProps?: ReactPlayerProps;
+    onNext?: () => void;
+    onPrevious?: () => void;
 }
 
 type ContentType = 'Video' | 'Image' | 'Unknown';
 
-export function ContentViewer({ artifact }: IContentViewerProps) {
+export function ContentViewer({ artifact, autoplay, videoProps, onPrevious, onNext }: IContentViewerProps) {
     const api = useApi();
 
     let type: ContentType = 'Unknown';
@@ -36,7 +41,18 @@ export function ContentViewer({ artifact }: IContentViewerProps) {
                     {} as { [key: string]: string },
                 );
 
-                return <Video sources={videoSources} minW="100%" maxW="100%" h="60vmin" />;
+                return (
+                    <Video
+                        videoProps={videoProps}
+                        sources={videoSources}
+                        minW="100%"
+                        maxW="100%"
+                        h="60vmin"
+                        autoplay={autoplay}
+                        onPrevious={onPrevious}
+                        onNext={onNext}
+                    />
+                );
             case 'Image':
                 const image = artifact.shards.filter((shard) => shard.kind === 'Image')[0];
                 return (

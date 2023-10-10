@@ -219,5 +219,13 @@ export const playlistChildRoutes = (t: (id: string) => string): AppRoute[] => [
         path: ':id',
         title: t('route.playlists.detail.title'),
         element: <PlaylistDetail />,
+        children: [
+            {
+                path: ':itemId',
+                title: t('route.playlists.detail.title'),
+                element: <PlaylistDetail />,
+                children: [],
+            },
+        ],
     },
 ];

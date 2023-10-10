@@ -30,7 +30,7 @@ public class AccountService
         return await db.Events.AggregateStreamAsync<AccountInfo>(id, token: token);
     }
     
-    public async Task<AccountInfo?> Load(string emailAddress, CancellationToken token = default)
+    public async Task<AccountInfo?> FindByEmail(string emailAddress, CancellationToken token = default)
     {
         return await db.Query<AccountInfo>()
             .Where(a => a.EmailAddress == emailAddress)

@@ -103,7 +103,10 @@ public class UserProvider : IUserProvider
             throw new InvalidOperationException("Cannot sign in outside of a request.");
         }
 
-        await contextAccessor.HttpContext.SignInAsync(GetClaimsPrincipal(account), authProperties);
+        await contextAccessor.HttpContext.SignInAsync(
+            CookieAuthenticationDefaults.AuthenticationScheme,
+            GetClaimsPrincipal(account, CookieAuthenticationDefaults.AuthenticationScheme),
+            authProperties);
         Account = account;
     }
 

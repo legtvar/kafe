@@ -47,14 +47,14 @@ public class SeedDaemon : BackgroundService
 
         foreach (var account in options.Value.Accounts)
         {
-            var data = await accounts.Load(account.EmailAddress, token);
+            var data = await accounts.FindByEmail(account.EmailAddress, token);
             if (data is null)
             {
                 var id = (await accounts.CreateTemporaryAccount(
                     account.EmailAddress,
                     account.PreferredCulture,
                     token)).Id;
-                data = await accounts.Load(id, token);
+                data = await accounts.FindByEmail(id, token);
                 if (data is null)
                 {
                     logger.LogError("Seed account '{}' could not be created.", account.EmailAddress);
@@ -65,6 +65,7 @@ public class SeedDaemon : BackgroundService
             }
 
             var missingPermissions = account.Permissions
+                .ToDictionary(p => p.Key, p => p.Value)
                 .Except(data.Permissions)
                 .Select(kv => (kv.Key, kv.Value))
                 .ToImmutableArray();

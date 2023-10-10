@@ -175,6 +175,7 @@ public class Startup
         services.AddKafeMedia();
         services.AddKafeData();
 
+        services.AddScoped<UserProvider>();
         services.AddScoped<IUserProvider, UserProvider>();
         services.AddScoped<IProjectGroupService, DefaultProjectGroupService>();
         services.AddScoped<IProjectService, DefaultProjectService>();

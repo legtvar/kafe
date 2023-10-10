@@ -75,6 +75,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ArtifactService>();
         services.AddScoped<ShardService>();
         services.AddScoped<PlaylistService>();
+        services.AddScoped<EntityService>();
 
         services.AddOptions<StorageOptions>()
             .BindConfiguration("Storage");

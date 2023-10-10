@@ -14,9 +14,9 @@ public record PermissionRequirement(
 
 public class PermissionHandler : AuthorizationHandler<PermissionRequirement>
 {
-    private readonly IUserProvider userProvider;
+    private readonly UserProvider userProvider;
 
-    public PermissionHandler(IUserProvider userProvider)
+    public PermissionHandler(UserProvider userProvider)
     {
         this.userProvider = userProvider;
     }
@@ -31,21 +31,15 @@ public class PermissionHandler : AuthorizationHandler<PermissionRequirement>
             return;
         }
 
-        if (context.Resource is IVisibleEntity visibleEntity
-            && userProvider.HasPermission(visibleEntity, requirement.Permission))
-        {
-            context.Succeed(requirement);
-            return;
-        }
-        
         if (context.Resource is IEntity entity
-            && userProvider.HasExplicitPermission(entity.Id, requirement.Permission))
+            && await userProvider.HasPermission(entity, requirement.Permission))
         {
             context.Succeed(requirement);
             return;
         }
 
-        if (context.Resource is Hrib hrib && userProvider.HasExplicitPermission(hrib, requirement.Permission))
+        if ((context.Resource is Hrib || context.Resource is string)
+            && await userProvider.HasPermission((Hrib)context.Resource, requirement.Permission))
         {
             context.Succeed(requirement);
             return;

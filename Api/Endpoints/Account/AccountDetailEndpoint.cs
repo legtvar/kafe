@@ -20,12 +20,12 @@ public class AccountDetailEndpoint : EndpointBaseAsync
 {
     private readonly AccountService accountService;
     private readonly IAuthorizationService authorization;
-    private readonly IUserProvider userProvider;
+    private readonly UserProvider userProvider;
 
     public AccountDetailEndpoint(
         AccountService accounts,
         IAuthorizationService authorization,
-        IUserProvider userProvider)
+        UserProvider userProvider)
     {
         this.accountService = accounts;
         this.authorization = authorization;

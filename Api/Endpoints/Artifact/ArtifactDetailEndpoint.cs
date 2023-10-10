@@ -2,6 +2,7 @@
 using Asp.Versioning;
 using Kafe.Api.Services;
 using Kafe.Api.Transfer;
+using Kafe.Data.Services;
 using Marten;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,16 +14,19 @@ namespace Kafe.Api.Endpoints.Artifact;
 
 [ApiVersion("1")]
 [Route("artifact/{id}")]
-[Authorize]
 public class ArtifactDetailEndpoint : EndpointBaseAsync
     .WithRequest<string>
     .WithActionResult<ArtifactDetailDto>
 {
-    private readonly IArtifactService artifacts;
+    private readonly ArtifactService artifacts;
+    private readonly IAuthorizationService authorization;
 
-    public ArtifactDetailEndpoint(IArtifactService artifacts)
+    public ArtifactDetailEndpoint(
+        ArtifactService artifacts,
+        IAuthorizationService authorization)
     {
         this.artifacts = artifacts;
+        this.authorization = authorization;
     }
 
     [HttpGet]
@@ -33,7 +37,13 @@ public class ArtifactDetailEndpoint : EndpointBaseAsync
         string id,
         CancellationToken cancellationToken = default)
     {
-        var dto = await artifacts.Load(id, cancellationToken);
-        return dto is null ? NotFound() : Ok(dto);
+        var auth = await authorization.AuthorizeAsync(User, EndpointPolicy.ReadInspect);
+        if (!auth.Succeeded)
+        {
+            return Unauthorized();
+        }
+
+        var artifact = await artifacts.Load(id, cancellationToken);
+        return artifact is null ? NotFound() : Ok(TransferMaps.ToArtifactDetailDto(artifact));
     }
 }

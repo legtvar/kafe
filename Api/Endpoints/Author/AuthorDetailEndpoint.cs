@@ -1,29 +1,30 @@
 using Ardalis.ApiEndpoints;
 using Asp.Versioning;
-using Kafe.Data.Aggregates;
 using Kafe.Api.Transfer;
-using Marten;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading;
 using System.Threading.Tasks;
 using Swashbuckle.AspNetCore.Annotations;
-using Kafe.Api.Services;
+using Kafe.Data.Services;
 
 namespace Kafe.Api.Endpoints.Author;
 
 [ApiVersion("1")]
 [Route("author/{id}")]
-[Authorize]
 public class AuthorDetailEndpoint : EndpointBaseAsync
     .WithRequest<string>
     .WithActionResult<AuthorDetailDto?>
 {
-    private readonly IAuthorService authors;
+    private readonly AuthorService authorService;
+    private readonly IAuthorizationService authorizationService;
 
-    public AuthorDetailEndpoint(IAuthorService authors)
+    public AuthorDetailEndpoint(
+        AuthorService authorService,
+        IAuthorizationService authorizationService)
     {
-        this.authors = authors;
+        this.authorService = authorService;
+        this.authorizationService = authorizationService;
     }
 
     [HttpGet]
@@ -34,12 +35,18 @@ public class AuthorDetailEndpoint : EndpointBaseAsync
         string id,
         CancellationToken cancellationToken = default)
     {
-        var data = await authors.Load(id, cancellationToken);
+        var auth = await authorizationService.AuthorizeAsync(User, id, EndpointPolicy.ReadInspect);
+        if (!auth.Succeeded)
+        {
+            return Unauthorized();
+        }
+        
+        var data = await authorService.Load(id, cancellationToken);
         if (data is null)
         {
             return NotFound();
         }
 
-        return Ok(data);
+        return Ok(TransferMaps.ToAuthorDetailDto(data));
     }
 }

@@ -19,17 +19,20 @@ namespace Kafe.Api.Services;
 public class UserProvider
 {
     private readonly IHttpContextAccessor contextAccessor;
+    private readonly EntityService entityService;
     private readonly AccountService accountService;
     private readonly IQuerySession query;
     private readonly ILogger<UserProvider> logger;
 
     public UserProvider(
         IHttpContextAccessor contextAccessor,
+        EntityService entityService,
         AccountService accountService,
         ILogger<UserProvider> logger,
         IQuerySession query)
     {
         this.contextAccessor = contextAccessor;
+        this.entityService = entityService;
         this.accountService = accountService;
         this.logger = logger;
         this.query = query;
@@ -45,18 +48,35 @@ public class UserProvider
     }
 
     public async Task<bool> HasPermission(
-        IVisibleEntity entity,
+        Hrib entityId,
         Permission permission,
         CancellationToken token = default)
     {
-        if (permission == Permission.Read && entity.Visibility == Visibility.Public)
+        var entity = await entityService.Load(entityId, token);
+        if (entity is null)
         {
-            return true;
+            return false;
         }
 
-        if (permission == Permission.Read && entity.Visibility == Visibility.Internal && Account is not null)
+        return await HasPermission(entity, permission, token);
+    }
+
+    public async Task<bool> HasPermission(
+        IEntity entity,
+        Permission permission,
+        CancellationToken token = default)
+    {
+        if (entity is IVisibleEntity visibleEntity)
         {
-            return true;
+            if (permission == Permission.Read && visibleEntity.Visibility == Visibility.Public)
+            {
+                return true;
+            }
+
+            if (permission == Permission.Read && visibleEntity.Visibility == Visibility.Internal && Account is not null)
+            {
+                return true;
+            }
         }
 
         if (HasExplicitPermission(entity.Id, permission))
@@ -72,7 +92,7 @@ public class UserProvider
                 return true;
             }
         }
-        
+
         return false;
     }
 
@@ -157,25 +177,15 @@ public class UserProvider
             return Permission.None;
         }
 
-        var mask = Permission.None;
         IEntity? current = entity;
+        var mask = Account.Permissions.GetValueOrDefault(current.Id);
         while (current is IHierarchicalEntity hierarchicalCurrent)
         {
-            mask |= Account.Permissions.GetValueOrDefault(current.Id);
-
-            var parentState = await query.Events.FetchStreamStateAsync(hierarchicalCurrent.ParentId);
-            if (parentState?.AggregateType is null)
+            current = await entityService.Load(hierarchicalCurrent.ParentId, token);
+            if (current is not null)
             {
-                return mask;
+                mask |= Account.Permissions.GetValueOrDefault(current.Id);
             }
-
-            current = (await query.QueryAsync(
-                parentState.AggregateType,
-                "where data ->> Id = ?",
-                token,
-                parentState.Id))
-                    .Cast<IEntity>()
-                    .FirstOrDefault();
         }
 
         return mask;

@@ -12,21 +12,25 @@ using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using Kafe.Api.Services;
 using System.Collections.Immutable;
+using Kafe.Data.Services;
 
 namespace Kafe.Api.Endpoints.Author;
 
 [ApiVersion("1")]
 [Route("authors")]
-[Authorize]
 public class AuthorListEndpoint : EndpointBaseAsync
     .WithoutRequest
     .WithActionResult<ImmutableArray<AuthorListDto>>
 {
-    private readonly IAuthorService authors;
+    private readonly AuthorService authorService;
+    private readonly IAuthorizationService authorizationService;
 
-    public AuthorListEndpoint(IAuthorService authors)
+    public AuthorListEndpoint(
+        AuthorService authorService,
+        IAuthorizationService authorizationService)
     {
-        this.authors = authors;
+        this.authorService = authorService;
+        this.authorizationService = authorizationService;
     }
 
     [HttpGet]
@@ -34,6 +38,11 @@ public class AuthorListEndpoint : EndpointBaseAsync
     public override async Task<ActionResult<ImmutableArray<AuthorListDto>>> HandleAsync(
         CancellationToken cancellationToken = default)
     {
-        return Ok(await authors.List(cancellationToken));
+        // TODO: Filter by permission
+        var auth = await authorizationService.AuthorizeAsync(User, EndpointPolicy.Inspect);
+        
+        return Ok((await authorService.List(cancellationToken))
+            .Select(TransferMaps.ToAuthorListDto)
+            .ToImmutableArray());
     }
 }

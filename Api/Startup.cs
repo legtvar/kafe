@@ -97,6 +97,7 @@ public class Startup
             o.AddPolicy(EndpointPolicy.Write, b => b.AddRequirements(new PermissionRequirement(Permission.Write)));
             o.AddPolicy(EndpointPolicy.Append, b => b.AddRequirements(new PermissionRequirement(Permission.Append)));
             o.AddPolicy(EndpointPolicy.Inspect, b => b.AddRequirements(new PermissionRequirement(Permission.Inspect)));
+            o.AddPolicy(EndpointPolicy.ReadInspect, b => b.AddRequirements(new PermissionRequirement(Permission.Read | Permission.Inspect)));
         });
 
         ConfigureDataProtection(services);
@@ -151,7 +152,7 @@ public class Startup
         app.UseAuthentication();
         app.Use(async (ctx, next) =>
         {
-            await ctx.RequestServices.GetRequiredService<IUserProvider>().RefreshAccount();
+            await ctx.RequestServices.GetRequiredService<UserProvider>().RefreshAccount();
             await next();
         });
         app.UseAuthorization();

@@ -3,8 +3,6 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Kafe.Api.Endpoints.Account;
 

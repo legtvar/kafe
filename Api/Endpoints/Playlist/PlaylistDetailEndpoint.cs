@@ -7,21 +7,25 @@ using System.Threading;
 using System.Threading.Tasks;
 using Swashbuckle.AspNetCore.Annotations;
 using Kafe.Api.Services;
+using Kafe.Data.Services;
 
 namespace Kafe.Api.Endpoints.Playlist;
 
 [ApiVersion("1")]
 [Route("playlist/{id}")]
-[Authorize]
 public class PlaylistDetailEndpoint : EndpointBaseAsync
     .WithRequest<string>
     .WithActionResult<PlaylistDetailDto>
 {
-    private readonly IPlaylistService playlists;
+    private readonly PlaylistService playlistService;
+    private readonly IAuthorizationService authorizationService;
 
-    public PlaylistDetailEndpoint(IPlaylistService playlists)
+    public PlaylistDetailEndpoint(
+        PlaylistService playlistService,
+        IAuthorizationService authorizationService)
     {
-        this.playlists = playlists;
+        this.playlistService = playlistService;
+        this.authorizationService = authorizationService;
     }
 
     [HttpGet]
@@ -32,12 +36,18 @@ public class PlaylistDetailEndpoint : EndpointBaseAsync
         string id,
         CancellationToken cancellationToken = default)
     {
-        var dto = await playlists.Load(id, cancellationToken);
-        if (dto is null)
+        var auth = await authorizationService.AuthorizeAsync(User, id, EndpointPolicy.ReadInspect);
+        if (!auth.Succeeded)
+        {
+            return Unauthorized();
+        }
+        
+        var data = await playlistService.Load(id, cancellationToken);
+        if (data is null)
         {
             return NotFound();
         }
 
-        return Ok(dto);
+        return Ok(TransferMaps.ToPlaylistDetailDto(data));
     }
 }

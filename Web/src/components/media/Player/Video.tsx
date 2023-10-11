@@ -13,14 +13,17 @@ import {
     SliderFilledTrack,
     SliderThumb,
     SliderTrack,
+    Spacer,
     Spinner,
     Text,
     VStack,
 } from '@chakra-ui/react';
+import { t } from 'i18next';
 import { createRef, useEffect, useState } from 'react';
 import { AiOutlineCheck } from 'react-icons/ai';
 import { BsDownload, BsGear } from 'react-icons/bs';
 import {
+    IoChatboxEllipsesOutline,
     IoEaselOutline,
     IoLink,
     IoPauseOutline,
@@ -34,20 +37,24 @@ import {
 } from 'react-icons/io5';
 import ReactPlayer, { ReactPlayerProps } from 'react-player';
 import { OnProgressProps } from 'react-player/base';
+import { TrackProps } from 'react-player/file';
 import { Link } from 'react-router-dom';
 import screenfull from 'screenfull';
 import { capitalize } from '../../../utils/capitalize';
+import { Subtitles } from './Subtitles';
 
 interface IVideoProps extends BoxProps {
     sources: { [key: string]: string };
+    subtitles?: { [key: string]: string };
     autoplay?: boolean;
     videoProps?: ReactPlayerProps;
     onNext?: () => void;
     onPrevious?: () => void;
 }
 
-export function Video({ sources, autoplay, videoProps, onNext, onPrevious, ...rest }: IVideoProps) {
+export function Video({ sources, subtitles, autoplay, videoProps, onNext, onPrevious, ...rest }: IVideoProps) {
     const [quality, setQuality] = useState(Object.keys(sources)[0]);
+    const [subtitleTrack, setSubtitleTrack] = useState<string | null>(null);
     const [playing, setPlaying] = useState(!!autoplay);
     const [progressState, setProgressState] = useState<OnProgressProps | null>(null);
     const [duration, setDuration] = useState(0);
@@ -74,12 +81,13 @@ export function Video({ sources, autoplay, videoProps, onNext, onPrevious, ...re
         setLoaded(false);
         setBuffering(false);
         setError(null);
+        setSubtitleTrack(null);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [sources, autoplay]);
+    }, [sources, autoplay, subtitles]);
 
     const updateMouse = () => {
         if (controlsShown) clearTimeout(controlsShown);
-        setControlsShown(setTimeout(() => setControlsShown(null), 1000));
+        setControlsShown(setTimeout(() => setControlsShown(null), 2000));
     };
 
     return (
@@ -133,7 +141,22 @@ export function Video({ sources, autoplay, videoProps, onNext, onPrevious, ...re
                 volume={volume}
                 muted={muted}
                 url={sources[quality]}
-                progressInterval={100}
+                progressInterval={50}
+                config={{
+                    file: {
+                        attributes: {
+                            crossorigin: 'anonymous',
+                        },
+                        tracks: (subtitles ? Object.entries(subtitles) : []).map(
+                            ([id, url]): TrackProps => ({
+                                kind: 'subtitles',
+                                src: url,
+                                srcLang: 'en',
+                                label: id,
+                            }),
+                        ),
+                    },
+                }}
                 onError={(error) => {
                     if (error.message.includes('play()')) {
                         setPlaying(false);
@@ -158,6 +181,22 @@ export function Video({ sources, autoplay, videoProps, onNext, onPrevious, ...re
                 onReady={() => setLoaded(true)}
                 onStarted={() => setLoaded(true)}
             />
+            <Flex
+                position="absolute"
+                left="25%"
+                right="25%"
+                top="16"
+                bottom="16"
+                flexDir="column"
+                color="white"
+                fontSize="2em"
+                alignItems="center"
+            >
+                <Spacer />
+                {subtitles && subtitleTrack && progressState && (
+                    <Subtitles path={subtitles[subtitleTrack]} currentSeconds={progressState.playedSeconds} />
+                )}
+            </Flex>
             {!headless && (
                 <Center
                     position="absolute"
@@ -202,183 +241,277 @@ export function Video({ sources, autoplay, videoProps, onNext, onPrevious, ...re
                     </Box>
                     {!headless && (
                         <Flex
-                            direction="row"
                             px={4}
                             position="absolute"
                             bottom={0}
                             left={0}
                             right={0}
-                            h={14}
                             bg="rgba(0,0,0,0.8)"
                             cursor="default"
-                            alignItems="center"
+                            alignItems={{
+                                base: 'stretch',
+                                lg: 'center',
+                            }}
+                            direction={{
+                                base: 'column',
+                                lg: 'row',
+                            }}
                         >
-                            <IconButton
-                                variant="ghost"
-                                aria-label="Play"
-                                onClick={() => {
-                                    setPlaying(!playing);
-                                    updateMouse();
+                            <Flex
+                                direction="row"
+                                alignItems="center"
+                                flexGrow={1}
+                                h={{
+                                    base: 10,
+                                    lg: 14,
                                 }}
-                                tabIndex={-1}
-                                icon={playing ? <IoPauseOutline /> : <IoPlayOutline />}
-                            />
-                            {onPrevious && (
+                            >
                                 <IconButton
                                     variant="ghost"
-                                    aria-label="Previous"
-                                    onClick={() => onPrevious()}
+                                    aria-label="Play"
+                                    onClick={() => {
+                                        setPlaying(!playing);
+                                        updateMouse();
+                                    }}
                                     tabIndex={-1}
-                                    icon={<IoPlaySkipBackOutline />}
+                                    icon={playing ? <IoPauseOutline /> : <IoPlayOutline />}
                                 />
-                            )}
-                            {onNext && (
+                                {onPrevious && (
+                                    <IconButton
+                                        variant="ghost"
+                                        aria-label="Previous"
+                                        onClick={() => onPrevious()}
+                                        tabIndex={-1}
+                                        icon={<IoPlaySkipBackOutline />}
+                                    />
+                                )}
+                                {onNext && (
+                                    <IconButton
+                                        variant="ghost"
+                                        aria-label="Next"
+                                        onClick={() => onNext()}
+                                        tabIndex={-1}
+                                        icon={<IoPlaySkipForwardOutline />}
+                                    />
+                                )}
+                                <Text
+                                    whiteSpace="nowrap"
+                                    ml={4}
+                                    display={{
+                                        base: 'none',
+                                        lg: 'block',
+                                    }}
+                                >
+                                    {progressState
+                                        ? `${formatTime(progressState.playedSeconds)} / ${formatTime(duration)}`
+                                        : '00:00 / 00:00'}
+                                </Text>
+                                <Slider
+                                    ml={4}
+                                    aria-label="slider-ex-1"
+                                    value={progressState?.playedSeconds}
+                                    max={duration}
+                                    step={0.01}
+                                    tabIndex={-1}
+                                    onChange={(value) => {
+                                        playerRef.current?.seekTo(value, 'seconds');
+                                        updateMouse();
+                                    }}
+                                    focusThumbOnChange={false}
+                                >
+                                    <SliderTrack>
+                                        <Box
+                                            position="absolute"
+                                            top={0}
+                                            bottom={0}
+                                            left={0}
+                                            w={`${(progressState?.loaded || 0) * 100}%`}
+                                            bg="rgba(255,255,255,0.4)"
+                                        ></Box>
+                                        <SliderFilledTrack />
+                                    </SliderTrack>
+                                    <SliderThumb />
+                                </Slider>
+                            </Flex>
+                            <Flex
+                                direction="row"
+                                alignItems="center"
+                                h={{
+                                    base: 10,
+                                    lg: 14,
+                                }}
+                                ml={{
+                                    base: -6,
+                                    lg: 0,
+                                }}
+                            >
                                 <IconButton
+                                    display={{
+                                        base: 'none',
+                                        lg: 'flex',
+                                    }}
+                                    ml={4}
                                     variant="ghost"
-                                    aria-label="Next"
-                                    onClick={() => onNext()}
+                                    aria-label="Mute"
+                                    onClick={() => setMuted(!muted)}
                                     tabIndex={-1}
-                                    icon={<IoPlaySkipForwardOutline />}
+                                    icon={muted ? <IoVolumeMuteOutline /> : <IoVolumeHighOutline />}
                                 />
-                            )}
-                            <Text whiteSpace="nowrap" mx={4}>
-                                {progressState &&
-                                    `${formatTime(progressState.playedSeconds)} / ${formatTime(duration)}`}
-                            </Text>
-                            <Slider
-                                aria-label="slider-ex-1"
-                                value={progressState?.playedSeconds}
-                                max={duration}
-                                step={0.01}
-                                tabIndex={-1}
-                                onChange={(value) => {
-                                    playerRef.current?.seekTo(value, 'seconds');
-                                    updateMouse();
-                                }}
-                                focusThumbOnChange={false}
-                            >
-                                <SliderTrack>
-                                    <Box
-                                        position="absolute"
-                                        top={0}
-                                        bottom={0}
-                                        left={0}
-                                        w={`${(progressState?.loaded || 0) * 100}%`}
-                                        bg="rgba(255,255,255,0.4)"
-                                    ></Box>
-                                    <SliderFilledTrack />
-                                </SliderTrack>
-                                <SliderThumb />
-                            </Slider>
-                            <IconButton
-                                ml={4}
-                                variant="ghost"
-                                aria-label="Mute"
-                                onClick={() => setMuted(!muted)}
-                                tabIndex={-1}
-                                icon={muted ? <IoVolumeMuteOutline /> : <IoVolumeHighOutline />}
-                            />
-                            <Slider
-                                ml={2}
-                                value={volume}
-                                max={1}
-                                w={32}
-                                step={0.001}
-                                tabIndex={-1}
-                                onChange={(value) => {
-                                    setVolume(value as number);
-                                    updateMouse();
-                                }}
-                                focusThumbOnChange={false}
-                            >
-                                <SliderTrack>
-                                    <SliderFilledTrack />
-                                </SliderTrack>
-                                <SliderThumb />
-                            </Slider>
-                            <Menu>
-                                <MenuButton
-                                    variant="ghost"
-                                    as={IconButton}
-                                    aria-label="Quality"
-                                    icon={<BsGear />}
-                                    tabIndex={-1}
-                                    ml={6}
-                                />
-                                <MenuList>
-                                    {Object.keys(sources).map((source, key) => (
-                                        <MenuItem
-                                            key={key}
-                                            value={source}
-                                            icon={source === quality ? <AiOutlineCheck /> : undefined}
-                                            onClick={() => setQuality(source)}
-                                            tabIndex={-1}
-                                        >
-                                            {capitalize(source)}
-                                        </MenuItem>
-                                    ))}
-                                </MenuList>
-                            </Menu>
-                            <Menu>
-                                <MenuButton
-                                    variant="ghost"
-                                    as={IconButton}
-                                    aria-label="Download"
-                                    icon={<BsDownload />}
+                                <Slider
                                     ml={2}
+                                    value={volume}
+                                    max={1}
+                                    display={{
+                                        base: 'none',
+                                        lg: 'flex',
+                                    }}
+                                    w={{
+                                        base: 16,
+                                        xl: 32,
+                                    }}
+                                    step={0.001}
                                     tabIndex={-1}
-                                />
-                                <MenuList>
-                                    {Object.keys(sources).map((source, key) => (
-                                        <MenuItem
-                                            key={key}
-                                            as={'a'}
-                                            value={source}
-                                            href={`${sources[source]}`}
-                                            target="_blank"
+                                    onChange={(value) => {
+                                        setVolume(value as number);
+                                        updateMouse();
+                                    }}
+                                    focusThumbOnChange={false}
+                                >
+                                    <SliderTrack>
+                                        <SliderFilledTrack />
+                                    </SliderTrack>
+                                    <SliderThumb />
+                                </Slider>
+                                {subtitles && (
+                                    <Menu>
+                                        <MenuButton
+                                            variant="ghost"
+                                            as={IconButton}
+                                            aria-label="Subtitles"
+                                            icon={<IoChatboxEllipsesOutline />}
                                             tabIndex={-1}
-                                        >
-                                            {capitalize(source)}
-                                        </MenuItem>
-                                    ))}
-                                </MenuList>
-                            </Menu>
-                            <Link
-                                tabIndex={-1}
-                                to={`/play/${sources['original'].split('/').reverse()[1]}`}
-                                target="_blank"
-                            >
-                                <IconButton ml={2} variant="ghost" aria-label="Share" icon={<IoLink />} tabIndex={-1} />
-                            </Link>
-                            <IconButton
-                                ml={4}
-                                variant="ghost"
-                                aria-label="Fullscreen"
-                                tabIndex={-1}
-                                onClick={() => {
-                                    if (headless) {
-                                        setHeadless(false);
-                                        screenfull.exit();
-                                    } else {
-                                        setHeadless(true);
-                                        screenfull.request(wrapperRef.current!);
-                                        screenfull.on('change', () => {
-                                            if (!screenfull.isFullscreen) {
-                                                setHeadless(false);
-                                            }
-                                        });
-                                    }
-                                }}
-                                icon={<IoEaselOutline />}
-                            />
-                            <IconButton
-                                ml={4}
-                                variant="ghost"
-                                aria-label="Fullscreen"
-                                onClick={() => screenfull.toggle(wrapperRef.current!)}
-                                tabIndex={-1}
-                                icon={<IoScan />}
-                            />
+                                            ml={6}
+                                        />
+                                        <MenuList>
+                                            <MenuItem
+                                                icon={null === subtitleTrack ? <AiOutlineCheck /> : undefined}
+                                                onClick={() => setSubtitleTrack(null)}
+                                                tabIndex={-1}
+                                            >
+                                                {t('subtitles.none').toString()}
+                                            </MenuItem>
+                                            {Object.keys(subtitles).map((source, key) => (
+                                                <MenuItem
+                                                    key={key}
+                                                    value={source}
+                                                    icon={source === subtitleTrack ? <AiOutlineCheck /> : undefined}
+                                                    onClick={() => setSubtitleTrack(source)}
+                                                    tabIndex={-1}
+                                                >
+                                                    {capitalize(source)}
+                                                </MenuItem>
+                                            ))}
+                                        </MenuList>
+                                    </Menu>
+                                )}
+                                <Menu>
+                                    <MenuButton
+                                        variant="ghost"
+                                        as={IconButton}
+                                        aria-label="Quality"
+                                        icon={<BsGear />}
+                                        tabIndex={-1}
+                                        ml={6}
+                                    />
+                                    <MenuList>
+                                        {Object.keys(sources).map((source, key) => (
+                                            <MenuItem
+                                                key={key}
+                                                value={source}
+                                                icon={source === quality ? <AiOutlineCheck /> : undefined}
+                                                onClick={() => setQuality(source)}
+                                                tabIndex={-1}
+                                            >
+                                                {capitalize(source)}
+                                            </MenuItem>
+                                        ))}
+                                    </MenuList>
+                                </Menu>
+                                <Menu>
+                                    <MenuButton
+                                        variant="ghost"
+                                        as={IconButton}
+                                        aria-label="Download"
+                                        icon={<BsDownload />}
+                                        ml={2}
+                                        tabIndex={-1}
+                                    />
+                                    <MenuList>
+                                        {Object.keys(sources).map((source, key) => (
+                                            <MenuItem
+                                                key={key}
+                                                as={'a'}
+                                                value={source}
+                                                href={`${sources[source]}`}
+                                                target="_blank"
+                                                tabIndex={-1}
+                                            >
+                                                {capitalize(source)}
+                                            </MenuItem>
+                                        ))}
+                                    </MenuList>
+                                </Menu>
+                                <Link
+                                    tabIndex={-1}
+                                    to={`/play/${sources['original'].split('/').reverse()[1]}`}
+                                    target="_blank"
+                                >
+                                    <IconButton
+                                        ml={2}
+                                        display={{
+                                            base: 'none',
+                                            lg: 'flex',
+                                        }}
+                                        variant="ghost"
+                                        aria-label="Share"
+                                        icon={<IoLink />}
+                                        tabIndex={-1}
+                                    />
+                                </Link>
+                                <IconButton
+                                    ml={6}
+                                    variant="ghost"
+                                    aria-label="Headless fullscreen"
+                                    tabIndex={-1}
+                                    display={{
+                                        base: 'none',
+                                        lg: 'flex',
+                                    }}
+                                    onClick={() => {
+                                        if (headless) {
+                                            setHeadless(false);
+                                            screenfull.exit();
+                                        } else {
+                                            setHeadless(true);
+                                            screenfull.request(wrapperRef.current!);
+                                            screenfull.on('change', () => {
+                                                if (!screenfull.isFullscreen) {
+                                                    setHeadless(false);
+                                                }
+                                            });
+                                        }
+                                    }}
+                                    icon={<IoEaselOutline />}
+                                />
+                                <IconButton
+                                    ml={2}
+                                    variant="ghost"
+                                    aria-label="Fullscreen"
+                                    onClick={() => screenfull.toggle(wrapperRef.current!)}
+                                    tabIndex={-1}
+                                    icon={<IoScan />}
+                                />
+                            </Flex>
                         </Flex>
                     )}
                 </Box>

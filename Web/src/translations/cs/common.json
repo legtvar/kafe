@@ -358,5 +358,12 @@
   },
   "munilogin": {
     "button": "Přihlásit se přes MUNI"
+  },
+  "subtitles": {
+    "languages": {
+      "cs": "České",
+      "en": "Anglické"
+    },
+    "none": "Skrýt titulky"
   }
 }

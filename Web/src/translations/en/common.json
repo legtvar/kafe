@@ -356,5 +356,12 @@
   },
   "munilogin": {
     "button": "Login through MUNI"
+  },
+  "subtitles": {
+    "languages": {
+      "cs": "Czech",
+      "en": "English"
+    },
+    "none": "Hide subtitles"
   }
 }

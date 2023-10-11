@@ -31,7 +31,7 @@ export function ContentViewer({ artifact, autoplay, videoProps, onPrevious, onNe
         switch (type.split('/')[0]) {
             case 'Video':
                 const video = artifact.shards.filter((shard) => shard.kind === 'Video')[0];
-                // const subtitles = artifact.shards.filter((shard) => shard.kind === 'Subtitles')[0];
+                const subtitles = artifact.shards.filter((shard) => shard.kind === 'Subtitles');
 
                 const videoSources = video.variants.reduce(
                     (prev, curr) => ({
@@ -41,10 +41,19 @@ export function ContentViewer({ artifact, autoplay, videoProps, onPrevious, onNe
                     {} as { [key: string]: string },
                 );
 
+                const subtitleSources = subtitles.reduce(
+                    (prev, curr) => ({
+                        ...prev,
+                        [curr.id]: api.shards.defaultStreamUrl(curr.id),
+                    }),
+                    {} as { [key: string]: string },
+                );
+
                 return (
                     <Video
                         videoProps={videoProps}
                         sources={videoSources}
+                        subtitles={subtitleSources}
                         minW="100%"
                         maxW="100%"
                         h="60vmin"

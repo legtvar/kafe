@@ -828,46 +828,49 @@ public partial class ProjectService
         );
     }
 
-    public async Task Review(ProjectReviewCreationDto dto, CancellationToken token = default)
+    public async Task AddReview(
+        string projectId,
+        ReviewKind kind,
+        string reviewerRole,
+        LocalizedString? comment,
+        CancellationToken token = default)
     {
-        var project = await Load(dto.ProjectId, token);
+        var project = await Load(projectId, token);
         if (project is null)
         {
             throw new IndexOutOfRangeException();
         }
 
-        if (dto.Kind == ReviewKind.NotReviewed)
+        if (kind == ReviewKind.NotReviewed)
         {
             throw new ArgumentException("Review must be either accepting or rejecting.");
         }
 
-        // TODO: Change after FFFIMU 2023
-
-        var eventStream = await db.Events.FetchForExclusiveWriting<ProjectInfo>(dto.ProjectId, token);
-        var reviewAdded = new ProjectReviewAdded(dto.ProjectId, dto.Kind, dto.ReviewerRole, dto.Comment);
+        var eventStream = await db.Events.FetchForExclusiveWriting<ProjectInfo>(projectId, token);
+        var reviewAdded = new ProjectReviewAdded(projectId, kind, reviewerRole, comment);
         eventStream.AppendOne(reviewAdded);
         await db.SaveChangesAsync(token);
 
-        var ownershipString = (string)new ProjectOwnership(dto.ProjectId);
-        var owners = await db.Query<AccountInfo>()
-            .Where(a => a.Capabilities.Contains(ownershipString))
-            .ToListAsync(token);
+        // var ownershipString = (string)new ProjectOwnership(projectId);
+        // var owners = await db.Query<AccountInfo>()
+        //     .Where(a => a.Capabilities.Contains(ownershipString))
+        //     .ToListAsync(token);
 
-        if (dto.Comment is not null)
-        {
-            foreach (var owner in owners)
-            {
-                if (dto.Comment[owner.PreferredCulture] is not null)
-                {
-                    await emails.SendEmail(
-                        owner.EmailAddress,
-                        Const.ProjectReviewEmailSubject[owner.PreferredCulture]!,
-                        dto.Comment[owner.PreferredCulture]!,
-                        userProvider.User?.EmailAddress,
-                        token);
-                }
-            }
-        }
+        // if (comment is not null)
+        // {
+        //     foreach (var owner in owners)
+        //     {
+        //         if (comment[owner.PreferredCulture] is not null)
+        //         {
+        //             await emails.SendEmail(
+        //                 owner.EmailAddress,
+        //                 Const.ProjectReviewEmailSubject[owner.PreferredCulture]!,
+        //                 dto.Comment[owner.PreferredCulture]!,
+        //                 userProvider.User?.EmailAddress,
+        //                 token);
+        //         }
+        //     }
+        // }
     }
 
     private static IEnumerable<Diagnostic> ValidateVideo(

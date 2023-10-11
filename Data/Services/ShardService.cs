@@ -1,15 +1,9 @@
-﻿using Kafe.Api.Transfer;
-using Kafe.Data;
-using Kafe.Data.Aggregates;
+﻿using Kafe.Data.Aggregates;
 using Kafe.Data.Events;
-using Kafe.Data.Options;
-using Kafe.Data.Services;
 using Kafe.Media;
 using Kafe.Media.Services;
 using Marten;
-using Microsoft.Extensions.Options;
 using System;
-using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -23,23 +17,20 @@ public class ShardService
     private readonly StorageService storageService;
     private readonly IMediaService mediaService;
     private readonly IImageService imageService;
-    private readonly UserProvider userProvider;
 
     public ShardService(
         IDocumentSession db,
         StorageService storageService,
         IMediaService mediaService,
-        IImageService imageService,
-        UserProvider userProvider)
+        IImageService imageService)
     {
         this.db = db;
         this.storageService = storageService;
         this.mediaService = mediaService;
         this.imageService = imageService;
-        this.userProvider = userProvider;
     }
 
-    public async Task<ShardDetailBaseDto?> Load(Hrib id, CancellationToken token = default)
+    public async Task<IShardEntity?> Load(Hrib id, CancellationToken token = default)
     {
         var shardKind = await GetShardKind(id, token);
         if (shardKind == ShardKind.Unknown)
@@ -47,45 +38,38 @@ public class ShardService
             return null;
         }
 
-        ShardInfoBase? shard = shardKind switch
+        IShardEntity? shard = shardKind switch
         {
             ShardKind.Video => await db.LoadAsync<VideoShardInfo>(id, token),
             ShardKind.Image => await db.LoadAsync<ImageShardInfo>(id, token),
             ShardKind.Subtitles => await db.LoadAsync<SubtitlesShardInfo>(id, token),
             _ => throw new NotSupportedException($"ShardKind '{shardKind}' is not supported.")
         };
-
-        if (shard is null)
-        {
-            return null;
-        }
-
-        // await CheckAccess(shard.ArtifactId, token);
-
-        return TransferMaps.ToShardDetailDto(shard);
+        return shard;
     }
 
     public async Task<Hrib?> Create(
-        ShardCreationDto dto,
+        ShardKind kind,
+        Hrib artifactId,
         Stream stream,
         string mimeType,
+        Hrib? shardId = null,
         CancellationToken token = default)
     {
-        await CheckAccess(dto.ArtifactId, token);
-
-        return dto.Kind switch
+        return kind switch
         {
-            ShardKind.Video => await CreateVideo(dto, stream, mimeType, token),
-            ShardKind.Image => await CreateImage(dto, stream, token),
-            ShardKind.Subtitles => await CreateSubtitles(dto, stream, token),
-            _ => throw new NotSupportedException($"Creation of '{dto.Kind}' shards is not supported yet.")
+            ShardKind.Video => await CreateVideo(artifactId, stream, mimeType, shardId, token),
+            ShardKind.Image => await CreateImage(artifactId, stream, shardId, token),
+            ShardKind.Subtitles => await CreateSubtitles(artifactId, stream, shardId, token),
+            _ => throw new NotSupportedException($"Creation of '{kind}' shards is not supported yet.")
         };
     }
 
     private async Task<Hrib?> CreateVideo(
-        ShardCreationDto dto,
+        Hrib artifactId,
         Stream videoStream,
         string mimeType,
+        Hrib? shardId = null,
         CancellationToken token = default)
     {
         if (mimeType != Const.MatroskaMimeType && mimeType != Const.Mp4MimeType)
@@ -94,12 +78,12 @@ public class ShardService
                 $"formats are supported.");
         }
 
-        var shardId = Hrib.Create();
+        shardId ??= Hrib.Create();
         var originalFileExtension = mimeType == Const.MatroskaMimeType
             ? Const.MatroskaFileExtension
             : Const.Mp4FileExtension;
         if (!await storageService.TryStoreShard(
-            dto.Kind,
+            ShardKind.Video,
             shardId,
             videoStream,
             Const.OriginalShardVariant,
@@ -110,7 +94,7 @@ public class ShardService
         }
 
         if (!storageService.TryGetFilePath(
-            dto.Kind,
+            ShardKind.Video,
             shardId,
             Const.OriginalShardVariant,
             out var shardFilePath))
@@ -123,7 +107,7 @@ public class ShardService
         var created = new VideoShardCreated(
             ShardId: shardId,
             CreationMethod: CreationMethod.Api,
-            ArtifactId: dto.ArtifactId,
+            ArtifactId: artifactId,
             OriginalVariantInfo: mediaInfo);
         db.Events.StartStream<VideoShardInfo>(created.ShardId, created);
         await db.SaveChangesAsync(token);
@@ -132,18 +116,21 @@ public class ShardService
     }
 
     private async Task<Hrib?> CreateImage(
-        ShardCreationDto dto,
+        Hrib artifactId,
         Stream imageStream,
+        Hrib? shardId = null,
         CancellationToken token = default)
     {
         var imageInfo = await imageService.GetInfo(imageStream, token);
 
         imageStream.Seek(0, SeekOrigin.Begin);
 
+        shardId ??= Hrib.Create();
+
         var created = new ImageShardCreated(
-            ShardId: Hrib.Create(),
+            ShardId: shardId,
             CreationMethod: CreationMethod.Api,
-            ArtifactId: dto.ArtifactId,
+            ArtifactId: artifactId,
             OriginalVariantInfo: imageInfo);
 
         if (!await storageService.TryStoreShard(
@@ -164,8 +151,9 @@ public class ShardService
     }
 
     private async Task<Hrib?> CreateSubtitles(
-        ShardCreationDto dto,
+        Hrib artifactId,
         Stream subtitlesStream,
+        Hrib? shardId = null,
         CancellationToken token = default)
     {
         var mediaInfo = await mediaService.GetInfo(subtitlesStream, token);
@@ -191,15 +179,17 @@ public class ShardService
             Bitrate: ssInfo.Bitrate,
             IsCorrupted: mediaInfo.IsCorrupted);
 
+        shardId ??= Hrib.Create();
+
         var created = new SubtitlesShardCreated(
-            ShardId: Hrib.Create(),
+            ShardId: shardId,
             CreationMethod: CreationMethod.Api,
-            ArtifactId: dto.ArtifactId,
+            ArtifactId: artifactId,
             OriginalVariantInfo: info);
 
         if (!await storageService.TryStoreShard(
             ShardKind.Subtitles,
-            created.ShardId,
+            shardId,
             subtitlesStream,
             Const.OriginalShardVariant,
             info.FileExtension,
@@ -236,8 +226,15 @@ public class ShardService
 
         return ((IShardCreated)firstEvent.Data).GetShardKind();
     }
+    
+    public record VariantInfo(
+        Hrib ShardId,
+        string Variant,
+        string? FileExtension,
+        string? MimeType
+    );
 
-    public async Task<ShardVariantMediaTypeDto?> GetShardVariantMediaType(
+    public async Task<VariantInfo?> GetShardVariantMediaType(
         Hrib id,
         string? variant,
         CancellationToken token = default)
@@ -253,22 +250,22 @@ public class ShardService
 
         return shard.Kind switch
         {
-            ShardKind.Video => ((VideoShardDetailDto)shard).Variants.TryGetValue(variant, out var media)
-                ? new ShardVariantMediaTypeDto(
+            ShardKind.Video => ((VideoShardInfo)shard).Variants.TryGetValue(variant, out var media)
+                ? new VariantInfo(
                     ShardId: shard.Id,
                     Variant: variant,
                     FileExtension: media.FileExtension,
                     MimeType: media.MimeType)
                 : null,
-            ShardKind.Image => ((ImageShardDetailDto)shard).Variants.TryGetValue(variant, out var image)
-                ? new ShardVariantMediaTypeDto(
+            ShardKind.Image => ((ImageShardInfo)shard).Variants.TryGetValue(variant, out var image)
+                ? new VariantInfo(
                     ShardId: shard.Id,
                     Variant: variant,
                     FileExtension: image.FileExtension,
                     MimeType: image.MimeType)
                 : null,
-            ShardKind.Subtitles => ((SubtitlesShardDetailDto)shard).Variants.TryGetValue(variant, out var image)
-                ? new ShardVariantMediaTypeDto(
+            ShardKind.Subtitles => ((SubtitlesShardInfo)shard).Variants.TryGetValue(variant, out var image)
+                ? new VariantInfo(
                     ShardId: shard.Id,
                     Variant: variant,
                     FileExtension: image.FileExtension,
@@ -287,39 +284,5 @@ public class ShardService
         variant = Path.GetFileNameWithoutExtension(variant);
 
         return variant;
-    }
-
-    private async Task CheckAccess(Hrib artifactId, CancellationToken token)
-    {
-        var artifact = await db.LoadAsync<ArtifactDetail>(artifactId, token);
-        if (artifact is null)
-        {
-            throw new IndexOutOfRangeException($"Artifact '{artifactId}' does not exist.");
-        }
-
-        await CheckAccess(artifact, token);
-    }
-
-    private async Task CheckAccess(ArtifactDetail artifact, CancellationToken token)
-    {
-        if (userProvider.IsAdministrator())
-        {
-            return;
-        }
-
-        if (artifact.ContainingProjectIds.Length == 0)
-        {
-            throw new UnauthorizedAccessException();
-        }
-
-        var containingProjects = artifact.ContainingProjectIds.Select(p => (string)p).ToImmutableArray();
-        var projectCount = await db.Query<ProjectInfo>()
-            .Where(p => containingProjects.Contains(p.Id))
-            .WhereCanRead(userProvider)
-            .CountAsync(token);
-        if (projectCount == 0)
-        {
-            throw new UnauthorizedAccessException();
-        }
     }
 }

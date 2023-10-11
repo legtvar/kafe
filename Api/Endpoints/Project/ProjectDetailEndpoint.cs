@@ -13,21 +13,25 @@ using System.Threading;
 using System.Threading.Tasks;
 using Swashbuckle.AspNetCore.Annotations;
 using Kafe.Api.Services;
+using Kafe.Data.Services;
 
 namespace Kafe.Api.Endpoints.Project;
 
 [ApiVersion("1")]
 [Route("project/{id}")]
-[Authorize]
 public class ProjectDetailEndpoint : EndpointBaseAsync
     .WithRequest<string>
     .WithActionResult<ProjectDetailDto>
 {
-    private readonly IProjectService projects;
+    private readonly ProjectService projectService;
+    private readonly IAuthorizationService authorizationService;
 
-    public ProjectDetailEndpoint(IProjectService projects)
+    public ProjectDetailEndpoint(
+        ProjectService projectService,
+        IAuthorizationService authorizationService)
     {
-        this.projects = projects;
+        this.projectService = projectService;
+        this.authorizationService = authorizationService;
     }
 
     [HttpGet]
@@ -38,12 +42,18 @@ public class ProjectDetailEndpoint : EndpointBaseAsync
         string id,
         CancellationToken cancellationToken = default)
     {
-        var project = await projects.Load(id, cancellationToken);
+        var auth = await authorizationService.AuthorizeAsync(User, id, EndpointPolicy.ReadInspect);
+        if (!auth.Succeeded)
+        {
+            return Unauthorized();
+        }
+
+        var project = await projectService.Load(id, cancellationToken);
         if (project is null)
         {
             return NotFound();
         }
 
-        return Ok(project);
+        return Ok(TransferMaps.ToProjectDetailDto(project));
     }
 }

@@ -64,31 +64,13 @@ public class ProjectGroupService
     //         .Select(TransferMaps.ToProjectGroupListDto).ToImmutableArray();
     // }
 
-    // public async Task<ProjectGroupDetailDto?> Load(Hrib id, CancellationToken token = default)
-    // {
-    //     var projectGroup = await db.LoadAsync<ProjectGroupInfo>(id, token);
-    //     if (projectGroup is null)
-    //     {
-    //         return null;
-    //     }
+    public async Task<ProjectGroupInfo?> Load(Hrib id, CancellationToken token = default)
+    {
+        return await db.LoadAsync<ProjectGroupInfo>(id, token);
 
-    //     // if (!userProvider.CanRead(projectGroup))
-    //     // {
-    //     //     throw new UnauthorizedAccessException();
-    //     // }
-
-    //     var dto = TransferMaps.ToProjectGroupDetailDto(projectGroup);
-    //     var projects = await db.Query<ProjectInfo>()
-    //         .Where(p => p.ProjectGroupId == projectGroup.Id)
-    //         .WhereCanRead(userProvider)
-    //         .ToListAsync(token);
-    //     var preferredCulture = userProvider.GetPreferredCulture().TwoLetterISOLanguageName;
-    //     return dto with
-    //     {
-    //         Projects = projects
-    //             .OrderBy(p => ((LocalizedString)p.Name)[preferredCulture])
-    //             .Select(TransferMaps.ToProjectListDto)
-    //             .ToImmutableArray()
-    //     };
-    // }
+        // if (!userProvider.CanRead(projectGroup))
+        // {
+        //     throw new UnauthorizedAccessException();
+        // }
+    }
 }

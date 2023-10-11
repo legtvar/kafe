@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using Swashbuckle.AspNetCore.Annotations;
 using Kafe.Api.Services;
 using System.Collections.Immutable;
+using Kafe.Data.Services;
 
 namespace Kafe.Api.Endpoints.ProjectGroup;
 
@@ -21,9 +22,9 @@ public class ProjectGroupListEndpoint : EndpointBaseAsync
     .WithoutRequest
     .WithActionResult<ImmutableArray<ProjectGroupListDto>>
 {
-    private readonly IProjectGroupService projectGroupService;
+    private readonly ProjectGroupService projectGroupService;
 
-    public ProjectGroupListEndpoint(IProjectGroupService projectGroupService)
+    public ProjectGroupListEndpoint(ProjectGroupService projectGroupService)
     {
         this.projectGroupService = projectGroupService;
     }
@@ -34,6 +35,6 @@ public class ProjectGroupListEndpoint : EndpointBaseAsync
         CancellationToken cancellationToken = default)
     {
         var groups = await projectGroupService.List(cancellationToken);
-        return Ok(groups);
+        return Ok(groups.Select(TransferMaps.ToProjectGroupListDto));
     }
 }

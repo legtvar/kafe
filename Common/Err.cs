@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using System.Diagnostics;
 
 namespace Kafe.Common;
 
@@ -9,14 +10,14 @@ public readonly record struct Err<T>
 {
     // Inspired in part by: https://stackoverflow.com/questions/3151702/discriminated-union-in-c-sharp
     // And: https://ziglang.org/documentation/master/#while-with-Error-Unions
-    
+
     private readonly T value;
-    private readonly ImmutableArray<Exception> exceptions;
+    private readonly ImmutableArray<Error> errors;
 
     public Err()
     {
         value = default!;
-        exceptions = ImmutableArray<Exception>.Empty;
+        errors = ImmutableArray<Error>.Empty;
     }
 
     public Err(T value) : this()
@@ -24,24 +25,36 @@ public readonly record struct Err<T>
         this.value = value;
     }
 
-    public Err(ImmutableArray<Exception> exceptions) : this()
+    public Err(ImmutableArray<Error> errors) : this()
     {
-        this.exceptions = exceptions;
+        this.errors = errors;
     }
 
-    public Err(Exception exception) : this(ImmutableArray.Create(exception))
+    public Err(Error error) : this(ImmutableArray.Create(error))
     {
+    }
+
+    public Err(Exception exception) : this()
+    {
+        var stackTrace = new StackTrace(skipFrames: 1, fNeedFileInfo: true);
+        errors = ImmutableArray.Create(new Error(exception, stackTrace.ToString()));
     }
 
     public T? Value => value;
 
-    public ImmutableArray<Exception> Exceptions => exceptions;
+    public ImmutableArray<Error> Errors => errors;
 
-    public bool HasErrors => !exceptions.IsEmpty;
+    public bool HasErrors => !errors.IsEmpty;
+
 
     public static implicit operator Err<T>(T value)
     {
         return new Err<T>(value);
+    }
+
+    public static implicit operator Err<T>(Error error)
+    {
+        return new Err<T>(error);
     }
     
     public static implicit operator Err<T>(Exception exception)

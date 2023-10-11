@@ -1,6 +1,8 @@
-﻿using Kafe.Data.Aggregates;
+﻿using Kafe.Common;
+using Kafe.Data.Aggregates;
 using Kafe.Data.Events;
 using Marten;
+using Marten.Linq;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -107,27 +109,27 @@ public partial class ProjectService
         await db.SaveChangesAsync();
     }
 
-    public async Task Edit(ProjectInfo @new, CancellationToken token = default)
+    public async Task<Err<bool>> Edit(ProjectInfo @new, CancellationToken token = default)
     {
         var @old = await Load(@new.Id, token);
         if (@old is null)
         {
-            throw new ArgumentOutOfRangeException(nameof(@new));
+            return new Error($"Project '{@new.Name}' ({@new.Id}) does not exist.");
         }
 
         if (LocalizedString.IsTooLong(@new.Name, NameMaxLength))
         {
-            throw new ArgumentException("Name is too long.", nameof(@new));
+            return new Error("Name is too long.");
         }
 
         if (LocalizedString.IsTooLong(@new.Genre, GenreMaxLength))
         {
-            throw new ArgumentException("Genre is too long.", nameof(@new));
+            return new Error("Genre is too long.");
         }
 
         if (LocalizedString.IsTooLong(@new.Description, DescriptionMaxLength))
         {
-            throw new ArgumentException("Description is too long.", nameof(@new));
+            return new Error("Description is too long.");
         }
 
         var eventStream = await db.Events.FetchForExclusiveWriting<ProjectInfo>(@new.Id, token);
@@ -157,11 +159,31 @@ public partial class ProjectService
         eventStream.AppendMany(authorsAdded);
 
         await db.SaveChangesAsync(token);
+        return true;
     }
 
-    public async Task<ImmutableArray<ProjectInfo>> List(CancellationToken token = default)
+    public record ProjectFilter(
+        Hrib? ProjectGroupId = null,
+        Hrib? AccountId = null
+    );
+
+    public async Task<ImmutableArray<ProjectInfo>> List(ProjectFilter? filter = null, CancellationToken token = default)
     {
-        return (await db.Query<ProjectInfo>().ToListAsync(token)).ToImmutableArray();
+        filter ??= new ProjectFilter();
+        var query = db.Query<ProjectInfo>();
+        
+        // TODO:
+        // if (filter.AccountId is not null)
+        // {
+        //     query.Include(e => e.ProjectGroupId)
+        // }
+        
+        if (filter.ProjectGroupId is not null)
+        {
+            query = (IMartenQueryable<ProjectInfo>)query.Where(e => e.ProjectGroupId == filter.ProjectGroupId);
+        }
+        var results = (await query.ToListAsync(token)).ToImmutableArray();
+        return results;
     }
 
     public async Task<ProjectInfo?> Load(Hrib id, CancellationToken token = default)

@@ -7,6 +7,9 @@ namespace Kafe.Common;
 /// </summary>
 public readonly record struct Err<T>
 {
+    // Inspired in part by: https://stackoverflow.com/questions/3151702/discriminated-union-in-c-sharp
+    // And: https://ziglang.org/documentation/master/#while-with-Error-Unions
+    
     private readonly T value;
     private readonly ImmutableArray<Exception> exceptions;
 

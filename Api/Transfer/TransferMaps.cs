@@ -349,7 +349,7 @@ public static class TransferMaps
             Uco: null,
             EmailAddress: data.EmailAddress,
             PreferredCulture: data.PreferredCulture,
-            Capabilities: data.Capabilities
+            Permissions: data.Permissions.ToImmutableDictionary(p => (Hrib)p.Key, p => p.Value)
         );
     }
 
@@ -360,7 +360,7 @@ public static class TransferMaps
             Id: data.Id,
             EmailAddress: data.EmailAddress,
             PreferredCulture: data.PreferredCulture,
-            Capabilities: data.Capabilities
+            Permissions: data.Permissions.ToImmutableDictionary(p => (Hrib)p.Key, p => p.Value)
         );
     }
 }

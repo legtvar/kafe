@@ -23,7 +23,7 @@ public sealed class KafeClient : IAsyncDisposable
     public async Task Initialize()
     {
         await martenStore.Storage.ApplyAllConfiguredChangesToDatabaseAsync();
-        session = martenStore.OpenSession();
+        session = martenStore.DirtyTrackedSession();
     }
 
     public async ValueTask DisposeAsync()

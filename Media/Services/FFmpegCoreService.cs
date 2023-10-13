@@ -1,11 +1,14 @@
 ﻿using FFMpegCore;
+using FFMpegCore.Arguments;
+using FFMpegCore.Enums;
 using FFMpegCore.Exceptions;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -13,7 +16,14 @@ namespace Kafe.Media.Services;
 
 public class FFmpegCoreService : IMediaService
 {
-    public FFmpegCoreService()
+    private readonly ILogger<FFmpegCoreService> logger;
+
+    public FFmpegCoreService(ILogger<FFmpegCoreService>? logger = null)
+    {
+        this.logger = logger ?? NullLogger<FFmpegCoreService>.Instance;
+    }
+    
+    static FFmpegCoreService()
     {
         var path = FFmpeg.FindExecutable();
         if (path is null)
@@ -61,6 +71,57 @@ public class FFmpegCoreService : IMediaService
         {
             return MediaInfo.Invalid with { Error = e.Message }; ;
         }
+    }
+
+    public async Task<MediaInfo> CreateVariant(
+        string filePath,
+        VideoQualityPreset preset,
+        string? outputDir = null,
+        bool overwrite = false,
+        CancellationToken token = default)
+    {
+        var name = preset.ToFileName()
+            ?? throw new ArgumentException($"Preset '{preset}' is not valid.");
+
+        if (preset == VideoQualityPreset.Invalid || preset == VideoQualityPreset.Original)
+        {
+            throw new ArgumentException($"Video variant '{preset}' cannot be created.");
+        }
+
+        outputDir ??= Path.GetDirectoryName(filePath);
+        if (outputDir is null || !Directory.Exists(outputDir))
+        {
+            throw new ArgumentException($"Output directory '{outputDir}' does not exist.");
+        }
+
+        var outputPath = Path.Combine(outputDir, $"{name}.webm");
+
+        try
+        {
+            await FFMpegArguments
+                .FromFileInput(filePath)
+                .OutputToFile(outputPath, overwrite, o =>
+                    o.WithVideoCodec("libvpx-vp9")
+                    .WithAudioCodec("libopus")
+                    .ForceFormat("webm")
+                    .WithVideoFilters(f => f.Scale(-2, preset.ToHeight()))
+                    .WithFastStart())
+                .NotifyOnProgress(p => logger.LogDebug($"Progress {Path.GetFileName(filePath)} ({name}): '{p}'"))
+                .NotifyOnOutput(p => logger.LogError(p))
+                .ProcessAsynchronously(true);
+        }
+        catch (Exception)
+        {
+            File.Delete(outputPath);
+            throw;
+        }
+
+        var info = await GetInfo(outputPath, token) with
+        {
+            // TODO: Figure out a way to handle the webm format correctly
+            MimeType = "video/webm"
+        };
+        return info;
     }
 
     private MediaInfo GetMediaInfo(IMediaAnalysis data)

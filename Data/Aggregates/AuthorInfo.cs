@@ -15,7 +15,7 @@ public record AuthorInfo(
     string? Email = null,
     string? Phone = null) : IEntity;
 
-public class AuthorInfoProjection : SingleStreamAggregation<AuthorInfo>
+public class AuthorInfoProjection : SingleStreamProjection<AuthorInfo>
 {
     public AuthorInfoProjection()
     {

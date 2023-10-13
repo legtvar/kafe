@@ -31,4 +31,14 @@ public interface IStorageService
         Hrib id,
         string? variant,
         [NotNullWhen(true)] out string? filePath);
+
+    bool TryDeleteShard(
+        ShardKind kind,
+        Hrib id,
+        string variant);
+        
+    DirectoryInfo GetShardKindDirectory(
+        ShardKind kind,
+        string variant = Const.OriginalShardVariant,
+        bool create = true);
 }

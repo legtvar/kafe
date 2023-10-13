@@ -8,12 +8,13 @@ namespace Kafe.Data.Aggregates;
 public record VideoConversionInfo(
     [Hrib] string Id,
     string VideoId,
+    string Variant,
     bool IsCompleted = false,
     bool HasFailed = false,
     [LocalizedString] ImmutableDictionary<string, string>? Error = null
 );
 
-public class VideoConversionInfoProjection : SingleStreamAggregation<VideoConversionInfo>
+public class VideoConversionInfoProjection : SingleStreamProjection<VideoConversionInfo>
 {
     public VideoConversionInfoProjection()
     {
@@ -23,7 +24,8 @@ public class VideoConversionInfoProjection : SingleStreamAggregation<VideoConver
     {
         return new VideoConversionInfo(
             Id: e.ConversionId,
-            VideoId: e.VideoId);
+            VideoId: e.VideoId,
+            Variant: e.Variant);
     }
 
     public VideoConversionInfo Apply(VideoConversionCompleted e, VideoConversionInfo c)

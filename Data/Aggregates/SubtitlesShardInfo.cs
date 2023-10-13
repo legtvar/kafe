@@ -2,6 +2,7 @@
 using Kafe.Media;
 using Marten.Events;
 using Marten.Events.Aggregation;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Globalization;
@@ -13,28 +14,30 @@ public record SubtitlesShardInfo(
     [Hrib] string Id,
     CreationMethod CreationMethod,
     [Hrib] string ArtifactId,
+    DateTimeOffset CreatedAt,
     ImmutableDictionary<string, SubtitlesInfo> Variants
-) : ShardInfoBase(Id, CreationMethod, ArtifactId)
+) : ShardInfoBase(Id, CreationMethod, ArtifactId, CreatedAt)
 {
     public override ShardKind Kind => ShardKind.Subtitles;
 }
 
 
-public class SubtitlesShardInfoProjection : SingleStreamAggregation<SubtitlesShardInfo>
+public class SubtitlesShardInfoProjection : SingleStreamProjection<SubtitlesShardInfo>
 {
     public SubtitlesShardInfoProjection()
     {
     }
 
-    public SubtitlesShardInfo Create(SubtitlesShardCreated e)
+    public SubtitlesShardInfo Create(IEvent<SubtitlesShardCreated> e)
     {
         return new(
-            Id: e.ShardId,
-            CreationMethod: e.CreationMethod,
-            ArtifactId: e.ArtifactId,
+            Id: e.Data.ShardId,
+            CreationMethod: e.Data.CreationMethod,
+            ArtifactId: e.Data.ArtifactId,
+            CreatedAt: e.Timestamp,
             Variants: ImmutableDictionary.CreateRange(new KeyValuePair<string, SubtitlesInfo>[]
             {
-                new(Const.OriginalShardVariant, e.OriginalVariantInfo)
+                new(Const.OriginalShardVariant, e.Data.OriginalVariantInfo)
             })
         );
     }

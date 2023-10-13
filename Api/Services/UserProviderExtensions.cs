@@ -30,7 +30,7 @@ public static class UserProviderExtensions
         this IQueryable<ProjectGroupInfo> q,
         IUserProvider p)
     {
-        if (p.IsAdministrator())
+        if (p.IsAdministrator() || p.IsFestivalOrg())
         {
             return q;
         }
@@ -95,7 +95,7 @@ public static class UserProviderExtensions
 
     public static bool CanRead(this IUserProvider p, ProjectGroupInfo projectGroup)
     {
-        if (p.IsAdministrator())
+        if (p.IsAdministrator() || p.IsFestivalOrg())
         {
             return true;
         }

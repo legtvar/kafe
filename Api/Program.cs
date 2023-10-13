@@ -2,16 +2,24 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using Oakton;
+using System.Threading.Tasks;
 
 namespace Kafe.Api;
 
 public static class Program
 {
-    public static void Main(string[] args)
+    public static async Task<int> Main(string[] args)
     {
         var builder = Host.CreateDefaultBuilder(args)
             .ConfigureWebHostDefaults(builder =>
             {
+                builder.ConfigureLogging(l =>
+                {
+                   l.ClearProviders();
+                   l.AddSimpleConsole();
+                });
                 builder.ConfigureKestrel(k =>
                 {
                     // set request limit to 4 GiB
@@ -22,9 +30,10 @@ public static class Program
                     c.AddJsonFile("appsettings.local.json");
                 });
                 builder.UseStartup<Startup>();
-            });
+            })
+            .ApplyOaktonExtensions();
 
         var host = builder.Build();
-        host.Run();
+        return await host.RunOaktonCommands(args);
     }
 }

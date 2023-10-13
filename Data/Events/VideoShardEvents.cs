@@ -13,13 +13,13 @@ public record VideoShardCreated(
     MediaInfo OriginalVariantInfo
 ) : IVideoShardEvent, IShardCreated;
 
-public record VideoShardVariantsAdded(
+public record VideoShardVariantAdded(
     [Hrib] string ShardId,
     string Name,
     MediaInfo Info
 ) : IVideoShardEvent, IShardVariantAdded;
 
-public record VideoShardVariantsRemoved(
+public record VideoShardVariantRemoved(
     [Hrib] string ShardId,
     string Name
 ) : IVideoShardEvent, IShardVariantRemoved;

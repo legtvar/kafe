@@ -14,7 +14,7 @@ public record PlaylistInfo(
     Visibility Visibility = Visibility.Unknown
 ) : IEntity;
 
-public class PlaylistInfoProjection : SingleStreamAggregation<PlaylistInfo>
+public class PlaylistInfoProjection : SingleStreamProjection<PlaylistInfo>
 {
     public PlaylistInfoProjection()
     {

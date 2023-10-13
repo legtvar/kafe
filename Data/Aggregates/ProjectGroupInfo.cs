@@ -15,7 +15,7 @@ public record ProjectGroupInfo(
     bool IsOpen = false
 ) : IEntity;
 
-public class ProjectGroupInfoProjection : SingleStreamAggregation<ProjectGroupInfo>
+public class ProjectGroupInfoProjection : SingleStreamProjection<ProjectGroupInfo>
 {
     public ProjectGroupInfoProjection()
     {

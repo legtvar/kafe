@@ -31,6 +31,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Authentication;
 using Kafe.Media.Services;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 
 namespace Kafe.Api;
 
@@ -51,7 +52,11 @@ public class Startup
     {
         services.AddHttpContextAccessor();
 
-        services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+        services.AddAuthentication(o =>
+            {
+                o.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                // o.DefaultChallengeScheme = "oidc";
+            })
             .AddCookie(o =>
             {
                 o.Events.OnRedirectToAccessDenied = c =>
@@ -65,6 +70,16 @@ public class Startup
                     return Task.CompletedTask;
                 };
             });
+            // .AddOpenIdConnect("oidc", o => {
+            //     o.Authority = "http://localhost:5273";
+            //     o.Scope.Add("openid");
+            //     o.Scope.Add("profile");
+            //     o.Scope.Add("email");
+            //     o.ClientId = "KAFE";
+            //     o.ClientSecret = "42";
+            //     o.ResponseType = OpenIdConnectResponseType.Code;
+            //     o.RequireHttpsMetadata = false;
+            // });
 
         services.AddAuthorization(o =>
         {
@@ -157,6 +172,7 @@ public class Startup
         services.Configure<EmailOptions>(Configuration.GetSection("Email"));
 
         services.AddHostedService<SeedDaemon>();
+        services.AddHostedService<VideoConversionDaemon>();
 
         var emailServiceType = Configuration.GetSection("Email").Get<EmailOptions>()?.ServiceType
             ?? EmailOptions.EmailServiceType.Default;

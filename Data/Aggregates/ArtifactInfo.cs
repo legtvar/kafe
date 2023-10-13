@@ -12,7 +12,7 @@ public record ArtifactInfo(
     DateTimeOffset AddedOn
 ) : IEntity;
 
-public class ArtifactInfoProjection : SingleStreamAggregation<ArtifactInfo>
+public class ArtifactInfoProjection : SingleStreamProjection<ArtifactInfo>
 {
     public ArtifactInfo Create(ArtifactCreated e)
     {

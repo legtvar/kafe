@@ -8,3 +8,7 @@ KAFE is an archival system initially built for the Film festival of FI MU.
 
 * https://spreg.aai.muni.cz/auth/requests/detail/975
 * https://perun.aai.muni.cz
+
+## Backup and Restore
+
+To back

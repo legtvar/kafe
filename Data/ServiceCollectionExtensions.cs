@@ -1,4 +1,5 @@
 ﻿using Kafe.Data.Aggregates;
+using Kafe.Data.Events.Upcasts;
 using Kafe.Data.Options;
 using Kafe.Data.Services;
 using Marten;
@@ -57,6 +58,7 @@ public static class ServiceCollectionExtensions
             options.Projections.Add<VideoConversionInfoProjection>(ProjectionLifecycle.Inline);
             options.Projections.Add<ArtifactDetailProjection>(ProjectionLifecycle.Inline);
             options.Projections.Add<AccountInfoProjection>(ProjectionLifecycle.Inline);
+            options.Events.Upcast<AccountCapabilityAddedUpcaster>();
             options.UseDefaultSerialization(serializerType: SerializerType.Newtonsoft);
 
             return options;

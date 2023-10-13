@@ -8,8 +8,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Data.Common;
-using System.Linq;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
@@ -37,8 +35,6 @@ public class UserProvider
         this.logger = logger;
         this.query = query;
     }
-
-    public ApiUser? User { get; private set; }
 
     public AccountInfo? Account { get; private set; }
 

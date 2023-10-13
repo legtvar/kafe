@@ -72,7 +72,7 @@ public class ProjectReviewEndpoint : EndpointBaseAsync
                         owner.EmailAddress,
                         Const.ProjectReviewEmailSubject[owner.PreferredCulture]!,
                         dto.Comment[owner.PreferredCulture]!,
-                        userProvider.User?.EmailAddress,
+                        userProvider.Account?.EmailAddress,
                         cancellationToken);
                 }
             }

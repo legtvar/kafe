@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Collections.Immutable;
 using Kafe.Api.Services;
+using Kafe.Data.Services;
 
 namespace Kafe.Api.Endpoints.Project;
 
@@ -22,11 +23,15 @@ public class ProjectListEndpoint : EndpointBaseAsync
     .WithoutRequest
     .WithActionResult<ImmutableArray<ProjectListDto>>
 {
-    private readonly IProjectService projects;
+    private readonly ProjectService projectService;
+    private readonly UserProvider userProvider;
 
-    public ProjectListEndpoint(IProjectService projects)
+    public ProjectListEndpoint(
+        ProjectService projectService,
+        UserProvider userProvider)
     {
-        this.projects = projects;
+        this.projectService = projectService;
+        this.userProvider = userProvider;
     }
 
     [HttpGet]
@@ -34,6 +39,7 @@ public class ProjectListEndpoint : EndpointBaseAsync
     public override async Task<ActionResult<ImmutableArray<ProjectListDto>>> HandleAsync(
         CancellationToken cancellationToken = default)
     {
-        return Ok(await projects.List(cancellationToken));
+        var projects =  await projectService.List(new(AccountId: userProvider.User?.Id), cancellationToken);
+        return Ok(projects.Select(TransferMaps.ToProjectListDto).ToImmutableArray());
     }
 }

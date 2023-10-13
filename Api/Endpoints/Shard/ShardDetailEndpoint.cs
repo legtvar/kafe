@@ -2,6 +2,7 @@
 using Asp.Versioning;
 using Kafe.Api.Services;
 using Kafe.Api.Transfer;
+using Kafe.Data.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -17,11 +18,11 @@ public class ShardDetailEndpoint : EndpointBaseAsync
     .WithRequest<string>
     .WithActionResult<ShardDetailBaseDto?>
 {
-    private readonly IShardService shards;
+    private readonly ShardService shardService;
 
-    public ShardDetailEndpoint(IShardService shards)
+    public ShardDetailEndpoint(ShardService shardService)
     {
-        this.shards = shards;
+        this.shardService = shardService;
     }
 
     [HttpGet]
@@ -32,12 +33,12 @@ public class ShardDetailEndpoint : EndpointBaseAsync
         string id,
         CancellationToken cancellationToken = default)
     {
-        var detail = await shards.Load(id, cancellationToken);
+        var detail = await shardService.Load(id, cancellationToken);
         if (detail is null)
         {
             return NotFound();
         }
 
-        return Ok(detail);
+        return Ok(TransferMaps.ToShardDetailDto(detail));
     }
 }

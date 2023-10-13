@@ -1,6 +1,7 @@
 ﻿using Ardalis.ApiEndpoints;
 using Asp.Versioning;
 using Kafe.Api.Services;
+using Kafe.Data.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -17,11 +18,11 @@ public class ShardDownloadEndpoint : EndpointBaseAsync
     .WithRequest<ShardDownloadEndpoint.RequestData>
     .WithActionResult
 {
-    private readonly IShardService shards;
+    private readonly ShardService shardService;
 
-    public ShardDownloadEndpoint(IShardService shards)
+    public ShardDownloadEndpoint(ShardService shardService)
     {
-        this.shards = shards;
+        this.shardService = shardService;
     }
 
     [HttpGet]
@@ -31,13 +32,13 @@ public class ShardDownloadEndpoint : EndpointBaseAsync
         [FromRoute] RequestData data,
         CancellationToken cancellationToken = default)
     {
-        var mediaType = await shards.GetShardVariantMediaType(data.Id, data.Variant, cancellationToken);
-        if (mediaType is null)
+        var mediaType = await shardService.GetShardVariantMediaType(data.Id, data.Variant, cancellationToken);
+        if (mediaType is null || mediaType.MimeType is null)
         {
             return NotFound();
         }
 
-        var stream = await shards.OpenStream(data.Id, data.Variant, cancellationToken);
+        var stream = await shardService.OpenStream(data.Id, data.Variant, cancellationToken);
         return File(stream, mediaType.MimeType, $"{data.Id}.{mediaType.Variant}{mediaType.FileExtension}", true);
     }
 

@@ -2,9 +2,12 @@
 using Asp.Versioning;
 using Kafe.Api.Services;
 using Kafe.Api.Transfer;
+using Kafe.Data.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
+using System.Collections.Immutable;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -17,11 +20,11 @@ public class ProjectValidationEndpoint : EndpointBaseAsync
     .WithRequest<string>
     .WithActionResult<ProjectValidationDto>
 {
-    private readonly IProjectService projects;
+    private readonly ProjectService projectService;
 
-    public ProjectValidationEndpoint(IProjectService projects)
+    public ProjectValidationEndpoint(ProjectService projectService)
     {
-        this.projects = projects;
+        this.projectService = projectService;
     }
 
     [HttpGet]
@@ -30,6 +33,16 @@ public class ProjectValidationEndpoint : EndpointBaseAsync
         string id,
         CancellationToken cancellationToken = default)
     {
-        return await projects.Validate(id, cancellationToken);
+        var report = await projectService.Validate(id, cancellationToken);
+        return Ok(new ProjectValidationDto(
+            ProjectId: id,
+            ValidatedOn: report.ValidatedOn,
+            Diagnostics: report.Diagnostics.Select(d => new ProjectDiagnosticDto(
+                Kind: d.Kind,
+                Message: d.Message,
+                ValidationStage: d.ValidationStage
+            ))
+            .ToImmutableArray()
+        ));
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Kafe.Data.Aggregates;
 using Kafe.Data.Events;
 using Marten;
+using Marten.Linq;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -24,12 +25,31 @@ public class AccountService
     {
         return await db.Events.AggregateStreamAsync<AccountInfo>(id, token: token);
     }
-    
+
     public async Task<AccountInfo?> FindByEmail(string emailAddress, CancellationToken token = default)
     {
         return await db.Query<AccountInfo>()
             .Where(a => a.EmailAddress == emailAddress)
             .SingleOrDefaultAsync(token: token);
+    }
+
+    public record AccountFilter(
+        ImmutableDictionary<string, Permission>? Permissions = default
+    );
+
+    public async Task<ImmutableArray<AccountInfo>> List(AccountFilter? filter = null, CancellationToken token = default)
+    {
+        filter ??= new AccountFilter();
+
+        var query = db.Query<AccountInfo>();
+        if (filter.Permissions is not null)
+        {
+            query = (IMartenQueryable<AccountInfo>)query.Where(a => filter.Permissions
+                .All(p => (a.Permissions.GetValueOrDefault(p.Key) & p.Value) == p.Value));
+        }
+
+        var results = await query.ToListAsync();
+        return results.ToImmutableArray();
     }
 
     public async Task<AccountInfo> CreateTemporaryAccount(
@@ -102,7 +122,7 @@ public class AccountService
             // throw new UnauthorizedAccessException("The token has been already used or revoked.");
             return false;
         }
-        
+
         return true;
 
         //var closedSuccessfully = new TemporaryAccountClosed(account.Id);
@@ -128,10 +148,5 @@ public class AccountService
         var eventStream = await db.Events.FetchForExclusiveWriting<AccountInfo>(account.Id, token);
         eventStream.AppendMany(permissions.Select(c => new AccountPermissionSet(account.Id, c.id, c.permission)));
         await db.SaveChangesAsync(token);
-    }
-
-    public async Task<ImmutableArray<AccountInfo>> List(CancellationToken token = default)
-    {
-        return (await db.Query<AccountInfo>().ToListAsync(token)).ToImmutableArray();
     }
 }

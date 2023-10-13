@@ -92,7 +92,6 @@ public class Startup
 
         services.AddAuthorization(o =>
         {
-            o.AddPolicy(EndpointPolicy.AdministratorOnly, b => b.AddRequirements(new AdministratorRequirement()));
             o.AddPolicy(EndpointPolicy.Read, b => b.AddRequirements(new PermissionRequirement(Permission.Read)));
             o.AddPolicy(EndpointPolicy.Write, b => b.AddRequirements(new PermissionRequirement(Permission.Write)));
             o.AddPolicy(EndpointPolicy.Append, b => b.AddRequirements(new PermissionRequirement(Permission.Append)));
@@ -178,7 +177,6 @@ public class Startup
 
         services.AddScoped<UserProvider>();
 
-        services.AddScoped<IAuthorizationHandler, AdministratorHandler>();
         services.AddScoped<IAuthorizationHandler, PermissionHandler>();
 
         services.Configure<ApiOptions>(Configuration);

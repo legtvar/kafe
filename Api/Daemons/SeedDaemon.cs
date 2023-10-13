@@ -43,7 +43,7 @@ public class SeedDaemon : BackgroundService
     {
         using var scope = services.CreateScope();
         var accounts = scope.ServiceProvider.GetRequiredService<AccountService>();
-        var projectGroups = scope.ServiceProvider.GetRequiredService<IProjectGroupService>();
+        var projectGroups = scope.ServiceProvider.GetRequiredService<ProjectGroupService>();
 
         foreach (var account in options.Value.Accounts)
         {
@@ -93,8 +93,12 @@ public class SeedDaemon : BackgroundService
 
             var deadline = group.Deadline is null ? default : DateTimeOffset.Parse(group.Deadline);
             var creationInfo = new ProjectGroupCreationDto(name, null, deadline);
-            // TODO: Remove the internal Create overload.
-            var id = await ((ProjectGroupService)projectGroups).Create(creationInfo, group.Id, token);
+            var id = await projectGroups.Create(
+                name: name,
+                description: null,
+                deadline: deadline,
+                id: group.Id,
+                token: token);
             logger.LogInformation($"Seed project group '{id}' created.");
         }
     }

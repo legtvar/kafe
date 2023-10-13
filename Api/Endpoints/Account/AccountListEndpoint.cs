@@ -31,7 +31,7 @@ public class AccountListEndpoint : EndpointBaseAsync
     public override async Task<ActionResult<ImmutableArray<AccountListDto>>> HandleAsync(
         CancellationToken cancellationToken = default)
     {
-        var data = await accounts.List(cancellationToken);
+        var data = await accounts.List(token: cancellationToken);
         return Ok(data.Select(TransferMaps.ToAccountListDto).ToImmutableArray());
     }
 }

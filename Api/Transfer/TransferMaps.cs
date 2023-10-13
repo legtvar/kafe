@@ -302,7 +302,7 @@ public static class TransferMaps
             IsCorrupted: data.IsCorrupted);
     }
 
-    public static ShardDetailBaseDto ToShardDetailDto(ShardInfoBase data)
+    public static ShardDetailBaseDto ToShardDetailDto(IShardEntity data)
     {
         return data switch
         {

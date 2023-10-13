@@ -3,6 +3,7 @@ using Asp.Versioning;
 using Kafe.Api.Services;
 using Kafe.Api.Transfer;
 using Kafe.Data;
+using Kafe.Data.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -20,11 +21,11 @@ public class ShardCreationEndpoint : EndpointBaseAsync
     .WithRequest<ShardCreationEndpoint.RequestData>
     .WithActionResult<Hrib>
 {
-    private readonly IShardService shards;
+    private readonly ShardService shardService;
 
-    public ShardCreationEndpoint(IShardService shards)
+    public ShardCreationEndpoint(ShardService shardService)
     {
-        this.shards = shards;
+        this.shardService = shardService;
     }
 
     [HttpPost]
@@ -36,11 +37,12 @@ public class ShardCreationEndpoint : EndpointBaseAsync
         CancellationToken cancellationToken = default)
     {
         using var stream = request.File.OpenReadStream();
-        var id = await shards.Create(
-            new ShardCreationDto(request.Kind, request.ArtifactId),
-            stream,
-            request.File.ContentType,
-            cancellationToken);
+        var id = await shardService.Create(
+            kind: request.Kind,
+            artifactId: request.ArtifactId,
+            stream: stream,
+            mimeType: request.File.ContentType,
+            token: cancellationToken);
         if (id is null)
         {
             return BadRequest();

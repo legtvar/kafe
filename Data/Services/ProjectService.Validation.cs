@@ -1,4 +1,5 @@
-﻿using Kafe.Data.Aggregates;
+﻿using Kafe.Common;
+using Kafe.Data.Aggregates;
 using Kafe.Data.Capabilities;
 using Kafe.Data.Events;
 using Marten;
@@ -828,8 +829,8 @@ public partial class ProjectService
         );
     }
 
-    public async Task AddReview(
-        string projectId,
+    public async Task<Err<bool>> AddReview(
+        Hrib projectId,
         ReviewKind kind,
         string reviewerRole,
         LocalizedString? comment,
@@ -838,39 +839,19 @@ public partial class ProjectService
         var project = await Load(projectId, token);
         if (project is null)
         {
-            throw new IndexOutOfRangeException();
+            return new Error($"Project {projectId} could not be found.");
         }
 
         if (kind == ReviewKind.NotReviewed)
         {
-            throw new ArgumentException("Review must be either accepting or rejecting.");
+            return new Error($"Review cannot be '{kind}'. It must be either accepting or rejecting.");
         }
 
         var eventStream = await db.Events.FetchForExclusiveWriting<ProjectInfo>(projectId, token);
         var reviewAdded = new ProjectReviewAdded(projectId, kind, reviewerRole, comment);
         eventStream.AppendOne(reviewAdded);
         await db.SaveChangesAsync(token);
-
-        // var ownershipString = (string)new ProjectOwnership(projectId);
-        // var owners = await db.Query<AccountInfo>()
-        //     .Where(a => a.Capabilities.Contains(ownershipString))
-        //     .ToListAsync(token);
-
-        // if (comment is not null)
-        // {
-        //     foreach (var owner in owners)
-        //     {
-        //         if (comment[owner.PreferredCulture] is not null)
-        //         {
-        //             await emails.SendEmail(
-        //                 owner.EmailAddress,
-        //                 Const.ProjectReviewEmailSubject[owner.PreferredCulture]!,
-        //                 dto.Comment[owner.PreferredCulture]!,
-        //                 userProvider.User?.EmailAddress,
-        //                 token);
-        //         }
-        //     }
-        // }
+        return true;
     }
 
     private static IEnumerable<Diagnostic> ValidateVideo(

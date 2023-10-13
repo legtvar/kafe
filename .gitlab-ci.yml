@@ -26,6 +26,7 @@ build-web:
   image: alpine:latest
   stage: build
   script:
+    - set CI=
     - apk update
     - apk add npm
     - cd Web

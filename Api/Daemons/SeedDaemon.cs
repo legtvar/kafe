@@ -1,23 +1,14 @@
-﻿using JasperFx.Core;
-using Kafe.Api.Services;
-using Kafe.Api.Transfer;
+﻿using Kafe.Api.Transfer;
 using Kafe.Data;
-using Kafe.Data.Aggregates;
-using Kafe.Data.Capabilities;
-using Kafe.Data.Events;
 using Kafe.Data.Options;
 using Kafe.Data.Services;
-using Marten;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using System.Text;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -64,16 +55,19 @@ public class SeedDaemon : BackgroundService
                 logger.LogInformation("Seed account '{}' created.", account.EmailAddress);
             }
 
-            var missingPermissions = account.Permissions
-                .ToDictionary(p => p.Key, p => p.Value)
-                .Except(data.Permissions)
-                .Select(kv => (kv.Key, kv.Value))
-                .ToImmutableArray();
-
-            if (missingPermissions.Length > 0)
+            if (account.Permissions is not null)
             {
-                await accounts.AddPermissions(data.Id, missingPermissions, token);
-                logger.LogInformation("Permissions of seed account '{}' updated.", account.EmailAddress);
+                var missingPermissions = account.Permissions
+                    .ToDictionary(p => p.Key, p => p.Value)
+                    .Except(data.Permissions ?? ImmutableDictionary<string, Permission>.Empty)
+                    .Select(kv => (kv.Key, kv.Value))
+                    .ToImmutableArray();
+
+                if (missingPermissions.Length > 0)
+                {
+                    await accounts.AddPermissions(data.Id, missingPermissions, token);
+                    logger.LogInformation("Permissions of seed account '{}' updated.", account.EmailAddress);
+                }
             }
         }
 

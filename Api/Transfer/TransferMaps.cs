@@ -360,7 +360,7 @@ public static class TransferMaps
             Id: data.Id,
             EmailAddress: data.EmailAddress,
             PreferredCulture: data.PreferredCulture,
-            Permissions: data.Permissions.ToImmutableDictionary(p => (Hrib)p.Key, p => p.Value)
+            Permissions: data?.Permissions.ToImmutableDictionary(p => (Hrib)p.Key, p => p.Value)
         );
     }
 }

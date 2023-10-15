@@ -119,7 +119,7 @@ backup-db:
   timeout: 10min
   script:
     - name="backup_$(date +%Y-%m-%d)"
-    - docker exec kafe_db_1 sh -c "pg_dump -U postgres -d kafe -F d -f '/tmp/$name' && tar -cf '/tmp/$name.tar' -C '/tmp/$name' ."
+    - docker exec kafe_db_1 sh -c "rm -rf '/tmp/$name' && pg_dump -U postgres -d kafe -F d -f '/tmp/$name' && tar -cf '/tmp/$name.tar' -C '/tmp/$name' ."
     - docker cp kafe_db_1:/tmp/$name.tar .
   artifacts:
     paths:

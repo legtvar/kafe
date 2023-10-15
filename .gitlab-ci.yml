@@ -113,3 +113,19 @@ cleanup-images:
     - lemma-new
   rules:
     - if: $IS_CLEANUP == "true"
+
+backup-db:
+  stage: manual
+  timeout: 10min
+  script:
+    - name="backup_$(date +%Y-%m-%d)"
+    - docker exec kafe_db_1 sh -c "pg_dump -U postgres -d kafe -F d -f '/tmp/$name' && tar -cf '/tmp/$name.tar' -C '/tmp/$name' ."
+    - docker cp kafe_db_1:/tmp/$name.tar .
+  artifacts:
+    paths:
+      - "backup_*.tar"
+    expire_in: "90 days"
+  tags:
+    - lemma-new
+  rules:
+    - if: $IS_BACKUP == "true"

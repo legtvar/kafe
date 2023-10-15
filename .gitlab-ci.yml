@@ -19,7 +19,7 @@ build-api:
     paths:
       - .nuget/
   rules:
-    - if: $IS_CLEANUP != "true" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "api")
+    - if: $IS_CLEANUP != "true" && $IS_BACKUP != "true" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "api")
     - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH
 
 build-web:
@@ -43,7 +43,7 @@ build-web:
       - Web/build
     expire_in: 42s
   rules:
-    - if: $IS_CLEANUP != "true" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "web")
+    - if: $IS_CLEANUP != "true" && $IS_BACKUP != "true" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "web")
     - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH
 
 migrate-wma:
@@ -66,7 +66,7 @@ migrate-wma:
     - lemma-new-docker
   when: manual
   rules:
-    - if: $IS_CLEANUP != "true" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "api")
+    - if: $IS_CLEANUP != "true" && $IS_BACKUP != "true" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "api")
 
 publish-api:
   stage: manual
@@ -78,7 +78,7 @@ publish-api:
     - lemma-new
   when: manual
   rules:
-    - if: $IS_CLEANUP != "true" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "api")
+    - if: $IS_CLEANUP != "true" && $IS_BACKUP != "true" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "api")
 
 publish-all:
   stage: manual
@@ -91,7 +91,7 @@ publish-all:
     - lemma-new
   when: manual
   rules:
-    - if: $IS_CLEANUP != "true" && $CI_COMMIT_BRANCH == "main"
+    - if: $IS_CLEANUP != "true" && $IS_BACKUP != "true" && $CI_COMMIT_BRANCH == "main"
 
 publish-web:
   stage: manual
@@ -102,7 +102,7 @@ publish-web:
     - lemma-new
   when: manual
   rules:
-    - if: $IS_CLEANUP != "true" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "api" || $CI_COMMIT_BRANCH == "web")
+    - if: $IS_CLEANUP != "true" && $IS_BACKUP != "true" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "api" || $CI_COMMIT_BRANCH == "web")
 
 cleanup-images:
   stage: manual

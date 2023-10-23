@@ -3,6 +3,7 @@ using Kafe.Data.Aggregates;
 using Kafe.Data.Events;
 using Marten;
 using Marten.Linq;
+using Marten.Linq.MatchesSql;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -170,17 +171,30 @@ public partial class ProjectService
     public async Task<ImmutableArray<ProjectInfo>> List(ProjectFilter? filter = null, CancellationToken token = default)
     {
         filter ??= new ProjectFilter();
+
         var query = db.Query<ProjectInfo>();
-        
-        // TODO:
-        // if (filter.AccountId is not null)
-        // {
-        //     query.Include(e => e.ProjectGroupId)
-        // }
-        
+
+        if (filter.AccountId is not null)
+        {
+           query = (IMartenQueryable<ProjectInfo>)query.Where(e => e.MatchesSql(
+$@"((SELECT (data -> 'Permissions') AS account_permissions
+   FROM mt_doc_accountinfo
+   WHERE (data ->> 'Id') = '{filter.AccountId}') -> (data ->> 'Id'))::int & {(int)Permission.Read} != 0
+   OR
+   ((SELECT (data -> 'Permissions') AS account_permissions
+   FROM mt_doc_accountinfo
+   WHERE (data ->> 'Id') = '{filter.AccountId}') -> (data ->> 'ProjectGroupId'))::int & {(int)Permission.Inspect} != 0
+   OR
+   ((SELECT (data -> 'Permissions') AS account_permissions
+   FROM mt_doc_accountinfo
+   WHERE (data ->> 'Id') = '{filter.AccountId}') -> '*')::int & {(int)Permission.Inspect} != 0
+   "));
+        }
+
         if (filter.ProjectGroupId is not null)
         {
-            query = (IMartenQueryable<ProjectInfo>)query.Where(e => e.ProjectGroupId == filter.ProjectGroupId);
+            query = (IMartenQueryable<ProjectInfo>)query
+                .Where(e => e.ProjectGroupId == filter.ProjectGroupId);
         }
         var results = (await query.ToListAsync(token)).ToImmutableArray();
         return results;

@@ -177,17 +177,14 @@ public partial class ProjectService
         if (filter.AccountId is not null)
         {
            query = (IMartenQueryable<ProjectInfo>)query.Where(e => e.MatchesSql(
-$@"((SELECT (data -> 'Permissions') AS account_permissions
-   FROM mt_doc_accountinfo
-   WHERE (data ->> 'Id') = '{filter.AccountId}') -> (data ->> 'Id'))::int & {(int)Permission.Read} != 0
-   OR
-   ((SELECT (data -> 'Permissions') AS account_permissions
-   FROM mt_doc_accountinfo
-   WHERE (data ->> 'Id') = '{filter.AccountId}') -> (data ->> 'ProjectGroupId'))::int & {(int)Permission.Inspect} != 0
-   OR
-   ((SELECT (data -> 'Permissions') AS account_permissions
-   FROM mt_doc_accountinfo
-   WHERE (data ->> 'Id') = '{filter.AccountId}') -> '*')::int & {(int)Permission.Inspect} != 0
+$@"((SELECT (data -> 'Permissions') FROM mt_doc_accountinfo WHERE (data ->> 'Id') = '{filter.AccountId}')
+        -> (data ->> 'Id'))::int & {(int)Permission.Read} != 0
+OR
+    ((SELECT (data -> 'Permissions') FROM mt_doc_accountinfo WHERE (data ->> 'Id') = '{filter.AccountId}')
+        -> (data ->> 'ProjectGroupId'))::int & {(int)Permission.Inspect} != 0
+OR
+   ((SELECT (data -> 'Permissions') FROM mt_doc_accountinfo WHERE (data ->> 'Id') = '{filter.AccountId}')
+        -> '*')::int & {(int)Permission.Inspect} != 0
    "));
         }
 

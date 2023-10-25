@@ -14,6 +14,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Weasel.Core;
+using Weasel.Postgresql.Functions;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -60,6 +61,11 @@ public static class ServiceCollectionExtensions
             options.Projections.Add<AccountInfoProjection>(ProjectionLifecycle.Inline);
             options.Events.Upcast<AccountCapabilityAddedUpcaster>();
             options.UseDefaultSerialization(serializerType: SerializerType.Newtonsoft);
+
+            options.Storage.ExtendedSchemaObjects.Add(new Function(new DbObjectName("public", "kafe_get_project_perms"), @"
+CREATE OR REPLACE FUNCTION kafe_get_project_perms(
+    
+"));
 
             return options;
         }

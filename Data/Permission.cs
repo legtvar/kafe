@@ -4,7 +4,7 @@ using Npgsql.Replication;
 namespace Kafe.Data;
 
 [Flags]
-public enum Permission
+public enum Permission : uint
 {
     /// <summary>
     /// No action can be done on the entity.
@@ -31,5 +31,5 @@ public enum Permission
     /// </summary>
     Write = 1 << 3,
 
-    All = Read | Append | Inspect | Write
+    All = uint.MaxValue
 }

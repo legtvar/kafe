@@ -53,8 +53,7 @@ public partial class ProjectService
             ProjectId: Hrib.Create(),
             CreationMethod: CreationMethod.Api,
             ProjectGroupId: projectGroupId,
-            Name: name,
-            Visibility: Visibility.Private);
+            Name: name);
 
         var infoChanged = new ProjectInfoChanged(
             ProjectId: Hrib.Create(),

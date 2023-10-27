@@ -9,11 +9,11 @@ public record AuthorInfo(
     [Hrib] string Id,
     CreationMethod CreationMethod,
     string Name,
-    Visibility Visibility,
+    Permission GlobalPermissions = Permission.None,
     [LocalizedString] ImmutableDictionary<string, string>? Bio = null,
     string? Uco = null,
     string? Email = null,
-    string? Phone = null) : IVisibleEntity;
+    string? Phone = null) : IEntity;
 
 public class AuthorInfoProjection : SingleStreamProjection<AuthorInfo>
 {
@@ -26,7 +26,6 @@ public class AuthorInfoProjection : SingleStreamProjection<AuthorInfo>
         return new AuthorInfo(
             Id: e.AuthorId,
             CreationMethod: e.CreationMethod,
-            Visibility: e.Visibility,
             Name: e.Name);;
     }
 
@@ -35,7 +34,7 @@ public class AuthorInfoProjection : SingleStreamProjection<AuthorInfo>
         return a with
         {
             Name = e.Name ?? a.Name,
-            Visibility = e.Visibility ?? a.Visibility,
+            GlobalPermissions = e.GlobalPermissions ?? a.GlobalPermissions,
             Bio = e.Bio ?? a.Bio,
             Uco = e.Uco ?? a.Uco,
             Email = e.Email ?? a.Email,

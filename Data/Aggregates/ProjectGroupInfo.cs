@@ -12,7 +12,7 @@ public record ProjectGroupInfo(
     [LocalizedString] ImmutableDictionary<string, string>? Description = null,
     DateTimeOffset Deadline = default,
     bool IsOpen = false,
-    Permission Permissions = Permission.None
+    Permission GlobalPermissions = Permission.None
 ) : IEntity;
 
 public class ProjectGroupInfoProjection : SingleStreamProjection<ProjectGroupInfo>
@@ -37,7 +37,7 @@ public class ProjectGroupInfoProjection : SingleStreamProjection<ProjectGroupInf
             Name = e.Name ?? g.Name,
             Description = e.Description ?? g.Description,
             Deadline = e.Deadline ?? g.Deadline,
-            Permissions = e.Permissions ?? g.Permissions
+            GlobalPermissions = e.GlobalPermissions ?? g.GlobalPermissions
         };
     }
 

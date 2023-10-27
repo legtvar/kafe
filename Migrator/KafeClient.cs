@@ -64,8 +64,7 @@ public sealed class KafeClient : IAsyncDisposable
         var created = new AuthorCreated(
             AuthorId: hrib,
             CreationMethod: CreationMethod.Migrator,
-            Name: name,
-            Visibility: Visibility.Internal);
+            Name: name);
         LogEvent(hrib, created);
 
         var infoChanged = new AuthorInfoChanged(
@@ -144,8 +143,7 @@ public sealed class KafeClient : IAsyncDisposable
             ArtifactId: artifactId,
             CreationMethod: CreationMethod.Migrator,
             Name: (LocalizedString)name,
-            AddedOn: addedOn,
-            Visibility: Visibility.Public);
+            AddedOn: addedOn);
         session.Events.StartStream<ArtifactInfo>(artifactId, artifactCreated);
         LogEvent(artifactId, artifactCreated);
 
@@ -188,8 +186,7 @@ public sealed class KafeClient : IAsyncDisposable
         var created = new PlaylistCreated(
             PlaylistId: hrib,
             CreationMethod: CreationMethod.Migrator,
-            Name: (LocalizedString)name,
-            Visibility: Visibility.Internal);
+            Name: (LocalizedString)name);
         LogEvent(hrib, created);
         session.Events.StartStream<PlaylistInfo>(hrib, created);
 
@@ -217,7 +214,6 @@ public sealed class KafeClient : IAsyncDisposable
 
     public async Task<ProjectInfo> CreateProject(
         string name,
-        Visibility visibility,
         Hrib projectGroupId,
         string? description = null,
         DateTime? releasedOn = default,
@@ -230,8 +226,7 @@ public sealed class KafeClient : IAsyncDisposable
             ProjectId: hrib,
             CreationMethod: CreationMethod.Migrator,
             ProjectGroupId: projectGroupId,
-            Name: (LocalizedString)name,
-            Visibility: visibility);
+            Name: (LocalizedString)name);
         LogEvent(hrib, created);
 
         var infoChanged = new ProjectInfoChanged(
@@ -275,8 +270,7 @@ public sealed class KafeClient : IAsyncDisposable
         var created = new ProjectGroupCreated(
             ProjectGroupId: hrib,
             CreationMethod.Migrator,
-            (LocalizedString)name,
-            Visibility: Visibility.Internal);
+            (LocalizedString)name);
         LogEvent(hrib, created);
 
         session.Events.StartStream<ProjectGroupInfo>(hrib, created);

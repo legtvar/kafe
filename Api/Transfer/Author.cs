@@ -6,13 +6,13 @@ namespace Kafe.Api.Transfer;
 public record AuthorListDto(
     string Id,
     string Name,
-    Visibility Visibility
+    Permission GlobalPermissions
 );
 
 public record AuthorDetailDto(
     string Id,
     string Name,
-    Visibility Visibility,
+    Permission GlobalPermissions,
     LocalizedString? Bio,
     string? Uco,
     string? Email,
@@ -21,7 +21,7 @@ public record AuthorDetailDto(
 
 public record AuthorCreationDto(
     string Name,
-    Visibility Visibility,
+    Permission GlobalPermissions,
     LocalizedString? Bio,
     string? Uco,
     string? Email,

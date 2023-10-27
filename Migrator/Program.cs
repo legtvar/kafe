@@ -169,7 +169,6 @@ public static class Program
 
         var kafeProject = await kafe.CreateProject(
             name: project.Name,
-            visibility: project.Publicpseudosecret == true ? Visibility.Internal : Visibility.Private,
             projectGroupId: groupId,
             description: project.Desc,
             releasedOn: project.ReleaseDate,

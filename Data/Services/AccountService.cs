@@ -45,7 +45,7 @@ public class AccountService
         if (filter.Permissions is not null)
         {
             query = (IMartenQueryable<AccountInfo>)query.Where(a => filter.Permissions
-                .All(p => (a.Permissions.GetValueOrDefault(p.Key) & p.Value) == p.Value));
+                .All(p => (a.Permissions!.GetValueOrDefault(p.Key) & p.Value) == p.Value));
         }
 
         var results = await query.ToListAsync();

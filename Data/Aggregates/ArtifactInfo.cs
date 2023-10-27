@@ -9,9 +9,8 @@ public record ArtifactInfo(
     [Hrib] string Id,
     CreationMethod CreationMethod,
     [LocalizedString] ImmutableDictionary<string, string> Name,
-    DateTimeOffset AddedOn,
-    Visibility Visibility
-) : IVisibleEntity;
+    DateTimeOffset AddedOn
+) : IEntity;
 
 public class ArtifactInfoProjection : SingleStreamProjection<ArtifactInfo>
 {
@@ -21,8 +20,7 @@ public class ArtifactInfoProjection : SingleStreamProjection<ArtifactInfo>
             Id: e.ArtifactId,
             CreationMethod: e.CreationMethod,
             Name: e.Name,
-            AddedOn: e.AddedOn,
-            Visibility: e.Visibility);
+            AddedOn: e.AddedOn);
     }
 
     public ArtifactInfo Apply(ArtifactInfoChanged e, ArtifactInfo a)

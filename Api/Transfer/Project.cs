@@ -9,7 +9,7 @@ public record ProjectListDto(
     Hrib ProjectGroupId,
     LocalizedString Name,
     LocalizedString? Description,
-    Visibility Visibility,
+    Permission GlobalPermissions,
     DateTimeOffset ReleasedOn
     // TODO: Thumbnail
 );
@@ -21,7 +21,7 @@ public record ProjectDetailDto(
     LocalizedString? Genre,
     LocalizedString Name,
     LocalizedString? Description,
-    Visibility Visibility,
+    Permission GlobalPermissions,
     DateTimeOffset ReleasedOn,
     ImmutableArray<ProjectAuthorDto> Crew,
     ImmutableArray<ProjectAuthorDto> Cast,

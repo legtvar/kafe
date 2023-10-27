@@ -7,11 +7,11 @@ public record PlaylistListDto(
     string Id,
     LocalizedString Name,
     LocalizedString? Description,
-    Visibility Visibility);
+    Permission GlobalPermissions);
 
 public record PlaylistDetailDto(
     string Id,
     LocalizedString Name,
     LocalizedString? Description,
-    Visibility Visibility,
+    Permission GlobalPermissions,
     ImmutableArray<string> Videos);

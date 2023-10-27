@@ -29,8 +29,7 @@ public class ProjectGroupService
         var created = new ProjectGroupCreated(
             ProjectGroupId: id,
             CreationMethod: CreationMethod.Api,
-            Name: name,
-            Visibility: Visibility.Unknown);
+            Name: name);
 
         var changed = new ProjectGroupInfoChanged(
             ProjectGroupId: created.ProjectGroupId,

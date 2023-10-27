@@ -36,7 +36,6 @@ public class AuthorCreationEndpoint : EndpointBaseAsync
     {
         var author = await authorService.Create(
             name: dto.Name,
-            visibility: dto.Visibility,
             bio: dto.Bio,
             uco: dto.Uco,
             email: dto.Email,

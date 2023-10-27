@@ -23,7 +23,6 @@ public class AuthorService
 
     public async Task<AuthorInfo> Create(
         string name,
-        Visibility visibility,
         LocalizedString? bio,
         string? uco,
         string? email,
@@ -34,8 +33,7 @@ public class AuthorService
         var created = new AuthorCreated(
             AuthorId: Hrib.Create(),
             CreationMethod: CreationMethod.Api,
-            Name: name,
-            Visibility: visibility);
+            Name: name);
         db.Events.StartStream<AuthorInfo>(created.AuthorId, created);
         if (!string.IsNullOrEmpty(uco)
             || LocalizedString.IsNullOrEmpty(bio)

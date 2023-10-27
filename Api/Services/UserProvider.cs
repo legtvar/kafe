@@ -40,7 +40,7 @@ public class UserProvider
 
     public bool HasExplicitPermission(Hrib entityId, Permission permission)
     {
-        return Account is not null && (Account.Permissions.GetValueOrDefault(entityId) & permission) == permission;
+        return Account is not null && (Account.Permissions?.GetValueOrDefault(entityId) & permission) == permission;
     }
 
     public async Task<bool> HasPermission(
@@ -62,18 +62,18 @@ public class UserProvider
         Permission permission,
         CancellationToken token = default)
     {
-        if (entity is IVisibleEntity visibleEntity)
-        {
-            if (permission == Permission.Read && visibleEntity.Visibility == Visibility.Public)
-            {
-                return true;
-            }
+        //if (entity is IVisibleEntity visibleEntity)
+        //{
+        //    if (permission == Permission.Read && visibleEntity.Visibility == Visibility.Public)
+        //    {
+        //        return true;
+        //    }
 
-            if (permission == Permission.Read && visibleEntity.Visibility == Visibility.Internal && Account is not null)
-            {
-                return true;
-            }
-        }
+        //    if (permission == Permission.Read && visibleEntity.Visibility == Visibility.Internal && Account is not null)
+        //    {
+        //        return true;
+        //    }
+        //}
 
         if (HasExplicitPermission(entity.Id, permission))
         {
@@ -174,13 +174,13 @@ public class UserProvider
         }
 
         IEntity? current = entity;
-        var mask = Account.Permissions.GetValueOrDefault(current.Id);
+        var mask = Account.Permissions?.GetValueOrDefault(current.Id) ?? Permission.None;
         while (current is IHierarchicalEntity hierarchicalCurrent)
         {
             current = await entityService.Load(hierarchicalCurrent.ParentId, token);
             if (current is not null)
             {
-                mask |= Account.Permissions.GetValueOrDefault(current.Id);
+                mask |= Account.Permissions?.GetValueOrDefault(current.Id) ?? Permission.None;
             }
         }
 

@@ -109,7 +109,7 @@ public static class TransferMaps
             ProjectGroupId: data.ProjectGroupId,
             Name: (LocalizedString)data.Name,
             Description: data.Description,
-            Visibility: data.Visibility,
+            GlobalPermissions: data.GlobalPermissions,
             ReleasedOn: data.ReleasedOn);
     }
 
@@ -122,7 +122,7 @@ public static class TransferMaps
             Genre: data.Genre,
             Name: data.Name,
             Description: data.Description,
-            Visibility: data.Visibility,
+            GlobalPermissions: data.GlobalPermissions,
             ReleasedOn: data.ReleasedOn,
             Crew: ImmutableArray<ProjectAuthorDto>.Empty,
             Cast: ImmutableArray<ProjectAuthorDto>.Empty,
@@ -149,7 +149,7 @@ public static class TransferMaps
         return new AuthorListDto(
             Id: data.Id,
             Name: data.Name,
-            Visibility: data.Visibility);
+            GlobalPermissions: data.GlobalPermissions);
     }
 
     public static AuthorDetailDto ToAuthorDetailDto(AuthorInfo data)
@@ -157,7 +157,7 @@ public static class TransferMaps
         return new AuthorDetailDto(
             Id: data.Id,
             Name: data.Name,
-            Visibility: data.Visibility,
+            GlobalPermissions: data.GlobalPermissions,
             Bio: data.Bio,
             Uco: data.Uco,
             Email: data.Email,
@@ -170,7 +170,7 @@ public static class TransferMaps
             Id: data.Id,
             Name: data.Name,
             Description: data.Description,
-            Visibility: data.Visibility);
+            GlobalPermissions: data.GlobalPermissions);
     }
 
     public static PlaylistDetailDto ToPlaylistDetailDto(PlaylistInfo data)
@@ -179,7 +179,7 @@ public static class TransferMaps
             Id: data.Id,
             Name: data.Name,
             Description: data.Description,
-            Visibility: data.Visibility,
+            GlobalPermissions: data.GlobalPermissions,
             Videos: data.VideoIds);
     }
 
@@ -349,7 +349,8 @@ public static class TransferMaps
             Uco: null,
             EmailAddress: data.EmailAddress,
             PreferredCulture: data.PreferredCulture,
-            Permissions: data.Permissions.ToImmutableDictionary(p => (Hrib)p.Key, p => p.Value)
+            Permissions: data.Permissions?.ToImmutableDictionary(p => (Hrib)p.Key, p => p.Value)
+                ?? ImmutableDictionary<Hrib, Permission>.Empty
         );
     }
 
@@ -360,7 +361,8 @@ public static class TransferMaps
             Id: data.Id,
             EmailAddress: data.EmailAddress,
             PreferredCulture: data.PreferredCulture,
-            Permissions: data?.Permissions.ToImmutableDictionary(p => (Hrib)p.Key, p => p.Value)
+            Permissions: data?.Permissions?.ToImmutableDictionary(p => (Hrib)p.Key, p => p.Value)
+                ?? ImmutableDictionary<Hrib, Permission>.Empty
         );
     }
 }

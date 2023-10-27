@@ -11,8 +11,8 @@ public record PlaylistInfo(
     [KafeType(typeof(ImmutableArray<Hrib>))] ImmutableArray<string> VideoIds,
     [LocalizedString] ImmutableDictionary<string, string> Name,
     [LocalizedString] ImmutableDictionary<string, string>? Description = null,
-    Visibility Visibility = Visibility.Unknown
-) : IVisibleEntity;
+    Permission GlobalPermissions = Permission.None 
+) : IEntity;
 
 public class PlaylistInfoProjection : SingleStreamProjection<PlaylistInfo>
 {
@@ -26,8 +26,7 @@ public class PlaylistInfoProjection : SingleStreamProjection<PlaylistInfo>
             Id: e.PlaylistId,
             CreationMethod: e.CreationMethod,
             VideoIds: ImmutableArray.Create<string>(),
-            Name: e.Name,
-            Visibility: e.Visibility
+            Name: e.Name
         );
     }
 
@@ -37,7 +36,7 @@ public class PlaylistInfoProjection : SingleStreamProjection<PlaylistInfo>
         {
             Name = e.Name ?? p.Name,
             Description = e.Description ?? p.Name,
-            Visibility = e.Visibility ?? p.Visibility
+            GlobalPermissions = e.GlobalPermissions ?? p.GlobalPermissions
         };
     }
 

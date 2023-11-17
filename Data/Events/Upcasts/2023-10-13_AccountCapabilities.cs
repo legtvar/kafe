@@ -167,7 +167,7 @@ namespace Kafe.Data.Events
     );
 }
 
-#pragma warning disable 0618
+// #pragma warning disable 0618
 namespace Kafe.Data.Events.Upcasts
 {
     internal class AccountCapabilityAddedUpcaster : EventUpcaster<AccountCapabilityAdded, AccountPermissionSet>

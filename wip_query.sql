@@ -192,7 +192,7 @@ $$ LANGUAGE plpgsql;
 -- FROM mt_doc_artifactinfo
 -- WHERE kafe_get_artifact_perms(data ->> 'Id', 'kI1xT3L-tkD') != 0;
 
-SELECT data ->> 'Id' as id, perms.v
+SELECT data ->> 'Id' as id, data -> 'Name' ->> 'iv' as name, perms.v
 FROM mt_doc_artifactinfo, LATERAL (SELECT kafe_get_artifact_perms(data ->> 'Id', 'kI1xT3L-tkD') as v) as perms
 WHERE perms.v != 0;
 

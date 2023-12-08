@@ -164,7 +164,7 @@ public partial class ProjectService
 
     public record ProjectFilter(
         Hrib? ProjectGroupId = null,
-        Hrib? AccountId = null
+        Hrib? AccessingAccountId = null
     );
 
     public async Task<ImmutableArray<ProjectInfo>> List(ProjectFilter? filter = null, CancellationToken token = default)
@@ -173,12 +173,12 @@ public partial class ProjectService
 
         var query = db.Query<ProjectInfo>();
 
-        if (filter.AccountId is not null)
+        if (filter.AccessingAccountId is not null)
         {
             query = (IMartenQueryable<ProjectInfo>)query
                 .Where(e => e.MatchesSql(
                     $"({SqlFunctions.GetProjectPerms}(data ->> 'Id', ?) & ?) != 0",
-                    filter.AccountId.Value,
+                    filter.AccessingAccountId.Value,
                     (int)Permission.Read));
         }
 

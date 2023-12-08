@@ -39,7 +39,7 @@ public class ProjectListEndpoint : EndpointBaseAsync
     public override async Task<ActionResult<ImmutableArray<ProjectListDto>>> HandleAsync(
         CancellationToken cancellationToken = default)
     {
-        var projects =  await projectService.List(new(AccountId: userProvider.Account?.Id), cancellationToken);
+        var projects =  await projectService.List(new(AccessingAccountId: userProvider.Account?.Id), cancellationToken);
         return Ok(projects.Select(TransferMaps.ToProjectListDto).ToImmutableArray());
     }
 }

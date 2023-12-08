@@ -10,7 +10,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Weasel.Core;
@@ -62,10 +64,7 @@ public static class ServiceCollectionExtensions
             options.Events.Upcast<AccountCapabilityAddedUpcaster>();
             options.UseDefaultSerialization(serializerType: SerializerType.Newtonsoft);
 
-//             options.Storage.ExtendedSchemaObjects.Add(new Function(new DbObjectName("public", "kafe_get_project_perms"), @"
-// CREATE OR REPLACE FUNCTION kafe_get_project_perms(
-    
-// "));
+            RegisterEmbeddedSql(options);
 
             return options;
         }
@@ -75,7 +74,7 @@ public static class ServiceCollectionExtensions
             .UseIdentitySessions();
 
         services.AddSingleton<StorageService>();
-        
+
         services.AddScoped<AccountService>();
         services.AddScoped<ProjectGroupService>();
         services.AddScoped<ProjectService>();
@@ -92,5 +91,25 @@ public static class ServiceCollectionExtensions
             .BindConfiguration("Seed");
 
         return services;
+    }
+
+    private static void RegisterEmbeddedSql(StoreOptions options)
+    {
+        // NB: Currently assumes all raw sql is a function
+
+        var assembly = Assembly.GetExecutingAssembly();
+        var sqlFiles = assembly.GetManifestResourceNames()
+            .Where(n => Path.GetExtension(n) == ".sql");
+
+        foreach (var sqlFile in sqlFiles)
+        {
+            using var stream = assembly.GetManifestResourceStream(sqlFile)
+                ?? throw new NotSupportedException($"Embedded Sql '{sqlFile}' could not be found.");
+            using var reader = new StreamReader(stream);
+            var contents = reader.ReadToEnd();
+            
+            var objectName = Path.GetFileNameWithoutExtension(sqlFile);
+            options.Storage.ExtendedSchemaObjects.Add(new Function(new DbObjectName("public", objectName), contents));
+        }
     }
 }

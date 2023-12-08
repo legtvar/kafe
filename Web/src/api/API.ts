@@ -31,7 +31,7 @@ export class API {
 
     public constructor() {
         if (window.location.hostname.startsWith('localhost') || window.location.hostname.startsWith('127.0.0.1')) {
-            this.apiUrl = 'http://localhost:8000' + this.apiUrl;
+            this.apiUrl = 'https://localhost:44369' + this.apiUrl;
         }
 
         this.client = axios.create({

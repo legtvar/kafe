@@ -1,8 +1,11 @@
 ﻿using Kafe.Data.Aggregates;
 using Kafe.Data.Events;
 using Marten;
+using Marten.Linq;
+using Marten.Linq.MatchesSql;
 using System;
 using System.Collections.Immutable;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -67,9 +70,23 @@ public class AuthorService
         return author;
     }
 
-    public async Task<ImmutableArray<AuthorInfo>> List(CancellationToken token = default)
+    public record AuthorFilter(
+        Hrib? AccessingAccountId = null
+    );
+
+    public async Task<ImmutableArray<AuthorInfo>> List(AuthorFilter? filter = null, CancellationToken token = default)
     {
-        return (await db.Query<AuthorInfo>().ToListAsync(token)).ToImmutableArray();
+        var query = db.Query<AuthorInfo>();
+        if (filter.AccessingAccountId is not null)
+        {
+            query = (IMartenQueryable<AuthorInfo>)query
+                .Where(e => e.MatchesSql(
+                    $"({SqlFunctions.GetAuthorPerms}(data ->> 'Id', ?) & ?) != 0",
+                    filter.AccessingAccountId.Value,
+                    (int)Permission.Read));
+        }
+        
+        return (await query.ToListAsync(token)).ToImmutableArray();
     }
 
     public async Task<AuthorInfo?> Load(Hrib id, CancellationToken token = default)

@@ -1,13 +1,9 @@
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Ardalis.ApiEndpoints;
 using Asp.Versioning;
-using Kafe.Data.Aggregates;
 using Kafe.Api.Transfer;
-using Marten;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using Kafe.Api.Services;
@@ -23,14 +19,14 @@ public class AuthorListEndpoint : EndpointBaseAsync
     .WithActionResult<ImmutableArray<AuthorListDto>>
 {
     private readonly AuthorService authorService;
-    private readonly IAuthorizationService authorizationService;
+    private readonly UserProvider userProvider;
 
     public AuthorListEndpoint(
         AuthorService authorService,
-        IAuthorizationService authorizationService)
+        UserProvider userProvider)
     {
         this.authorService = authorService;
-        this.authorizationService = authorizationService;
+        this.userProvider = userProvider;
     }
 
     [HttpGet]
@@ -38,10 +34,11 @@ public class AuthorListEndpoint : EndpointBaseAsync
     public override async Task<ActionResult<ImmutableArray<AuthorListDto>>> HandleAsync(
         CancellationToken cancellationToken = default)
     {
-        // TODO: Filter by permission
-        var auth = await authorizationService.AuthorizeAsync(User, EndpointPolicy.Inspect);
+        var filter = new AuthorService.AuthorFilter(
+            AccessingAccountId: userProvider.Account?.Id
+        );
         
-        return Ok((await authorService.List(cancellationToken))
+        return Ok((await authorService.List(filter, cancellationToken))
             .Select(TransferMaps.ToAuthorListDto)
             .ToImmutableArray());
     }

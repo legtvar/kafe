@@ -24,6 +24,10 @@ public enum Permission : uint
     /// <summary>
     /// The contents of the entity can be viewed.
     /// </summary>
+    /// <remarks>
+    /// Currently has meaning only on project groups where it represents the ability to read all of the
+    /// group's projects.
+    /// </remarks>
     Inspect = 1 << 2,
 
     /// <summary>

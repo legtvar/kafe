@@ -14,6 +14,7 @@ namespace Kafe.Api.Endpoints.Account;
 [ApiVersion("1")]
 [Route("account")]
 [Route("account/{id}")]
+[Authorize]
 public class AccountDetailEndpoint : EndpointBaseAsync
     .WithRequest<string?>
     .WithActionResult<AccountDetailDto?>

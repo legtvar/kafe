@@ -22,20 +22,41 @@ public class ShardCreationEndpoint : EndpointBaseAsync
     .WithActionResult<Hrib>
 {
     private readonly ShardService shardService;
+    private readonly ArtifactService artifactService;
+    private readonly IAuthorizationService authorizationService;
 
-    public ShardCreationEndpoint(ShardService shardService)
+    public ShardCreationEndpoint(
+        ShardService shardService,
+        ArtifactService artifactService,
+        IAuthorizationService authorizationService)
     {
         this.shardService = shardService;
+        this.artifactService = artifactService;
+        this.authorizationService = authorizationService;
     }
 
     [HttpPost]
     [SwaggerOperation(Tags = new[] { EndpointArea.Shard })]
     [RequestSizeLimit(Const.ShardSizeLimit)]
     [RequestFormLimits(MultipartBodyLengthLimit = Const.ShardSizeLimit)]
+    [ProducesResponseType(403)]
+    [ProducesResponseType(404)]
     public override async Task<ActionResult<Hrib>> HandleAsync(
         [FromForm] RequestData request,
         CancellationToken cancellationToken = default)
     {
+        var artifact = await artifactService.Load(request.ArtifactId, cancellationToken);
+        if (artifact is null)
+        {
+            return NotFound();
+        }
+
+        var auth = await authorizationService.AuthorizeAsync(User, artifact, EndpointPolicy.Write);
+        if (!auth.Succeeded)
+        {
+            return Unauthorized();
+        }
+
         using var stream = request.File.OpenReadStream();
         var id = await shardService.Create(
             kind: request.Kind,

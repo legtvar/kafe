@@ -13,6 +13,7 @@ namespace Kafe.Api.Endpoints.Author;
 
 [ApiVersion("1")]
 [Route("author")]
+[Authorize]
 public class AuthorCreationEndpoint : EndpointBaseAsync
     .WithRequest<AuthorCreationDto>
     .WithActionResult<Hrib?>

@@ -21,10 +21,14 @@ public class ProjectValidationEndpoint : EndpointBaseAsync
     .WithActionResult<ProjectValidationDto>
 {
     private readonly ProjectService projectService;
+    private readonly IAuthorizationService authorizationService;
 
-    public ProjectValidationEndpoint(ProjectService projectService)
+    public ProjectValidationEndpoint(
+        ProjectService projectService,
+        IAuthorizationService authorizationService)
     {
         this.projectService = projectService;
+        this.authorizationService = authorizationService;
     }
 
     [HttpGet]
@@ -33,6 +37,14 @@ public class ProjectValidationEndpoint : EndpointBaseAsync
         string id,
         CancellationToken cancellationToken = default)
     {
+        // NB: Only project owners (i.e. account with Write on the project) can validate projects since only they
+        //     can make changes to them anyway.
+        var auth = await authorizationService.AuthorizeAsync(User, id, EndpointPolicy.Write);
+        if (!auth.Succeeded)
+        {
+            return Unauthorized();
+        }
+        
         var report = await projectService.Validate(id, cancellationToken);
         return Ok(new ProjectValidationDto(
             ProjectId: id,

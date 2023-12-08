@@ -9,6 +9,7 @@ using Swashbuckle.AspNetCore.Annotations;
 using Kafe.Api.Services;
 using System.Collections.Immutable;
 using Kafe.Data.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Kafe.Api.Endpoints.Author;
 

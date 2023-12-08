@@ -23,10 +23,14 @@ public class ProjectGroupListEndpoint : EndpointBaseAsync
     .WithActionResult<ImmutableArray<ProjectGroupListDto>>
 {
     private readonly ProjectGroupService projectGroupService;
+    private readonly UserProvider userProvider;
 
-    public ProjectGroupListEndpoint(ProjectGroupService projectGroupService)
+    public ProjectGroupListEndpoint(
+        ProjectGroupService projectGroupService,
+        UserProvider userProvider)
     {
         this.projectGroupService = projectGroupService;
+        this.userProvider = userProvider;
     }
 
     [HttpGet]
@@ -34,7 +38,11 @@ public class ProjectGroupListEndpoint : EndpointBaseAsync
     public override async Task<ActionResult<ImmutableArray<ProjectGroupListDto>>> HandleAsync(
         CancellationToken cancellationToken = default)
     {
-        var groups = await projectGroupService.List(cancellationToken);
+        var filter = new ProjectGroupService.ProjectGroupFilter(
+            AccessingAccountId: userProvider.Account?.Id
+        );
+        
+        var groups = await projectGroupService.List(filter, cancellationToken);
         return Ok(groups.Select(TransferMaps.ToProjectGroupListDto));
     }
 }

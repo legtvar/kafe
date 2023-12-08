@@ -1,6 +1,8 @@
 ﻿using Kafe.Data.Aggregates;
 using Kafe.Data.Events;
 using Marten;
+using Marten.Linq;
+using Marten.Linq.MatchesSql;
 using System;
 using System.Collections.Immutable;
 using System.Linq;
@@ -44,9 +46,25 @@ public class ProjectGroupService
         return created.ProjectGroupId;
     }
 
-    public async Task<ImmutableArray<ProjectGroupInfo>> List(CancellationToken token = default)
+    public record ProjectGroupFilter(
+        Hrib? AccessingAccountId = null
+    );
+
+    public async Task<ImmutableArray<ProjectGroupInfo>> List(
+        ProjectGroupFilter? filter = null,
+        CancellationToken token = default)
     {
-        return (await db.Query<ProjectGroupInfo>().ToListAsync(token)).ToImmutableArray();
+        var query = db.Query<ProjectGroupInfo>();
+        if (filter?.AccessingAccountId is not null)
+        {
+            query = (IMartenQueryable<ProjectGroupInfo>)query
+                .Where(e => e.MatchesSql(
+                    $"({SqlFunctions.GetProjectGroupPerms}(data ->> 'Id', ?) & ?) != 0",
+                    filter.AccessingAccountId.Value,
+                    (int)Permission.Read));
+        }
+        
+        return (await query.ToListAsync(token)).ToImmutableArray();
     }
 
     // TODO: Search

@@ -31,21 +31,24 @@ public class PermissionHandler : AuthorizationHandler<PermissionRequirement>
             return;
         }
 
+        // NB: Check for admin perms first since those are already in memory.
+        if (userProvider.HasExplicitPermission(Hrib.System, requirement.Permission))
+        {
+            context.Succeed(requirement);
+            return;
+        }
+
         if (context.Resource is IEntity entity
-            && await userProvider.HasPermission(entity, requirement.Permission))
+            && (userProvider.HasExplicitPermission(entity.Id, requirement.Permission)
+                || await userProvider.HasPermission(entity, requirement.Permission)))
         {
             context.Succeed(requirement);
             return;
         }
 
         if ((context.Resource is Hrib || context.Resource is string)
-            && await userProvider.HasPermission((Hrib)context.Resource, requirement.Permission))
-        {
-            context.Succeed(requirement);
-            return;
-        }
-
-        if (userProvider.HasExplicitPermission(Hrib.System, requirement.Permission))
+            && (userProvider.HasExplicitPermission((Hrib)context.Resource, requirement.Permission)
+                || await userProvider.HasPermission((Hrib)context.Resource, requirement.Permission)))
         {
             context.Succeed(requirement);
             return;

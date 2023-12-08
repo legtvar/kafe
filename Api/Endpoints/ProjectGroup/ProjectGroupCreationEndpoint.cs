@@ -12,7 +12,7 @@ namespace Kafe.Api.Endpoints.ProjectGroup;
 
 [ApiVersion("1")]
 [Route("project-group")]
-[Authorize(EndpointPolicy.Append )]
+[Authorize(EndpointPolicy.Append)]
 public class ProjectGroupCreationEndpoint : EndpointBaseAsync
     .WithRequest<ProjectGroupCreationDto>
     .WithActionResult<Hrib>

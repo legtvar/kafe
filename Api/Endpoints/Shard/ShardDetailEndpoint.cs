@@ -13,21 +13,26 @@ namespace Kafe.Api.Endpoints.Shard;
 
 [ApiVersion("1")]
 [Route("shard/{id}")]
-[Authorize]
 public class ShardDetailEndpoint : EndpointBaseAsync
     .WithRequest<string>
     .WithActionResult<ShardDetailBaseDto?>
 {
     private readonly ShardService shardService;
+    private readonly IAuthorizationService authorizationService;
 
-    public ShardDetailEndpoint(ShardService shardService)
+    public ShardDetailEndpoint(
+        ShardService shardService,
+        ArtifactService artifactService,
+        IAuthorizationService authorizationService)
     {
         this.shardService = shardService;
+        this.authorizationService = authorizationService;
     }
 
     [HttpGet]
     [SwaggerOperation(Tags = new[] { EndpointArea.Shard })]
     [ProducesResponseType(typeof(ShardDetailBaseDto), 200)]
+    [ProducesResponseType(403)]
     [ProducesResponseType(404)]
     public override async Task<ActionResult<ShardDetailBaseDto?>> HandleAsync(
         string id,
@@ -37,6 +42,12 @@ public class ShardDetailEndpoint : EndpointBaseAsync
         if (detail is null)
         {
             return NotFound();
+        }
+        
+        var auth = await authorizationService.AuthorizeAsync(User, detail.ArtifactId, EndpointPolicy.Read);
+        if (!auth.Succeeded)
+        {
+            return Unauthorized();
         }
 
         return Ok(TransferMaps.ToShardDetailDto(detail));

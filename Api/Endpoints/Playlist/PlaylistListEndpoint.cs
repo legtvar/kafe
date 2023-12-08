@@ -37,7 +37,7 @@ public class PlaylistListEndpoint : EndpointBaseAsync
         CancellationToken cancellationToken = default)
     {
         // TODO: Filter by permission
-        var auth = await authorization.AuthorizeAsync(User, EndpointPolicy.Inspect);
+        var auth = await authorization.AuthorizeAsync(User, EndpointPolicy.Read);
 
         var list = await playlistService.List(cancellationToken);
         return Ok(list.Select(TransferMaps.ToPlaylistListDto).ToImmutableArray());

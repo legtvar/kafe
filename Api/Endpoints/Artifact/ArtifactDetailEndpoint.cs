@@ -14,7 +14,6 @@ namespace Kafe.Api.Endpoints.Artifact;
 
 [ApiVersion("1")]
 [Route("artifact/{id}")]
-[Authorize]
 public class ArtifactDetailEndpoint : EndpointBaseAsync
     .WithRequest<string>
     .WithActionResult<ArtifactDetailDto>
@@ -38,7 +37,7 @@ public class ArtifactDetailEndpoint : EndpointBaseAsync
         string id,
         CancellationToken cancellationToken = default)
     {
-        var auth = await authorization.AuthorizeAsync(User, EndpointPolicy.ReadInspect);
+        var auth = await authorization.AuthorizeAsync(User, EndpointPolicy.Read);
         if (!auth.Succeeded)
         {
             return Unauthorized();

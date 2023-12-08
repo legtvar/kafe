@@ -50,13 +50,13 @@ public class ProjectGroupDetailEndpoint : EndpointBaseAsync
         {
             return Unauthorized();
         }
-        
+
         var projectGroup = await projectGroupService.Load(id, cancellationToken);
         if (projectGroup is null)
         {
             return NotFound();
         }
-        
+
         var dto = TransferMaps.ToProjectGroupDetailDto(projectGroup);
         var projects = await projectService.List(new(ProjectGroupId: projectGroup.Id), token: cancellationToken);
         var preferredCulture = userProvider.Account?.PreferredCulture ?? Const.InvariantCultureCode;

@@ -42,7 +42,7 @@ public class ProjectDetailEndpoint : EndpointBaseAsync
         string id,
         CancellationToken cancellationToken = default)
     {
-        var auth = await authorizationService.AuthorizeAsync(User, id, EndpointPolicy.ReadInspect);
+        var auth = await authorizationService.AuthorizeAsync(User, id, EndpointPolicy.Read);
         if (!auth.Succeeded)
         {
             return Unauthorized();

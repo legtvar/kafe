@@ -17,6 +17,7 @@ namespace Kafe.Api.Endpoints.Project;
 
 [ApiVersion("1")]
 [Route("project")]
+[Authorize]
 public class ProjectEditEndpoint : EndpointBaseAsync
     .WithRequest<ProjectEditDto>
     .WithActionResult

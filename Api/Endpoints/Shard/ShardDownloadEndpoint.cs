@@ -13,16 +13,19 @@ namespace Kafe.Api.Endpoints.Shard;
 [ApiVersion("1")]
 [Route("shard-download/{id}")]
 [Route("shard-download/{id}/{variant}")]
-// [Authorize]
 public class ShardDownloadEndpoint : EndpointBaseAsync
     .WithRequest<ShardDownloadEndpoint.RequestData>
     .WithActionResult
 {
     private readonly ShardService shardService;
+    private readonly IAuthorizationService authorizationService;
 
-    public ShardDownloadEndpoint(ShardService shardService)
+    public ShardDownloadEndpoint(
+        ShardService shardService,
+        IAuthorizationService authorizationService)
     {
         this.shardService = shardService;
+        this.authorizationService = authorizationService;
     }
 
     [HttpGet]
@@ -32,6 +35,18 @@ public class ShardDownloadEndpoint : EndpointBaseAsync
         [FromRoute] RequestData data,
         CancellationToken cancellationToken = default)
     {
+        var detail = await shardService.Load(data.Id, cancellationToken);
+        if (detail is null)
+        {
+            return NotFound();
+        }
+
+        var auth = await authorizationService.AuthorizeAsync(User, detail.ArtifactId, EndpointPolicy.Read);
+        if (!auth.Succeeded)
+        {
+            return Unauthorized();
+        }
+
         var mediaType = await shardService.GetShardVariantMediaType(data.Id, data.Variant, cancellationToken);
         if (mediaType is null || mediaType.MimeType is null)
         {

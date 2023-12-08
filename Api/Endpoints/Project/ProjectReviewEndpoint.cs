@@ -25,17 +25,20 @@ public class ProjectReviewEndpoint : EndpointBaseAsync
     private readonly IEmailService emailService;
     private readonly AccountService accountService;
     private readonly UserProvider userProvider;
+    private readonly IAuthorizationService authorizationService;
 
     public ProjectReviewEndpoint(
         ProjectService projectService,
         IEmailService emailService,
         AccountService accountService,
-        UserProvider userProvider)
+        UserProvider userProvider,
+        IAuthorizationService authorizationService)
     {
         this.projectService = projectService;
         this.emailService = emailService;
         this.accountService = accountService;
         this.userProvider = userProvider;
+        this.authorizationService = authorizationService;
     }
 
     [HttpPost]
@@ -44,6 +47,18 @@ public class ProjectReviewEndpoint : EndpointBaseAsync
         ProjectReviewCreationDto dto,
         CancellationToken cancellationToken = default)
     {
+        var project = await projectService.Load(dto.ProjectId, cancellationToken);
+        if (project is null)
+        {
+            return NotFound();
+        }
+
+        var auth = await authorizationService.AuthorizeAsync(User, project.ProjectGroupId, EndpointPolicy.Write);
+        if (!auth.Succeeded)
+        {
+            return Unauthorized();
+        }
+
         var result = await projectService.AddReview(
             projectId: dto.ProjectId,
             kind: dto.Kind,
@@ -55,11 +70,13 @@ public class ProjectReviewEndpoint : EndpointBaseAsync
             return result.ToActionResult();
         }
 
-        var owners = await accountService.List(new(Permissions:
-            ImmutableDictionary.CreateRange(new[]
-            {
-                new KeyValuePair<string, Permission>(dto.ProjectId, Permission.Write)
-            })),
+        var owners = await accountService.List(
+            filter: new(
+                Permissions: ImmutableDictionary.CreateRange(new[]
+                    {
+                        new KeyValuePair<string, Permission>(dto.ProjectId, Permission.Write)
+                    })
+            ),
             token: cancellationToken);
 
         if (dto.Comment is not null)

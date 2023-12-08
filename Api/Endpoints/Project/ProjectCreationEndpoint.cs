@@ -14,6 +14,7 @@ namespace Kafe.Api.Endpoints.Project;
 
 [ApiVersion("1")]
 [Route("project")]
+[Authorize]
 public class ProjectCreationEndpoint : EndpointBaseAsync
     .WithRequest<ProjectCreationDto>
     .WithActionResult<Hrib>

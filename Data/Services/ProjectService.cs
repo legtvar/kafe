@@ -150,7 +150,7 @@ public partial class ProjectService
         var authorsAdded = @new.Authors.Except(@old.Authors)
             .Select(a => new ProjectAuthorAdded(@new.Id, a.Id, a.Kind, a.Roles));
         eventStream.AppendMany(authorsAdded);
-        
+
         var artifactsRemoved = @old.Artifacts.Except(@new.Artifacts)
             .Select(a => new ProjectArtifactAdded(@new.Id, a.Id, a.BlueprintSlot));
         eventStream.AppendMany(artifactsRemoved);
@@ -175,16 +175,11 @@ public partial class ProjectService
 
         if (filter.AccountId is not null)
         {
-           query = (IMartenQueryable<ProjectInfo>)query.Where(e => e.MatchesSql(
-$@"((SELECT (data -> 'Permissions') FROM mt_doc_accountinfo WHERE (data ->> 'Id') = '{filter.AccountId}')
-        -> (data ->> 'Id'))::int & {(int)Permission.Read} != 0
-OR
-    ((SELECT (data -> 'Permissions') FROM mt_doc_accountinfo WHERE (data ->> 'Id') = '{filter.AccountId}')
-        -> (data ->> 'ProjectGroupId'))::int & {(int)Permission.Inspect} != 0
-OR
-   ((SELECT (data -> 'Permissions') FROM mt_doc_accountinfo WHERE (data ->> 'Id') = '{filter.AccountId}')
-        -> '*')::int & {(int)Permission.Inspect} != 0
-   "));
+            query = (IMartenQueryable<ProjectInfo>)query
+                .Where(e => e.MatchesSql(
+                    $"({SqlFunctions.GetProjectPerms}(data ->> 'Id', ?) & ?) != 0",
+                    filter.AccountId.Value,
+                    (int)Permission.Read));
         }
 
         if (filter.ProjectGroupId is not null)

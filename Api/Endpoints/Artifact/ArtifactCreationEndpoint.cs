@@ -12,6 +12,7 @@ namespace Kafe.Api.Endpoints.Artifact;
 
 [ApiVersion("1")]
 [Route("artifact")]
+[Authorize]
 public class ArtifactCreationEndpoint : EndpointBaseAsync
     .WithRequest<ArtifactCreationDto>
     .WithActionResult<Hrib>

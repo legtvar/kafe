@@ -77,7 +77,7 @@ public class AuthorService
     public async Task<ImmutableArray<AuthorInfo>> List(AuthorFilter? filter = null, CancellationToken token = default)
     {
         var query = db.Query<AuthorInfo>();
-        if (filter.AccessingAccountId is not null)
+        if (filter?.AccessingAccountId is not null)
         {
             query = (IMartenQueryable<AuthorInfo>)query
                 .Where(e => e.MatchesSql(

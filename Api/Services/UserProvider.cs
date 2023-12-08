@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
@@ -48,48 +49,22 @@ public class UserProvider
         Permission permission,
         CancellationToken token = default)
     {
-        var entity = await entityService.Load(entityId, token);
-        if (entity is null)
-        {
-            return false;
-        }
-
-        return await HasPermission(entity, permission, token);
+        var result = await query.QueryAsync<bool>(
+            "SELECT kafe_get_resource_perms(?, ?) & ? = ?",
+            token,
+            entityId.Value,
+            Account?.Id!,
+            (int)permission,
+            (int)permission);
+        return result?.Single() ?? false;
     }
 
-    public async Task<bool> HasPermission(
+    public Task<bool> HasPermission(
         IEntity entity,
         Permission permission,
         CancellationToken token = default)
     {
-        //if (entity is IVisibleEntity visibleEntity)
-        //{
-        //    if (permission == Permission.Read && visibleEntity.Visibility == Visibility.Public)
-        //    {
-        //        return true;
-        //    }
-
-        //    if (permission == Permission.Read && visibleEntity.Visibility == Visibility.Internal && Account is not null)
-        //    {
-        //        return true;
-        //    }
-        //}
-
-        if (HasExplicitPermission(entity.Id, permission))
-        {
-            return true;
-        }
-
-        if (entity is IHierarchicalEntity hierarchicalEntity)
-        {
-            var cascade = await GetCascadingPermission(hierarchicalEntity, token);
-            if ((cascade & permission) == permission)
-            {
-                return true;
-            }
-        }
-
-        return false;
+        return HasPermission(entity.Id, permission, token);
     }
 
     public async Task RefreshAccount(ClaimsPrincipal? user = null, CancellationToken token = default)
@@ -164,26 +139,5 @@ public class UserProvider
 
         var claimsIdentity = new ClaimsIdentity(claims, authenticationScheme);
         return new ClaimsPrincipal(claimsIdentity);
-    }
-
-    private async Task<Permission> GetCascadingPermission(IHierarchicalEntity entity, CancellationToken token)
-    {
-        if (Account is null)
-        {
-            return Permission.None;
-        }
-
-        IEntity? current = entity;
-        var mask = Account.Permissions?.GetValueOrDefault(current.Id) ?? Permission.None;
-        while (current is IHierarchicalEntity hierarchicalCurrent)
-        {
-            current = await entityService.Load(hierarchicalCurrent.ParentId, token);
-            if (current is not null)
-            {
-                mask |= Account.Permissions?.GetValueOrDefault(current.Id) ?? Permission.None;
-            }
-        }
-
-        return mask;
     }
 }

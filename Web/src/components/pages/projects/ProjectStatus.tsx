@@ -85,7 +85,7 @@ function StatusGroup(props: IStatusGroupProps) {
         } else {
             return (
                 <StatusCheck
-                    status={inStage[0].kind === 'Accepted' ? 'ok' : 'nok'}
+                    status={inStage[0].kind === 'accepted' ? 'ok' : 'nok'}
                     details={<Text>{getPrefered(inStage[0].comment as any as localizedString)}</Text>}
                 >
                     {t(`projectStatus.${props.stage}`).toString()}

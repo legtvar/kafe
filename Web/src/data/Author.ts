@@ -9,7 +9,7 @@ export class Author extends AbstractType {
     public email!: string;
     public phone!: string;
     public uco!: string;
-    public visibility!: components['schemas']['Visibility'];
+    // public visibility!: components['schemas']['Visibility'];
 
     /*
         "id": "string",

@@ -38,7 +38,7 @@ export function PlaylistDetail(props: IPlaylistDetailProps) {
                 >
                     {(tempProject: Project) => {
                         const artifacts = tempProject.artifacts.filter((artifact) =>
-                            artifact.shards.some((shard) => shard.kind === 'Video'),
+                            artifact.shards.some((shard) => shard.kind === 'video'),
                         );
                         return (
                             <Stack direction={{ base: 'column', lg: 'row' }} spacing={4}>

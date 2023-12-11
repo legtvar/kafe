@@ -40,6 +40,7 @@
     "web-vitals": "^3.5.0"
   },
   "devDependencies": {
+    "@babel/eslint-parser": "^7.23.3",
     "@testing-library/jest-dom": "^6.1.5",
     "@testing-library/react": "^14.1.2",
     "@testing-library/user-event": "^14.5.1",
@@ -50,7 +51,15 @@
     "@types/react-dom": "^18.2.17",
     "@types/styled-components": "^5.1.34",
     "@types/video.js": "^7.3.56",
+    "@typescript-eslint/eslint-plugin": "^6.13.2",
+    "@typescript-eslint/parser": "^6.13.2",
     "eslint": "^8.55.0",
+    "eslint-plugin-flowtype": "^8.0.3",
+    "eslint-plugin-import": "^2.29.0",
+    "eslint-plugin-jsdoc": "^46.9.0",
+    "eslint-plugin-jsx-a11y": "^6.8.0",
+    "eslint-plugin-prefer-arrow": "^1.2.3",
+    "eslint-plugin-react-hooks": "^4.6.0",
     "i18next-parser": "^8.9.0",
     "less": "^4.2.0",
     "less-loader": "^11.1.3",
@@ -62,7 +71,7 @@
     "test": "react-app-rewired test",
     "lint": "eslint",
     "extract-translations": "i18next 'src/**/*.{ts,tsx,js}' -c i18next-parser.config.mjs",
-    "generate-typings": "npx openapi-typescript https://kafe.fi.muni.cz/swagger/v1/swagger.json --output src/schemas/api.ts --path-params-as-types",
+    "generate-typings": "openapi-typescript ./swagger.json --output src/schemas/api.ts",
     "proxy": "cd proxy && npm run start"
   },
   "eslintConfig": {

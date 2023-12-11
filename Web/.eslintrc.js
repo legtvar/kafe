@@ -26,9 +26,13 @@ module.exports = {
         "sourceType": "module"
     },
     "plugins": [
+        "@typescript-eslint",
+        "eslint-plugin-flowtype",
+        "eslint-plugin-import",
         "eslint-plugin-jsdoc",
+        "eslint-plugin-jsx-a11y",
         "eslint-plugin-prefer-arrow",
-        "@typescript-eslint"
+        "eslint-plugin-react-hooks"
     ],
     "root": true,
     "rules": {

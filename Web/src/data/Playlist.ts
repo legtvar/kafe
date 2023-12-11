@@ -7,7 +7,7 @@ export class Playlist extends AbstractType {
     // API object
     public name!: localizedString;
     public description?: localizedString;
-    public visibility?: components['schemas']['Visibility'];
+    // public visibility?: components['schemas']['Visibility'];
     public videos!: string[];
     public customFields: Record<string, any> = {};
 

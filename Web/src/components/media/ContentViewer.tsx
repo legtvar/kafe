@@ -21,17 +21,17 @@ export function ContentViewer({ artifact, autoplay, videoProps, onPrevious, onNe
     let type: ContentType = 'Unknown';
 
     // Determine the type of the content
-    if (artifact.shards.some((shard) => shard.kind === 'Video')) {
+    if (artifact.shards.some((shard) => shard.kind === 'video')) {
         type = 'Video';
-    } else if (artifact.shards.some((shard) => shard.kind === 'Image')) {
+    } else if (artifact.shards.some((shard) => shard.kind === 'image')) {
         type = 'Image';
     }
 
     if (type) {
         switch (type.split('/')[0]) {
-            case 'Video':
-                const video = artifact.shards.filter((shard) => shard.kind === 'Video')[0];
-                const subtitles = artifact.shards.filter((shard) => shard.kind === 'Subtitles');
+            case 'video':
+                const video = artifact.shards.filter((shard) => shard.kind === 'video')[0];
+                const subtitles = artifact.shards.filter((shard) => shard.kind === 'subtitles');
 
                 const videoSources = video.variants.reduce(
                     (prev, curr) => ({
@@ -63,7 +63,7 @@ export function ContentViewer({ artifact, autoplay, videoProps, onPrevious, onNe
                     />
                 );
             case 'Image':
-                const image = artifact.shards.filter((shard) => shard.kind === 'Image')[0];
+                const image = artifact.shards.filter((shard) => shard.kind === 'image')[0];
                 return (
                     <img
                         src={api.shards.defaultStreamUrl(image.id)}

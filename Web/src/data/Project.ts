@@ -15,7 +15,7 @@ export class Project extends AbstractType {
     public name?: localizedString;
     public genre?: localizedString;
     public description?: localizedString;
-    public visibility!: components['schemas']['Visibility'];
+    // public visibility!: components['schemas']['Visibility'];
     public releasedOn!: Date | null;
 
     // Authors

@@ -6,7 +6,7 @@ import { useColorScheme } from '../../hooks/useColorScheme';
 import { components } from '../../schemas/api';
 
 interface IVisibilityTagProps {
-    visibility: components['schemas']['Visibility'];
+    visibility: unknown;
 }
 
 export function VisibilityTag(props: IVisibilityTagProps) {

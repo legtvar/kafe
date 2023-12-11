@@ -66,7 +66,7 @@ export function AddReview(props: IAddReviewProps) {
     const { border, bg } = useColorScheme();
     const [emailContent, setEmailContent] = useState('');
     const [role, setRole] = useState<'tech' | 'visual' | 'dramaturgy' | null>(null);
-    const [kind, setKind] = useState<components['schemas']['ReviewKind']>('Accepted');
+    const [kind, setKind] = useState<components['schemas']['ReviewKind']>('accepted');
     const { user } = useAuth();
     const navigate = useNavigate();
     const { isOpen, onOpen, onClose } = useDisclosure();

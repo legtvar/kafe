@@ -185,7 +185,7 @@ public partial class ProjectService
         if (filter.ProjectGroupId is not null)
         {
             query = (IMartenQueryable<ProjectInfo>)query
-                .Where(e => e.ProjectGroupId == filter.ProjectGroupId);
+                .Where(e => e.ProjectGroupId == filter.ProjectGroupId.Value);
         }
         var results = (await query.ToListAsync(token)).ToImmutableArray();
         return results;

@@ -34,6 +34,7 @@ using Kafe.Media.Services;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using System.Security.Cryptography;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.IdentityModel.Logging;
 
 namespace Kafe.Api;
 
@@ -52,12 +53,15 @@ public class Startup
 
     public void ConfigureServices(IServiceCollection services)
     {
+        IdentityModelEventSource.ShowPII = true;
+        
         services.AddHttpContextAccessor();
 
         services.AddAuthentication(o =>
             {
                 o.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                o.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
+                o.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                // o.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
             })
             .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, o =>
             {
@@ -71,24 +75,24 @@ public class Startup
                     c.Response.StatusCode = 401;
                     return Task.CompletedTask;
                 };
-            })
-            .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, o =>
-            {
-                o.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-
-                var oidcConfig = Configuration.GetRequiredSection("Oidc").Get<OidcOptions>()
-                    ?? throw new ArgumentException("OIDC is not configured well.");
-
-                o.Authority = oidcConfig.Authority;
-                o.ClientId = oidcConfig.ClientId;
-                o.ClientSecret = oidcConfig.ClientSecret;
-                o.ResponseType = OpenIdConnectResponseType.Code;
-                o.Scope.Add("openid");
-                o.Scope.Add("profile");
-                o.Scope.Add("email");
-                o.CallbackPath = new PathString("/signin-oidc");
-                o.SaveTokens = true;
             });
+            // .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, o =>
+            // {
+            //     o.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+
+            //     var oidcConfig = Configuration.GetRequiredSection("Oidc").Get<OidcOptions>()
+            //         ?? throw new ArgumentException("OIDC is not configured well.");
+
+            //     o.Authority = oidcConfig.Authority;
+            //     o.ClientId = oidcConfig.ClientId;
+            //     o.ClientSecret = oidcConfig.ClientSecret;
+            //     o.ResponseType = OpenIdConnectResponseType.Code;
+            //     o.Scope.Add("openid");
+            //     o.Scope.Add("profile");
+            //     o.Scope.Add("email");
+            //     o.CallbackPath = new PathString("/signin-oidc");
+            //     o.SaveTokens = true;
+            // });
 
         services.AddAuthorization(o =>
         {
@@ -125,6 +129,7 @@ public class Startup
         {
             o.AddDefaultPolicy(p =>
             {
+                p.AllowAnyHeader();
                 p.WithOrigins(ApiOptions.AllowedOrigins.ToArray())
                     .AllowCredentials();
             });

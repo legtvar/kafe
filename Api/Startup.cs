@@ -35,6 +35,7 @@ using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using System.Security.Cryptography;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.IdentityModel.Logging;
+using System.Text.Json;
 
 namespace Kafe.Api;
 
@@ -121,7 +122,8 @@ public class Startup
         })
         .AddJsonOptions(o =>
         {
-            o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            o.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+            o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
             o.JsonSerializerOptions.Converters.Add(new LocalizedStringJsonConverter());
         });
 

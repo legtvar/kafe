@@ -18,12 +18,12 @@ public record AccountDetailDto(
     string? Uco,
     string EmailAddress,
     string PreferredCulture,
-    ImmutableDictionary<Hrib, Permission> Permissions
+    ImmutableDictionary<Hrib, ImmutableArray<Permission>> Permissions
 );
 
 public record AccountListDto(
     Hrib Id,
     string EmailAddress,
     string PreferredCulture,
-    ImmutableDictionary<Hrib, Permission> Permissions
+    ImmutableDictionary<Hrib, ImmutableArray<Permission>> Permissions
 );

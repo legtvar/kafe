@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Security.Claims;
+using Kafe.Common;
 using Kafe.Data;
 using Kafe.Data.Aggregates;
 using Kafe.Data.Capabilities;
@@ -349,8 +350,8 @@ public static class TransferMaps
             Uco: null,
             EmailAddress: data.EmailAddress,
             PreferredCulture: data.PreferredCulture,
-            Permissions: data.Permissions?.ToImmutableDictionary(p => (Hrib)p.Key, p => p.Value)
-                ?? ImmutableDictionary<Hrib, Permission>.Empty
+            Permissions: data.Permissions?.ToImmutableDictionary(p => (Hrib)p.Key, p => ToPermissionArray(p.Value))
+                ?? ImmutableDictionary<Hrib, ImmutableArray<Permission>>.Empty
         );
     }
 
@@ -361,8 +362,20 @@ public static class TransferMaps
             Id: data.Id,
             EmailAddress: data.EmailAddress,
             PreferredCulture: data.PreferredCulture,
-            Permissions: data?.Permissions?.ToImmutableDictionary(p => (Hrib)p.Key, p => p.Value)
-                ?? ImmutableDictionary<Hrib, Permission>.Empty
+            Permissions: data?.Permissions?.ToImmutableDictionary(p => (Hrib)p.Key, p => ToPermissionArray(p.Value))
+                ?? ImmutableDictionary<Hrib, ImmutableArray<Permission>>.Empty
         );
+    }
+    
+    private static ImmutableArray<Permission> ToPermissionArray(Permission value)
+    {
+        if (value == Permission.None)
+        {
+            return ImmutableArray<Permission>.Empty;
+        }
+
+        return Enum.GetValues<Permission>()
+            .Where(v => v != Permission.None && (value & v) == v)
+            .ToImmutableArray();
     }
 }

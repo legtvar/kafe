@@ -32,14 +32,14 @@ export function GroupsEdit(props: IGroupsEditProps) {
                     <Tabs>
                         <TabList>
                             <Tab>{t('groupsEdit.tabs.info').toString()}</Tab>
-                            <Tab>{t('groupsEdit.tabs.rights').toString()}</Tab>
+                            {/* <Tab>{t('groupsEdit.tabs.rights').toString()}</Tab> */}
                         </TabList>
 
                         <TabPanels pt={6}>
                             <TabPanel>
                                 <GroupBasicInfo group={group} />
                             </TabPanel>
-                            <TabPanel>
+                            {/* <TabPanel>
                                 <RightsEditor
                                     item={group}
                                     explanation={{
@@ -49,7 +49,7 @@ export function GroupsEdit(props: IGroupsEditProps) {
                                         append: t('rights.groups.group.append').toString(),
                                     }}
                                 />
-                            </TabPanel>
+                            </TabPanel> */}
                         </TabPanels>
                     </Tabs>
                 </Box>

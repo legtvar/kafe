@@ -49,13 +49,13 @@ export function TempAccount() {
                                 bg={'blue.400'}
                                 color={'white'}
                                 onClick={() => login()}
-                                _hover={{
+                                _hover={{   
                                     bg: 'blue.500',
                                 }}
                             >
                                 {t('register.button').toString()}
                             </Button>
-                            <hr />
+                            {/* <hr />
                             <Button
                                 size="lg"
                                 bg={'white'}
@@ -67,7 +67,7 @@ export function TempAccount() {
                                 leftIcon={<MuniIcon />}
                             >
                                 {t('munilogin.button').toString()}
-                            </Button>
+                            </Button> */}
                         </Stack>
                     </Stack>
                 )}

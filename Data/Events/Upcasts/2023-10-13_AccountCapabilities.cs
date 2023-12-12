@@ -172,7 +172,7 @@ namespace Kafe.Data.Events.Upcasts
 {
     internal class AccountCapabilityAddedUpcaster : EventUpcaster<AccountCapabilityAdded, AccountPermissionSet>
     {
-        public const string Fffimu23Id = "0JY2-TPhOC7";
+        public const string Fffimu23Id = "CafMk2sO9fL";
 
         protected override AccountPermissionSet Upcast(AccountCapabilityAdded oldEvent)
         {
@@ -206,7 +206,7 @@ namespace Kafe.Data.Events.Upcasts
 
     internal class AccountCapabilityRemovedUpcaster : EventUpcaster<AccountCapabilityRemoved, AccountPermissionUnset>
     {
-        public const string Fffimu23Id = "0JY2-TPhOC7";
+        public const string Fffimu23Id = "CafMk2sO9fL";
 
         protected override AccountPermissionUnset Upcast(AccountCapabilityRemoved oldEvent)
         {

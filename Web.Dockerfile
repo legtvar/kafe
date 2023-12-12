@@ -1,4 +1,4 @@
-FROM node:21 as builder
+FROM node:21-alpine as builder
 RUN corepack enable && corepack prepare pnpm@latest --activate
 WORKDIR /app
 COPY ./Web/package*.json ./

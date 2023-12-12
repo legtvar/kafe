@@ -29,15 +29,18 @@ build-web:
     CI: ''
   script:
     - apk update
-    - apk add npm
+    - apk add nodejs-current npm
+    - corepack enable && corepack prepare pnpm@latest --activate
+
     - cd Web
-    - npm ci
-    - npm run build
+    - pnpm config set store-dir .pnpm-store/
+    - pnpm i
+    - pnpm run build
   tags:
     - shared-fi
   cache:
     paths:
-      - Web/node_modules
+      - Web/.pnpm-store/
   artifacts:
     paths:
       - Web/build

@@ -21,15 +21,15 @@ BEGIN
 		perms := perms | (account -> 'Permissions' -> (project ->> 'Id'))::int;
 	END IF;
 
-	IF (account -> 'Permissions' -> (project ->> 'ProjectGroupId'))::int & 4 == 4 THEN
+	IF (account -> 'Permissions' -> (project ->> 'ProjectGroupId'))::int & 4 = 4 THEN
 		perms := perms | 2; -- read
 	END IF;
 	
-	IF (account -> 'Permissions' -> (project ->> 'ProjectGroupId'))::int & 8 == 8 THEN
+	IF (account -> 'Permissions' -> (project ->> 'ProjectGroupId'))::int & 8 = 8 THEN
 		perms := perms | 8; -- write
 	END IF;
 
-	IF (account -> 'Permissions' -> (project ->> 'ProjectGroupId'))::int & 16 == 16 THEN
+	IF (account -> 'Permissions' -> (project ->> 'ProjectGroupId'))::int & 16 = 16 THEN
 		perms := perms | 16; -- review
 	END IF;
 

@@ -44,7 +44,7 @@ public class EntityService
             $"SELECT {SqlFunctions.GetResourcePerms}(?, ?)",
             token,
             entityId.Value,
-            accessingAccountId!);
+            accessingAccountId?.Value!);
         return (Permission)perms.Single();
     }
     

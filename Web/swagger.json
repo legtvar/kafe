@@ -1812,6 +1812,7 @@
           "append",
           "inspect",
           "write",
+          "review",
           "all"
         ],
         "type": "string"
@@ -2358,7 +2359,8 @@
           "name",
           "projectGroupId",
           "releasedOn",
-          "reviews"
+          "reviews",
+          "userPermissions"
         ],
         "type": "object",
         "properties": {
@@ -2458,7 +2460,16 @@
             "nullable": true
           },
           "globalPermissions": {
-            "$ref": "#/components/schemas/Permission"
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Permission"
+            }
+          },
+          "userPermissions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Permission"
+            }
           },
           "releasedOn": {
             "type": "string",
@@ -2821,7 +2832,8 @@
           "id",
           "name",
           "projectGroupId",
-          "releasedOn"
+          "releasedOn",
+          "userPermissions"
         ],
         "type": "object",
         "properties": {
@@ -2879,14 +2891,26 @@
             "nullable": true
           },
           "globalPermissions": {
-            "$ref": "#/components/schemas/Permission"
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Permission"
+            },
+            "description": "Permissions that apply to all users, even the anonymous ones."
+          },
+          "userPermissions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Permission"
+            },
+            "description": "Permissions that apply to the currently logged in user. Includes the global permissions."
           },
           "releasedOn": {
             "type": "string",
             "format": "date-time"
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "A DTO of a project. To be used when listing projects."
       },
       "ProjectReviewCreationDto": {
         "required": [

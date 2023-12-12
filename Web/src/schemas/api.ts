@@ -738,7 +738,7 @@ export interface components {
       error?: string | null;
     };
     /** @enum {string} */
-    Permission: "none" | "read" | "append" | "inspect" | "write" | "all";
+    Permission: "none" | "read" | "append" | "inspect" | "write" | "review" | "all";
     PlaylistDetailDto: {
       id: string;
       /** LocalizedString */
@@ -928,7 +928,8 @@ export interface components {
         cs?: string | null;
         en?: string | null;
       }) | null;
-      globalPermissions: components["schemas"]["Permission"];
+      globalPermissions: components["schemas"]["Permission"][];
+      userPermissions: components["schemas"]["Permission"][];
       /** Format: date-time */
       releasedOn: string;
       crew: components["schemas"]["ProjectAuthorDto"][];
@@ -1024,6 +1025,7 @@ export interface components {
       deadline: string;
       isOpen: boolean;
     };
+    /** @description A DTO of a project. To be used when listing projects. */
     ProjectListDto: {
       /**
        * Format: hrib
@@ -1049,7 +1051,10 @@ export interface components {
         cs?: string | null;
         en?: string | null;
       }) | null;
-      globalPermissions: components["schemas"]["Permission"];
+      /** @description Permissions that apply to all users, even the anonymous ones. */
+      globalPermissions: components["schemas"]["Permission"][];
+      /** @description Permissions that apply to the currently logged in user. Includes the global permissions. */
+      userPermissions: components["schemas"]["Permission"][];
       /** Format: date-time */
       releasedOn: string;
     };

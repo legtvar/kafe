@@ -67,14 +67,14 @@ export function AddReview(props: IAddReviewProps) {
     const [emailContent, setEmailContent] = useState('');
     const [role, setRole] = useState<'tech' | 'visual' | 'dramaturgy' | 'unknown' | null>('unknown');
     const [kind, setKind] = useState<components['schemas']['ReviewKind']>('accepted');
-    const { user } = useAuth();
+    // const { user } = useAuth();
     const navigate = useNavigate();
     const { isOpen, onOpen, onClose } = useDisclosure();
     const cancelRef = createRef<HTMLButtonElement>();
 
-    const roles = user!.capabilities.includes('Administration')
-        ? ['tech', 'visual', 'dramaturgy']
-        : user!.capabilities.filter((cap) => cap.startsWith('ProjectReview')).map((cap) => cap.split(':')[1]);
+    // const roles = user!.capabilities.includes('Administration')
+    //     ? ['tech', 'visual', 'dramaturgy']
+    //     : user!.capabilities.filter((cap) => cap.startsWith('ProjectReview')).map((cap) => cap.split(':')[1]);
 
     return (
         <SendAPI

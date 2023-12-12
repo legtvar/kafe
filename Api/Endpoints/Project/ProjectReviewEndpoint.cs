@@ -53,7 +53,7 @@ public class ProjectReviewEndpoint : EndpointBaseAsync
             return NotFound();
         }
 
-        var auth = await authorizationService.AuthorizeAsync(User, project.ProjectGroupId, EndpointPolicy.Write);
+        var auth = await authorizationService.AuthorizeAsync(User, project.Id, EndpointPolicy.Review);
         if (!auth.Succeeded)
         {
             return Unauthorized();

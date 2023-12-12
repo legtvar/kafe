@@ -8,4 +8,5 @@ public static class EndpointPolicy
     public const string Append = "Append";
     public const string Inspect = "Inspect";
     public const string ReadInspect = "ReadInspect";
+    public const string Review = "Review";
 }

@@ -20,11 +20,19 @@ BEGIN
 	IF account -> 'Permissions' -> (project ->> 'Id') IS NOT NULL THEN
 		perms := perms | (account -> 'Permissions' -> (project ->> 'Id'))::int;
 	END IF;
-						 
-	IF (account -> 'Permissions' -> (project ->> 'ProjectGroupId'))::int & 4 != 0 THEN
-		perms := perms | 2;
+
+	IF (account -> 'Permissions' -> (project ->> 'ProjectGroupId'))::int & 4 == 4 THEN
+		perms := perms | 2; -- read
 	END IF;
 	
+	IF (account -> 'Permissions' -> (project ->> 'ProjectGroupId'))::int & 8 == 8 THEN
+		perms := perms | 8; -- write
+	END IF;
+
+	IF (account -> 'Permissions' -> (project ->> 'ProjectGroupId'))::int & 16 == 16 THEN
+		perms := perms | 16; -- review
+	END IF;
+
 	RETURN perms;
 END
 $$ LANGUAGE plpgsql;

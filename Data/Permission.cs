@@ -1,10 +1,10 @@
 using System;
-using Npgsql.Replication;
 
 namespace Kafe.Data;
 
+// NB: must be int because postgres, doesn't seem to have unsigned integers
 [Flags]
-public enum Permission : uint
+public enum Permission : int
 {
     /// <summary>
     /// No action can be done on the entity.
@@ -20,7 +20,7 @@ public enum Permission : uint
     /// The entity can be "appended to" (e.g., a project can be added to a project group).
     /// </summary>
     Append = 1 << 1,
-    
+
     /// <summary>
     /// The contents of the entity can be viewed.
     /// </summary>
@@ -34,5 +34,11 @@ public enum Permission : uint
     /// The entity can be written to and archived.
     /// </summary>
     Write = 1 << 3,
-    All = uint.MaxValue
+
+    /// <summary>
+    /// The entity can be reviewed (comments regarding it can be published and deliver to project owners).
+    /// </summary>
+    Review = 1 << 4,
+
+    All = int.MaxValue
 }

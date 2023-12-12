@@ -1,4 +1,5 @@
 import { components } from '../schemas/api';
+import { HRIB } from '../schemas/generic';
 import { AbstractType } from './AbstractType';
 
 export class User extends AbstractType {
@@ -7,6 +8,7 @@ export class User extends AbstractType {
     public preferredCulture!: string;
     public role!: 'admin' | 'temp' | 'user';
     public capabilities!: string[];
+    public permissions!: Record<HRIB, Array<components["schemas"]["Permission"]>>;
 
     /*
         id: string;

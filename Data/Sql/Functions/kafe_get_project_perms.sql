@@ -1,6 +1,3 @@
-
-
-
 CREATE OR REPLACE FUNCTION kafe_get_project_perms(
 	IN project_id character varying,
 	IN account_id character varying

@@ -327,7 +327,7 @@ public static class Program
 
         var originalFile = originalCandidates.First();
 
-        var shardDir = new DirectoryInfo(Path.Combine(migratorOptions.KafeVideosDirectory!, shardId));
+        var shardDir = new DirectoryInfo(Path.Combine(migratorOptions.KafeVideosDirectory!, shardId.Value));
         if (shardDir.Exists)
         {
             logger.LogError("Video '{}' ({}) with shard id '{}' has already been migrated. " +
@@ -340,8 +340,8 @@ public static class Program
 
         var migrationInfo = new VideoShardMigrationInfo(
             WmaId: wmaId,
-            ArtifactId: artifactId,
-            VideoShardId: shardId,
+            ArtifactId: artifactId.Value,
+            VideoShardId: shardId.Value,
             Name: name,
             AddedOn: addedOn);
         await SerializedVideoShardMigrationInfo(migrationInfo);
@@ -373,7 +373,7 @@ public static class Program
 
     private static async Task<MediaInfo> GetOriginalVariant(Hrib shardId)
     {
-        var shardDir = new DirectoryInfo(Path.Combine(migratorOptions.KafeVideosDirectory!, shardId));
+        var shardDir = new DirectoryInfo(Path.Combine(migratorOptions.KafeVideosDirectory!, shardId.Value));
         if (!shardDir.Exists)
         {
             logger.LogError($"Shard directory '{shardId}' does not exist. Video will be migrated without MediaInfo.");

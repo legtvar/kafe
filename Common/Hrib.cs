@@ -27,8 +27,9 @@ public record Hrib
 
     public string Value { get; init; }
 
+    // NB: this conversion is deliberately left `explicit` to prevent type casting issues with Marten/Postgres
     [return: NotNullIfNotNull(nameof(hrib))]
-    public static implicit operator string?(Hrib? hrib)
+    public static explicit operator string?(Hrib? hrib)
     {
         if (hrib is null)
         {

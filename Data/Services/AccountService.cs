@@ -1,7 +1,8 @@
-﻿using Kafe.Data.Aggregates;
+using Kafe.Data.Aggregates;
 using Kafe.Data.Events;
 using Marten;
 using Marten.Linq;
+using Marten.Linq.MatchesSql;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -23,7 +24,7 @@ public class AccountService
 
     public async Task<AccountInfo?> Load(Hrib id, CancellationToken token = default)
     {
-        return await db.Events.AggregateStreamAsync<AccountInfo>(id, token: token);
+        return await db.Events.AggregateStreamAsync<AccountInfo>(id.Value, token: token);
     }
 
     public async Task<AccountInfo?> FindByEmail(string emailAddress, CancellationToken token = default)
@@ -66,12 +67,12 @@ public class AccountService
         {
             id = Hrib.Create();
             var created = new TemporaryAccountCreated(
-                AccountId: id,
+                AccountId: id.Value,
                 CreationMethod: CreationMethod.Api,
                 EmailAddress: emailAddress,
                 PreferredCulture: preferredCulture ?? Const.InvariantCultureCode
             );
-            var selfPermissionSet = new AccountPermissionSet(id, id, Permission.All);
+            var selfPermissionSet = new AccountPermissionSet(id.Value, id.Value, Permission.All);
             db.Events.StartStream<AccountInfo>(id, created, selfPermissionSet);
         }
         else
@@ -80,12 +81,12 @@ public class AccountService
         }
 
         var refreshed = new TemporaryAccountRefreshed(
-            AccountId: id,
+            AccountId: id.Value,
             SecurityStamp: account?.SecurityStamp ?? Guid.NewGuid().ToString()
         );
-        db.Events.Append(id, refreshed);
+        db.Events.Append(id.Value, refreshed);
         await db.SaveChangesAsync(token);
-        account = await db.Events.AggregateStreamAsync<AccountInfo>(id, token: token);
+        account = await db.Events.AggregateStreamAsync<AccountInfo>(id.Value, token: token);
         if (account is null)
         {
             throw new InvalidOperationException($"Account '{id}' could no be found.");

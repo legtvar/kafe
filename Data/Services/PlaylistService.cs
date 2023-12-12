@@ -23,6 +23,6 @@ public class PlaylistService
 
     public async Task<PlaylistInfo?> Load(Hrib id, CancellationToken token = default)
     {
-        return await db.LoadAsync<PlaylistInfo>(id, token);
+        return await db.LoadAsync<PlaylistInfo>(id.Value, token);
     }
 }

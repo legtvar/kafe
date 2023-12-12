@@ -62,13 +62,13 @@ public sealed class KafeClient : IAsyncDisposable
         hrib ??= Hrib.Create();
         name ??= string.Format(Fallback.AuthorName, hrib);
         var created = new AuthorCreated(
-            AuthorId: hrib,
+            AuthorId: hrib.Value,
             CreationMethod: CreationMethod.Migrator,
             Name: name);
         LogEvent(hrib, created);
 
         var infoChanged = new AuthorInfoChanged(
-            AuthorId: hrib,
+            AuthorId: hrib.Value,
             Uco: uco,
             Email: email,
             Phone: phone);
@@ -76,7 +76,7 @@ public sealed class KafeClient : IAsyncDisposable
 
         session.Events.StartStream<AuthorInfo>(hrib, created, infoChanged);
         await session.SaveChangesAsync();
-        return (await session.Events.AggregateStreamAsync<AuthorInfo>(hrib))!;
+        return (await session.Events.AggregateStreamAsync<AuthorInfo>(hrib.Value))!;
     }
 
     public async Task<AuthorInfo> GetOrAddAuthor(
@@ -89,7 +89,7 @@ public sealed class KafeClient : IAsyncDisposable
         AuthorInfo? author = null;
         if (hrib is not null )
         {
-            author = await session.Events.AggregateStreamAsync<AuthorInfo>(hrib);
+            author = await session.Events.AggregateStreamAsync<AuthorInfo>(hrib.Value);
         }
         else if (name is not null)
         {
@@ -140,7 +140,7 @@ public sealed class KafeClient : IAsyncDisposable
     {
         artifactId ??= Hrib.Create();
         var artifactCreated = new ArtifactCreated(
-            ArtifactId: artifactId,
+            ArtifactId: artifactId.Value,
             CreationMethod: CreationMethod.Migrator,
             Name: (LocalizedString)name,
             AddedOn: addedOn);
@@ -149,9 +149,9 @@ public sealed class KafeClient : IAsyncDisposable
 
         shardId ??= Hrib.Create();
         var shardCreated = new VideoShardCreated(
-            ShardId: shardId,
+            ShardId: shardId.Value,
             CreationMethod: CreationMethod.Migrator,
-            ArtifactId: artifactId,
+            ArtifactId: artifactId.Value,
             OriginalVariantInfo: originalVariant);
         session.Events.StartStream<VideoShardInfo>(shardId, shardCreated);
         LogEvent(shardId, shardCreated);
@@ -162,15 +162,15 @@ public sealed class KafeClient : IAsyncDisposable
         }
 
         await session.SaveChangesAsync();
-        return ((await session.Events.AggregateStreamAsync<ArtifactInfo>(artifactId))!,
-            (await session.Events.AggregateStreamAsync<VideoShardInfo>(shardId))!);
+        return ((await session.Events.AggregateStreamAsync<ArtifactInfo>(artifactId.Value))!,
+            (await session.Events.AggregateStreamAsync<VideoShardInfo>(shardId.Value))!);
     }
 
     public async Task AddArtifactToProject(Hrib artifactId, Hrib projectId)
     {
-        var artifactAdded = new ProjectArtifactAdded(projectId, artifactId, null);
+        var artifactAdded = new ProjectArtifactAdded(projectId.Value, artifactId.Value, null);
         LogEvent(projectId, artifactAdded);
-        session.Events.Append(projectId, artifactAdded);
+        session.Events.Append(projectId.Value, artifactAdded);
 
         await session.SaveChangesAsync();
     }
@@ -184,7 +184,7 @@ public sealed class KafeClient : IAsyncDisposable
         hrib ??= Hrib.Create();
 
         var created = new PlaylistCreated(
-            PlaylistId: hrib,
+            PlaylistId: hrib.Value,
             CreationMethod: CreationMethod.Migrator,
             Name: (LocalizedString)name);
         LogEvent(hrib, created);
@@ -193,23 +193,23 @@ public sealed class KafeClient : IAsyncDisposable
         if (!string.IsNullOrEmpty(description))
         {
             var infoChanged = new PlaylistInfoChanged(
-                PlaylistId: hrib,
+                PlaylistId: hrib.Value,
                 Description: (LocalizedString?)description
             );
-            session.Events.Append(hrib, infoChanged);
+            session.Events.Append(hrib.Value, infoChanged);
             LogEvent(hrib, infoChanged);
         }
 
         videos ??= Enumerable.Empty<Hrib>();
         foreach(var video in videos)
         {
-            var itemAdded = new PlaylistVideoAdded(hrib, video);
+            var itemAdded = new PlaylistVideoAdded(hrib.Value, video.Value);
             LogEvent(hrib, itemAdded);
-            session.Events.Append(hrib, itemAdded);
+            session.Events.Append(hrib.Value, itemAdded);
         }
 
         await session.SaveChangesAsync();
-        return (await session.Events.AggregateStreamAsync<PlaylistInfo>(hrib))!;
+        return (await session.Events.AggregateStreamAsync<PlaylistInfo>(hrib.Value))!;
     }
 
     public async Task<ProjectInfo> CreateProject(
@@ -223,14 +223,14 @@ public sealed class KafeClient : IAsyncDisposable
     {
         hrib ??= Hrib.Create();
         var created = new ProjectCreated(
-            ProjectId: hrib,
+            ProjectId: hrib.Value,
             CreationMethod: CreationMethod.Migrator,
-            ProjectGroupId: projectGroupId,
+            ProjectGroupId: projectGroupId.Value,
             Name: (LocalizedString)name);
         LogEvent(hrib, created);
 
         var infoChanged = new ProjectInfoChanged(
-            ProjectId: hrib,
+            ProjectId: hrib.Value,
             ReleasedOn: releasedOn.HasValue
                 ? new DateTimeOffset(releasedOn.Value).ToUniversalTime()
                 : null,
@@ -241,8 +241,8 @@ public sealed class KafeClient : IAsyncDisposable
 
         if (isLocked)
         {
-            var locked = new ProjectLocked(hrib);
-            session.Events.Append(hrib, locked);
+            var locked = new ProjectLocked(hrib.Value);
+            session.Events.Append(hrib.Value, locked);
             LogEvent(hrib, locked);
         }
 
@@ -250,16 +250,16 @@ public sealed class KafeClient : IAsyncDisposable
         foreach(var author in authors)
         {
             var authorAdded = new ProjectAuthorAdded(
-                ProjectId: hrib,
+                ProjectId: hrib.Value,
                 AuthorId: author.Id,
                 Kind: author.Kind,
                 Roles: author.Roles);
-            session.Events.Append(hrib, authorAdded);
+            session.Events.Append(hrib.Value, authorAdded);
             LogEvent(hrib, authorAdded);
         }
 
         await session.SaveChangesAsync();
-        return (await session.Events.AggregateStreamAsync<ProjectInfo>(hrib))!;
+        return (await session.Events.AggregateStreamAsync<ProjectInfo>(hrib.Value))!;
     }
 
     public async Task<ProjectGroupInfo> CreateProjectGroup(
@@ -268,19 +268,19 @@ public sealed class KafeClient : IAsyncDisposable
     {
         hrib ??= Hrib.Create();
         var created = new ProjectGroupCreated(
-            ProjectGroupId: hrib,
+            ProjectGroupId: hrib.Value,
             CreationMethod.Migrator,
             (LocalizedString)name);
         LogEvent(hrib, created);
 
         session.Events.StartStream<ProjectGroupInfo>(hrib, created);
 
-        var closed = new ProjectGroupClosed(hrib);
-        session.Events.Append(hrib, closed);
+        var closed = new ProjectGroupClosed(hrib.Value);
+        session.Events.Append(hrib.Value, closed);
         LogEvent(hrib, closed);
 
         await session.SaveChangesAsync();
-        return (await session.Events.AggregateStreamAsync<ProjectGroupInfo>(hrib))!;
+        return (await session.Events.AggregateStreamAsync<ProjectGroupInfo>(hrib.Value))!;
     }
 
     private void LogEvent<TEvent>(Hrib hrib, TEvent @event)

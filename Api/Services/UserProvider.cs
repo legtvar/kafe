@@ -41,7 +41,8 @@ public class UserProvider
 
     public bool HasExplicitPermission(Hrib entityId, Permission permission)
     {
-        return Account is not null && (Account.Permissions?.GetValueOrDefault(entityId) & permission) == permission;
+        return Account is not null
+            && (Account.Permissions?.GetValueOrDefault(entityId.Value) & permission) == permission;
     }
 
     public async Task<bool> HasPermission(

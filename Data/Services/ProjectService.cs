@@ -50,13 +50,13 @@ public partial class ProjectService
         }
 
         var created = new ProjectCreated(
-            ProjectId: Hrib.Create(),
+            ProjectId: Hrib.Create().Value,
             CreationMethod: CreationMethod.Api,
             ProjectGroupId: projectGroupId,
             Name: name);
 
         var infoChanged = new ProjectInfoChanged(
-            ProjectId: Hrib.Create(),
+            ProjectId: Hrib.Create().Value,
             Name: name,
             Description: description,
             Genre: genre);
@@ -87,11 +87,11 @@ public partial class ProjectService
     {
         var authorsAdded = authors
             .Select(a => new ProjectAuthorAdded(
-                ProjectId: projectId,
+                ProjectId: projectId.Value,
                 AuthorId: a.id,
                 Kind: a.kind,
                 Roles: a.roles));
-        db.Events.Append(projectId, authorsAdded);
+        db.Events.Append(projectId.Value, authorsAdded);
         await db.SaveChangesAsync();
     }
 
@@ -101,11 +101,11 @@ public partial class ProjectService
     {
         var authorsAdded = authors
             .Select(a => new ProjectAuthorRemoved(
-                ProjectId: projectId,
+                ProjectId: projectId.Value,
                 AuthorId: a.id,
                 Kind: a.kind,
                 Roles: a.roles));
-        db.Events.Append(projectId, authorsAdded);
+        db.Events.Append(projectId.Value, authorsAdded);
         await db.SaveChangesAsync();
     }
 
@@ -193,7 +193,7 @@ public partial class ProjectService
 
     public async Task<ProjectInfo?> Load(Hrib id, CancellationToken token = default)
     {
-        return await db.LoadAsync<ProjectInfo>(id, token);
+        return await db.LoadAsync<ProjectInfo>(id.Value, token);
         // if (data is null)
         // {
         //     return null;

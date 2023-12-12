@@ -21,13 +21,7 @@ public class ArtifactService
 
     public async Task<ArtifactDetail?> Load(Hrib id, CancellationToken token = default)
     {
-        var artifact = await db.LoadAsync<ArtifactDetail>(id, token);
-        if (artifact is null)
-        {
-            return null;
-        }
-
-        return artifact;
+        return await db.LoadAsync<ArtifactDetail>(id.Value, token);
     }
 
     public async Task<ImmutableArray<ArtifactDetail>> LoadMany(
@@ -47,7 +41,7 @@ public class ArtifactService
         CancellationToken token = default)
     {
         var created = new ArtifactCreated(
-            ArtifactId: Hrib.Create(),
+            ArtifactId: Hrib.Create().Value,
             CreationMethod: CreationMethod.Api,
             Name: name,
             AddedOn: addedOn?.ToUniversalTime() ?? DateTimeOffset.UtcNow
@@ -57,10 +51,10 @@ public class ArtifactService
         if (containingProject is not null)
         {
             var artifactAdded = new ProjectArtifactAdded(
-                ProjectId: containingProject,
+                ProjectId: containingProject.Value,
                 ArtifactId: created.ArtifactId,
                 BlueprintSlot: blueprintSlot);
-            var projectStream = await db.Events.FetchForWriting<ProjectInfo>(containingProject, token);
+            var projectStream = await db.Events.FetchForWriting<ProjectInfo>(containingProject.Value, token);
             projectStream.AppendOne(artifactAdded);
         }
 

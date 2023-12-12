@@ -580,7 +580,7 @@ public partial class ProjectService
     // TODO: Blueprints instead of these hard-coded validation settings for FFFI MU 2023.
     public async Task<ProjectReport> Validate(Hrib id, CancellationToken token = default)
     {
-        var project = await db.LoadAsync<ProjectInfo>(id, token);
+        var project = await db.LoadAsync<ProjectInfo>(id.Value, token);
         if (project is null)
         {
             throw new IndexOutOfRangeException();
@@ -847,8 +847,8 @@ public partial class ProjectService
             return new Error($"Review cannot be '{kind}'. It must be either accepting or rejecting.");
         }
 
-        var eventStream = await db.Events.FetchForExclusiveWriting<ProjectInfo>(projectId, token);
-        var reviewAdded = new ProjectReviewAdded(projectId, kind, reviewerRole, comment);
+        var eventStream = await db.Events.FetchForExclusiveWriting<ProjectInfo>(projectId.Value, token);
+        var reviewAdded = new ProjectReviewAdded(projectId.Value, kind, reviewerRole, comment);
         eventStream.AppendOne(reviewAdded);
         await db.SaveChangesAsync(token);
         return true;

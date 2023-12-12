@@ -34,7 +34,7 @@ public class AuthorService
         CancellationToken token = default)
     {
         var created = new AuthorCreated(
-            AuthorId: Hrib.Create(),
+            AuthorId: Hrib.Create().Value,
             CreationMethod: CreationMethod.Api,
             Name: name);
         db.Events.StartStream<AuthorInfo>(created.AuthorId, created);
@@ -91,6 +91,6 @@ public class AuthorService
 
     public async Task<AuthorInfo?> Load(Hrib id, CancellationToken token = default)
     {
-        return await db.LoadAsync<AuthorInfo>(id, token);
+        return await db.LoadAsync<AuthorInfo>(id.Value, token);
     }
 }

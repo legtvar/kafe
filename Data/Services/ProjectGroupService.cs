@@ -29,7 +29,7 @@ public class ProjectGroupService
     {
         id ??= Hrib.Create();
         var created = new ProjectGroupCreated(
-            ProjectGroupId: id,
+            ProjectGroupId: id.Value,
             CreationMethod: CreationMethod.Api,
             Name: name);
 
@@ -83,7 +83,7 @@ public class ProjectGroupService
 
     public async Task<ProjectGroupInfo?> Load(Hrib id, CancellationToken token = default)
     {
-        return await db.LoadAsync<ProjectGroupInfo>(id, token);
+        return await db.LoadAsync<ProjectGroupInfo>(id.Value, token);
 
         // if (!userProvider.CanRead(projectGroup))
         // {

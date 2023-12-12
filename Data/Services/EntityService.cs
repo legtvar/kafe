@@ -20,7 +20,7 @@ public class EntityService
 
     public async Task<IEntity?> Load(Hrib id, CancellationToken token = default)
     {
-        var parentState = await db.Events.FetchStreamStateAsync(id, token);
+        var parentState = await db.Events.FetchStreamStateAsync(id.Value, token);
         if (parentState?.AggregateType is null)
         {
             return null;

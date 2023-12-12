@@ -102,7 +102,7 @@ namespace Kafe.Data.Capabilities
 
         public ProjectOwnership(Hrib projectId)
         {
-            ProjectId = IsValidCapabilitySubvalue(projectId)
+            ProjectId = IsValidCapabilitySubvalue(projectId.Value)
                 ? projectId
                 : throw new ArgumentException($"Capability subvalues can contain only ASCII letters " +
                     $"and digits except '{SubvalueSeparator}'.", nameof(projectId));
@@ -116,7 +116,7 @@ namespace Kafe.Data.Capabilities
 
         public AuthorManagement(Hrib authorId)
         {
-            AuthorId = IsValidCapabilitySubvalue(authorId)
+            AuthorId = IsValidCapabilitySubvalue(authorId.Value)
                 ? authorId
                 : throw new ArgumentException($"Capability subvalues can contain only ASCII letters " +
                     $"and digits except '{SubvalueSeparator}'.", nameof(authorId));
@@ -181,7 +181,7 @@ namespace Kafe.Data.Events.Upcasts
             {
                 Administration => new AccountPermissionSet(
                     AccountId: oldEvent.AccountId,
-                    EntityId: Hrib.System,
+                    EntityId: Hrib.System.Value,
                     Permission: Permission.All),
                 ProjectReview => new AccountPermissionSet(
                     AccountId: oldEvent.AccountId,
@@ -189,11 +189,11 @@ namespace Kafe.Data.Events.Upcasts
                     Permission: Permission.All),
                 ProjectOwnership p => new AccountPermissionSet(
                     AccountId: oldEvent.AccountId,
-                    EntityId: p.ProjectId,
+                    EntityId: p.ProjectId.Value,
                     Permission: Permission.All),
                 AuthorManagement a => new AccountPermissionSet(
                     AccountId: oldEvent.AccountId,
-                    EntityId: a.AuthorId,
+                    EntityId: a.AuthorId.Value,
                     Permission: Permission.All),
                 OrganizeFestival => new AccountPermissionSet(
                     AccountId: oldEvent.AccountId,
@@ -215,16 +215,16 @@ namespace Kafe.Data.Events.Upcasts
             {
                 Administration => new AccountPermissionUnset(
                     AccountId: oldEvent.AccountId,
-                    EntityId: Hrib.System),
+                    EntityId: Hrib.System.Value),
                 ProjectReview => new AccountPermissionUnset(
                     AccountId: oldEvent.AccountId,
                     EntityId: Fffimu23Id),
                 ProjectOwnership p => new AccountPermissionUnset(
                     AccountId: oldEvent.AccountId,
-                    EntityId: p.ProjectId),
+                    EntityId: p.ProjectId.Value),
                 AuthorManagement a => new AccountPermissionUnset(
                     AccountId: oldEvent.AccountId,
-                    EntityId: a.AuthorId),
+                    EntityId: a.AuthorId.Value),
                 OrganizeFestival => new AccountPermissionUnset(
                     AccountId: oldEvent.AccountId,
                     EntityId: Fffimu23Id),

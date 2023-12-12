@@ -1,9 +1,10 @@
-FROM node:18 as builder
+FROM node:20 as builder
+RUN corepack enable && corepack prepare pnpm@latest --activate
 WORKDIR /app
 COPY ./Web/package*.json ./
-RUN npm ci
+RUN pnpm i
 COPY ./Web ./
-RUN npm run build
+RUN pnpm run build
 
 FROM nginx:alpine
 RUN mkdir /app

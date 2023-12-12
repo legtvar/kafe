@@ -1,5 +1,4 @@
 using Kafe.Data.Events;
-using Marten.Events;
 using Marten.Events.Aggregation;
 using System;
 using System.Collections.Immutable;
@@ -12,7 +11,8 @@ public record ProjectGroupInfo(
     [LocalizedString] ImmutableDictionary<string, string> Name,
     [LocalizedString] ImmutableDictionary<string, string>? Description = null,
     DateTimeOffset Deadline = default,
-    bool IsOpen = false
+    bool IsOpen = false,
+    Permission GlobalPermissions = Permission.None
 ) : IEntity;
 
 public class ProjectGroupInfoProjection : SingleStreamProjection<ProjectGroupInfo>
@@ -36,7 +36,8 @@ public class ProjectGroupInfoProjection : SingleStreamProjection<ProjectGroupInf
         {
             Name = e.Name ?? g.Name,
             Description = e.Description ?? g.Description,
-            Deadline = e.Deadline ?? g.Deadline
+            Deadline = e.Deadline ?? g.Deadline,
+            GlobalPermissions = e.GlobalPermissions ?? g.GlobalPermissions
         };
     }
 

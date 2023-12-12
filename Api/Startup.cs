@@ -32,6 +32,10 @@ using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Authentication;
 using Kafe.Media.Services;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using System.Security.Cryptography;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.IdentityModel.Logging;
+using System.Text.Json;
 
 namespace Kafe.Api;
 
@@ -50,14 +54,17 @@ public class Startup
 
     public void ConfigureServices(IServiceCollection services)
     {
+        IdentityModelEventSource.ShowPII = true;
+        
         services.AddHttpContextAccessor();
 
         services.AddAuthentication(o =>
             {
                 o.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                // o.DefaultChallengeScheme = "oidc";
+                o.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                // o.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
             })
-            .AddCookie(o =>
+            .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, o =>
             {
                 o.Events.OnRedirectToAccessDenied = c =>
                 {
@@ -70,20 +77,32 @@ public class Startup
                     return Task.CompletedTask;
                 };
             });
-            // .AddOpenIdConnect("oidc", o => {
-            //     o.Authority = "http://localhost:5273";
+            // .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, o =>
+            // {
+            //     o.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+
+            //     var oidcConfig = Configuration.GetRequiredSection("Oidc").Get<OidcOptions>()
+            //         ?? throw new ArgumentException("OIDC is not configured well.");
+
+            //     o.Authority = oidcConfig.Authority;
+            //     o.ClientId = oidcConfig.ClientId;
+            //     o.ClientSecret = oidcConfig.ClientSecret;
+            //     o.ResponseType = OpenIdConnectResponseType.Code;
             //     o.Scope.Add("openid");
             //     o.Scope.Add("profile");
             //     o.Scope.Add("email");
-            //     o.ClientId = "KAFE";
-            //     o.ClientSecret = "42";
-            //     o.ResponseType = OpenIdConnectResponseType.Code;
-            //     o.RequireHttpsMetadata = false;
+            //     o.CallbackPath = new PathString("/signin-oidc");
+            //     o.SaveTokens = true;
             // });
 
         services.AddAuthorization(o =>
         {
-            o.AddPolicy(EndpointPolicy.AdministratorOnly, b => b.AddRequirements(new AdministratorRequirement()));
+            o.AddPolicy(EndpointPolicy.Read, b => b.AddRequirements(new PermissionRequirement(Permission.Read)));
+            o.AddPolicy(EndpointPolicy.Write, b => b.AddRequirements(new PermissionRequirement(Permission.Write)));
+            o.AddPolicy(EndpointPolicy.Append, b => b.AddRequirements(new PermissionRequirement(Permission.Append)));
+            o.AddPolicy(EndpointPolicy.Inspect, b => b.AddRequirements(new PermissionRequirement(Permission.Inspect)));
+            o.AddPolicy(EndpointPolicy.ReadInspect, b => b.AddRequirements(new PermissionRequirement(Permission.Read | Permission.Inspect)));
+            o.AddPolicy(EndpointPolicy.Review, b => b.AddRequirements(new PermissionRequirement(Permission.Review)));
         });
 
         ConfigureDataProtection(services);
@@ -104,7 +123,8 @@ public class Startup
         })
         .AddJsonOptions(o =>
         {
-            o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            o.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+            o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
             o.JsonSerializerOptions.Converters.Add(new LocalizedStringJsonConverter());
         });
 
@@ -112,6 +132,7 @@ public class Startup
         {
             o.AddDefaultPolicy(p =>
             {
+                p.AllowAnyHeader();
                 p.WithOrigins(ApiOptions.AllowedOrigins.ToArray())
                     .AllowCredentials();
             });
@@ -136,6 +157,11 @@ public class Startup
         app.UseCors();
 
         app.UseAuthentication();
+        app.Use(async (ctx, next) =>
+        {
+            await ctx.RequestServices.GetRequiredService<UserProvider>().RefreshAccount();
+            await next();
+        });
         app.UseAuthorization();
 
         if (environment.IsDevelopment())
@@ -157,16 +183,9 @@ public class Startup
         services.AddKafeMedia();
         services.AddKafeData();
 
-        services.AddScoped<IUserProvider, DefaultUserProvider>();
-        services.AddScoped<IProjectGroupService, DefaultProjectGroupService>();
-        services.AddScoped<IProjectService, DefaultProjectService>();
-        services.AddScoped<IAuthorService, DefaultAuthorService>();
-        services.AddScoped<IArtifactService, DefaultArtifactService>();
-        services.AddScoped<IShardService, DefaultShardService>();
-        services.AddScoped<IPlaylistService, DefaultPlaylistService>();
-        services.AddScoped<IAccountService, DefaultAccountService>();
+        services.AddScoped<UserProvider>();
 
-        services.AddScoped<IAuthorizationHandler, AdministratorHandler>();
+        services.AddScoped<IAuthorizationHandler, PermissionHandler>();
 
         services.Configure<ApiOptions>(Configuration);
         services.Configure<EmailOptions>(Configuration.GetSection("Email"));

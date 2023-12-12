@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
@@ -21,13 +22,13 @@ public class VideoConversionDaemon : BackgroundService
     private readonly IServiceProvider serviceProvider;
     private readonly ILogger<VideoConversionDaemon> logger;
     private readonly IMediaService mediaService;
-    private readonly IStorageService storageService;
+    private readonly StorageService storageService;
 
     public VideoConversionDaemon(
         IServiceProvider serviceProvider,
         ILogger<VideoConversionDaemon> logger,
         IMediaService mediaService,
-        IStorageService storageService)
+        StorageService storageService)
     {
         this.serviceProvider = serviceProvider;
         this.logger = logger;
@@ -57,14 +58,13 @@ public class VideoConversionDaemon : BackgroundService
                     out var originalPath))
                 {
                     throw new InvalidOperationException(
-                        $"Cannot convert video '${conversion.VideoId}' because it has no original variant.");
+                        $"Cannot convert video '{conversion.VideoId}' because it has no original variant.");
                 }
 
                 var videosDir = storageService.GetShardKindDirectory(ShardKind.Video, conversion.Variant);
                 if (videosDir is null || !videosDir.Exists)
                 {
-                    throw new InvalidOperationException($"The directory for the '{conversion.Variant}' variant of video " +
-                        "'{video.VideoId}' could not be found.");
+                    throw new InvalidOperationException($"The directory for the '{conversion.Variant}' variant of video '{conversion.VideoId}' could not be found.");
                 }
 
                 var shardDir = videosDir.CreateSubdirectory(conversion.VideoId);
@@ -121,58 +121,61 @@ public class VideoConversionDaemon : BackgroundService
             return conversion;
         }
 
+        async Task<VideoConversionInfo?> SiftThroughRange(IReadOnlyList<VideoShardInfo> range)
+        {
+            var ids = range.Select(v => v.Id).ToList();
+            var finishedConversions = await db.Query<VideoConversionInfo>()
+                .Where(c => c.IsCompleted || c.HasFailed && ids.Contains(c.VideoId))
+                .Select(c => c.VideoId)
+                .ToListAsync();
+            var candidateIds = ids.Except(finishedConversions).Distinct().ToList();
+            var candidate = range
+                .Where(v => candidateIds.Contains(v.Id))
+                .Select(v => (video: v, missingVariants: GetMissingVariants(v)))
+                .FirstOrDefault(p => p.missingVariants.Length > 0);
+            if (candidate.video is null)
+            {
+                return null;
+            }
+
+            logger.LogDebug("Found video '{}' with missing variants.", candidate.video.Id);
+            var id = Hrib.Create();
+            var created = new VideoConversionCreated(
+                id.Value,
+                candidate.video.Id,
+                candidate.missingVariants.First());
+            db.Events.StartStream<VideoConversionInfo>(id, created);
+            await db.SaveChangesAsync();
+            return await db.Events.AggregateStreamAsync<VideoConversionInfo>(id.Value);
+        }
+
+        VideoConversionInfo? result = null;
+
         var today = DateTimeOffset.UtcNow.Date;
         var todayVideos = await db.Query<VideoShardInfo>()
             .Where(v => ((string)(object)v.CreatedAt).StartsWith(today.ToString("yyyy-MM-dd")))
             .ToListAsync();
-        var candidateTodayVideo = todayVideos.Select(v => (video: v, missingVariants: GetMissingVariants(v)))
-            .FirstOrDefault(p => p.missingVariants.Length > 0);
-        if (candidateTodayVideo.video is not null)
+        result = await SiftThroughRange(todayVideos);
+        if (result is not null)
         {
-            logger.LogDebug("Found today's video '{}' with missing variants.", candidateTodayVideo.video.Id);
-            var id = Hrib.Create();
-            var created = new VideoConversionCreated(
-                id,
-                candidateTodayVideo.video.Id,
-                candidateTodayVideo.missingVariants.First());
-            db.Events.StartStream<VideoConversionInfo>(id, created);
-            await db.SaveChangesAsync();
-            return await db.Events.AggregateStreamAsync<VideoConversionInfo>(id);
+            return result;
         }
 
         var yearVideos = await db.Query<VideoShardInfo>()
             .Where(v => ((string)(object)v.CreatedAt).StartsWith(today.ToString("yyyy")))
             .ToListAsync();
-        var candidateYearVideo = yearVideos.Select(v => (video: v, missingVariants: GetMissingVariants(v)))
-            .FirstOrDefault(p => p.missingVariants.Length > 0);
-        if (candidateYearVideo.video is not null)
+        result = await SiftThroughRange(yearVideos);
+        if (result is not null)
         {
-            logger.LogDebug("Found this year's video '{}' with missing variants.", candidateYearVideo.video.Id);
-            var id = Hrib.Create();
-            var created = new VideoConversionCreated(
-                id,
-                candidateYearVideo.video.Id,
-                candidateYearVideo.missingVariants.First());
-            db.Events.StartStream<VideoConversionInfo>(id, created);
-            await db.SaveChangesAsync();
-            return await db.Events.AggregateStreamAsync<VideoConversionInfo>(id);
+            return result;
         }
 
         var allTimeVideos = await db.Query<VideoShardInfo>()
             .ToListAsync();
-        var candidateAllTimeVideo = allTimeVideos.Select(v => (video: v, missingVariants: GetMissingVariants(v)))
-            .FirstOrDefault(p => p.missingVariants.Length > 0);
-        if (candidateAllTimeVideo.video is not null)
+        result = await SiftThroughRange(allTimeVideos);
+        if (result is not null)
         {
-            logger.LogDebug("Found this year's video '{}' with missing variants.", candidateAllTimeVideo.video.Id);
-            var id = Hrib.Create();
-            var created = new VideoConversionCreated(
-                id,
-                candidateAllTimeVideo.video.Id,
-                candidateAllTimeVideo.missingVariants.First());
-            db.Events.StartStream<VideoConversionInfo>(id, created);
-            await db.SaveChangesAsync();
-            return await db.Events.AggregateStreamAsync<VideoConversionInfo>(id);
+            return result;
         }
 
         return null;

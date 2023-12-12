@@ -1,19 +1,12 @@
-﻿using Kafe.Data.Capabilities;
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace Kafe.Data.Events;
 
-namespace Kafe.Data.Events;
-
-public record AccountCapabilityAdded(
+public record AccountPermissionSet(
     [Hrib] string AccountId,
-    [AccountCapability] string Capability
+    string EntityId,
+    Permission Permission
 );
 
-public record AccountCapabilityRemoved(
+public record AccountPermissionUnset(
     [Hrib] string AccountId,
-    [AccountCapability] string Capability
+    string EntityId
 );

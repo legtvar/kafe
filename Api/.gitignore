@@ -24,3 +24,5 @@
 # reignore output
 obj/
 bin/
+
+appsettings.oidc.json

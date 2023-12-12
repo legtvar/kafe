@@ -1,4 +1,5 @@
 ﻿using Kafe.Data.Aggregates;
+using Kafe.Data.Events.Upcasts;
 using Kafe.Data.Options;
 using Kafe.Data.Services;
 using Marten;
@@ -9,10 +10,13 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Weasel.Core;
+using Weasel.Postgresql.Functions;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -45,10 +49,6 @@ public static class ServiceCollectionExtensions
                     .ConnectionLimit(-1);
             });
 
-            //options.Linq.FieldSources.Add(new LocalizedStringFieldSource());
-            //options.Linq.MethodCallParsers.Add(new DummyMethodCallParser());
-            //options.Linq.FieldSources.Add(new HribFieldSource());
-
             options.Projections.Add<AuthorInfoProjection>(ProjectionLifecycle.Inline);
             options.Projections.Add<ArtifactInfoProjection>(ProjectionLifecycle.Inline);
             options.Projections.Add<VideoShardInfoProjection>(ProjectionLifecycle.Inline);
@@ -61,15 +61,28 @@ public static class ServiceCollectionExtensions
             options.Projections.Add<VideoConversionInfoProjection>(ProjectionLifecycle.Inline);
             options.Projections.Add<ArtifactDetailProjection>(ProjectionLifecycle.Inline);
             options.Projections.Add<AccountInfoProjection>(ProjectionLifecycle.Inline);
+            options.Events.Upcast<AccountCapabilityAddedUpcaster>();
             options.UseDefaultSerialization(serializerType: SerializerType.Newtonsoft);
+
+            RegisterEmbeddedSql(options);
 
             return options;
         }
 
         services.AddMarten(ConfigureMarten)
-            .ApplyAllDatabaseChangesOnStartup();
+            .ApplyAllDatabaseChangesOnStartup()
+            .UseIdentitySessions();
 
-        services.AddSingleton<IStorageService, DefaultStorageService>();
+        services.AddSingleton<StorageService>();
+
+        services.AddScoped<AccountService>();
+        services.AddScoped<ProjectGroupService>();
+        services.AddScoped<ProjectService>();
+        services.AddScoped<AuthorService>();
+        services.AddScoped<ArtifactService>();
+        services.AddScoped<ShardService>();
+        services.AddScoped<PlaylistService>();
+        services.AddScoped<EntityService>();
 
         services.AddOptions<StorageOptions>()
             .BindConfiguration("Storage");
@@ -78,5 +91,25 @@ public static class ServiceCollectionExtensions
             .BindConfiguration("Seed");
 
         return services;
+    }
+
+    private static void RegisterEmbeddedSql(StoreOptions options)
+    {
+        // NB: Currently assumes all raw sql is a function
+
+        var assembly = Assembly.GetExecutingAssembly();
+        var sqlFiles = assembly.GetManifestResourceNames()
+            .Where(n => Path.GetExtension(n) == ".sql");
+
+        foreach (var sqlFile in sqlFiles)
+        {
+            using var stream = assembly.GetManifestResourceStream(sqlFile)
+                ?? throw new NotSupportedException($"Embedded Sql '{sqlFile}' could not be found.");
+            using var reader = new StreamReader(stream);
+            var contents = reader.ReadToEnd();
+            
+            var objectName = Path.GetFileNameWithoutExtension(sqlFile);
+            options.Storage.ExtendedSchemaObjects.Add(new Function(new DbObjectName("public", objectName), contents));
+        }
     }
 }

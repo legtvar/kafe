@@ -1,0 +1,3188 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "KAFE API",
+    "version": "v1"
+  },
+  "paths": {
+    "/api/v1/account": {
+      "get": {
+        "tags": [
+          "Account"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountDetailDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountDetailDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountDetailDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/account/{id}": {
+      "get": {
+        "tags": [
+          "Account"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountDetailDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountDetailDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountDetailDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/accounts": {
+      "get": {
+        "tags": [
+          "Account"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AccountListDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AccountListDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AccountListDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/account/logout": {
+      "get": {
+        "tags": [
+          "Account"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v1/artifact": {
+      "post": {
+        "tags": [
+          "Artifact"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ArtifactCreationDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ArtifactCreationDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ArtifactCreationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "description": "Human-Readable Identifier Ballast",
+                  "format": "hrib",
+                  "example": "AAAAbadf00d"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "description": "Human-Readable Identifier Ballast",
+                  "format": "hrib",
+                  "example": "AAAAbadf00d"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "string",
+                  "description": "Human-Readable Identifier Ballast",
+                  "format": "hrib",
+                  "example": "AAAAbadf00d"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/artifact/{id}": {
+      "get": {
+        "tags": [
+          "Artifact"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "description": "Human-Readable Identifier Ballast",
+                  "format": "hrib",
+                  "example": "AAAAbadf00d"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "description": "Human-Readable Identifier Ballast",
+                  "format": "hrib",
+                  "example": "AAAAbadf00d"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "string",
+                  "description": "Human-Readable Identifier Ballast",
+                  "format": "hrib",
+                  "example": "AAAAbadf00d"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/author": {
+      "post": {
+        "tags": [
+          "Author"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthorCreationDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthorCreationDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthorCreationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "description": "Human-Readable Identifier Ballast",
+                  "format": "hrib",
+                  "example": "AAAAbadf00d"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "description": "Human-Readable Identifier Ballast",
+                  "format": "hrib",
+                  "example": "AAAAbadf00d"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "string",
+                  "description": "Human-Readable Identifier Ballast",
+                  "format": "hrib",
+                  "example": "AAAAbadf00d"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/author/{id}": {
+      "get": {
+        "tags": [
+          "Author"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthorDetailDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthorDetailDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthorDetailDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/authors": {
+      "get": {
+        "tags": [
+          "Author"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AuthorListDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AuthorListDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AuthorListDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/playlist/{id}": {
+      "get": {
+        "tags": [
+          "Playlist"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlaylistDetailDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlaylistDetailDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlaylistDetailDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/playlists": {
+      "get": {
+        "tags": [
+          "Playlist"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PlaylistListDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PlaylistListDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PlaylistListDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/project": {
+      "post": {
+        "tags": [
+          "Project"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectCreationDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectCreationDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectCreationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "description": "Human-Readable Identifier Ballast",
+                  "format": "hrib",
+                  "example": "AAAAbadf00d"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "description": "Human-Readable Identifier Ballast",
+                  "format": "hrib",
+                  "example": "AAAAbadf00d"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "string",
+                  "description": "Human-Readable Identifier Ballast",
+                  "format": "hrib",
+                  "example": "AAAAbadf00d"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Project"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectEditDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectEditDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectEditDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v1/project/{id}": {
+      "get": {
+        "tags": [
+          "Project"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectDetailDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectDetailDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectDetailDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/project-group": {
+      "post": {
+        "tags": [
+          "ProjectGroup"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectGroupCreationDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectGroupCreationDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectGroupCreationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "description": "Human-Readable Identifier Ballast",
+                  "format": "hrib",
+                  "example": "AAAAbadf00d"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "description": "Human-Readable Identifier Ballast",
+                  "format": "hrib",
+                  "example": "AAAAbadf00d"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "string",
+                  "description": "Human-Readable Identifier Ballast",
+                  "format": "hrib",
+                  "example": "AAAAbadf00d"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/project-group/{id}": {
+      "get": {
+        "tags": [
+          "ProjectGroup"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectGroupDetailDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectGroupDetailDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectGroupDetailDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/project-groups": {
+      "get": {
+        "tags": [
+          "ProjectGroup"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProjectGroupListDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProjectGroupListDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProjectGroupListDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/projects": {
+      "get": {
+        "tags": [
+          "Project"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProjectListDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProjectListDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProjectListDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/project-review": {
+      "post": {
+        "tags": [
+          "Project"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectReviewCreationDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectReviewCreationDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectReviewCreationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v1/project-validation/{id}": {
+      "get": {
+        "tags": [
+          "Project"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectValidationDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectValidationDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectValidationDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/shard": {
+      "post": {
+        "tags": [
+          "Shard"
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "Kind": {
+                    "$ref": "#/components/schemas/ShardKind"
+                  },
+                  "ArtifactId": {
+                    "type": "string"
+                  },
+                  "File": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              },
+              "encoding": {
+                "Kind": {
+                  "style": "form"
+                },
+                "ArtifactId": {
+                  "style": "form"
+                },
+                "File": {
+                  "style": "form"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/shard/{id}": {
+      "get": {
+        "tags": [
+          "Shard"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/VideoShardDetailDto"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ImageShardDetailDto"
+                    }
+                  ]
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/VideoShardDetailDto"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ImageShardDetailDto"
+                    }
+                  ]
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/VideoShardDetailDto"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ImageShardDetailDto"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/shard-download/{id}": {
+      "get": {
+        "tags": [
+          "Shard"
+        ],
+        "parameters": [
+          {
+            "name": "Id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/shard-download/{id}/{variant}": {
+      "get": {
+        "tags": [
+          "Shard"
+        ],
+        "parameters": [
+          {
+            "name": "Id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Variant",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/tmp-account/{token}": {
+      "get": {
+        "tags": [
+          "Account"
+        ],
+        "parameters": [
+          {
+            "name": "token",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/tmp-account": {
+      "post": {
+        "tags": [
+          "Account"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TemporaryAccountCreationDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TemporaryAccountCreationDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/TemporaryAccountCreationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AccountDetailDto": {
+        "required": [
+          "emailAddress",
+          "id",
+          "permissions",
+          "preferredCulture"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Human-Readable Identifier Ballast",
+            "format": "hrib",
+            "example": "AAAAbadf00d"
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the user. Null if the account is temporary.",
+            "nullable": true
+          },
+          "uco": {
+            "type": "string",
+            "description": "The uco of the user. Null if the account is temporary.",
+            "nullable": true
+          },
+          "emailAddress": {
+            "type": "string",
+            "description": "The email address of the user."
+          },
+          "preferredCulture": {
+            "type": "string",
+            "description": "The preferred culture of the user."
+          },
+          "permissions": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Permission"
+              }
+            },
+            "description": "The explicit permissions this user has been granted."
+          }
+        },
+        "additionalProperties": false,
+        "description": "A detail of a user account."
+      },
+      "AccountListDto": {
+        "required": [
+          "emailAddress",
+          "id",
+          "permissions",
+          "preferredCulture"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Human-Readable Identifier Ballast",
+            "format": "hrib",
+            "example": "AAAAbadf00d"
+          },
+          "emailAddress": {
+            "type": "string"
+          },
+          "preferredCulture": {
+            "type": "string"
+          },
+          "permissions": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Permission"
+              }
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "ArgumentArity": {
+        "required": [
+          "max",
+          "min"
+        ],
+        "type": "object",
+        "properties": {
+          "min": {
+            "type": "integer",
+            "description": "The inclusive lower bound.",
+            "format": "int32"
+          },
+          "max": {
+            "type": "integer",
+            "description": "The inclusive upper bound.",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false,
+        "description": "The lower and upper bound for the count of something."
+      },
+      "ArtifactCreationDto": {
+        "required": [
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "title": "LocalizedString",
+            "required": [
+              "iv"
+            ],
+            "type": "object",
+            "properties": {
+              "iv": {
+                "type": "string"
+              },
+              "cs": {
+                "type": "string",
+                "nullable": true
+              },
+              "en": {
+                "type": "string",
+                "nullable": true
+              }
+            }
+          },
+          "addedOn": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "containingProject": {
+            "type": "string",
+            "description": "Human-Readable Identifier Ballast",
+            "format": "hrib",
+            "nullable": true,
+            "example": "AAAAbadf00d"
+          },
+          "blueprintSlot": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "AudioStreamDto": {
+        "required": [
+          "bitrate",
+          "channels",
+          "codec",
+          "sampleRate"
+        ],
+        "type": "object",
+        "properties": {
+          "codec": {
+            "type": "string"
+          },
+          "bitrate": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "channels": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "sampleRate": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AuthorCreationDto": {
+        "required": [
+          "globalPermissions",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "globalPermissions": {
+            "$ref": "#/components/schemas/Permission"
+          },
+          "bio": {
+            "title": "LocalizedString",
+            "required": [
+              "iv"
+            ],
+            "type": "object",
+            "properties": {
+              "iv": {
+                "type": "string"
+              },
+              "cs": {
+                "type": "string",
+                "nullable": true
+              },
+              "en": {
+                "type": "string",
+                "nullable": true
+              }
+            },
+            "nullable": true
+          },
+          "uco": {
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "AuthorDetailDto": {
+        "required": [
+          "globalPermissions",
+          "id",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "globalPermissions": {
+            "$ref": "#/components/schemas/Permission"
+          },
+          "bio": {
+            "title": "LocalizedString",
+            "required": [
+              "iv"
+            ],
+            "type": "object",
+            "properties": {
+              "iv": {
+                "type": "string"
+              },
+              "cs": {
+                "type": "string",
+                "nullable": true
+              },
+              "en": {
+                "type": "string",
+                "nullable": true
+              }
+            },
+            "nullable": true
+          },
+          "uco": {
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "AuthorListDto": {
+        "required": [
+          "globalPermissions",
+          "id",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "globalPermissions": {
+            "$ref": "#/components/schemas/Permission"
+          }
+        },
+        "additionalProperties": false
+      },
+      "DiagnosticKind": {
+        "enum": [
+          "unknown",
+          "info",
+          "warning",
+          "error"
+        ],
+        "type": "string"
+      },
+      "ImageDto": {
+        "required": [
+          "fileExtension",
+          "height",
+          "isCorrupted",
+          "mimeType",
+          "width"
+        ],
+        "type": "object",
+        "properties": {
+          "fileExtension": {
+            "type": "string"
+          },
+          "mimeType": {
+            "type": "string"
+          },
+          "width": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "height": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "isCorrupted": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ImageShardDetailDto": {
+        "required": [
+          "variants"
+        ],
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ShardDetailBaseDto"
+          }
+        ],
+        "properties": {
+          "variants": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/ImageDto"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "MediaDto": {
+        "required": [
+          "audioStreams",
+          "duration",
+          "fileExtension",
+          "fileLength",
+          "isCorrupted",
+          "mimeType",
+          "subtitleStreams",
+          "videoStreams"
+        ],
+        "type": "object",
+        "properties": {
+          "fileExtension": {
+            "type": "string"
+          },
+          "mimeType": {
+            "type": "string"
+          },
+          "fileLength": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "duration": {
+            "type": "string",
+            "format": "time-span",
+            "example": "00:00:00"
+          },
+          "videoStreams": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VideoStreamDto"
+            }
+          },
+          "audioStreams": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AudioStreamDto"
+            }
+          },
+          "subtitleStreams": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SubtitleStreamDto"
+            }
+          },
+          "isCorrupted": {
+            "type": "boolean"
+          },
+          "error": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Permission": {
+        "enum": [
+          "none",
+          "read",
+          "append",
+          "inspect",
+          "write",
+          "review",
+          "all"
+        ],
+        "type": "string"
+      },
+      "PlaylistDetailDto": {
+        "required": [
+          "globalPermissions",
+          "id",
+          "name",
+          "videos"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "title": "LocalizedString",
+            "required": [
+              "iv"
+            ],
+            "type": "object",
+            "properties": {
+              "iv": {
+                "type": "string"
+              },
+              "cs": {
+                "type": "string",
+                "nullable": true
+              },
+              "en": {
+                "type": "string",
+                "nullable": true
+              }
+            }
+          },
+          "description": {
+            "title": "LocalizedString",
+            "required": [
+              "iv"
+            ],
+            "type": "object",
+            "properties": {
+              "iv": {
+                "type": "string"
+              },
+              "cs": {
+                "type": "string",
+                "nullable": true
+              },
+              "en": {
+                "type": "string",
+                "nullable": true
+              }
+            },
+            "nullable": true
+          },
+          "globalPermissions": {
+            "$ref": "#/components/schemas/Permission"
+          },
+          "videos": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "PlaylistListDto": {
+        "required": [
+          "globalPermissions",
+          "id",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "title": "LocalizedString",
+            "required": [
+              "iv"
+            ],
+            "type": "object",
+            "properties": {
+              "iv": {
+                "type": "string"
+              },
+              "cs": {
+                "type": "string",
+                "nullable": true
+              },
+              "en": {
+                "type": "string",
+                "nullable": true
+              }
+            }
+          },
+          "description": {
+            "title": "LocalizedString",
+            "required": [
+              "iv"
+            ],
+            "type": "object",
+            "properties": {
+              "iv": {
+                "type": "string"
+              },
+              "cs": {
+                "type": "string",
+                "nullable": true
+              },
+              "en": {
+                "type": "string",
+                "nullable": true
+              }
+            },
+            "nullable": true
+          },
+          "globalPermissions": {
+            "$ref": "#/components/schemas/Permission"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ProblemDetails": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "detail": {
+            "type": "string",
+            "nullable": true
+          },
+          "instance": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": { }
+      },
+      "ProjectArtifactAdditionDto": {
+        "required": [
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "blueprintSlot": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ProjectArtifactBlueprintDto": {
+        "required": [
+          "arity",
+          "name",
+          "shardBlueprints"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "title": "LocalizedString",
+            "required": [
+              "iv"
+            ],
+            "type": "object",
+            "properties": {
+              "iv": {
+                "type": "string"
+              },
+              "cs": {
+                "type": "string",
+                "nullable": true
+              },
+              "en": {
+                "type": "string",
+                "nullable": true
+              }
+            }
+          },
+          "description": {
+            "title": "LocalizedString",
+            "required": [
+              "iv"
+            ],
+            "type": "object",
+            "properties": {
+              "iv": {
+                "type": "string"
+              },
+              "cs": {
+                "type": "string",
+                "nullable": true
+              },
+              "en": {
+                "type": "string",
+                "nullable": true
+              }
+            },
+            "nullable": true
+          },
+          "arity": {
+            "$ref": "#/components/schemas/ArgumentArity"
+          },
+          "shardBlueprints": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/ProjectArtifactShardBlueprintDto"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "ProjectArtifactDto": {
+        "required": [
+          "addedOn",
+          "id",
+          "name",
+          "shards"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Human-Readable Identifier Ballast",
+            "format": "hrib",
+            "example": "AAAAbadf00d"
+          },
+          "name": {
+            "title": "LocalizedString",
+            "required": [
+              "iv"
+            ],
+            "type": "object",
+            "properties": {
+              "iv": {
+                "type": "string"
+              },
+              "cs": {
+                "type": "string",
+                "nullable": true
+              },
+              "en": {
+                "type": "string",
+                "nullable": true
+              }
+            }
+          },
+          "addedOn": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "blueprintSlot": {
+            "type": "string",
+            "nullable": true
+          },
+          "shards": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ShardListDto"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "ProjectArtifactShardBlueprintDto": {
+        "required": [
+          "arity",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "title": "LocalizedString",
+            "required": [
+              "iv"
+            ],
+            "type": "object",
+            "properties": {
+              "iv": {
+                "type": "string"
+              },
+              "cs": {
+                "type": "string",
+                "nullable": true
+              },
+              "en": {
+                "type": "string",
+                "nullable": true
+              }
+            }
+          },
+          "description": {
+            "title": "LocalizedString",
+            "required": [
+              "iv"
+            ],
+            "type": "object",
+            "properties": {
+              "iv": {
+                "type": "string"
+              },
+              "cs": {
+                "type": "string",
+                "nullable": true
+              },
+              "en": {
+                "type": "string",
+                "nullable": true
+              }
+            },
+            "nullable": true
+          },
+          "arity": {
+            "$ref": "#/components/schemas/ArgumentArity"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ProjectAuthorDto": {
+        "required": [
+          "id",
+          "name",
+          "roles"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Human-Readable Identifier Ballast",
+            "format": "hrib",
+            "example": "AAAAbadf00d"
+          },
+          "name": {
+            "type": "string"
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "ProjectBlueprintDto": {
+        "required": [
+          "artifactBlueprints",
+          "name",
+          "requiredReviewers"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "title": "LocalizedString",
+            "required": [
+              "iv"
+            ],
+            "type": "object",
+            "properties": {
+              "iv": {
+                "type": "string"
+              },
+              "cs": {
+                "type": "string",
+                "nullable": true
+              },
+              "en": {
+                "type": "string",
+                "nullable": true
+              }
+            }
+          },
+          "description": {
+            "title": "LocalizedString",
+            "required": [
+              "iv"
+            ],
+            "type": "object",
+            "properties": {
+              "iv": {
+                "type": "string"
+              },
+              "cs": {
+                "type": "string",
+                "nullable": true
+              },
+              "en": {
+                "type": "string",
+                "nullable": true
+              }
+            },
+            "nullable": true
+          },
+          "requiredReviewers": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "artifactBlueprints": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/ProjectArtifactBlueprintDto"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "ProjectCreationAuthorDto": {
+        "required": [
+          "id",
+          "roles"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "ProjectCreationDto": {
+        "required": [
+          "cast",
+          "crew",
+          "name",
+          "projectGroupId"
+        ],
+        "type": "object",
+        "properties": {
+          "projectGroupId": {
+            "type": "string"
+          },
+          "name": {
+            "title": "LocalizedString",
+            "required": [
+              "iv"
+            ],
+            "type": "object",
+            "properties": {
+              "iv": {
+                "type": "string"
+              },
+              "cs": {
+                "type": "string",
+                "nullable": true
+              },
+              "en": {
+                "type": "string",
+                "nullable": true
+              }
+            }
+          },
+          "description": {
+            "title": "LocalizedString",
+            "required": [
+              "iv"
+            ],
+            "type": "object",
+            "properties": {
+              "iv": {
+                "type": "string"
+              },
+              "cs": {
+                "type": "string",
+                "nullable": true
+              },
+              "en": {
+                "type": "string",
+                "nullable": true
+              }
+            },
+            "nullable": true
+          },
+          "genre": {
+            "title": "LocalizedString",
+            "required": [
+              "iv"
+            ],
+            "type": "object",
+            "properties": {
+              "iv": {
+                "type": "string"
+              },
+              "cs": {
+                "type": "string",
+                "nullable": true
+              },
+              "en": {
+                "type": "string",
+                "nullable": true
+              }
+            },
+            "nullable": true
+          },
+          "crew": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProjectCreationAuthorDto"
+            }
+          },
+          "cast": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProjectCreationAuthorDto"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "ProjectDetailDto": {
+        "required": [
+          "artifacts",
+          "blueprint",
+          "cast",
+          "crew",
+          "globalPermissions",
+          "id",
+          "name",
+          "projectGroupId",
+          "releasedOn",
+          "reviews",
+          "userPermissions"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Human-Readable Identifier Ballast",
+            "format": "hrib",
+            "example": "AAAAbadf00d"
+          },
+          "projectGroupId": {
+            "type": "string",
+            "description": "Human-Readable Identifier Ballast",
+            "format": "hrib",
+            "example": "AAAAbadf00d"
+          },
+          "projectGroupName": {
+            "title": "LocalizedString",
+            "required": [
+              "iv"
+            ],
+            "type": "object",
+            "properties": {
+              "iv": {
+                "type": "string"
+              },
+              "cs": {
+                "type": "string",
+                "nullable": true
+              },
+              "en": {
+                "type": "string",
+                "nullable": true
+              }
+            },
+            "nullable": true
+          },
+          "genre": {
+            "title": "LocalizedString",
+            "required": [
+              "iv"
+            ],
+            "type": "object",
+            "properties": {
+              "iv": {
+                "type": "string"
+              },
+              "cs": {
+                "type": "string",
+                "nullable": true
+              },
+              "en": {
+                "type": "string",
+                "nullable": true
+              }
+            },
+            "nullable": true
+          },
+          "name": {
+            "title": "LocalizedString",
+            "required": [
+              "iv"
+            ],
+            "type": "object",
+            "properties": {
+              "iv": {
+                "type": "string"
+              },
+              "cs": {
+                "type": "string",
+                "nullable": true
+              },
+              "en": {
+                "type": "string",
+                "nullable": true
+              }
+            }
+          },
+          "description": {
+            "title": "LocalizedString",
+            "required": [
+              "iv"
+            ],
+            "type": "object",
+            "properties": {
+              "iv": {
+                "type": "string"
+              },
+              "cs": {
+                "type": "string",
+                "nullable": true
+              },
+              "en": {
+                "type": "string",
+                "nullable": true
+              }
+            },
+            "nullable": true
+          },
+          "globalPermissions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Permission"
+            }
+          },
+          "userPermissions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Permission"
+            }
+          },
+          "releasedOn": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "crew": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProjectAuthorDto"
+            }
+          },
+          "cast": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProjectAuthorDto"
+            }
+          },
+          "artifacts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProjectArtifactDto"
+            }
+          },
+          "reviews": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProjectReviewDto"
+            }
+          },
+          "blueprint": {
+            "$ref": "#/components/schemas/ProjectBlueprintDto"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ProjectDiagnosticDto": {
+        "required": [
+          "kind",
+          "message",
+          "validationStage"
+        ],
+        "type": "object",
+        "properties": {
+          "kind": {
+            "$ref": "#/components/schemas/DiagnosticKind"
+          },
+          "message": {
+            "title": "LocalizedString",
+            "required": [
+              "iv"
+            ],
+            "type": "object",
+            "properties": {
+              "iv": {
+                "type": "string"
+              },
+              "cs": {
+                "type": "string",
+                "nullable": true
+              },
+              "en": {
+                "type": "string",
+                "nullable": true
+              }
+            }
+          },
+          "validationStage": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ProjectEditDto": {
+        "required": [
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "title": "LocalizedString",
+            "required": [
+              "iv"
+            ],
+            "type": "object",
+            "properties": {
+              "iv": {
+                "type": "string"
+              },
+              "cs": {
+                "type": "string",
+                "nullable": true
+              },
+              "en": {
+                "type": "string",
+                "nullable": true
+              }
+            },
+            "nullable": true
+          },
+          "description": {
+            "title": "LocalizedString",
+            "required": [
+              "iv"
+            ],
+            "type": "object",
+            "properties": {
+              "iv": {
+                "type": "string"
+              },
+              "cs": {
+                "type": "string",
+                "nullable": true
+              },
+              "en": {
+                "type": "string",
+                "nullable": true
+              }
+            },
+            "nullable": true
+          },
+          "genre": {
+            "title": "LocalizedString",
+            "required": [
+              "iv"
+            ],
+            "type": "object",
+            "properties": {
+              "iv": {
+                "type": "string"
+              },
+              "cs": {
+                "type": "string",
+                "nullable": true
+              },
+              "en": {
+                "type": "string",
+                "nullable": true
+              }
+            },
+            "nullable": true
+          },
+          "crew": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProjectCreationAuthorDto"
+            },
+            "nullable": true
+          },
+          "cast": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProjectCreationAuthorDto"
+            },
+            "nullable": true
+          },
+          "artifacts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProjectArtifactAdditionDto"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ProjectGroupCreationDto": {
+        "required": [
+          "deadline",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "title": "LocalizedString",
+            "required": [
+              "iv"
+            ],
+            "type": "object",
+            "properties": {
+              "iv": {
+                "type": "string"
+              },
+              "cs": {
+                "type": "string",
+                "nullable": true
+              },
+              "en": {
+                "type": "string",
+                "nullable": true
+              }
+            }
+          },
+          "description": {
+            "title": "LocalizedString",
+            "required": [
+              "iv"
+            ],
+            "type": "object",
+            "properties": {
+              "iv": {
+                "type": "string"
+              },
+              "cs": {
+                "type": "string",
+                "nullable": true
+              },
+              "en": {
+                "type": "string",
+                "nullable": true
+              }
+            },
+            "nullable": true
+          },
+          "deadline": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ProjectGroupDetailDto": {
+        "required": [
+          "deadline",
+          "id",
+          "isOpen",
+          "name",
+          "projects"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "title": "LocalizedString",
+            "required": [
+              "iv"
+            ],
+            "type": "object",
+            "properties": {
+              "iv": {
+                "type": "string"
+              },
+              "cs": {
+                "type": "string",
+                "nullable": true
+              },
+              "en": {
+                "type": "string",
+                "nullable": true
+              }
+            }
+          },
+          "description": {
+            "title": "LocalizedString",
+            "required": [
+              "iv"
+            ],
+            "type": "object",
+            "properties": {
+              "iv": {
+                "type": "string"
+              },
+              "cs": {
+                "type": "string",
+                "nullable": true
+              },
+              "en": {
+                "type": "string",
+                "nullable": true
+              }
+            },
+            "nullable": true
+          },
+          "deadline": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "isOpen": {
+            "type": "boolean"
+          },
+          "projects": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProjectListDto"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "ProjectGroupListDto": {
+        "required": [
+          "deadline",
+          "id",
+          "isOpen",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "title": "LocalizedString",
+            "required": [
+              "iv"
+            ],
+            "type": "object",
+            "properties": {
+              "iv": {
+                "type": "string"
+              },
+              "cs": {
+                "type": "string",
+                "nullable": true
+              },
+              "en": {
+                "type": "string",
+                "nullable": true
+              }
+            }
+          },
+          "description": {
+            "title": "LocalizedString",
+            "required": [
+              "iv"
+            ],
+            "type": "object",
+            "properties": {
+              "iv": {
+                "type": "string"
+              },
+              "cs": {
+                "type": "string",
+                "nullable": true
+              },
+              "en": {
+                "type": "string",
+                "nullable": true
+              }
+            },
+            "nullable": true
+          },
+          "deadline": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "isOpen": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ProjectListDto": {
+        "required": [
+          "globalPermissions",
+          "id",
+          "name",
+          "projectGroupId",
+          "releasedOn",
+          "userPermissions"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Human-Readable Identifier Ballast",
+            "format": "hrib",
+            "example": "AAAAbadf00d"
+          },
+          "projectGroupId": {
+            "type": "string",
+            "description": "Human-Readable Identifier Ballast",
+            "format": "hrib",
+            "example": "AAAAbadf00d"
+          },
+          "name": {
+            "title": "LocalizedString",
+            "required": [
+              "iv"
+            ],
+            "type": "object",
+            "properties": {
+              "iv": {
+                "type": "string"
+              },
+              "cs": {
+                "type": "string",
+                "nullable": true
+              },
+              "en": {
+                "type": "string",
+                "nullable": true
+              }
+            }
+          },
+          "description": {
+            "title": "LocalizedString",
+            "required": [
+              "iv"
+            ],
+            "type": "object",
+            "properties": {
+              "iv": {
+                "type": "string"
+              },
+              "cs": {
+                "type": "string",
+                "nullable": true
+              },
+              "en": {
+                "type": "string",
+                "nullable": true
+              }
+            },
+            "nullable": true
+          },
+          "globalPermissions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Permission"
+            },
+            "description": "Permissions that apply to all users, even the anonymous ones."
+          },
+          "userPermissions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Permission"
+            },
+            "description": "Permissions that apply to the currently logged in user. Includes the global permissions."
+          },
+          "releasedOn": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false,
+        "description": "A DTO of a project. To be used when listing projects."
+      },
+      "ProjectReviewCreationDto": {
+        "required": [
+          "kind",
+          "projectId",
+          "reviewerRole"
+        ],
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/ReviewKind"
+          },
+          "reviewerRole": {
+            "type": "string"
+          },
+          "comment": {
+            "title": "LocalizedString",
+            "required": [
+              "iv"
+            ],
+            "type": "object",
+            "properties": {
+              "iv": {
+                "type": "string"
+              },
+              "cs": {
+                "type": "string",
+                "nullable": true
+              },
+              "en": {
+                "type": "string",
+                "nullable": true
+              }
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ProjectReviewDto": {
+        "required": [
+          "addedOn",
+          "kind",
+          "reviewerRole"
+        ],
+        "type": "object",
+        "properties": {
+          "kind": {
+            "$ref": "#/components/schemas/ReviewKind"
+          },
+          "reviewerRole": {
+            "type": "string"
+          },
+          "comment": {
+            "title": "LocalizedString",
+            "required": [
+              "iv"
+            ],
+            "type": "object",
+            "properties": {
+              "iv": {
+                "type": "string"
+              },
+              "cs": {
+                "type": "string",
+                "nullable": true
+              },
+              "en": {
+                "type": "string",
+                "nullable": true
+              }
+            },
+            "nullable": true
+          },
+          "addedOn": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ProjectValidationDto": {
+        "required": [
+          "diagnostics",
+          "projectId",
+          "validatedOn"
+        ],
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Human-Readable Identifier Ballast",
+            "format": "hrib",
+            "example": "AAAAbadf00d"
+          },
+          "validatedOn": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "diagnostics": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProjectDiagnosticDto"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "ReviewKind": {
+        "enum": [
+          "notReviewed",
+          "accepted",
+          "rejected"
+        ],
+        "type": "string"
+      },
+      "ShardDetailBaseDto": {
+        "required": [
+          "artifactId",
+          "id",
+          "kind"
+        ],
+        "type": "object",
+        "properties": {
+          "kind": {
+            "$ref": "#/components/schemas/ShardKind"
+          },
+          "id": {
+            "type": "string",
+            "description": "Human-Readable Identifier Ballast",
+            "format": "hrib",
+            "example": "AAAAbadf00d"
+          },
+          "artifactId": {
+            "type": "string",
+            "description": "Human-Readable Identifier Ballast",
+            "format": "hrib",
+            "example": "AAAAbadf00d"
+          }
+        },
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "kind",
+          "mapping": {
+            "Video": "#/components/schemas/VideoShardDetailDto",
+            "Image": "#/components/schemas/ImageShardDetailDto"
+          }
+        }
+      },
+      "ShardKind": {
+        "enum": [
+          "unknown",
+          "video",
+          "image",
+          "subtitles"
+        ],
+        "type": "string"
+      },
+      "ShardListDto": {
+        "required": [
+          "id",
+          "kind",
+          "variants"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Human-Readable Identifier Ballast",
+            "format": "hrib",
+            "example": "AAAAbadf00d"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/ShardKind"
+          },
+          "variants": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "SubtitleStreamDto": {
+        "required": [
+          "bitrate",
+          "codec"
+        ],
+        "type": "object",
+        "properties": {
+          "codec": {
+            "type": "string"
+          },
+          "bitrate": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "additionalProperties": false
+      },
+      "TemporaryAccountCreationDto": {
+        "required": [
+          "emailAddress"
+        ],
+        "type": "object",
+        "properties": {
+          "emailAddress": {
+            "type": "string"
+          },
+          "preferredCulture": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "VideoShardDetailDto": {
+        "required": [
+          "variants"
+        ],
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ShardDetailBaseDto"
+          }
+        ],
+        "properties": {
+          "variants": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/MediaDto"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "VideoStreamDto": {
+        "required": [
+          "bitrate",
+          "codec",
+          "framerate",
+          "height",
+          "width"
+        ],
+        "type": "object",
+        "properties": {
+          "codec": {
+            "type": "string"
+          },
+          "bitrate": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "width": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "height": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "framerate": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  }
+}

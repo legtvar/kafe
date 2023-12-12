@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Immutable;
+using System.Security;
 
 namespace Kafe.Data.Events;
 
@@ -13,7 +14,8 @@ public record ProjectGroupInfoChanged(
     [Hrib] string ProjectGroupId,
     [LocalizedString] ImmutableDictionary<string, string>? Name = null,
     [LocalizedString] ImmutableDictionary<string, string>? Description = null,
-    DateTimeOffset? Deadline = null);
+    DateTimeOffset? Deadline = null,
+    Permission? GlobalPermissions = null);
 
 public record ProjectGroupOpened(
     [Hrib] string ProjectGroupId

@@ -22,7 +22,7 @@ public record SeedOptions
 
         public string PreferredCulture { get; set; } = Const.InvariantCultureCode;
 
-        public List<string> Capabilities { get; set; } = new();
+        public Dictionary<string, Permission>? Permissions { get; set; } = new();
     }
 
     public record SeedProjectGroup

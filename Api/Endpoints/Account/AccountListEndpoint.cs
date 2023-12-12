@@ -1,11 +1,12 @@
 using Ardalis.ApiEndpoints;
 using Asp.Versioning;
-using Kafe.Api.Services;
 using Kafe.Api.Transfer;
+using Kafe.Data.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Collections.Immutable;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -13,14 +14,14 @@ namespace Kafe.Api.Endpoints;
 
 [ApiVersion("1")]
 [Route("accounts")]
-[Authorize(Policy = EndpointPolicy.AdministratorOnly)]
+[Authorize(Policy = EndpointPolicy.Read)]
 public class AccountListEndpoint : EndpointBaseAsync
     .WithoutRequest
     .WithActionResult<ImmutableArray<AccountListDto>>
 {
-    private readonly IAccountService accounts;
+    private readonly AccountService accounts;
 
-    public AccountListEndpoint(IAccountService accounts)
+    public AccountListEndpoint(AccountService accounts)
     {
         this.accounts = accounts;
     }
@@ -30,6 +31,7 @@ public class AccountListEndpoint : EndpointBaseAsync
     public override async Task<ActionResult<ImmutableArray<AccountListDto>>> HandleAsync(
         CancellationToken cancellationToken = default)
     {
-        return Ok(await accounts.List(cancellationToken));
+        var data = await accounts.List(token: cancellationToken);
+        return Ok(data.Select(TransferMaps.ToAccountListDto).ToImmutableArray());
     }
 }

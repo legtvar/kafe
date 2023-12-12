@@ -4,6 +4,7 @@ import { getPrefered } from '../utils/preferedLanguage';
 import { AbstractType } from './AbstractType';
 import { Project } from './Project';
 import { Serializer } from './serialize/Serializer';
+import { localizedMapper } from './serialize/localizedMapper';
 
 export class Group extends AbstractType {
     // API object
@@ -30,12 +31,12 @@ export class Group extends AbstractType {
         return getPrefered(this.description);
     }
 
-    serialize(update: boolean = false): components['schemas']['GroupCreationDto'] {
+    serialize(update: boolean = false): components['schemas']['ProjectGroupCreationDto'] {
         return (
             new Serializer(this, update)
-                // .add('name', localizedMapper)
+                .add('name', localizedMapper)
                 // .add('genre', localizedMapper)
-                // .add('description', localizedMapper)
+                .add('description', localizedMapper)
                 // .add('visibility')
                 // .add('artifacts', (artifacts: Artifact[]) =>
                 //     artifacts ? artifacts.map((artifact) => artifact.serialize(false)) : undefined,

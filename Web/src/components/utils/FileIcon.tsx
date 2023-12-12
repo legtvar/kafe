@@ -8,16 +8,16 @@ interface IFileIconProps {
 
 export function FileIcon(props: IFileIconProps) {
     switch (props.kind) {
-        case 'Video':
+        case 'video':
             return <BsCameraReels />;
 
-        case 'Image':
+        case 'image':
             return <BsCardImage />;
 
-        case 'Subtitles':
+        case 'subtitles':
             return <BsChatLeftText />;
 
-        case 'Unknown':
+        case 'unknown':
             return <AiOutlineFile />;
     }
 }

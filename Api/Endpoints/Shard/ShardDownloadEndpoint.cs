@@ -1,6 +1,7 @@
 ﻿using Ardalis.ApiEndpoints;
 using Asp.Versioning;
 using Kafe.Api.Services;
+using Kafe.Data.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -12,16 +13,19 @@ namespace Kafe.Api.Endpoints.Shard;
 [ApiVersion("1")]
 [Route("shard-download/{id}")]
 [Route("shard-download/{id}/{variant}")]
-// [Authorize]
 public class ShardDownloadEndpoint : EndpointBaseAsync
     .WithRequest<ShardDownloadEndpoint.RequestData>
     .WithActionResult
 {
-    private readonly IShardService shards;
+    private readonly ShardService shardService;
+    private readonly IAuthorizationService authorizationService;
 
-    public ShardDownloadEndpoint(IShardService shards)
+    public ShardDownloadEndpoint(
+        ShardService shardService,
+        IAuthorizationService authorizationService)
     {
-        this.shards = shards;
+        this.shardService = shardService;
+        this.authorizationService = authorizationService;
     }
 
     [HttpGet]
@@ -31,13 +35,25 @@ public class ShardDownloadEndpoint : EndpointBaseAsync
         [FromRoute] RequestData data,
         CancellationToken cancellationToken = default)
     {
-        var mediaType = await shards.GetShardVariantMediaType(data.Id, data.Variant, cancellationToken);
-        if (mediaType is null)
+        var detail = await shardService.Load(data.Id, cancellationToken);
+        if (detail is null)
         {
             return NotFound();
         }
 
-        var stream = await shards.OpenStream(data.Id, data.Variant, cancellationToken);
+        var auth = await authorizationService.AuthorizeAsync(User, detail.ArtifactId, EndpointPolicy.Read);
+        if (!auth.Succeeded)
+        {
+            return Unauthorized();
+        }
+
+        var mediaType = await shardService.GetShardVariantMediaType(data.Id, data.Variant, cancellationToken);
+        if (mediaType is null || mediaType.MimeType is null)
+        {
+            return NotFound();
+        }
+
+        var stream = await shardService.OpenStream(data.Id, data.Variant, cancellationToken);
         return File(stream, mediaType.MimeType, $"{data.Id}.{mediaType.Variant}{mediaType.FileExtension}", true);
     }
 

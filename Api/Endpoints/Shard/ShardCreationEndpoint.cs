@@ -3,6 +3,7 @@ using Asp.Versioning;
 using Kafe.Api.Services;
 using Kafe.Api.Transfer;
 using Kafe.Data;
+using Kafe.Data.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -20,27 +21,49 @@ public class ShardCreationEndpoint : EndpointBaseAsync
     .WithRequest<ShardCreationEndpoint.RequestData>
     .WithActionResult<Hrib>
 {
-    private readonly IShardService shards;
+    private readonly ShardService shardService;
+    private readonly ArtifactService artifactService;
+    private readonly IAuthorizationService authorizationService;
 
-    public ShardCreationEndpoint(IShardService shards)
+    public ShardCreationEndpoint(
+        ShardService shardService,
+        ArtifactService artifactService,
+        IAuthorizationService authorizationService)
     {
-        this.shards = shards;
+        this.shardService = shardService;
+        this.artifactService = artifactService;
+        this.authorizationService = authorizationService;
     }
 
     [HttpPost]
     [SwaggerOperation(Tags = new[] { EndpointArea.Shard })]
     [RequestSizeLimit(Const.ShardSizeLimit)]
     [RequestFormLimits(MultipartBodyLengthLimit = Const.ShardSizeLimit)]
+    [ProducesResponseType(403)]
+    [ProducesResponseType(404)]
     public override async Task<ActionResult<Hrib>> HandleAsync(
         [FromForm] RequestData request,
         CancellationToken cancellationToken = default)
     {
+        var artifact = await artifactService.Load(request.ArtifactId, cancellationToken);
+        if (artifact is null)
+        {
+            return NotFound();
+        }
+
+        var auth = await authorizationService.AuthorizeAsync(User, artifact, EndpointPolicy.Write);
+        if (!auth.Succeeded)
+        {
+            return Unauthorized();
+        }
+
         using var stream = request.File.OpenReadStream();
-        var id = await shards.Create(
-            new ShardCreationDto(request.Kind, request.ArtifactId),
-            stream,
-            request.File.ContentType,
-            cancellationToken);
+        var id = await shardService.Create(
+            kind: request.Kind,
+            artifactId: request.ArtifactId,
+            stream: stream,
+            mimeType: request.File.ContentType,
+            token: cancellationToken);
         if (id is null)
         {
             return BadRequest();

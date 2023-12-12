@@ -17,7 +17,7 @@ public record ProjectInfo(
     [LocalizedString] ImmutableDictionary<string, string> Name,
     [LocalizedString] ImmutableDictionary<string, string>? Description = null,
     [LocalizedString] ImmutableDictionary<string, string>? Genre = null,
-    Visibility Visibility = Visibility.Unknown,
+    Permission GlobalPermissions = Permission.None,
     DateTimeOffset ReleasedOn = default,
     bool IsLocked = false
 ) : IEntity;
@@ -55,8 +55,7 @@ public class ProjectInfoProjection : SingleStreamProjection<ProjectInfo>
             Authors: ImmutableArray<ProjectAuthorInfo>.Empty,
             Artifacts: ImmutableArray<ProjectArtifactInfo>.Empty,
             Reviews: ImmutableArray<ProjectReviewInfo>.Empty,
-            Name: e.Name,
-            Visibility: e.Visibility);
+            Name: e.Name);
     }
 
     public ProjectInfo Apply(ProjectInfoChanged e, ProjectInfo p)
@@ -65,7 +64,7 @@ public class ProjectInfoProjection : SingleStreamProjection<ProjectInfo>
         {
             Name = e.Name ?? p.Name,
             Description = e.Description ?? p.Description,
-            Visibility = e.Visibility ?? p.Visibility,
+            GlobalPermissions = e.GlobalPermissions ?? p.GlobalPermissions,
             ReleasedOn = e.ReleasedOn ?? p.ReleasedOn,
             Genre = e.Genre ?? p.Genre
         };

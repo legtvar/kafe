@@ -31,6 +31,9 @@ public static class Const
 
     public const string SystemName = "System";
 
+    public const string TemporaryAccountPurpose = "TemporaryAccount";
+    public const string EmailConfirmationPurpose = "EmailConfirmation";
+
     public static readonly TimeSpan AuthenticationCookieExpirationTime = new(30, 0, 0, 0);
 
     public const string MatroskaMimeType = "video/x-matroska";

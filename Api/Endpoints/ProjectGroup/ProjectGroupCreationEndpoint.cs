@@ -1,7 +1,7 @@
 ﻿using Ardalis.ApiEndpoints;
 using Asp.Versioning;
-using Kafe.Api.Services;
 using Kafe.Api.Transfer;
+using Kafe.Data.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -12,16 +12,18 @@ namespace Kafe.Api.Endpoints.ProjectGroup;
 
 [ApiVersion("1")]
 [Route("project-group")]
-[Authorize(Policy = EndpointPolicy.AdministratorOnly)]
+[Authorize(EndpointPolicy.Append)]
 public class ProjectGroupCreationEndpoint : EndpointBaseAsync
     .WithRequest<ProjectGroupCreationDto>
     .WithActionResult<Hrib>
 {
-    private readonly IProjectGroupService projectGroups;
+    private readonly ProjectGroupService projectGroupService;
 
-    public ProjectGroupCreationEndpoint(IProjectGroupService projectGroups)
+    public ProjectGroupCreationEndpoint(
+        ProjectGroupService projectGroupService,
+        IAuthorizationService authorizationService)
     {
-        this.projectGroups = projectGroups;
+        this.projectGroupService = projectGroupService;
     }
 
     [HttpPost]
@@ -30,7 +32,11 @@ public class ProjectGroupCreationEndpoint : EndpointBaseAsync
         ProjectGroupCreationDto dto,
         CancellationToken cancellationToken = default)
     {
-        var group = await projectGroups.Create(dto, cancellationToken);
+        var group = await projectGroupService.Create(
+            name: dto.Name,
+            description: dto.Description,
+            deadline: dto.Deadline,
+            token: cancellationToken);
         return Ok(group);
     }
 }

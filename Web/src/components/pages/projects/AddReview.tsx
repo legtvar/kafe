@@ -65,16 +65,16 @@ const messages = {
 export function AddReview(props: IAddReviewProps) {
     const { border, bg } = useColorScheme();
     const [emailContent, setEmailContent] = useState('');
-    const [role, setRole] = useState<'tech' | 'visual' | 'dramaturgy' | null>(null);
-    const [kind, setKind] = useState<components['schemas']['ReviewKind']>('Accepted');
-    const { user } = useAuth();
+    const [role, setRole] = useState<'tech' | 'visual' | 'dramaturgy' | 'unknown' | null>('unknown');
+    const [kind, setKind] = useState<components['schemas']['ReviewKind']>('accepted');
+    // const { user } = useAuth();
     const navigate = useNavigate();
     const { isOpen, onOpen, onClose } = useDisclosure();
     const cancelRef = createRef<HTMLButtonElement>();
 
-    const roles = user!.capabilities.includes('Administration')
-        ? ['tech', 'visual', 'dramaturgy']
-        : user!.capabilities.filter((cap) => cap.startsWith('ProjectReview')).map((cap) => cap.split(':')[1]);
+    // const roles = user!.capabilities.includes('Administration')
+    //     ? ['tech', 'visual', 'dramaturgy']
+    //     : user!.capabilities.filter((cap) => cap.startsWith('ProjectReview')).map((cap) => cap.split(':')[1]);
 
     return (
         <SendAPI
@@ -84,7 +84,7 @@ export function AddReview(props: IAddReviewProps) {
         >
             {(onSubmit, status) => (
                 <Stack spacing={4} direction="column" mb={8}>
-                    <FormControl>
+                    {/* <FormControl>
                         <Select
                             value={role || 'Unknown'}
                             onChange={(event) => setRole(event.target.value as any)}
@@ -96,7 +96,7 @@ export function AddReview(props: IAddReviewProps) {
                                 <option value={role}>{t(`project.admin.role.${role}`).toString()}</option>
                             ))}
                         </Select>
-                    </FormControl>
+                    </FormControl> */}
                     <FormControl>
                         <Select
                             value={kind || undefined}

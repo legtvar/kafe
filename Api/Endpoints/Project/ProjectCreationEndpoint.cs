@@ -2,8 +2,10 @@
 using Asp.Versioning;
 using Kafe.Api.Services;
 using Kafe.Api.Transfer;
+using Kafe.Data.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,11 +19,18 @@ public class ProjectCreationEndpoint : EndpointBaseAsync
     .WithRequest<ProjectCreationDto>
     .WithActionResult<Hrib>
 {
-    private readonly IProjectService projects;
+    private readonly ProjectService projectService;
+    private readonly UserProvider userProvider;
+    private readonly IAuthorizationService authorizationService;
 
-    public ProjectCreationEndpoint(IProjectService projects)
+    public ProjectCreationEndpoint(
+        ProjectService projectService,
+        UserProvider userProvider,
+        IAuthorizationService authorizationService)
     {
-        this.projects = projects;
+        this.projectService = projectService;
+        this.userProvider = userProvider;
+        this.authorizationService = authorizationService;
     }
 
     [HttpPost]
@@ -30,6 +39,20 @@ public class ProjectCreationEndpoint : EndpointBaseAsync
         ProjectCreationDto request,
         CancellationToken cancellationToken = default)
     {
-        return await projects.Create(request, cancellationToken);
+        var auth = await authorizationService.AuthorizeAsync(User, request.ProjectGroupId, EndpointPolicy.Append);
+        if (!auth.Succeeded)
+        {
+            return Unauthorized();
+        }
+
+        var project = await projectService.Create(
+            projectGroupId: request.ProjectGroupId,
+            name: request.Name,
+            description: request.Description,
+            genre: request.Genre,
+            ownerId: userProvider.Account?.Id,
+            token: cancellationToken);
+
+        return Ok(project.Id);
     }
 }

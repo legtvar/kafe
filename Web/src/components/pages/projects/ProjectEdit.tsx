@@ -45,14 +45,13 @@ export function ProjectEdit(props: IProjectEditProps) {
                             <Tab>{t('projectEdit.tabs.status').toString()}</Tab>
                             <Tab>{t('projectEdit.tabs.info').toString()}</Tab>
                             <Tab>{t('projectEdit.tabs.files').toString()}</Tab>
-                            <Tab>{t('projectEdit.tabs.rights').toString()}</Tab>
-                            {user &&
-                                user.capabilities.some((cap) => tagsForAdmin.some((tag) => cap.startsWith(tag))) && (
-                                    <Tab>
-                                        <AiOutlineUnlock />
-                                        <Text pl={2}>{t('projectEdit.tabs.admin').toString()}</Text>
-                                    </Tab>
-                                )}
+                            {/* <Tab>{t('projectEdit.tabs.rights').toString()}</Tab> */}
+                            {project.userPermissions.includes('review') && (
+                                <Tab>
+                                    <AiOutlineUnlock />
+                                    <Text pl={2}>{t('projectEdit.tabs.admin').toString()}</Text>
+                                </Tab>
+                            )}
                         </TabList>
 
                         <TabPanels pt={6}>
@@ -80,7 +79,7 @@ export function ProjectEdit(props: IProjectEditProps) {
                                     )}
                                 </Stack>
                             </TabPanel>
-                            <TabPanel>
+                            {/* <TabPanel>
                                 <RightsEditor
                                     item={project}
                                     explanation={{
@@ -90,7 +89,7 @@ export function ProjectEdit(props: IProjectEditProps) {
                                         append: t('rights.groups.project.append').toString(),
                                     }}
                                 />
-                            </TabPanel>
+                            </TabPanel> */}
                             <TabPanel>
                                 <Heading as="h2" fontSize="lg" mb={4}>
                                     {t('project.admin.new').toString()}

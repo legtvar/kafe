@@ -1,14 +1,9 @@
-﻿using Kafe.Data.Capabilities;
-using Kafe.Data.Events;
+﻿using Kafe.Data.Events;
 using Marten.Events;
 using Marten.Events.Aggregation;
 using Marten.Schema;
 using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Kafe.Data.Aggregates;
 
@@ -23,9 +18,8 @@ public record AccountInfo(
     string PreferredCulture,
     string? SecurityStamp,
     DateTimeOffset RefreshedOn,
-    [KafeType(typeof(ImmutableHashSet<AccountCapability>))]
-    ImmutableHashSet<string> Capabilities
-);
+    ImmutableDictionary<string, Permission>? Permissions
+) : IEntity;
 
 public class AccountInfoProjection : SingleStreamProjection<AccountInfo>
 {
@@ -43,7 +37,7 @@ public class AccountInfoProjection : SingleStreamProjection<AccountInfo>
             PreferredCulture: e.PreferredCulture,
             SecurityStamp: null,
             RefreshedOn: default,
-            Capabilities: ImmutableHashSet<string>.Empty
+            Permissions: ImmutableDictionary<string, Permission>.Empty
         );
     }
 
@@ -74,19 +68,29 @@ public class AccountInfoProjection : SingleStreamProjection<AccountInfo>
         };
     }
 
-    public AccountInfo Apply(AccountCapabilityAdded e, AccountInfo a)
+    public AccountInfo Apply(AccountPermissionSet e, AccountInfo a)
     {
+        if (a.Permissions is null)
+        {
+            a = a with { Permissions = ImmutableDictionary<string, Permission>.Empty };
+        }
+
         return a with
         {
-            Capabilities = a.Capabilities.Add(e.Capability)
+            Permissions = a.Permissions.SetItem(e.EntityId, e.Permission)
         };
     }
 
-    public AccountInfo Apply(AccountCapabilityRemoved e, AccountInfo a)
+    public AccountInfo Apply(AccountPermissionUnset e, AccountInfo a)
     {
+        if (a.Permissions is null)
+        {
+            a = a with { Permissions = ImmutableDictionary<string, Permission>.Empty };
+        }
+        
         return a with
         {
-            Capabilities = a.Capabilities.Remove(e.Capability)
+            Permissions = a.Permissions.Remove(e.EntityId)
         };
     }
 }

@@ -31,7 +31,7 @@ export class API {
 
     public constructor() {
         if (window.location.hostname.startsWith('localhost') || window.location.hostname.startsWith('127.0.0.1')) {
-            this.apiUrl = 'http://localhost:8000' + this.apiUrl;
+            this.apiUrl = 'https://localhost:44369' + this.apiUrl;
         }
 
         this.client = axios.create({
@@ -75,10 +75,10 @@ export class API {
                 return api.requestSingle(`project-group/${id}`, Group);
             },
             async create(group: Group) {
-                return api.post<components['schemas']['GroupCreationDto'], HRIB>(`group`, group.serialize());
+                return api.post<components['schemas']['ProjectGroupCreationDto'], HRIB>(`group`, group.serialize());
             },
             async update(group: Group) {
-                return api.patch<components['schemas']['GroupCreationDto'], HRIB>(`group`, group.serialize(true));
+                return api.patch<components['schemas']['ProjectGroupCreationDto'], HRIB>(`group`, group.serialize(true));
             },
         };
     }

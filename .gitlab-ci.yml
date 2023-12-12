@@ -11,7 +11,7 @@ build-api:
     NUGET_PACKAGES: $CI_PROJECT_DIR/.nuget
   script:
     - apk update
-    - apk add dotnet7-sdk
+    - apk add git dotnet7-sdk
     - dotnet build Kafe.sln
   tags:
     - shared-fi
@@ -29,15 +29,18 @@ build-web:
     CI: ''
   script:
     - apk update
-    - apk add npm
+    - apk add nodejs-current npm
+    - corepack enable && corepack prepare pnpm@latest --activate
+
     - cd Web
-    - npm ci
-    - npm run build
+    - pnpm config set store-dir .pnpm-store/
+    - pnpm i
+    - pnpm run build
   tags:
     - shared-fi
   cache:
     paths:
-      - Web/node_modules
+      - Web/.pnpm-store/
   artifacts:
     paths:
       - Web/build

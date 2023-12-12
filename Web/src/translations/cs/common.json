@@ -143,6 +143,7 @@
         "tech": "Posudek technika",
         "visual": "Posudek grafika",
         "dramaturgy": "Posudek z dramaturgie",
+        "unknown": "Neznámý hodnotitel",
         "placeholder": "-- vyberte roli --"
       },
       "submit": "Odeslat posudek",

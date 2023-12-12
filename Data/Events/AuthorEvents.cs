@@ -5,14 +5,13 @@ namespace Kafe.Data.Events;
 public record AuthorCreated(
     [Hrib] string AuthorId,
     CreationMethod CreationMethod,
-    string Name,
-    Visibility Visibility
+    string Name
 );
 
 public record AuthorInfoChanged(
     [Hrib] string AuthorId,
     string? Name = null,
-    Visibility? Visibility = null,
+    Permission? GlobalPermissions = null,
     [LocalizedString] ImmutableDictionary<string, string>? Bio = null,
     string? Uco = null,
     string? Email = null,

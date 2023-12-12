@@ -7,8 +7,7 @@ public record ProjectCreated(
     [Hrib] string ProjectId,
     CreationMethod CreationMethod,
     string ProjectGroupId,
-    [LocalizedString] ImmutableDictionary<string, string> Name,
-    Visibility Visibility
+    [LocalizedString] ImmutableDictionary<string, string> Name
 );
 
 public record ProjectAuthorAdded(
@@ -36,7 +35,7 @@ public record ProjectInfoChanged(
     [Hrib] string ProjectId,
     [LocalizedString] ImmutableDictionary<string, string>? Name = null,
     [LocalizedString] ImmutableDictionary<string, string>? Description = null,
-    Visibility? Visibility = null,
+    Permission? GlobalPermissions = null,
     DateTimeOffset? ReleasedOn = null,
     [LocalizedString] ImmutableDictionary<string, string>? Genre = null
 );

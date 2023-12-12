@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Security.Claims;
+using Kafe.Common;
 using Kafe.Data;
 using Kafe.Data.Aggregates;
 using Kafe.Data.Capabilities;
@@ -102,18 +103,19 @@ public static class TransferMaps
         );
 
 
-    public static ProjectListDto ToProjectListDto(ProjectInfo data)
+    public static ProjectListDto ToProjectListDto(ProjectInfo data, Permission userPermission = Permission.None)
     {
         return new ProjectListDto(
             Id: data.Id,
             ProjectGroupId: data.ProjectGroupId,
             Name: (LocalizedString)data.Name,
             Description: data.Description,
-            Visibility: data.Visibility,
+            GlobalPermissions: ToPermissionArray(data.GlobalPermissions),
+            UserPermissions: ToPermissionArray(data.GlobalPermissions | userPermission),
             ReleasedOn: data.ReleasedOn);
     }
 
-    public static ProjectDetailDto ToProjectDetailDto(ProjectInfo data)
+    public static ProjectDetailDto ToProjectDetailDto(ProjectInfo data, Permission userPermission = Permission.None)
     {
         return new ProjectDetailDto(
             Id: data.Id,
@@ -122,7 +124,8 @@ public static class TransferMaps
             Genre: data.Genre,
             Name: data.Name,
             Description: data.Description,
-            Visibility: data.Visibility,
+            GlobalPermissions: ToPermissionArray(data.GlobalPermissions),
+            UserPermissions: ToPermissionArray(data.GlobalPermissions | userPermission),
             ReleasedOn: data.ReleasedOn,
             Crew: ImmutableArray<ProjectAuthorDto>.Empty,
             Cast: ImmutableArray<ProjectAuthorDto>.Empty,
@@ -149,7 +152,7 @@ public static class TransferMaps
         return new AuthorListDto(
             Id: data.Id,
             Name: data.Name,
-            Visibility: data.Visibility);
+            GlobalPermissions: data.GlobalPermissions);
     }
 
     public static AuthorDetailDto ToAuthorDetailDto(AuthorInfo data)
@@ -157,7 +160,7 @@ public static class TransferMaps
         return new AuthorDetailDto(
             Id: data.Id,
             Name: data.Name,
-            Visibility: data.Visibility,
+            GlobalPermissions: data.GlobalPermissions,
             Bio: data.Bio,
             Uco: data.Uco,
             Email: data.Email,
@@ -170,7 +173,7 @@ public static class TransferMaps
             Id: data.Id,
             Name: data.Name,
             Description: data.Description,
-            Visibility: data.Visibility);
+            GlobalPermissions: data.GlobalPermissions);
     }
 
     public static PlaylistDetailDto ToPlaylistDetailDto(PlaylistInfo data)
@@ -179,7 +182,7 @@ public static class TransferMaps
             Id: data.Id,
             Name: data.Name,
             Description: data.Description,
-            Visibility: data.Visibility,
+            GlobalPermissions: data.GlobalPermissions,
             Videos: data.VideoIds);
     }
 
@@ -302,7 +305,7 @@ public static class TransferMaps
             IsCorrupted: data.IsCorrupted);
     }
 
-    public static ShardDetailBaseDto ToShardDetailDto(ShardInfoBase data)
+    public static ShardDetailBaseDto ToShardDetailDto(IShardEntity data)
     {
         return data switch
         {
@@ -341,8 +344,7 @@ public static class TransferMaps
     }
 
     public static AccountDetailDto ToAccountDetailDto(
-        AccountInfo data,
-        IEnumerable<ProjectInfo> projects)
+        AccountInfo data)
     {
         return new AccountDetailDto(
             Id: data.Id,
@@ -350,8 +352,8 @@ public static class TransferMaps
             Uco: null,
             EmailAddress: data.EmailAddress,
             PreferredCulture: data.PreferredCulture,
-            Projects: projects.Select(ToProjectListDto).ToImmutableArray(),
-            Capabilities: data.Capabilities
+            Permissions: data.Permissions?.ToImmutableDictionary(p => (Hrib)p.Key, p => ToPermissionArray(p.Value))
+                ?? ImmutableDictionary<Hrib, ImmutableArray<Permission>>.Empty
         );
     }
 
@@ -362,7 +364,20 @@ public static class TransferMaps
             Id: data.Id,
             EmailAddress: data.EmailAddress,
             PreferredCulture: data.PreferredCulture,
-            Capabilities: data.Capabilities
+            Permissions: data?.Permissions?.ToImmutableDictionary(p => (Hrib)p.Key, p => ToPermissionArray(p.Value))
+                ?? ImmutableDictionary<Hrib, ImmutableArray<Permission>>.Empty
         );
+    }
+    
+    private static ImmutableArray<Permission> ToPermissionArray(Permission value)
+    {
+        if (value == Permission.None)
+        {
+            return ImmutableArray<Permission>.Empty;
+        }
+
+        return Enum.GetValues<Permission>()
+            .Where(v => v != Permission.None && v != Permission.All && (value & v) == v)
+            .ToImmutableArray();
     }
 }

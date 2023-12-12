@@ -2,6 +2,7 @@
 using Asp.Versioning;
 using Kafe.Api.Services;
 using Kafe.Api.Transfer;
+using Kafe.Data.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -17,11 +18,15 @@ public class AuthorCreationEndpoint : EndpointBaseAsync
     .WithRequest<AuthorCreationDto>
     .WithActionResult<Hrib?>
 {
-    private readonly IAuthorService authors;
+    private readonly AuthorService authorService;
+    private readonly UserProvider userProvider;
 
-    public AuthorCreationEndpoint(IAuthorService authors)
+    public AuthorCreationEndpoint(
+        AuthorService authorService,
+        UserProvider userProvider)
     {
-        this.authors = authors;
+        this.authorService = authorService;
+        this.userProvider = userProvider;
     }
 
     [HttpPost]
@@ -30,12 +35,19 @@ public class AuthorCreationEndpoint : EndpointBaseAsync
         AuthorCreationDto dto,
         CancellationToken cancellationToken = default)
     {
-        var id = await authors.Create(dto, cancellationToken);
-        if (id is null)
+        var author = await authorService.Create(
+            name: dto.Name,
+            bio: dto.Bio,
+            uco: dto.Uco,
+            email: dto.Email,
+            phone: dto.Phone,
+            ownerId: userProvider.Account?.Id,
+            token: cancellationToken);
+        if (author is null)
         {
             return BadRequest();
         }
 
-        return Ok(id);
+        return Ok(author);
     }
 }

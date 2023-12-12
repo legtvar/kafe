@@ -29,7 +29,7 @@ export function ReviewList({ project }: IReviewListProps) {
                         alignItems="start"
                     >
                         <Box fontSize="2em" mt={2}>
-                            {review.kind === 'Accepted' ? (
+                            {review.kind === 'accepted' ? (
                                 <Text color="green.500">
                                     <BsCheckCircleFill />
                                 </Text>

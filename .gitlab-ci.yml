@@ -29,7 +29,7 @@ build-web:
     CI: ''
   script:
     - apk update
-    - apk add nodejs-lts npm
+    - apk add nodejs-current npm
     - corepack enable && corepack prepare pnpm@latest --activate
 
     - cd Web

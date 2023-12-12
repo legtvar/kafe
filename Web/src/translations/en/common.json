@@ -142,6 +142,7 @@
         "tech": "Technician review",
         "visual": "Visual review",
         "dramaturgy": "Dramaturgy review",
+        "unknown": "Unknown reviewer",
         "placeholder": "-- select a role --"
       },
       "submit": "Submit the review",

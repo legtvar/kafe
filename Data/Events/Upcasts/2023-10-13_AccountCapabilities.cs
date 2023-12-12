@@ -186,19 +186,19 @@ namespace Kafe.Data.Events.Upcasts
                 ProjectReview => new AccountPermissionSet(
                     AccountId: oldEvent.AccountId,
                     EntityId: Fffimu23Id,
-                    Permission: Permission.All),
+                    Permission: Permission.Review),
                 ProjectOwnership p => new AccountPermissionSet(
                     AccountId: oldEvent.AccountId,
                     EntityId: p.ProjectId.Value,
-                    Permission: Permission.All),
+                    Permission: Permission.Read | Permission.Write),
                 AuthorManagement a => new AccountPermissionSet(
                     AccountId: oldEvent.AccountId,
                     EntityId: a.AuthorId.Value,
-                    Permission: Permission.All),
+                    Permission: Permission.Read | Permission.Write),
                 OrganizeFestival => new AccountPermissionSet(
                     AccountId: oldEvent.AccountId,
                     EntityId: Fffimu23Id,
-                    Permission: Permission.All),
+                    Permission: Permission.Read | Permission.Write | Permission.Inspect | Permission.Review),
                 _ => throw new NotSupportedException()
             };
         }

@@ -1,4 +1,4 @@
-using Kafe.Data.Aggregates;
+﻿using Kafe.Data.Aggregates;
 using Kafe.Data.Events;
 using Marten;
 using Marten.Linq;
@@ -45,8 +45,12 @@ public class AccountService
         var query = db.Query<AccountInfo>();
         if (filter.Permissions is not null)
         {
-            query = (IMartenQueryable<AccountInfo>)query.Where(a => filter.Permissions
-                .All(p => (a.Permissions!.GetValueOrDefault(p.Key) & p.Value) == p.Value));
+            var permValues = string.Join(",", filter.Permissions.Select(p => $"('{p.Key}',{(int)p.Value})"));
+            query = (IMartenQueryable<AccountInfo>)query.Where(a => a.MatchesSql(
+$@"TRUE = ALL(
+    SELECT (data -> 'Permissions' -> entity_id)::int & expected = expected
+    FROM (VALUES {permValues}) as expected_perms (entity_id, expected)
+)"));
         }
 
         var results = await query.ToListAsync();

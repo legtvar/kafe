@@ -24,17 +24,20 @@ public class ProjectDetailEndpoint : EndpointBaseAsync
     .WithActionResult<ProjectDetailDto>
 {
     private readonly ProjectService projectService;
+    private readonly ProjectGroupService projectGroupService;
     private readonly EntityService entityService;
     private readonly UserProvider userProvider;
     private readonly IAuthorizationService authorizationService;
 
     public ProjectDetailEndpoint(
         ProjectService projectService,
+        ProjectGroupService projectGroupService,
         EntityService entityService,
         UserProvider userProvider,
         IAuthorizationService authorizationService)
     {
         this.projectService = projectService;
+        this.projectGroupService = projectGroupService;
         this.entityService = entityService;
         this.userProvider = userProvider;
         this.authorizationService = authorizationService;
@@ -60,7 +63,19 @@ public class ProjectDetailEndpoint : EndpointBaseAsync
             return NotFound();
         }
 
+        var group = await projectGroupService.Load(project.ProjectGroupId, cancellationToken);
+        if (group is null)
+        {
+            return NotFound();
+        }
+
         var userPerms = await entityService.GetPermission(project.Id, userProvider.Account?.Id, cancellationToken);
-        return Ok(TransferMaps.ToProjectDetailDto(project, userPerms));
+
+        var detail = TransferMaps.ToProjectDetailDto(project, userPerms) with
+        {
+            ProjectGroupName = group.Name
+        };
+
+        return Ok(detail);
     }
 }

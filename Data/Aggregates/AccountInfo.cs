@@ -3,6 +3,7 @@ using Marten.Events;
 using Marten.Events.Aggregation;
 using Marten.Schema;
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 
 namespace Kafe.Data.Aggregates;
@@ -37,7 +38,10 @@ public class AccountInfoProjection : SingleStreamProjection<AccountInfo>
             PreferredCulture: e.PreferredCulture,
             SecurityStamp: null,
             RefreshedOn: default,
-            Permissions: ImmutableDictionary<string, Permission>.Empty
+            Permissions: ImmutableDictionary.CreateRange(new[]
+            {
+                new KeyValuePair<string, Permission>(e.AccountId, Permission.Read | Permission.Write)
+            })
         );
     }
 
@@ -87,7 +91,7 @@ public class AccountInfoProjection : SingleStreamProjection<AccountInfo>
         {
             a = a with { Permissions = ImmutableDictionary<string, Permission>.Empty };
         }
-        
+
         return a with
         {
             Permissions = a.Permissions.Remove(e.EntityId)

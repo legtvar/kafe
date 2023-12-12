@@ -19,13 +19,16 @@ public class ProjectListEndpoint : EndpointBaseAsync
     .WithActionResult<ImmutableArray<ProjectListDto>>
 {
     private readonly ProjectService projectService;
+    private readonly EntityService entityService;
     private readonly UserProvider userProvider;
 
     public ProjectListEndpoint(
         ProjectService projectService,
+        EntityService entityService,
         UserProvider userProvider)
     {
         this.projectService = projectService;
+        this.entityService = entityService;
         this.userProvider = userProvider;
     }
 
@@ -35,6 +38,12 @@ public class ProjectListEndpoint : EndpointBaseAsync
         CancellationToken cancellationToken = default)
     {
         var projects =  await projectService.List(new(AccessingAccountId: userProvider.Account?.Id), cancellationToken);
-        return Ok(projects.Select(TransferMaps.ToProjectListDto).ToImmutableArray());
+        var perms = await entityService.
+            GetPermissions(projects.Select(p => (Hrib)p.Id),
+            userProvider.Account?.Id,
+            cancellationToken);
+        return Ok(projects.Zip(perms)
+            .Select((p) => TransferMaps.ToProjectListDto(p.First, p.Second))
+            .ToImmutableArray());
     }
 }

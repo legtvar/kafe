@@ -24,17 +24,20 @@ public class ProjectGroupDetailEndpoint : EndpointBaseAsync
     private readonly ProjectService projectService;
     private readonly IAuthorizationService authorizationService;
     private readonly UserProvider userProvider;
+    private readonly EntityService entityService;
 
     public ProjectGroupDetailEndpoint(
         ProjectGroupService projectGroupService,
         ProjectService projectService,
         IAuthorizationService authorizationService,
-        UserProvider userProvider)
+        UserProvider userProvider,
+        EntityService entityService)
     {
         this.projectGroupService = projectGroupService;
         this.projectService = projectService;
         this.authorizationService = authorizationService;
         this.userProvider = userProvider;
+        this.entityService = entityService;
     }
 
     [HttpGet]
@@ -59,12 +62,16 @@ public class ProjectGroupDetailEndpoint : EndpointBaseAsync
 
         var dto = TransferMaps.ToProjectGroupDetailDto(projectGroup);
         var projects = await projectService.List(new(ProjectGroupId: projectGroup.Id), token: cancellationToken);
+        var projectPerms = await entityService.GetPermissions(
+            projects.Select(p => (Hrib)p.Id),
+            userProvider.Account?.Id,
+            cancellationToken);
         var preferredCulture = userProvider.Account?.PreferredCulture ?? Const.InvariantCultureCode;
         dto = dto with
         {
-            Projects = projects
-                .OrderBy(p => ((LocalizedString)p.Name)[preferredCulture])
-                .Select(TransferMaps.ToProjectListDto)
+            Projects = projects.Zip(projectPerms)
+                .OrderBy(p => ((LocalizedString)p.First.Name)[preferredCulture])
+                .Select(p => TransferMaps.ToProjectListDto(p.First, p.Second))
                 .ToImmutableArray()
         };
         

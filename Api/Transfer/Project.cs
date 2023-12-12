@@ -4,12 +4,20 @@ using Kafe.Data;
 
 namespace Kafe.Api.Transfer;
 
+/// <summary>
+/// A DTO of a project. To be used when listing projects.
+/// </summary>
+/// <param name="GlobalPermissions">Permissions that apply to all users, even the anonymous ones.</param>
+/// <param name="UserPermissions">
+/// Permissions that apply to the currently logged in user. Includes the global permissions.
+/// </param>
 public record ProjectListDto(
     Hrib Id,
     Hrib ProjectGroupId,
     LocalizedString Name,
     LocalizedString? Description,
-    Permission GlobalPermissions,
+    ImmutableArray<Permission> GlobalPermissions,
+    ImmutableArray<Permission> UserPermissions,
     DateTimeOffset ReleasedOn
     // TODO: Thumbnail
 );
@@ -21,7 +29,8 @@ public record ProjectDetailDto(
     LocalizedString? Genre,
     LocalizedString Name,
     LocalizedString? Description,
-    Permission GlobalPermissions,
+    ImmutableArray<Permission> GlobalPermissions,
+    ImmutableArray<Permission> UserPermissions,
     DateTimeOffset ReleasedOn,
     ImmutableArray<ProjectAuthorDto> Crew,
     ImmutableArray<ProjectAuthorDto> Cast,

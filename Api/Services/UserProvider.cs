@@ -50,7 +50,7 @@ public class UserProvider
         CancellationToken token = default)
     {
         var result = await query.QueryAsync<bool>(
-            "SELECT kafe_get_resource_perms(?, ?) & ? = ?",
+            $"SELECT {SqlFunctions.GetResourcePerms}(?, ?) & ? = ?",
             token,
             entityId.Value,
             Account?.Id!,

@@ -103,18 +103,19 @@ public static class TransferMaps
         );
 
 
-    public static ProjectListDto ToProjectListDto(ProjectInfo data)
+    public static ProjectListDto ToProjectListDto(ProjectInfo data, Permission userPermission = Permission.None)
     {
         return new ProjectListDto(
             Id: data.Id,
             ProjectGroupId: data.ProjectGroupId,
             Name: (LocalizedString)data.Name,
             Description: data.Description,
-            GlobalPermissions: data.GlobalPermissions,
+            GlobalPermissions: ToPermissionArray(data.GlobalPermissions),
+            UserPermissions: ToPermissionArray(data.GlobalPermissions | userPermission),
             ReleasedOn: data.ReleasedOn);
     }
 
-    public static ProjectDetailDto ToProjectDetailDto(ProjectInfo data)
+    public static ProjectDetailDto ToProjectDetailDto(ProjectInfo data, Permission userPermission = Permission.None)
     {
         return new ProjectDetailDto(
             Id: data.Id,
@@ -123,7 +124,8 @@ public static class TransferMaps
             Genre: data.Genre,
             Name: data.Name,
             Description: data.Description,
-            GlobalPermissions: data.GlobalPermissions,
+            GlobalPermissions: ToPermissionArray(data.GlobalPermissions),
+            UserPermissions: ToPermissionArray(data.GlobalPermissions | userPermission),
             ReleasedOn: data.ReleasedOn,
             Crew: ImmutableArray<ProjectAuthorDto>.Empty,
             Cast: ImmutableArray<ProjectAuthorDto>.Empty,

@@ -34,6 +34,5 @@ public enum Permission : uint
     /// The entity can be written to and archived.
     /// </summary>
     Write = 1 << 3,
-
     All = uint.MaxValue
 }

@@ -41,7 +41,7 @@ public class ShardDownloadEndpoint : EndpointBaseAsync
             return NotFound();
         }
 
-        var auth = await authorizationService.AuthorizeAsync(User, detail.ArtifactId, EndpointPolicy.Read);
+        var auth = await authorizationService.AuthorizeAsync(User, (Hrib)detail.ArtifactId, EndpointPolicy.Read);
         if (!auth.Succeeded)
         {
             return Unauthorized();

@@ -29,7 +29,7 @@ export function ContentViewer({ artifact, autoplay, videoProps, onPrevious, onNe
 
     if (type) {
         switch (type.split('/')[0]) {
-            case 'video':
+            case 'Video':
                 const video = artifact.shards.filter((shard) => shard.kind === 'video')[0];
                 const subtitles = artifact.shards.filter((shard) => shard.kind === 'subtitles');
 

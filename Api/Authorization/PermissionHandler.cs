@@ -46,12 +46,15 @@ public class PermissionHandler : AuthorizationHandler<PermissionRequirement>
             return;
         }
 
-        if ((context.Resource is Hrib || context.Resource is string)
-            && (userProvider.HasExplicitPermission((Hrib)context.Resource, requirement.Permission)
-                || await userProvider.HasPermission((Hrib)context.Resource, requirement.Permission)))
+        if (context.Resource is Hrib || context.Resource is string)
         {
-            context.Succeed(requirement);
-            return;
+            var hrib = context.Resource is Hrib ? (Hrib)context.Resource : (Hrib)(string)context.Resource;
+            if (userProvider.HasExplicitPermission(hrib, requirement.Permission)
+                || await userProvider.HasPermission(hrib, requirement.Permission))
+            {
+                context.Succeed(requirement);
+                return;
+            }
         }
     }
 }

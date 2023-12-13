@@ -26,6 +26,8 @@ public class ProjectDetailEndpoint : EndpointBaseAsync
     private readonly ProjectService projectService;
     private readonly ProjectGroupService projectGroupService;
     private readonly EntityService entityService;
+    private readonly ArtifactService artifactService;
+    private readonly AuthorService authorService;
     private readonly UserProvider userProvider;
     private readonly IAuthorizationService authorizationService;
 
@@ -33,12 +35,16 @@ public class ProjectDetailEndpoint : EndpointBaseAsync
         ProjectService projectService,
         ProjectGroupService projectGroupService,
         EntityService entityService,
+        ArtifactService artifactService,
+        AuthorService authorService,
         UserProvider userProvider,
         IAuthorizationService authorizationService)
     {
         this.projectService = projectService;
         this.projectGroupService = projectGroupService;
         this.entityService = entityService;
+        this.artifactService = artifactService;
+        this.authorService = authorService;
         this.userProvider = userProvider;
         this.authorizationService = authorizationService;
     }
@@ -71,11 +77,36 @@ public class ProjectDetailEndpoint : EndpointBaseAsync
 
         var userPerms = await entityService.GetPermission(project.Id, userProvider.Account?.Id, cancellationToken);
 
-        var detail = TransferMaps.ToProjectDetailDto(project, userPerms) with
+        var dto = TransferMaps.ToProjectDetailDto(project, userPerms) with
         {
             ProjectGroupName = group.Name
         };
 
-        return Ok(detail);
+        var artifactDetails = await artifactService.LoadMany(
+            project.Artifacts.Select(a => (Hrib)a.Id),
+            cancellationToken);
+        var authors = await authorService.LoadMany(
+            project.Authors.Select(a => (Hrib)a.Id),
+            cancellationToken);
+
+        dto = dto with
+        {
+            ProjectGroupName = group?.Name ?? Const.UnknownProjectGroup,
+            Artifacts = artifactDetails.Select(TransferMaps.ToProjectArtifactDto).ToImmutableArray(),
+            Cast = project.Authors.Where(a => a.Kind == ProjectAuthorKind.Cast)
+                    .Select(a => new ProjectAuthorDto(
+                        Id: a.Id,
+                        Name: authors.SingleOrDefault(e => e?.Id == a.Id)?.Name ?? (string)Const.UnknownAuthor,
+                        Roles: a.Roles))
+                    .ToImmutableArray(),
+            Crew = project.Authors.Where(a => a.Kind == ProjectAuthorKind.Crew)
+                    .Select(a => new ProjectAuthorDto(
+                        Id: a.Id,
+                        Name: authors.SingleOrDefault(e => e?.Id == a.Id)?.Name ?? (string)Const.UnknownAuthor,
+                        Roles: a.Roles))
+                    .ToImmutableArray()
+        };        
+
+        return Ok(dto);
     }
 }

@@ -4,6 +4,8 @@ using Marten;
 using Marten.Linq;
 using Marten.Linq.MatchesSql;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
@@ -92,5 +94,12 @@ public class AuthorService
     public async Task<AuthorInfo?> Load(Hrib id, CancellationToken token = default)
     {
         return await db.LoadAsync<AuthorInfo>(id.Value, token);
+    }
+    
+    public async Task<ImmutableArray<AuthorInfo>> LoadMany(IEnumerable<Hrib> ids, CancellationToken token = default)
+    {
+        return (await db.LoadManyAsync<AuthorInfo>(token, ids.Select(i => (string)i)))
+            .Where(a => a is not null)
+            .ToImmutableArray();
     }
 }

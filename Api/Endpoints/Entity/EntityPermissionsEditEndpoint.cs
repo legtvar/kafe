@@ -20,7 +20,7 @@ namespace Kafe.Api.Endpoints.Entity;
 [ApiVersion("1")]
 [Route("entity/perms")]
 public class EntityPermissionsEditEndpoint : EndpointBaseAsync
-    .WithRequest<EntityPermissionsAccountEditDto>
+    .WithRequest<EntityPermissionsEditDto>
     .WithActionResult<string>
 {
     private readonly IAuthorizationService authorizationService;
@@ -43,9 +43,27 @@ public class EntityPermissionsEditEndpoint : EndpointBaseAsync
     [HttpPatch]
     [SwaggerOperation(Tags = new[] { EndpointArea.Entity })]
     public override async Task<ActionResult<string>> HandleAsync(
-        EntityPermissionsAccountEditDto dto,
+        EntityPermissionsEditDto dto,
         CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        var authEntity = await authorizationService.AuthorizeAsync(User, dto.Id, EndpointPolicy.Write);
+        if (!authEntity.Succeeded)
+        {
+            return Unauthorized();
+        }
+
+        if (dto.GlobalPermissions is not null)
+        {
+            await entityService.SetPermissions((Hrib)dto.Id, TransferMaps.FromPermissionArray(dto.GlobalPermissions), userProvider.Account?.Id, cancellationToken);
+        }
+
+        // TODO: Apply account changes
+        // var authAccount = await authorizationService.AuthorizeAsync(User, dto.Id, EndpointPolicy.Write);
+        // if (!authEntity.Succeeded)
+        // {
+        //     return Unauthorized();
+        // }
+
+        return Ok(dto.Id);
     }
 }

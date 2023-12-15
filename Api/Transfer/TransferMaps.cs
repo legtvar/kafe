@@ -389,8 +389,18 @@ public static class TransferMaps
             )).ToImmutableArray()
         );
     }
+    
+    public static Permission FromPermissionArray(ImmutableArray<Permission>? array)
+    {
+        if (array is null || array.Value.IsDefaultOrEmpty)
+        {
+            return Permission.None;
+        }
 
-    private static ImmutableArray<Permission> ToPermissionArray(Permission value)
+        return array.Value.Aggregate(Permission.None, (lhs, rhs) => lhs | rhs);
+    }
+
+    public static ImmutableArray<Permission> ToPermissionArray(Permission value)
     {
         if (value == Permission.None)
         {

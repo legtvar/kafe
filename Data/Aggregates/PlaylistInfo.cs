@@ -11,7 +11,7 @@ public record PlaylistInfo(
     [KafeType(typeof(ImmutableArray<Hrib>))] ImmutableArray<string> VideoIds,
     [LocalizedString] ImmutableDictionary<string, string> Name,
     [LocalizedString] ImmutableDictionary<string, string>? Description = null,
-    Permission GlobalPermissions = Permission.None 
+    Permission GlobalPermissions = Permission.None
 ) : IVisibleEntity;
 
 public class PlaylistInfoProjection : SingleStreamProjection<PlaylistInfo>
@@ -45,17 +45,25 @@ public class PlaylistInfoProjection : SingleStreamProjection<PlaylistInfo>
         p.VideoIds!.Add(e.VideoId);
         return p;
     }
-    
+
     public PlaylistInfo Apply(PlaylistVideoRemoved e, PlaylistInfo p)
     {
         p.VideoIds!.RemoveAll(v => v == e.VideoId);
         return p;
     }
-    
+
     public PlaylistInfo Apply(PlaylistVideoOrderChanged e, PlaylistInfo p)
     {
         p.VideoIds!.RemoveAll(v => v == e.VideoId);
         p.VideoIds!.Insert(e.NewIndex, e.VideoId);
         return p;
+    }
+
+    public PlaylistInfo Apply(GlobalPermissionsChanged e, PlaylistInfo a)
+    {
+        return a with
+        {
+            GlobalPermissions = a.GlobalPermissions
+        };
     }
 }

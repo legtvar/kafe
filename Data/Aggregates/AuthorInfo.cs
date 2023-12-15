@@ -26,7 +26,7 @@ public class AuthorInfoProjection : SingleStreamProjection<AuthorInfo>
         return new AuthorInfo(
             Id: e.AuthorId,
             CreationMethod: e.CreationMethod,
-            Name: e.Name);;
+            Name: e.Name); ;
     }
 
     public AuthorInfo Apply(AuthorInfoChanged e, AuthorInfo a)
@@ -39,6 +39,14 @@ public class AuthorInfoProjection : SingleStreamProjection<AuthorInfo>
             Uco = e.Uco ?? a.Uco,
             Email = e.Email ?? a.Email,
             Phone = e.Phone ?? a.Phone
+        };
+    }
+
+    public AuthorInfo Apply(GlobalPermissionsChanged e, AuthorInfo a)
+    {
+        return a with
+        {
+            GlobalPermissions = a.GlobalPermissions
         };
     }
 }

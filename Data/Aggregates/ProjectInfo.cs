@@ -192,4 +192,12 @@ public class ProjectInfoProjection : SingleStreamProjection<ProjectInfo>
             )
         };
     }
+
+    public ProjectInfo Apply(GlobalPermissionsChanged e, ProjectInfo a)
+    {
+        return a with
+        {
+            GlobalPermissions = a.GlobalPermissions
+        };
+    }
 }

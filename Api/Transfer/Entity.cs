@@ -7,5 +7,11 @@ public record EntityPermissionsDetailDto(
     string? EntityType,
     ImmutableArray<Permission>? GlobalPermissions,
     ImmutableArray<Permission>? UserPermissions,
-    ImmutableDictionary<string, ImmutableArray<Permission>> AccountPermissions
+    ImmutableArray<EntityPermissionsAccountListDto> AccountPermissions
+);
+
+public record EntityPermissionsAccountListDto(
+    string Id,
+    string EmailAddress,
+    ImmutableArray<Permission> Permissions
 );

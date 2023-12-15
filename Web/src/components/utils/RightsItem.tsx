@@ -1,16 +1,25 @@
 import { Avatar, Box, Button, Checkbox, Flex, Input, InputGroup, Text, useColorModeValue } from '@chakra-ui/react';
 import { t } from 'i18next';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { IoAdd, IoEarth } from 'react-icons/io5';
 import { AbstractType } from '../../data/AbstractType';
 import { User } from '../../data/User';
 import { useColorScheme } from '../../hooks/useColorScheme';
 import { avatarUrl } from '../../utils/avatarUrl';
+import { HRIB } from '../../schemas/generic';
+
+export interface IUser {
+    id?: HRIB;
+    emailAddress?: string;
+    name?: string;
+    permissions: Array<Rights>;
+}
 
 export interface IRightsItemProps {
-    user: User | number | null; // User, 0 for anyone, null for new user
-    initialRights: Rights[];
-    item: AbstractType | null;
+    user: IUser | number | null; // User, 0 for anyone, null for new user
+    options: Array<Rights>;
+    initialPerms: Rights[];
+    onChange: (user: IUser) => void;
     readonly?: boolean;
 }
 
@@ -19,20 +28,28 @@ export enum Rights {
     WRITE = 'write',
     INSPECT = 'inspect',
     APPEND = 'append',
-    REVIEW = 'review'
+    REVIEW = 'review',
 }
 
-export function RightsItem({ user, initialRights, item, readonly }: IRightsItemProps) {
+export function RightsItem({ user, options, initialPerms, readonly, onChange }: IRightsItemProps) {
     const borderColor = useColorModeValue('gray.300', 'gray.700');
     const { border, bg } = useColorScheme();
     const [newEmail, setNewEmail] = useState<string>('');
-    const [rights, setRights] = useState<Rights[]>(initialRights);
+    const [perms, setPerms] = useState<Rights[]>(initialPerms);
+
+    useEffect(() => {
+        let newUser: IUser = typeof user === 'number' ? { permissions: [] } : { ...user, permissions: [] };
+        newUser.emailAddress = newEmail;
+        newUser.permissions = perms;
+        onChange(newUser);
+    }, [perms, newEmail]);
 
     const rightNames: Record<Rights, string> = {
         read: t('rights.read').toString(),
         write: t('rights.write').toString(),
         inspect: t('rights.inspect').toString(),
         append: t('rights.append').toString(),
+        review: t('rights.review').toString(),
     };
 
     return (
@@ -90,7 +107,7 @@ export function RightsItem({ user, initialRights, item, readonly }: IRightsItemP
                 </Flex>
             ) : (
                 <Flex direction="row" flex="1" align={'center'}>
-                    <Avatar size={'sm'} src={avatarUrl(user!.id)} mr={4} />
+                    <Avatar size={'sm'} src={avatarUrl(user!.id ?? null)} mr={4} />
                     <Text>{user.name || user.emailAddress}</Text>
                 </Flex>
             )}
@@ -110,7 +127,7 @@ export function RightsItem({ user, initialRights, item, readonly }: IRightsItemP
                         md: 'row',
                     }}
                 >
-                    {Object.values(Rights).map((right) => (
+                    {options.map((right) => (
                         <InputGroup>
                             <Checkbox
                                 mr={{
@@ -122,12 +139,12 @@ export function RightsItem({ user, initialRights, item, readonly }: IRightsItemP
                                     md: '0',
                                 }}
                                 isDisabled={readonly}
-                                isChecked={rights.includes(right)}
+                                isChecked={perms.includes(right)}
                                 onChange={(event) => {
                                     if (event.target.checked) {
-                                        setRights([...rights, right]);
+                                        setPerms([...perms, right]);
                                     } else {
-                                        setRights(rights.filter((r) => r !== right));
+                                        setPerms(perms.filter((r) => r !== right));
                                     }
                                 }}
                             >
@@ -137,19 +154,6 @@ export function RightsItem({ user, initialRights, item, readonly }: IRightsItemP
                     ))}
                 </Flex>
             </Box>
-            <Button
-                colorScheme="blue"
-                ml={{
-                    base: '0',
-                    xl: '4',
-                }}
-                mt={{
-                    base: '2',
-                    xl: '0',
-                }}
-            >
-                {t('generic.save').toString()}
-            </Button>
         </Flex>
     );
 }

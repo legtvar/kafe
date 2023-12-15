@@ -374,7 +374,7 @@ public static class TransferMaps
         string? entityType,
         Permission? globalPermissions,
         Permission? userPermissions,
-        ImmutableDictionary<Hrib, Permission> accountPermissions
+        IEnumerable<AccountInfo> accounts
     )
     {
         return new EntityPermissionsDetailDto(
@@ -382,9 +382,11 @@ public static class TransferMaps
             EntityType: entityType,
             GlobalPermissions: globalPermissions is null ? null : ToPermissionArray(globalPermissions.Value),
             UserPermissions: userPermissions is null ? null : ToPermissionArray(userPermissions.Value),
-            AccountPermissions: accountPermissions.ToImmutableDictionary(
-                p => p.Key.Value,
-                p => ToPermissionArray(p.Value))
+            AccountPermissions: accounts.Select(a => new EntityPermissionsAccountListDto(
+                Id: a.Id,
+                EmailAddress: a.EmailAddress,
+                Permissions: ToPermissionArray(a.Permissions?.GetValueOrDefault(id.Value) ?? Permission.None)
+            )).ToImmutableArray()
         );
     }
 

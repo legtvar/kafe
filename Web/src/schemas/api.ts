@@ -730,14 +730,17 @@ export interface components {
     };
     /** @enum {string} */
     DiagnosticKind: "unknown" | "info" | "warning" | "error";
+    EntityPermissionsAccountListDto: {
+      id: string;
+      emailAddress: string;
+      permissions: components["schemas"]["Permission"][];
+    };
     EntityPermissionsDetailDto: {
       id: string;
       entityType?: string | null;
       globalPermissions?: components["schemas"]["Permission"][] | null;
       userPermissions?: components["schemas"]["Permission"][] | null;
-      accountPermissions: {
-        [key: string]: components["schemas"]["Permission"][];
-      };
+      accountPermissions: components["schemas"]["EntityPermissionsAccountListDto"][];
     };
     ImageDto: {
       fileExtension: string;

@@ -294,8 +294,7 @@
     "title": "Systémová nastavení",
     "warning": "Prosím pozor! Cokoliv změníš tady může mít katastrofický dopad na finální chuť Kafe! Postupujte opatrně!",
     "rights": "Oprávnění",
-    "homepage": "Domovská obrazovka",
-    "autosave": "Změny se ukládají ihned a automaticky! Oprávnění se vztahují i na zděděné položky!"
+    "homepage": "Domovská obrazovka"
   },
   "rights": {
     "read": "Zobrazit",

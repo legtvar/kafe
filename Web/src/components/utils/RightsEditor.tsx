@@ -4,57 +4,78 @@ import { AbstractType } from '../../data/AbstractType';
 import { useAuth } from '../../hooks/Caffeine';
 import { useColorScheme } from '../../hooks/useColorScheme';
 import { Rights, RightsItem } from './RightsItem';
+import { EntityPermissions, EntityPermissionsUser } from '../../data/EntityPermissions';
+import { useState } from 'react';
 
 export interface IRightsEditorProps {
-    item: AbstractType | null;
+    item: EntityPermissions;
     readonly?: boolean;
-    options: Array<Rights>
+    options: Array<Rights>;
     explanation: Record<Rights, string>;
 }
 
-export function RightsEditor({ item, readonly, explanation }: IRightsEditorProps) {
+export function RightsEditor({ item, readonly, explanation, options }: IRightsEditorProps) {
     const { border } = useColorScheme();
-    const { user } = useAuth();
+
+    const [newItems, setNewItems] = useState<Array<Partial<EntityPermissionsUser>>>([{}]);
 
     return (
         <>
             <Box mb={4} mx={-4} fontSize="smaller" color="gray.500">
                 <List>
-                    <li>
-                        <Text as="span" fontWeight="bold">
-                            {t('rights.write').toString()}
-                        </Text>
-                        <Text as="span"> - {explanation.write}</Text>
-                    </li>
-                    <li>
-                        <Text as="span" fontWeight="bold">
-                            {t('rights.read').toString()}
-                        </Text>
-                        <Text as="span"> - {explanation.read}</Text>
-                    </li>
-                    <li>
-                        <Text as="span" fontWeight="bold">
-                            {t('rights.inspect').toString()}
-                        </Text>
-                        <Text as="span"> - {explanation.inspect}</Text>
-                    </li>
-                    <li>
-                        <Text as="span" fontWeight="bold">
-                            {t('rights.append').toString()}
-                        </Text>
-                        <Text as="span"> - {explanation.append}</Text>
-                    </li>
+                    {options.map((o) => (
+                        <li>
+                            <Text as="span" fontWeight="bold">
+                                {t(`rights.${o}`).toString()}
+                            </Text>
+                            <Text as="span"> - {explanation[o]}</Text>
+                        </li>
+                    ))}
                 </List>
-                <Text mt={4}>{t('system.autosave').toString()}</Text>
             </Box>
             <Box>
-                <RightsItem user={0} initialRights={[]} {...{ item, readonly }} />
+                {item.globalPermissions && (
+                    <RightsItem
+                        user={0}
+                        initialPerms={item.globalPermissions as Array<Rights>}
+                        {...{ readonly, options }}
+                        onChange={(user) => item.set('globalPermissions', user.permissions)}
+                    />
+                )}
+
                 <Spacer borderBottomColor={border} borderBottomWidth={1} mx={-4} mt={1} />
-                <RightsItem user={user!} initialRights={[Rights.READ]} {...{ item, readonly }} />
-                <RightsItem user={user!} initialRights={[Rights.WRITE]} {...{ item, readonly }} />
-                <RightsItem user={user!} initialRights={[Rights.APPEND]} {...{ item, readonly }} />
+
+                {item.accountPermissions.map((a) => (
+                    <RightsItem
+                        user={a}
+                        initialPerms={a.permissions as Array<Rights>}
+                        {...{ readonly, options }}
+                        onChange={(user) => {
+                            item.accountPermissions
+                                .filter((b) => b.id === a.id)
+                                .forEach((b) => (b.permissions = user.permissions));
+                            item.changed.add('accountPermissions');
+                        }}
+                    />
+                ))}
+
                 <Spacer borderBottomColor={border} borderBottomWidth={1} mx={-4} mt={1} />
-                <RightsItem user={null} initialRights={[]} {...{ item, readonly }} />
+
+                {newItems.map((a, i) => (
+                    <RightsItem
+                        key={i}
+                        user={null}
+                        initialPerms={[]}
+                        {...{ readonly, options }}
+                        onChange={(user) => {
+                            setNewItems(newItems.map((n, j) => (i == j ? user : n)));
+
+                            if (newItems.filter((e) => !e.emailAddress).length == 0) {
+                                setNewItems([...newItems, {}]);
+                            }
+                        }}
+                    />
+                ))}
             </Box>
         </>
     );

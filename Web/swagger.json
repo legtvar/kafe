@@ -1747,6 +1747,29 @@
         ],
         "type": "string"
       },
+      "EntityPermissionsAccountListDto": {
+        "required": [
+          "emailAddress",
+          "id",
+          "permissions"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "emailAddress": {
+            "type": "string"
+          },
+          "permissions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Permission"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "EntityPermissionsDetailDto": {
         "required": [
           "accountPermissions",
@@ -1776,12 +1799,9 @@
             "nullable": true
           },
           "accountPermissions": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "array",
-              "items": {
-                "$ref": "#/components/schemas/Permission"
-              }
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EntityPermissionsAccountListDto"
             }
           }
         },

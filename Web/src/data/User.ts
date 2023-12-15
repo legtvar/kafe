@@ -18,7 +18,8 @@ export class User extends AbstractType {
         projects: (components["schemas"]["ProjectListDto"])[];
     */
 
-    public constructor(struct: components['schemas']['AccountDetailDto']) {
+    public constructor(struct: components['schemas']['AccountDetailDto']
+            | components['schemas']['EntityPermissionsAccountListDto']) {
         super();
         Object.assign(this, struct);
         this.role = this.name ? 'user' : 'temp';

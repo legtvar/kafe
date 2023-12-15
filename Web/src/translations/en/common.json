@@ -293,8 +293,7 @@
     "title": "System settings",
     "warning": "Please be careful! Anything you change here can have a catastrophic impact on the final taste of Kafe! Proceed with caution!",
     "rights": "Rights",
-    "homepage": "Homepage",
-    "autosave": "Changes are saved immediately and automatically! Permissions also apply to inherited items!"
+    "homepage": "Homepage"
   },
   "rights": {
     "read": "View",

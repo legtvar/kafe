@@ -55,7 +55,7 @@ public class Startup
     public void ConfigureServices(IServiceCollection services)
     {
         IdentityModelEventSource.ShowPII = true;
-        
+
         services.AddHttpContextAccessor();
 
         services.AddAuthentication(o =>
@@ -77,23 +77,23 @@ public class Startup
                     return Task.CompletedTask;
                 };
             });
-            // .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, o =>
-            // {
-            //     o.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+        // .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, o =>
+        // {
+        //     o.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
 
-            //     var oidcConfig = Configuration.GetRequiredSection("Oidc").Get<OidcOptions>()
-            //         ?? throw new ArgumentException("OIDC is not configured well.");
+        //     var oidcConfig = Configuration.GetRequiredSection("Oidc").Get<OidcOptions>()
+        //         ?? throw new ArgumentException("OIDC is not configured well.");
 
-            //     o.Authority = oidcConfig.Authority;
-            //     o.ClientId = oidcConfig.ClientId;
-            //     o.ClientSecret = oidcConfig.ClientSecret;
-            //     o.ResponseType = OpenIdConnectResponseType.Code;
-            //     o.Scope.Add("openid");
-            //     o.Scope.Add("profile");
-            //     o.Scope.Add("email");
-            //     o.CallbackPath = new PathString("/signin-oidc");
-            //     o.SaveTokens = true;
-            // });
+        //     o.Authority = oidcConfig.Authority;
+        //     o.ClientId = oidcConfig.ClientId;
+        //     o.ClientSecret = oidcConfig.ClientSecret;
+        //     o.ResponseType = OpenIdConnectResponseType.Code;
+        //     o.Scope.Add("openid");
+        //     o.Scope.Add("profile");
+        //     o.Scope.Add("email");
+        //     o.CallbackPath = new PathString("/signin-oidc");
+        //     o.SaveTokens = true;
+        // });
 
         services.AddAuthorization(o =>
         {
@@ -259,6 +259,21 @@ public class Startup
                 ["en"] = new OpenApiSchema() { Type = "string", Nullable = true }
             }
         });
+        // o.MapType<Permission>(() => new OpenApiSchema
+        // {
+        //     Title = nameof(Permission),
+        //     Ref
+        //     Type = "string",
+        //     Enum = Enum.GetValues<Permission>()
+        //         .Where(v => v != Permission.None && v != Permission.All)
+        //         .Select(v =>
+        //         {
+        //             var name = v.ToString();
+        //             name = char.ToLowerInvariant(name[0]) + name[1..];
+        //             return new OpenApiString(name) as IOpenApiAny;
+        //         })
+        //         .ToList()
+        // });
         o.EnableAnnotations(
             enableAnnotationsForInheritance: true,
             enableAnnotationsForPolymorphism: true);

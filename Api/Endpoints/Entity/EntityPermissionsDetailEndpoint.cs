@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Ardalis.ApiEndpoints;
@@ -11,6 +12,7 @@ using Kafe.Data.Aggregates;
 using Kafe.Data.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace Kafe.Api.Endpoints.Entity;
 
@@ -37,6 +39,8 @@ public class EntityPermissionsDetailEndpoint : EndpointBaseAsync
         this.accountService = accountService;
     }
 
+    [HttpGet]
+    [SwaggerOperation(Tags = new[] { EndpointArea.Entity })]
     public override async Task<ActionResult<EntityPermissionsDetailDto>> HandleAsync(
         string id,
         CancellationToken cancellationToken = default)
@@ -69,16 +73,11 @@ public class EntityPermissionsDetailEndpoint : EndpointBaseAsync
             })
         });
 
-        var accountPermissions = relevantAccounts.ToImmutableDictionary(
-            a => (Hrib)a.Id,
-            a => a.Permissions?.GetValueOrDefault(id) ?? Permission.None
-        );
-
         return Ok(TransferMaps.ToEntityPermissionsDetailDto(
             id: entityId,
             entityType: entityId == Hrib.System ? null : entity?.GetType().Name,
             globalPermissions: entity is IVisibleEntity visible ? visible.GlobalPermissions : null,
             userPermissions: userPermissions,
-            accountPermissions: accountPermissions));
+            accounts: relevantAccounts.OrderBy(a => a.EmailAddress)));
     }
 }

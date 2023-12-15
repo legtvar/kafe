@@ -25,8 +25,8 @@ BEGIN
 									WHERE data ->> 'Id' = accessing_account_id);
 	END IF;
 	
-	IF accessing_account_perms -> '*' IS NOT NULL THEN
-		perms := perms | (accessing_account_perms -> '*')::int;
+	IF accessing_account_perms -> 'system' IS NOT NULL THEN
+		perms := perms | (accessing_account_perms -> 'system')::int;
 	END IF;
 	
 	IF accessing_account_perms -> account_id IS NOT NULL THEN

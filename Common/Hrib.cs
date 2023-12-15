@@ -15,7 +15,7 @@ public record Hrib
     public const int Length = 11;
 
     public const string InvalidValue = "invalid";
-    public const string SystemValue = "*";
+    public const string SystemValue = "system";
 
     public static readonly Hrib System = new Hrib(SystemValue);
     public static readonly Hrib Invalid = new Hrib(InvalidValue);

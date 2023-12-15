@@ -28,9 +28,9 @@ public class EntityService
 
         return (await db.QueryAsync(
             parentState.AggregateType,
-            "where data ->> Id = ?",
+            "WHERE data ->> 'Id' = ?",
             token,
-            parentState.Id))
+            parentState.Key))
                 .Cast<IEntity>()
                 .FirstOrDefault();
     }

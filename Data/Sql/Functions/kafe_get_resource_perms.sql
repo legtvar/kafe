@@ -9,6 +9,10 @@ BEGIN
 		RAISE '`resource_id` must be non-null.';
 	END IF;
 	
+	IF resource_id = 'system' THEN
+		RETURN kafe_get_system_perms(account_id);
+	END IF;
+	
 	resource_type := (SELECT type
 					  FROM mt_streams
 					  WHERE id = resource_id);

@@ -29,8 +29,8 @@ BEGIN
 					  WHERE data ->> 'Id' = account_id);
 	END IF;
 
-	IF account_perms -> '*' IS NOT NULL THEN
-		perms := perms | (account_perms -> '*')::int;
+	IF account_perms -> 'system' IS NOT NULL THEN
+		perms := perms | (account_perms -> 'system')::int;
 	END IF;
 
 	IF account_perms -> projectgroup_id IS NOT NULL THEN

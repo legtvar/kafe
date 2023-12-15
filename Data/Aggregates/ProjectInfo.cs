@@ -20,7 +20,7 @@ public record ProjectInfo(
     Permission GlobalPermissions = Permission.None,
     DateTimeOffset ReleasedOn = default,
     bool IsLocked = false
-) : IEntity;
+) : IVisibleEntity;
 
 public record ProjectAuthorInfo(
     [Hrib] string Id,

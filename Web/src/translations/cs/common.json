@@ -301,6 +301,8 @@
     "read": "Zobrazit",
     "write": "Upravit",
     "append": "Přidat",
+    "inspect": "Prohlížet",
+    "review": "Hodnotit",
     "special": {
       "anyone": {
         "title": "Kdokoli v internetu",
@@ -316,22 +318,22 @@
         "read": "Zobrazit tato nastavení",
         "append": "Vytvářet nové projekty, skupiny projektů a playlisty",
         "write": "Měnit práva a systémová nastavení",
-        "inspect": "Zobrazit všechny projekty, skupiny projektů a playlisty"
+        "inspect": "Zobrazit všechny projekty, skupiny projektů a playlisty",
+        "review": "Hodnotit projekty ve všech skupinách"
       },
       "project": {
         "append": "Přidávat nové soubory do projektu",
-        "read": "Zobrazit projekt a jeho metadata",
-        "write": "Upravovat metadata a oprávnění projektu",
-        "inspect": "Zobrazit soubory projektu"
+        "read": "Zobrazit projekt, jeho metadata a soubory",
+        "write": "Upravovat metadata a oprávnění projektu"
       },
       "group": {
         "read": "Vidět tuto skupinu projektů",
         "write": "Měnit metadata a nastavení skupiny",
         "inspect": "Zobrazit všechny projekty ve skupině projektů",
-        "append": "Vytvořit nový projekt v této skupině"
+        "append": "Vytvořit nový projekt v této skupině",
+        "review": "Hodnotit projekty ve skupině"
       }
-    },
-    "inspect": "Prohlížet"
+    }
   },
   "groupsEdit": {
     "tabs": {

@@ -368,7 +368,26 @@ public static class TransferMaps
                 ?? ImmutableDictionary<Hrib, ImmutableArray<Permission>>.Empty
         );
     }
-    
+
+    public static EntityPermissionsDetailDto ToEntityPermissionsDetailDto(
+        Hrib id,
+        string? entityType,
+        Permission? globalPermissions,
+        Permission? userPermissions,
+        ImmutableDictionary<Hrib, Permission> accountPermissions
+    )
+    {
+        return new EntityPermissionsDetailDto(
+            Id: id.Value,
+            EntityType: entityType,
+            GlobalPermissions: globalPermissions is null ? null : ToPermissionArray(globalPermissions.Value),
+            UserPermissions: userPermissions is null ? null : ToPermissionArray(userPermissions.Value),
+            AccountPermissions: accountPermissions.ToImmutableDictionary(
+                p => p.Key.Value,
+                p => ToPermissionArray(p.Value))
+        );
+    }
+
     private static ImmutableArray<Permission> ToPermissionArray(Permission value)
     {
         if (value == Permission.None)

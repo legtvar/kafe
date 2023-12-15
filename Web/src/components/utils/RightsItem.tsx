@@ -19,6 +19,7 @@ export enum Rights {
     WRITE = 'write',
     INSPECT = 'inspect',
     APPEND = 'append',
+    REVIEW = 'review'
 }
 
 export function RightsItem({ user, initialRights, item, readonly }: IRightsItemProps) {

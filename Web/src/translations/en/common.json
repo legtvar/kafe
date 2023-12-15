@@ -300,6 +300,8 @@
     "read": "View",
     "write": "Edit",
     "append": "Append",
+    "inspect": "Inspect",
+    "review": "Review",
     "special": {
       "anyone": {
         "title": "Anyone on the Internet",
@@ -315,7 +317,8 @@
         "read": "View these settings",
         "append": "Create new projects, project groups and playlists",
         "write": "Change rights and system settings",
-        "inspect": "View all projects, project groups and playlists"
+        "inspect": "View all projects, project groups and playlists",
+        "review": "Write reviews for all projects in all groups"
       },
       "project": {
         "append": "Add new files to the project",
@@ -327,10 +330,10 @@
         "read": "See this group of projects",
         "write": "Change metadata and group settings",
         "inspect": "View all projects in the project group",
-        "append": "Create a new project in this group"
+        "append": "Create a new project in this group",
+        "review": "Write reviews for all projects in the group"
       }
-    },
-    "inspect": "Inspect"
+    }
   },
   "groupsEdit": {
     "tabs": {

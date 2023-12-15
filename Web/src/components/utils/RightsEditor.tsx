@@ -8,6 +8,7 @@ import { Rights, RightsItem } from './RightsItem';
 export interface IRightsEditorProps {
     item: AbstractType | null;
     readonly?: boolean;
+    options: Array<Rights>
     explanation: Record<Rights, string>;
 }
 

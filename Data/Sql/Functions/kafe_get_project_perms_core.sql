@@ -13,8 +13,8 @@ BEGIN
 		perms := perms | (project -> 'GlobalPermissions')::int;
 	END IF;
 
-	IF account -> 'Permissions' -> '*' IS NOT NULL THEN
-		perms := perms | (account -> 'Permissions' -> '*')::int;
+	IF account -> 'Permissions' -> 'system' IS NOT NULL THEN
+		perms := perms | (account -> 'Permissions' -> 'system')::int;
 	END IF;
 
 	IF account -> 'Permissions' -> (project ->> 'Id') IS NOT NULL THEN

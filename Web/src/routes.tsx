@@ -170,17 +170,17 @@ export const authRoutes = (t: (id: string) => string): AppRoute[] => [
         },
         children: playlistChildRoutes(t),
     },
-    // {
-    //     path: 'system',
-    //     title: t('route.system.title'),
-    //     element: <SystemComponent />,
-    //     inMenu: true,
-    //     icon: {
-    //         default: IoSettingsOutline,
-    //         selected: IoSettingsSharp,
-    //     },
-    //     children: playlistChildRoutes(t),
-    // },
+    {
+        path: 'system',
+        title: t('route.system.title'),
+        element: <SystemComponent />,
+        inMenu: true,
+        icon: {
+            default: IoSettingsOutline,
+            selected: IoSettingsSharp,
+        },
+        children: playlistChildRoutes(t),
+    },
 ];
 
 export const unauthRoutes = (t: (id: string) => string): RouteObject[] => [

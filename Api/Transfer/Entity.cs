@@ -15,3 +15,15 @@ public record EntityPermissionsAccountListDto(
     string EmailAddress,
     ImmutableArray<Permission> Permissions
 );
+
+public record EntityPermissionsEditDto(
+    string Id,
+    ImmutableArray<Permission>? GlobalPermissions,
+    ImmutableArray<EntityPermissionsAccountEditDto>? AccountPermissions
+);
+
+public record EntityPermissionsAccountEditDto(
+    string? Id,
+    string? EmailAddress,
+    ImmutableArray<Permission> Permissions
+);

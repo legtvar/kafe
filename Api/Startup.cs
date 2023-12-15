@@ -133,8 +133,9 @@ public class Startup
             o.AddDefaultPolicy(p =>
             {
                 p.AllowAnyHeader();
-                p.WithOrigins(ApiOptions.AllowedOrigins.ToArray())
-                    .AllowCredentials();
+                p.AllowAnyMethod();
+                p.AllowCredentials();
+                p.WithOrigins(ApiOptions.AllowedOrigins.ToArray());
             });
         });
 

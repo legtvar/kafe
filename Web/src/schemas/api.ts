@@ -239,6 +239,27 @@ export interface paths {
       };
     };
   };
+  "/api/v1/entity/perms": {
+    patch: {
+      requestBody?: {
+        content: {
+          "application/json": components["schemas"]["EntityPermissionsAccountEditDto"];
+          "text/json": components["schemas"]["EntityPermissionsAccountEditDto"];
+          "application/*+json": components["schemas"]["EntityPermissionsAccountEditDto"];
+        };
+      };
+      responses: {
+        /** @description Success */
+        200: {
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
+          };
+        };
+      };
+    };
+  };
   "/api/v1/playlist/{id}": {
     get: {
       parameters: {
@@ -730,6 +751,11 @@ export interface components {
     };
     /** @enum {string} */
     DiagnosticKind: "unknown" | "info" | "warning" | "error";
+    EntityPermissionsAccountEditDto: {
+      id?: string | null;
+      emailAddress?: string | null;
+      permissions: components["schemas"]["Permission"][];
+    };
     EntityPermissionsAccountListDto: {
       id: string;
       emailAddress: string;

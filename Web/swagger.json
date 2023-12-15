@@ -550,6 +550,54 @@
         }
       }
     },
+    "/api/v1/entity/perms": {
+      "patch": {
+        "tags": [
+          "Entity"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EntityPermissionsAccountEditDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EntityPermissionsAccountEditDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/EntityPermissionsAccountEditDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/playlist/{id}": {
       "get": {
         "tags": [
@@ -1746,6 +1794,29 @@
           "error"
         ],
         "type": "string"
+      },
+      "EntityPermissionsAccountEditDto": {
+        "required": [
+          "permissions"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "nullable": true
+          },
+          "emailAddress": {
+            "type": "string",
+            "nullable": true
+          },
+          "permissions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Permission"
+            }
+          }
+        },
+        "additionalProperties": false
       },
       "EntityPermissionsAccountListDto": {
         "required": [

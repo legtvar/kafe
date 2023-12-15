@@ -215,6 +215,10 @@ export class API {
             perms: {
                 async getById(id: string) {
                     return await api.requestSingle(`entity/perms/${id}`, EntityPermissions);
+                },
+                async update(perms: EntityPermissions) {
+                    return await api.patch<components['schemas']['EntityPermissionsAccountEditDto'], HRIB>(
+                        `entity/perms`, perms.serialize(true));
                 }
             }
         }

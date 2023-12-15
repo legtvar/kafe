@@ -1,5 +1,6 @@
 import {
     Box,
+    Button,
     Heading,
     HStack,
     Tab,
@@ -19,6 +20,7 @@ import { RightsEditor } from '../../utils/RightsEditor';
 import { Rights } from '../../utils/RightsItem';
 import { AwaitAPI } from '../../utils/AwaitAPI';
 import { SystemHRIB } from '../../../schemas/generic';
+import { SendAPI } from '../../utils/SendAPI';
 
 interface ISystemComponentProps {}
 
@@ -32,13 +34,49 @@ export function SystemComponent(props: ISystemComponentProps) {
             <AwaitAPI request={(api) => api.entities.perms.getById(SystemHRIB)}>
                 {(perms) => (
                     <Box m={6} pb={12}>
-                        <Heading fontSize="4xl" fontWeight="semibold" as="h2" lineHeight="tight" mr="auto" mb={2}>
-                            {t('system.title').toString()}
-                        </Heading>
-                        <HStack color="red.500" mb={8}>
-                            <IoWarning />
-                            <Text>{t('system.warning').toString()}</Text>
-                        </HStack>
+                        <SendAPI
+                            request={(api, value) => api.entities.perms.update(value)}
+                            onSubmited={() => {}}
+                            value={perms}
+                        >
+                            {(onSubmit, status, error) => (
+                                <>
+                                    <HStack>
+                                        <Heading
+                                            fontSize="4xl"
+                                            fontWeight="semibold"
+                                            as="h2"
+                                            lineHeight="tight"
+                                            mr="auto"
+                                            mb={2}
+                                        >
+                                            {t('system.title').toString()}
+                                        </Heading>
+                                        <Button
+                                            colorScheme="blue"
+                                            ml={{
+                                                base: '0',
+                                                xl: '4',
+                                            }}
+                                            mt={{
+                                                base: '2',
+                                                xl: '0',
+                                            }}
+                                            onClick={onSubmit}
+                                            isLoading={status === 'sending'}
+                                            isDisabled={status === 'sending' || status === 'ok'}
+                                        >
+                                            {t('generic.save').toString()}
+                                        </Button>
+                                    </HStack>
+
+                                    <HStack color="red.500" mb={8}>
+                                        <IoWarning />
+                                        <Text>{t('system.warning').toString()}</Text>
+                                    </HStack>
+                                </>
+                            )}
+                        </SendAPI>
                         <Tabs>
                             <TabList>
                                 <Tab>{t('system.rights').toString()}</Tab>

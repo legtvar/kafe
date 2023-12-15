@@ -158,6 +158,15 @@
         "tags": [
           "Account"
         ],
+        "parameters": [
+          {
+            "name": "AccessedEntityId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Success",
@@ -495,6 +504,45 @@
                   "items": {
                     "$ref": "#/components/schemas/AuthorListDto"
                   }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/entity/perms/{id}": {
+      "get": {
+        "tags": [
+          "Entity"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntityPermissionsDetailDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntityPermissionsDetailDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntityPermissionsDetailDto"
                 }
               }
             }
@@ -1698,6 +1746,46 @@
           "error"
         ],
         "type": "string"
+      },
+      "EntityPermissionsDetailDto": {
+        "required": [
+          "accountPermissions",
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "entityType": {
+            "type": "string",
+            "nullable": true
+          },
+          "globalPermissions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Permission"
+            },
+            "nullable": true
+          },
+          "userPermissions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Permission"
+            },
+            "nullable": true
+          },
+          "accountPermissions": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Permission"
+              }
+            }
+          }
+        },
+        "additionalProperties": false
       },
       "ImageDto": {
         "required": [

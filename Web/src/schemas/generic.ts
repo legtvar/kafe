@@ -44,3 +44,6 @@ export type ArtifactFootprint = {
 };
 
 export type HRIB = string;
+
+// NB: Keep in sync with Common/Hrib.cs
+export const SystemHRIB = 'system';

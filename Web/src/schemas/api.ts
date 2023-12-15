@@ -75,6 +75,11 @@ export interface paths {
   };
   "/api/v1/accounts": {
     get: {
+      parameters: {
+        query?: {
+          AccessedEntityId?: string;
+        };
+      };
       responses: {
         /** @description Success */
         200: {
@@ -210,6 +215,25 @@ export interface paths {
             "text/plain": components["schemas"]["AuthorListDto"][];
             "application/json": components["schemas"]["AuthorListDto"][];
             "text/json": components["schemas"]["AuthorListDto"][];
+          };
+        };
+      };
+    };
+  };
+  "/api/v1/entity/perms/{id}": {
+    get: {
+      parameters: {
+        path: {
+          id: string;
+        };
+      };
+      responses: {
+        /** @description Success */
+        200: {
+          content: {
+            "text/plain": components["schemas"]["EntityPermissionsDetailDto"];
+            "application/json": components["schemas"]["EntityPermissionsDetailDto"];
+            "text/json": components["schemas"]["EntityPermissionsDetailDto"];
           };
         };
       };
@@ -706,6 +730,15 @@ export interface components {
     };
     /** @enum {string} */
     DiagnosticKind: "unknown" | "info" | "warning" | "error";
+    EntityPermissionsDetailDto: {
+      id: string;
+      entityType?: string | null;
+      globalPermissions?: components["schemas"]["Permission"][] | null;
+      userPermissions?: components["schemas"]["Permission"][] | null;
+      accountPermissions: {
+        [key: string]: components["schemas"]["Permission"][];
+      };
+    };
     ImageDto: {
       fileExtension: string;
       mimeType: string;

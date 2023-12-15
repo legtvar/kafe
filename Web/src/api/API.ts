@@ -7,6 +7,7 @@ import { User } from '../data/User';
 import { components } from '../schemas/api';
 import { HRIB, localizedString } from '../schemas/generic';
 import { IntRange } from '../utils/IntRange';
+import { EntityPermissions } from '../data/EntityPermissions';
 
 export type ApiCredentials = {
     username: string;
@@ -15,15 +16,15 @@ export type ApiCredentials = {
 
 export type ApiResponse<T> =
     | {
-          status: 200;
-          response: AxiosResponse<any>;
-          data: T;
-      }
+        status: 200;
+        response: AxiosResponse<any>;
+        data: T;
+    }
     | {
-          status: IntRange<400, 500>;
-          response: AxiosResponse<any>;
-          error: components['schemas']['ProblemDetails'];
-      };
+        status: IntRange<400, 500>;
+        response: AxiosResponse<any>;
+        error: components['schemas']['ProblemDetails'];
+    };
 
 export class API {
     private apiUrl = '/api/v1/';
@@ -205,6 +206,18 @@ export class API {
                 return api.getSimple(`account/logout`);
             },
         };
+    }
+
+    public get entities() {
+        const api = this;
+
+        return {
+            perms: {
+                async getById(id: string) {
+                    return await api.requestSingle(`entity/perms/${id}`, EntityPermissions);
+                }
+            }
+        }
     }
 
     // END

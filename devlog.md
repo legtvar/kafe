@@ -33,3 +33,20 @@ Nevertheless, they are important to remember.
 
 We use string Human-Readable Identifier Ballast (`Hrib`) for Ids on pretty much everything.
 These are essentially YouTube's 11-chars-long Ids but without the checks for swear words.
+
+
+# Other
+
+## `pg_dump`
+
+To dump all:
+
+```bash
+sudo -u postgres pg_dumpall > lemma-yyyy-MM-dd-all.sql
+```
+
+To dump and tar WMA
+
+```bash
+NAME=lemma-yyyy-MM-dd sudo -u postgres pg_dump --schema lemma --format d --file "/tmp/$NAME" && tar -cf "/tmp/$NAME.tar" -C "/tmp/$NAME" .
+```

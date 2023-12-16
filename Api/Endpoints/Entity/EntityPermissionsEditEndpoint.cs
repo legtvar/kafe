@@ -19,6 +19,7 @@ namespace Kafe.Api.Endpoints.Entity;
 
 [ApiVersion("1")]
 [Route("entity/perms")]
+[Authorize]
 public class EntityPermissionsEditEndpoint : EndpointBaseAsync
     .WithRequest<EntityPermissionsEditDto>
     .WithActionResult<string>

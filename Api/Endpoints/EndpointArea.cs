@@ -10,4 +10,5 @@ public static class EndpointArea
     public const string ProjectGroup = "ProjectGroup";
     public const string Shard = "Shard";
     public const string Entity = "Entity";
+    public const string System = "System";
 }

@@ -111,11 +111,15 @@ public class EntityService
 
             if ((account.Permissions?.GetValueOrDefault(entityId.Value) ?? Permission.None) != permissions)
             {
-                db.Events.Append(accessingAccountId.Value, new AccountPermissionSet(
-                    AccountId: accessingAccountId.Value,
-                    EntityId: entityId.Value,
-                    Permission: permissions
-                ));
+                object @event = permissions != Permission.None
+                    ? new AccountPermissionSet(
+                        AccountId: accessingAccountId.Value,
+                        EntityId: entityId.Value,
+                        Permission: permissions)
+                    : new AccountPermissionUnset(
+                        AccountId: accessingAccountId.Value,
+                        EntityId: entityId.Value);
+                db.Events.Append(accessingAccountId.Value, @event);
             }
 
         }

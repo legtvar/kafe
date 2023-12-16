@@ -28,7 +28,7 @@ public class AccountInfoProjection : SingleStreamProjection<AccountInfo>
     {
     }
 
-    public AccountInfo Create(TemporaryAccountCreated e)
+    public static AccountInfo Create(TemporaryAccountCreated e)
     {
         return new(
             Id: e.AccountId,

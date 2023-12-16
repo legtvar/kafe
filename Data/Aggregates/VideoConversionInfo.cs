@@ -20,7 +20,7 @@ public class VideoConversionInfoProjection : SingleStreamProjection<VideoConvers
     {
     }
 
-    public VideoConversionInfo Create(VideoConversionCreated e)
+    public static VideoConversionInfo Create(VideoConversionCreated e)
     {
         return new VideoConversionInfo(
             Id: e.ConversionId,

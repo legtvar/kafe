@@ -16,6 +16,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Weasel.Core;
+using Weasel.Postgresql;
 using Weasel.Postgresql.Functions;
 
 namespace Microsoft.Extensions.DependencyInjection;
@@ -107,9 +108,10 @@ public static class ServiceCollectionExtensions
                 ?? throw new NotSupportedException($"Embedded Sql '{sqlFile}' could not be found.");
             using var reader = new StreamReader(stream);
             var contents = reader.ReadToEnd();
-            
+
             var objectName = Path.GetFileNameWithoutExtension(sqlFile);
-            options.Storage.ExtendedSchemaObjects.Add(new Function(new DbObjectName("public", objectName), contents));
+            options.Storage.ExtendedSchemaObjects.Add(
+                new Function(new PostgresqlObjectName("public", objectName), contents));
         }
     }
 }

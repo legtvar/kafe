@@ -40,7 +40,7 @@ public class ArtifactDetailProjection : MultiStreamProjection<ArtifactDetail, st
         CustomGrouping(new Grouper());
     }
 
-    public ArtifactDetail Create(ArtifactCreated e)
+    public static ArtifactDetail Create(ArtifactCreated e)
     {
         return new ArtifactDetail(
             Id: e.ArtifactId,

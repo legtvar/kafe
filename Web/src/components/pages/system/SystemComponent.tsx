@@ -17,9 +17,8 @@ import { useAuth } from '../../../hooks/Caffeine';
 import { useColorScheme } from '../../../hooks/useColorScheme';
 import { OutletOrChildren } from '../../utils/OutletOrChildren';
 import { RightsEditor } from '../../utils/RightsEditor';
-import { Rights } from '../../utils/RightsItem';
 import { AwaitAPI } from '../../utils/AwaitAPI';
-import { SystemHRIB } from '../../../schemas/generic';
+import { AllPermissions, SystemHRIB } from '../../../schemas/generic';
 import { SendAPI } from '../../utils/SendAPI';
 
 interface ISystemComponentProps {}
@@ -40,7 +39,7 @@ export function SystemComponent(props: ISystemComponentProps) {
                             value={perms}
                             repeatable={true}
                         >
-                            {(onSubmit, status, error) => (
+                            {(onSubmit, status) => (
                                 <>
                                     <HStack>
                                         <Heading
@@ -67,7 +66,7 @@ export function SystemComponent(props: ISystemComponentProps) {
                                             isLoading={status === 'sending'}
                                             isDisabled={status === 'sending'}
                                         >
-                                            {t('generic.save').toString()} ({status})
+                                            {t('generic.save').toString()}
                                         </Button>
                                     </HStack>
 
@@ -88,13 +87,7 @@ export function SystemComponent(props: ISystemComponentProps) {
                                 <TabPanel>
                                     <RightsEditor
                                         perms={perms}
-                                        options={[
-                                            Rights.READ,
-                                            Rights.WRITE,
-                                            Rights.APPEND,
-                                            Rights.INSPECT,
-                                            Rights.REVIEW,
-                                        ]}
+                                        options={AllPermissions}
                                         explanation={{
                                             read: t('rights.groups.system.read').toString(),
                                             write: t('rights.groups.system.write').toString(),

@@ -1,17 +1,35 @@
 ```
-      ██     ██                                                                             
-    ██     ██                                                                               
-      ██     ██        █  █▀ ██   ▄████  ▄███▄       ██▄   ▄███▄      ▄   █    ████▄   ▄▀   
+      █      █                                                                              
+     █      █                                                                               
+      █      █         █  █▀ ██   ▄████  ▄███▄       ██▄   ▄███▄      ▄   █    ████▄   ▄▀   
                        █▄█   █ █  █▀   ▀ █▀   ▀      █  █  █▀   ▀      █  █    █   █ ▄▀     
   ███████████████      █▀▄   █▄▄█ █▀▀    ██▄▄        █   █ ██▄▄   █     █ █    █   █ █ ▀▄   
-  ██           ████    █  █  █  █ █      █▄   ▄▀     █  █  █▄   ▄▀ █    █ ███▄ ▀████ █   █  
-  ██           ████      █      █  █     ▀███▀       ███▀  ▀███▀    █  █      ▀       ███   
-    ██       ██         ▀      █    ▀                                █▐                     
+  █            ███     █  █  █  █ █      █▄   ▄▀     █  █  █▄   ▄▀ █    █ ███▄ ▀████ █   █  
+   █           ███       █      █  █     ▀███▀       ███▀  ▀███▀    █  █      ▀       ███   
+    █         █  █      ▀      █    ▀                                █▐                     
      █████████                ▀                                      ▐                      
 ```
 
 > A very minimalistic [_architecture design record_](https://github.com/joelparkerhenderson/architecture-decision-record).
 
-# 2023-12-15
+# Architecture Decisions
 
-- Changed the system `Hrib` from `'*'` to `"system"` because `'*'` is weird in URLs.
+# Static `Create`s (2023-12-16)
+
+Made the `Create` methods on all projections `static`.
+
+Turns out this is necessary when using Marten. (Thanks, Oskar.)
+
+## System Hrib (2023-12-15)
+
+Changed the system `Hrib` from `'*'` to `"system"` because `'*'` is weird in URLs.
+
+# History
+
+These decisions were made before we started writing this devlog.
+Nevertheless, they are important to remember.
+
+## Hrib
+
+We use string Human-Readable Identifier Ballast (`Hrib`) for Ids on pretty much everything.
+These are essentially YouTube's 11-chars-long Ids but without the checks for swear words.

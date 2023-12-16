@@ -46,7 +46,7 @@ public class ProjectInfoProjection : SingleStreamProjection<ProjectInfo>
     {
     }
 
-    public ProjectInfo Create(ProjectCreated e)
+    public static ProjectInfo Create(ProjectCreated e)
     {
         return new ProjectInfo(
             Id: e.ProjectId,
@@ -197,7 +197,7 @@ public class ProjectInfoProjection : SingleStreamProjection<ProjectInfo>
     {
         return a with
         {
-            GlobalPermissions = a.GlobalPermissions
+            GlobalPermissions = e.GlobalPermissions
         };
     }
 }

@@ -3,15 +3,16 @@ import { t } from 'i18next';
 import { AbstractType } from '../../data/AbstractType';
 import { useAuth } from '../../hooks/Caffeine';
 import { useColorScheme } from '../../hooks/useColorScheme';
-import { Rights, RightsItem } from './RightsItem';
+import { RightsItem } from './RightsItem';
 import { EntityPermissions, EntityPermissionsUser } from '../../data/EntityPermissions';
 import { useState } from 'react';
+import { Permission } from '../../schemas/generic';
 
 export interface IRightsEditorProps {
     perms: EntityPermissions;
     readonly?: boolean;
-    options: Array<Rights>;
-    explanation: Record<Rights, string>;
+    options: Readonly<Array<Permission>>;
+    explanation: Partial<Record<Permission, string>>;
 }
 
 export function RightsEditor({ perms, readonly, explanation, options }: IRightsEditorProps) {
@@ -37,7 +38,7 @@ export function RightsEditor({ perms, readonly, explanation, options }: IRightsE
                 {perms.globalPermissions && (
                     <RightsItem
                         user={0}
-                        initialPerms={perms.globalPermissions as Array<Rights>}
+                        initialPerms={perms.globalPermissions}
                         {...{ readonly, options }}
                         onChange={(user) => perms.set('globalPermissions', user.permissions)}
                     />
@@ -50,7 +51,7 @@ export function RightsEditor({ perms, readonly, explanation, options }: IRightsE
                     .map((a) => (
                         <RightsItem
                             user={a}
-                            initialPerms={a.permissions as Array<Rights>}
+                            initialPerms={a.permissions}
                             {...{ readonly, options }}
                             onChange={(user) => {
                                 perms.accountPermissions

@@ -6,36 +6,28 @@ import { AbstractType } from '../../data/AbstractType';
 import { User } from '../../data/User';
 import { useColorScheme } from '../../hooks/useColorScheme';
 import { avatarUrl } from '../../utils/avatarUrl';
-import { HRIB } from '../../schemas/generic';
+import { HRIB, Permission } from '../../schemas/generic';
 
 export interface IUser {
     id?: HRIB;
     emailAddress?: string;
     name?: string;
-    permissions: Array<Rights>;
+    permissions: Array<Permission>;
 }
 
 export interface IRightsItemProps {
     user: IUser | number | null; // User, 0 for anyone, null for new user
-    options: Array<Rights>;
-    initialPerms: Rights[];
+    options: Readonly<Array<Permission>>;
+    initialPerms: Array<Permission>;
     onChange: (user: IUser) => void;
     readonly?: boolean;
-}
-
-export enum Rights {
-    READ = 'read',
-    WRITE = 'write',
-    INSPECT = 'inspect',
-    APPEND = 'append',
-    REVIEW = 'review',
 }
 
 export function RightsItem({ user, options, initialPerms, readonly, onChange }: IRightsItemProps) {
     const borderColor = useColorModeValue('gray.300', 'gray.700');
     const { border, bg } = useColorScheme();
     const [newEmail, setNewEmail] = useState<string>('');
-    const [perms, setPerms] = useState<Rights[]>(initialPerms);
+    const [perms, setPerms] = useState<Permission[]>(initialPerms);
 
     useEffect(() => {
         let newUser: IUser = typeof user === 'number' ? { permissions: [] } : { ...user, permissions: [] };
@@ -44,7 +36,7 @@ export function RightsItem({ user, options, initialPerms, readonly, onChange }: 
         onChange(newUser);
     }, [perms, newEmail]);
 
-    const rightNames: Record<Rights, string> = {
+    const rightNames: Record<Permission, string> = {
         read: t('rights.read').toString(),
         write: t('rights.write').toString(),
         inspect: t('rights.inspect').toString(),
@@ -81,7 +73,7 @@ export function RightsItem({ user, options, initialPerms, readonly, onChange }: 
                             <Flex direction="column">
                                 <Text>{t('rights.special.anyone.title').toString()}</Text>
                                 <Text fontSize="smaller" color="red.500">
-                                    {t('rights.special.anyone.warning').toString()}
+                                {t('rights.special.anyone.warning').toString()}
                                 </Text>
                             </Flex>
                         </Flex>

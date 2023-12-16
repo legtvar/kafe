@@ -28,7 +28,7 @@ public class VideoShardInfoProjection : SingleStreamProjection<VideoShardInfo>
     {
     }
 
-    public VideoShardInfo Create(IEvent<VideoShardCreated> e)
+    public static VideoShardInfo Create(IEvent<VideoShardCreated> e)
     {
         return new(
             Id: e.Data.ShardId,

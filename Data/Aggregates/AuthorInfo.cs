@@ -21,7 +21,7 @@ public class AuthorInfoProjection : SingleStreamProjection<AuthorInfo>
     {
     }
 
-    public AuthorInfo Create(AuthorCreated e)
+    public static AuthorInfo Create(AuthorCreated e)
     {
         return new AuthorInfo(
             Id: e.AuthorId,
@@ -46,7 +46,7 @@ public class AuthorInfoProjection : SingleStreamProjection<AuthorInfo>
     {
         return a with
         {
-            GlobalPermissions = a.GlobalPermissions
+            GlobalPermissions = e.GlobalPermissions
         };
     }
 }

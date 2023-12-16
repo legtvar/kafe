@@ -14,7 +14,7 @@ public record ArtifactInfo(
 
 public class ArtifactInfoProjection : SingleStreamProjection<ArtifactInfo>
 {
-    public ArtifactInfo Create(ArtifactCreated e)
+    public static ArtifactInfo Create(ArtifactCreated e)
     {
         return new ArtifactInfo(
             Id: e.ArtifactId,

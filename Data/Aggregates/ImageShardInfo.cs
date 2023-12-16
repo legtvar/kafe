@@ -28,7 +28,7 @@ public class ImageShardInfoProjection : SingleStreamProjection<ImageShardInfo>
     {
     }
 
-    public ImageShardInfo Create(IEvent<ImageShardCreated> e)
+    public static ImageShardInfo Create(IEvent<ImageShardCreated> e)
     {
         return new(
             Id: e.Data.ShardId,

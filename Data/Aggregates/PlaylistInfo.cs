@@ -20,7 +20,7 @@ public class PlaylistInfoProjection : SingleStreamProjection<PlaylistInfo>
     {
     }
 
-    public PlaylistInfo Create(PlaylistCreated e)
+    public static PlaylistInfo Create(PlaylistCreated e)
     {
         return new PlaylistInfo(
             Id: e.PlaylistId,
@@ -59,11 +59,11 @@ public class PlaylistInfoProjection : SingleStreamProjection<PlaylistInfo>
         return p;
     }
 
-    public PlaylistInfo Apply(GlobalPermissionsChanged e, PlaylistInfo a)
-    {
-        return a with
-        {
-            GlobalPermissions = a.GlobalPermissions
-        };
-    }
+    // public PlaylistInfo Apply(GlobalPermissionsChanged e, PlaylistInfo a)
+    // {
+    //     return a with
+    //     {
+    //         GlobalPermissions = e.GlobalPermissions
+    //     };
+    // }
 }

@@ -47,3 +47,7 @@ export type HRIB = string;
 
 // NB: Keep in sync with Common/Hrib.cs
 export const SystemHRIB = 'system';
+
+export const AllPermissions = ['read', 'write', 'inspect', 'append', 'review'] as const;
+type PermissionTuple = typeof AllPermissions;
+export type Permission = PermissionTuple[number];

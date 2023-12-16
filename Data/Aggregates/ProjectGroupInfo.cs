@@ -21,7 +21,7 @@ public class ProjectGroupInfoProjection : SingleStreamProjection<ProjectGroupInf
     {
     }
 
-    public ProjectGroupInfo Create(ProjectGroupCreated e)
+    public static ProjectGroupInfo Create(ProjectGroupCreated e)
     {
         return new ProjectGroupInfo(
             Id: e.ProjectGroupId,
@@ -55,7 +55,7 @@ public class ProjectGroupInfoProjection : SingleStreamProjection<ProjectGroupInf
     {
         return a with
         {
-            GlobalPermissions = a.GlobalPermissions
+            GlobalPermissions = e.GlobalPermissions
         };
     }
 }

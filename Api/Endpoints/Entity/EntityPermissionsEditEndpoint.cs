@@ -85,7 +85,11 @@ public class EntityPermissionsEditEndpoint : EndpointBaseAsync
 
         if (dto.GlobalPermissions is not null)
         {
-            await entityService.SetPermissions((Hrib)dto.Id, TransferMaps.FromPermissionArray(dto.GlobalPermissions), userProvider.Account?.Id, cancellationToken);
+            await entityService.SetPermissions(
+                entityId: (Hrib)dto.Id,
+                permissions: TransferMaps.FromPermissionArray(dto.GlobalPermissions),
+                accessingAccountId: null, // sets global permissions
+                token: cancellationToken);
         }
 
         return Ok(dto.Id);

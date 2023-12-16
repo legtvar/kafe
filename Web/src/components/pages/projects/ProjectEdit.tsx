@@ -1,4 +1,18 @@
-import { Box, Button, Flex, Heading, Stack, Tab, TabList, TabPanel, TabPanels, Tabs, Text } from '@chakra-ui/react';
+import {
+    Box,
+    Button,
+    Flex,
+    HStack,
+    Heading,
+    Stack,
+    Tab,
+    TabList,
+    TabPanel,
+    TabPanels,
+    Tabs,
+    Text,
+    VStack,
+} from '@chakra-ui/react';
 import { t } from 'i18next';
 import { AiOutlineUnlock } from 'react-icons/ai';
 import { BsX } from 'react-icons/bs';
@@ -14,6 +28,7 @@ import { ProjectBasicInfo } from './create/ProjectBasicInfo';
 import { ProjectStatus } from './ProjectStatus';
 import { ProjectTags } from './ProjectTags';
 import { ReviewList } from './ReviewList';
+import { SendAPI } from '../../utils/SendAPI';
 
 interface IProjectEditProps {}
 
@@ -24,8 +39,6 @@ export function ProjectEdit(props: IProjectEditProps) {
     if (!id) {
         return <Status statusCode={404} embeded />;
     }
-
-    const tagsForAdmin = ['ProjectReview', 'Administration'];
 
     return (
         <AwaitAPI request={(api) => api.projects.getById(id)} error={<Status statusCode={404} embeded />}>
@@ -79,17 +92,49 @@ export function ProjectEdit(props: IProjectEditProps) {
                                     )}
                                 </Stack>
                             </TabPanel>
-                            {/* <TabPanel>
-                                <RightsEditor
-                                    item={project}
-                                    explanation={{
-                                        read: t('rights.groups.project.read').toString(),
-                                        write: t('rights.groups.project.write').toString(),
-                                        inspect: t('rights.groups.project.inspect').toString(),
-                                        append: t('rights.groups.project.append').toString(),
-                                    }}
-                                />
-                            </TabPanel> */}
+                            <TabPanel>
+                                <AwaitAPI request={(api) => api.entities.perms.getById(project.id)}>
+                                    {(perms) => (
+                                        <VStack align="stretch">
+                                            <SendAPI
+                                                value={perms}
+                                                request={(api, value) => api.entities.perms.update(value)}
+                                                onSubmited={() => {}}
+                                                repeatable={true}
+                                            >
+                                                {(onSubmit, status) => (
+                                                    <HStack align="stretch" justifyContent="flex-end">
+                                                        <Button
+                                                            colorScheme="blue"
+                                                            ml={{
+                                                                base: '0',
+                                                                xl: '4',
+                                                            }}
+                                                            mt={{
+                                                                base: '2',
+                                                                xl: '0',
+                                                            }}
+                                                            onClick={onSubmit}
+                                                            isLoading={status === 'sending'}
+                                                            isDisabled={status === 'sending'}
+                                                        >
+                                                            {t('generic.save').toString()}
+                                                        </Button>
+                                                    </HStack>
+                                                )}
+                                            </SendAPI>
+                                            <RightsEditor
+                                                perms={perms}
+                                                options={['read', 'write']}
+                                                explanation={{
+                                                    read: t('rights.groups.project.read').toString(),
+                                                    write: t('rights.groups.project.write').toString(),
+                                                }}
+                                            />
+                                        </VStack>
+                                    )}
+                                </AwaitAPI>
+                            </TabPanel>
                             <TabPanel>
                                 <Heading as="h2" fontSize="lg" mb={4}>
                                     {t('project.admin.new').toString()}

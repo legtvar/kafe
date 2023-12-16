@@ -135,7 +135,11 @@ Vaše KAFE
             LocalizedString.Create(
                 (InvariantCulture, "To infinity and beyond!"),
                 (CzechCulture, "Do nekonečna a ještě dál!"),
-                (SlovakCulture, "Do nekonečna a ešte ďalej!"))
+                (SlovakCulture, "Do nekonečna a ešte ďalej!")),
+            LocalizedString.Create(
+                (InvariantCulture, "Have fun out there."),
+                (CzechCulture, "Užijte si to."),
+                (SlovakCulture, "Užite si to."))
         };
     }
 }

@@ -28,7 +28,7 @@ public class SubtitlesShardInfoProjection : SingleStreamProjection<SubtitlesShar
     {
     }
 
-    public SubtitlesShardInfo Create(IEvent<SubtitlesShardCreated> e)
+    public static SubtitlesShardInfo Create(IEvent<SubtitlesShardCreated> e)
     {
         return new(
             Id: e.Data.ShardId,

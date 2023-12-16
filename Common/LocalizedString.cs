@@ -11,6 +11,10 @@ namespace Kafe;
 [JsonConverter(typeof(LocalizedStringJsonConverter))]
 public sealed partial class LocalizedString : IEquatable<LocalizedString>
 {
+    public static readonly LocalizedString Empty = new LocalizedString(ImmutableDictionary.CreateRange(new[] {
+        new KeyValuePair<string, string>(Const.InvariantCultureCode, string.Empty)
+    }));
+
     private readonly ImmutableDictionary<string, string> data;
 
     public string this[CultureInfo culture] => this[culture.TwoLetterISOLanguageName];

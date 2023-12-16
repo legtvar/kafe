@@ -26,6 +26,11 @@
             },
             "sourceFileMap": {
                 "/Views": "${workspaceFolder}/Views"
+            },
+            "sourceLinkOptions": {
+                "*": {
+                    "enabled": true
+                }
             }
         },
         {

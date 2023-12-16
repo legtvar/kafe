@@ -21,7 +21,7 @@ public class NotificationInfoProjection : SingleStreamProjection<NotificationInf
     {
     }
 
-    public NotificationInfo Create(NotificationCreated e)
+    public static NotificationInfo Create(NotificationCreated e)
     {
         return new NotificationInfo
         (

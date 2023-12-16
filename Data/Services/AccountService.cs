@@ -77,7 +77,7 @@ $@"TRUE = ALL(
                 PreferredCulture: preferredCulture ?? Const.InvariantCultureCode
             );
             var selfPermissionSet = new AccountPermissionSet(id.Value, id.Value, Permission.All);
-            db.Events.StartStream<AccountInfo>(id, created, selfPermissionSet);
+            db.Events.StartStream<AccountInfo>(id.Value, created, selfPermissionSet);
         }
         else
         {

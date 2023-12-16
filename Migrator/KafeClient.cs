@@ -74,7 +74,7 @@ public sealed class KafeClient : IAsyncDisposable
             Phone: phone);
         LogEvent(hrib, infoChanged);
 
-        session.Events.StartStream<AuthorInfo>(hrib, created, infoChanged);
+        session.Events.StartStream<AuthorInfo>(hrib.Value, created, infoChanged);
         await session.SaveChangesAsync();
         return (await session.Events.AggregateStreamAsync<AuthorInfo>(hrib.Value))!;
     }
@@ -144,7 +144,7 @@ public sealed class KafeClient : IAsyncDisposable
             CreationMethod: CreationMethod.Migrator,
             Name: (LocalizedString)name,
             AddedOn: addedOn);
-        session.Events.StartStream<ArtifactInfo>(artifactId, artifactCreated);
+        session.Events.StartStream<ArtifactInfo>(artifactId.Value, artifactCreated);
         LogEvent(artifactId, artifactCreated);
 
         shardId ??= Hrib.Create();
@@ -153,7 +153,7 @@ public sealed class KafeClient : IAsyncDisposable
             CreationMethod: CreationMethod.Migrator,
             ArtifactId: artifactId.Value,
             OriginalVariantInfo: originalVariant);
-        session.Events.StartStream<VideoShardInfo>(shardId, shardCreated);
+        session.Events.StartStream<VideoShardInfo>(shardId.Value, shardCreated);
         LogEvent(shardId, shardCreated);
 
         if (projectId is not null)
@@ -188,7 +188,7 @@ public sealed class KafeClient : IAsyncDisposable
             CreationMethod: CreationMethod.Migrator,
             Name: (LocalizedString)name);
         LogEvent(hrib, created);
-        session.Events.StartStream<PlaylistInfo>(hrib, created);
+        session.Events.StartStream<PlaylistInfo>(hrib.Value, created);
 
         if (!string.IsNullOrEmpty(description))
         {
@@ -237,7 +237,7 @@ public sealed class KafeClient : IAsyncDisposable
             Description: (LocalizedString?)description);
         LogEvent(hrib, infoChanged);
 
-        session.Events.StartStream<ProjectInfo>(hrib, created, infoChanged);
+        session.Events.StartStream<ProjectInfo>(hrib.Value, created, infoChanged);
 
         if (isLocked)
         {
@@ -273,7 +273,7 @@ public sealed class KafeClient : IAsyncDisposable
             (LocalizedString)name);
         LogEvent(hrib, created);
 
-        session.Events.StartStream<ProjectGroupInfo>(hrib, created);
+        session.Events.StartStream<ProjectGroupInfo>(hrib.Value, created);
 
         var closed = new ProjectGroupClosed(hrib.Value);
         session.Events.Append(hrib.Value, closed);

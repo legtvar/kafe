@@ -144,7 +144,7 @@ public class VideoConversionDaemon : BackgroundService
                 id.Value,
                 candidate.video.Id,
                 candidate.missingVariants.First());
-            db.Events.StartStream<VideoConversionInfo>(id, created);
+            db.Events.StartStream<VideoConversionInfo>(id.Value, created);
             await db.SaveChangesAsync();
             return await db.Events.AggregateStreamAsync<VideoConversionInfo>(id.Value);
         }

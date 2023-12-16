@@ -58,7 +58,7 @@ export function ProjectEdit(props: IProjectEditProps) {
                             <Tab>{t('projectEdit.tabs.status').toString()}</Tab>
                             <Tab>{t('projectEdit.tabs.info').toString()}</Tab>
                             <Tab>{t('projectEdit.tabs.files').toString()}</Tab>
-                            {/* <Tab>{t('projectEdit.tabs.rights').toString()}</Tab> */}
+                            <Tab>{t('projectEdit.tabs.rights').toString()}</Tab>
                             {project.userPermissions.includes('review') && (
                                 <Tab>
                                     <AiOutlineUnlock />

@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Hosting.Server.Features;
 using System.Reflection;
 using JasperFx.Core;
 using System;
+using System.Collections.Generic;
 
 namespace Kafe.Api.Endpoints.ProjectGroup;
 
@@ -45,7 +46,8 @@ public class SystemDetailEndpoint : EndpointBaseAsync
     {
         var dto = new SystemDetailDto(
             Name: hostEnvironment.ApplicationName,
-            BaseUrls: (server.Features.Get<IServerAddressesFeature>()?.Addresses ?? []).ToImmutableArray(),
+            BaseUrls: (server.Features.Get<IServerAddressesFeature>()?.Addresses ?? Enumerable.Empty<string>())
+                .ToImmutableArray(),
             Version: typeof(Startup).Assembly.GetName().Version?.ToString() ?? "unknown",
             Commit: ThisAssembly.Git.Commit,
             CommitDate: DateTimeOffset.Parse(ThisAssembly.Git.CommitDate),

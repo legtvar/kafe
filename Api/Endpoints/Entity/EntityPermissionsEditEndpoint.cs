@@ -52,17 +52,40 @@ public class EntityPermissionsEditEndpoint : EndpointBaseAsync
             return Unauthorized();
         }
 
+        var accountPermissions = dto.AccountPermissions ?? ImmutableArray<EntityPermissionsAccountEditDto>.Empty;
+        if (accountPermissions.Any(a => string.IsNullOrEmpty(a.Id) && string.IsNullOrEmpty(a.EmailAddress)))
+        {
+            return ValidationProblem(title: "All accounts must be identified by either id or email address.");
+        }
+
+        var accounts = await Task.WhenAll(accountPermissions
+            .Select(async a =>
+            {
+                var account = a.Id is not null
+                    ? await accountService.Load(a.Id)
+                    : await accountService.FindByEmail(a.EmailAddress!);
+                return (dto: a, entity: account);
+            }));
+        if (accounts.Any(a => a.entity is null))
+        {
+            var notFoundAccounts = string.Join(", ", accounts.Where(a => a.entity is null)
+                .Select(a => $"\"{a.dto.Id ?? a.dto.EmailAddress}\""));
+            return NotFound($"Could not find accounts: {notFoundAccounts}.");
+        }
+
+        foreach (var account in accounts)
+        {
+            await entityService.SetPermissions(
+                dto.Id,
+                TransferMaps.FromPermissionArray(account.dto.Permissions),
+                account.entity!.Id,
+                cancellationToken);
+        }
+
         if (dto.GlobalPermissions is not null)
         {
             await entityService.SetPermissions((Hrib)dto.Id, TransferMaps.FromPermissionArray(dto.GlobalPermissions), userProvider.Account?.Id, cancellationToken);
         }
-
-        // TODO: Apply account changes
-        // var authAccount = await authorizationService.AuthorizeAsync(User, dto.Id, EndpointPolicy.Write);
-        // if (!authEntity.Succeeded)
-        // {
-        //     return Unauthorized();
-        // }
 
         return Ok(dto.Id);
     }

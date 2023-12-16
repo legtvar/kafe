@@ -8,13 +8,13 @@ import { EntityPermissions, EntityPermissionsUser } from '../../data/EntityPermi
 import { useState } from 'react';
 
 export interface IRightsEditorProps {
-    item: EntityPermissions;
+    perms: EntityPermissions;
     readonly?: boolean;
     options: Array<Rights>;
     explanation: Record<Rights, string>;
 }
 
-export function RightsEditor({ item, readonly, explanation, options }: IRightsEditorProps) {
+export function RightsEditor({ perms, readonly, explanation, options }: IRightsEditorProps) {
     const { border } = useColorScheme();
 
     const [newItems, setNewItems] = useState<Array<Partial<EntityPermissionsUser>>>([{}]);
@@ -34,30 +34,32 @@ export function RightsEditor({ item, readonly, explanation, options }: IRightsEd
                 </List>
             </Box>
             <Box>
-                {item.globalPermissions && (
+                {perms.globalPermissions && (
                     <RightsItem
                         user={0}
-                        initialPerms={item.globalPermissions as Array<Rights>}
+                        initialPerms={perms.globalPermissions as Array<Rights>}
                         {...{ readonly, options }}
-                        onChange={(user) => item.set('globalPermissions', user.permissions)}
+                        onChange={(user) => perms.set('globalPermissions', user.permissions)}
                     />
                 )}
 
                 <Spacer borderBottomColor={border} borderBottomWidth={1} mx={-4} mt={1} />
 
-                {item.accountPermissions.map((a) => (
-                    <RightsItem
-                        user={a}
-                        initialPerms={a.permissions as Array<Rights>}
-                        {...{ readonly, options }}
-                        onChange={(user) => {
-                            item.accountPermissions
-                                .filter((b) => b.id === a.id)
-                                .forEach((b) => (b.permissions = user.permissions));
-                            item.changed.add('accountPermissions');
-                        }}
-                    />
-                ))}
+                {perms.accountPermissions
+                    .filter((a) => a.id)
+                    .map((a) => (
+                        <RightsItem
+                            user={a}
+                            initialPerms={a.permissions as Array<Rights>}
+                            {...{ readonly, options }}
+                            onChange={(user) => {
+                                perms.accountPermissions
+                                    .filter((b) => b.id === a.id)
+                                    .forEach((b) => (b.permissions = user.permissions));
+                                perms.changed.add('accountPermissions');
+                            }}
+                        />
+                    ))}
 
                 <Spacer borderBottomColor={border} borderBottomWidth={1} mx={-4} mt={1} />
 
@@ -68,11 +70,18 @@ export function RightsEditor({ item, readonly, explanation, options }: IRightsEd
                         initialPerms={[]}
                         {...{ readonly, options }}
                         onChange={(user) => {
-                            setNewItems(newItems.map((n, j) => (i == j ? user : n)));
+                            let newNewItems = newItems.map((n, j) => (i == j ? user : n));
 
-                            if (newItems.filter((e) => !e.emailAddress).length == 0) {
-                                setNewItems([...newItems, {}]);
+                            if (newNewItems.filter((e) => !e.emailAddress).length == 0) {
+                                newNewItems.push({});
                             }
+                            setNewItems(newNewItems);
+
+                            perms.accountPermissions = [
+                                ...perms.accountPermissions.filter((a) => a.id),
+                                ...(newNewItems.filter(a => a.emailAddress) as EntityPermissionsUser[]),
+                            ];
+                            console.log(perms);
                         }}
                     />
                 ))}

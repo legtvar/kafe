@@ -38,6 +38,7 @@ export function SystemComponent(props: ISystemComponentProps) {
                             request={(api, value) => api.entities.perms.update(value)}
                             onSubmited={() => {}}
                             value={perms}
+                            repeatable={true}
                         >
                             {(onSubmit, status, error) => (
                                 <>
@@ -64,9 +65,9 @@ export function SystemComponent(props: ISystemComponentProps) {
                                             }}
                                             onClick={onSubmit}
                                             isLoading={status === 'sending'}
-                                            isDisabled={status === 'sending' || status === 'ok'}
+                                            isDisabled={status === 'sending'}
                                         >
-                                            {t('generic.save').toString()}
+                                            {t('generic.save').toString()} ({status})
                                         </Button>
                                     </HStack>
 
@@ -86,7 +87,7 @@ export function SystemComponent(props: ISystemComponentProps) {
                             <TabPanels pt={6}>
                                 <TabPanel>
                                     <RightsEditor
-                                        item={perms}
+                                        perms={perms}
                                         options={[
                                             Rights.READ,
                                             Rights.WRITE,

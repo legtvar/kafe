@@ -18,19 +18,20 @@ public class SemanticExceptionFilter : IExceptionFilter
     {
         int statusCode = context.Exception switch
         {
-            UnauthorizedAccessException => 403,
-            ArgumentOutOfRangeException => 404,
-            IndexOutOfRangeException => 404,
-            ArgumentException => 400,
-            NotImplementedException => 501,
-            NotSupportedException => 500,
-            InvalidOperationException => 500,
-            KafeException => 418,
-            _ => 500
+            UnauthorizedAccessException => 403, // 403 Forbidden
+            ArgumentOutOfRangeException => 404, // 404 Not Found
+            IndexOutOfRangeException => 404, // 404 Not Found
+            ArgumentException => 400, // 400 Bad Request
+            NotImplementedException => 501, // 501 Not Implemented
+            NotSupportedException => 500, // 500 Internal Server Error
+            InvalidOperationException => 500, // 500 Internal Server Error
+            KafeException => 418, // 418 I'm a teapot
+            _ => 500 // 500 Internal Server Error
         };
 
         context.Result = environment.IsDevelopment()
-            ? new ContentResult() {
+            ? new ContentResult()
+            {
                 StatusCode = statusCode,
                 ContentType = "text/plain",
                 Content = context.Exception.ToString()

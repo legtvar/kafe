@@ -24,7 +24,7 @@ public class AccountService
 
     public async Task<AccountInfo?> Load(Hrib id, CancellationToken token = default)
     {
-        return await db.Events.AggregateStreamAsync<AccountInfo>(id.Value, token: token);
+        return await db.LoadAsync<AccountInfo>(id.Value, token: token);
     }
 
     public async Task<AccountInfo?> FindByEmail(string emailAddress, CancellationToken token = default)

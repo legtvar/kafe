@@ -1,6 +1,5 @@
 using Marten.Events.Aggregation;
 using Kafe.Data.Events;
-using Marten.Events;
 using System.Collections.Immutable;
 
 namespace Kafe.Data.Aggregates;

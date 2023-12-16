@@ -14,6 +14,7 @@ namespace Kafe.Migrator;
 public static class Program
 {
     private const string MigrationInfoFileName = "migration.json";
+    private const string WmaStorageName = "WMA";
 
     private static IConfiguration configuration = null!;
     private static MigratorOptions migratorOptions = null!;
@@ -44,10 +45,6 @@ public static class Program
         configuration = host.Services.GetRequiredService<IConfiguration>();
         migratorOptions = configuration.Get<MigratorOptions>()!;
         logger = host.Services.GetRequiredService<ILogger<Migrator>>();
-        if (TryDropDb(host))
-        {
-            logger.LogInformation("Database dropped.");
-        }
 
         wma = host.Services.GetRequiredService<WmaClient>();
         kafe = host.Services.GetRequiredService<KafeClient>();

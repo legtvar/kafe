@@ -73,7 +73,10 @@ public class AuthorService
     }
 
     public record AuthorFilter(
-        Hrib? AccessingAccountId = null
+        Hrib? AccessingAccountId = null,
+        string? Email = null,
+        string? Uco = null,
+        string? Phone = null
     );
 
     public async Task<ImmutableArray<AuthorInfo>> List(AuthorFilter? filter = null, CancellationToken token = default)
@@ -98,7 +101,7 @@ public class AuthorService
     
     public async Task<ImmutableArray<AuthorInfo>> LoadMany(IEnumerable<Hrib> ids, CancellationToken token = default)
     {
-        return (await db.LoadManyAsync<AuthorInfo>(token, ids.Select(i => (string)i)))
+        return (await db.LoadManyAsync<AuthorInfo>(token, ids.Select(i => i.Value)))
             .Where(a => a is not null)
             .ToImmutableArray();
     }

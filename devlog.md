@@ -45,8 +45,19 @@ To dump all:
 sudo -u postgres pg_dumpall > lemma-yyyy-MM-dd-all.sql
 ```
 
-To dump and tar WMA
+To dump and tar WMA:
 
 ```bash
-NAME=lemma-yyyy-MM-dd sudo -u postgres pg_dump --schema lemma --format d --file "/tmp/$NAME" && tar -cf "/tmp/$NAME.tar" -C "/tmp/$NAME" .
+NAME=lemma-yyyy-MM-dd pg_dump --format d --file "/tmp/$NAME" lemma && tar -czf "/tmp/$NAME.tar.gz" -C "/tmp/$NAME" .
 ```
+
+To restore WMA:
+
+```bash
+NAME=lemma-yyyy-MM-dd
+mkdir $NAME
+tar -xzvf $NAME.tar.gz -C $NAME
+pg_restore -U postgres --clean --create --dbname postgres --format d lemma-2023-12-16
+```
+
+> NOTE: `--dbname postgres` is there because the first thing the restore does is `CREATE DATABASE lemma`. See [this](https://stackoverflow.com/questions/40784677/pg-restore-with-c-option-does-not-create-the-database).

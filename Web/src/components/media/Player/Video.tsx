@@ -158,11 +158,8 @@ export function Video({ sources, subtitles, autoplay, videoProps, onNext, onPrev
                     },
                 }}
                 onError={(error) => {
-                    if (error.message.includes('play()')) {
-                        setPlaying(false);
-                    } else {
-                        setError(error.message);
-                    }
+                    setPlaying(false);
+                    setError(error.message ?? t('error.title'));
                 }}
                 onProgress={(state) => {
                     setProgressState(state);

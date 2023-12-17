@@ -61,3 +61,14 @@ pg_restore -U postgres --clean --create --dbname postgres --format d lemma-2023-
 ```
 
 > NOTE: `--dbname postgres` is there because the first thing the restore does is `CREATE DATABASE lemma`. See [this](https://stackoverflow.com/questions/40784677/pg-restore-with-c-option-does-not-create-the-database).
+
+
+## Useful SQL queries
+
+To find projects referencing a certain artifact:
+
+```sql
+SELECT * FROM mt_doc_projectinfo
+WHERE 'UO20OFQkWAx' IN (SELECT sub ->> 'Id'
+                        FROM jsonb_array_elements(data -> 'Artifacts') AS sub)
+```

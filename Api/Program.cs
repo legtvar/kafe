@@ -17,8 +17,11 @@ public static class Program
             {
                 builder.ConfigureLogging(l =>
                 {
-                   l.ClearProviders();
-                   l.AddSimpleConsole();
+                    l.ClearProviders();
+                    l.AddSimpleConsole(c =>
+                    {
+                        c.IncludeScopes = true;
+                    });
                 });
                 builder.ConfigureKestrel(k =>
                 {

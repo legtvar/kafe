@@ -22,7 +22,7 @@ public class FFmpegCoreService : IMediaService
     {
         this.logger = logger ?? NullLogger<FFmpegCoreService>.Instance;
     }
-    
+
     static FFmpegCoreService()
     {
         var path = FFmpeg.FindExecutable();
@@ -95,6 +95,10 @@ public class FFmpegCoreService : IMediaService
         }
 
         var outputPath = Path.Combine(outputDir, $"{name}.webm");
+        if (File.Exists(outputPath) && !overwrite)
+        {
+            throw new ArgumentException($"A file already exists at the '{outputPath}' output path.");
+        }
 
         try
         {
@@ -106,7 +110,7 @@ public class FFmpegCoreService : IMediaService
                     .ForceFormat("webm")
                     .WithVideoFilters(f => f.Scale(-2, preset.ToHeight()))
                     .WithFastStart())
-                .NotifyOnProgress(p => logger.LogDebug($"Progress {Path.GetFileName(filePath)} ({name}): '{p}'"))
+                // .NotifyOnProgress(p => logger.LogDebug($"Progress {Path.GetFileName(filePath)} ({name}): '{p}'"))
                 .NotifyOnOutput(p => logger.LogError(p))
                 .CancellableThrough(token, 1_000)
                 .ProcessAsynchronously(true);

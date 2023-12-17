@@ -85,7 +85,10 @@ public class StorageService
         variant ??= Const.OriginalShardVariant;
         filePath = null;
 
-        var storageDir = GetShardKindDirectory(kind, create: false);
+        var storageDir = GetShardKindDirectory(
+            kind: kind,
+            variant: variant ?? Const.OriginalShardVariant,
+            create: false);
 
         var shardDir = new DirectoryInfo(Path.Combine(storageDir.FullName, id.Value));
         if (!shardDir.Exists)

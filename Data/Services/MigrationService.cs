@@ -8,7 +8,10 @@ using System.Threading.Tasks;
 using Kafe.Data.Aggregates;
 using Kafe.Media;
 using Marten;
+using Marten.Linq;
+using Marten.Linq.MatchesSql;
 using Microsoft.Extensions.Logging;
+using Remotion.Linq.Parsing.ExpressionVisitors.Transformation.PredefinedTransformations;
 
 namespace Kafe.Data.Services;
 
@@ -41,22 +44,48 @@ public class MigrationService
             .Where(a => a is not null)
             .ToImmutableArray();
     }
-    
+
     public record MigrationFilter(
-        string? OriginalId,
-        string? OriginalStorageName
-    );
+        string? OriginalId = null,
+        string? OriginalStorageName = null,
+        Type? MigratedEntityType = null);
 
     public async Task<ImmutableArray<MigrationInfo>> List(
-        MigrationFilter filter,
+        MigrationFilter? filter = null,
         CancellationToken token = default)
     {
-        
+        var query = db.Query<MigrationInfo>();
+
+        if (!string.IsNullOrEmpty(filter?.OriginalId))
+        {
+            query = (IMartenQueryable<MigrationInfo>)query
+                .Where(m => m.OriginalId == filter.OriginalId);
+        }
+
+        if (!string.IsNullOrEmpty(filter?.OriginalStorageName))
+        {
+            query = (IMartenQueryable<MigrationInfo>)query
+                .Where(m => m.OriginalStorageName == filter.OriginalStorageName);
+        }
+
+        if (filter?.MigratedEntityType is not null)
+        {
+            var tableName = await db.Database.ExistingTableFor(filter.MigratedEntityType);
+            query = (IMartenQueryable<MigrationInfo>)query
+                .Where(m => m.MatchesSql(
+                    $"? = (SELECT type FROM mt_streams WHERE id = data ->> 'Id')",
+                    tableName));
+        }
+
+        return (await query.ToListAsync(token)).ToImmutableArray();
     }
 
-    public void LogSummary();
+    public void LogSummary()
+    {
+        throw new NotImplementedException();
+    }
 
-    record AuthorMigrationInfo(
+    public record AuthorMigrationInfo(
         Hrib? ExistingId,
         string? OriginalId,
         string? OriginalStorageName,
@@ -68,18 +97,101 @@ public class MigrationService
 
     public async Task<AuthorInfo> GetOrAddAuthor(AuthorMigrationInfo info, CancellationToken token = default)
     {
-        var migration = await Load()
-        
+        using var scope = logger.BeginScope("Migration of author '{}' ({}:{})",
+            info.Name,
+            info.OriginalStorageName,
+            info.OriginalId);
+
+        logger.LogInformation("Started");
+
+        var existingMigration = await FindExistingMigration(
+            typeof(AuthorInfo),
+            info.OriginalId,
+            info.OriginalStorageName,
+            token);
+
         AuthorInfo? existing = null;
-        if (info.ExistingId is not null)
+        if (existing is null && existingMigration is not null)
         {
-            existing = await authorService.Load(info.ExistingId);
+            existing = await authorService.Load(existingMigration.EntityId, token);
+            logger.LogInformation(
+                "Looking up by existing migration: {}",
+                existing is null ? "Failed" : "Succeeded");
         }
 
-        if (info.OriginalId is not null)
+        if (existing is null && info.ExistingId is not null)
         {
-            existing = await authorService.
+            existing = await authorService.Load(info.ExistingId, token);
+            logger.LogInformation(
+                "Looking up by ExistingId: {}",
+                existing is null ? "Failed" : "Succeeded");
         }
+
+        if (existing is null && !string.IsNullOrEmpty(info.Uco))
+        {
+            var byUco = await authorService.List(new(Uco: info.Uco), token);
+            existing = byUco.FirstOrDefault();
+            logger.LogInformation(
+                "Looking up by Uco: {}",
+                existing is null ? "Failed" : "Succeeded");
+            if (byUco.Length > 1)
+            {
+                logger.LogWarning(
+                    "Found multiple authors with Uco '{}'. Manual adjustment recommended. Authors: {}",
+                    info.Uco,
+                    byUco.Select(a => a.Id));
+            }
+        }
+        
+        if (existing is null && !string.IsNullOrEmpty(info.Email))
+        {
+            var byEmail = await authorService.List(new(Email: info.Email), token);
+            existing = byEmail.FirstOrDefault();
+            logger.LogInformation(
+                "Looking up by Email: {}",
+                existing is null ? "Failed" : "Succeeded");
+            if (byEmail.Length > 1)
+            {
+                logger.LogWarning(
+                    "Found multiple authors with email '{}'. Manual adjustment recommended. Authors: {}",
+                    info.Email,
+                    byEmail.Select(a => a.Id));
+            }
+        }
+        
+        if (existing is null && !string.IsNullOrEmpty(info.Phone))
+        {
+            var byPhone = await authorService.List(new(Phone: info.Phone), token);
+            existing = byPhone.FirstOrDefault();
+            logger.LogInformation(
+                "Looking up by Phone: {}",
+                existing is null ? "Failed" : "Succeeded");
+            if (byPhone.Length > 1)
+            {
+                logger.LogWarning(
+                    "Found multiple authors with phone '{}'. Manual adjustment recommended. Authors: {}",
+                    info.Phone,
+                    byPhone.Select(a => a.Id));
+            }
+        }
+        
+        if (existing is null && !string.IsNullOrEmpty(info.Name))
+        {
+            var byPhone = await authorService.List(new(Name: info.Name), token);
+            existing = byPhone.FirstOrDefault();
+            logger.LogInformation(
+                "Looking up by Phone: {}",
+                existing is null ? "Failed" : "Succeeded");
+            if (byPhone.Length > 1)
+            {
+                logger.LogWarning(
+                    "Found multiple authors with phone '{}'. Manual adjustment recommended. Authors: {}",
+                    info.Phone,
+                    byPhone.Select(a => a.Id));
+            }
+        }
+
+        throw new NotImplementedException();
     }
 
     public record ProjectGroupMigrationInfo(
@@ -93,7 +205,10 @@ public class MigrationService
 
     public Task<ProjectGroupInfo> GetOrAddProjectGroup(
         ProjectGroupMigrationInfo info,
-        CancellationToken token = default);
+        CancellationToken token = default)
+    {
+        throw new NotImplementedException();
+    }
 
     public record ProjectMigrationInfo(
         Hrib? ExistingId,
@@ -109,7 +224,10 @@ public class MigrationService
 
     public Task<ProjectInfo> GetOrAddProject(
         ProjectMigrationInfo info,
-        CancellationToken token = default);
+        CancellationToken token = default)
+    {
+        throw new NotImplementedException();
+    }
 
     public record VideoMigrationInfo(
         Hrib? ExistingArtifactId,
@@ -124,7 +242,10 @@ public class MigrationService
 
     public Task<(ArtifactInfo artifact, VideoShardInfo videoShard)> GetOrAddVideoArtifact(
         VideoMigrationInfo info,
-        CancellationToken token = default);
+        CancellationToken token = default)
+    {
+        throw new NotImplementedException();
+    }
 
     public record PlaylistMigrationInfo(
         Hrib? ExistingId,
@@ -135,5 +256,41 @@ public class MigrationService
         ImmutableArray<Hrib>? Videos
     );
 
-    public Task<PlaylistInfo> GetOrAddPlaylist(PlaylistMigrationInfo info, CancellationToken token = default);
+    public Task<PlaylistInfo> GetOrAddPlaylist(PlaylistMigrationInfo info, CancellationToken token = default)
+    {
+        throw new NotImplementedException();
+    }
+
+    private async Task<MigrationInfo?> FindExistingMigration(
+        Type entityType,
+        string? originalId,
+        string? originalStorageName,
+        CancellationToken token = default)
+    {
+        var existingMigrations = await List(
+            new(
+                OriginalId: originalId,
+                OriginalStorageName: originalStorageName,
+                MigratedEntityType: entityType
+            ),
+            token);
+
+        if (existingMigrations.Length == 0)
+        {
+            logger.LogInformation("Existing migrations not found");
+            return null;
+        }
+
+        if (existingMigrations.Length > 1)
+        {
+            var oldest = existingMigrations.MinBy(m => m.CreatedOn)!;
+            logger.LogWarning(
+                "Multiple existing migrations found. Using '{}', the oldest one. Manual adjustment recommended. Found migrations: {}",
+                oldest.Id,
+                existingMigrations.Select(m => m.Id));
+            return oldest;
+        }
+
+        return existingMigrations.Single();
+    }
 }

@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Immutable;
 using Kafe.Data.Events;
+using Marten.Events;
 using Marten.Events.Aggregation;
 
 namespace Kafe.Data.Aggregates;
@@ -9,7 +11,9 @@ public record MigrationInfo(
     [Hrib] string EntityId,
     string? OriginalStorageName,
     string OriginalId,
-    ImmutableDictionary<string, string> MigrationMetadata);
+    ImmutableDictionary<string, string> MigrationMetadata,
+    DateTimeOffset CreatedOn,
+    DateTimeOffset ChangedOn);
 
 public class MigrationInfoProjection : SingleStreamProjection<MigrationInfo>
 {
@@ -17,32 +21,36 @@ public class MigrationInfoProjection : SingleStreamProjection<MigrationInfo>
     {
     }
 
-    public static MigrationInfo Create(MigrationUndergone e)
+    public static MigrationInfo Create(IEvent<MigrationUndergone> e)
     {
         return new MigrationInfo(
-            Id: e.MigrationId,
-            EntityId: e.EntityId,
-            OriginalStorageName: e.OriginalStorageName,
-            OriginalId: e.OriginalId,
-            MigrationMetadata: e.MigrationMetadata ?? ImmutableDictionary<string, string>.Empty);
+            Id: e.Data.MigrationId,
+            EntityId: e.Data.EntityId,
+            OriginalStorageName: e.Data.OriginalStorageName,
+            OriginalId: e.Data.OriginalId,
+            MigrationMetadata: e.Data.MigrationMetadata ?? ImmutableDictionary<string, string>.Empty,
+            CreatedOn: e.Timestamp,
+            ChangedOn: e.Timestamp);
     }
 
-    public MigrationInfo Apply(MigrationAmended e, MigrationInfo m)
+    public MigrationInfo Apply(IEvent<MigrationAmended> e, MigrationInfo m)
     {
         return m with
         {
-            OriginalStorageName = e.OriginalStorageName ?? m.OriginalStorageName,
-            OriginalId = e.OriginalId ?? m.OriginalId,
+            OriginalStorageName = e.Data.OriginalStorageName ?? m.OriginalStorageName,
+            OriginalId = e.Data.OriginalId ?? m.OriginalId,
             MigrationMetadata = m.MigrationMetadata.SetItems(
-                e.MigrationMetadata ?? ImmutableDictionary<string, string>.Empty)
+                e.Data.MigrationMetadata ?? ImmutableDictionary<string, string>.Empty),
+            ChangedOn = e.Timestamp
         };
     }
 
-    public MigrationInfo Apply(MigrationRetargeted e, MigrationInfo m)
+    public MigrationInfo Apply(IEvent<MigrationRetargeted> e, MigrationInfo m)
     {
         return m with
         {
-            EntityId = e.RetargetedEntityId
+            EntityId = e.Data.RetargetedEntityId,
+            ChangedOn = e.Timestamp
         };
     }
 }

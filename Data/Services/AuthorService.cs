@@ -59,7 +59,7 @@ public class AuthorService
         {
             await accountService.AddPermissions(
                 ownerId,
-                new [] { (created.AuthorId, Permission.All) },
+                new[] { (created.AuthorId, Permission.All) },
                 token);
         }
 
@@ -74,6 +74,7 @@ public class AuthorService
 
     public record AuthorFilter(
         Hrib? AccessingAccountId = null,
+        string? Name = null,
         string? Email = null,
         string? Uco = null,
         string? Phone = null
@@ -90,7 +91,31 @@ public class AuthorService
                     filter.AccessingAccountId.Value,
                     (int)Permission.Read));
         }
-        
+
+        if (filter?.Name is not null)
+        {
+            query = (IMartenQueryable<AuthorInfo>)query
+                .Where(a => a.Name == filter.Name);
+        }
+
+        if (filter?.Email is not null)
+        {
+            query = (IMartenQueryable<AuthorInfo>)query
+                .Where(a => a.Name == filter.Email);
+        }
+
+        if (filter?.Uco is not null)
+        {
+            query = (IMartenQueryable<AuthorInfo>)query
+                .Where(a => a.Name == filter.Uco);
+        }
+
+        if (filter?.Phone is not null)
+        {
+            query = (IMartenQueryable<AuthorInfo>)query
+                .Where(a => a.Name == filter.Phone);
+        }
+
         return (await query.ToListAsync(token)).ToImmutableArray();
     }
 
@@ -98,7 +123,7 @@ public class AuthorService
     {
         return await db.LoadAsync<AuthorInfo>(id.Value, token);
     }
-    
+
     public async Task<ImmutableArray<AuthorInfo>> LoadMany(IEnumerable<Hrib> ids, CancellationToken token = default)
     {
         return (await db.LoadManyAsync<AuthorInfo>(token, ids.Select(i => i.Value)))

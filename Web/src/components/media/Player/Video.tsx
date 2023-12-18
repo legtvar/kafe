@@ -145,7 +145,7 @@ export function Video({ sources, subtitles, autoplay, videoProps, onNext, onPrev
                 config={{
                     file: {
                         attributes: {
-                            crossorigin: 'anonymous',
+                            crossorigin: 'use-credentials',
                         },
                         tracks: (subtitles ? Object.entries(subtitles) : []).map(
                             ([id, url]): TrackProps => ({

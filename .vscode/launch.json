@@ -34,6 +34,19 @@
             }
         },
         {
+            "name": "ArtifactDetail rebuild",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/Api/bin/Debug/net7.0/Kafe.Api.dll",
+            "args": ["projections", "-r", "-p", "AuthorInfo"],
+            "cwd": "${workspaceFolder}/Api",
+            "stopAtEntry": false,
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            }
+        },
+        {
             "name": ".NET Core Attach",
             "type": "coreclr",
             "request": "attach"

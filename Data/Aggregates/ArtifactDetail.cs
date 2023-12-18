@@ -4,6 +4,7 @@ using Marten;
 using Marten.Events;
 using Marten.Events.Aggregation;
 using Marten.Events.Projections;
+using Marten.Linq;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -89,7 +90,7 @@ public class ArtifactDetailProjection : MultiStreamProjection<ArtifactDetail, st
 
     public ArtifactDetail Apply(ProjectArtifactAdded e, ArtifactDetail a)
     {
-        return a with
+        return a.ContainingProjectIds.Contains(e.ProjectId) ? a : a with
         {
             ContainingProjectIds = a.ContainingProjectIds.Add(e.ProjectId)
         };
@@ -109,23 +110,44 @@ public class ArtifactDetailProjection : MultiStreamProjection<ArtifactDetail, st
         {
             var filteredEvents = events.Where(e => e.EventType.IsAssignableTo(typeof(IShardVariantAdded))
                 || e.EventType.IsAssignableTo(typeof(IShardVariantRemoved)))
+                .Cast<IEvent<IShardEvent>>()
                 .ToList();
             if (!filteredEvents.Any())
             {
                 return;
             }
 
-            var shardIds = filteredEvents.Select(e => e.StreamKey).ToList();
+            var shardIds = filteredEvents.Select(e => (id: e.StreamKey, kind: e.Data.GetShardKind())).ToList();
 
-            var artifactShardPairs = await session.Events.QueryRawEventDataOnly<IShardCreated>()
-                .Where(e => shardIds.Contains(e.ShardId))
-                .Select(e => new { e.ArtifactId, e.ShardId })
-                .ToListAsync();
+            var artifactShardPairs = new List<(string artifactId, string shardId)>();
+            foreach (var (id, kind) in shardIds)
+            {
+                var pair = kind switch
+                {
+                    ShardKind.Video => await session.Events.QueryRawEventDataOnly<VideoShardCreated>()
+                        .Where(e => e.ShardId == id)
+                        .Select(e => new { e.ArtifactId, e.ShardId })
+                        .SingleOrDefaultAsync(),
+                    ShardKind.Image => await session.Events.QueryRawEventDataOnly<ImageShardCreated>()
+                        .Where(e => e.ShardId == id)
+                        .Select(e => new { e.ArtifactId, e.ShardId })
+                        .SingleOrDefaultAsync(),
+                    ShardKind.Subtitles => await session.Events.QueryRawEventDataOnly<SubtitlesShardCreated>()
+                        .Where(e => e.ShardId == id)
+                        .Select(e => new { e.ArtifactId, e.ShardId })
+                        .SingleOrDefaultAsync(),
+                    _ => throw new InvalidOperationException($"Shard kind '{kind}' is not supported.")
+                };
+                if (pair is not null)
+                {
+                    artifactShardPairs.Add((pair.ArtifactId, pair.ShardId));
+                }
+            }
 
             foreach (var group in artifactShardPairs
-                .Select(p => new { p.ArtifactId, Events = filteredEvents.Where(e => e.StreamKey == p.ShardId) }))
+                .Select(p => new { p!.artifactId, Events = filteredEvents.Where(e => e.StreamKey == p.shardId) }))
             {
-                grouping.AddEvents(group.ArtifactId, group.Events);
+                grouping.AddEvents(group.artifactId, group.Events);
             }
         }
     }

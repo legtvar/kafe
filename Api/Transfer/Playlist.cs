@@ -18,5 +18,4 @@ public record PlaylistDetailDto(
 
 public record PlaylistEntryDto(
     Hrib Id,
-    LocalizedString Name,
-    ImmutableArray<ShardListDto> Shards);
+    LocalizedString Name);

@@ -183,7 +183,7 @@ public static class TransferMaps
             Name: data.Name,
             Description: data.Description,
             GlobalPermissions: data.GlobalPermissions,
-            Videos: data.VideoIds);
+            Entries: ImmutableArray<PlaylistEntryDto>.Empty);
     }
 
     public static ProjectGroupListDto ToProjectGroupListDto(ProjectGroupInfo data)

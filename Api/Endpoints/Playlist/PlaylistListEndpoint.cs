@@ -22,13 +22,16 @@ public class PlaylistListEndpoint : EndpointBaseAsync
 {
     private readonly PlaylistService playlistService;
     private readonly IAuthorizationService authorization;
+    private readonly UserProvider userProvider;
 
     public PlaylistListEndpoint(
         PlaylistService playlistService,
-        IAuthorizationService authorization)
+        IAuthorizationService authorization,
+        UserProvider userProvider)
     {
         this.playlistService = playlistService;
         this.authorization = authorization;
+        this.userProvider = userProvider;
     }
 
     [HttpGet]
@@ -36,10 +39,8 @@ public class PlaylistListEndpoint : EndpointBaseAsync
     public override async Task<ActionResult<List<PlaylistListDto>>> HandleAsync(
         CancellationToken cancellationToken = default)
     {
-        // TODO: Filter by permission
-        var auth = await authorization.AuthorizeAsync(User, EndpointPolicy.Read);
-
-        var list = await playlistService.List(cancellationToken);
+        var filter = new PlaylistService.PlaylistFilter(userProvider.Account?.Id);
+        var list = await playlistService.List(filter, cancellationToken);
         return Ok(list.Select(TransferMaps.ToPlaylistListDto).ToImmutableArray());
     }
 }

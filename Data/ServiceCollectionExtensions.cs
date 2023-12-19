@@ -63,6 +63,9 @@ public static class ServiceCollectionExtensions
             options.Projections.Add<ArtifactDetailProjection>(ProjectionLifecycle.Inline);
             options.Projections.Add<AccountInfoProjection>(ProjectionLifecycle.Inline);
             options.Events.Upcast<AccountCapabilityAddedUpcaster>();
+            options.Events.Upcast<AccountCapabilityRemovedUpcaster>();
+            options.Events.Upcast<PlaylistVideoAddedUpcaster>();
+            options.Events.Upcast<PlaylistVideoRemovedUpcaster>();
             options.UseDefaultSerialization(serializerType: SerializerType.Newtonsoft);
 
             RegisterEmbeddedSql(options);

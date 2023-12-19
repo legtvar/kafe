@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 using Swashbuckle.AspNetCore.Annotations;
 using Kafe.Api.Services;
 using Kafe.Data.Services;
+using System.Linq;
+using JasperFx.Core;
+using System.Collections.Immutable;
 
 namespace Kafe.Api.Endpoints.Playlist;
 
@@ -18,13 +21,16 @@ public class PlaylistDetailEndpoint : EndpointBaseAsync
     .WithActionResult<PlaylistDetailDto>
 {
     private readonly PlaylistService playlistService;
+    private readonly ArtifactService artifactService;
     private readonly IAuthorizationService authorizationService;
 
     public PlaylistDetailEndpoint(
         PlaylistService playlistService,
+        ArtifactService artifactService,
         IAuthorizationService authorizationService)
     {
         this.playlistService = playlistService;
+        this.artifactService = artifactService;
         this.authorizationService = authorizationService;
     }
 
@@ -41,13 +47,22 @@ public class PlaylistDetailEndpoint : EndpointBaseAsync
         {
             return Unauthorized();
         }
-        
+
         var data = await playlistService.Load(id, cancellationToken);
         if (data is null)
         {
             return NotFound();
         }
 
-        return Ok(TransferMaps.ToPlaylistDetailDto(data));
+        var dto = TransferMaps.ToPlaylistDetailDto(data);
+
+        var artifacts = await artifactService.LoadMany(data.EntryIds.Select(i => (Hrib)i), cancellationToken);
+        dto = dto with
+        {
+            Entries = artifacts.Select(a => new PlaylistEntryDto((Hrib)a.Id, (LocalizedString)a.Name))
+                .ToImmutableArray()
+        };
+
+        return Ok(dto);
     }
 }

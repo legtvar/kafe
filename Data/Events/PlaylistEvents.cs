@@ -22,7 +22,7 @@ public record PlaylistEntryAppended(
 public record PlaylistEntryRemovedFirst(
     [Hrib] string PlaylistId,
     [Hrib] string ArtifactId);
-    
-public record PlaylistEntryEntriesSet(
+
+public record PlaylistEntriesSet(
     [Hrib] string PlaylistId,
     ImmutableArray<string> EntryIds);

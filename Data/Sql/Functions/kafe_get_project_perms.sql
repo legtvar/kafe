@@ -18,7 +18,6 @@ BEGIN
 				FROM mt_doc_accountinfo
 				WHERE data ->> 'Id' = account_id);
 
-	
 	RETURN kafe_get_project_perms_core(project, account);
 END;
 $$ LANGUAGE plpgsql;

@@ -31,6 +31,8 @@ BEGIN
 			RETURN kafe_get_project_perms(resource_id, account_id);
 		WHEN resource_type = 'project_group_info' THEN
 			RETURN kafe_get_projectgroup_perms(resource_id, account_id);
+		WHEN resource_type = 'playlist_info' THEN
+			RETURN kafe_get_playlist_perms(resource_id, account_id);
 		ELSE
 			RETURN FALSE;
 	END CASE;

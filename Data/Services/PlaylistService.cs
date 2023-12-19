@@ -1,5 +1,7 @@
 ﻿using Kafe.Data.Aggregates;
 using Marten;
+using Marten.Linq;
+using Marten.Linq.MatchesSql;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -17,11 +19,26 @@ public class PlaylistService
         this.db = db;
     }
 
-    public async Task<ImmutableArray<PlaylistInfo>> List(CancellationToken token = default)
-    {
-        // TODO: Return list of artifacts referenced in the playlist.
+    public record PlaylistFilter(
+        Hrib? AccessingAccountId
+    );
 
-        return (await db.Query<PlaylistInfo>().ToListAsync(token)).ToImmutableArray();
+    public async Task<ImmutableArray<PlaylistInfo>> List(
+        PlaylistFilter? filter = null,
+        CancellationToken token = default)
+    {
+        var query = db.Query<PlaylistInfo>();
+
+        if (filter?.AccessingAccountId is not null)
+        {
+            query = (IMartenQueryable<PlaylistInfo>)query
+                .Where(e => e.MatchesSql(
+                    $"({SqlFunctions.GetPlaylistPerms}(data ->> 'Id', ?) & ?) != 0",
+                    filter.AccessingAccountId.Value,
+                    (int)Permission.Read));
+        }
+
+        return (await query.ToListAsync(token)).ToImmutableArray();
     }
 
     public async Task<PlaylistInfo?> Load(Hrib id, CancellationToken token = default)

@@ -18,11 +18,26 @@ BEGIN
 		SELECT kafe_get_project_perms_core(data, account)
 		FROM mt_doc_projectinfo
 		WHERE EXISTS (SELECT 1
-				      FROM jsonb_array_elements(data -> 'Artifacts') AS artifact
-					  WHERE artifact ->> 'Id' = artifact_id)
+					FROM jsonb_array_elements(data -> 'Artifacts') AS artifact
+					WHERE artifact ->> 'Id' = artifact_id)
 	LOOP
 		perms := perms | project_perms;
 	END LOOP;
+	
+	IF perms & 1 = 0 THEN
+		FOR playlist_perms IN
+			SELECT kafe_get_playlist_perms_core(data, account)
+			FROM mt_doc_playlistinfo
+			WHERE EXISTS (SELECT 1
+						FROM jsonb_array_elements(data -> 'EntryIds') AS artifact
+						WHERE artifact ->> 'Id' = artifact_id)
+		LOOP
+			IF playlist_perms & 1 = 1 THEN
+				perms := perms | 1;
+				EXIT;
+			END IF;
+		END LOOP;
+	END IF;
 	
 	RETURN perms;
 END;

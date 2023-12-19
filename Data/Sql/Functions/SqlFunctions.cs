@@ -10,4 +10,5 @@ public static class SqlFunctions
     public const string GetProjectGroupPerms = "kafe_get_projectgroup_perms";
     public const string GetResourcePerms = "kafe_get_resource_perms";
     public const string GetSystemPerms = "kafe_get_system_perms";
+    public const string GetPlaylistPerms = "kafe_get_playlist_perms";
 }

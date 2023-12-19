@@ -8,7 +8,7 @@ namespace Kafe.Data.Aggregates;
 public record PlaylistInfo(
     [Hrib] string Id,
     CreationMethod CreationMethod,
-    [KafeType(typeof(ImmutableArray<Hrib>))] ImmutableArray<string> Entries,
+    [KafeType(typeof(ImmutableArray<Hrib>))] ImmutableArray<string> EntryIds,
     [LocalizedString] ImmutableDictionary<string, string> Name,
     [LocalizedString] ImmutableDictionary<string, string>? Description = null,
     Permission GlobalPermissions = Permission.None
@@ -25,7 +25,7 @@ public class PlaylistInfoProjection : SingleStreamProjection<PlaylistInfo>
         return new PlaylistInfo(
             Id: e.PlaylistId,
             CreationMethod: e.CreationMethod,
-            Entries: ImmutableArray.Create<string>(),
+            EntryIds: ImmutableArray.Create<string>(),
             Name: e.Name
         );
     }
@@ -40,30 +40,35 @@ public class PlaylistInfoProjection : SingleStreamProjection<PlaylistInfo>
         };
     }
 
-    public PlaylistInfo Apply(PlaylistVideoAdded e, PlaylistInfo p)
+    public PlaylistInfo Apply(PlaylistEntryAppended e, PlaylistInfo p)
     {
-        p.VideoIds!.Add(e.VideoId);
-        return p;
+        return p with
+        {
+            EntryIds = p.EntryIds.Add(e.ArtifactId)
+        };
     }
 
-    public PlaylistInfo Apply(PlaylistVideoRemoved e, PlaylistInfo p)
+    public PlaylistInfo Apply(PlaylistEntryRemovedFirst e, PlaylistInfo p)
     {
-        p.VideoIds!.RemoveAll(v => v == e.VideoId);
-        return p;
+        return p with
+        {
+            EntryIds = p.EntryIds.Remove(e.ArtifactId)
+        };
     }
 
-    public PlaylistInfo Apply(PlaylistVideoOrderChanged e, PlaylistInfo p)
+    public PlaylistInfo Apply(PlaylistEntriesSet e, PlaylistInfo p)
     {
-        p.VideoIds!.RemoveAll(v => v == e.VideoId);
-        p.VideoIds!.Insert(e.NewIndex, e.VideoId);
-        return p;
+        return p with
+        {
+            EntryIds = p.EntryIds
+        };
     }
 
-    // public PlaylistInfo Apply(GlobalPermissionsChanged e, PlaylistInfo a)
-    // {
-    //     return a with
-    //     {
-    //         GlobalPermissions = e.GlobalPermissions
-    //     };
-    // }
+    public PlaylistInfo Apply(GlobalPermissionsChanged e, PlaylistInfo a)
+    {
+        return a with
+        {
+            GlobalPermissions = e.GlobalPermissions
+        };
+    }
 }

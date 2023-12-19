@@ -559,17 +559,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/EntityPermissionsAccountEditDto"
+                "$ref": "#/components/schemas/EntityPermissionsEditDto"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/EntityPermissionsAccountEditDto"
+                "$ref": "#/components/schemas/EntityPermissionsEditDto"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/EntityPermissionsAccountEditDto"
+                "$ref": "#/components/schemas/EntityPermissionsEditDto"
               }
             }
           }
@@ -893,6 +893,35 @@
                 }
               }
             }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "ProjectGroup"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectGroupEditDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectGroupEditDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectGroupEditDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
           }
         }
       }
@@ -1375,6 +1404,35 @@
         }
       }
     },
+    "/api/v1/system": {
+      "get": {
+        "tags": [
+          "System"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SystemDetailDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SystemDetailDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SystemDetailDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/tmp-account/{token}": {
       "get": {
         "tags": [
@@ -1722,7 +1780,10 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "string"
+            "type": "string",
+            "description": "Human-Readable Identifier Ballast",
+            "format": "hrib",
+            "example": "AAAAbadf00d"
           },
           "name": {
             "type": "string"
@@ -1775,7 +1836,10 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "string"
+            "type": "string",
+            "description": "Human-Readable Identifier Ballast",
+            "format": "hrib",
+            "example": "AAAAbadf00d"
           },
           "name": {
             "type": "string"
@@ -1803,7 +1867,10 @@
         "properties": {
           "id": {
             "type": "string",
-            "nullable": true
+            "description": "Human-Readable Identifier Ballast",
+            "format": "hrib",
+            "nullable": true,
+            "example": "AAAAbadf00d"
           },
           "emailAddress": {
             "type": "string",
@@ -1827,7 +1894,10 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "string"
+            "type": "string",
+            "description": "Human-Readable Identifier Ballast",
+            "format": "hrib",
+            "example": "AAAAbadf00d"
           },
           "emailAddress": {
             "type": "string"
@@ -1849,7 +1919,10 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "string"
+            "type": "string",
+            "description": "Human-Readable Identifier Ballast",
+            "format": "hrib",
+            "example": "AAAAbadf00d"
           },
           "entityType": {
             "type": "string",
@@ -1874,6 +1947,35 @@
             "items": {
               "$ref": "#/components/schemas/EntityPermissionsAccountListDto"
             }
+          }
+        },
+        "additionalProperties": false
+      },
+      "EntityPermissionsEditDto": {
+        "required": [
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Human-Readable Identifier Ballast",
+            "format": "hrib",
+            "example": "AAAAbadf00d"
+          },
+          "globalPermissions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Permission"
+            },
+            "nullable": true
+          },
+          "accountPermissions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EntityPermissionsAccountEditDto"
+            },
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -2006,7 +2108,10 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "string"
+            "type": "string",
+            "description": "Human-Readable Identifier Ballast",
+            "format": "hrib",
+            "example": "AAAAbadf00d"
           },
           "name": {
             "title": "LocalizedString",
@@ -2070,7 +2175,10 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "string"
+            "type": "string",
+            "description": "Human-Readable Identifier Ballast",
+            "format": "hrib",
+            "example": "AAAAbadf00d"
           },
           "name": {
             "title": "LocalizedString",
@@ -2153,7 +2261,10 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "string"
+            "type": "string",
+            "description": "Human-Readable Identifier Ballast",
+            "format": "hrib",
+            "example": "AAAAbadf00d"
           },
           "blueprintSlot": {
             "type": "string",
@@ -2427,7 +2538,10 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "string"
+            "type": "string",
+            "description": "Human-Readable Identifier Ballast",
+            "format": "hrib",
+            "example": "AAAAbadf00d"
           },
           "roles": {
             "type": "array",
@@ -2448,7 +2562,10 @@
         "type": "object",
         "properties": {
           "projectGroupId": {
-            "type": "string"
+            "type": "string",
+            "description": "Human-Readable Identifier Ballast",
+            "format": "hrib",
+            "example": "AAAAbadf00d"
           },
           "name": {
             "title": "LocalizedString",
@@ -2728,7 +2845,10 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "string"
+            "type": "string",
+            "description": "Human-Readable Identifier Ballast",
+            "format": "hrib",
+            "example": "AAAAbadf00d"
           },
           "name": {
             "title": "LocalizedString",
@@ -2883,7 +3003,10 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "string"
+            "type": "string",
+            "description": "Human-Readable Identifier Ballast",
+            "format": "hrib",
+            "example": "AAAAbadf00d"
           },
           "name": {
             "title": "LocalizedString",
@@ -2942,6 +3065,72 @@
         },
         "additionalProperties": false
       },
+      "ProjectGroupEditDto": {
+        "required": [
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Human-Readable Identifier Ballast",
+            "format": "hrib",
+            "example": "AAAAbadf00d"
+          },
+          "name": {
+            "title": "LocalizedString",
+            "required": [
+              "iv"
+            ],
+            "type": "object",
+            "properties": {
+              "iv": {
+                "type": "string"
+              },
+              "cs": {
+                "type": "string",
+                "nullable": true
+              },
+              "en": {
+                "type": "string",
+                "nullable": true
+              }
+            },
+            "nullable": true
+          },
+          "description": {
+            "title": "LocalizedString",
+            "required": [
+              "iv"
+            ],
+            "type": "object",
+            "properties": {
+              "iv": {
+                "type": "string"
+              },
+              "cs": {
+                "type": "string",
+                "nullable": true
+              },
+              "en": {
+                "type": "string",
+                "nullable": true
+              }
+            },
+            "nullable": true
+          },
+          "deadline": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "isOpen": {
+            "type": "boolean",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "ProjectGroupListDto": {
         "required": [
           "deadline",
@@ -2952,7 +3141,10 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "string"
+            "type": "string",
+            "description": "Human-Readable Identifier Ballast",
+            "format": "hrib",
+            "example": "AAAAbadf00d"
           },
           "name": {
             "title": "LocalizedString",
@@ -3100,7 +3292,10 @@
         "type": "object",
         "properties": {
           "projectId": {
-            "type": "string"
+            "type": "string",
+            "description": "Human-Readable Identifier Ballast",
+            "format": "hrib",
+            "example": "AAAAbadf00d"
           },
           "kind": {
             "$ref": "#/components/schemas/ReviewKind"
@@ -3290,6 +3485,43 @@
           "bitrate": {
             "type": "integer",
             "format": "int64"
+          }
+        },
+        "additionalProperties": false
+      },
+      "SystemDetailDto": {
+        "required": [
+          "baseUrls",
+          "commit",
+          "commitDate",
+          "name",
+          "runningSince",
+          "version"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "baseUrls": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "version": {
+            "type": "string"
+          },
+          "commit": {
+            "type": "string"
+          },
+          "commitDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "runningSince": {
+            "type": "string",
+            "format": "date-time"
           }
         },
         "additionalProperties": false

@@ -4,13 +4,13 @@ using Kafe.Data;
 namespace Kafe.Api.Transfer;
 
 public record AuthorListDto(
-    string Id,
+    Hrib Id,
     string Name,
     Permission GlobalPermissions
 );
 
 public record AuthorDetailDto(
-    string Id,
+    Hrib Id,
     string Name,
     Permission GlobalPermissions,
     LocalizedString? Bio,

@@ -4,7 +4,7 @@ using System.Diagnostics;
 namespace Kafe.Common;
 
 /// <summary>
-/// An error union type. Can be used to return exceptions comfortably instead of throwing them.
+/// An error union type. Can be used to return exceptions instead of throwing them.
 /// </summary>
 public readonly record struct Err<T>
 {

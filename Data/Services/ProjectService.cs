@@ -114,7 +114,7 @@ public partial class ProjectService
         var @old = await Load(@new.Id, token);
         if (@old is null)
         {
-            return new Error($"Project '{@new.Name}' ({@new.Id}) does not exist.");
+            return Err.NotFound<bool>(@new.Id);
         }
 
         if (LocalizedString.IsTooLong(@new.Name, NameMaxLength))

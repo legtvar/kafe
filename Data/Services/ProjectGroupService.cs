@@ -1,4 +1,5 @@
-﻿using Kafe.Data.Aggregates;
+﻿using Kafe.Common;
+using Kafe.Data.Aggregates;
 using Kafe.Data.Events;
 using Marten;
 using Marten.Linq;
@@ -63,7 +64,7 @@ public class ProjectGroupService
                     filter.AccessingAccountId.Value,
                     (int)Permission.Read));
         }
-        
+
         return (await query.ToListAsync(token)).ToImmutableArray();
     }
 
@@ -84,10 +85,38 @@ public class ProjectGroupService
     public async Task<ProjectGroupInfo?> Load(Hrib id, CancellationToken token = default)
     {
         return await db.LoadAsync<ProjectGroupInfo>(id.Value, token);
+    }
 
-        // if (!userProvider.CanRead(projectGroup))
-        // {
-        //     throw new UnauthorizedAccessException();
-        // }
+    public async Task<Err<bool>> Edit(ProjectGroupInfo @new, CancellationToken token = default)
+    {
+        var @old = await Load(@new.Id, token);
+        if (@old is null)
+        {
+            return Err.NotFound<bool>(@new.Id);
+        }
+
+        var eventStream = await db.Events.FetchForExclusiveWriting<ProjectGroupInfo>(@new.Id, token);
+
+        var infoChanged = new ProjectGroupInfoChanged(
+            ProjectGroupId: @new.Id,
+            Name: (LocalizedString)@old.Name != @new.Name ? @new.Name : null,
+            Description: (LocalizedString?)@old.Description != @new.Description ? @new.Description : null,
+            Deadline: @old.Deadline != @new.Deadline ? @new.Deadline : null);
+        if (infoChanged.Name is not null
+            || infoChanged.Description is not null
+            || infoChanged.Deadline is not null)
+        {
+            eventStream.AppendOne(infoChanged);
+        }
+        
+        if (@old.IsOpen != @new.IsOpen)
+        {
+            eventStream.AppendOne(@new.IsOpen
+                ? new ProjectGroupOpened(@new.Id)
+                : new ProjectGroupClosed(@new.Id));
+        }
+        
+        await db.SaveChangesAsync(token);
+        return true;
     }
 }

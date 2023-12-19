@@ -4,24 +4,49 @@ namespace Kafe.Common;
 
 public readonly record struct Error
 {
-    public Error(string message, string? stackTrace = null, int skipFrames = 1)
+    public const string GenericErrorId = "GenericError";
+
+    public Error(string id, string message, string? stackTrace = null, int skipFrames = 1)
     {
+        Id = id;
         Message = message;
         StackTrace = stackTrace ?? new StackTrace(skipFrames: skipFrames, fNeedFileInfo: true).ToString();
     }
 
-    public Error(FormattableString formattedMessage, string? stackTrace = null, int skipFrames = 1) : this(
-        formattedMessage.ToString(),
-        stackTrace,
-        skipFrames: skipFrames + 1)
+    public Error(string id, FormattableString formattedMessage, string? stackTrace = null, int skipFrames = 1)
+        : this(
+            id,
+            formattedMessage.ToString(),
+            stackTrace,
+            skipFrames: skipFrames + 1)
     {
         FormattedMessage = formattedMessage;
     }
 
-    public Error(Exception inner, string? stackTrace = null, int skipFrames = 1) : this(
-        inner.Message,
-        stackTrace,
-        skipFrames: skipFrames + 1)
+    public Error(string message)
+        : this(
+            GenericErrorId,
+            message,
+            null,
+            skipFrames: 2) // to skip this frame and `this()`
+    {
+    }
+
+    public Error(FormattableString formattedMessage)
+        : this(
+            GenericErrorId,
+            formattedMessage,
+            null,
+            skipFrames: 2) // to skip this frame and `this()`
+    {
+    }
+
+    public Error(Exception inner, string? stackTrace = null, int skipFrames = 1)
+        : this(
+            inner.GetType().FullName ?? inner.GetType().Name,
+            inner.Message,
+            stackTrace,
+            skipFrames: skipFrames + 1)
     {
         InnerException = inner;
     }
@@ -29,6 +54,8 @@ public readonly record struct Error
     public Exception? InnerException { get; }
 
     public FormattableString? FormattedMessage { get; }
+
+    public string Id { get; }
 
     public string Message { get; }
 
@@ -45,7 +72,7 @@ public readonly record struct Error
     {
         return new Error(exception, skipFrames: 2);
     }
-    
+
     public static implicit operator string(Error error)
     {
         return error.Message;

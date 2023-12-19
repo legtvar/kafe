@@ -61,7 +61,7 @@ public record ProjectReviewDto(
 );
 
 public record ProjectReviewCreationDto(
-    string ProjectId,
+    Hrib ProjectId,
     ReviewKind Kind,
     string ReviewerRole,
     LocalizedString? Comment
@@ -88,7 +88,7 @@ public record ProjectArtifactShardBlueprintDto(
 );
 
 public record ProjectCreationDto(
-    string ProjectGroupId,
+    Hrib ProjectGroupId,
     LocalizedString Name,
     LocalizedString? Description,
     LocalizedString? Genre,
@@ -97,7 +97,7 @@ public record ProjectCreationDto(
 );
 
 public record ProjectEditDto(
-    string Id,
+    Hrib Id,
     LocalizedString? Name,
     LocalizedString? Description,
     LocalizedString? Genre,
@@ -107,7 +107,7 @@ public record ProjectEditDto(
 );
 
 public record ProjectCreationAuthorDto(
-    string Id,
+    Hrib Id,
     ImmutableArray<string> Roles
 );
 
@@ -124,6 +124,6 @@ public record ProjectDiagnosticDto(
 );
 
 public record ProjectArtifactAdditionDto(
-    string Id,
+    Hrib Id,
     string? BlueprintSlot
 );

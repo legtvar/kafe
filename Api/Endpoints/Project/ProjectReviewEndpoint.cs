@@ -74,7 +74,7 @@ public class ProjectReviewEndpoint : EndpointBaseAsync
             filter: new(
                 Permissions: ImmutableDictionary.CreateRange(new[]
                     {
-                        new KeyValuePair<string, Permission>(dto.ProjectId, Permission.Write)
+                        new KeyValuePair<string, Permission>(dto.ProjectId.Value, Permission.Write)
                     })
             ),
             token: cancellationToken);

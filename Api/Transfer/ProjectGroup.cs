@@ -5,7 +5,7 @@ using Kafe.Data;
 namespace Kafe.Api.Transfer;
 
 public record ProjectGroupListDto(
-    string Id,
+    Hrib Id,
     LocalizedString Name,
     LocalizedString? Description,
     DateTimeOffset Deadline,
@@ -13,7 +13,7 @@ public record ProjectGroupListDto(
 );
 
 public record ProjectGroupDetailDto(
-    string Id,
+    Hrib Id,
     LocalizedString Name,
     LocalizedString? Description,
     DateTimeOffset Deadline,
@@ -25,4 +25,12 @@ public record ProjectGroupCreationDto(
     LocalizedString Name,
     LocalizedString? Description,
     DateTimeOffset Deadline
+);
+
+public record ProjectGroupEditDto(
+    Hrib Id,
+    LocalizedString? Name,
+    LocalizedString? Description,
+    DateTimeOffset? Deadline,
+    bool? IsOpen
 );

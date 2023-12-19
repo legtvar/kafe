@@ -3,7 +3,7 @@ using Kafe.Data;
 
 namespace Kafe.Api.Transfer;
 public record EntityPermissionsDetailDto(
-    string Id,
+    Hrib Id,
     string? EntityType,
     ImmutableArray<Permission>? GlobalPermissions,
     ImmutableArray<Permission>? UserPermissions,
@@ -11,19 +11,19 @@ public record EntityPermissionsDetailDto(
 );
 
 public record EntityPermissionsAccountListDto(
-    string Id,
+    Hrib Id,
     string EmailAddress,
     ImmutableArray<Permission> Permissions
 );
 
 public record EntityPermissionsEditDto(
-    string Id,
+    Hrib Id,
     ImmutableArray<Permission>? GlobalPermissions,
     ImmutableArray<EntityPermissionsAccountEditDto>? AccountPermissions
 );
 
 public record EntityPermissionsAccountEditDto(
-    string? Id,
+    Hrib? Id,
     string? EmailAddress,
     ImmutableArray<Permission> Permissions
 );

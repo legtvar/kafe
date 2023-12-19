@@ -22,14 +22,14 @@ public class ProjectEditEndpoint : EndpointBaseAsync
     .WithRequest<ProjectEditDto>
     .WithActionResult
 {
-    private readonly ProjectService projects;
+    private readonly ProjectService projectService;
     private readonly IAuthorizationService authorizationService;
 
     public ProjectEditEndpoint(
-        ProjectService projects,
+        ProjectService projectService,
         IAuthorizationService authorizationService)
     {
-        this.projects = projects;
+        this.projectService = projectService;
         this.authorizationService = authorizationService;
     }
 
@@ -49,7 +49,7 @@ public class ProjectEditEndpoint : EndpointBaseAsync
         if (request.Crew.HasValue)
         {
             authors = authors.AddRange(request.Crew.Value.Select(c => new ProjectAuthorInfo(
-                Id: c.Id,
+                Id: c.Id.Value,
                 Kind: ProjectAuthorKind.Crew,
                 Roles: c.Roles
             )));
@@ -57,13 +57,13 @@ public class ProjectEditEndpoint : EndpointBaseAsync
         if (request.Cast.HasValue)
         {
             authors = authors.AddRange(request.Cast.Value.Select(c => new ProjectAuthorInfo(
-                Id: c.Id,
+                Id: c.Id.Value,
                 Kind: ProjectAuthorKind.Cast,
                 Roles: c.Roles
             )));
         }
 
-        var @old = await projects.Load(request.Id, token: cancellationToken);
+        var @old = await projectService.Load(request.Id, token: cancellationToken);
         if (@old is null)
         {
             return NotFound();
@@ -79,12 +79,12 @@ public class ProjectEditEndpoint : EndpointBaseAsync
                 : @old.Authors,
             Artifacts = request.Artifacts.HasValue
                 ? request.Artifacts.Value.Select(a => new ProjectArtifactInfo(
-                    Id: a.Id,
+                    Id: a.Id.Value,
                     BlueprintSlot: a.BlueprintSlot
                 )).ToImmutableArray()
                 : @old.Artifacts
         };
-        var result = await projects.Edit(@new, cancellationToken);
+        var result = await projectService.Edit(@new, cancellationToken);
         if (result.HasErrors)
         {
             return ValidationProblem(title: result.Errors.FirstOrDefault());

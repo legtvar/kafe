@@ -46,7 +46,7 @@ public class ProjectCreationEndpoint : EndpointBaseAsync
         }
 
         var project = await projectService.Create(
-            projectGroupId: request.ProjectGroupId,
+            projectGroupId: request.ProjectGroupId.Value,
             name: request.Name,
             description: request.Description,
             genre: request.Genre,

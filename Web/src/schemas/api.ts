@@ -243,9 +243,9 @@ export interface paths {
     patch: {
       requestBody?: {
         content: {
-          "application/json": components["schemas"]["EntityPermissionsAccountEditDto"];
-          "text/json": components["schemas"]["EntityPermissionsAccountEditDto"];
-          "application/*+json": components["schemas"]["EntityPermissionsAccountEditDto"];
+          "application/json": components["schemas"]["EntityPermissionsEditDto"];
+          "text/json": components["schemas"]["EntityPermissionsEditDto"];
+          "application/*+json": components["schemas"]["EntityPermissionsEditDto"];
         };
       };
       responses: {
@@ -381,6 +381,21 @@ export interface paths {
             "application/json": string;
             "text/json": string;
           };
+        };
+      };
+    };
+    patch: {
+      requestBody?: {
+        content: {
+          "application/json": components["schemas"]["ProjectGroupEditDto"];
+          "text/json": components["schemas"]["ProjectGroupEditDto"];
+          "application/*+json": components["schemas"]["ProjectGroupEditDto"];
+        };
+      };
+      responses: {
+        /** @description Success */
+        200: {
+          content: never;
         };
       };
     };
@@ -582,6 +597,20 @@ export interface paths {
       };
     };
   };
+  "/api/v1/system": {
+    get: {
+      responses: {
+        /** @description Success */
+        200: {
+          content: {
+            "text/plain": components["schemas"]["SystemDetailDto"];
+            "application/json": components["schemas"]["SystemDetailDto"];
+            "text/json": components["schemas"]["SystemDetailDto"];
+          };
+        };
+      };
+    };
+  };
   "/api/v1/tmp-account/{token}": {
     get: {
       parameters: {
@@ -731,6 +760,11 @@ export interface components {
       phone?: string | null;
     };
     AuthorDetailDto: {
+      /**
+       * Format: hrib
+       * @description Human-Readable Identifier Ballast
+       * @example AAAAbadf00d
+       */
       id: string;
       name: string;
       globalPermissions: components["schemas"]["Permission"];
@@ -745,6 +779,11 @@ export interface components {
       phone?: string | null;
     };
     AuthorListDto: {
+      /**
+       * Format: hrib
+       * @description Human-Readable Identifier Ballast
+       * @example AAAAbadf00d
+       */
       id: string;
       name: string;
       globalPermissions: components["schemas"]["Permission"];
@@ -752,21 +791,46 @@ export interface components {
     /** @enum {string} */
     DiagnosticKind: "unknown" | "info" | "warning" | "error";
     EntityPermissionsAccountEditDto: {
+      /**
+       * Format: hrib
+       * @description Human-Readable Identifier Ballast
+       * @example AAAAbadf00d
+       */
       id?: string | null;
       emailAddress?: string | null;
       permissions: components["schemas"]["Permission"][];
     };
     EntityPermissionsAccountListDto: {
+      /**
+       * Format: hrib
+       * @description Human-Readable Identifier Ballast
+       * @example AAAAbadf00d
+       */
       id: string;
       emailAddress: string;
       permissions: components["schemas"]["Permission"][];
     };
     EntityPermissionsDetailDto: {
+      /**
+       * Format: hrib
+       * @description Human-Readable Identifier Ballast
+       * @example AAAAbadf00d
+       */
       id: string;
       entityType?: string | null;
       globalPermissions?: components["schemas"]["Permission"][] | null;
       userPermissions?: components["schemas"]["Permission"][] | null;
       accountPermissions: components["schemas"]["EntityPermissionsAccountListDto"][];
+    };
+    EntityPermissionsEditDto: {
+      /**
+       * Format: hrib
+       * @description Human-Readable Identifier Ballast
+       * @example AAAAbadf00d
+       */
+      id: string;
+      globalPermissions?: components["schemas"]["Permission"][] | null;
+      accountPermissions?: components["schemas"]["EntityPermissionsAccountEditDto"][] | null;
     };
     ImageDto: {
       fileExtension: string;
@@ -802,6 +866,11 @@ export interface components {
     /** @enum {string} */
     Permission: "none" | "read" | "append" | "inspect" | "write" | "review" | "all";
     PlaylistDetailDto: {
+      /**
+       * Format: hrib
+       * @description Human-Readable Identifier Ballast
+       * @example AAAAbadf00d
+       */
       id: string;
       /** LocalizedString */
       name: {
@@ -819,6 +888,11 @@ export interface components {
       videos: string[];
     };
     PlaylistListDto: {
+      /**
+       * Format: hrib
+       * @description Human-Readable Identifier Ballast
+       * @example AAAAbadf00d
+       */
       id: string;
       /** LocalizedString */
       name: {
@@ -844,6 +918,11 @@ export interface components {
       [key: string]: unknown;
     };
     ProjectArtifactAdditionDto: {
+      /**
+       * Format: hrib
+       * @description Human-Readable Identifier Ballast
+       * @example AAAAbadf00d
+       */
       id: string;
       blueprintSlot?: string | null;
     };
@@ -927,10 +1006,20 @@ export interface components {
       };
     };
     ProjectCreationAuthorDto: {
+      /**
+       * Format: hrib
+       * @description Human-Readable Identifier Ballast
+       * @example AAAAbadf00d
+       */
       id: string;
       roles: string[];
     };
     ProjectCreationDto: {
+      /**
+       * Format: hrib
+       * @description Human-Readable Identifier Ballast
+       * @example AAAAbadf00d
+       */
       projectGroupId: string;
       /** LocalizedString */
       name: {
@@ -1011,6 +1100,11 @@ export interface components {
       validationStage: string;
     };
     ProjectEditDto: {
+      /**
+       * Format: hrib
+       * @description Human-Readable Identifier Ballast
+       * @example AAAAbadf00d
+       */
       id: string;
       /** LocalizedString */
       name?: ({
@@ -1051,6 +1145,11 @@ export interface components {
       deadline: string;
     };
     ProjectGroupDetailDto: {
+      /**
+       * Format: hrib
+       * @description Human-Readable Identifier Ballast
+       * @example AAAAbadf00d
+       */
       id: string;
       /** LocalizedString */
       name: {
@@ -1069,7 +1168,35 @@ export interface components {
       isOpen: boolean;
       projects: components["schemas"]["ProjectListDto"][];
     };
+    ProjectGroupEditDto: {
+      /**
+       * Format: hrib
+       * @description Human-Readable Identifier Ballast
+       * @example AAAAbadf00d
+       */
+      id: string;
+      /** LocalizedString */
+      name?: ({
+        iv: string;
+        cs?: string | null;
+        en?: string | null;
+      }) | null;
+      /** LocalizedString */
+      description?: ({
+        iv: string;
+        cs?: string | null;
+        en?: string | null;
+      }) | null;
+      /** Format: date-time */
+      deadline?: string | null;
+      isOpen?: boolean | null;
+    };
     ProjectGroupListDto: {
+      /**
+       * Format: hrib
+       * @description Human-Readable Identifier Ballast
+       * @example AAAAbadf00d
+       */
       id: string;
       /** LocalizedString */
       name: {
@@ -1121,6 +1248,11 @@ export interface components {
       releasedOn: string;
     };
     ProjectReviewCreationDto: {
+      /**
+       * Format: hrib
+       * @description Human-Readable Identifier Ballast
+       * @example AAAAbadf00d
+       */
       projectId: string;
       kind: components["schemas"]["ReviewKind"];
       reviewerRole: string;
@@ -1187,6 +1319,16 @@ export interface components {
       codec: string;
       /** Format: int64 */
       bitrate: number;
+    };
+    SystemDetailDto: {
+      name: string;
+      baseUrls: string[];
+      version: string;
+      commit: string;
+      /** Format: date-time */
+      commitDate: string;
+      /** Format: date-time */
+      runningSince: string;
     };
     TemporaryAccountCreationDto: {
       emailAddress: string;

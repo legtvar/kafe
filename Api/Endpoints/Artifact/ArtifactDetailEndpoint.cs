@@ -43,7 +43,7 @@ public class ArtifactDetailEndpoint : EndpointBaseAsync
             return Unauthorized();
         }
 
-        var artifact = await artifacts.Load(id, cancellationToken);
+        var artifact = await artifacts.LoadDetail(id, cancellationToken);
         return artifact is null ? NotFound() : Ok(TransferMaps.ToArtifactDetailDto(artifact));
     }
 }

@@ -19,12 +19,26 @@ public class ArtifactService
         this.db = db;
     }
 
-    public async Task<ArtifactDetail?> Load(Hrib id, CancellationToken token = default)
+    public async Task<ArtifactInfo?> Load(Hrib id, CancellationToken token = default)
+    {
+        return await db.LoadAsync<ArtifactInfo>(id.Value, token);
+    }
+
+    public async Task<ImmutableArray<ArtifactInfo>> LoadMany(
+        IEnumerable<Hrib> ids,
+        CancellationToken token = default)
+    {
+        return (await db.LoadManyAsync<ArtifactInfo>(token, ids.Select(i => (string)i)))
+            .Where(a => a is not null)
+            .ToImmutableArray();
+    }
+
+    public async Task<ArtifactDetail?> LoadDetail(Hrib id, CancellationToken token = default)
     {
         return await db.LoadAsync<ArtifactDetail>(id.Value, token);
     }
 
-    public async Task<ImmutableArray<ArtifactDetail>> LoadMany(
+    public async Task<ImmutableArray<ArtifactDetail>> LoadDetailMany(
         IEnumerable<Hrib> ids,
         CancellationToken token = default)
     {

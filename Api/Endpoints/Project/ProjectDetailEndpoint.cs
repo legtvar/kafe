@@ -82,7 +82,7 @@ public class ProjectDetailEndpoint : EndpointBaseAsync
             ProjectGroupName = group.Name
         };
 
-        var artifactDetails = await artifactService.LoadMany(
+        var artifactDetails = await artifactService.LoadDetailMany(
             project.Artifacts.Select(a => (Hrib)a.Id),
             cancellationToken);
         var authors = await authorService.LoadMany(

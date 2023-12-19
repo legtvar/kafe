@@ -45,7 +45,7 @@ public class ShardCreationEndpoint : EndpointBaseAsync
         [FromForm] RequestData request,
         CancellationToken cancellationToken = default)
     {
-        var artifact = await artifactService.Load(request.ArtifactId, cancellationToken);
+        var artifact = await artifactService.LoadDetail(request.ArtifactId, cancellationToken);
         if (artifact is null)
         {
             return NotFound();

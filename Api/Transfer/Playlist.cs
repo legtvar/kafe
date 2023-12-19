@@ -14,4 +14,9 @@ public record PlaylistDetailDto(
     LocalizedString Name,
     LocalizedString? Description,
     Permission GlobalPermissions,
-    ImmutableArray<string> Videos);
+    ImmutableArray<PlaylistEntryDto> Entries);
+
+public record PlaylistEntryDto(
+    Hrib Id,
+    LocalizedString Name,
+    ImmutableArray<ShardListDto> Shards);

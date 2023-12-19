@@ -8,7 +8,7 @@ namespace Kafe.Data.Aggregates;
 public record PlaylistInfo(
     [Hrib] string Id,
     CreationMethod CreationMethod,
-    [KafeType(typeof(ImmutableArray<Hrib>))] ImmutableArray<string> VideoIds,
+    [KafeType(typeof(ImmutableArray<Hrib>))] ImmutableArray<string> Entries,
     [LocalizedString] ImmutableDictionary<string, string> Name,
     [LocalizedString] ImmutableDictionary<string, string>? Description = null,
     Permission GlobalPermissions = Permission.None
@@ -25,7 +25,7 @@ public class PlaylistInfoProjection : SingleStreamProjection<PlaylistInfo>
         return new PlaylistInfo(
             Id: e.PlaylistId,
             CreationMethod: e.CreationMethod,
-            VideoIds: ImmutableArray.Create<string>(),
+            Entries: ImmutableArray.Create<string>(),
             Name: e.Name
         );
     }

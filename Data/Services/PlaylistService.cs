@@ -1,6 +1,9 @@
 ﻿using Kafe.Data.Aggregates;
 using Marten;
+using System.Collections;
+using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -24,5 +27,14 @@ public class PlaylistService
     public async Task<PlaylistInfo?> Load(Hrib id, CancellationToken token = default)
     {
         return await db.LoadAsync<PlaylistInfo>(id.Value, token);
+    }
+
+    public async Task<ImmutableArray<PlaylistInfo>> LoadMany(
+        IEnumerable<Hrib> ids,
+        CancellationToken token = default)
+    {
+        return (await db.LoadManyAsync<PlaylistInfo>(token, ids.Select(i => (string)i)))
+            .Where(a => a is not null)
+            .ToImmutableArray();
     }
 }

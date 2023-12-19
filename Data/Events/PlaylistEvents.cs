@@ -13,16 +13,16 @@ public record PlaylistInfoChanged(
     [LocalizedString] ImmutableDictionary<string, string>? Description = null,
     Permission? GlobalPermissions = null
 );
-public record PlaylistVideoAdded(
+
+public record PlaylistEntryAppended(
     [Hrib] string PlaylistId,
-    [Hrib] string VideoId
+    [Hrib] string ArtifactId
 );
-public record PlaylistVideoRemoved(
+
+public record PlaylistEntryRemovedFirst(
     [Hrib] string PlaylistId,
-    [Hrib] string VideoId
-);
-public record PlaylistVideoOrderChanged(
+    [Hrib] string ArtifactId);
+    
+public record PlaylistEntryEntriesSet(
     [Hrib] string PlaylistId,
-    [Hrib] string VideoId,
-    int NewIndex
-);
+    ImmutableArray<string> EntryIds);

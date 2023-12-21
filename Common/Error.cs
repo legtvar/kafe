@@ -2,7 +2,7 @@ using System.Diagnostics;
 
 namespace Kafe.Common;
 
-public readonly record struct Error
+public readonly partial record struct Error
 {
     public const string GenericErrorId = "GenericError";
 

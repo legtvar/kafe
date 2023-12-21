@@ -1,10 +1,15 @@
-﻿using Kafe.Data.Aggregates;
+﻿using Kafe.Common;
+using Kafe.Data.Aggregates;
+using Kafe.Data.Events;
 using Marten;
 using Marten.Linq;
 using Marten.Linq.MatchesSql;
+using Marten.Linq.SoftDeletes;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Data.Common;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -53,5 +58,84 @@ public class PlaylistService
         return (await db.LoadManyAsync<PlaylistInfo>(token, ids.Select(i => (string)i)))
             .Where(a => a is not null)
             .ToImmutableArray();
+    }
+
+    public async Task<Err<PlaylistInfo>> Create(
+        PlaylistInfo @new,
+        CancellationToken token = default)
+    {
+        if (!Hrib.TryParse(@new.Id, out var id, out var error))
+        {
+            return new Error(error);
+        }
+
+        if (id == Hrib.Invalid)
+        {
+            id = Hrib.Create();
+        }
+
+        var created = new PlaylistCreated(
+            PlaylistId: id.Value,
+            CreationMethod: CreationMethod.Api,
+            Name: @new.Name);
+        db.Events.StartStream(id.Value, created);
+
+        if (@new.GlobalPermissions != Permission.None || @new.Description is not null)
+        {
+            var changed = new PlaylistInfoChanged(
+                PlaylistId: id.Value,
+                Description: @new.Description,
+                GlobalPermissions: @new.GlobalPermissions);
+            db.Events.Append(id.Value, changed);
+        }
+
+        if (!@new.EntryIds.IsDefaultOrEmpty)
+        {
+            var entriesSet = new PlaylistEntriesSet(
+                PlaylistId: id.Value,
+                EntryIds: @new.EntryIds);
+            db.Events.Append(id.Value, entriesSet);
+        }
+        
+        // TODO: Check all entries exist before putting them in
+
+        await db.SaveChangesAsync(token);
+        var playlist = await db.Events.AggregateStreamAsync<PlaylistInfo>(id.Value, token: token)
+            ?? throw new InvalidOperationException($"Could not persist a playlist with id '{id}'.");
+        return playlist;
+    }
+
+    public async Task<Err<bool>> Edit(
+        PlaylistInfo @new,
+        CancellationToken token = default)
+    {
+        var old = await Load(@new.Id, token);
+        if (old is null)
+        {
+            return Error.NotFound(@new.Id, "A playlist");
+        }
+
+        var eventStream = await db.Events.FetchForExclusiveWriting<PlaylistInfo>(@new.Id, token);
+        var infoChanged = new PlaylistInfoChanged(
+            PlaylistId: @new.Id,
+            Name: @new.Name,
+            Description: @new.Description,
+            GlobalPermissions: @new.GlobalPermissions);
+        if (infoChanged.Name is not null
+            || infoChanged.Description is not null
+            || infoChanged.GlobalPermissions is not null)
+        {
+            eventStream.AppendOne(infoChanged);
+        }
+
+        if (@new.EntryIds.SequenceEqual(old.EntryIds))
+        {
+            eventStream.AppendOne(new PlaylistEntriesSet(
+                PlaylistId: @new.Id,
+                EntryIds: old.EntryIds));
+        }
+
+        await db.SaveChangesAsync(token);
+        return true;
     }
 }

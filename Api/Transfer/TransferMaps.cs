@@ -173,7 +173,7 @@ public static class TransferMaps
             Id: data.Id,
             Name: data.Name,
             Description: data.Description,
-            GlobalPermissions: data.GlobalPermissions);
+            GlobalPermissions: ToPermissionArray(data.GlobalPermissions));
     }
 
     public static PlaylistDetailDto ToPlaylistDetailDto(PlaylistInfo data)
@@ -182,7 +182,7 @@ public static class TransferMaps
             Id: data.Id,
             Name: data.Name,
             Description: data.Description,
-            GlobalPermissions: data.GlobalPermissions,
+            GlobalPermissions: ToPermissionArray(data.GlobalPermissions),
             Entries: ImmutableArray<PlaylistEntryDto>.Empty);
     }
 

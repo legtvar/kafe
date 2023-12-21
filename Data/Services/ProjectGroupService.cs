@@ -92,7 +92,7 @@ public class ProjectGroupService
         var @old = await Load(@new.Id, token);
         if (@old is null)
         {
-            return Err.NotFound<bool>(@new.Id);
+            return Error.NotFound(@new.Id);
         }
 
         var eventStream = await db.Events.FetchForExclusiveWriting<ProjectGroupInfo>(@new.Id, token);

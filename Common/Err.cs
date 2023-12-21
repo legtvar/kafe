@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Kafe.Common;
 
@@ -40,7 +41,7 @@ public readonly record struct Err<T>
         errors = ImmutableArray.Create(new Error(exception, stackTrace.ToString()));
     }
 
-    public T? Value => value;
+    public T Value => value;
 
     public ImmutableArray<Error> Errors => errors;
 

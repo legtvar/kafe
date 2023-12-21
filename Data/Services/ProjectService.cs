@@ -114,7 +114,7 @@ public partial class ProjectService
         var @old = await Load(@new.Id, token);
         if (@old is null)
         {
-            return Err.NotFound<bool>(@new.Id);
+            return Error.NotFound(@new.Id);
         }
 
         if (LocalizedString.IsTooLong(@new.Name, NameMaxLength))

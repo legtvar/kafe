@@ -37,6 +37,12 @@ public class EntityService
                 .Cast<IEntity>()
                 .FirstOrDefault();
     }
+    
+    // public async Task<ImmutableArray<bool>> AllExist<TEntity>(IEnumerable<Hrib> ids, CancellationToken token = default)
+    // {
+    //     var tableName = await db.Database.ExistingTableFor(typeof(TEntity));
+    //     if (tableName )
+    // }
 
     public async Task<Permission> GetPermission(
         Hrib entityId,

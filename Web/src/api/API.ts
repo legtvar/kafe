@@ -202,6 +202,11 @@ export class API {
                     return api.requestSingle(`account/${id}`, User);
                 },
             },
+            external: {
+                loginUrl() {
+                    return `${api.apiUrl}account/external-login?redirect=${window.location.origin}/auth`;
+                }
+            },
             async logout() {
                 return api.getSimple(`account/logout`);
             },

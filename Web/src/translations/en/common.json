@@ -18,7 +18,8 @@
     "description": "This application is currently under development. Please be patient with any issues while we build the app with our sweat, tears and coffee.",
     "title": "Development in progress...",
     "toggleLanguage": "Switch to {{language}}",
-    "warning": "KAFE is in beta"
+    "warning": "KAFE is in beta",
+    "muniLogin": "The Unified MUNI login is not yet available."
   },
   "common": {
     "backHome": "Back Home",

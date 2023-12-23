@@ -1,3 +1,4 @@
+using Duende.IdentityServer.Services;
 using MockIdentity;
 using Serilog;
 
@@ -20,6 +21,7 @@ internal static class HostingExtensions
             .AddInMemoryClients(Config.Clients)
             .AddTestUsers(TestUsers.Users);
 
+        builder.Services.AddSingleton<ICorsPolicyService, DevelopmentCorsPolicyService>();
         return builder.Build();
     }
     
@@ -35,7 +37,7 @@ internal static class HostingExtensions
         // uncomment if you want to add a UI
         app.UseStaticFiles();
         app.UseRouting();
-            
+
         app.UseIdentityServer();
 
         // uncomment if you want to add a UI
@@ -43,5 +45,13 @@ internal static class HostingExtensions
         app.MapRazorPages().RequireAuthorization();
 
         return app;
+    }
+}
+
+public class DevelopmentCorsPolicyService : ICorsPolicyService
+{
+    public Task<bool> IsOriginAllowedAsync(string origin)
+    {
+        return Task.FromResult(true);
     }
 }

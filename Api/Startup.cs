@@ -36,6 +36,7 @@ using System.Security.Cryptography;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.IdentityModel.Logging;
 using System.Text.Json;
+using Kafe.Data.Services;
 
 namespace Kafe.Api;
 
@@ -76,6 +77,10 @@ public class Startup
                 c.Response.StatusCode = 401;
                 return Task.CompletedTask;
             };
+            // o.Events.OnValidatePrincipal = async c =>
+            // {
+            //     Console.WriteLine(c);
+            // };
         })
         .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, o =>
         {
@@ -92,7 +97,8 @@ public class Startup
             o.Scope.Add("profile");
             o.Scope.Add("email");
             o.CallbackPath = new PathString("/signin-oidc");
-            o.SaveTokens = true;
+            // o.GetClaimsFromUserInfoEndpoint = true;
+            // o.SaveTokens = true;
         });
 
         services.AddAuthorization(o =>
@@ -160,6 +166,29 @@ public class Startup
         app.UseAuthentication();
         app.Use(async (ctx, next) =>
         {
+            var emailClaim = ctx.User.FindFirst(ClaimTypes.Email);
+            if (emailClaim is null || string.IsNullOrEmpty(emailClaim.Value))
+            {
+                await next();
+                return;
+            }
+
+            var oidcConfig = Configuration.GetRequiredSection("Oidc").Get<OidcOptions>()
+                ?? throw new ArgumentException("OIDC is not configured well.");
+
+            if (emailClaim.Issuer == oidcConfig.Authority)
+            {
+                var result = await ctx.RequestServices.GetRequiredService<AccountService>()
+                    .AssociateExternalAccount(ctx.User);
+                if (result.HasErrors)
+                {
+                    await ctx.ForbidAsync();
+                    return;
+                }
+
+                await ctx.RequestServices.GetRequiredService<UserProvider>().SignIn(result.Value);
+            }
+
             await ctx.RequestServices.GetRequiredService<UserProvider>().RefreshAccount();
             await next();
         });

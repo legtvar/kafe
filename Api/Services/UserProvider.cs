@@ -111,9 +111,11 @@ public class UserProvider
             throw new InvalidOperationException("Cannot sign in outside of a request.");
         }
 
+        var principal = GetClaimsPrincipal(account, CookieAuthenticationDefaults.AuthenticationScheme);
+        contextAccessor.HttpContext.User = principal;
         await contextAccessor.HttpContext.SignInAsync(
             CookieAuthenticationDefaults.AuthenticationScheme,
-            GetClaimsPrincipal(account, CookieAuthenticationDefaults.AuthenticationScheme),
+            principal,
             authProperties);
         Account = account;
     }
@@ -129,6 +131,16 @@ public class UserProvider
         if (account.PreferredCulture != Const.InvariantCultureCode)
         {
             claims.Add(new Claim(ClaimTypes.StateOrProvince, account.PreferredCulture));
+        }
+
+        if (!string.IsNullOrEmpty(account.Name))
+        {
+            claims.Add(new Claim(ClaimTypes.Name, account.Name));
+        }
+
+        if (!string.IsNullOrEmpty(account.Uco))
+        {
+            claims.Add(new Claim(AccountService.PreferredUsernameClaim, account.Uco));
         }
 
         // TODO: Let accounts have Name

@@ -1,9 +1,22 @@
-import { Box, Button, FormControl, FormLabel, Heading, Input, Stack, Text, useColorModeValue } from '@chakra-ui/react';
+import {
+    Box,
+    Button,
+    FormControl,
+    FormLabel,
+    HStack,
+    Heading,
+    Input,
+    Link,
+    Stack,
+    Text,
+    useColorModeValue,
+} from '@chakra-ui/react';
 import i18next, { t } from 'i18next';
 import { useState } from 'react';
 import { useApi } from '../../../hooks/Caffeine';
 import { Loading } from '../../utils/Loading';
 import { MuniIcon } from '../../utils/MuniIcon';
+import { AiFillWarning } from 'react-icons/ai';
 
 export function TempAccount() {
     const [state, setState] = useState<'ready' | 'submitting' | 'submited' | 'error'>('ready');
@@ -19,6 +32,17 @@ export function TempAccount() {
             setState('error');
         }
     };
+
+    // const muniLogin = async () => {
+    //     setState('submitting');
+    //     try {
+    //         var res = await api.accounts.external.login();
+    //         console.log(res);
+    //         setState('submited');
+    //     } catch (e) {
+    //         setState('error');
+    //     }
+    // };
 
     return (
         <>
@@ -49,25 +73,31 @@ export function TempAccount() {
                                 bg={'blue.400'}
                                 color={'white'}
                                 onClick={() => login()}
-                                _hover={{   
+                                _hover={{
                                     bg: 'blue.500',
                                 }}
                             >
                                 {t('register.button').toString()}
                             </Button>
-                            {/* <hr />
-                            <Button
-                                size="lg"
-                                bg={'white'}
-                                color={'#0000dc'}
-                                onClick={() => alert('MUNI login sucks dicks!')}
-                                _hover={{
-                                    bg: 'whiteAlpha.900',
-                                }}
-                                leftIcon={<MuniIcon />}
-                            >
-                                {t('munilogin.button').toString()}
-                            </Button> */}
+                            <hr />
+                            <HStack color="red.500">
+                                <AiFillWarning />
+                                <Text>{t('beta.muniLogin').toString()}</Text>
+                            </HStack>
+                            <Link href={api.accounts.external.loginUrl()}>
+                                <Button
+                                    size="lg"
+                                    bg={'#0000dc'}
+                                    color={'white'}
+                                    _hover={{
+                                        bg: 'black',
+                                    }}
+                                    width="100%"
+                                    leftIcon={<MuniIcon fill="white" />}
+                                >
+                                    {t('munilogin.button').toString()}
+                                </Button>
+                            </Link>
                         </Stack>
                     </Stack>
                 )}

@@ -1,4 +1,5 @@
-﻿using Kafe.Data.Aggregates;
+﻿using Kafe.Common;
+using Kafe.Data.Aggregates;
 using Kafe.Data.Events;
 using Marten;
 using Marten.Linq;
@@ -7,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -16,6 +18,8 @@ public class AccountService
 {
     public static readonly TimeSpan ConfirmationTokenExpiration = TimeSpan.FromHours(24);
     private readonly IDocumentSession db;
+
+    public const string PreferredUsernameClaim = "preferred_username";
 
     public AccountService(IDocumentSession db)
     {
@@ -90,12 +94,8 @@ $@"TRUE = ALL(
         );
         db.Events.Append(id.Value, refreshed);
         await db.SaveChangesAsync(token);
-        account = await db.Events.AggregateStreamAsync<AccountInfo>(id.Value, token: token);
-        if (account is null)
-        {
-            throw new InvalidOperationException($"Account '{id}' could no be found.");
-        }
-        return account;
+        return await db.Events.AggregateStreamAsync<AccountInfo>(id.Value, token: token)
+            ?? throw new InvalidOperationException($"Account '{id}' could not be live-aggregated.");
     }
 
     public async Task<bool> TryConfirmTemporaryAccount(
@@ -153,5 +153,44 @@ $@"TRUE = ALL(
         var eventStream = await db.Events.FetchForExclusiveWriting<AccountInfo>(account.Id, token);
         eventStream.AppendMany(permissions.Select(c => new AccountPermissionSet(account.Id, c.id, c.permission)));
         await db.SaveChangesAsync(token);
+    }
+
+    public async Task<Err<AccountInfo>> AssociateExternalAccount(
+        ClaimsPrincipal principal,
+        CancellationToken token = default)
+    {
+        var emailClaim = principal.FindFirst(ClaimTypes.Email);
+        if (emailClaim is null || string.IsNullOrEmpty(emailClaim.Value))
+        {
+            return Error.MissingValue("email address");
+        }
+
+        var name = principal.FindFirst(ClaimTypes.Name)?.Value;
+        var uco = principal.FindFirst(PreferredUsernameClaim)?.Value;
+        var existing = await FindByEmail(emailClaim.Value, token);
+
+        var identityProvider = emailClaim.Issuer;
+        var id = existing?.Id ?? Hrib.Create().Value;
+        var associated = new ExternalAccountAssociated(
+            AccountId: id,
+            CreationMethod: CreationMethod.Api,
+            EmailAddress: emailClaim.Value,
+            PreferredCulture: Const.InvariantCultureCode,
+            IdentityProvider: identityProvider,
+            Name: name,
+            Uco: uco);
+
+        if (existing is null)
+        {
+            db.Events.StartStream<AccountInfo>(id, associated);
+        }
+        else
+        {
+            db.Events.Append(id, associated);
+        }
+
+        await db.SaveChangesAsync(token);
+        return await db.Events.AggregateStreamAsync<AccountInfo>(id, token: token)
+            ?? throw new InvalidOperationException($"Account '{id}' could not be live-aggregated.");
     }
 }

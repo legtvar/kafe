@@ -8,7 +8,9 @@ public static class Config
     public static IEnumerable<IdentityResource> IdentityResources =>
         new IdentityResource[]
         {
-            new IdentityResources.OpenId()
+            new IdentityResources.OpenId(),
+            new IdentityResources.Profile(),
+            new IdentityResources.Email()
         };
 
     public static IEnumerable<ApiScope> ApiScopes =>
@@ -17,14 +19,14 @@ public static class Config
 
     public static IEnumerable<Client> Clients =>
         new Client[]
-            {
+        {
                 new Client
             {
                 ClientName = "KAFE dev",
                 ClientId = "kafe",
                 ClientSecrets =
                 {
-                    new Secret("coffein")
+                    new Secret("coffein".Sha512())
                 },
                 AllowedGrantTypes = GrantTypes.Code,
                 RedirectUris =
@@ -36,7 +38,8 @@ public static class Config
                     IdentityServerConstants.StandardScopes.OpenId,
                     IdentityServerConstants.StandardScopes.Profile,
                     IdentityServerConstants.StandardScopes.Email,
-                }
+                },
+                AlwaysIncludeUserClaimsInIdToken = true
             }
         };
 }

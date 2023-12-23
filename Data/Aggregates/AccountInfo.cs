@@ -17,6 +17,8 @@ public record AccountInfo(
     string EmailAddress,
 
     string PreferredCulture,
+    string? Name,
+    string? Uco,
     string? SecurityStamp,
     DateTimeOffset RefreshedOn,
     ImmutableDictionary<string, Permission>? Permissions
@@ -37,6 +39,8 @@ public class AccountInfoProjection : SingleStreamProjection<AccountInfo>
             EmailAddress: e.EmailAddress,
             PreferredCulture: e.PreferredCulture,
             SecurityStamp: null,
+            Name: null,
+            Uco: null,
             RefreshedOn: default,
             Permissions: ImmutableDictionary.CreateRange(new[]
             {
@@ -44,11 +48,45 @@ public class AccountInfoProjection : SingleStreamProjection<AccountInfo>
             })
         );
     }
+    
+    public static AccountInfo Create(IEvent<ExternalAccountAssociated> e)
+    {
+        return new(
+            Id: e.Data.AccountId,
+            CreationMethod: e.Data.CreationMethod,
+            Kind: AccountKind.External,
+            EmailAddress: e.Data.EmailAddress,
+            PreferredCulture: e.Data.PreferredCulture,
+            SecurityStamp: null,
+            Name: e.Data.Name,
+            Uco: e.Data.Uco,
+            RefreshedOn: e.Timestamp,
+            Permissions: ImmutableDictionary.CreateRange(new[]
+            {
+                new KeyValuePair<string, Permission>(e.Data.AccountId, Permission.Read | Permission.Write)
+            })
+        );
+    }
+    
+    public AccountInfo Apply(IEvent<ExternalAccountAssociated> e, AccountInfo a)
+    {
+        return a with
+        {
+            Kind = AccountKind.External,
+            EmailAddress = e.Data.EmailAddress,
+            PreferredCulture = e.Data.PreferredCulture,
+            SecurityStamp = null,
+            Name = e.Data.Name,
+            Uco = e.Data.Uco,
+            RefreshedOn = e.Timestamp
+        };
+    }
 
     public AccountInfo Apply(IEvent<TemporaryAccountRefreshed> e, AccountInfo a)
     {
         return a with
         {
+            Kind = AccountKind.Temporary,
             SecurityStamp = e.Data.SecurityStamp,
             RefreshedOn = e.Timestamp
         };

@@ -18,7 +18,8 @@
     "description": "Právě probíhá vývoj této aplikace. Prosím buďte shovívaví k případným problémům zatímco za vás proléváme krev, pot a kafe.",
     "title": "Právě probíhá vývoj...",
     "toggleLanguage": "Přepnout na {{language}}",
-    "warning": "KAFE je v testovacím provozu"
+    "warning": "KAFE je v testovacím provozu",
+    "muniLogin": "Jednotné přihlašování MUNI zatím není dostupné."
   },
   "common": {
     "backHome": "Zpět na domovskou stránku",

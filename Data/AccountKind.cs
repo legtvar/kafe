@@ -9,5 +9,6 @@ namespace Kafe.Data;
 public enum AccountKind
 {
     Unknown,
-    Temporary
+    Temporary,
+    External
 }

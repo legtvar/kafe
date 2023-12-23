@@ -182,7 +182,7 @@ public class Startup
             var oidcConfig = Configuration.GetRequiredSection("Oidc").Get<OidcOptions>()
                 ?? throw new ArgumentException("OIDC is not configured well.");
 
-            if (emailClaim.Value.StartsWith(oidcConfig.Authority))
+            if (emailClaim.Issuer.StartsWith(oidcConfig.Authority))
             {
                 var result = await ctx.RequestServices.GetRequiredService<AccountService>()
                     .AssociateExternalAccount(ctx.User);

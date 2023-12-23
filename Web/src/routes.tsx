@@ -14,7 +14,6 @@ import {
 import { Navigate, RouteObject } from 'react-router-dom';
 import { Login } from './components/pages/account/Login';
 import { Register } from './components/pages/account/Register';
-import { TempAccount } from './components/pages/account/TempAccount';
 import { Token } from './components/pages/account/Token';
 import { GoRedirect } from './components/pages/GoRedirect';
 import { Groups } from './components/pages/groups/Groups';
@@ -215,7 +214,7 @@ export const accountRoutes = (t: (id: string) => string): RouteObject[] => [
     },
     {
         path: 'temp',
-        element: <TempAccount />,
+        element: <Navigate to="/account/login" />
     },
 ];
 

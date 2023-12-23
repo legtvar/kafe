@@ -6,7 +6,7 @@ export function UnauthRoot(props: IUnauthRootProps) {
     // const reload = useReload();
 
     // TODO: Temporary
-    return <Navigate to={'/account/temp'} />;
+    return <Navigate to={'/account/login'} />;
 
     // return (
     //     <>

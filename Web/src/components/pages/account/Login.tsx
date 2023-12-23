@@ -1,9 +1,9 @@
 import {
     Box,
     Button,
-    Checkbox,
     FormControl,
     FormLabel,
+    HStack,
     Heading,
     Input,
     Link,
@@ -11,72 +11,112 @@ import {
     Text,
     useColorModeValue,
 } from '@chakra-ui/react';
-import { t } from 'i18next';
-import { Trans } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import i18next, { t } from 'i18next';
+import { useState } from 'react';
+import { useApi } from '../../../hooks/Caffeine';
+import { Loading } from '../../utils/Loading';
+import { MuniIcon } from '../../utils/MuniIcon';
+import { AiFillWarning } from 'react-icons/ai';
 
 export function Login() {
-    const navigate = useNavigate();
+    const [state, setState] = useState<'ready' | 'submitting' | 'submited' | 'error'>('ready');
+    const [email, setEmail] = useState<string>('');
+    const api = useApi();
+
+    const login = async () => {
+        setState('submitting');
+        try {
+            await api.accounts.temporary.create(email, i18next.language);
+            setState('submited');
+        } catch (e) {
+            setState('error');
+        }
+    };
 
     return (
         <>
             <Stack align={'center'}>
                 <Heading fontSize={'4xl'}>{t('login.title').toString()}</Heading>
                 <Text fontSize={'lg'} color={'gray.600'}>
-                    {t('login.subtitle').toString()}
+                    {t('register.subtitle').toString()}
                 </Text>
             </Stack>
             <Box rounded={'lg'} bg={useColorModeValue('white', 'gray.700')} boxShadow={'lg'} p={8}>
-                <Stack spacing={4}>
-                    <FormControl id="email">
-                        <FormLabel>{t('login.email').toString()}</FormLabel>
-                        <Input type="email" />
-                    </FormControl>
-                    <FormControl id="password">
-                        <FormLabel>{t('login.password').toString()}</FormLabel>
-                        <Input type="password" />
-                    </FormControl>
-                    <Stack spacing={10} pt={2}>
-                        <Stack direction={{ base: 'column', sm: 'row' }} align={'start'} justify={'space-between'}>
-                            <Checkbox>{t('login.remember').toString()}</Checkbox>
-                            <Link color={'blue.400'} onClick={() => navigate('/account/forgot')}>
-                                {t('login.forgot').toString()}
+                {(state === 'ready' || state === 'error') && (
+                    <Stack spacing={4}>
+                        <FormControl id="email" isRequired>
+                            <FormLabel>{t('register.email').toString()}</FormLabel>
+                            <form onSubmit={() => login()}>
+                                <Input type="email" value={email} onChange={(event) => setEmail(event.target.value)} />
+                            </form>
+                        </FormControl>
+                        {state === 'error' && (
+                            <Text as="p" color="red.500">
+                                {t('login.error').toString()}
+                            </Text>
+                        )}
+                        <Stack spacing={10} pt={2}>
+                            <Button
+                                loadingText="Submitting"
+                                size="lg"
+                                bg={'blue.400'}
+                                color={'white'}
+                                onClick={() => login()}
+                                _hover={{
+                                    bg: 'blue.500',
+                                }}
+                            >
+                                {t('register.button').toString()}
+                            </Button>
+                            <hr />
+                            <HStack color="red.500">
+                                <AiFillWarning />
+                                <Text>{t('beta.muniLogin').toString()}</Text>
+                            </HStack>
+                            <Link href={api.accounts.external.loginUrl()}>
+                                <Button
+                                    size="lg"
+                                    bg={'#0000dc'}
+                                    color={'white'}
+                                    _hover={{
+                                        bg: 'black',
+                                    }}
+                                    width="100%"
+                                    leftIcon={<MuniIcon fill="white" />}
+                                >
+                                    {t('munilogin.button').toString()}
+                                </Button>
                             </Link>
                         </Stack>
+                    </Stack>
+                )}
+                {state === 'submitting' && (
+                    <>
+                        <Loading center large />
+                    </>
+                )}
+                {state === 'submited' && (
+                    <>
+                        <Text as="p" pb={4}>
+                            {t('temp.after').toString()}
+                        </Text>
+                        <Text as="p" pb={4}>
+                            {t('temp.after2').toString()}
+                        </Text>
                         <Button
-                            loadingText="Submitting"
+                            loadingText="Send again"
                             size="lg"
                             bg={'blue.400'}
                             color={'white'}
-                            onClick={() => {
-                                // const user = new User();
-                                // user.email = 'rosecky.jonas@gmail.com';
-                                // user.id = '123456789';
-                                // user.name = 'Jonáš Rosecký';
-                                // user.role = 'admin';
-
-                                // setUser(user);
-
-                                navigate('/auth');
-                            }}
+                            onClick={() => setState('ready')}
                             _hover={{
                                 bg: 'blue.500',
                             }}
                         >
-                            {t('login.button').toString()}
+                            {t('temp.back').toString()}
                         </Button>
-                    </Stack>
-                    <Stack pt={6}>
-                        <Text align={'center'}>
-                            <Trans i18nKey="login.register">
-                                Don't have an account?
-                                <Link color={'blue.400'} onClick={() => navigate('/account/register')}>
-                                    Register now!
-                                </Link>
-                            </Trans>
-                        </Text>
-                    </Stack>
-                </Stack>
+                    </>
+                )}
             </Box>
         </>
     );

@@ -37,6 +37,7 @@ import { UnauthRoot } from './components/pages/root/UnauthRoot';
 import { SystemComponent } from './components/pages/system/SystemComponent';
 import { OutletOrChildren } from './components/utils/OutletOrChildren';
 import { Status } from './components/utils/Status';
+import { ServerError } from './components/pages/ServerError';
 
 export type SelectableIcon = {
     default: IconType;
@@ -87,6 +88,10 @@ export const routerConfig = (t: (id: string) => string): RouteObject[] => [
     {
         path: '/play/:slug',
         element: <Player />,
+    },
+    {
+        path: '/error',
+        element: <ServerError />,
     },
 ];
 

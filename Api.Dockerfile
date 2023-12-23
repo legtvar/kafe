@@ -7,6 +7,7 @@ FROM mcr.microsoft.com/dotnet/sdk:7.0
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt update && apt install -y ffmpeg && rm -rf /var/lib/apt/lists/*
 RUN dotnet dev-certs https
+RUN curl -sSL https://aka.ms/getvsdbgsh | /bin/sh /dev/stdin -v latest -l ~/vsdbg
 COPY --from=builder /kafe/publish /app
 WORKDIR /app
 ENTRYPOINT /app/Kafe.Api

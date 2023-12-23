@@ -100,7 +100,7 @@
     "footer": {
       "copy": "Created with <1>❤️</1> and ☕ by <3>LEMMA</3>"
     },
-    "title-prefix": "Kafe"
+    "title-prefix": "KAFE"
   },
   "login": {
     "button": "Sign in",
@@ -110,7 +110,7 @@
     "register": "Don't have an account? <1>Register now!</1>",
     "remember": "Remember me",
     "subtitle": "to your account to access all the features of the system",
-    "title": "Log in to Kafe",
+    "title": "Log in to KAFE",
     "error": "There was an error logging in, please try again!"
   },
   "navbar": {
@@ -292,7 +292,7 @@
   },
   "system": {
     "title": "System settings",
-    "warning": "Please be careful! Anything you change here can have a catastrophic impact on the final taste of Kafe! Proceed with caution!",
+    "warning": "Please be careful! Anything you change here can have a catastrophic impact on the final taste of KAFE! Proceed with caution!",
     "rights": "Rights",
     "homepage": "Homepage"
   },

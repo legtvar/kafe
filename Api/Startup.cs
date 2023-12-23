@@ -63,7 +63,6 @@ public class Startup
         {
             o.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
             o.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-            // o.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
         })
         .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, o =>
         {
@@ -78,14 +77,6 @@ public class Startup
                 return Task.CompletedTask;
             };
             o.AccessDeniedPath = "/error?title=403&detail='Access Denied'";
-            // o.Events.OnValidatePrincipal = async c =>
-            // {
-            //     Console.WriteLine(c);
-            // };
-            o.Events.OnRedirectToAccessDenied += async c =>
-            {
-                Console.WriteLine("Access Denied Redirect");
-            };
         })
         .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, o =>
         {
@@ -105,7 +96,6 @@ public class Startup
             // o.GetClaimsFromUserInfoEndpoint = true;
             // o.SaveTokens = true;
 
-            // o.Events.Redi
             o.Events.OnRemoteFailure += c =>
             {
                 var clientHost = Uri.TryCreate(c.Properties?.RedirectUri, UriKind.Absolute, out var redirect)
@@ -114,11 +104,6 @@ public class Startup
                 c.Response.Redirect($"{clientHost}/error?title=External Login Failed&detail={c.Failure?.Message}");
                 c.HandleResponse();
                 return Task.CompletedTask;
-            };
-
-            o.Events.OnAuthenticationFailed += async c =>
-            {
-                Console.WriteLine("Authentication Failed");
             };
         });
 

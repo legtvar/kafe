@@ -6,6 +6,7 @@ RUN dotnet publish /kafe/src/Api --configuration Release --output /kafe/publish 
 FROM mcr.microsoft.com/dotnet/aspnet:7.0
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt update && apt install -y ffmpeg && rm -rf /var/lib/apt/lists/*
+RUN dotnet dev-certs https
 COPY --from=builder /kafe/publish /app
 WORKDIR /app
 ENTRYPOINT /app/Kafe.Api

@@ -47,9 +47,20 @@
             }
         },
         {
-            "name": ".NET Core Attach",
+            "name": "Attach to Production",
             "type": "coreclr",
-            "request": "attach"
+            "request": "attach",
+            "processId": "${command:pickRemoteProcess}",
+            "pipeTransport": {
+                "pipeCwd": "${workspaceFolder}",
+                "pipeProgram": "ssh",
+                "pipeArgs": ["-T", "lemma-new", "docker", "exec", "-i", "kafe_api_1", "sh", "-c"],
+                "debuggerPath": "~/vsdbg/vsdbg"
+            },
+            "sourceFileMap": {
+                "/kafe/src": "${workspaceRoot}"
+            },
+            "justMyCode": false
         }
     ]
 }

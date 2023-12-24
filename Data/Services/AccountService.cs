@@ -167,9 +167,16 @@ $@"TRUE = ALL(
 
         var name = principal.FindFirst(ClaimTypes.Name)?.Value;
         var uco = principal.FindFirst(PreferredUsernameClaim)?.Value;
-        var existing = await FindByEmail(emailClaim.Value, token);
-
         var identityProvider = emailClaim.Issuer;
+
+        var existing = await FindByEmail(emailClaim.Value, token);
+        if (existing is not null
+            && existing.Kind == AccountKind.External
+            && existing.IdentityProvider == identityProvider)
+        {
+            return existing;
+        }
+
         var id = existing?.Id ?? Hrib.Create().Value;
         var associated = new ExternalAccountAssociated(
             AccountId: id,

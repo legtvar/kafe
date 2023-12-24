@@ -12,6 +12,7 @@ public record AccountInfo(
     [Hrib] string Id,
     CreationMethod CreationMethod,
     AccountKind Kind,
+    string? IdentityProvider,
 
     [property: UniqueIndex(IndexType = UniqueIndexType.Computed)]
     string EmailAddress,
@@ -36,6 +37,7 @@ public class AccountInfoProjection : SingleStreamProjection<AccountInfo>
             Id: e.AccountId,
             CreationMethod: e.CreationMethod,
             Kind: AccountKind.Temporary,
+            IdentityProvider: null,
             EmailAddress: e.EmailAddress,
             PreferredCulture: e.PreferredCulture,
             SecurityStamp: null,
@@ -55,6 +57,7 @@ public class AccountInfoProjection : SingleStreamProjection<AccountInfo>
             Id: e.Data.AccountId,
             CreationMethod: e.Data.CreationMethod,
             Kind: AccountKind.External,
+            IdentityProvider: e.Data.IdentityProvider,
             EmailAddress: e.Data.EmailAddress,
             PreferredCulture: e.Data.PreferredCulture,
             SecurityStamp: null,
@@ -73,6 +76,7 @@ public class AccountInfoProjection : SingleStreamProjection<AccountInfo>
         return a with
         {
             Kind = AccountKind.External,
+            IdentityProvider = e.Data.IdentityProvider,
             EmailAddress = e.Data.EmailAddress,
             PreferredCulture = e.Data.PreferredCulture,
             SecurityStamp = null,

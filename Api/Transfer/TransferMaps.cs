@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Security.Claims;
 using Kafe.Common;
@@ -348,8 +349,8 @@ public static class TransferMaps
     {
         return new AccountDetailDto(
             Id: data.Id,
-            Name: null,
-            Uco: null,
+            Name: data.Name,
+            Uco: data.Uco,
             EmailAddress: data.EmailAddress,
             PreferredCulture: data.PreferredCulture,
             Permissions: data.Permissions?.ToImmutableDictionary(p => (Hrib)p.Key, p => ToPermissionArray(p.Value))

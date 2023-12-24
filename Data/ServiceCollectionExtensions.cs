@@ -66,6 +66,7 @@ public static class ServiceCollectionExtensions
             options.Events.Upcast<AccountCapabilityRemovedUpcaster>();
             options.Events.Upcast<PlaylistVideoAddedUpcaster>();
             options.Events.Upcast<PlaylistVideoRemovedUpcaster>();
+            options.Events.Upcast<TemporaryAccountCreatedUpcaster>();
             options.UseDefaultSerialization(serializerType: SerializerType.Newtonsoft);
 
             RegisterEmbeddedSql(options);

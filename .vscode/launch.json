@@ -34,12 +34,12 @@
             }
         },
         {
-            "name": "ArtifactDetail rebuild",
+            "name": "Projection Rebuild",
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build-api",
             "program": "${workspaceFolder}/Api/bin/Debug/net7.0/Kafe.Api.dll",
-            "args": ["projections", "-r", "-p", "AuthorInfo"],
+            "args": ["projections", "-r", "-p", "AccountInfo"],
             "cwd": "${workspaceFolder}/Api",
             "stopAtEntry": false,
             "env": {

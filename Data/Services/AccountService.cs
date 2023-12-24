@@ -180,16 +180,19 @@ $@"TRUE = ALL(
         var id = existing?.Id ?? Hrib.Create().Value;
         var associated = new ExternalAccountAssociated(
             AccountId: id,
-            CreationMethod: CreationMethod.Api,
-            EmailAddress: emailClaim.Value,
-            PreferredCulture: Const.InvariantCultureCode,
             IdentityProvider: identityProvider,
             Name: name,
             Uco: uco);
 
         if (existing is null)
         {
-            db.Events.StartStream<AccountInfo>(id, associated);
+            var created = new AccountCreated(
+                AccountId: id,
+                CreationMethod: CreationMethod.Api,
+                EmailAddress: emailClaim.Value,
+                PreferredCulture: Const.InvariantCultureCode
+            );
+            db.Events.StartStream<AccountInfo>(id, created, associated);
         }
         else
         {

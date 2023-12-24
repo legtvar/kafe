@@ -5,6 +5,7 @@ using Marten.Schema;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.ComponentModel.DataAnnotations;
 
 namespace Kafe.Data.Aggregates;
 
@@ -20,6 +21,7 @@ public record AccountInfo(
     string PreferredCulture,
     string? Name,
     string? Uco,
+    string? Phone,
     string? SecurityStamp,
     DateTimeOffset RefreshedOn,
     ImmutableDictionary<string, Permission>? Permissions
@@ -31,18 +33,19 @@ public class AccountInfoProjection : SingleStreamProjection<AccountInfo>
     {
     }
 
-    public static AccountInfo Create(TemporaryAccountCreated e)
+    public static AccountInfo Create(AccountCreated e)
     {
         return new(
             Id: e.AccountId,
             CreationMethod: e.CreationMethod,
-            Kind: AccountKind.Temporary,
+            Kind: AccountKind.Unknown,
             IdentityProvider: null,
             EmailAddress: e.EmailAddress,
             PreferredCulture: e.PreferredCulture,
             SecurityStamp: null,
             Name: null,
             Uco: null,
+            Phone: null,
             RefreshedOn: default,
             Permissions: ImmutableDictionary.CreateRange(new[]
             {
@@ -50,35 +53,13 @@ public class AccountInfoProjection : SingleStreamProjection<AccountInfo>
             })
         );
     }
-    
-    public static AccountInfo Create(IEvent<ExternalAccountAssociated> e)
-    {
-        return new(
-            Id: e.Data.AccountId,
-            CreationMethod: e.Data.CreationMethod,
-            Kind: AccountKind.External,
-            IdentityProvider: e.Data.IdentityProvider,
-            EmailAddress: e.Data.EmailAddress,
-            PreferredCulture: e.Data.PreferredCulture,
-            SecurityStamp: null,
-            Name: e.Data.Name,
-            Uco: e.Data.Uco,
-            RefreshedOn: e.Timestamp,
-            Permissions: ImmutableDictionary.CreateRange(new[]
-            {
-                new KeyValuePair<string, Permission>(e.Data.AccountId, Permission.Read | Permission.Write)
-            })
-        );
-    }
-    
+
     public AccountInfo Apply(IEvent<ExternalAccountAssociated> e, AccountInfo a)
     {
         return a with
         {
             Kind = AccountKind.External,
             IdentityProvider = e.Data.IdentityProvider,
-            EmailAddress = e.Data.EmailAddress,
-            PreferredCulture = e.Data.PreferredCulture,
             SecurityStamp = null,
             Name = e.Data.Name,
             Uco = e.Data.Uco,
@@ -106,11 +87,14 @@ public class AccountInfoProjection : SingleStreamProjection<AccountInfo>
     //    };
     //}
 
-    public AccountInfo Apply(TemporaryAccountInfoChanged e, AccountInfo a)
+    public AccountInfo Apply(AccountInfoChanged e, AccountInfo a)
     {
         return a with
         {
-            PreferredCulture = e.PreferredCulture ?? a.PreferredCulture
+            PreferredCulture = e.PreferredCulture ?? a.PreferredCulture,
+            Name = e.Name ?? a.Name,
+            Phone = e.Phone ?? a.Phone,
+            Uco = e.Uco ?? a.Uco
         };
     }
 

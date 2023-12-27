@@ -11,7 +11,6 @@ using Marten;
 using Marten.Linq;
 using Marten.Linq.MatchesSql;
 using Microsoft.Extensions.Logging;
-using Remotion.Linq.Parsing.ExpressionVisitors.Transformation.PredefinedTransformations;
 
 namespace Kafe.Data.Services;
 
@@ -85,7 +84,7 @@ public class MigrationService
         throw new NotImplementedException();
     }
 
-    public record AuthorMigrationInfo(
+    public record AuthorMigrationOrder(
         Hrib? ExistingId,
         string? OriginalId,
         string? OriginalStorageName,
@@ -95,19 +94,19 @@ public class MigrationService
         string? Phone
     );
 
-    public async Task<AuthorInfo> GetOrAddAuthor(AuthorMigrationInfo info, CancellationToken token = default)
+    public async Task<AuthorInfo> GetOrAddAuthor(AuthorMigrationOrder order, CancellationToken token = default)
     {
         using var scope = logger.BeginScope("Migration of author '{}' ({}:{})",
-            info.Name,
-            info.OriginalStorageName,
-            info.OriginalId);
+            order.Name,
+            order.OriginalStorageName,
+            order.OriginalId);
 
         logger.LogInformation("Started");
 
         var existingMigration = await FindExistingMigration(
             typeof(AuthorInfo),
-            info.OriginalId,
-            info.OriginalStorageName,
+            order.OriginalId,
+            order.OriginalStorageName,
             token);
 
         AuthorInfo? existing = null;
@@ -119,33 +118,17 @@ public class MigrationService
                 existing is null ? "Failed" : "Succeeded");
         }
 
-        if (existing is null && info.ExistingId is not null)
+        if (existing is null && order.ExistingId is not null)
         {
-            existing = await authorService.Load(info.ExistingId, token);
+            existing = await authorService.Load(order.ExistingId, token);
             logger.LogInformation(
                 "Looking up by ExistingId: {}",
                 existing is null ? "Failed" : "Succeeded");
         }
 
-        if (existing is null && !string.IsNullOrEmpty(info.Uco))
+        if (existing is null && !string.IsNullOrEmpty(order.Email))
         {
-            var byUco = await authorService.List(new(Uco: info.Uco), token);
-            existing = byUco.FirstOrDefault();
-            logger.LogInformation(
-                "Looking up by Uco: {}",
-                existing is null ? "Failed" : "Succeeded");
-            if (byUco.Length > 1)
-            {
-                logger.LogWarning(
-                    "Found multiple authors with Uco '{}'. Manual adjustment recommended. Authors: {}",
-                    info.Uco,
-                    byUco.Select(a => a.Id));
-            }
-        }
-        
-        if (existing is null && !string.IsNullOrEmpty(info.Email))
-        {
-            var byEmail = await authorService.List(new(Email: info.Email), token);
+            var byEmail = await authorService.List(new(Email: order.Email), token);
             existing = byEmail.FirstOrDefault();
             logger.LogInformation(
                 "Looking up by Email: {}",
@@ -154,47 +137,40 @@ public class MigrationService
             {
                 logger.LogWarning(
                     "Found multiple authors with email '{}'. Manual adjustment recommended. Authors: {}",
-                    info.Email,
+                    order.Email,
                     byEmail.Select(a => a.Id));
             }
         }
-        
-        if (existing is null && !string.IsNullOrEmpty(info.Phone))
+
+        if (existing is null && !string.IsNullOrEmpty(order.Uco))
         {
-            var byPhone = await authorService.List(new(Phone: info.Phone), token);
-            existing = byPhone.FirstOrDefault();
+            var byUco = await authorService.List(new(Uco: order.Uco), token);
+            existing = byUco.FirstOrDefault();
             logger.LogInformation(
-                "Looking up by Phone: {}",
+                "Looking up by Uco: {}",
                 existing is null ? "Failed" : "Succeeded");
-            if (byPhone.Length > 1)
+            if (byUco.Length > 1)
             {
                 logger.LogWarning(
-                    "Found multiple authors with phone '{}'. Manual adjustment recommended. Authors: {}",
-                    info.Phone,
-                    byPhone.Select(a => a.Id));
-            }
-        }
-        
-        if (existing is null && !string.IsNullOrEmpty(info.Name))
-        {
-            var byPhone = await authorService.List(new(Name: info.Name), token);
-            existing = byPhone.FirstOrDefault();
-            logger.LogInformation(
-                "Looking up by Phone: {}",
-                existing is null ? "Failed" : "Succeeded");
-            if (byPhone.Length > 1)
-            {
-                logger.LogWarning(
-                    "Found multiple authors with phone '{}'. Manual adjustment recommended. Authors: {}",
-                    info.Phone,
-                    byPhone.Select(a => a.Id));
+                    "Found multiple authors with Uco '{}'. Manual adjustment recommended. Authors: {}",
+                    order.Uco,
+                    byUco.Select(a => a.Id));
             }
         }
 
-        throw new NotImplementedException();
+        if (existing is null)
+        {
+            return await authorService.Create(AuthorInfo.Invalid with
+            {
+                Name = order.Name,
+                Email = order.Email,
+                Uco = order.Uco,
+                Phone = order.Phone
+            }, token);
+        }
     }
 
-    public record ProjectGroupMigrationInfo(
+    public record ProjectGroupMigrationOrder(
         Hrib? ExistingId,
         string? OriginalId,
         string? OriginalStorageName,
@@ -204,13 +180,13 @@ public class MigrationService
     );
 
     public Task<ProjectGroupInfo> GetOrAddProjectGroup(
-        ProjectGroupMigrationInfo info,
+        ProjectGroupMigrationOrder order,
         CancellationToken token = default)
     {
         throw new NotImplementedException();
     }
 
-    public record ProjectMigrationInfo(
+    public record ProjectMigrationOrder(
         Hrib? ExistingId,
         string? OriginalId,
         string? OriginalStorageName,
@@ -223,13 +199,13 @@ public class MigrationService
     );
 
     public Task<ProjectInfo> GetOrAddProject(
-        ProjectMigrationInfo info,
+        ProjectMigrationOrder order,
         CancellationToken token = default)
     {
         throw new NotImplementedException();
     }
 
-    public record VideoMigrationInfo(
+    public record VideoMigrationOrder(
         Hrib? ExistingArtifactId,
         Hrib? ExistingShardId,
         string? OriginalId,
@@ -241,13 +217,13 @@ public class MigrationService
     );
 
     public Task<(ArtifactInfo artifact, VideoShardInfo videoShard)> GetOrAddVideoArtifact(
-        VideoMigrationInfo info,
+        VideoMigrationOrder order,
         CancellationToken token = default)
     {
         throw new NotImplementedException();
     }
 
-    public record PlaylistMigrationInfo(
+    public record PlaylistMigrationOrder(
         Hrib? ExistingId,
         string? OriginalId,
         string? OriginalStorageName,
@@ -256,7 +232,7 @@ public class MigrationService
         ImmutableArray<Hrib>? Videos
     );
 
-    public Task<PlaylistInfo> GetOrAddPlaylist(PlaylistMigrationInfo info, CancellationToken token = default)
+    public Task<PlaylistInfo> GetOrAddPlaylist(PlaylistMigrationOrder order, CancellationToken token = default)
     {
         throw new NotImplementedException();
     }

@@ -148,20 +148,28 @@ $@"TRUE = ALL(
     /// Gives the account the specified capabilities.
     /// </summary>
     public async Task AddPermissions(
-        Hrib id,
+        Hrib accountId,
         IEnumerable<(string id, Permission permission)> permissions,
         CancellationToken token = default)
     {
         // TODO: Find a cheaper way of knowing that an account exists.
-        var account = await Load(id, token);
+        var account = await Load(accountId, token);
         if (account is null)
         {
-            throw new ArgumentOutOfRangeException(nameof(id));
+            throw new ArgumentOutOfRangeException(nameof(accountId));
         }
 
         var eventStream = await db.Events.FetchForExclusiveWriting<AccountInfo>(account.Id, token);
         eventStream.AppendMany(permissions.Select(c => new AccountPermissionSet(account.Id, c.id, c.permission)));
         await db.SaveChangesAsync(token);
+    }
+
+    public Task AddPermissions(
+        Hrib accountId,
+        CancellationToken token = default,
+        params (string id, Permission permission)[] permissions)
+    {
+        return AddPermissions(accountId, permissions, token);
     }
 
     public async Task<Err<AccountInfo>> AssociateExternalAccount(

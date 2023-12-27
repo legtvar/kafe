@@ -21,3 +21,5 @@ layout: layouts/list.tsx
 ```
 
 This is a very minimalistic [_architecture design record_](https://github.com/joelparkerhenderson/architecture-decision-record).
+
+> Started on 2023-12-15. Some entries were reconstructed from git commits and my memory.

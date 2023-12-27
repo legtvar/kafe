@@ -1,4 +1,5 @@
-﻿using Kafe.Data.Aggregates;
+﻿using Kafe.Common;
+using Kafe.Data.Aggregates;
 using Kafe.Data.Events;
 using Marten;
 using Marten.Linq;
@@ -26,50 +27,49 @@ public class AuthorService
         this.accountService = accountService;
     }
 
-    public async Task<AuthorInfo> Create(
-        string name,
-        LocalizedString? bio,
-        string? uco,
-        string? email,
-        string? phone,
-        Hrib? ownerId,
+    public async Task<Err<AuthorInfo>> Create(
+        AuthorInfo @new,
         CancellationToken token = default)
     {
+        if (!Hrib.TryParse(@new.Id, out var id, out var error))
+        {
+            return new Error(error);
+        }
+
+        if (id == Hrib.Invalid)
+        {
+            id = Hrib.Create();
+        }
+
         var created = new AuthorCreated(
-            AuthorId: Hrib.Create().Value,
+            AuthorId: id.Value,
             CreationMethod: CreationMethod.Api,
-            Name: name);
+            Name: @new.Name);
         db.Events.StartStream<AuthorInfo>(created.AuthorId, created);
-        if (!string.IsNullOrEmpty(uco)
-            || LocalizedString.IsNullOrEmpty(bio)
-            || !string.IsNullOrEmpty(email)
-            || !string.IsNullOrEmpty(phone))
+
+        if (!string.IsNullOrEmpty(@new.Uco)
+            || LocalizedString.IsNullOrEmpty(@new.Bio)
+            || !string.IsNullOrEmpty(@new.Email)
+            || !string.IsNullOrEmpty(@new.Phone)
+            || @new.GlobalPermissions != Permission.None
+            || !string.IsNullOrEmpty(@new.Name))
         {
             var infoChanged = new AuthorInfoChanged(
                 AuthorId: created.AuthorId,
-                Bio: bio,
-                Uco: uco,
-                Email: email,
-                Phone: phone);
+                Name: @new.Name,
+                GlobalPermissions: @new.GlobalPermissions,
+                Bio: @new.Bio,
+                Uco: @new.Uco,
+                Email: @new.Email,
+                Phone: @new.Phone);
             db.Events.Append(created.AuthorId, infoChanged);
         }
+
         await db.SaveChangesAsync(token);
 
-        if (ownerId is not null)
-        {
-            await accountService.AddPermissions(
-                ownerId,
-                new[] { (created.AuthorId, Permission.All) },
-                token);
-        }
-
-        var author = await db.Events.AggregateStreamAsync<AuthorInfo>(created.AuthorId, token: token);
-        if (author is null)
-        {
-            throw new InvalidOperationException($"Could not persist an author with id '{created.AuthorId}'.");
-        }
-
-        return author;
+        // NB: perform a live aggregation because the DB might still have outdated data
+        return await db.Events.AggregateStreamAsync<AuthorInfo>(created.AuthorId, token: token)
+            ?? throw new InvalidOperationException($"Could not persist an author with id '{created.AuthorId}'.");
     }
 
     public record AuthorFilter(

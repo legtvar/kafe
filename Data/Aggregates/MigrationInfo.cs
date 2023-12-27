@@ -9,11 +9,21 @@ namespace Kafe.Data.Aggregates;
 public record MigrationInfo(
     [Hrib] string Id,
     [Hrib] string EntityId,
-    string? OriginalStorageName,
+    string OriginalStorageName,
     string OriginalId,
     ImmutableDictionary<string, string> MigrationMetadata,
     DateTimeOffset CreatedOn,
-    DateTimeOffset ChangedOn);
+    DateTimeOffset ChangedOn)
+{
+    public static readonly MigrationInfo Invalid = new(
+        Id: Hrib.InvalidValue,
+        EntityId: string.Empty,
+        OriginalStorageName: string.Empty,
+        OriginalId: string.Empty,
+        MigrationMetadata: null!,
+        CreatedOn: default,
+        ChangedOn: default);
+}
 
 public class MigrationInfoProjection : SingleStreamProjection<MigrationInfo>
 {

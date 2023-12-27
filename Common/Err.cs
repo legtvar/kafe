@@ -57,14 +57,25 @@ public readonly record struct Err<T>
     {
         return new Err<T>(error);
     }
-    
+
+    public static implicit operator Err<T>(ImmutableArray<Error> errors)
+    {
+        return new Err<T>(errors);
+    }
+
     public static implicit operator Err<T>(Exception exception)
     {
         return new Err<T>(exception);
     }
 
-    public static implicit operator T?(Err<T> err)
+    // NB: This is explicit to force people to unwrap their errors properly.
+    public static explicit operator T?(Err<T> err)
     {
         return err.HasErrors ? default : err.value;
+    }
+
+    public KafeErrorException AsException()
+    {
+        return new KafeErrorException(Errors);
     }
 }

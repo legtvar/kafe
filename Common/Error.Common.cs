@@ -5,6 +5,7 @@ public readonly partial record struct Error
     public const string NotFoundId = nameof(NotFound);
     public const string BadHribId = nameof(BadHrib);
     public const string MissingValueId = nameof(MissingValue);
+    public const string UnmodifiedId = nameof(Unmodified);
 
     public static Error NotFound(string? message = null)
     {
@@ -25,5 +26,10 @@ public readonly partial record struct Error
     public static Error MissingValue(string what)
     {
         return new Error(MissingValueId, $"Value for '{what}' is missing.");
+    }
+    
+    public static Error Unmodified(string what)
+    {
+        return new Error(UnmodifiedId, $"No changes were made to '{what}'.");
     }
 }

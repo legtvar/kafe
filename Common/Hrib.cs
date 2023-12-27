@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json.Serialization;
+using Kafe.Common;
 
 namespace Kafe;
 
@@ -97,6 +98,16 @@ public record Hrib
 
         hrib = new Hrib(value);
         return true;
+    }
+
+    public static Err<Hrib> Parse(string? value)
+    {
+        if (TryParse(value, out var hrib, out var error))
+        {
+            return hrib;
+        }
+        
+        return new Error(Error.BadHribId, error);
     }
 
     public override string ToString()

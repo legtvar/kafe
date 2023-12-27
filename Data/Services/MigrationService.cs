@@ -5,11 +5,14 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Kafe.Common;
 using Kafe.Data.Aggregates;
+using Kafe.Data.Events;
 using Kafe.Media;
 using Marten;
 using Marten.Linq;
 using Marten.Linq.MatchesSql;
+using Marten.Linq.SoftDeletes;
 using Microsoft.Extensions.Logging;
 
 namespace Kafe.Data.Services;
@@ -28,6 +31,61 @@ public class MigrationService
         this.db = db;
         this.authorService = authorService;
         this.logger = logger;
+    }
+
+    public async Task<Err<MigrationInfo>> Create(MigrationInfo @new, CancellationToken token = default)
+    {
+        var parseResult = Hrib.Parse(@new.Id);
+        if (parseResult.HasErrors)
+        {
+            return parseResult.Errors;
+        }
+
+        var id = parseResult.Value;
+        if (id == Hrib.Invalid)
+        {
+            id = Hrib.Create();
+        }
+
+        var created = new MigrationUndergone(
+            MigrationId: id.Value,
+            EntityId: @new.EntityId,
+            OriginalStorageName: @new.OriginalStorageName,
+            OriginalId: @new.OriginalId,
+            MigrationMetadata: @new.MigrationMetadata);
+        db.Events.StartStream<MigrationInfo>(id.Value, created);
+        await db.SaveChangesAsync(token);
+
+        return await db.Events.AggregateStreamAsync<MigrationInfo>(id.Value, token: token)
+            ?? throw new InvalidOperationException($"Could not persist an author with id '{created.MigrationId}'.");
+    }
+
+    public async Task<Err<MigrationInfo>> Edit(MigrationInfo modified, CancellationToken token = default)
+    {
+        var @old = await Load(modified.Id, token);
+        if (@old is null)
+        {
+            return Error.NotFound(modified.Id);
+        }
+
+        if (@old.EntityId != modified.EntityId
+            || @old.OriginalStorageName != modified.OriginalStorageName
+            || @old.OriginalId != modified.OriginalId
+            || !@old.MigrationMetadata.SequenceEqual(modified.MigrationMetadata))
+        {
+            var amended = new MigrationAmended(
+                MigrationId: @old.Id,
+                OriginalStorageName: @old.OriginalStorageName,
+                OriginalId: @old.OriginalId,
+                MigrationMetadata: @old.MigrationMetadata);
+            db.Events.Append(@old.Id, amended);
+            await db.SaveChangesAsync(token);
+            return await db.Events.AggregateStreamAsync<MigrationInfo>(@old.Id, token: token)
+                ?? throw new InvalidOperationException($"The migration is no longer present in the database. "
+                    + "This should never happend.");
+        }
+
+        return Error.Unmodified($"migration {modified.Id}");
     }
 
     public async Task<MigrationInfo?> Load(Hrib id, CancellationToken token = default)
@@ -86,15 +144,18 @@ public class MigrationService
 
     public record AuthorMigrationOrder(
         Hrib? ExistingId,
-        string? OriginalId,
-        string? OriginalStorageName,
+        string OriginalId,
+        string OriginalStorageName,
+        ImmutableDictionary<string, string>? MigrationMetadata,
         string? Email,
-        string? Name,
+        string Name,
         string? Uco,
         string? Phone
     );
 
-    public async Task<AuthorInfo> GetOrAddAuthor(AuthorMigrationOrder order, CancellationToken token = default)
+    public async Task<(MigrationInfo migration, AuthorInfo author)> GetOrAddAuthor(
+        AuthorMigrationOrder order,
+        CancellationToken token = default)
     {
         using var scope = logger.BeginScope("Migration of author '{}' ({}:{})",
             order.Name,
@@ -109,30 +170,30 @@ public class MigrationService
             order.OriginalStorageName,
             token);
 
-        AuthorInfo? existing = null;
-        if (existing is null && existingMigration is not null)
+        AuthorInfo? entity = null;
+        if (entity is null && existingMigration is not null)
         {
-            existing = await authorService.Load(existingMigration.EntityId, token);
+            entity = await authorService.Load(existingMigration.EntityId, token);
             logger.LogInformation(
                 "Looking up by existing migration: {}",
-                existing is null ? "Failed" : "Succeeded");
+                entity is null ? "Failed" : "Succeeded");
         }
 
-        if (existing is null && order.ExistingId is not null)
+        if (entity is null && order.ExistingId is not null)
         {
-            existing = await authorService.Load(order.ExistingId, token);
+            entity = await authorService.Load(order.ExistingId, token);
             logger.LogInformation(
                 "Looking up by ExistingId: {}",
-                existing is null ? "Failed" : "Succeeded");
+                entity is null ? "Failed" : "Succeeded");
         }
 
-        if (existing is null && !string.IsNullOrEmpty(order.Email))
+        if (entity is null && !string.IsNullOrEmpty(order.Email))
         {
             var byEmail = await authorService.List(new(Email: order.Email), token);
-            existing = byEmail.FirstOrDefault();
+            entity = byEmail.FirstOrDefault();
             logger.LogInformation(
                 "Looking up by Email: {}",
-                existing is null ? "Failed" : "Succeeded");
+                entity is null ? "Failed" : "Succeeded");
             if (byEmail.Length > 1)
             {
                 logger.LogWarning(
@@ -142,13 +203,13 @@ public class MigrationService
             }
         }
 
-        if (existing is null && !string.IsNullOrEmpty(order.Uco))
+        if (entity is null && !string.IsNullOrEmpty(order.Uco))
         {
             var byUco = await authorService.List(new(Uco: order.Uco), token);
-            existing = byUco.FirstOrDefault();
+            entity = byUco.FirstOrDefault();
             logger.LogInformation(
                 "Looking up by Uco: {}",
-                existing is null ? "Failed" : "Succeeded");
+                entity is null ? "Failed" : "Succeeded");
             if (byUco.Length > 1)
             {
                 logger.LogWarning(
@@ -158,16 +219,58 @@ public class MigrationService
             }
         }
 
-        if (existing is null)
+        if (entity is null)
         {
-            return await authorService.Create(AuthorInfo.Invalid with
+            var createResult = await authorService.Create(AuthorInfo.Invalid with
             {
                 Name = order.Name,
                 Email = order.Email,
                 Uco = order.Uco,
                 Phone = order.Phone
             }, token);
+            if (createResult.HasErrors)
+            {
+                throw createResult.AsException();
+            }
+
+            entity = createResult.Value;
         }
+        else
+        {
+            entity = entity with
+            {
+                Name = order.Name ?? entity.Name,
+                Uco = order.Uco ?? entity.Uco,
+                Email = order.Email ?? entity.Email,
+                Phone = order.Phone ?? entity.Phone
+            };
+
+            var editResult = await authorService.Edit(entity, token);
+            if (editResult.HasErrors && editResult.Errors.Any(e => e.Id != Error.UnmodifiedId))
+            {
+                throw editResult.AsException();
+            }
+
+            entity = editResult.Value;
+        }
+
+        var newOrModifiedMigration = (existingMigration ?? MigrationInfo.Invalid) with
+        {
+            EntityId = entity.Id,
+            OriginalId = order.OriginalId,
+            OriginalStorageName = order.OriginalStorageName,
+            MigrationMetadata = order.MigrationMetadata ?? ImmutableDictionary<string, string>.Empty
+        };
+
+        var migrationResult = existingMigration is null
+            ? await Create(newOrModifiedMigration, token)
+            : await Edit(newOrModifiedMigration, token);
+        if (migrationResult.HasErrors)
+        {
+            throw migrationResult.AsException();
+        }
+
+        return (migrationResult.Value, entity);
     }
 
     public record ProjectGroupMigrationOrder(

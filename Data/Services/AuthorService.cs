@@ -72,6 +72,40 @@ public class AuthorService
             ?? throw new InvalidOperationException($"Could not persist an author with id '{created.AuthorId}'.");
     }
 
+    public async Task<Err<AuthorInfo>> Edit(AuthorInfo modified, CancellationToken token = default)
+    {
+        var @old = await Load(modified.Id, token);
+        if (@old is null)
+        {
+            return Error.NotFound(modified.Id);
+        }
+        
+        if (@old.Uco != modified.Uco
+            || @old.Bio != modified.Bio
+            || @old.Email != modified.Email
+            || @old.Phone != modified.Phone
+            || @old.GlobalPermissions != modified.GlobalPermissions
+            || @old.Name != modified.Name)
+        {
+            var infoChanged = new AuthorInfoChanged(
+                AuthorId: @old.Id,
+                Name: modified.Name,
+                GlobalPermissions: modified.GlobalPermissions,
+                Bio: modified.Bio,
+                Uco: modified.Uco,
+                Email: modified.Email,
+                Phone: modified.Phone
+            );
+            db.Events.Append(@old.Id, infoChanged);
+            await db.SaveChangesAsync(token);
+            return await db.Events.AggregateStreamAsync<AuthorInfo>(infoChanged.AuthorId, token: token)
+                ?? throw new InvalidOperationException($"The author is no longer present in the database. "
+                    + "This should never happen.");
+        }
+
+        return Error.Unmodified($"author {modified.Id}");
+    }
+
     public record AuthorFilter(
         Hrib? AccessingAccountId = null,
         string? Name = null,

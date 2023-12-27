@@ -109,46 +109,46 @@ public partial class ProjectService
         await db.SaveChangesAsync();
     }
 
-    public async Task<Err<bool>> Edit(ProjectInfo @new, CancellationToken token = default)
+    public async Task<Err<bool>> Edit(ProjectInfo modified, CancellationToken token = default)
     {
-        var @old = await Load(@new.Id, token);
+        var @old = await Load(modified.Id, token);
         if (@old is null)
         {
-            return Error.NotFound(@new.Id);
+            return Error.NotFound(modified.Id);
         }
 
-        if (LocalizedString.IsTooLong(@new.Name, NameMaxLength))
+        if (LocalizedString.IsTooLong(modified.Name, NameMaxLength))
         {
             return new Error("Name is too long.");
         }
 
-        if (LocalizedString.IsTooLong(@new.Genre, GenreMaxLength))
+        if (LocalizedString.IsTooLong(modified.Genre, GenreMaxLength))
         {
             return new Error("Genre is too long.");
         }
 
-        if (LocalizedString.IsTooLong(@new.Description, DescriptionMaxLength))
+        if (LocalizedString.IsTooLong(modified.Description, DescriptionMaxLength))
         {
             return new Error("Description is too long.");
         }
 
-        var eventStream = await db.Events.FetchForExclusiveWriting<ProjectInfo>(@new.Id, token);
+        var eventStream = await db.Events.FetchForExclusiveWriting<ProjectInfo>(modified.Id, token);
 
         var infoChanged = new ProjectInfoChanged(
-            ProjectId: @new.Id,
-            Name: (LocalizedString)@old.Name != @new.Name ? @new.Name : null,
-            Description: (LocalizedString?)@old.Description != @new.Description ? @new.Description : null,
-            Genre: (LocalizedString?)@old.Genre != @new.Genre ? @new.Genre : null);
+            ProjectId: modified.Id,
+            Name: (LocalizedString)@old.Name != modified.Name ? modified.Name : null,
+            Description: (LocalizedString?)@old.Description != modified.Description ? modified.Description : null,
+            Genre: (LocalizedString?)@old.Genre != modified.Genre ? modified.Genre : null);
         if (infoChanged.Name is not null || infoChanged.Description is not null || infoChanged.Genre is not null)
         {
             eventStream.AppendOne(infoChanged);
         }
 
-        var authorsRemoved = @old.Authors.Except(@new.Authors)
-            .Select(a => new ProjectAuthorRemoved(@new.Id, a.Id, a.Kind, a.Roles));
+        var authorsRemoved = @old.Authors.Except(modified.Authors)
+            .Select(a => new ProjectAuthorRemoved(modified.Id, a.Id, a.Kind, a.Roles));
         eventStream.AppendMany(authorsRemoved);
-        var authorsAdded = @new.Authors.Except(@old.Authors)
-            .Select(a => new ProjectAuthorAdded(@new.Id, a.Id, a.Kind, a.Roles));
+        var authorsAdded = modified.Authors.Except(@old.Authors)
+            .Select(a => new ProjectAuthorAdded(modified.Id, a.Id, a.Kind, a.Roles));
         eventStream.AppendMany(authorsAdded);
 
         var artifactsRemoved = @old.Artifacts.Except(@new.Artifacts)

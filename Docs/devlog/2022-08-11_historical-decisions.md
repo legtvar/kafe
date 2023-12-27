@@ -33,17 +33,19 @@ This session is only temporary and must be refreshed by another email to the sam
 
 UPDATE (2023-12-24): Alternatively the user can log in through an external identity provider (e.g. MUNI login).
 
-## `Error` & `Err<T>`
-
-To (eventually) avoid leaking .NET abstraction through the API (for example by the `SemanticExceptionFilter`), we use the `Error` and `Err<T>`. `Err<T>` can be either `T` or one or more `Error`s.
-These are then passed out of a method through its return value.
-This forces the caller to deal with the errors that can occur or pass them upwards.
-The API should send then the error(s) along with the proper http code.
-Eventually we should to remove the `SemanticExceptionFilter` and treat all exceptions as internal server errors (500).
-
 ## `LocalizedString`
 
 Our means of persisting for example project names and descriptions in multiple languages.
 All of the language mutations available are saved in an `ImmutableDictonary` and serialized by Marten as a JSON object.
 The fallback, invariant mutation is always under "iv".
 The others are under their respective two-letter code (e.g. "cs", "en", "sk", etc.).
+
+## Media metadata
+
+The `Media` project integrates our abstractions with libraries that work with media.
+We use FFmpeg to get video metadata and convert videos to other formats and resolutions.
+FFMpeg must be installed on the machine where KAFE runs.
+We **don't** pack our own and access the one available in `Path` through the FFMpegCore wrapper instead.
+
+For images we use _ImageSharp_, which is pretty great.
+**However, if you're reading this and want to use KAFE commercially, you should buy ImageSharp's [commercial license](https://sixlabors.com/pricing/) or not use it all.**

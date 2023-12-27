@@ -5,7 +5,6 @@ using Marten.Schema;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.ComponentModel.DataAnnotations;
 
 namespace Kafe.Data.Aggregates;
 
@@ -24,7 +23,8 @@ public record AccountInfo(
     string? Phone,
     string? SecurityStamp,
     DateTimeOffset RefreshedOn,
-    ImmutableDictionary<string, Permission>? Permissions
+    ImmutableDictionary<string, Permission> Permissions,
+    ImmutableArray<string> RoleIds
 ) : IEntity;
 
 public class AccountInfoProjection : SingleStreamProjection<AccountInfo>
@@ -50,7 +50,8 @@ public class AccountInfoProjection : SingleStreamProjection<AccountInfo>
             Permissions: ImmutableDictionary.CreateRange(new[]
             {
                 new KeyValuePair<string, Permission>(e.AccountId, Permission.Read | Permission.Write)
-            })
+            }),
+            RoleIds: ImmutableArray<string>.Empty
         );
     }
 
@@ -121,6 +122,22 @@ public class AccountInfoProjection : SingleStreamProjection<AccountInfo>
         return a with
         {
             Permissions = a.Permissions.Remove(e.EntityId)
+        };
+    }
+
+    public AccountInfo Apply(AccountRoleSet e, AccountInfo a)
+    {
+        return a with
+        {
+            RoleIds = a.RoleIds.Contains(e.RoleId) ? a.RoleIds : a.RoleIds.Add(e.RoleId)
+        };
+    }
+
+    public AccountInfo Apply(AccountRoleUnset e, AccountInfo a)
+    {
+        return a with
+        {
+            RoleIds = a.RoleIds.Contains(e.RoleId) ? a.RoleIds.Remove(e.RoleId) : a.RoleIds
         };
     }
 }

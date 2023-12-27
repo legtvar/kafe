@@ -72,6 +72,8 @@ public static class ServiceCollectionExtensions
             mo.Projections.Add<VideoConversionInfoProjection>(ProjectionLifecycle.Inline);
             mo.Projections.Add<ArtifactDetailProjection>(ProjectionLifecycle.Inline);
             mo.Projections.Add<AccountInfoProjection>(ProjectionLifecycle.Inline);
+            mo.Projections.Add<OrganizationInfoProjection>(ProjectionLifecycle.Inline);
+            mo.Projections.Add<RoleInfoProjection>(ProjectionLifecycle.Inline);
             mo.Events.Upcast<AccountCapabilityAddedUpcaster>();
             mo.Events.Upcast<AccountCapabilityRemovedUpcaster>();
             mo.Events.Upcast<PlaylistVideoAddedUpcaster>();
@@ -102,6 +104,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ShardService>();
         services.AddScoped<PlaylistService>();
         services.AddScoped<EntityService>();
+        services.AddScoped<MigrationService>();
 
         services.AddOptions<StorageOptions>()
             .BindConfiguration("Storage")

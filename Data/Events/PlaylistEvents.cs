@@ -2,11 +2,13 @@ using System.Collections.Immutable;
 
 namespace Kafe.Data.Events;
 
-public record PlaylistCreated(
+public record PlaylistEstablished(
     [Hrib] string PlaylistId,
     CreationMethod CreationMethod,
+    [Hrib] string OrganizationId,
     [LocalizedString] ImmutableDictionary<string, string> Name
 );
+
 public record PlaylistInfoChanged(
     [Hrib] string PlaylistId,
     [LocalizedString] ImmutableDictionary<string, string>? Name = null,

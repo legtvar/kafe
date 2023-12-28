@@ -12,7 +12,6 @@ using Kafe.Media;
 using Marten;
 using Marten.Linq;
 using Marten.Linq.MatchesSql;
-using Marten.Linq.SoftDeletes;
 using Microsoft.Extensions.Logging;
 
 namespace Kafe.Data.Services;
@@ -279,6 +278,7 @@ public class MigrationService
         string? OriginalStorageName,
         string Name,
         string? Description,
+        Hrib OrganizationId,
         bool IsLocked
     );
 
@@ -295,7 +295,7 @@ public class MigrationService
         string? OriginalStorageName,
         string Name,
         string? Description,
-        Hrib? ProjectGroupId,
+        Hrib ProjectGroupId,
         DateTimeOffset? ReleasedOn,
         bool IsLocked,
         ImmutableArray<ProjectAuthorInfo>? Authors
@@ -332,6 +332,7 @@ public class MigrationService
         string? OriginalStorageName,
         string Name,
         string? Description,
+        Hrib OrganizationId,
         ImmutableArray<Hrib>? Videos
     );
 

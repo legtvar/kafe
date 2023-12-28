@@ -8,6 +8,7 @@ namespace Kafe.Data.Aggregates;
 public record ProjectGroupInfo(
     [Hrib] string Id,
     CreationMethod CreationMethod,
+    [Hrib] string OrganizationId,
     [LocalizedString] ImmutableDictionary<string, string> Name,
     [LocalizedString] ImmutableDictionary<string, string>? Description = null,
     DateTimeOffset Deadline = default,
@@ -22,6 +23,14 @@ public record ProjectGroupInfo(
     )
     {
     }
+
+    public static readonly ProjectGroupInfo Invalid = new(
+        Id: Hrib.InvalidValue,
+        CreationMethod: CreationMethod.Unknown,
+        OrganizationId: Hrib.InvalidValue,
+        Name: null!,
+        Description: null
+    );
 }
 
 public class ProjectGroupInfoProjection : SingleStreamProjection<ProjectGroupInfo>
@@ -30,11 +39,12 @@ public class ProjectGroupInfoProjection : SingleStreamProjection<ProjectGroupInf
     {
     }
 
-    public static ProjectGroupInfo Create(ProjectGroupCreated e)
+    public static ProjectGroupInfo Create(ProjectGroupEstablished e)
     {
         return new ProjectGroupInfo(
             Id: e.ProjectGroupId,
             CreationMethod: e.CreationMethod,
+            OrganizationId: e.OrganizationId,
             Name: e.Name
         );
     }

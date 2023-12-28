@@ -8,6 +8,7 @@ namespace Kafe.Data.Aggregates;
 public record PlaylistInfo(
     [Hrib] string Id,
     CreationMethod CreationMethod,
+    [Hrib] string OrganizationId,
     [KafeType(typeof(ImmutableArray<Hrib>))] ImmutableArray<string> EntryIds,
     [LocalizedString] ImmutableDictionary<string, string> Name,
     [LocalizedString] ImmutableDictionary<string, string>? Description = null,
@@ -21,6 +22,16 @@ public record PlaylistInfo(
         LocalizedString.Empty)
     {
     }
+
+    public static readonly PlaylistInfo Invalid = new(
+        Id: Hrib.InvalidValue,
+        CreationMethod: CreationMethod.Unknown,
+        OrganizationId: Hrib.InvalidValue,
+        EntryIds: ImmutableArray<string>.Empty,
+        Name: null!,
+        Description: null,
+        GlobalPermissions: Permission.None
+    );
 }
 
 public class PlaylistInfoProjection : SingleStreamProjection<PlaylistInfo>
@@ -29,11 +40,12 @@ public class PlaylistInfoProjection : SingleStreamProjection<PlaylistInfo>
     {
     }
 
-    public static PlaylistInfo Create(PlaylistCreated e)
+    public static PlaylistInfo Create(PlaylistEstablished e)
     {
         return new PlaylistInfo(
             Id: e.PlaylistId,
             CreationMethod: e.CreationMethod,
+            OrganizationId: e.OrganizationId,
             EntryIds: ImmutableArray.Create<string>(),
             Name: e.Name
         );

@@ -23,6 +23,7 @@ public record ProjectGroupDetailDto(
 
 public record ProjectGroupCreationDto(
     LocalizedString Name,
+    Hrib OrganizationId,
     LocalizedString? Description,
     DateTimeOffset Deadline
 );

@@ -15,36 +15,65 @@ namespace Kafe.Data.Services;
 public class ProjectGroupService
 {
     private readonly IDocumentSession db;
+    private readonly OrganizationService organizationService;
 
-    public ProjectGroupService(IDocumentSession db)
+    public ProjectGroupService(
+        IDocumentSession db,
+        OrganizationService organizationService)
     {
         this.db = db;
+        this.organizationService = organizationService;
     }
 
-    public async Task<Hrib> Create(
-        LocalizedString name,
-        LocalizedString? description,
-        DateTimeOffset deadline,
-        Hrib? id = null,
+    public async Task<Err<ProjectGroupInfo>> Create(
+        ProjectGroupInfo @new,
         CancellationToken token = default)
     {
-        id ??= Hrib.Create();
-        var created = new ProjectGroupCreated(
+        var parseResult = Hrib.Parse(@new.Id);
+        if (parseResult.HasErrors)
+        {
+            return parseResult.Errors;
+        }
+
+        var organization = await organizationService.Load(@new.OrganizationId, token);
+        if (organization is null)
+        {
+            return Error.NotFound(@new.OrganizationId, "An organization");
+        }
+
+        var id = parseResult.Value;
+        if (id == Hrib.Invalid)
+        {
+            id = Hrib.Create();
+        }
+
+        var created = new ProjectGroupEstablished(
             ProjectGroupId: id.Value,
             CreationMethod: CreationMethod.Api,
-            Name: name);
+            OrganizationId: @new.OrganizationId,
+            Name: @new.Name);
+        db.Events.StartStream<ProjectGroupInfo>(id.Value, created);
 
-        var changed = new ProjectGroupInfoChanged(
-            ProjectGroupId: created.ProjectGroupId,
-            Description: description,
-            Deadline: deadline);
+        if (@new.Description is not null
+            || @new.Deadline != default)
+        {
+            var changed = new ProjectGroupInfoChanged(
+                ProjectGroupId: created.ProjectGroupId,
+                Description: @new.Description,
+                Deadline: @new.Deadline);
+            db.Events.Append(id.Value, changed);
+        }
 
-        var opened = new ProjectGroupOpened(
-            ProjectGroupId: created.ProjectGroupId);
+        if (@new.IsOpen)
+        {
+            var opened = new ProjectGroupOpened(
+                ProjectGroupId: created.ProjectGroupId);
+            db.Events.Append(id.Value, opened);
+        }
 
-        db.Events.StartStream<ProjectGroupInfo>(created.ProjectGroupId, created, changed, opened);
         await db.SaveChangesAsync(token);
-        return created.ProjectGroupId;
+        return await db.Events.AggregateStreamAsync<ProjectGroupInfo>(id.Value, token: token)
+            ?? throw new InvalidOperationException($"Could not persist a project group with id '{id.Value}'.");
     }
 
     public record ProjectGroupFilter(
@@ -87,7 +116,7 @@ public class ProjectGroupService
         return await db.LoadAsync<ProjectGroupInfo>(id.Value, token);
     }
 
-    public async Task<Err<bool>> Edit(ProjectGroupInfo @new, CancellationToken token = default)
+    public async Task<Err<ProjectGroupInfo>> Edit(ProjectGroupInfo @new, CancellationToken token = default)
     {
         var @old = await Load(@new.Id, token);
         if (@old is null)
@@ -108,15 +137,17 @@ public class ProjectGroupService
         {
             eventStream.AppendOne(infoChanged);
         }
-        
+
         if (@old.IsOpen != @new.IsOpen)
         {
             eventStream.AppendOne(@new.IsOpen
                 ? new ProjectGroupOpened(@new.Id)
                 : new ProjectGroupClosed(@new.Id));
         }
-        
+
         await db.SaveChangesAsync(token);
-        return true;
+        return await db.Events.AggregateStreamAsync<ProjectGroupInfo>(@old.Id, token: token)
+            ?? throw new InvalidOperationException($"The project group is no longer present in the database. "
+                + "This should never happen.");
     }
 }

@@ -41,17 +41,16 @@ public class PlaylistCreationEndpoint : EndpointBaseAsync
         PlaylistCreationDto dto,
         CancellationToken cancellationToken = default)
     {
-        var playlist = await playlistService.Create(
-            new PlaylistInfo(
-                Id: Hrib.InvalidValue,
-                CreationMethod: CreationMethod.Api,
-                EntryIds: dto.EntryIds ?? ImmutableArray<string>.Empty,
-                Name: dto.Name,
-                Description: dto.Description,
-                GlobalPermissions: dto.GlobalPermissions is not null
+        var playlist = await playlistService.Create(PlaylistInfo.Invalid with
+        {
+            OrganizationId = dto.OrganizationId.Value,
+            EntryIds = dto.EntryIds ?? ImmutableArray<string>.Empty,
+            Name = dto.Name,
+            Description = dto.Description,
+            GlobalPermissions = dto.GlobalPermissions is not null
                     ? TransferMaps.FromPermissionArray(dto.GlobalPermissions)
-                    : Permission.None)
-        );
+                    : Permission.None
+        }, cancellationToken);
 
         if (playlist.HasErrors)
         {

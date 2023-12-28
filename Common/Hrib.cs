@@ -39,7 +39,7 @@ public record Hrib
             return null;
         }
 
-        return hrib.Value;
+        return hrib.ToString();
     }
 
     [return: NotNullIfNotNull(nameof(value))]
@@ -106,12 +106,17 @@ public record Hrib
         {
             return hrib;
         }
-        
+
         return new Error(Error.BadHribId, error);
     }
-
     public override string ToString()
     {
+        if (Value == InvalidValue)
+        {
+            throw new InvalidOperationException(
+                "This Hrib is invalid and cannot be stringified to prevent accidental use in a database.");
+        }
+
         return Value;
     }
 }

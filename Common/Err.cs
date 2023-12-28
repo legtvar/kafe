@@ -78,4 +78,19 @@ public readonly record struct Err<T>
     {
         return new KafeErrorException(Errors);
     }
+
+    public static T Unwrap(Err<T> err)
+    {
+        if (err.HasErrors)
+        {
+            throw err.AsException();
+        }
+
+        return err.Value;
+    }
+    
+    public T Unwrap()
+    {
+        return Unwrap(this);
+    }
 }

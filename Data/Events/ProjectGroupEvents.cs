@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Immutable;
-using System.Security;
 
 namespace Kafe.Data.Events;
 
-public record ProjectGroupCreated(
+public record ProjectGroupEstablished(
     [Hrib] string ProjectGroupId,
     CreationMethod CreationMethod,
+    [Hrib] string OrganizationId,
     [LocalizedString] ImmutableDictionary<string, string> Name
 );
 

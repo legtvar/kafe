@@ -19,9 +19,14 @@ namespace Kafe.Data.Services;
 public class PlaylistService
 {
     private readonly IDocumentSession db;
-    public PlaylistService(IDocumentSession db)
+    private readonly OrganizationService organizationService;
+
+    public PlaylistService(
+        IDocumentSession db,
+        OrganizationService organizationService)
     {
         this.db = db;
+        this.organizationService = organizationService;
     }
 
     public record PlaylistFilter(
@@ -64,19 +69,28 @@ public class PlaylistService
         PlaylistInfo @new,
         CancellationToken token = default)
     {
-        if (!Hrib.TryParse(@new.Id, out var id, out var error))
+        var parseResult = Hrib.Parse(@new.Id);
+        if (parseResult.HasErrors)
         {
-            return new Error(error);
+            return parseResult.Errors;
         }
 
+        var organization = await organizationService.Load(@new.OrganizationId, token);
+        if (organization is null)
+        {
+            return Error.NotFound(@new.OrganizationId, "An organization");
+        }
+
+        var id = parseResult.Value;
         if (id == Hrib.Invalid)
         {
             id = Hrib.Create();
         }
 
-        var created = new PlaylistCreated(
+        var created = new PlaylistEstablished(
             PlaylistId: id.Value,
             CreationMethod: CreationMethod.Api,
+            OrganizationId: @new.OrganizationId,
             Name: @new.Name);
         db.Events.StartStream(id.Value, created);
 
@@ -96,7 +110,7 @@ public class PlaylistService
                 EntryIds: @new.EntryIds);
             db.Events.Append(id.Value, entriesSet);
         }
-        
+
         // TODO: Check all entries exist before putting them in
 
         await db.SaveChangesAsync(token);
@@ -105,7 +119,7 @@ public class PlaylistService
         return playlist;
     }
 
-    public async Task<Err<bool>> Edit(
+    public async Task<Err<PlaylistInfo>> Edit(
         PlaylistInfo @new,
         CancellationToken token = default)
     {
@@ -136,6 +150,8 @@ public class PlaylistService
         }
 
         await db.SaveChangesAsync(token);
-        return true;
+        return await db.Events.AggregateStreamAsync<PlaylistInfo>(@old.Id, token: token)
+            ?? throw new InvalidOperationException($"The playlist is no longer present in the database. "
+                + "This should never happen.");
     }
 }

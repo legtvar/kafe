@@ -1,6 +1,7 @@
 ﻿using Ardalis.ApiEndpoints;
 using Asp.Versioning;
 using Kafe.Api.Transfer;
+using Kafe.Data.Aggregates;
 using Kafe.Data.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -32,11 +33,13 @@ public class ProjectGroupCreationEndpoint : EndpointBaseAsync
         ProjectGroupCreationDto dto,
         CancellationToken cancellationToken = default)
     {
-        var group = await projectGroupService.Create(
-            name: dto.Name,
-            description: dto.Description,
-            deadline: dto.Deadline,
-            token: cancellationToken);
+        var group = await projectGroupService.Create(ProjectGroupInfo.Invalid with
+        {
+            Name = dto.Name,
+            OrganizationId = dto.OrganizationId.Value,
+            Description = dto.Description,
+            Deadline = dto.Deadline
+        }, cancellationToken);
         return Ok(group);
     }
 }

@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Kafe.Data.Aggregates;
 using Kafe.Data.Options;
 using Kafe.Data.Services;
 using Marten;
@@ -50,11 +51,11 @@ public class SeedData : IInitialData
             var data = await accounts.FindByEmail(account.EmailAddress, token);
             if (data is null)
             {
-                var id = (await accounts.CreateTemporaryAccount(
+                var res = await accounts.CreateOrRefreshTemporaryAccount(
                     account.EmailAddress,
                     account.PreferredCulture,
-                    token: token)).Id;
-                data = await accounts.FindByEmail(id, token);
+                    token: token);
+                data = await accounts.FindByEmail(res.Value.Id, token);
                 if (data is null)
                 {
                     logger.LogError("Seed account '{AccountEmailAddress}' could not be created.", account.EmailAddress);
@@ -97,12 +98,14 @@ public class SeedData : IInitialData
             }
 
             var deadline = group.Deadline is null ? default : DateTimeOffset.Parse(group.Deadline);
-            var id = await projectGroups.Create(
-                name: name,
-                description: null,
-                deadline: deadline,
-                id: group.Id,
-                token: token);
+            var id = await projectGroups.Create(new ProjectGroupInfo(
+                Id: group.Id,
+                CreationMethod: CreationMethod.Seed,
+                OrganizationId: group.OrganizationId,
+                Name: LocalizedString.CreateInvariant(group.Name),
+                Description: null,
+                Deadline: deadline
+            ));
             logger.LogInformation("Seed project group '{ProjectGroupId}' created.", id);
         }
     }

@@ -16,13 +16,8 @@ public record ProjectGroupInfo(
     Permission GlobalPermissions = Permission.None
 ) : IVisibleEntity
 {
-    public ProjectGroupInfo() : this(
-        Hrib.InvalidValue,
-        CreationMethod.Unknown,
-        LocalizedString.Empty
-    )
-    {
-    }
+    public ProjectGroupInfo() : this(Invalid)
+    {}
 
     public static readonly ProjectGroupInfo Invalid = new(
         Id: Hrib.InvalidValue,

@@ -88,9 +88,14 @@ public readonly record struct Err<T>
 
         return err.Value;
     }
-    
+
     public T Unwrap()
     {
         return Unwrap(this);
+    }
+
+    public T? GetValueOrDefault()
+    {
+        return HasErrors ? default : Value;
     }
 }

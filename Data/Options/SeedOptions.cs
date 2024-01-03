@@ -33,6 +33,18 @@ public record SeedOptions
         [Required]
         public string Name { get; set; } = null!;
 
+        [Hrib, Required]
+        public string OrganizationId { get; set; } = null!;
+
         public string? Deadline { get; set; }
+    }
+
+    public record SeedOrganization
+    {
+        [Hrib, Required]
+        public string Id { get; set; } = null!;
+
+        [Required]
+        public string Name { get; set; } = null!;
     }
 }

@@ -25,7 +25,24 @@ public record AccountInfo(
     DateTimeOffset RefreshedOn,
     ImmutableDictionary<string, Permission> Permissions,
     ImmutableArray<string> RoleIds
-) : IEntity;
+) : IEntity
+{
+    public static readonly AccountInfo Invalid = new(
+        Id: Hrib.InvalidValue,
+        CreationMethod: CreationMethod.Unknown,
+        Kind: AccountKind.Unknown,
+        IdentityProvider: null,
+        EmailAddress: Const.InvalidEmailAddress,
+        PreferredCulture: Const.InvariantCultureCode,
+        Name: null,
+        Uco: null,
+        Phone: null,
+        SecurityStamp: null,
+        RefreshedOn: default,
+        Permissions: null!,
+        RoleIds: default
+    );
+}
 
 public class AccountInfoProjection : SingleStreamProjection<AccountInfo>
 {

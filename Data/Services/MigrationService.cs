@@ -19,15 +19,18 @@ namespace Kafe.Data.Services;
 public class MigrationService
 {
     private readonly IDocumentSession db;
+    private readonly AccountService accountService;
     private readonly AuthorService authorService;
     private readonly ILogger<MigrationService> logger;
 
     public MigrationService(
         ILogger<MigrationService> logger,
         IDocumentSession db,
+        AccountService accountService,
         AuthorService authorService)
     {
         this.db = db;
+        this.accountService = accountService;
         this.authorService = authorService;
         this.logger = logger;
     }
@@ -139,6 +142,129 @@ public class MigrationService
     public void LogSummary()
     {
         throw new NotImplementedException();
+    }
+
+    public record AccountMigrationOrder(
+        Hrib? ExistingId,
+        string OriginalId,
+        string OriginalStorageName,
+        ImmutableDictionary<string, string>? MigrationMetadata,
+        string Email,
+        string? Name,
+        string? Uco,
+        string? Phone
+    );
+
+    public async Task<(MigrationInfo migration, AccountInfo account)> GetOrAddAccount(
+        AccountMigrationOrder order,
+        CancellationToken token = default)
+    {
+        using var scope = logger.BeginScope("Migration of account '{}' ({}:{})",
+            order.Name,
+            order.OriginalStorageName,
+            order.OriginalId);
+
+        logger.LogInformation("Started");
+
+        var existingMigration = await FindExistingMigration(
+            typeof(AccountInfo),
+            order.OriginalId,
+            order.OriginalStorageName,
+            token);
+
+        AccountInfo? entity = null;
+        if (entity is null && existingMigration is not null)
+        {
+            entity = await accountService.Load(existingMigration.EntityId, token);
+            logger.LogInformation(
+                "Looking up by existing migration: {}",
+                entity is null ? "Failed" : "Succeeded");
+        }
+
+        if (entity is null && order.ExistingId is not null)
+        {
+            entity = await accountService.Load(order.ExistingId, token);
+            logger.LogInformation(
+                "Looking up by ExistingId: {}",
+                entity is null ? "Failed" : "Succeeded");
+        }
+
+        if (entity is null)
+        {
+            entity = await accountService.FindByEmail(order.Email, token);
+            logger.LogInformation(
+                "Looking up by Email: {}",
+                entity is null ? "Failed" : "Succeeded");
+        }
+
+        if (entity is null && !string.IsNullOrEmpty(order.Uco))
+        {
+            var byUco = await accountService.List(new(Uco: order.Uco), token);
+            entity = byUco.FirstOrDefault();
+            logger.LogInformation(
+                "Looking up by Uco: {}",
+                entity is null ? "Failed" : "Succeeded");
+            if (byUco.Length > 1)
+            {
+                logger.LogWarning(
+                    "Found multiple accounts with Uco '{}'. Manual adjustment recommended. Accounts: {}",
+                    order.Uco,
+                    byUco.Select(a => a.Id));
+            }
+        }
+
+        if (entity is null)
+        {
+            var createResult = await accountService.Create(AccountInfo.Invalid with
+            {
+                Name = order.Name,
+                EmailAddress = order.Email,
+                Uco = order.Uco,
+                Phone = order.Phone
+            }, token);
+            if (createResult.HasErrors)
+            {
+                throw createResult.AsException();
+            }
+
+            entity = createResult.Value;
+        }
+        else
+        {
+            entity = entity with
+            {
+                Name = order.Name ?? entity.Name,
+                Uco = order.Uco ?? entity.Uco,
+                EmailAddress = order.Email ?? entity.EmailAddress,
+                Phone = order.Phone ?? entity.Phone
+            };
+
+            var editResult = await accountService.Edit(entity, token);
+            if (editResult.HasErrors && editResult.Errors.Any(e => e.Id != Error.UnmodifiedId))
+            {
+                throw editResult.AsException();
+            }
+
+            entity = editResult.Value;
+        }
+
+        var newOrModifiedMigration = (existingMigration ?? MigrationInfo.Invalid) with
+        {
+            EntityId = entity.Id,
+            OriginalId = order.OriginalId,
+            OriginalStorageName = order.OriginalStorageName,
+            MigrationMetadata = order.MigrationMetadata ?? ImmutableDictionary<string, string>.Empty
+        };
+
+        var migrationResult = existingMigration is null
+            ? await Create(newOrModifiedMigration, token)
+            : await Edit(newOrModifiedMigration, token);
+        if (migrationResult.HasErrors)
+        {
+            throw migrationResult.AsException();
+        }
+
+        return (migrationResult.Value, entity);
     }
 
     public record AuthorMigrationOrder(

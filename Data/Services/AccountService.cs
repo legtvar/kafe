@@ -28,9 +28,11 @@ public class AccountService
         this.db = db;
     }
 
-    public async Task<AccountInfo?> Load(Hrib id, CancellationToken token = default)
+    public async Task<AccountInfo?> Load(
+        Hrib id,
+        CancellationToken token = default)
     {
-        return await db.LoadAsync<AccountInfo>(id.Value, token: token);
+        return (await db.KafeLoadAsync<AccountInfo>(id, token: token)).GetValueOrDefault();
     }
 
     public async Task<AccountInfo?> FindByEmail(string emailAddress, CancellationToken token = default)
@@ -40,7 +42,132 @@ public class AccountService
             .SingleOrDefaultAsync(token: token);
     }
 
+    public async Task<Err<AccountInfo>> Create(AccountInfo @new, CancellationToken token = default)
+    {
+        var parseResult = Hrib.Parse(@new.Id);
+        if (parseResult.HasErrors)
+        {
+            return parseResult.Errors;
+        }
+
+        var id = parseResult.Value;
+        if (id == Hrib.Invalid)
+        {
+            id = Hrib.Create();
+        }
+
+        var created = new AccountCreated(
+            AccountId: id.ToString(),
+            CreationMethod: @new.CreationMethod,
+            EmailAddress: @new.EmailAddress,
+            PreferredCulture: @new.PreferredCulture
+        );
+        var selfPermissionSet = new AccountPermissionSet(id.Value, id.Value, Permission.All);
+        db.Events.KafeStartStream<AccountInfo>(id, created, selfPermissionSet);
+
+        switch (@new.Kind)
+        {
+            case AccountKind.Temporary:
+                RefreshTemporaryAccountCore(id.ToString());
+                break;
+            case AccountKind.External:
+                if (string.IsNullOrEmpty(@new.IdentityProvider))
+                {
+                    return Error.MissingValue(nameof(@new.IdentityProvider));
+                }
+
+                var associated = new ExternalAccountAssociated(
+                    AccountId: id.ToString(),
+                    IdentityProvider: @new.IdentityProvider,
+                    Name: @new.Name,
+                    Uco: @new.Uco);
+                db.Events.KafeAppend(id, associated);
+                break;
+        }
+
+        if (!string.IsNullOrEmpty(@new.Uco)
+            || !string.IsNullOrEmpty(@new.Name)
+            || !string.IsNullOrEmpty(@new.Phone))
+        {
+            var infoChanged = new AccountInfoChanged(
+                AccountId: id.ToString(),
+                PreferredCulture: null,
+                Name: @new.Name,
+                Uco: @new.Uco,
+                Phone: @new.Phone);
+            db.Events.KafeAppend(id, infoChanged);
+        }
+
+        await db.SaveChangesAsync(token);
+        return await db.Events.KafeAggregateRequiredStream<AccountInfo>(id, token: token);
+    }
+
+    public async Task<Err<AccountInfo>> Edit(AccountInfo modified, CancellationToken token = default)
+    {
+        var old = await Load(modified.Id, token);
+        if (old is null)
+        {
+            return Error.NotFound(modified.Id, "An account");
+        }
+
+        var infoChanged = new AccountInfoChanged(
+            AccountId: modified.Id,
+            PreferredCulture: modified.PreferredCulture != old.PreferredCulture
+                ? modified.PreferredCulture
+                : null,
+            Name: modified.Name != old.Name
+                ? modified.Name
+                : null,
+            Uco: modified.Uco != old.Uco
+                ? modified.Uco
+                : null,
+            Phone: modified.Phone != old.Phone
+                ? modified.Phone
+                : null
+        );
+
+        var hasChanged = false;
+        if (infoChanged.PreferredCulture is not null
+            || infoChanged.Name is not null
+            || infoChanged.Uco is not null
+            || infoChanged.Phone is not null)
+        {
+            hasChanged = true;
+            db.Events.KafeAppend(modified.Id, infoChanged);
+        }
+
+        var changedPermissions = modified.Permissions.Except(@old.Permissions);
+        foreach (var changedPermission in changedPermissions)
+        {
+            hasChanged = true;
+            db.Events.KafeAppend(old.Id, new AccountPermissionSet(
+                AccountId: old.Id,
+                EntityId: changedPermission.Key,
+                Permission: changedPermission.Value
+            ));
+        }
+
+        var removedPermissions = old.Permissions.Keys.Except(modified.Permissions.Keys);
+        foreach (var removedPermission in removedPermissions)
+        {
+            hasChanged = true;
+            db.Events.KafeAppend(old.Id, new AccountPermissionUnset(
+                AccountId: old.Id,
+                EntityId: removedPermission
+            ));
+        }
+
+        if (!hasChanged)
+        {
+            return Error.Unmodified(old.Id, "An account");
+        }
+
+        await db.SaveChangesAsync(token);
+        return await db.Events.KafeAggregateRequiredStream<AccountInfo>(old.Id, token: token);
+    }
+
     public record AccountFilter(
+        string? Uco = null,
         ImmutableDictionary<string, Permission>? Permissions = default
     );
 
@@ -49,6 +176,11 @@ public class AccountService
         filter ??= new AccountFilter();
 
         var query = db.Query<AccountInfo>();
+        if (filter.Uco is not null)
+        {
+            query = (IMartenQueryable<AccountInfo>)query.Where(a => a.Uco == filter.Uco);
+        }
+
         if (filter.Permissions is not null)
         {
             var permValues = string.Join(",", filter.Permissions.Select(p => $"('{p.Key}',{(int)p.Value})"));
@@ -63,7 +195,7 @@ $@"TRUE = ALL(
         return results.ToImmutableArray();
     }
 
-    public async Task<AccountInfo> CreateTemporaryAccount(
+    public async Task<Err<AccountInfo>> CreateOrRefreshTemporaryAccount(
         string emailAddress,
         string? preferredCulture,
         Hrib? id = null,
@@ -79,32 +211,32 @@ $@"TRUE = ALL(
                 nameof(emailAddress));
         }
 
-        var account = await db.Query<AccountInfo>().SingleOrDefaultAsync(a => a.EmailAddress == emailAddress, token);
+        var account = await FindByEmail(emailAddress, token);
         if (account is null)
         {
-            id ??= Hrib.Create();
-            var created = new AccountCreated(
-                AccountId: id.Value,
-                CreationMethod: CreationMethod.Api,
-                EmailAddress: emailAddress,
-                PreferredCulture: preferredCulture ?? Const.InvariantCultureCode
-            );
-            var selfPermissionSet = new AccountPermissionSet(id.Value, id.Value, Permission.All);
-            db.Events.StartStream<AccountInfo>(id.Value, created, selfPermissionSet);
+            return await Create(AccountInfo.Invalid with
+            {
+                Id = (id ?? Hrib.Create()).ToString(),
+                Kind = AccountKind.Temporary,
+                EmailAddress = emailAddress,
+                PreferredCulture = preferredCulture ?? Const.InvariantCultureCode
+            }, token);
         }
         else
         {
-            id = account.Id;
+            RefreshTemporaryAccountCore(emailAddress);
+            await db.SaveChangesAsync(token);
+            return await db.Events.KafeAggregateRequiredStream<AccountInfo>(account.Id, token: token);
         }
+    }
 
+    private void RefreshTemporaryAccountCore(Hrib id)
+    {
         var refreshed = new TemporaryAccountRefreshed(
             AccountId: id.Value,
-            SecurityStamp: account?.SecurityStamp ?? Guid.NewGuid().ToString()
+            SecurityStamp: Guid.NewGuid().ToString()
         );
         db.Events.Append(id.Value, refreshed);
-        await db.SaveChangesAsync(token);
-        return await db.Events.AggregateStreamAsync<AccountInfo>(id.Value, token: token)
-            ?? throw new InvalidOperationException($"Account '{id}' could not be live-aggregated.");
     }
 
     public async Task<bool> TryConfirmTemporaryAccount(
@@ -217,8 +349,7 @@ $@"TRUE = ALL(
         }
 
         await db.SaveChangesAsync(token);
-        return await db.Events.AggregateStreamAsync<AccountInfo>(id, token: token)
-            ?? throw new InvalidOperationException($"Account '{id}' could not be live-aggregated.");
+        return await db.Events.KafeAggregateRequiredStream<AccountInfo>(id, token: token);
     }
 
     public static bool IsValidEmailAddress(string emailAddress)

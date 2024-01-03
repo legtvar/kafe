@@ -27,9 +27,14 @@ public readonly partial record struct Error
     {
         return new Error(MissingValueId, $"Value for '{what}' is missing.");
     }
-    
+
     public static Error Unmodified(string what)
     {
         return new Error(UnmodifiedId, $"No changes were made to '{what}'.");
+    }
+
+    public static Error Unmodified(Hrib id, string description = "An entity")
+    {
+        return new Error(UnmodifiedId, $"No changed were made to {description} with identifier '{id}'.");
     }
 }

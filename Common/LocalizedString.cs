@@ -29,6 +29,8 @@ public sealed partial class LocalizedString : IEquatable<LocalizedString>
         ?? data.Values.FirstOrDefault() // return whatever is there
         ?? throw new NullReferenceException("This localized string is empty."); // give up
 
+    public string Invariant => this[Const.InvariantCultureCode];
+
     public ImmutableDictionary<string, string> GetRaw() => data;
 
     private LocalizedString(ImmutableDictionary<string, string> data)

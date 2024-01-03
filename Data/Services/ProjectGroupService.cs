@@ -76,7 +76,8 @@ public class ProjectGroupService
     }
 
     public record ProjectGroupFilter(
-        Hrib? AccessingAccountId = null
+        Hrib? AccessingAccountId = null,
+        LocalizedString? Name = null
     );
 
     public async Task<ImmutableArray<ProjectGroupInfo>> List(
@@ -91,6 +92,14 @@ public class ProjectGroupService
                     $"({SqlFunctions.GetProjectGroupPerms}(data ->> 'Id', ?) & ?) != 0",
                     filter.AccessingAccountId.ToString(),
                     (int)Permission.Read));
+        }
+
+        if (filter?.Name is not null)
+        {
+            var dictName = (ImmutableDictionary<string, string>)filter.Name;
+            query = (IMartenQueryable<ProjectGroupInfo>)query.Where(e => e.MatchesSql(
+                $"data -> {nameof(ProjectGroupInfo.Name)} @> (?)::jsonb",
+                dictName));
         }
 
         return (await query.ToListAsync(token)).ToImmutableArray();
@@ -148,5 +157,12 @@ public class ProjectGroupService
         return await db.Events.AggregateStreamAsync<ProjectGroupInfo>(@old.Id, token: token)
             ?? throw new InvalidOperationException($"The project group is no longer present in the database. "
                 + "This should never happen.");
+    }
+
+    public async Task<Err<ProjectGroupInfo>> CreateOrEdit(ProjectGroupInfo info, CancellationToken token = default)
+    {
+        // TODO: Get rid of the unnecessary trip to DB (by calling Load twice).
+        var existing = info.Id == Hrib.InvalidValue ? null : await Load(info.Id, token);
+        return existing is null ? await Create(info, token) : await Edit(info, token);
     }
 }

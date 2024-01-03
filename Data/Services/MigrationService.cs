@@ -21,17 +21,20 @@ public class MigrationService
     private readonly IDocumentSession db;
     private readonly AccountService accountService;
     private readonly AuthorService authorService;
+    private readonly ProjectGroupService projectGroupService;
     private readonly ILogger<MigrationService> logger;
 
     public MigrationService(
         ILogger<MigrationService> logger,
         IDocumentSession db,
         AccountService accountService,
-        AuthorService authorService)
+        AuthorService authorService,
+        ProjectGroupService projectGroupService)
     {
         this.db = db;
         this.accountService = accountService;
         this.authorService = authorService;
+        this.projectGroupService = projectGroupService;
         this.logger = logger;
     }
 
@@ -84,6 +87,13 @@ public class MigrationService
         }
 
         return Error.Unmodified(modified.Id, "A migration");
+    }
+
+    public async Task<Err<MigrationInfo>> CreateOrEdit(MigrationInfo info, CancellationToken token = default)
+    {
+        // TODO: Get rid of the unnecessary trip to DB (by calling Load twice).
+        var existing = info.Id == Hrib.InvalidValue ? null : await Load(info.Id, token);
+        return existing is null ? await Create(info, token) : await Edit(info, token);
     }
 
     public async Task<MigrationInfo?> Load(Hrib id, CancellationToken token = default)
@@ -141,7 +151,7 @@ public class MigrationService
     }
 
     public record AccountMigrationOrder(
-        Hrib? ExistingId,
+        Hrib? AccountId,
         string OriginalId,
         string OriginalStorageName,
         ImmutableDictionary<string, string>? MigrationMetadata,
@@ -149,7 +159,7 @@ public class MigrationService
         string? Name,
         string? Uco,
         string? Phone,
-        ImmutableArray<Hrib>? RoleIds = null
+        ImmutableArray<Hrib>? RoleIds
     );
 
     public async Task<(MigrationInfo migration, AccountInfo account)> GetOrAddAccount(
@@ -178,9 +188,9 @@ public class MigrationService
                 entity is null ? "Failed" : "Succeeded");
         }
 
-        if (entity is null && order.ExistingId is not null)
+        if (entity is null && order.AccountId is not null)
         {
-            entity = await accountService.Load(order.ExistingId, token);
+            entity = await accountService.Load(order.AccountId, token);
             logger.LogInformation(
                 "Looking up by ExistingId: {}",
                 entity is null ? "Failed" : "Succeeded");
@@ -214,11 +224,12 @@ public class MigrationService
         {
             var createResult = await accountService.Create(AccountInfo.Invalid with
             {
+                Id = (order.AccountId ?? Hrib.Invalid).Value,
                 Name = order.Name,
                 EmailAddress = order.Email,
                 Uco = order.Uco,
                 Phone = order.Phone,
-                RoleIds = order.RoleIds is null 
+                RoleIds = order.RoleIds is null
                     ? ImmutableArray<string>.Empty
                     : order.RoleIds.Value.Select(r => r.ToString()).ToImmutableArray()
             }, token);
@@ -237,7 +248,7 @@ public class MigrationService
                 Uco = order.Uco ?? entity.Uco,
                 EmailAddress = order.Email ?? entity.EmailAddress,
                 Phone = order.Phone ?? entity.Phone,
-                RoleIds = order.RoleIds is null 
+                RoleIds = order.RoleIds is null
                     ? ImmutableArray<string>.Empty
                     : order.RoleIds.Value.Select(r => r.ToString()).ToImmutableArray()
             };
@@ -271,7 +282,7 @@ public class MigrationService
     }
 
     public record AuthorMigrationOrder(
-        Hrib? ExistingId,
+        Hrib? AuthorId,
         string OriginalId,
         string OriginalStorageName,
         ImmutableDictionary<string, string>? MigrationMetadata,
@@ -307,9 +318,9 @@ public class MigrationService
                 entity is null ? "Failed" : "Succeeded");
         }
 
-        if (entity is null && order.ExistingId is not null)
+        if (entity is null && order.AuthorId is not null)
         {
-            entity = await authorService.Load(order.ExistingId, token);
+            entity = await authorService.Load(order.AuthorId, token);
             logger.LogInformation(
                 "Looking up by ExistingId: {}",
                 entity is null ? "Failed" : "Succeeded");
@@ -351,6 +362,7 @@ public class MigrationService
         {
             var createResult = await authorService.Create(AuthorInfo.Invalid with
             {
+                Id = (order.AuthorId ?? Hrib.Invalid).Value,
                 Name = order.Name,
                 Email = order.Email,
                 Uco = order.Uco,
@@ -402,24 +414,102 @@ public class MigrationService
     }
 
     public record ProjectGroupMigrationOrder(
-        Hrib? ExistingId,
-        string? OriginalId,
-        string? OriginalStorageName,
+        Hrib? ProjectGroupId,
+        string OriginalId,
+        string OriginalStorageName,
+        ImmutableDictionary<string, string>? MigrationMetadata,
         string Name,
         string? Description,
         Hrib OrganizationId,
-        bool IsLocked
+        bool IsOpen,
+        ImmutableDictionary<Hrib, Permission>? AccountPermissions,
+        ImmutableDictionary<Hrib, Permission>? RolePermissions
     );
 
-    public Task<ProjectGroupInfo> GetOrAddProjectGroup(
+    public async Task<(MigrationInfo migration, ProjectGroupInfo projectGroup)> GetOrAddProjectGroup(
         ProjectGroupMigrationOrder order,
         CancellationToken token = default)
     {
-        throw new NotImplementedException();
+        using var scope = logger.BeginScope("Migration of ProjectGroup '{}' ({}:{})",
+            order.Name,
+            order.OriginalStorageName,
+            order.OriginalId);
+
+        logger.LogInformation("Started");
+
+        var existingMigration = await FindExistingMigration(
+            typeof(ProjectGroupInfo),
+            order.OriginalId,
+            order.OriginalStorageName,
+            token);
+
+        ProjectGroupInfo? entity = null;
+        if (entity is null && existingMigration is not null)
+        {
+            entity = await projectGroupService.Load(existingMigration.EntityId, token);
+            logger.LogInformation(
+                "Looking up by existing migration: {}",
+                entity is null ? "Failed" : "Succeeded");
+        }
+
+        if (entity is null && order.ProjectGroupId is not null)
+        {
+            entity = await projectGroupService.Load(order.ProjectGroupId, token);
+            logger.LogInformation(
+                "Looking up by ExistingId: {}",
+                entity is null ? "Failed" : "Succeeded");
+        }
+
+        var orderName = LocalizedString.CreateInvariant(order.Name);
+        if (entity is null)
+        {
+            var byName = await projectGroupService.List(new(Name: orderName), token);
+            entity = byName.FirstOrDefault();
+            logger.LogInformation(
+                "Looking up by name: {}",
+                entity is null ? "Failed" : "Succeeded");
+            if (byName.Length > 1)
+            {
+                logger.LogWarning(
+                    "Found multiple project groups with name '{}'. Manual adjustment recommended. Project groups: {}",
+                    order.Name,
+                    byName.Select(a => a.Id));
+            }
+        }
+
+        entity ??= ProjectGroupInfo.Invalid;
+        entity = entity with
+        {
+            Id = order.ProjectGroupId?.ToString() ?? entity.Id,
+            Name = orderName ?? entity.Name,
+            Description = !string.IsNullOrEmpty(order.Description)
+                ? LocalizedString.CreateInvariant(order.Description)
+                : entity.Description,
+            IsOpen = order.IsOpen
+        };
+        entity = (await projectGroupService.CreateOrEdit(entity, token)).Unwrap();
+
+        var newOrModifiedMigration = (existingMigration ?? MigrationInfo.Invalid) with
+        {
+            EntityId = entity.Id,
+            OriginalId = order.OriginalId,
+            OriginalStorageName = order.OriginalStorageName,
+            MigrationMetadata = order.MigrationMetadata ?? ImmutableDictionary<string, string>.Empty
+        };
+
+        var migrationResult = existingMigration is null
+            ? await Create(newOrModifiedMigration, token)
+            : await Edit(newOrModifiedMigration, token);
+        if (migrationResult.HasErrors)
+        {
+            throw migrationResult.AsException();
+        }
+
+        return (migrationResult.Value, entity);
     }
 
     public record ProjectMigrationOrder(
-        Hrib? ExistingId,
+        Hrib? ProjectId,
         string? OriginalId,
         string? OriginalStorageName,
         string Name,
@@ -438,8 +528,8 @@ public class MigrationService
     }
 
     public record VideoMigrationOrder(
-        Hrib? ExistingArtifactId,
-        Hrib? ExistingShardId,
+        Hrib? ArtifactId,
+        Hrib? VideoShardId,
         string? OriginalId,
         string? OriginalStorageName,
         string Name,
@@ -456,7 +546,7 @@ public class MigrationService
     }
 
     public record PlaylistMigrationOrder(
-        Hrib? ExistingId,
+        Hrib? PlaylistId,
         string? OriginalId,
         string? OriginalStorageName,
         string Name,

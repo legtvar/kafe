@@ -544,12 +544,15 @@ public class MigrationService
         Hrib? ProjectId,
         string OriginalId,
         string OriginalStorageName,
+        ImmutableDictionary<string, string>? MigrationMetadata,
         string Name,
         string? Description,
         Hrib ProjectGroupId,
         DateTimeOffset? ReleasedOn,
         bool IsLocked,
-        ImmutableArray<ProjectAuthorInfo>? Authors
+        ImmutableArray<ProjectAuthorInfo>? Authors,
+        ImmutableDictionary<Hrib, Permission>? AccountPermissions,
+        ImmutableDictionary<Hrib, Permission>? RolePermissions
     );
 
     public Task<ProjectInfo> GetOrAddProject(

@@ -181,7 +181,7 @@ namespace Kafe.Data.Events.Upcasts
             {
                 Administration => new AccountPermissionSet(
                     AccountId: oldEvent.AccountId,
-                    EntityId: Hrib.System.Value,
+                    EntityId: Hrib.System.ToString(),
                     Permission: Permission.All),
                 ProjectReview => new AccountPermissionSet(
                     AccountId: oldEvent.AccountId,
@@ -189,11 +189,11 @@ namespace Kafe.Data.Events.Upcasts
                     Permission: Permission.Review),
                 ProjectOwnership p => new AccountPermissionSet(
                     AccountId: oldEvent.AccountId,
-                    EntityId: p.ProjectId.Value,
+                    EntityId: p.ProjectId.ToString(),
                     Permission: Permission.Read | Permission.Write),
                 AuthorManagement a => new AccountPermissionSet(
                     AccountId: oldEvent.AccountId,
-                    EntityId: a.AuthorId.Value,
+                    EntityId: a.AuthorId.ToString(),
                     Permission: Permission.Read | Permission.Write),
                 OrganizeFestival => new AccountPermissionSet(
                     AccountId: oldEvent.AccountId,
@@ -215,16 +215,16 @@ namespace Kafe.Data.Events.Upcasts
             {
                 Administration => new AccountPermissionUnset(
                     AccountId: oldEvent.AccountId,
-                    EntityId: Hrib.System.Value),
+                    EntityId: Hrib.System.ToString()),
                 ProjectReview => new AccountPermissionUnset(
                     AccountId: oldEvent.AccountId,
                     EntityId: Fffimu23Id),
                 ProjectOwnership p => new AccountPermissionUnset(
                     AccountId: oldEvent.AccountId,
-                    EntityId: p.ProjectId.Value),
+                    EntityId: p.ProjectId.ToString()),
                 AuthorManagement a => new AccountPermissionUnset(
                     AccountId: oldEvent.AccountId,
-                    EntityId: a.AuthorId.Value),
+                    EntityId: a.AuthorId.ToString()),
                 OrganizeFestival => new AccountPermissionUnset(
                     AccountId: oldEvent.AccountId,
                     EntityId: Fffimu23Id),

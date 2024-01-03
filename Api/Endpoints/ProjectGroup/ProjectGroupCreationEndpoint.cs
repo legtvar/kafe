@@ -36,7 +36,7 @@ public class ProjectGroupCreationEndpoint : EndpointBaseAsync
         var group = await projectGroupService.Create(ProjectGroupInfo.Invalid with
         {
             Name = dto.Name,
-            OrganizationId = dto.OrganizationId.Value,
+            OrganizationId = dto.OrganizationId.ToString(),
             Description = dto.Description,
             Deadline = dto.Deadline
         }, cancellationToken);

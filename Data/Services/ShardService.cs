@@ -40,9 +40,9 @@ public class ShardService
 
         IShardEntity? shard = shardKind switch
         {
-            ShardKind.Video => await db.LoadAsync<VideoShardInfo>(id.Value, token),
-            ShardKind.Image => await db.LoadAsync<ImageShardInfo>(id.Value, token),
-            ShardKind.Subtitles => await db.LoadAsync<SubtitlesShardInfo>(id.Value, token),
+            ShardKind.Video => await db.LoadAsync<VideoShardInfo>(id.ToString(), token),
+            ShardKind.Image => await db.LoadAsync<ImageShardInfo>(id.ToString(), token),
+            ShardKind.Subtitles => await db.LoadAsync<SubtitlesShardInfo>(id.ToString(), token),
             _ => throw new NotSupportedException($"ShardKind '{shardKind}' is not supported.")
         };
         return shard;
@@ -105,11 +105,11 @@ public class ShardService
         var mediaInfo = await mediaService.GetInfo(shardFilePath, token);
 
         var created = new VideoShardCreated(
-            ShardId: shardId.Value,
+            ShardId: shardId.ToString(),
             CreationMethod: CreationMethod.Api,
-            ArtifactId: artifactId.Value,
+            ArtifactId: artifactId.ToString(),
             OriginalVariantInfo: mediaInfo);
-        db.Events.StartStream<VideoShardInfo>(created.ShardId, created);
+        db.Events.KafeStartStream<VideoShardInfo>(created.ShardId, created);
         await db.SaveChangesAsync(token);
 
         return created.ShardId;
@@ -128,9 +128,9 @@ public class ShardService
         shardId ??= Hrib.Create();
 
         var created = new ImageShardCreated(
-            ShardId: shardId.Value,
+            ShardId: shardId.ToString(),
             CreationMethod: CreationMethod.Api,
-            ArtifactId: artifactId.Value,
+            ArtifactId: artifactId.ToString(),
             OriginalVariantInfo: imageInfo);
 
         if (!await storageService.TryStoreShard(
@@ -144,7 +144,7 @@ public class ShardService
             throw new InvalidOperationException("The image could not be stored.");
         }
 
-        db.Events.StartStream<VideoShardInfo>(created.ShardId, created);
+        db.Events.KafeStartStream<VideoShardInfo>(created.ShardId, created);
 
         await db.SaveChangesAsync(token);
         return created.ShardId;
@@ -182,9 +182,9 @@ public class ShardService
         shardId ??= Hrib.Create();
 
         var created = new SubtitlesShardCreated(
-            ShardId: shardId.Value,
+            ShardId: shardId.ToString(),
             CreationMethod: CreationMethod.Api,
-            ArtifactId: artifactId.Value,
+            ArtifactId: artifactId.ToString(),
             OriginalVariantInfo: info);
 
         if (!await storageService.TryStoreShard(
@@ -218,7 +218,7 @@ public class ShardService
 
     public async Task<ShardKind> GetShardKind(Hrib id, CancellationToken token = default)
     {
-        var firstEvent = (await db.Events.FetchStreamAsync(id.Value, 1, token: token)).SingleOrDefault();
+        var firstEvent = (await db.Events.FetchStreamAsync(id.ToString(), 1, token: token)).SingleOrDefault();
         if (firstEvent is null)
         {
             return ShardKind.Unknown;

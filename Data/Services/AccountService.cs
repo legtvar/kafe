@@ -62,7 +62,7 @@ public class AccountService
             EmailAddress: @new.EmailAddress,
             PreferredCulture: @new.PreferredCulture
         );
-        var selfPermissionSet = new AccountPermissionSet(id.Value, id.Value, Permission.All);
+        var selfPermissionSet = new AccountPermissionSet(id.ToString(), id.ToString(), Permission.All);
         db.Events.KafeStartStream<AccountInfo>(id, created, selfPermissionSet);
 
         switch (@new.Kind)
@@ -233,10 +233,10 @@ $@"TRUE = ALL(
     private void RefreshTemporaryAccountCore(Hrib id)
     {
         var refreshed = new TemporaryAccountRefreshed(
-            AccountId: id.Value,
+            AccountId: id.ToString(),
             SecurityStamp: Guid.NewGuid().ToString()
         );
-        db.Events.Append(id.Value, refreshed);
+        db.Events.KafeAppend(id, refreshed);
     }
 
     public async Task<bool> TryConfirmTemporaryAccount(
@@ -326,7 +326,7 @@ $@"TRUE = ALL(
             return existing;
         }
 
-        var id = existing?.Id ?? Hrib.Create().Value;
+        var id = existing?.Id ?? Hrib.Create().ToString();
         var associated = new ExternalAccountAssociated(
             AccountId: id,
             IdentityProvider: identityProvider,

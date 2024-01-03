@@ -379,14 +379,14 @@ public static class TransferMaps
     )
     {
         return new EntityPermissionsDetailDto(
-            Id: id.Value,
+            Id: id.ToString(),
             EntityType: entityType,
             GlobalPermissions: globalPermissions is null ? null : ToPermissionArray(globalPermissions.Value),
             UserPermissions: userPermissions is null ? null : ToPermissionArray(userPermissions.Value),
             AccountPermissions: accounts.Select(a => new EntityPermissionsAccountListDto(
                 Id: a.Id,
                 EmailAddress: a.EmailAddress,
-                Permissions: ToPermissionArray(a.Permissions?.GetValueOrDefault(id.Value) ?? Permission.None)
+                Permissions: ToPermissionArray(a.Permissions?.GetValueOrDefault(id.ToString()) ?? Permission.None)
             )).ToImmutableArray()
         );
     }

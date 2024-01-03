@@ -44,7 +44,7 @@ public class PlaylistService
             query = (IMartenQueryable<PlaylistInfo>)query
                 .Where(e => e.MatchesSql(
                     $"({SqlFunctions.GetPlaylistPerms}(data ->> 'Id', ?) & ?) != 0",
-                    filter.AccessingAccountId.Value,
+                    filter.AccessingAccountId.ToString(),
                     (int)Permission.Read));
         }
 
@@ -53,7 +53,7 @@ public class PlaylistService
 
     public async Task<PlaylistInfo?> Load(Hrib id, CancellationToken token = default)
     {
-        return await db.LoadAsync<PlaylistInfo>(id.Value, token);
+        return await db.LoadAsync<PlaylistInfo>(id.ToString(), token);
     }
 
     public async Task<ImmutableArray<PlaylistInfo>> LoadMany(
@@ -88,33 +88,33 @@ public class PlaylistService
         }
 
         var created = new PlaylistEstablished(
-            PlaylistId: id.Value,
+            PlaylistId: id.ToString(),
             CreationMethod: CreationMethod.Api,
             OrganizationId: @new.OrganizationId,
             Name: @new.Name);
-        db.Events.StartStream(id.Value, created);
+        db.Events.StartStream(id.ToString(), created);
 
         if (@new.GlobalPermissions != Permission.None || @new.Description is not null)
         {
             var changed = new PlaylistInfoChanged(
-                PlaylistId: id.Value,
+                PlaylistId: id.ToString(),
                 Description: @new.Description,
                 GlobalPermissions: @new.GlobalPermissions);
-            db.Events.Append(id.Value, changed);
+            db.Events.Append(id.ToString(), changed);
         }
 
         if (!@new.EntryIds.IsDefaultOrEmpty)
         {
             var entriesSet = new PlaylistEntriesSet(
-                PlaylistId: id.Value,
+                PlaylistId: id.ToString(),
                 EntryIds: @new.EntryIds);
-            db.Events.Append(id.Value, entriesSet);
+            db.Events.Append(id.ToString(), entriesSet);
         }
 
         // TODO: Check all entries exist before putting them in
 
         await db.SaveChangesAsync(token);
-        var playlist = await db.Events.AggregateStreamAsync<PlaylistInfo>(id.Value, token: token)
+        var playlist = await db.Events.AggregateStreamAsync<PlaylistInfo>(id.ToString(), token: token)
             ?? throw new InvalidOperationException($"Could not persist a playlist with id '{id}'.");
         return playlist;
     }
@@ -150,8 +150,6 @@ public class PlaylistService
         }
 
         await db.SaveChangesAsync(token);
-        return await db.Events.AggregateStreamAsync<PlaylistInfo>(@old.Id, token: token)
-            ?? throw new InvalidOperationException($"The playlist is no longer present in the database. "
-                + "This should never happen.");
+        return await db.Events.KafeAggregateRequiredStream<PlaylistInfo>(@old.Id, token: token);
     }
 }

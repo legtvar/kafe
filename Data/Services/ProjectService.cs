@@ -50,13 +50,13 @@ public partial class ProjectService
         }
 
         var created = new ProjectCreated(
-            ProjectId: Hrib.Create().Value,
+            ProjectId: Hrib.Create().ToString(),
             CreationMethod: CreationMethod.Api,
             ProjectGroupId: projectGroupId,
             Name: name);
 
         var infoChanged = new ProjectInfoChanged(
-            ProjectId: Hrib.Create().Value,
+            ProjectId: Hrib.Create().ToString(),
             Name: name,
             Description: description,
             Genre: genre);
@@ -87,11 +87,11 @@ public partial class ProjectService
     {
         var authorsAdded = authors
             .Select(a => new ProjectAuthorAdded(
-                ProjectId: projectId.Value,
+                ProjectId: projectId.ToString(),
                 AuthorId: a.id,
                 Kind: a.kind,
                 Roles: a.roles));
-        db.Events.Append(projectId.Value, authorsAdded);
+        db.Events.KafeAppend(projectId, authorsAdded);
         await db.SaveChangesAsync();
     }
 
@@ -101,11 +101,11 @@ public partial class ProjectService
     {
         var authorsAdded = authors
             .Select(a => new ProjectAuthorRemoved(
-                ProjectId: projectId.Value,
+                ProjectId: projectId.ToString(),
                 AuthorId: a.id,
                 Kind: a.kind,
                 Roles: a.roles));
-        db.Events.Append(projectId.Value, authorsAdded);
+        db.Events.KafeAppend(projectId, authorsAdded);
         await db.SaveChangesAsync();
     }
 
@@ -178,14 +178,14 @@ public partial class ProjectService
             query = (IMartenQueryable<ProjectInfo>)query
                 .Where(e => e.MatchesSql(
                     $"({SqlFunctions.GetProjectPerms}(data ->> 'Id', ?) & ?) != 0",
-                    filter.AccessingAccountId.Value,
+                    filter.AccessingAccountId.ToString(),
                     (int)Permission.Read));
         }
 
         if (filter.ProjectGroupId is not null)
         {
             query = (IMartenQueryable<ProjectInfo>)query
-                .Where(e => e.ProjectGroupId == filter.ProjectGroupId.Value);
+                .Where(e => e.ProjectGroupId == filter.ProjectGroupId.ToString());
         }
         var results = (await query.ToListAsync(token)).ToImmutableArray();
         return results;
@@ -193,7 +193,7 @@ public partial class ProjectService
 
     public async Task<ProjectInfo?> Load(Hrib id, CancellationToken token = default)
     {
-        return await db.LoadAsync<ProjectInfo>(id.Value, token);
+        return await db.LoadAsync<ProjectInfo>(id.ToString(), token);
         // if (data is null)
         // {
         //     return null;

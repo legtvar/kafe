@@ -48,11 +48,11 @@ public class ProjectGroupService
         }
 
         var created = new ProjectGroupEstablished(
-            ProjectGroupId: id.Value,
+            ProjectGroupId: id.ToString(),
             CreationMethod: CreationMethod.Api,
             OrganizationId: @new.OrganizationId,
             Name: @new.Name);
-        db.Events.StartStream<ProjectGroupInfo>(id.Value, created);
+        db.Events.KafeStartStream<ProjectGroupInfo>(id, created);
 
         if (@new.Description is not null
             || @new.Deadline != default)
@@ -61,19 +61,18 @@ public class ProjectGroupService
                 ProjectGroupId: created.ProjectGroupId,
                 Description: @new.Description,
                 Deadline: @new.Deadline);
-            db.Events.Append(id.Value, changed);
+            db.Events.KafeAppend(id, changed);
         }
 
         if (@new.IsOpen)
         {
             var opened = new ProjectGroupOpened(
                 ProjectGroupId: created.ProjectGroupId);
-            db.Events.Append(id.Value, opened);
+            db.Events.KafeAppend(id, opened);
         }
 
         await db.SaveChangesAsync(token);
-        return await db.Events.AggregateStreamAsync<ProjectGroupInfo>(id.Value, token: token)
-            ?? throw new InvalidOperationException($"Could not persist a project group with id '{id.Value}'.");
+        return await db.Events.KafeAggregateRequiredStream<ProjectGroupInfo>(id, token: token);
     }
 
     public record ProjectGroupFilter(
@@ -90,7 +89,7 @@ public class ProjectGroupService
             query = (IMartenQueryable<ProjectGroupInfo>)query
                 .Where(e => e.MatchesSql(
                     $"({SqlFunctions.GetProjectGroupPerms}(data ->> 'Id', ?) & ?) != 0",
-                    filter.AccessingAccountId.Value,
+                    filter.AccessingAccountId.ToString(),
                     (int)Permission.Read));
         }
 
@@ -113,7 +112,7 @@ public class ProjectGroupService
 
     public async Task<ProjectGroupInfo?> Load(Hrib id, CancellationToken token = default)
     {
-        return await db.LoadAsync<ProjectGroupInfo>(id.Value, token);
+        return await db.LoadAsync<ProjectGroupInfo>(id.ToString(), token);
     }
 
     public async Task<Err<ProjectGroupInfo>> Edit(ProjectGroupInfo @new, CancellationToken token = default)

@@ -14,6 +14,7 @@ public record MigrationInfo(
     ImmutableDictionary<string, string> MigrationMetadata,
     DateTimeOffset CreatedOn,
     DateTimeOffset ChangedOn)
+    : IEntity
 {
     public static readonly MigrationInfo Invalid = new(
         Id: Hrib.InvalidValue,

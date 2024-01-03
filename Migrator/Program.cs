@@ -342,7 +342,7 @@ public static class Program
 
         var originalFile = originalCandidates.First();
 
-        var shardDir = new DirectoryInfo(Path.Combine(migratorOptions.KafeVideosDirectory!, shardId.Value));
+        var shardDir = new DirectoryInfo(Path.Combine(migratorOptions.KafeVideosDirectory!, shardId.ToString()));
         if (shardDir.Exists)
         {
             logger.LogError(
@@ -358,8 +358,8 @@ public static class Program
 
         var migrationInfo = new VideoShardMigrationInfo(
             WmaId: wmaId,
-            ArtifactId: artifactId.Value,
-            VideoShardId: shardId.Value,
+            ArtifactId: artifactId.ToString(),
+            VideoShardId: shardId.ToString(),
             Name: name,
             AddedOn: addedOn);
         await SerializedVideoShardMigrationInfo(migrationInfo);
@@ -391,7 +391,7 @@ public static class Program
 
     private static async Task<MediaInfo> GetOriginalVariant(Hrib shardId)
     {
-        var shardDir = new DirectoryInfo(Path.Combine(migratorOptions.KafeVideosDirectory!, shardId.Value));
+        var shardDir = new DirectoryInfo(Path.Combine(migratorOptions.KafeVideosDirectory!, shardId.ToString()));
         if (!shardDir.Exists)
         {
             logger.LogError(

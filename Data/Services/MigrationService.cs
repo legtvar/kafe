@@ -50,16 +50,15 @@ public class MigrationService
         }
 
         var created = new MigrationUndergone(
-            MigrationId: id.Value,
+            MigrationId: id.ToString(),
             EntityId: @new.EntityId,
             OriginalStorageName: @new.OriginalStorageName,
             OriginalId: @new.OriginalId,
             MigrationMetadata: @new.MigrationMetadata);
-        db.Events.StartStream<MigrationInfo>(id.Value, created);
+        db.Events.KafeStartStream<MigrationInfo>(id, created);
         await db.SaveChangesAsync(token);
 
-        return await db.Events.AggregateStreamAsync<MigrationInfo>(id.Value, token: token)
-            ?? throw new InvalidOperationException($"Could not persist an author with id '{created.MigrationId}'.");
+        return await db.Events.KafeAggregateRequiredStream<MigrationInfo>(id, token: token);
     }
 
     public async Task<Err<MigrationInfo>> Edit(MigrationInfo modified, CancellationToken token = default)
@@ -92,14 +91,14 @@ public class MigrationService
 
     public async Task<MigrationInfo?> Load(Hrib id, CancellationToken token = default)
     {
-        return await db.LoadAsync<MigrationInfo>(id.Value, token);
+        return await db.LoadAsync<MigrationInfo>(id.ToString(), token);
     }
 
     public async Task<ImmutableArray<MigrationInfo>> LoadMany(
         IEnumerable<Hrib> ids,
         CancellationToken token = default)
     {
-        return (await db.LoadManyAsync<MigrationInfo>(token, ids.Select(i => i.Value)))
+        return (await db.LoadManyAsync<MigrationInfo>(token, ids.Select(i => i.ToString())))
             .Where(a => a is not null)
             .ToImmutableArray();
     }

@@ -22,14 +22,14 @@ public class OrganizationService
 
     public async Task<OrganizationInfo?> Load(Hrib id, CancellationToken token = default)
     {
-        return await db.LoadAsync<OrganizationInfo>(id.Value, token: token);
+        return await db.LoadAsync<OrganizationInfo>(id.ToString(), token: token);
     }
 
     public async Task<ImmutableArray<OrganizationInfo>> LoadMany(
         IEnumerable<Hrib> ids,
         CancellationToken token = default)
     {
-        return (await db.LoadManyAsync<OrganizationInfo>(token, ids.Select(i => i.Value))).ToImmutableArray();
+        return (await db.LoadManyAsync<OrganizationInfo>(token, ids.Select(i => i.ToString()))).ToImmutableArray();
     }
 
     public async Task<Err<OrganizationInfo>> Create(OrganizationInfo @new, CancellationToken token = default)
@@ -47,15 +47,14 @@ public class OrganizationService
         }
 
         var created = new OrganizationEstablished(
-            OrganizationId: id.Value,
+            OrganizationId: id.ToString(),
             CreationMethod: CreationMethod.Api,
             Name: @new.Name
         );
-        db.Events.StartStream<OrganizationInfo>(id.Value, created);
+        db.Events.KafeStartStream<OrganizationInfo>(id, created);
         await db.SaveChangesAsync(token);
 
-        return await db.Events.AggregateStreamAsync<OrganizationInfo>(id.Value, token: token)
-            ?? throw new InvalidOperationException($"Could not persist an organization '{id.Value}'.");
+        return await db.Events.KafeAggregateRequiredStream<OrganizationInfo>(id, token: token);
     }
 
     public async Task<Err<OrganizationInfo>> Edit(OrganizationInfo modified, CancellationToken token = default)

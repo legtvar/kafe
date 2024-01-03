@@ -89,12 +89,12 @@ public class VideoConversionDaemon : BackgroundService
             logger.LogDebug("Found video '{VideoShardId}' with missing variants.", candidate.video.Id);
             var id = Hrib.Create();
             var created = new VideoConversionCreated(
-                id.Value,
+                id.ToString(),
                 candidate.video.Id,
                 candidate.missingVariants.First());
-            db.Events.StartStream<VideoConversionInfo>(id.Value, created);
+            db.Events.StartStream<VideoConversionInfo>(id.ToString(), created);
             await db.SaveChangesAsync();
-            return await db.Events.AggregateStreamAsync<VideoConversionInfo>(id.Value);
+            return await db.Events.AggregateStreamAsync<VideoConversionInfo>(id.ToString());
         }
 
         VideoConversionInfo? result = null;

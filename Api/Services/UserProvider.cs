@@ -42,7 +42,7 @@ public class UserProvider
     public bool HasExplicitPermission(Hrib entityId, Permission permission)
     {
         return Account is not null
-            && (Account.Permissions?.GetValueOrDefault(entityId.Value) & permission) == permission;
+            && (Account.Permissions?.GetValueOrDefault(entityId.ToString()) & permission) == permission;
     }
 
     public async Task<bool> HasPermission(
@@ -54,7 +54,7 @@ public class UserProvider
             // $"SET search_path TO {query.DocumentStore.Options.Events.DatabaseSchemaName}; "
             $"SELECT {query.DocumentStore.Options.DatabaseSchemaName}.{SqlFunctions.GetResourcePerms}(?, ?) & ? = ?",
             token,
-            entityId.Value,
+            entityId.ToString(),
             Account?.Id!,
             (int)permission,
             (int)permission);

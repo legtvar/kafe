@@ -26,14 +26,14 @@ public class RoleService
 
     public async Task<RoleInfo?> Load(Hrib id, CancellationToken token = default)
     {
-        return await db.LoadAsync<RoleInfo>(id.Value, token: token);
+        return await db.LoadAsync<RoleInfo>(id.ToString(), token: token);
     }
 
     public async Task<ImmutableArray<RoleInfo>> LoadMany(
         IEnumerable<Hrib> ids,
         CancellationToken token = default)
     {
-        return (await db.LoadManyAsync<RoleInfo>(token, ids.Select(i => i.Value))).ToImmutableArray();
+        return (await db.LoadManyAsync<RoleInfo>(token, ids.Select(i => i.ToString()))).ToImmutableArray();
     }
 
     public async Task<Err<RoleInfo>> Create(RoleInfo @new, CancellationToken token = default)
@@ -57,16 +57,15 @@ public class RoleService
         }
 
         var created = new RoleCreated(
-            RoleId: id.Value,
-            OrganizationId: id.Value,
+            RoleId: id.ToString(),
+            OrganizationId: id.ToString(),
             CreationMethod: CreationMethod.Api,
             Name: @new.Name
         );
-        db.Events.StartStream<RoleInfo>(id.Value, created);
+        db.Events.KafeStartStream<RoleInfo>(id, created);
         await db.SaveChangesAsync(token);
 
-        return await db.Events.AggregateStreamAsync<RoleInfo>(id.Value, token: token)
-            ?? throw new InvalidOperationException($"Could not persist a role with id '{id.Value}'.");
+        return await db.Events.KafeAggregateRequiredStream<RoleInfo>(id, token: token);
     }
 
     public async Task<Err<RoleInfo>> Edit(RoleInfo modified, CancellationToken token = default)
@@ -116,8 +115,6 @@ public class RoleService
         }
 
         await db.SaveChangesAsync(token);
-        return await db.Events.AggregateStreamAsync<RoleInfo>(@old.Id, token: token)
-            ?? throw new InvalidOperationException($"The role is no longer present in the database. "
-                + "This should never happen.");
+        return await db.Events.KafeAggregateRequiredStream<RoleInfo>(@old.Id, token: token);
     }
 }

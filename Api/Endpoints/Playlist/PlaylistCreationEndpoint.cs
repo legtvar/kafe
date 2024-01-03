@@ -43,7 +43,7 @@ public class PlaylistCreationEndpoint : EndpointBaseAsync
     {
         var playlist = await playlistService.Create(PlaylistInfo.Invalid with
         {
-            OrganizationId = dto.OrganizationId.Value,
+            OrganizationId = dto.OrganizationId.ToString(),
             EntryIds = dto.EntryIds ?? ImmutableArray<string>.Empty,
             Name = dto.Name,
             Description = dto.Description,

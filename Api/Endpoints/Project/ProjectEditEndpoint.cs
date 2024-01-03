@@ -84,7 +84,7 @@ public class ProjectEditEndpoint : EndpointBaseAsync
             Authors = authors,
             Artifacts = request.Artifacts.HasValue
                 ? request.Artifacts.Value.Select(a => new ProjectArtifactInfo(
-                    Id: a.Id.Value,
+                    Id: a.Id.ToString(),
                     BlueprintSlot: a.BlueprintSlot
                 )).ToImmutableArray()
                 : @old.Artifacts

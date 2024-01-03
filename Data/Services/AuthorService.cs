@@ -42,7 +42,7 @@ public class AuthorService
         }
 
         var created = new AuthorCreated(
-            AuthorId: id.Value,
+            AuthorId: id.ToString(),
             CreationMethod: CreationMethod.Api,
             Name: @new.Name);
         db.Events.StartStream<AuthorInfo>(created.AuthorId, created);
@@ -122,7 +122,7 @@ public class AuthorService
             query = (IMartenQueryable<AuthorInfo>)query
                 .Where(e => e.MatchesSql(
                     $"({SqlFunctions.GetAuthorPerms}(data ->> 'Id', ?) & ?) != 0",
-                    filter.AccessingAccountId.Value,
+                    filter.AccessingAccountId.ToString(),
                     (int)Permission.Read));
         }
 
@@ -155,12 +155,12 @@ public class AuthorService
 
     public async Task<AuthorInfo?> Load(Hrib id, CancellationToken token = default)
     {
-        return await db.LoadAsync<AuthorInfo>(id.Value, token);
+        return await db.LoadAsync<AuthorInfo>(id.ToString(), token);
     }
 
     public async Task<ImmutableArray<AuthorInfo>> LoadMany(IEnumerable<Hrib> ids, CancellationToken token = default)
     {
-        return (await db.LoadManyAsync<AuthorInfo>(token, ids.Select(i => i.Value)))
+        return (await db.LoadManyAsync<AuthorInfo>(token, ids.Select(i => i.ToString())))
             .Where(a => a is not null)
             .ToImmutableArray();
     }

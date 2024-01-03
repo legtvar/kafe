@@ -23,7 +23,7 @@ public class EntityService
 
     public async Task<IEntity?> Load(Hrib id, CancellationToken token = default)
     {
-        var parentState = await db.Events.FetchStreamStateAsync(id.Value, token);
+        var parentState = await db.Events.FetchStreamStateAsync(id.ToString(), token);
         if (parentState?.AggregateType is null)
         {
             return null;
@@ -52,8 +52,8 @@ public class EntityService
         var perms = await db.QueryAsync<int>(
             $"SELECT {db.DocumentStore.Options.DatabaseSchemaName}.{SqlFunctions.GetResourcePerms}(?, ?)",
             token,
-            entityId.Value,
-            accessingAccountId?.Value!);
+            entityId.ToString(),
+            accessingAccountId?.ToString()!);
         return (Permission)perms.Single();
     }
 
@@ -71,8 +71,8 @@ public class EntityService
             $"SELECT {db.DocumentStore.Options.DatabaseSchemaName}.{SqlFunctions.GetResourcePerms}(id, ?) "
             + "FROM unnest(?) as id",
             token,
-            accessingAccountId?.Value!,
-            entityIds.Select(i => i.Value).ToArray()
+            accessingAccountId?.ToString()!,
+            entityIds.Select(i => i.ToString()).ToArray()
         );
         return perms.Select(p => (Permission)p).ToImmutableArray();
     }
@@ -114,7 +114,7 @@ public class EntityService
         }
         else
         {
-            var account = await db.LoadAsync<AccountInfo>(accessingAccountId.Value, token)
+            var account = await db.LoadAsync<AccountInfo>(accessingAccountId.ToString(), token)
                 ?? throw new NullReferenceException("Account could not be found.");
 
             if (entityId != Hrib.System)
@@ -122,17 +122,17 @@ public class EntityService
                 _ = await Load(entityId, token) ?? throw new NullReferenceException("Entity could not be found.");
             }
 
-            if ((account.Permissions?.GetValueOrDefault(entityId.Value) ?? Permission.None) != permissions)
+            if ((account.Permissions?.GetValueOrDefault(entityId.ToString()) ?? Permission.None) != permissions)
             {
                 object @event = permissions != Permission.None
                     ? new AccountPermissionSet(
-                        AccountId: accessingAccountId.Value,
-                        EntityId: entityId.Value,
+                        AccountId: accessingAccountId.ToString(),
+                        EntityId: entityId.ToString(),
                         Permission: permissions)
                     : new AccountPermissionUnset(
-                        AccountId: accessingAccountId.Value,
-                        EntityId: entityId.Value);
-                db.Events.Append(accessingAccountId.Value, @event);
+                        AccountId: accessingAccountId.ToString(),
+                        EntityId: entityId.ToString());
+                db.Events.Append(accessingAccountId.ToString(), @event);
             }
 
         }

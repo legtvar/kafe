@@ -92,7 +92,7 @@ public class VideoConversionDaemon : BackgroundService
                 id.ToString(),
                 candidate.video.Id,
                 candidate.missingVariants.First());
-            db.Events.StartStream<VideoConversionInfo>(id.ToString(), created);
+            db.Events.KafeStartStream<VideoConversionInfo>(id, created);
             await db.SaveChangesAsync();
             return await db.Events.AggregateStreamAsync<VideoConversionInfo>(id.ToString());
         }

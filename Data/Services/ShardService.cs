@@ -198,7 +198,7 @@ public class ShardService
             throw new InvalidOperationException("The subtitles could not be stored.");
         }
 
-        db.Events.StartStream<SubtitlesShardInfo>(created.ShardId, created);
+        db.Events.KafeStartStream<SubtitlesShardInfo>(created.ShardId, created);
 
         await db.SaveChangesAsync(token);
         return created.ShardId;

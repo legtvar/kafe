@@ -45,7 +45,7 @@ public class AuthorService
             AuthorId: id.ToString(),
             CreationMethod: CreationMethod.Api,
             Name: @new.Name);
-        db.Events.StartStream<AuthorInfo>(created.AuthorId, created);
+        db.Events.KafeStartStream<AuthorInfo>(id, created);
 
         if (!string.IsNullOrEmpty(@new.Uco)
             || LocalizedString.IsNullOrEmpty(@new.Bio)

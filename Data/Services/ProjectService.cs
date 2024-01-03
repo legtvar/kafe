@@ -61,7 +61,7 @@ public partial class ProjectService
             Description: description,
             Genre: genre);
 
-        db.Events.StartStream<ProjectInfo>(created.ProjectId, created, infoChanged);
+        db.Events.KafeStartStream<ProjectInfo>(created.ProjectId, created, infoChanged);
         await db.SaveChangesAsync(token);
 
         if (ownerId is not null)

@@ -341,11 +341,11 @@ $@"TRUE = ALL(
                 EmailAddress: emailClaim.Value,
                 PreferredCulture: Const.InvariantCultureCode
             );
-            db.Events.StartStream<AccountInfo>(id, created, associated);
+            db.Events.KafeStartStream<AccountInfo>(id, created, associated);
         }
         else
         {
-            db.Events.Append(id, associated);
+            db.Events.KafeAppend(id, associated);
         }
 
         await db.SaveChangesAsync(token);

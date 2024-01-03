@@ -12,7 +12,7 @@ public record VideoConversionInfo(
     bool IsCompleted = false,
     bool HasFailed = false,
     [LocalizedString] ImmutableDictionary<string, string>? Error = null
-);
+) : IEntity;
 
 public class VideoConversionInfoProjection : SingleStreamProjection<VideoConversionInfo>
 {

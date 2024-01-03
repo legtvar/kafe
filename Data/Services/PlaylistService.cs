@@ -92,7 +92,7 @@ public class PlaylistService
             CreationMethod: CreationMethod.Api,
             OrganizationId: @new.OrganizationId,
             Name: @new.Name);
-        db.Events.StartStream(id.ToString(), created);
+        db.Events.KafeStartStream(id, created);
 
         if (@new.GlobalPermissions != Permission.None || @new.Description is not null)
         {

@@ -60,7 +60,7 @@ public class ArtifactService
             Name: name,
             AddedOn: addedOn?.ToUniversalTime() ?? DateTimeOffset.UtcNow
         );
-        db.Events.StartStream<ArtifactInfo>(created.ArtifactId, created);
+        db.Events.KafeStartStream<ArtifactInfo>(created.ArtifactId, created);
 
         if (containingProject is not null)
         {

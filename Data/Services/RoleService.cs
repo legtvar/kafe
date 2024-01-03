@@ -117,4 +117,43 @@ public class RoleService
         await db.SaveChangesAsync(token);
         return await db.Events.KafeAggregateRequiredStream<RoleInfo>(@old.Id, token: token);
     }
+
+    /// <summary>
+    /// Gives the role the specified capabilities.
+    /// </summary>
+    public async Task<Err<bool>> AddPermissions(
+        Hrib roleId,
+        IEnumerable<(Hrib entityId, Permission permission)> permissions,
+        CancellationToken token = default)
+    {
+        // TODO: Find a cheaper way of knowing that an account exists.
+        var role = await Load(roleId, token);
+        if (role is null)
+        {
+            return Error.NotFound(roleId, "A role");
+        }
+
+        foreach (var permissionPair in permissions)
+        {
+            if (!role.Permissions.TryGetValue(permissionPair.entityId.ToString(), out var existingPermission)
+                || existingPermission != permissionPair.permission)
+            {
+                db.Events.KafeAppend(roleId, new RolePermissionSet(
+                    RoleId: roleId.ToString(),
+                    EntityId: permissionPair.entityId.ToString(),
+                    Permission: permissionPair.permission
+                ));
+            }
+        }
+        await db.SaveChangesAsync(token);
+        return true;
+    }
+
+    public Task<Err<bool>> AddPermissions(
+        Hrib roleId,
+        CancellationToken token = default,
+        params (Hrib entityId, Permission permission)[] permissions)
+    {
+        return AddPermissions(roleId, permissions, token);
+    }
 }

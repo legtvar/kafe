@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -22,6 +21,7 @@ public class MigrationService
     private readonly AccountService accountService;
     private readonly AuthorService authorService;
     private readonly ProjectGroupService projectGroupService;
+    private readonly RoleService roleService;
     private readonly ILogger<MigrationService> logger;
 
     public MigrationService(
@@ -29,12 +29,14 @@ public class MigrationService
         IDocumentSession db,
         AccountService accountService,
         AuthorService authorService,
-        ProjectGroupService projectGroupService)
+        ProjectGroupService projectGroupService,
+        RoleService roleService)
     {
         this.db = db;
         this.accountService = accountService;
         this.authorService = authorService;
         this.projectGroupService = projectGroupService;
+        this.roleService = roleService;
         this.logger = logger;
     }
 
@@ -505,13 +507,43 @@ public class MigrationService
             throw migrationResult.AsException();
         }
 
+        foreach (var accountPermission in order.AccountPermissions ?? ImmutableDictionary<Hrib, Permission>.Empty)
+        {
+            var res = await accountService.AddPermissions(
+                accountPermission.Key,
+                token,
+                (entity.Id, accountPermission.Value));
+            if (res.HasErrors)
+            {
+                logger.LogError(
+                    res.AsException(),
+                    "An error occurred while assigning permission to account '{}'.",
+                    accountPermission.Key);
+            }
+        }
+
+        foreach (var rolePermission in order.RolePermissions ?? ImmutableDictionary<Hrib, Permission>.Empty)
+        {
+            var res = await roleService.AddPermissions(
+                rolePermission.Key,
+                token,
+                (entity.Id, rolePermission.Value));
+            if (res.HasErrors)
+            {
+                logger.LogError(
+                    res.AsException(),
+                    "An error occurred while assigning permission to account '{}'.",
+                    rolePermission.Key);
+            }
+        }
+
         return (migrationResult.Value, entity);
     }
 
     public record ProjectMigrationOrder(
         Hrib? ProjectId,
-        string? OriginalId,
-        string? OriginalStorageName,
+        string OriginalId,
+        string OriginalStorageName,
         string Name,
         string? Description,
         Hrib ProjectGroupId,

@@ -173,9 +173,9 @@ public class AccountService
                 EntityId: removedPermission
             ));
         }
-        
+
         var addedRoles = modified.RoleIds.Except(modified.RoleIds);
-        foreach(var newRole in addedRoles)
+        foreach (var newRole in addedRoles)
         {
             hasChanged = true;
             db.Events.KafeAppend(old.Id, new AccountRoleSet(
@@ -183,9 +183,9 @@ public class AccountService
                 RoleId: newRole
             ));
         }
-        
+
         var removedRoles = old.RoleIds.Except(modified.RoleIds);
-        foreach(var removedRole in removedRoles)
+        foreach (var removedRole in removedRoles)
         {
             hasChanged = true;
             db.Events.KafeAppend(old.Id, new AccountRoleUnset(
@@ -316,29 +316,73 @@ $@"TRUE = ALL(
     /// <summary>
     /// Gives the account the specified capabilities.
     /// </summary>
-    public async Task AddPermissions(
+    public async Task<Err<bool>> AddPermissions(
         Hrib accountId,
-        IEnumerable<(string id, Permission permission)> permissions,
+        IEnumerable<(Hrib entityId, Permission permission)> permissions,
         CancellationToken token = default)
     {
         // TODO: Find a cheaper way of knowing that an account exists.
         var account = await Load(accountId, token);
         if (account is null)
         {
-            throw new ArgumentOutOfRangeException(nameof(accountId));
+            return Error.NotFound(accountId, "An account");
         }
 
-        var eventStream = await db.Events.FetchForExclusiveWriting<AccountInfo>(account.Id, token);
-        eventStream.AppendMany(permissions.Select(c => new AccountPermissionSet(account.Id, c.id, c.permission)));
+        foreach (var permissionPair in permissions)
+        {
+            if (!account.Permissions.TryGetValue(permissionPair.entityId.ToString(), out var existingPermission)
+                || existingPermission != permissionPair.permission)
+            {
+                db.Events.KafeAppend(accountId, new AccountPermissionSet(
+                    AccountId: accountId.ToString(),
+                    EntityId: permissionPair.entityId.ToString(),
+                    Permission: permissionPair.permission
+                ));
+            }
+        }
         await db.SaveChangesAsync(token);
+        return true;
     }
 
-    public Task AddPermissions(
+    public Task<Err<bool>> AddPermissions(
         Hrib accountId,
         CancellationToken token = default,
-        params (string id, Permission permission)[] permissions)
+        params (Hrib entityId, Permission permission)[] permissions)
     {
         return AddPermissions(accountId, permissions, token);
+    }
+
+    public async Task<Err<bool>> AddRoles(
+        Hrib accountId,
+        IEnumerable<Hrib> roleIds,
+        CancellationToken token = default)
+    {
+        var account = await Load(accountId, token);
+        if (account is null)
+        {
+            return Error.NotFound(accountId, "An account");
+        }
+
+        foreach (var roleId in roleIds)
+        {
+            if (!account.RoleIds.Contains(roleId.ToString()))
+            {
+                db.Events.KafeAppend(accountId, new AccountRoleSet(
+                    AccountId: accountId.ToString(),
+                    RoleId: roleId.ToString()
+                ));
+            }
+        }
+        await db.SaveChangesAsync(token);
+        return true;
+    }
+
+    public Task<Err<bool>> AddRoles(
+        Hrib accountId,
+        CancellationToken token = default,
+        params Hrib[] roleIds)
+    {
+        return AddRoles(accountId, token, roleIds);
     }
 
     public async Task<Err<AccountInfo>> AssociateExternalAccount(

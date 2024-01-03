@@ -68,7 +68,7 @@ public partial class ProjectService
         {
             await accountService.AddPermissions(
                 ownerId,
-                new[] { (created.ProjectId, Permission.Read | Permission.Write | Permission.Append) },
+                [((Hrib)created.ProjectId, Permission.Read | Permission.Write | Permission.Append)],
                 token);
         }
 
@@ -151,11 +151,11 @@ public partial class ProjectService
             .Select(a => new ProjectAuthorAdded(modified.Id, a.Id, a.Kind, a.Roles));
         eventStream.AppendMany(authorsAdded);
 
-        var artifactsRemoved = @old.Artifacts.Except(@new.Artifacts)
-            .Select(a => new ProjectArtifactRemoved(@new.Id, a.Id));
+        var artifactsRemoved = @old.Artifacts.Except(modified.Artifacts)
+            .Select(a => new ProjectArtifactRemoved(modified.Id, a.Id));
         eventStream.AppendMany(artifactsRemoved);
-        var artifactsAdded = @new.Artifacts.Except(@old.Artifacts)
-            .Select(a => new ProjectArtifactAdded(@new.Id, a.Id, a.BlueprintSlot));
+        var artifactsAdded = modified.Artifacts.Except(@old.Artifacts)
+            .Select(a => new ProjectArtifactAdded(modified.Id, a.Id, a.BlueprintSlot));
         eventStream.AppendMany(artifactsAdded);
 
         await db.SaveChangesAsync(token);

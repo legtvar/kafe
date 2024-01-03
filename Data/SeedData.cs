@@ -69,8 +69,8 @@ public class SeedData : IInitialData
             {
                 var missingPermissions = account.Permissions
                     .ToDictionary(p => p.Key, p => p.Value)
-                    .Except(data.Permissions ?? Enumerable.Empty<KeyValuePair<string, Permission>>())
-                    .Select(kv => (kv.Key, kv.Value))
+                    .Except(data.Permissions ?? ImmutableDictionary<string, Permission>.Empty)
+                    .Select(kv => ((Hrib)kv.Key, kv.Value))
                     .ToImmutableArray();
 
                 if (missingPermissions.Length > 0)

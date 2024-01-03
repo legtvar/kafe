@@ -98,6 +98,23 @@ public class AccountService
             db.Events.KafeAppend(id, infoChanged);
         }
 
+        foreach (var permission in @new.Permissions)
+        {
+            db.Events.KafeAppend(@new.Id, new AccountPermissionSet(
+                AccountId: @new.Id,
+                EntityId: permission.Key,
+                Permission: permission.Value
+            ));
+        }
+
+        foreach (var role in @new.RoleIds)
+        {
+            db.Events.KafeAppend(@new.Id, new AccountRoleSet(
+                AccountId: @new.Id,
+                RoleId: role
+            ));
+        }
+
         await db.SaveChangesAsync(token);
         return await db.Events.KafeAggregateRequiredStream<AccountInfo>(id, token: token);
     }
@@ -154,6 +171,26 @@ public class AccountService
             db.Events.KafeAppend(old.Id, new AccountPermissionUnset(
                 AccountId: old.Id,
                 EntityId: removedPermission
+            ));
+        }
+        
+        var addedRoles = modified.RoleIds.Except(modified.RoleIds);
+        foreach(var newRole in addedRoles)
+        {
+            hasChanged = true;
+            db.Events.KafeAppend(old.Id, new AccountRoleSet(
+                AccountId: old.Id,
+                RoleId: newRole
+            ));
+        }
+        
+        var removedRoles = old.RoleIds.Except(modified.RoleIds);
+        foreach(var removedRole in removedRoles)
+        {
+            hasChanged = true;
+            db.Events.KafeAppend(old.Id, new AccountRoleUnset(
+                AccountId: old.Id,
+                RoleId: removedRole
             ));
         }
 

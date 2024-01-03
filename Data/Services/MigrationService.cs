@@ -57,7 +57,6 @@ public class MigrationService
             MigrationMetadata: @new.MigrationMetadata);
         db.Events.KafeStartStream<MigrationInfo>(id, created);
         await db.SaveChangesAsync(token);
-
         return await db.Events.KafeAggregateRequiredStream<MigrationInfo>(id, token: token);
     }
 
@@ -81,12 +80,10 @@ public class MigrationService
                 MigrationMetadata: @old.MigrationMetadata);
             db.Events.Append(@old.Id, amended);
             await db.SaveChangesAsync(token);
-            return await db.Events.AggregateStreamAsync<MigrationInfo>(@old.Id, token: token)
-                ?? throw new InvalidOperationException($"The migration is no longer present in the database. "
-                    + "This should never happend.");
+            return await db.Events.KafeAggregateRequiredStream<MigrationInfo>(@old.Id, token: token);
         }
 
-        return Error.Unmodified($"migration {modified.Id}");
+        return Error.Unmodified(modified.Id, "A migration");
     }
 
     public async Task<MigrationInfo?> Load(Hrib id, CancellationToken token = default)
@@ -151,7 +148,8 @@ public class MigrationService
         string Email,
         string? Name,
         string? Uco,
-        string? Phone
+        string? Phone,
+        ImmutableArray<Hrib>? RoleIds = null
     );
 
     public async Task<(MigrationInfo migration, AccountInfo account)> GetOrAddAccount(
@@ -219,7 +217,10 @@ public class MigrationService
                 Name = order.Name,
                 EmailAddress = order.Email,
                 Uco = order.Uco,
-                Phone = order.Phone
+                Phone = order.Phone,
+                RoleIds = order.RoleIds is null 
+                    ? ImmutableArray<string>.Empty
+                    : order.RoleIds.Value.Select(r => r.ToString()).ToImmutableArray()
             }, token);
             if (createResult.HasErrors)
             {
@@ -235,7 +236,10 @@ public class MigrationService
                 Name = order.Name ?? entity.Name,
                 Uco = order.Uco ?? entity.Uco,
                 EmailAddress = order.Email ?? entity.EmailAddress,
-                Phone = order.Phone ?? entity.Phone
+                Phone = order.Phone ?? entity.Phone,
+                RoleIds = order.RoleIds is null 
+                    ? ImmutableArray<string>.Empty
+                    : order.RoleIds.Value.Select(r => r.ToString()).ToImmutableArray()
             };
 
             var editResult = await accountService.Edit(entity, token);

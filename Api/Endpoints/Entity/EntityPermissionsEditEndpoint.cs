@@ -59,14 +59,16 @@ public class EntityPermissionsEditEndpoint : EndpointBaseAsync
             return ValidationProblem(title: "All accounts must be identified by either id or email address.");
         }
 
-        var accounts = await Task.WhenAll(accountPermissions
-            .Select(async a =>
-            {
-                var account = a.Id is not null
-                    ? await accountService.Load(a.Id)
-                    : await accountService.FindByEmail(a.EmailAddress!);
-                return (dto: a, entity: account);
-            }));
+        // NB: Npgsql does not allow multiple queries per connection.
+        var accounts = new List<(EntityPermissionsAccountEditDto dto, AccountInfo? entity)>(accountPermissions.Length);
+        foreach(var accountPerm in accountPermissions)
+        {
+            var account = accountPerm.Id is not null
+                ? await accountService.Load(accountPerm.Id, cancellationToken)
+                : await accountService.FindByEmail(accountPerm.EmailAddress!, cancellationToken);
+            accounts.Add((dto: accountPerm, entity: account));
+        }
+
         if (accounts.Any(a => a.entity is null))
         {
             var notFoundAccounts = string.Join(", ", accounts.Where(a => a.entity is null)

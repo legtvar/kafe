@@ -74,7 +74,7 @@ $@"TRUE = ALL(
         if (account is null)
         {
             id = Hrib.Create();
-            var created = new TemporaryAccountCreated(
+            var created = new AccountCreated(
                 AccountId: id.Value,
                 CreationMethod: CreationMethod.Api,
                 EmailAddress: emailAddress,

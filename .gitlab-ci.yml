@@ -75,8 +75,8 @@ publish-api:
   stage: manual
   script:
     - cp "$APPSETTINGS_PRODUCTION" "./Api/appsettings.local.json"
-    - docker-compose -f docker-compose.yml build api
-    - docker-compose -f docker-compose.yml up -d api
+    - docker compose -f docker-compose.yml build api
+    - docker compose -f docker-compose.yml up -d api
   tags:
     - mlejnek
   when: manual
@@ -85,9 +85,9 @@ publish-all:
   stage: manual
   script:
     - cp "$APPSETTINGS_PRODUCTION" "./Api/appsettings.local.json"
-    - docker-compose -f docker-compose.yml build
-    - docker-compose -f docker-compose.yml down
-    - docker-compose -f docker-compose.yml up -d
+    - docker compose -f docker-compose.yml build
+    - docker compose -f docker-compose.yml down
+    - docker compose -f docker-compose.yml up -d
   tags:
     - mlejnek
   when: manual
@@ -95,8 +95,8 @@ publish-all:
 publish-web:
   stage: manual
   script:
-    - docker-compose -f docker-compose.yml build
-    - docker-compose -f docker-compose.yml up -d web
+    - docker compose -f docker-compose.yml build
+    - docker compose -f docker-compose.yml up -d web
   tags:
     - mlejnek
   when: manual

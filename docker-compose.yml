@@ -15,7 +15,7 @@ services:
       default:
         aliases:
           - kafe-db
-      bridge:
+      backbone:
         aliases:
           - kafe-db
     restart: always
@@ -34,7 +34,7 @@ services:
     depends_on:
       - db
     networks:
-      bridge:
+      backbone:
         aliases:
           - kafe-api
       default:
@@ -45,7 +45,7 @@ services:
       context: ./
       dockerfile: Web.Dockerfile
     networks:
-      bridge:
+      backbone:
         aliases:
           - kafe-web
       default:
@@ -73,5 +73,7 @@ volumes:
       device: :/gpfs/vol1/nfs/lemma/kafe
 
 networks:
-  bridge:
+  # NB: we use `backbone` because the default `bridge` network does not support aliases
+  #     https://github.com/docker/compose/issues/3012
+  backbone:
     external: true

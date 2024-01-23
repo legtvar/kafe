@@ -81,7 +81,7 @@ publish-api:
     - mlejnek
   when: manual
   rules:
-    - if: $IS_CLEANUP != "true" && $IS_BACKUP != "true" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "api")
+    - if: $IS_CLEANUP != "true" && $IS_BACKUP != "true" && ($CI_COMMIT_BRANCH == "mlejnek-test" || $CI_COMMIT_BRANCH == "api")
 
 publish-all:
   stage: manual
@@ -94,7 +94,7 @@ publish-all:
     - mlejnek
   when: manual
   rules:
-    - if: $IS_CLEANUP != "true" && $IS_BACKUP != "true" && $CI_COMMIT_BRANCH == "main"
+    - if: $IS_CLEANUP != "true" && $IS_BACKUP != "true" && $CI_COMMIT_BRANCH == "mlejnek-test"
 
 publish-web:
   stage: manual
@@ -102,10 +102,10 @@ publish-web:
     - docker-compose -f docker-compose.yml build
     - docker-compose -f docker-compose.yml up -d web
   tags:
-    - lemma-new
+    - mlejnek
   when: manual
   rules:
-    - if: $IS_CLEANUP != "true" && $IS_BACKUP != "true" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "api" || $CI_COMMIT_BRANCH == "web")
+    - if: $IS_CLEANUP != "true" && $IS_BACKUP != "true" && ($CI_COMMIT_BRANCH == "mlejnek-test" || $CI_COMMIT_BRANCH == "api" || $CI_COMMIT_BRANCH == "web")
 
 publish-announcer:
   stage: manual

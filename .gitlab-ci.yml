@@ -79,6 +79,7 @@ publish-api:
     - docker compose -f docker-compose.yml up -d api
   tags:
     - mlejnek
+  resource_group: mlejnek
   when: manual
 
 publish-all:
@@ -90,6 +91,7 @@ publish-all:
     - docker compose -f docker-compose.yml up -d
   tags:
     - mlejnek
+  resource_group: mlejnek
   when: manual
 
 publish-web:
@@ -99,6 +101,7 @@ publish-web:
     - docker compose -f docker-compose.yml up -d web
   tags:
     - mlejnek
+  resource_group: mlejnek
   when: manual
 
 publish-announcer:

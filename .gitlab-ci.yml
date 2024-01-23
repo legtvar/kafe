@@ -80,8 +80,6 @@ publish-api:
   tags:
     - mlejnek
   when: manual
-  rules:
-    - if: $IS_CLEANUP != "true" && $IS_BACKUP != "true" && ($CI_COMMIT_BRANCH == "mlejnek-test" || $CI_COMMIT_BRANCH == "api")
 
 publish-all:
   stage: manual
@@ -93,8 +91,6 @@ publish-all:
   tags:
     - mlejnek
   when: manual
-  rules:
-    - if: $IS_CLEANUP != "true" && $IS_BACKUP != "true" && $CI_COMMIT_BRANCH == "mlejnek-test"
 
 publish-web:
   stage: manual
@@ -104,8 +100,6 @@ publish-web:
   tags:
     - mlejnek
   when: manual
-  rules:
-    - if: $IS_CLEANUP != "true" && $IS_BACKUP != "true" && ($CI_COMMIT_BRANCH == "mlejnek-test" || $CI_COMMIT_BRANCH == "api" || $CI_COMMIT_BRANCH == "web")
 
 publish-announcer:
   stage: manual

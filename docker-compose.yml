@@ -72,6 +72,7 @@ volumes:
   #     o: "addr=storage-brno1-cerit.metacentrum.cz,rw,tcp,nolock,rsize=32768,wsize=32768,intr,noatime,nfsvers=3,actimeo=3"
   #     device: :/gpfs/vol1/nfs/lemma/kafe
   cerit:
+    driver: local
 
 networks:
   # NB: we use `backbone` because the default `bridge` network does not support aliases

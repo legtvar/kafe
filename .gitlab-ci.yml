@@ -78,7 +78,7 @@ publish-api:
     - docker-compose -f docker-compose.yml build api
     - docker-compose -f docker-compose.yml up -d api
   tags:
-    - lemma-new
+    - mlejnek
   when: manual
   rules:
     - if: $IS_CLEANUP != "true" && $IS_BACKUP != "true" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "api")
@@ -91,7 +91,7 @@ publish-all:
     - docker-compose -f docker-compose.yml down
     - docker-compose -f docker-compose.yml up -d
   tags:
-    - lemma-new
+    - mlejnek
   when: manual
   rules:
     - if: $IS_CLEANUP != "true" && $IS_BACKUP != "true" && $CI_COMMIT_BRANCH == "main"

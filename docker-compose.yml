@@ -40,17 +40,26 @@ services:
           - kafe-api
       default:
     restart: always
+    labels:
+      - "traefik.http.routers.kafe-api.rule=PathPrefix(`/api/`)"
+      - "traefik.http.services.kafe-api-service.loadbalancer.server.port=443"
+      - "traefik.http.routers.kafe-api.priority=100"
 
   web:
     build:
       context: ./
       dockerfile: Web.Dockerfile
+    expose:
+      - 80
     networks:
       backbone:
         aliases:
           - kafe-web
       default:
     restart: always
+    labels:
+      - "traefik.http.routers.kafe-web.rule=PathPrefix(`/`)"
+      - "traefik.http.routers.kafe-web.priority=0" # web is the fallback for all other services
 
   announcer:
     build:

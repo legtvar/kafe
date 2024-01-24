@@ -41,7 +41,7 @@ services:
       default:
     restart: always
     labels:
-      - "traefik.http.routers.kafe-api.rule=PathPrefix(`/api/`)"
+      - "traefik.http.routers.kafe-api.rule=PathPrefix(`/api`, `/swagger`, `/confirm`, `/signin-oidc`)"
       - "traefik.http.services.kafe-api-service.loadbalancer.server.port=443"
       - "traefik.http.routers.kafe-api.priority=100"
 

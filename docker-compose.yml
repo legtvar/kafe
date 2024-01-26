@@ -36,10 +36,12 @@ services:
     depends_on:
       - db
     networks:
+      default:
+        aliases:
+          - kafe-api
       backbone:
         aliases:
           - kafe-api
-      default:
     restart: always
     labels:
       - "traefik.http.routers.kafe-api.rule=PathPrefix(`/api`, `/swagger`, `/confirm`, `/signin-oidc`)"
@@ -57,6 +59,8 @@ services:
         aliases:
           - kafe-web
       default:
+        aliases:
+          - kafe-web
     restart: always
     labels:
       - "traefik.http.routers.kafe-web.rule=PathPrefix(`/`)"

@@ -74,7 +74,7 @@ migrate-wma:
 publish-api:
   stage: manual
   script:
-    - cp "$APPSETTINGS_PRODUCTION" "./Api/appsettings.local.json"
+    - cp "$APPSETTINGS_MLEJNEK" "./Api/appsettings.local.json"
     - docker compose -f docker-compose.yml build api
     - docker compose -f docker-compose.yml up -d api
   tags:
@@ -85,7 +85,7 @@ publish-api:
 publish-all:
   stage: manual
   script:
-    - cp "$APPSETTINGS_PRODUCTION" "./Api/appsettings.local.json"
+    - cp "$APPSETTINGS_MLEJNEK" "./Api/appsettings.local.json"
     - docker compose -f docker-compose.yml build
     - docker compose -f docker-compose.yml down
     - docker compose -f docker-compose.yml up -d

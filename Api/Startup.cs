@@ -39,6 +39,7 @@ using System.Text.Json;
 using Kafe.Data.Services;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.HttpLogging;
+using Microsoft.Extensions.Logging;
 
 namespace Kafe.Api;
 
@@ -192,6 +193,12 @@ public class Startup
         app.UseRouting();
 
         app.UseCors();
+
+        app.Use((ctx, next) => {
+            var logger = ctx.RequestServices.GetRequiredService<ILogger<Startup>>();
+            logger.Log(LogLevel.Information, "Scheme: {}", ctx.Request.Scheme);
+            return next();
+        });
 
         app.UseAuthentication();
         app.Use(async (ctx, next) =>

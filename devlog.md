@@ -72,3 +72,27 @@ SELECT * FROM mt_doc_projectinfo
 WHERE 'UO20OFQkWAx' IN (SELECT sub ->> 'Id'
                         FROM jsonb_array_elements(data -> 'Artifacts') AS sub)
 ```
+
+To find artifacts in a project group 'CafMk2sO9fL':
+
+```sql
+select id from mt_doc_videoshardinfo
+where data ->> 'ArtifactId' in
+	(select data ->> 'Id' from mt_doc_artifactdetail
+	where data -> 'ContainingProjectIds' ->> 0 in 
+	(select data ->> 'Id' from mt_doc_projectinfo
+	 where data ->> 'ProjectGroupId' = 'CafMk2sO9fL'
+))
+```
+
+...and to get their collective file size:
+
+```sql
+select sum((data -> 'Variants' -> 'sd' ->> 'FileLength')::int) from mt_doc_videoshardinfo
+where data ->> 'ArtifactId' in
+	(select data ->> 'Id' from mt_doc_artifactdetail
+	where data -> 'ContainingProjectIds' ->> 0 in 
+	(select data ->> 'Id' from mt_doc_projectinfo
+	 where data ->> 'ProjectGroupId' = 'CafMk2sO9fL'
+))
+```

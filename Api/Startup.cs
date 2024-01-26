@@ -151,12 +151,15 @@ public class Startup
                 p.WithOrigins(ApiOptions.AllowedOrigins.ToArray());
             });
         });
+        
+        services.AddHttpLogging(o => {});
 
         RegisterKafe(services);
     }
 
     public void Configure(IApplicationBuilder app, IHostEnvironment environment)
     {
+        app.UseHttpLogging();
         app.UseForwardedHeaders(new ForwardedHeadersOptions
         {
             ForwardedHeaders = ForwardedHeaders.All

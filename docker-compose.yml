@@ -19,6 +19,8 @@ services:
         aliases:
           - kafe-db
     restart: always
+    labels:
+      - "traefik.enable=false"
 
   api:
     build:
@@ -42,8 +44,9 @@ services:
     restart: always
     labels:
       - "traefik.http.routers.kafe-api.rule=PathPrefix(`/api`, `/swagger`, `/confirm`, `/signin-oidc`)"
-      - "traefik.http.services.kafe-api-service.loadbalancer.server.port=443"
       - "traefik.http.routers.kafe-api.priority=100"
+      - "traefik.http.routers.kafe-api.tls=true"
+      - "traefik.http.services.kafe-api.loadbalancer.server.port=443"
 
   web:
     build:
@@ -60,6 +63,7 @@ services:
     labels:
       - "traefik.http.routers.kafe-web.rule=PathPrefix(`/`)"
       - "traefik.http.routers.kafe-web.priority=0" # web is the fallback for all other services
+      - "traefik.http.routers.kafe-web.tls=true"
 
   announcer:
     build:

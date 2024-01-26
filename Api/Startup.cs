@@ -37,6 +37,7 @@ using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.IdentityModel.Logging;
 using System.Text.Json;
 using Kafe.Data.Services;
+using Microsoft.AspNetCore.HttpOverrides;
 
 namespace Kafe.Api;
 
@@ -156,6 +157,10 @@ public class Startup
 
     public void Configure(IApplicationBuilder app, IHostEnvironment environment)
     {
+        app.UseForwardedHeaders(new ForwardedHeadersOptions
+        {
+            ForwardedHeaders = ForwardedHeaders.All
+        });
         app.UseHttpsRedirection();
 
         var apiOptions = app.ApplicationServices.GetRequiredService<IOptions<ApiOptions>>();

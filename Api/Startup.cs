@@ -38,6 +38,7 @@ using Microsoft.IdentityModel.Logging;
 using System.Text.Json;
 using Kafe.Data.Services;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.HttpLogging;
 
 namespace Kafe.Api;
 
@@ -151,8 +152,23 @@ public class Startup
                 p.WithOrigins(ApiOptions.AllowedOrigins.ToArray());
             });
         });
-        
-        services.AddHttpLogging(o => {});
+
+        services.AddHttpLogging(o =>
+        {
+            o.LoggingFields = HttpLoggingFields.All;
+            o.RequestHeaders.Add("X-Forwarded-For");
+            o.RequestHeaders.Add("Sec-Fetch-Dest");
+            o.RequestHeaders.Add("Sec-Fetch-Site");
+            o.RequestHeaders.Add("Sec-Fetch-User");
+            o.RequestHeaders.Add("Sec-Fetch-Mode");
+            o.RequestHeaders.Add("X-Forwarded-Host");
+            o.RequestHeaders.Add("X-Forwarded-Port");
+            o.RequestHeaders.Add("X-Forwarded-Proto");
+            o.RequestHeaders.Add("X-Real-Ip");
+            o.RequestHeaders.Add("X-Forwarded-Server");
+            o.RequestHeaders.Add("Upgrade-Insecure-Requests");
+            o.RequestHeaders.Add("Referer");
+        });
 
         RegisterKafe(services);
     }

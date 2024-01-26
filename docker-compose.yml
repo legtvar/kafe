@@ -45,7 +45,7 @@ services:
     labels:
       - "traefik.http.routers.kafe-api.rule=PathPrefix(`/api`, `/swagger`, `/confirm`, `/signin-oidc`)"
       - "traefik.http.routers.kafe-api.priority=100"
-      - "traefik.http.routers.kafe-api.tls=true"
+      # - "traefik.http.routers.kafe-api.tls=true"
       - "traefik.http.services.kafe-api.loadbalancer.server.port=443"
 
   web:
@@ -63,7 +63,7 @@ services:
     labels:
       - "traefik.http.routers.kafe-web.rule=PathPrefix(`/`)"
       - "traefik.http.routers.kafe-web.priority=0" # web is the fallback for all other services
-      - "traefik.http.routers.kafe-web.tls=true"
+      # - "traefik.http.routers.kafe-web.tls=true"
 
   announcer:
     build:

@@ -67,7 +67,7 @@ services:
       - "traefik.http.routers.kafe-web.rule=Host(`kafe-stage.fi.muni.cz`) && PathPrefix(`/`)"
       - "traefik.http.routers.kafe-web.priority=0" # web is the fallback for all other services
       - "traefik.http.routers.kafe-web.tls=true"
-      - "traefik.http.routers.kafe-api.tls.certresolver=lets-encrypt"
+      - "traefik.http.routers.kafe-web.tls.certresolver=lets-encrypt"
 
   announcer:
     build:

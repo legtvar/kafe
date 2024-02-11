@@ -181,6 +181,12 @@ public class Startup
         {
             ForwardedHeaders = ForwardedHeaders.All
         });
+        app.Use((ctx, next) => {
+            var logger = ctx.RequestServices.GetRequiredService<ILogger<Startup>>();
+            logger.Log(LogLevel.Information, "Scheme right after ForwardedHeadersMiddleware: {}", ctx.Request.Scheme);
+            return next();
+        });
+        
         app.UseHttpsRedirection();
 
         var apiOptions = app.ApplicationServices.GetRequiredService<IOptions<ApiOptions>>();
@@ -196,7 +202,7 @@ public class Startup
 
         app.Use((ctx, next) => {
             var logger = ctx.RequestServices.GetRequiredService<ILogger<Startup>>();
-            logger.Log(LogLevel.Information, "Scheme: {}", ctx.Request.Scheme);
+            logger.Log(LogLevel.Information, "Scheme after CorsMidleware: {}", ctx.Request.Scheme);
             return next();
         });
 

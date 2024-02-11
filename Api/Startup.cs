@@ -40,6 +40,7 @@ using Kafe.Data.Services;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.Extensions.Logging;
+using System.Net;
 
 namespace Kafe.Api;
 
@@ -171,16 +172,22 @@ public class Startup
             o.RequestHeaders.Add("Referer");
         });
 
+        services.Configure<ForwardedHeadersOptions>(o => {
+            o.ForwardedHeaders = ForwardedHeaders.All;
+            
+            // Accept proxies at all local IPv4 addresses
+            o.KnownNetworks.Add(new IPNetwork(IPAddress.Parse("192.168.0.0"), 16));
+            o.KnownNetworks.Add(new IPNetwork(IPAddress.Parse("172.16.0.0"), 12));
+            o.KnownNetworks.Add(new IPNetwork(IPAddress.Parse("10.0.0.0"), 8));
+        });
+
         RegisterKafe(services);
     }
 
     public void Configure(IApplicationBuilder app, IHostEnvironment environment)
     {
         app.UseHttpLogging();
-        app.UseForwardedHeaders(new ForwardedHeadersOptions
-        {
-            ForwardedHeaders = ForwardedHeaders.All
-        });
+        app.UseForwardedHeaders();
         app.Use((ctx, next) => {
             var logger = ctx.RequestServices.GetRequiredService<ILogger<Startup>>();
             logger.Log(LogLevel.Information, "Scheme right after ForwardedHeadersMiddleware: {}", ctx.Request.Scheme);

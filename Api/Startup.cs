@@ -155,23 +155,6 @@ public class Startup
             });
         });
 
-        services.AddHttpLogging(o =>
-        {
-            o.LoggingFields = HttpLoggingFields.All;
-            o.RequestHeaders.Add("X-Forwarded-For");
-            o.RequestHeaders.Add("Sec-Fetch-Dest");
-            o.RequestHeaders.Add("Sec-Fetch-Site");
-            o.RequestHeaders.Add("Sec-Fetch-User");
-            o.RequestHeaders.Add("Sec-Fetch-Mode");
-            o.RequestHeaders.Add("X-Forwarded-Host");
-            o.RequestHeaders.Add("X-Forwarded-Port");
-            o.RequestHeaders.Add("X-Forwarded-Proto");
-            o.RequestHeaders.Add("X-Real-Ip");
-            o.RequestHeaders.Add("X-Forwarded-Server");
-            o.RequestHeaders.Add("Upgrade-Insecure-Requests");
-            o.RequestHeaders.Add("Referer");
-        });
-
         services.Configure<ForwardedHeadersOptions>(o => {
             o.ForwardedHeaders = ForwardedHeaders.All;
             
@@ -186,14 +169,8 @@ public class Startup
 
     public void Configure(IApplicationBuilder app, IHostEnvironment environment)
     {
-        app.UseHttpLogging();
         app.UseForwardedHeaders();
-        app.Use((ctx, next) => {
-            var logger = ctx.RequestServices.GetRequiredService<ILogger<Startup>>();
-            logger.Log(LogLevel.Information, "Scheme right after ForwardedHeadersMiddleware: {}", ctx.Request.Scheme);
-            return next();
-        });
-        
+
         app.UseHttpsRedirection();
 
         var apiOptions = app.ApplicationServices.GetRequiredService<IOptions<ApiOptions>>();
@@ -206,12 +183,6 @@ public class Startup
         app.UseRouting();
 
         app.UseCors();
-
-        app.Use((ctx, next) => {
-            var logger = ctx.RequestServices.GetRequiredService<ILogger<Startup>>();
-            logger.Log(LogLevel.Information, "Scheme after CorsMidleware: {}", ctx.Request.Scheme);
-            return next();
-        });
 
         app.UseAuthentication();
         app.Use(async (ctx, next) =>

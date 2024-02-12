@@ -11,7 +11,7 @@ export function toLocalizedString(input: any): localizedString {
 }
 
 export const concat = (...parts: (localizedString | string)[]) => {
-    let result = {
+    const result = {
         iv: '',
         cs: '',
         en: '',

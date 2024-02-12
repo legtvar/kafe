@@ -21,14 +21,14 @@ import { Project } from '../../../data/Project';
 import { useAuth } from '../../../hooks/Caffeine';
 import { AwaitAPI } from '../../utils/AwaitAPI';
 import { RightsEditor } from '../../utils/RightsEditor';
+import { SendAPI } from '../../utils/SendAPI';
 import { Status } from '../../utils/Status';
 import { ArtifactGroupUpload } from '../../utils/Upload/ArtifactGroup';
 import { AddReview } from './AddReview';
-import { ProjectBasicInfo } from './create/ProjectBasicInfo';
 import { ProjectStatus } from './ProjectStatus';
 import { ProjectTags } from './ProjectTags';
 import { ReviewList } from './ReviewList';
-import { SendAPI } from '../../utils/SendAPI';
+import { ProjectBasicInfo } from './create/ProjectBasicInfo';
 
 interface IProjectEditProps {}
 
@@ -82,8 +82,9 @@ export function ProjectEdit(props: IProjectEditProps) {
                             <TabPanel>
                                 <Stack spacing={8} direction="column">
                                     {Object.entries(project.blueprint.artifactBlueprints).map(
-                                        ([slotName, blueprint]) => (
+                                        ([slotName, blueprint], i) => (
                                             <ArtifactGroupUpload
+                                                key={i}
                                                 project={project}
                                                 artifactBlueprint={blueprint!}
                                                 slotName={slotName}

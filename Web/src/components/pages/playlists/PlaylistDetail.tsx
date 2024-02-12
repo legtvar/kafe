@@ -73,7 +73,7 @@ export function PlaylistDetail(props: IPlaylistDetailProps) {
 
                                         <Flex direction="column" w="full" mt={-4}>
                                             {artifacts.map((artifact, i) => (
-                                                <Link to={`./${i + 1}`}>
+                                                <Link to={`./${i + 1}`} key={i}>
                                                     <Flex
                                                         direction={{
                                                             base: 'column',

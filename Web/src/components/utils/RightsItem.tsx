@@ -1,12 +1,10 @@
-import { Avatar, Box, Button, Checkbox, Flex, Input, InputGroup, Text, useColorModeValue } from '@chakra-ui/react';
+import { Avatar, Box, Checkbox, Flex, Input, InputGroup, Text, useColorModeValue } from '@chakra-ui/react';
 import { t } from 'i18next';
 import { useEffect, useState } from 'react';
 import { IoAdd, IoEarth } from 'react-icons/io5';
-import { AbstractType } from '../../data/AbstractType';
-import { User } from '../../data/User';
 import { useColorScheme } from '../../hooks/useColorScheme';
-import { avatarUrl } from '../../utils/avatarUrl';
 import { HRIB, Permission } from '../../schemas/generic';
+import { avatarUrl } from '../../utils/avatarUrl';
 
 export interface IUser {
     id?: HRIB;
@@ -30,7 +28,7 @@ export function RightsItem({ user, options, initialPerms, readonly, onChange }: 
     const [perms, setPerms] = useState<Permission[]>(initialPerms);
 
     useEffect(() => {
-        let newUser: IUser = typeof user === 'number' ? { permissions: [] } : { ...user, permissions: [] };
+        const newUser: IUser = typeof user === 'number' ? { permissions: [] } : { ...user, permissions: [] };
         newUser.emailAddress = newEmail;
         newUser.permissions = perms;
         onChange(newUser);
@@ -73,7 +71,7 @@ export function RightsItem({ user, options, initialPerms, readonly, onChange }: 
                             <Flex direction="column">
                                 <Text>{t('rights.special.anyone.title').toString()}</Text>
                                 <Text fontSize="smaller" color="red.500">
-                                {t('rights.special.anyone.warning').toString()}
+                                    {t('rights.special.anyone.warning').toString()}
                                 </Text>
                             </Flex>
                         </Flex>
@@ -119,8 +117,8 @@ export function RightsItem({ user, options, initialPerms, readonly, onChange }: 
                         md: 'row',
                     }}
                 >
-                    {options.map((right) => (
-                        <InputGroup>
+                    {options.map((right, i) => (
+                        <InputGroup key={i}>
                             <Checkbox
                                 mr={{
                                     base: '0',

@@ -14,7 +14,8 @@ interface IPaginationProps<T> {
 
 export function Pagination<T>(props: IPaginationProps<T>) {
     const [page, setPage] = React.useState<number>(0);
-    let { data, perPage, maxPages, children } = props;
+    const { data, children } = props;
+    let { perPage, maxPages } = props;
     perPage = perPage || 20;
     maxPages = maxPages || 7;
     const pagesInData = Math.ceil(data.length / perPage);

@@ -17,7 +17,7 @@ export function ReviewList({ project }: IReviewListProps) {
         <VStack w="100%" alignItems="stretch" spacing={4}>
             {project.reviews
                 .sort((a, b) => new Date(b.addedOn).getTime() - new Date(a.addedOn).getTime())
-                .map((review) => (
+                .map((review, i) => (
                     <HStack
                         borderColor={border}
                         bg={bg}
@@ -27,6 +27,7 @@ export function ReviewList({ project }: IReviewListProps) {
                         py={4}
                         spacing={4}
                         alignItems="start"
+                        key={i}
                     >
                         <Box fontSize="2em" mt={2}>
                             {review.kind === 'accepted' ? (

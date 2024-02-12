@@ -69,7 +69,7 @@
     "start": "react-app-rewired start",
     "build": "react-app-rewired build",
     "test": "react-app-rewired test",
-    "lint": "eslint",
+    "lint": "eslint src",
     "extract-translations": "i18next 'src/**/*.{ts,tsx,js}' -c i18next-parser.config.mjs",
     "generate-typings": "openapi-typescript ./swagger.json --output src/schemas/api.ts",
     "proxy": "cd proxy && npm run start"

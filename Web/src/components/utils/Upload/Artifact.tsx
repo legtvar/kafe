@@ -74,8 +74,13 @@ export function ArtifactUpload(props: IArtifactUploadProps) {
                             </AccordionButton>
                             <AccordionPanel pb={4}>
                                 <SimpleGrid columns={{ base: 1, lg: 2, xl: 3 }} spacing={4} w="100%">
-                                    {Object.entries(shardBlueprints).map(([kind, shard]) => (
-                                        <ShardGroupUpload kind={kind as any} shardBlueprint={shard!} {...props} />
+                                    {Object.entries(shardBlueprints).map(([kind, shard], i) => (
+                                        <ShardGroupUpload
+                                            kind={kind as any}
+                                            shardBlueprint={shard!}
+                                            key={i}
+                                            {...props}
+                                        />
                                     ))}
                                 </SimpleGrid>
                                 <Button mt={4} colorScheme="red" leftIcon={<IoTrashOutline />} onClick={onOpen}>

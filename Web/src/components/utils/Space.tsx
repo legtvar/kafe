@@ -4,7 +4,7 @@ interface ISpaceProps {
 }
 
 export function Space(props: ISpaceProps) {
-    let size =
+    const size =
         {
             xs: '0.5em',
             s: '1em',

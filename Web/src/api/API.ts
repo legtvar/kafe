@@ -184,7 +184,7 @@ export class API {
         return {
             temporary: {
                 async create(email: string, culture: string) {
-                    return await api.post<components['schemas']['TemporaryAccountCreationDto'], {}>(
+                    return await api.post<components['schemas']['TemporaryAccountCreationDto'], Record<string, never>>(
                         `tmp-account`,
                         {
                             emailAddress: email,

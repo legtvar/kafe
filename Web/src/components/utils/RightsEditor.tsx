@@ -1,12 +1,10 @@
 import { Box, List, Spacer, Text } from '@chakra-ui/react';
 import { t } from 'i18next';
-import { AbstractType } from '../../data/AbstractType';
-import { useAuth } from '../../hooks/Caffeine';
-import { useColorScheme } from '../../hooks/useColorScheme';
-import { RightsItem } from './RightsItem';
-import { EntityPermissions, EntityPermissionsUser } from '../../data/EntityPermissions';
 import { useState } from 'react';
+import { EntityPermissions, EntityPermissionsUser } from '../../data/EntityPermissions';
+import { useColorScheme } from '../../hooks/useColorScheme';
 import { Permission } from '../../schemas/generic';
+import { RightsItem } from './RightsItem';
 
 export interface IRightsEditorProps {
     perms: EntityPermissions;
@@ -24,8 +22,8 @@ export function RightsEditor({ perms, readonly, explanation, options }: IRightsE
         <>
             <Box mb={4} mx={-4} fontSize="smaller" color="gray.500">
                 <List>
-                    {options.map((o) => (
-                        <li>
+                    {options.map((o, i) => (
+                        <li key={i}>
                             <Text as="span" fontWeight="bold">
                                 {t(`rights.${o}`).toString()}
                             </Text>
@@ -48,8 +46,9 @@ export function RightsEditor({ perms, readonly, explanation, options }: IRightsE
 
                 {perms.accountPermissions
                     .filter((a) => a.id)
-                    .map((a) => (
+                    .map((a, i) => (
                         <RightsItem
+                            key={i}
                             user={a}
                             initialPerms={a.permissions}
                             {...{ readonly, options }}
@@ -71,7 +70,7 @@ export function RightsEditor({ perms, readonly, explanation, options }: IRightsE
                         initialPerms={[]}
                         {...{ readonly, options }}
                         onChange={(user) => {
-                            let newNewItems = newItems.map((n, j) => (i == j ? user : n));
+                            const newNewItems = newItems.map((n, j) => (i == j ? user : n));
 
                             if (newNewItems.filter((e) => !e.emailAddress).length == 0) {
                                 newNewItems.push({});
@@ -80,7 +79,7 @@ export function RightsEditor({ perms, readonly, explanation, options }: IRightsE
 
                             perms.accountPermissions = [
                                 ...perms.accountPermissions.filter((a) => a.id),
-                                ...(newNewItems.filter(a => a.emailAddress) as EntityPermissionsUser[]),
+                                ...(newNewItems.filter((a) => a.emailAddress) as EntityPermissionsUser[]),
                             ];
                         }}
                     />

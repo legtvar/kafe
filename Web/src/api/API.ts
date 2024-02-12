@@ -1,5 +1,6 @@
 import axios, { Axios, AxiosProgressEvent, AxiosResponse } from 'axios';
 import { Author } from '../data/Author';
+import { EntityPermissions } from '../data/EntityPermissions';
 import { Group } from '../data/Group';
 import { Playlist } from '../data/Playlist';
 import { Project } from '../data/Project';
@@ -7,7 +8,6 @@ import { User } from '../data/User';
 import { components } from '../schemas/api';
 import { HRIB, localizedString } from '../schemas/generic';
 import { IntRange } from '../utils/IntRange';
-import { EntityPermissions } from '../data/EntityPermissions';
 
 export type ApiCredentials = {
     username: string;
@@ -16,15 +16,15 @@ export type ApiCredentials = {
 
 export type ApiResponse<T> =
     | {
-        status: 200;
-        response: AxiosResponse<any>;
-        data: T;
-    }
+          status: 200;
+          response: AxiosResponse<any>;
+          data: T;
+      }
     | {
-        status: IntRange<400, 500>;
-        response: AxiosResponse<any>;
-        error: components['schemas']['ProblemDetails'];
-    };
+          status: IntRange<400, 500>;
+          response: AxiosResponse<any>;
+          error: components['schemas']['ProblemDetails'];
+      };
 
 export class API {
     private apiUrl = '/api/v1/';
@@ -32,7 +32,7 @@ export class API {
 
     public constructor() {
         if (window.location.hostname.startsWith('localhost') || window.location.hostname.startsWith('127.0.0.1')) {
-            this.apiUrl = 'https://localhost:44369' + this.apiUrl;
+            this.apiUrl = 'http://localhost:8000' + this.apiUrl;
         }
 
         this.client = axios.create({
@@ -79,7 +79,10 @@ export class API {
                 return api.post<components['schemas']['ProjectGroupCreationDto'], HRIB>(`group`, group.serialize());
             },
             async update(group: Group) {
-                return api.patch<components['schemas']['ProjectGroupCreationDto'], HRIB>(`group`, group.serialize(true));
+                return api.patch<components['schemas']['ProjectGroupCreationDto'], HRIB>(
+                    `group`,
+                    group.serialize(true),
+                );
             },
         };
     }
@@ -205,7 +208,7 @@ export class API {
             external: {
                 loginUrl() {
                     return `${api.apiUrl}account/external-login?redirect=${window.location.origin}/auth`;
-                }
+                },
             },
             async logout() {
                 return api.getSimple(`account/logout`);
@@ -223,10 +226,12 @@ export class API {
                 },
                 async update(perms: EntityPermissions) {
                     return await api.patch<components['schemas']['EntityPermissionsAccountEditDto'], HRIB>(
-                        `entity/perms`, perms.serialize(true));
-                }
-            }
-        }
+                        `entity/perms`,
+                        perms.serialize(true),
+                    );
+                },
+            },
+        };
     }
 
     // END

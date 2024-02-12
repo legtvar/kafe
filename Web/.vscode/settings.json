@@ -7,7 +7,7 @@
     "npm.autoDetect": "on",
     "debug.allowBreakpointsEverywhere": true,
     "editor.codeActionsOnSave": {
-        "source.organizeImports": true
+        "source.organizeImports": "explicit"
     },
     "search.exclude": {
         "*/**/node_modules/": true

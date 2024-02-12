@@ -19,6 +19,6 @@
         "useDefineForClassFields": true,
         "downlevelIteration": true
     },
-    "include": ["src"],
+    "include": ["src", "./.eslintrc.js"],
     "typeRoots": ["src/customTypings", "node_modules/@types"]
 }

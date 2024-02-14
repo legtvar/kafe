@@ -51,6 +51,17 @@ services:
       default:
     restart: always
 
+  announcer:
+    build:
+      context: ./
+      dockerfile: Announcer.Dockerfile
+    networks:
+      backbone:
+        aliases:
+          - kafe-announcer
+      default:
+    restart: always
+
 volumes:
   postgres_data:
   secrets:

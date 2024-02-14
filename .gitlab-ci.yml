@@ -107,6 +107,17 @@ publish-web:
   rules:
     - if: $IS_CLEANUP != "true" && $IS_BACKUP != "true" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "api" || $CI_COMMIT_BRANCH == "web")
 
+publish-announcer:
+  stage: manual
+  script:
+    - docker-compose -f docker-compose.yml build
+    - docker-compose -f docker-compose.yml up -d announcer
+  tags:
+    - lemma-new
+  when: manual
+  rules:
+    - if: $IS_CLEANUP != "true" && $IS_BACKUP != "true" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "api" || $CI_COMMIT_BRANCH == "web")
+
 cleanup-images:
   stage: manual
   timeout: 1h

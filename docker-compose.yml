@@ -50,6 +50,7 @@ services:
       - "traefik.http.routers.kafe-api.priority=100"
       - "traefik.http.routers.kafe-api.tls=true"
       - "traefik.http.routers.kafe-api.tls.certresolver=lets-encrypt"
+      # - "traefik.enable=false"
 
   web:
     build:
@@ -70,6 +71,7 @@ services:
       - "traefik.http.routers.kafe-web.priority=0" # web is the fallback for all other services
       - "traefik.http.routers.kafe-web.tls=true"
       - "traefik.http.routers.kafe-web.tls.certresolver=lets-encrypt"
+      # - "traefik.enable=false"
 
   announcer:
     build:
@@ -81,6 +83,11 @@ services:
           - kafe-announcer
       default:
     restart: always
+    labels:
+      - "traefik.enable=false"
+      # - "traefik.http.routers.kafe-web.rule=Host(`kafe-stage.fi.muni.cz`)"
+      # - "traefik.http.routers.kafe-web.tls=true"
+      # - "traefik.http.routers.kafe-web.tls.certresolver=lets-encrypt"
 
 volumes:
   kafe_postgres:

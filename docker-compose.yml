@@ -46,7 +46,7 @@ services:
           - kafe-api
     restart: always
     labels:
-      - "traefik.http.routers.kafe-api.rule=Host(`kafe-stage.fi.muni.cz`) && PathPrefix(`/api`, `/swagger`, `/confirm`, `/signin-oidc`)"
+      - "traefik.http.routers.kafe-api.rule=Host(`kafe-stage.fi.muni.cz`,`kafe.fi.muni.cz`,`kafe.lemma.fi.muni.cz`) && PathPrefix(`/api`, `/swagger`, `/confirm`, `/signin-oidc`)"
       - "traefik.http.routers.kafe-api.priority=100"
       - "traefik.http.routers.kafe-api.tls=true"
       - "traefik.http.routers.kafe-api.tls.certresolver=lets-encrypt"
@@ -67,7 +67,7 @@ services:
           - kafe-web
     restart: always
     labels:
-      - "traefik.http.routers.kafe-web.rule=Host(`kafe-stage.fi.muni.cz`) && PathPrefix(`/`)"
+      - "traefik.http.routers.kafe-web.rule=Host(`kafe-stage.fi.muni.cz`,`kafe.fi.muni.cz`,`kafe.lemma.fi.muni.cz`) && PathPrefix(`/`)"
       - "traefik.http.routers.kafe-web.priority=0" # web is the fallback for all other services
       - "traefik.http.routers.kafe-web.tls=true"
       - "traefik.http.routers.kafe-web.tls.certresolver=lets-encrypt"

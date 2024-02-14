@@ -118,3 +118,12 @@ docker volume create --driver local --opt type=none --opt device=/data/kafe/$nam
 > NOTE: This only works on Linux. The `--opt` options are taken from [`mount(8)`](https://man7.org/linux/man-pages/man8/mount.8.html). See [Docker docs](https://docs.docker.com/engine/reference/commandline/volume_create/#opt) for more details.
 
 > NOTE: This solution is based on [this SO question](https://stackoverflow.com/questions/39496564/docker-volume-custom-mount-point).
+
+
+## Useful Commands
+
+To get the IP address of the Postgres container to use in PgAdmin remotely:
+
+```bash
+docker inspect -f '{{.NetworkSettings.Networks.backbone.IPAddress}}' kafe-db-1
+```

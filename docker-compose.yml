@@ -89,6 +89,8 @@ volumes:
     external: true
   kafe_generated:
     external: true
+  kafe_temp:
+    external: true
   kafe_secrets:
     name: kafe_secrets
     driver: local

@@ -86,10 +86,10 @@ services:
       default:
     restart: always
     labels:
-      - "traefik.enable=false"
-      # - "traefik.http.routers.kafe-announcer.rule=Host(`kafe-stage.fi.muni.cz`)"
-      # - "traefik.http.routers.kafe-announcer.tls=true"
-      # - "traefik.http.routers.kafe-announcer.tls.certresolver=lets-encrypt"
+      # - "traefik.enable=false"
+      - "traefik.http.routers.kafe-announcer.rule=Host(`games.muni.cz`)"
+      - "traefik.http.routers.kafe-announcer.tls=true"
+      - "traefik.http.routers.kafe-announcer.tls.certresolver=lets-encrypt"
 
 volumes:
   kafe_postgres:

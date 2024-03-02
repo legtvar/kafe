@@ -62,9 +62,9 @@ deploy-production:
 deploy-games:
   stage: deploy
   script:
-    - docker-compose -f docker-compose.games.yml build
+    - docker compose -f docker-compose.games.yml build
     - docker compose -f docker-compose.base.yml -f docker-compose.production.yml down
-    - docker-compose -f docker-compose.yml up -d 
+    - docker compose -f docker-compose.yml up -d 
   tags:
     - mlejnek
   when: manual

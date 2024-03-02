@@ -120,6 +120,12 @@ docker volume create --driver local --opt type=none --opt device=/data/kafe/$nam
 > NOTE: This solution is based on [this SO question](https://stackoverflow.com/questions/39496564/docker-volume-custom-mount-point).
 
 
+To create volumes for staging using Linux's overlay filesystem:
+
+```bash
+docker volume create --driver local --opt type=overlay --opt device=overlay --opt o=lowerdir=/data/kafe/temp,upperdir=/data/kafe-stage/upper-temp,workdir=/data/kafe-stage/work-temp kafe_staging_temp
+```
+
 ## Useful Commands
 
 To get the IP address of the Postgres container to use in PgAdmin remotely:

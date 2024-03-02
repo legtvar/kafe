@@ -1,8 +1,6 @@
 stages:
-  - manual
-  - build
-  # - test
   - deploy
+  - build
 
 build-api:
   image: alpine:latest
@@ -19,7 +17,6 @@ build-api:
     paths:
       - .nuget/
   rules:
-    - if: $IS_CLEANUP != "true" && $IS_BACKUP != "true" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "api")
     - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH
 
 build-web:
@@ -41,102 +38,47 @@ build-web:
   cache:
     paths:
       - Web/.pnpm-store/
-  artifacts:
-    paths:
-      - Web/build
-    expire_in: 42s
   rules:
-    - if: $IS_CLEANUP != "true" && $IS_BACKUP != "true" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "web")
     - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH
 
-migrate-wma:
-  image: alpine:latest
-  stage: manual
-  variables:
-    PGPASSWORD: postgres
-  timeout: 3h
-  script:
-    #- apk update
-    #- apk add dotnet7-sdk postgresql-client ffmpeg
-    #- psql -h kafe-db -p 5432 -U postgres -c "DROP DATABASE lemma"
-    #- cat /mnt/kafe/lemma-08-03-2023-all.sql | psql -h kafe-db -p 5432 -U postgres
-    #- dotnet build Migrator
-    #- cp "$APPSETTINGS_MIGRATOR" "./Migrator/appsettings.local.json"
-    #- dotnet run --project Migrator --framework net7.0
-    - echo "This job has been crippled on purpose."
-    - exit 1
-  tags:
-    - lemma-new-docker
-  when: manual
-  rules:
-    - if: $IS_CLEANUP != "true" && $IS_BACKUP != "true" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "api")
-
-publish-api:
-  stage: manual
+deploy-production:
+  stage: deploy
   script:
     - cp "$APPSETTINGS_MLEJNEK" "./Api/appsettings.local.json"
-    - docker compose -f docker-compose.yml build api
-    - docker compose -f docker-compose.yml up -d api
+    - docker compose -f docker-compose.base.yml -f docker-compose.production.yml build
+    - docker compose -f docker-compose.base.yml -f docker-compose.production.yml down
+    - docker compose -f docker-compose.base.yml -f docker-compose.production.yml up -d
   tags:
     - mlejnek
   resource_group: mlejnek
-  when: manual
+  environment:
+    name: production
+    url: https://kafe.fi.muni.cz
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      when: manual
 
-publish-all:
-  stage: manual
+deploy-staging:
+  stage: deploy
   script:
     - cp "$APPSETTINGS_MLEJNEK" "./Api/appsettings.local.json"
-    - docker compose -f docker-compose.yml build
-    - docker compose -f docker-compose.yml down
-    - docker compose -f docker-compose.yml up -d
+    - docker compose -f docker-compose.base.yml -f docker-compose.staging.yml build
+    - docker compose -f docker-compose.base.yml -f docker-compose.staging.yml down
+    - docker compose -f docker-compose.base.yml -f docker-compose.staging.yml up -d
   tags:
     - mlejnek
   resource_group: mlejnek
+  environment:
+    name: staging
+    url: https://kafe-stage.fi.muni.cz
   when: manual
 
-publish-web:
-  stage: manual
+deploy-games:
+  stage: deploy
   script:
-    - docker compose -f docker-compose.yml build
-    - docker compose -f docker-compose.yml up -d web
+    - docker compose -f docker-compose.games.yml build
+    - docker compose -f docker-compose.games.yml down
+    - docker compose -f docker-compose.games.yml up -d 
   tags:
     - mlejnek
-  resource_group: mlejnek
   when: manual
-
-publish-announcer:
-  stage: manual
-  script:
-    - docker-compose -f docker-compose.yml build
-    - docker-compose -f docker-compose.yml up -d announcer
-  tags:
-    - lemma-new
-  when: manual
-  rules:
-    - if: $IS_CLEANUP != "true" && $IS_BACKUP != "true" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "api" || $CI_COMMIT_BRANCH == "web")
-
-cleanup-images:
-  stage: manual
-  timeout: 1h
-  script:
-    - docker image prune --force
-  tags:
-    - lemma-new
-  rules:
-    - if: $IS_CLEANUP == "true"
-
-backup-db:
-  stage: manual
-  timeout: 10min
-  script:
-    - name="backup_$(date +%Y-%m-%d)"
-    - docker exec kafe_db_1 sh -c "rm -rf '/tmp/$name' && pg_dump -U postgres -d kafe -F d -f '/tmp/$name' && tar -cf '/tmp/$name.tar' -C '/tmp/$name' ."
-    - docker cp kafe_db_1:/tmp/$name.tar .
-  artifacts:
-    paths:
-      - "backup_*.tar"
-    expire_in: "90 days"
-  tags:
-    - lemma-new
-  rules:
-    - if: $IS_BACKUP == "true"

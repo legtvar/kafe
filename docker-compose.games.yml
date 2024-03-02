@@ -1,0 +1,15 @@
+version: "3.8"
+name: "games"
+
+services:
+  announcer:
+    build:
+      context: ./
+      dockerfile: Announcer.Dockerfile
+    expose:
+      - 80
+    restart: always
+    labels:
+      - "traefik.http.routers.kafe-announcer.rule=Host(`games.muni.cz`)"
+      - "traefik.http.routers.kafe-announcer.tls=true"
+      - "traefik.http.routers.kafe-announcer.tls.certresolver=lets-encrypt"

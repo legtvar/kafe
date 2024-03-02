@@ -1,0 +1,42 @@
+version: "3.8"
+name: kafe-staging
+
+services:
+  api:
+    environment:
+      - BaseUrl=https://kafe-stage.fi.muni.cz
+    labels:
+      - "traefik.http.routers.kafe-staging-api.rule=Host(`kafe-stage.fi.muni.cz`)
+          && PathPrefix(`/api`, `/swagger`, `/confirm`, `/signin-oidc`)"
+      - "traefik.http.routers.kafe-staging-api.priority=100"
+      - "traefik.http.routers.kafe-staging-api.tls=true"
+      - "traefik.http.routers.kafe-staging-api.tls.certresolver=lets-encrypt"
+      - "traefik.http.routers.kafe-staging-api.middlewares=kafe-lemma-redirect"
+      - "traefik.http.middlewares.kafe-lemma-redirect.redirectregex.regex=^https://kafe.lemma.fi.muni.cz/(.*)"
+      - "traefik.http.middlewares.kafe-lemma-redirect.redirectregex.replacement=https://kafe.fi.muni.cz/$${1}"
+      - "traefik.http.middlewares.kafe-lemma-redirect.redirectregex.permanent=true"
+
+  web:
+    labels:
+      - "traefik.http.routers.kafe-staging-web.rule=Host(`kafe-stage.fi.muni.cz`) && PathPrefix(`/`)"
+      - "traefik.http.routers.kafe-staging-web.middlewares=kafe-lemma-redirect"
+      - "traefik.http.routers.kafe-staging-web.priority=0" # web is the fallback for all other services
+      - "traefik.http.routers.kafe-staging-web.tls=true"
+      - "traefik.http.routers.kafe-staging-web.tls.certresolver=lets-encrypt"
+
+volumes:
+  kafe_postgres:
+    name: kafe_staging_postgres
+    driver: local
+  kafe_archive:
+    name: kafe_staging_archive
+    external: true
+  kafe_generated:
+    name: kafe_staging_generated
+    external: true
+  kafe_temp:
+    name: kafe_staging_temp
+    external: true
+  kafe_secrets:
+    name: kafe_secrets
+    driver: local

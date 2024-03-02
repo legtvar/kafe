@@ -1,0 +1,59 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres:16-alpine
+    expose:
+      - 5432
+    volumes:
+      - kafe_postgres:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    networks:
+      default:
+        aliases:
+          - kafe-db
+    restart: always
+    labels:
+      - "traefik.enable=false"
+
+  api:
+    build:
+      context: ./
+      dockerfile: Api.Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    expose:
+      - 80
+    volumes:
+      - kafe_archive:/mnt/kafe_archive
+      - kafe_generated:/mnt/kafe_generated
+      - kafe_secrets:/mnt/kafe_secrets
+      - kafe_temp:/mnt/kafe_temp
+    depends_on:
+      - db
+    networks:
+      default:
+        aliases:
+          - kafe-api
+    restart: always
+
+  web:
+    build:
+      context: ./
+      dockerfile: Web.Dockerfile
+    expose:
+      - 80
+    networks:
+      default:
+        aliases:
+          - kafe-web
+    restart: always
+
+networks:
+  # NB: we use `backbone` because the default `bridge` network does not support aliases
+  #     https://github.com/docker/compose/issues/3012
+  backbone:
+    external: true

@@ -13,7 +13,7 @@ services:
       - "traefik.http.routers.kafe-production-api.tls.certresolver=lets-encrypt"
       - "traefik.http.routers.kafe-production-api.middlewares=kafe-lemma-redirect"
       - "traefik.http.middlewares.kafe-lemma-redirect.redirectregex.regex=^https://kafe.lemma.fi.muni.cz/(.*)"
-      - "traefik.http.middlewares.kafe-lemma-redirect.redirectregex.replacement=^https://kafe.fi.muni.cz/$${1}"
+      - "traefik.http.middlewares.kafe-lemma-redirect.redirectregex.replacement=https://kafe.fi.muni.cz/$${1}"
       - "traefik.http.middlewares.kafe-lemma-redirect.redirectregex.permanent=true"
 
   web:

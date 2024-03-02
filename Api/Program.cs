@@ -28,6 +28,7 @@ public static class Program
                 builder.ConfigureAppConfiguration(c =>
                 {
                     c.AddJsonFile("appsettings.local.json");
+                    c.AddEnvironmentVariables();
                 });
                 builder.UseStartup<Startup>();
             })

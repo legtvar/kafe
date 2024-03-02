@@ -3,6 +3,8 @@ name: kafe-production
 
 services:
   api:
+    environment:
+      - BaseUrl=https://kafe.fi.muni.cz
     labels:
       - "traefik.http.routers.kafe-production-api.rule=Host(`kafe.fi.muni.cz`,`kafe.lemma.fi.muni.cz`)
           && PathPrefix(`/api`, `/swagger`, `/confirm`, `/signin-oidc`)"

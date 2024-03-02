@@ -41,6 +41,7 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.Extensions.Logging;
 using System.Net;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Kafe.Api;
 
@@ -49,6 +50,7 @@ public class Startup
     public IConfiguration Configuration { get; }
     public ApiOptions ApiOptions { get; }
     public IHostEnvironment Environment { get; }
+    public ILogger<Startup> Logger { get; private set; } = NullLogger<Startup>.Instance;
 
     public Startup(IConfiguration configuration, IHostEnvironment environment)
     {
@@ -146,22 +148,32 @@ public class Startup
 
         services.AddCors(o =>
         {
-            o.AddDefaultPolicy(p =>
+            o.AddPolicy("Cors", p =>
             {
                 p.AllowAnyHeader();
                 p.AllowAnyMethod();
                 p.AllowCredentials();
+                p.SetIsOriginAllowedToAllowWildcardSubdomains();
                 p.WithOrigins(ApiOptions.AllowedOrigins.ToArray());
+                // p.AllowAnyMethod()
+                // .AllowCredentials()
+                // .SetIsOriginAllowed((host) => true)
+                // .AllowAnyHeader()
             });
         });
 
-        services.Configure<ForwardedHeadersOptions>(o => {
+        services.Configure<ForwardedHeadersOptions>(o =>
+        {
             o.ForwardedHeaders = ForwardedHeaders.All;
-            
+
             // Accept proxies at all local IPv4 addresses
             o.KnownNetworks.Add(new IPNetwork(IPAddress.Parse("192.168.0.0"), 16));
             o.KnownNetworks.Add(new IPNetwork(IPAddress.Parse("172.16.0.0"), 12));
             o.KnownNetworks.Add(new IPNetwork(IPAddress.Parse("10.0.0.0"), 8));
+        });
+
+        services.AddHttpLogging(o =>
+        {
         });
 
         RegisterKafe(services);
@@ -169,6 +181,10 @@ public class Startup
 
     public void Configure(IApplicationBuilder app, IHostEnvironment environment)
     {
+        Logger = app.ApplicationServices.GetRequiredService<ILogger<Startup>>();
+        Logger.LogInformation("BaseUrl: {}", ApiOptions.BaseUrl);
+
+        app.UseHttpLogging();
         app.UseForwardedHeaders();
 
         app.UseHttpsRedirection();
@@ -182,7 +198,7 @@ public class Startup
 
         app.UseRouting();
 
-        app.UseCors();
+        app.UseCors("Cors");
 
         app.UseAuthentication();
         app.Use(async (ctx, next) =>

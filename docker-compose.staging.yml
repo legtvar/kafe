@@ -18,7 +18,7 @@ services:
 
   web:
     labels:
-      - "traefik.http.routers.kafe-staging-web.rule=Host(`kafe-stage`) && PathPrefix(`/`)"
+      - "traefik.http.routers.kafe-staging-web.rule=Host(`kafe-stage.fi.muni.cz`) && PathPrefix(`/`)"
       - "traefik.http.routers.kafe-staging-web.middlewares=kafe-lemma-redirect"
       - "traefik.http.routers.kafe-staging-web.priority=0" # web is the fallback for all other services
       - "traefik.http.routers.kafe-staging-web.tls=true"

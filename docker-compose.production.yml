@@ -27,7 +27,8 @@ services:
 
 volumes:
   kafe_postgres:
-    external: true
+    name: kafe_postgres
+    driver: local
   kafe_archive:
     external: true
   kafe_generated:

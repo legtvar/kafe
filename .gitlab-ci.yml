@@ -59,6 +59,24 @@ deploy-production:
   #   - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
   #     when: manual
 
+deploy-staging:
+  stage: deploy
+  script:
+    - cp "$APPSETTINGS_MLEJNEK" "./Api/appsettings.local.json"
+    - docker compose -f docker-compose.base.yml -f docker-compose.staging.yml build
+    - docker compose -f docker-compose.base.yml -f docker-compose.staging.yml down
+    - docker compose -f docker-compose.base.yml -f docker-compose.staging.yml up -d
+  tags:
+    - mlejnek
+  resource_group: mlejnek
+  environment:
+    name: staging
+    url: https://kafe-stage.fi.muni.cz
+  when: manual
+  # rules:
+  #   - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  #     when: manual
+
 deploy-games:
   stage: deploy
   script:

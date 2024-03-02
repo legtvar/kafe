@@ -54,10 +54,9 @@ deploy-production:
   environment:
     name: production
     url: https://kafe.fi.muni.cz
-  when: manual
-  # rules:
-  #   - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-  #     when: manual
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      when: manual
 
 deploy-staging:
   stage: deploy
@@ -73,9 +72,6 @@ deploy-staging:
     name: staging
     url: https://kafe-stage.fi.muni.cz
   when: manual
-  # rules:
-  #   - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-  #     when: manual
 
 deploy-games:
   stage: deploy

@@ -2,11 +2,11 @@ version: "3.8"
 
 services:
   db:
-    image: postgres:13-alpine
+    image: postgres:16-alpine
     expose:
       - 5432
     volumes:
-      - postgres_data:/var/lib/postgresql/data/
+      - kafe_postgres:/var/lib/postgresql/data/
     environment:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
@@ -19,6 +19,8 @@ services:
         aliases:
           - kafe-db
     restart: always
+    labels:
+      - "traefik.enable=false"
 
   api:
     build:
@@ -29,49 +31,81 @@ services:
     expose:
       - 80
     volumes:
-      - cerit:/mnt/kafe-data
-      - secrets:/mnt/kafe-secrets
+      - kafe_archive:/mnt/kafe_archive
+      - kafe_generated:/mnt/kafe_generated
+      - kafe_secrets:/mnt/kafe_secrets
+      - kafe_temp:/mnt/kafe_temp
     depends_on:
       - db
     networks:
+      default:
+        aliases:
+          - kafe-api
       backbone:
         aliases:
           - kafe-api
-      default:
     restart: always
+    labels:
+      - "traefik.http.routers.kafe-api.rule=Host(`kafe-stage.fi.muni.cz`,`kafe.fi.muni.cz`,`kafe.lemma.fi.muni.cz`) && PathPrefix(`/api`, `/swagger`, `/confirm`, `/signin-oidc`)"
+      - "traefik.http.routers.kafe-api.priority=100"
+      - "traefik.http.routers.kafe-api.tls=true"
+      - "traefik.http.routers.kafe-api.tls.certresolver=lets-encrypt"
+      # - "traefik.enable=false"
 
   web:
     build:
       context: ./
       dockerfile: Web.Dockerfile
+    expose:
+      - 80
     networks:
       backbone:
         aliases:
           - kafe-web
       default:
+        aliases:
+          - kafe-web
     restart: always
+    labels:
+      - "traefik.http.routers.kafe-web.rule=Host(`kafe-stage.fi.muni.cz`,`kafe.fi.muni.cz`,`kafe.lemma.fi.muni.cz`) && PathPrefix(`/`)"
+      - "traefik.http.routers.kafe-web.priority=0" # web is the fallback for all other services
+      - "traefik.http.routers.kafe-web.tls=true"
+      - "traefik.http.routers.kafe-web.tls.certresolver=lets-encrypt"
+      # - "traefik.enable=false"
 
   announcer:
     build:
       context: ./
       dockerfile: Announcer.Dockerfile
+    expose:
+      - 80
     networks:
       backbone:
         aliases:
           - kafe-announcer
       default:
     restart: always
+    labels:
+      # - "traefik.enable=false"
+      - "traefik.http.routers.kafe-announcer.rule=Host(`games.muni.cz`)"
+      - "traefik.http.routers.kafe-announcer.tls=true"
+      - "traefik.http.routers.kafe-announcer.tls.certresolver=lets-encrypt"
 
 volumes:
-  postgres_data:
-  secrets:
-  cerit:
+  kafe_postgres:
+    external: true
+  kafe_archive:
+    external: true
+  kafe_generated:
+    external: true
+  kafe_temp:
+    external: true
+  kafe_secrets:
+    name: kafe_secrets
     driver: local
-    driver_opts:
-      type: nfs
-      o: "addr=storage-brno1-cerit.metacentrum.cz,rw,tcp,nolock,rsize=32768,wsize=32768,intr,noatime,nfsvers=3,actimeo=3"
-      device: :/gpfs/vol1/nfs/lemma/kafe
 
 networks:
+  # NB: we use `backbone` because the default `bridge` network does not support aliases
+  #     https://github.com/docker/compose/issues/3012
   backbone:
     external: true

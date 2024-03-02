@@ -74,38 +74,35 @@ migrate-wma:
 publish-api:
   stage: manual
   script:
-    - cp "$APPSETTINGS_PRODUCTION" "./Api/appsettings.local.json"
-    - docker-compose -f docker-compose.yml build api
-    - docker-compose -f docker-compose.yml up -d api
+    - cp "$APPSETTINGS_MLEJNEK" "./Api/appsettings.local.json"
+    - docker compose -f docker-compose.yml build api
+    - docker compose -f docker-compose.yml up -d api
   tags:
-    - lemma-new
+    - mlejnek
+  resource_group: mlejnek
   when: manual
-  rules:
-    - if: $IS_CLEANUP != "true" && $IS_BACKUP != "true" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "api")
 
 publish-all:
   stage: manual
   script:
-    - cp "$APPSETTINGS_PRODUCTION" "./Api/appsettings.local.json"
-    - docker-compose -f docker-compose.yml build
-    - docker-compose -f docker-compose.yml down
-    - docker-compose -f docker-compose.yml up -d
+    - cp "$APPSETTINGS_MLEJNEK" "./Api/appsettings.local.json"
+    - docker compose -f docker-compose.yml build
+    - docker compose -f docker-compose.yml down
+    - docker compose -f docker-compose.yml up -d
   tags:
-    - lemma-new
+    - mlejnek
+  resource_group: mlejnek
   when: manual
-  rules:
-    - if: $IS_CLEANUP != "true" && $IS_BACKUP != "true" && $CI_COMMIT_BRANCH == "main"
 
 publish-web:
   stage: manual
   script:
-    - docker-compose -f docker-compose.yml build
-    - docker-compose -f docker-compose.yml up -d web
+    - docker compose -f docker-compose.yml build
+    - docker compose -f docker-compose.yml up -d web
   tags:
-    - lemma-new
+    - mlejnek
+  resource_group: mlejnek
   when: manual
-  rules:
-    - if: $IS_CLEANUP != "true" && $IS_BACKUP != "true" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "api" || $CI_COMMIT_BRANCH == "web")
 
 publish-announcer:
   stage: manual

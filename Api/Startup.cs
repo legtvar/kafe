@@ -37,6 +37,10 @@ using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.IdentityModel.Logging;
 using System.Text.Json;
 using Kafe.Data.Services;
+using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.HttpLogging;
+using Microsoft.Extensions.Logging;
+using System.Net;
 
 namespace Kafe.Api;
 
@@ -151,11 +155,22 @@ public class Startup
             });
         });
 
+        services.Configure<ForwardedHeadersOptions>(o => {
+            o.ForwardedHeaders = ForwardedHeaders.All;
+            
+            // Accept proxies at all local IPv4 addresses
+            o.KnownNetworks.Add(new IPNetwork(IPAddress.Parse("192.168.0.0"), 16));
+            o.KnownNetworks.Add(new IPNetwork(IPAddress.Parse("172.16.0.0"), 12));
+            o.KnownNetworks.Add(new IPNetwork(IPAddress.Parse("10.0.0.0"), 8));
+        });
+
         RegisterKafe(services);
     }
 
     public void Configure(IApplicationBuilder app, IHostEnvironment environment)
     {
+        app.UseForwardedHeaders();
+
         app.UseHttpsRedirection();
 
         var apiOptions = app.ApplicationServices.GetRequiredService<IOptions<ApiOptions>>();

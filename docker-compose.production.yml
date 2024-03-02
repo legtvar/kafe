@@ -18,7 +18,7 @@ services:
     labels:
       - "traefik.http.routers.kafe-production-web.rule=Host(`kafe.fi.muni.cz`,`kafe.lemma.fi.muni.cz`)\
           && PathPrefix(`/`)"
-      - "traefik.http.routers.kafe-production-api.middlewares=kafe-lemma-redirect"
+      - "traefik.http.routers.kafe-production-web.middlewares=kafe-lemma-redirect"
       - "traefik.http.routers.kafe-production-web.priority=0" # web is the fallback for all other services
       - "traefik.http.routers.kafe-production-web.tls=true"
       - "traefik.http.routers.kafe-production-web.tls.certresolver=lets-encrypt"

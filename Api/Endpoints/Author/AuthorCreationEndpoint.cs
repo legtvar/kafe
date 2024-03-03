@@ -48,6 +48,6 @@ public class AuthorCreationEndpoint : EndpointBaseAsync
             return BadRequest();
         }
 
-        return Ok(author);
+        return Ok(author.Id);
     }
 }

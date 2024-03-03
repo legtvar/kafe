@@ -189,8 +189,8 @@ public partial class ProjectService
         Kind: DiagnosticKind.Error,
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
-            (Const.InvariantCulture, "English subtitles for the film file are required."),
-            (Const.CzechCulture, "Anglické titulky pro film jsou povinné.")
+            (Const.InvariantCulture, "Subtitles for the film file are required."),
+            (Const.CzechCulture, "Titulky pro film jsou povinné.")
         )
     );
 
@@ -198,8 +198,8 @@ public partial class ProjectService
         Kind: DiagnosticKind.Error,
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
-            (Const.InvariantCulture, "The video-annotation is missing English subtitles."),
-            (Const.CzechCulture, "Videoanotaci chybí soubor s anglickými titulky.")
+            (Const.InvariantCulture, "The video-annotation is missing subtitles."),
+            (Const.CzechCulture, "Videoanotaci chybí soubor s titulky.")
         )
     );
 
@@ -207,8 +207,8 @@ public partial class ProjectService
         Kind: DiagnosticKind.Error,
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
-            (Const.InvariantCulture, "Only one file with English subtitles for the film is permitted."),
-            (Const.CzechCulture, "Pouze jedny anglické titulky k filmu mohou být součástí přihlášky.")
+            (Const.InvariantCulture, "Only one file with subtitles for the film is permitted."),
+            (Const.CzechCulture, "Pouze jedny titulky k filmu mohou být součástí přihlášky.")
         )
     );
 
@@ -216,8 +216,8 @@ public partial class ProjectService
         Kind: DiagnosticKind.Error,
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
-            (Const.InvariantCulture, "Only one file with English subtitles for the video-annotation is permitted."),
-            (Const.CzechCulture, "Pouze jedny anglické titulky k videoanotaci mohou být součástí přihlášky.")
+            (Const.InvariantCulture, "Only one file with subtitles for the video-annotation is permitted."),
+            (Const.CzechCulture, "Pouze jedny titulky k videoanotaci mohou být součástí přihlášky.")
         )
     );
 

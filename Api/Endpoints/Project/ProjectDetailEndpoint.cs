@@ -92,7 +92,11 @@ public class ProjectDetailEndpoint : EndpointBaseAsync
         dto = dto with
         {
             ProjectGroupName = group?.Name ?? Const.UnknownProjectGroup,
-            Artifacts = artifactDetails.Select(TransferMaps.ToProjectArtifactDto).ToImmutableArray(),
+            Artifacts = artifactDetails
+                .Select(a => TransferMaps.ToProjectArtifactDto(a) with {
+                    BlueprintSlot = project.Artifacts.FirstOrDefault(b => b.Id == a.Id)?.BlueprintSlot
+                })
+                .ToImmutableArray(),
             Cast = project.Authors.Where(a => a.Kind == ProjectAuthorKind.Cast)
                     .Select(a => new ProjectAuthorDto(
                         Id: a.Id,

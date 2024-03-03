@@ -81,4 +81,7 @@ deploy-games:
     - docker compose -f docker-compose.games.yml up -d 
   tags:
     - mlejnek
+  environment:
+    name: games
+    url: https://games.muni.cz
   when: manual

@@ -12,7 +12,16 @@ public record PlaylistInfo(
     [LocalizedString] ImmutableDictionary<string, string> Name,
     [LocalizedString] ImmutableDictionary<string, string>? Description = null,
     Permission GlobalPermissions = Permission.None
-) : IVisibleEntity;
+) : IVisibleEntity
+{
+    public PlaylistInfo() : this(
+        Hrib.InvalidValue,
+        CreationMethod.Unknown,
+        ImmutableArray<string>.Empty,
+        LocalizedString.Empty)
+    {
+    }
+}
 
 public class PlaylistInfoProjection : SingleStreamProjection<PlaylistInfo>
 {

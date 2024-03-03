@@ -13,7 +13,12 @@ public record AuthorInfo(
     [LocalizedString] ImmutableDictionary<string, string>? Bio = null,
     string? Uco = null,
     string? Email = null,
-    string? Phone = null) : IVisibleEntity;
+    string? Phone = null) : IVisibleEntity
+{
+    public AuthorInfo() : this(Hrib.InvalidValue, CreationMethod.Unknown, Const.InvalidName)
+    {
+    }
+}
 
 public class AuthorInfoProjection : SingleStreamProjection<AuthorInfo>
 {

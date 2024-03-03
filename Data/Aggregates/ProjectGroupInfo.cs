@@ -13,7 +13,16 @@ public record ProjectGroupInfo(
     DateTimeOffset Deadline = default,
     bool IsOpen = false,
     Permission GlobalPermissions = Permission.None
-) : IVisibleEntity;
+) : IVisibleEntity
+{
+    public ProjectGroupInfo() : this(
+        Hrib.InvalidValue,
+        CreationMethod.Unknown,
+        LocalizedString.Empty
+    )
+    {
+    }
+}
 
 public class ProjectGroupInfoProjection : SingleStreamProjection<ProjectGroupInfo>
 {

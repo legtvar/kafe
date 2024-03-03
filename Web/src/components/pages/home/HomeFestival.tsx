@@ -35,7 +35,7 @@ export function HomeFestival(props: IHomeFestivalProps) {
                     {t('homeFestival.title')}
                 </Box>
 
-                <IntroText displayDetails/>
+                <IntroText />
 
                 <AwaitAPI request={(api) => api.groups.getById('7rYVhQWyzk5')}>
                     {(group) => (

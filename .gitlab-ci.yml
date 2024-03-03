@@ -61,7 +61,7 @@ deploy-production:
 deploy-staging:
   stage: deploy
   script:
-    - cp "$APPSETTINGS_MLEJNEK" "./Api/appsettings.local.json"
+    - cp "$APPSETTINGS_STAGE" "./Api/appsettings.local.json"
     - docker compose -f docker-compose.base.yml -f docker-compose.staging.yml build
     - docker compose -f docker-compose.base.yml -f docker-compose.staging.yml down
     - docker compose -f docker-compose.base.yml -f docker-compose.staging.yml up -d

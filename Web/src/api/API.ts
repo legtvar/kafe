@@ -29,10 +29,14 @@ export type ApiResponse<T> =
 export class API {
     private apiUrl = '/api/v1/';
     private client: Axios;
+    private static Production = "https://kafe.fi.muni.cz";
+    private static Staging = "https://kafe-stage.fi.muni.cz";
 
     public constructor() {
         if (window.location.hostname.startsWith('localhost') || window.location.hostname.startsWith('127.0.0.1')) {
-            this.apiUrl = 'http://localhost:8000' + this.apiUrl;
+            this.apiUrl = 'https://kafe-stage.fi.muni.cz' + this.apiUrl;
+        } else {
+            this.apiUrl = window.location.origin + this.apiUrl;
         }
 
         this.client = axios.create({
@@ -40,6 +44,19 @@ export class API {
             withCredentials: true,
             validateStatus: (status) => [200].includes(status) || (status >= 400 && status < 500),
         });
+    }
+    
+    public get isProduction() {
+        return new URL(this.apiUrl).origin === API.Production;
+    }
+
+    public get isStaging() {
+        return new URL(this.apiUrl).origin === API.Staging;
+    }
+    
+    public get isLocalhost() {
+        const url = new URL(this.apiUrl);
+        return url.hostname === "localhost" || url.hostname === "127.0.0.1";
     }
 
     // API fetch functions

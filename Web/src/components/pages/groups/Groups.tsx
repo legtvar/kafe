@@ -9,12 +9,14 @@ import { fulltextFilter } from '../../../utils/fulltextFilter';
 import { AwaitAPI } from '../../utils/AwaitAPI';
 import { OutletOrChildren } from '../../utils/OutletOrChildren';
 import { Pagination } from '../../utils/Pagination';
+import { useTitle } from '../../../utils/useTitle';
 
 interface IGroupsProps {}
 
 export function Groups(props: IGroupsProps) {
     const borderColor = useColorModeValue('gray.300', 'gray.700');
     const hoverColor = useColorModeValue('gray.200', 'gray.700');
+    useTitle(t("title.groups"));
 
     const { border, bg } = useColorScheme();
     const highlightStyle = useHighlightStyle();

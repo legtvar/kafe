@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using System;
 
 namespace Kafe.Api;
@@ -8,10 +9,12 @@ namespace Kafe.Api;
 public class SemanticExceptionFilter : IExceptionFilter
 {
     private readonly IHostEnvironment environment;
+    private readonly ILogger<SemanticExceptionFilter> logger;
 
-    public SemanticExceptionFilter(IHostEnvironment environment)
+    public SemanticExceptionFilter(IHostEnvironment environment, ILogger<SemanticExceptionFilter> logger)
     {
         this.environment = environment;
+        this.logger = logger;
     }
 
     public void OnException(ExceptionContext context)
@@ -29,15 +32,20 @@ public class SemanticExceptionFilter : IExceptionFilter
             _ => 500 // 500 Internal Server Error
         };
 
-        context.Result = environment.IsDevelopment()
-            ? new ContentResult()
+        context.Result = new ObjectResult(
+            new ProblemDetails
             {
-                StatusCode = statusCode,
-                ContentType = "text/plain",
-                Content = context.Exception.ToString()
-            }
-            : new StatusCodeResult(statusCode);
+                Type = context.Exception.GetType().Name,
+                Title = "An exception was thrown while processing your request.",
+                Status = statusCode,
+                Detail = context.Exception.ToString()
+            })
+        {
+            StatusCode = statusCode,
+        };
 
         context.ExceptionHandled = true;
+        
+        logger.LogError(context.Exception, "An exception occured while processing {}.", context.ActionDescriptor.DisplayName);
     }
 }

@@ -23,8 +23,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useApi, useAuth } from '../../../hooks/Caffeine';
 import { avatarUrl } from '../../../utils/avatarUrl';
 import { LanguageToggle } from '../../utils/LanguageToggle';
-import { BetaWarning } from '../BetaWarning';
 import { Logo } from '../Logo';
+import { MessageButton } from '../MessageButton';
 
 interface INavbarProps extends FlexProps {
     onOpen?: () => void;
@@ -69,7 +69,20 @@ export function Navbar({ onOpen, forceReload, signedIn, ...rest }: INavbarProps)
                 />
             )}
 
-            <BetaWarning />
+            {api.isStaging && (
+                <MessageButton
+                    warningKey="staging.warning"
+                    titleKey="staging.title"
+                    descriptionKey="staging.description"
+                />
+            )}
+            {api.isLocalhost && (
+                <MessageButton
+                    warningKey="localhost.warning"
+                    titleKey="localhost.title"
+                    descriptionKey="localhost.description"
+                />
+            )}
 
             {signedIn && <Spacer />}
             <Link to="/">
@@ -121,9 +134,10 @@ export function Navbar({ onOpen, forceReload, signedIn, ...rest }: INavbarProps)
                                             <Text maxW="100%" fontSize="sm" isTruncated>
                                                 {user?.name}
                                             </Text>
+                                            {/* TODO: Maybe show some role information once its implemented in the API.
                                             <Text maxW="100%" fontSize="xs" isTruncated color={'gray.500'}>
                                                 {t(`role.${user?.role}`).toString()}
-                                            </Text>
+                                            </Text> */}
                                         </VStack>
                                         <Box display={{ base: 'none', md: 'flex' }}>
                                             <FiChevronDown />

@@ -20,6 +20,7 @@ import { RightsEditor } from '../../utils/RightsEditor';
 import { AwaitAPI } from '../../utils/AwaitAPI';
 import { AllPermissions, SystemHRIB } from '../../../schemas/generic';
 import { SendAPI } from '../../utils/SendAPI';
+import { useTitle } from '../../../utils/useTitle';
 
 interface ISystemComponentProps {}
 
@@ -27,6 +28,7 @@ export function SystemComponent(props: ISystemComponentProps) {
     const borderColor = useColorModeValue('gray.300', 'gray.700');
     const { border } = useColorScheme();
     const { user } = useAuth();
+    useTitle(t("title.system"));
 
     return (
         <OutletOrChildren>

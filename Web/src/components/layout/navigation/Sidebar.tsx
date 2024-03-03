@@ -6,6 +6,7 @@ import { AppRoute, authRoutes } from '../../../routes';
 import { Footer } from '../Footer';
 import { Logo } from '../Logo';
 import { NavItem } from './NavItem';
+import { MessageButton } from '../MessageButton';
 
 interface ISidebarProps extends BoxProps {
     onClose: () => void;
@@ -97,15 +98,24 @@ export function Sidebar({ onClose, ...rest }: ISidebarProps) {
             overflowY="auto"
             {...rest}
         >
-            <Flex direction="column" minH="100%">
+            <Flex direction="column" minH="100%" justifyContent="space-between">
                 <Flex h="20" alignItems="center" mx="8" justifyContent="space-between" key="heading">
                     <Link to="/">
                         <Logo />
                     </Link>
                     <CloseButton display={{ base: 'flex', md: 'none' }} onClick={onClose} />
                 </Flex>
-                {items}
-                <Footer mt="auto" key="footer" />
+                <Flex direction="column" grow={1}>
+                    {items}
+                </Flex>
+                <MessageButton
+                    warningKey="troubleshooting.title"
+                    titleKey="troubleshooting.title"
+                    descriptionKey="troubleshooting.contactUs"
+                    alignSelf="stretch"
+                    mx={4}
+                />
+                <Footer key="footer" />
             </Flex>
         </Box>
     );

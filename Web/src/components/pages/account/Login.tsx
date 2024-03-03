@@ -16,12 +16,13 @@ import { useState } from 'react';
 import { useApi } from '../../../hooks/Caffeine';
 import { Loading } from '../../utils/Loading';
 import { MuniIcon } from '../../utils/MuniIcon';
-import { AiFillWarning } from 'react-icons/ai';
+import { useTitle } from '../../../utils/useTitle';
 
 export function Login() {
     const [state, setState] = useState<'ready' | 'submitting' | 'submited' | 'error'>('ready');
     const [email, setEmail] = useState<string>('');
     const api = useApi();
+    useTitle(t("title.login"));
 
     const login = async () => {
         setState('submitting');
@@ -68,11 +69,6 @@ export function Login() {
                             >
                                 {t('register.button').toString()}
                             </Button>
-                            <hr />
-                            <HStack color="red.500">
-                                <AiFillWarning />
-                                <Text>{t('beta.muniLogin').toString()}</Text>
-                            </HStack>
                             <Link href={api.accounts.external.loginUrl()}>
                                 <Button
                                     size="lg"

@@ -48,7 +48,7 @@ public class ProjectGroupDetailEndpoint : EndpointBaseAsync
         string id,
         CancellationToken cancellationToken = default)
     {
-        var auth = await authorizationService.AuthorizeAsync(User, id, EndpointPolicy.ReadInspect);
+        var auth = await authorizationService.AuthorizeAsync(User, id, EndpointPolicy.Read);
         if (!auth.Succeeded)
         {
             return Unauthorized();
@@ -61,20 +61,26 @@ public class ProjectGroupDetailEndpoint : EndpointBaseAsync
         }
 
         var dto = TransferMaps.ToProjectGroupDetailDto(projectGroup);
-        var projects = await projectService.List(new(ProjectGroupId: projectGroup.Id), token: cancellationToken);
-        var projectPerms = await entityService.GetPermissions(
-            projects.Select(p => (Hrib)p.Id),
-            userProvider.Account?.Id,
-            cancellationToken);
-        var preferredCulture = userProvider.Account?.PreferredCulture ?? Const.InvariantCultureCode;
-        dto = dto with
+
+        auth = await authorizationService.AuthorizeAsync(User, id, EndpointPolicy.ReadInspect);
+
+        if (auth.Succeeded)
         {
-            Projects = projects.Zip(projectPerms)
-                .OrderBy(p => ((LocalizedString)p.First.Name)[preferredCulture])
-                .Select(p => TransferMaps.ToProjectListDto(p.First, p.Second))
-                .ToImmutableArray()
-        };
-        
+            var projects = await projectService.List(new(ProjectGroupId: projectGroup.Id), token: cancellationToken);
+            var projectPerms = await entityService.GetPermissions(
+                projects.Select(p => (Hrib)p.Id),
+                userProvider.Account?.Id,
+                cancellationToken);
+            var preferredCulture = userProvider.Account?.PreferredCulture ?? Const.InvariantCultureCode;
+            dto = dto with
+            {
+                Projects = projects.Zip(projectPerms)
+                    .OrderBy(p => ((LocalizedString)p.First.Name)[preferredCulture])
+                    .Select(p => TransferMaps.ToProjectListDto(p.First, p.Second))
+                    .ToImmutableArray()
+            };
+        }
+
         return Ok(dto);
     }
 }

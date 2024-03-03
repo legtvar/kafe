@@ -131,6 +131,7 @@
     "watchNewest": "Watch the newest playlist"
   },
   "project": {
+    "general": "Project information",
     "actors": "Actors",
     "annotation": "Annotation",
     "crew": "Film crew",

@@ -143,8 +143,20 @@ docker volume create --driver local --opt type=overlay --opt device=overlay --op
 
 ## Useful Commands
 
+### Get an IP address of a container
+
 To get the IP address of the Postgres container to use in PgAdmin remotely:
 
 ```bash
 docker inspect -f '{{.NetworkSettings.Networks.backbone.IPAddress}}' kafe-db-1
 ```
+
+### Create an overlay
+
+To create an overlay filesystem, where data in `lowerdir` is read-only, data in `upperdir` contains the changes, `workdir` is for files while they're being changed:
+
+```bash
+ mount -t overlay overlay -o lowerdir=/data/kafe/temp,upperdir=/data/kafe-stage/upper-temp,workdir=/data/kafe-stage/work-temp /data/kafe-stage/temp
+```
+
+...and the final mountpoint is `/data/kafe-stage/temp`.

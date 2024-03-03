@@ -44,7 +44,7 @@ build-web:
 deploy-production:
   stage: deploy
   script:
-    - cp "$APPSETTINGS_MLEJNEK" "./Api/appsettings.local.json"
+    - cp "$APPSETTINGS_PRODUCTION" "./Api/appsettings.local.json"
     - docker compose -f docker-compose.base.yml -f docker-compose.production.yml build
     - docker compose -f docker-compose.base.yml -f docker-compose.production.yml down
     - docker compose -f docker-compose.base.yml -f docker-compose.production.yml up -d

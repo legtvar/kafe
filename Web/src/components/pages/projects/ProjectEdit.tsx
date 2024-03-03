@@ -126,7 +126,7 @@ export function ProjectEdit(props: IProjectEditProps) {
                                             </SendAPI>
                                             <RightsEditor
                                                 perms={perms}
-                                                options={['read', 'write']}
+                                                options={['read', 'write', 'append']}
                                                 explanation={{
                                                     read: t('rights.groups.project.read').toString(),
                                                     write: t('rights.groups.project.write').toString(),

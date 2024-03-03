@@ -39,6 +39,8 @@ public class ProjectGroupEditEndpoint : EndpointBaseAsync
         ProjectGroupEditDto request,
         CancellationToken cancellationToken = default)
     {
+        // TODO: Add project group permission to edit child project permissions. Right now it's disabled globally.
+        // NB: Remove this segment once you fix this.
         var auth = await authorizationService.AuthorizeAsync(User, request.Id, EndpointPolicy.Write);
         if (!auth.Succeeded)
         {

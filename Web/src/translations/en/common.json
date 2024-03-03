@@ -343,7 +343,7 @@
       "project": {
         "append": "Add new files to the project",
         "read": "View the project and its metadata",
-        "write": "Edit project metadata and permissions",
+        "write": "Edit project metadata",
         "inspect": "View project files"
       },
       "group": {

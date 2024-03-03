@@ -341,7 +341,7 @@
       "project": {
         "append": "Přidávat nové soubory do projektu",
         "read": "Zobrazit projekt, jeho metadata a soubory",
-        "write": "Upravovat metadata a oprávnění projektu"
+        "write": "Upravovat metadata projektu"
       },
       "group": {
         "read": "Vidět tuto skupinu projektů",

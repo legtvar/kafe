@@ -68,7 +68,7 @@ public partial class ProjectService
         {
             await accountService.AddPermissions(
                 ownerId,
-                new[] { (created.ProjectId, Permission.All) },
+                new[] { (created.ProjectId, Permission.Read | Permission.Write) },
                 token);
         }
 

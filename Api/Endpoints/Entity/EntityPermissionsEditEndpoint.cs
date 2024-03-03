@@ -47,6 +47,21 @@ public class EntityPermissionsEditEndpoint : EndpointBaseAsync
         EntityPermissionsEditDto dto,
         CancellationToken cancellationToken = default)
     {
+        var entity = await entityService.Load(dto.Id, cancellationToken);
+        if (entity is null)
+        {
+            return NotFound();
+        }
+
+        if (entity is ProjectInfo project)
+        {
+            var auth = await authorizationService.AuthorizeAsync(User, project.ProjectGroupId, EndpointPolicy.Write);
+            if (!auth.Succeeded)
+            {
+                return Unauthorized();
+            }
+        }
+
         var authEntity = await authorizationService.AuthorizeAsync(User, dto.Id, EndpointPolicy.Write);
         if (!authEntity.Succeeded)
         {
@@ -61,7 +76,7 @@ public class EntityPermissionsEditEndpoint : EndpointBaseAsync
 
         // NB: Npgsql does not allow multiple queries per connection.
         var accounts = new List<(EntityPermissionsAccountEditDto dto, AccountInfo? entity)>(accountPermissions.Length);
-        foreach(var accountPerm in accountPermissions)
+        foreach (var accountPerm in accountPermissions)
         {
             var account = accountPerm.Id is not null
                 ? await accountService.Load(accountPerm.Id, cancellationToken)

@@ -11,7 +11,7 @@ import { useTitle } from '../../../utils/useTitle';
 interface IHomeFestivalProps {}
 
 export function HomeFestival(props: IHomeFestivalProps) {
-    useTitle(t("homeFestival.title"));
+    useTitle(t('homeFestival.title'));
     const CountdownItem = (props: { children: number; title: string }) => (
         <Box textAlign="center" py={8} px={4}>
             <Text fontSize="2em" fontWeight="bold">
@@ -23,76 +23,62 @@ export function HomeFestival(props: IHomeFestivalProps) {
 
     return (
         <OutletOrChildren>
-            <AwaitAPI request={(api) => api.groups.getAll()}>
-                {(data: Group[]) => (
-                    <Box p={8}>
-                        {(() => {
-                            const filtered = data.filter((data) => data.isOpen);
+            <Box p={8}>
+                <Box
+                    fontSize="4xl"
+                    fontWeight="semibold"
+                    as="h2"
+                    lineHeight="tight"
+                    mb={8}
+                    isTruncated
+                >
+                    {t('homeFestival.title')}
+                </Box>
 
-                            if (filtered.length > 0)
-                                return (
-                                    <>
-                                        <Box fontSize="xl" as="h2" lineHeight="tight" color="gray.500" isTruncated>
-                                            {t('homeFestival.title').toString()}
-                                        </Box>
-                                        {filtered.map((group) => (
-                                            <>
-                                                <Box
-                                                    fontSize="4xl"
-                                                    fontWeight="semibold"
-                                                    as="h2"
-                                                    lineHeight="tight"
-                                                    mb={8}
-                                                    isTruncated
-                                                >
-                                                    {group.getName()}
-                                                </Box>
+                <IntroText displayDetails/>
 
-                                                <IntroText groupName={group.getName()} />
+                <AwaitAPI request={(api) => api.groups.getById('7rYVhQWyzk5')}>
+                    {(group) => (
+                        <>
+                            {group.deadline && (
+                                <Box>
+                                    <Box fontWeight="bold" mt={12}>
+                                        {t('createProject.doNotforget').toString()}
+                                    </Box>
+                                    <Countdown
+                                        date={new Date(group.deadline)}
+                                        renderer={({ days, hours, minutes, seconds }) => (
+                                            <SimpleGrid columns={4} display="inline-grid">
+                                                <CountdownItem title={t('countdown.days')}>
+                                                    {days}
+                                                </CountdownItem>
+                                                <CountdownItem title={t('countdown.hours')}>
+                                                    {hours}
+                                                </CountdownItem>
+                                                <CountdownItem title={t('countdown.minutes')}>
+                                                    {minutes}
+                                                </CountdownItem>
+                                                <CountdownItem title={t('countdown.seconds')}>
+                                                    {seconds}
+                                                </CountdownItem>
+                                            </SimpleGrid>
+                                        )}
+                                    />
+                                </Box>
+                            )}
 
-                                                {group.deadline && (
-                                                    <Box>
-                                                        <Box fontWeight="bold" mt={12}>
-                                                            {t('createProject.doNotforget').toString()}
-                                                        </Box>
-                                                        <Countdown
-                                                            date={new Date(group.deadline)}
-                                                            renderer={({ days, hours, minutes, seconds }) => (
-                                                                <SimpleGrid columns={4} display="inline-grid">
-                                                                    <CountdownItem title={t('countdown.days')}>
-                                                                        {days}
-                                                                    </CountdownItem>
-                                                                    <CountdownItem title={t('countdown.hours')}>
-                                                                        {hours}
-                                                                    </CountdownItem>
-                                                                    <CountdownItem title={t('countdown.minutes')}>
-                                                                        {minutes}
-                                                                    </CountdownItem>
-                                                                    <CountdownItem title={t('countdown.seconds')}>
-                                                                        {seconds}
-                                                                    </CountdownItem>
-                                                                </SimpleGrid>
-                                                            )}
-                                                        />
-                                                    </Box>
-                                                )}
-
-                                                <Flex direction="row" my={12}>
-                                                    <Link to={`/auth/groups/${group.id}/create`}>
-                                                        <Button colorScheme="brand">
-                                                            {t('createProject.signUp').toString()}
-                                                        </Button>
-                                                    </Link>
-                                                    <Spacer />
-                                                </Flex>
-                                            </>
-                                        ))}
-                                    </>
-                                );
-                        })()}
-                    </Box>
-                )}
-            </AwaitAPI>
+                            <Flex direction="row" my={12}>
+                                <Link to={`/auth/groups/${group.id}/create`}>
+                                    <Button colorScheme="brand">
+                                        {t('createProject.signUp').toString()}
+                                    </Button>
+                                </Link>
+                                <Spacer />
+                            </Flex>
+                        </>
+                    )}
+                </AwaitAPI>
+            </Box>
         </OutletOrChildren>
     );
 }

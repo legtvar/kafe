@@ -29,7 +29,7 @@ export function CreateProject(props: ICreateProjectProps) {
                             {group.getName()}
                         </Box>
 
-                        <IntroText groupName={group.getName()} displayDetails />
+                        <IntroText displayDetails />
                         <ProjectBasicInfo groupId={id} />
 
                         {/*

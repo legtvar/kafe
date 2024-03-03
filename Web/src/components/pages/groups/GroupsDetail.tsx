@@ -40,7 +40,7 @@ export function GroupsDetail(props: IGroupsDetailProps) {
 
                         {group.isOpen && (
                             <>
-                                <IntroText groupName={group.getName()} />
+                                <IntroText />
 
                                 <Flex direction="row" pb={12}>
                                     <Link to="create">

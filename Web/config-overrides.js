@@ -15,6 +15,11 @@ module.exports = function override(config, env) {
             },
         ],
     });
-
+    
+    config.module.rules[2] = {
+        test: /\.i18n\.html/,
+        type: "asset/source"
+    };
+    
     return config;
 };

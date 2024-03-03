@@ -134,9 +134,10 @@ export function Navbar({ onOpen, forceReload, signedIn, ...rest }: INavbarProps)
                                             <Text maxW="100%" fontSize="sm" isTruncated>
                                                 {user?.name}
                                             </Text>
+                                            {/* TODO: Maybe show some role information once its implemented in the API.
                                             <Text maxW="100%" fontSize="xs" isTruncated color={'gray.500'}>
                                                 {t(`role.${user?.role}`).toString()}
-                                            </Text>
+                                            </Text> */}
                                         </VStack>
                                         <Box display={{ base: 'none', md: 'flex' }}>
                                             <FiChevronDown />

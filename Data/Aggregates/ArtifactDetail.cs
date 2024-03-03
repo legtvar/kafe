@@ -21,7 +21,7 @@ public record ArtifactDetail(
     DateTimeOffset AddedOn,
     ImmutableArray<ArtifactShardInfo> Shards,
     [KafeType(typeof(ImmutableArray<Hrib>))] ImmutableArray<string> ContainingProjectIds
-);
+) : IEntity;
 
 public record ArtifactShardInfo(
     [Hrib] string ShardId,

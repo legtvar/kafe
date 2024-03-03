@@ -152,11 +152,11 @@ public partial class ProjectService
         eventStream.AppendMany(authorsAdded);
 
         var artifactsRemoved = @old.Artifacts.Except(@new.Artifacts)
-            .Select(a => new ProjectArtifactAdded(@new.Id, a.Id, a.BlueprintSlot));
+            .Select(a => new ProjectArtifactRemoved(@new.Id, a.Id));
         eventStream.AppendMany(artifactsRemoved);
         var artifactsAdded = @new.Artifacts.Except(@old.Artifacts)
             .Select(a => new ProjectArtifactAdded(@new.Id, a.Id, a.BlueprintSlot));
-        eventStream.AppendMany(authorsAdded);
+        eventStream.AppendMany(artifactsAdded);
 
         await db.SaveChangesAsync(token);
         return true;

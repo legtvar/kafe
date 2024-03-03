@@ -43,7 +43,11 @@ public class DefaultEmailService : IEmailService, IDisposable
         };
 
         await smtp.ConnectAsync(options.Value.Host, options.Value.Port, true, token);
-        await smtp.AuthenticateAsync(options.Value.Username, options.Value.Password, token);
+        if (!string.IsNullOrEmpty(options.Value.Username) || !string.IsNullOrEmpty(options.Value.Password))
+        {
+            await smtp.AuthenticateAsync(options.Value.Username, options.Value.Password, token);
+        }
+
         var envelopeSender = new MailboxAddress(
             options.Value.FromName,
             options.Value.EnvelopeSender ?? options.Value.FromAddress);

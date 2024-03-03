@@ -148,17 +148,13 @@ public class Startup
 
         services.AddCors(o =>
         {
-            o.AddPolicy("Cors", p =>
+            o.AddDefaultPolicy(p =>
             {
                 p.AllowAnyHeader();
                 p.AllowAnyMethod();
                 p.AllowCredentials();
                 p.SetIsOriginAllowedToAllowWildcardSubdomains();
                 p.WithOrigins(ApiOptions.AllowedOrigins.ToArray());
-                // p.AllowAnyMethod()
-                // .AllowCredentials()
-                // .SetIsOriginAllowed((host) => true)
-                // .AllowAnyHeader()
             });
         });
 
@@ -172,9 +168,11 @@ public class Startup
             o.KnownNetworks.Add(new IPNetwork(IPAddress.Parse("10.0.0.0"), 8));
         });
 
-        services.AddHttpLogging(o =>
-        {
-        });
+        services.AddProblemDetails();
+
+        // services.AddHttpLogging(o =>
+        // {
+        // });
 
         RegisterKafe(services);
     }
@@ -184,7 +182,7 @@ public class Startup
         Logger = app.ApplicationServices.GetRequiredService<ILogger<Startup>>();
         Logger.LogInformation("BaseUrl: {}", ApiOptions.BaseUrl);
 
-        app.UseHttpLogging();
+        // app.UseHttpLogging();
         app.UseForwardedHeaders();
 
         app.UseHttpsRedirection();
@@ -198,7 +196,7 @@ public class Startup
 
         app.UseRouting();
 
-        app.UseCors("Cors");
+        app.UseCors();
 
         app.UseAuthentication();
         app.Use(async (ctx, next) =>
@@ -231,13 +229,11 @@ public class Startup
         });
         app.UseAuthorization();
 
-        if (environment.IsDevelopment())
-        {
-            app.UseDeveloperExceptionPage();
+        app.UseExceptionHandler();
 
-            app.UseSwagger();
-            app.UseSwaggerUI();
-        }
+        app.UseSwagger();
+        app.UseSwaggerUI();
+
 
         app.UseEndpoints(e =>
         {

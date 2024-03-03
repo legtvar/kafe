@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.Annotations;
 using System;
@@ -27,17 +28,20 @@ public class TemporaryAccountCreationEndpoint : EndpointBaseAsync
     private readonly AccountService accountService;
     private readonly IEmailService emailService;
     private readonly IOptions<ApiOptions> apiOptions;
+    private readonly ILogger<TemporaryAccountCreationEndpoint> logger;
     private readonly IDataProtector dataProtector;
 
     public TemporaryAccountCreationEndpoint(
         AccountService accountService,
         IDataProtectionProvider dataProtectionProvider,
         IEmailService emailService,
-        IOptions<ApiOptions> apiOptions)
+        IOptions<ApiOptions> apiOptions,
+        ILogger<TemporaryAccountCreationEndpoint> logger)
     {
         this.accountService = accountService;
         this.emailService = emailService;
         this.apiOptions = apiOptions;
+        this.logger = logger;
         this.dataProtector = dataProtectionProvider.CreateProtector(Const.TemporaryAccountPurpose);
     }
 
@@ -59,6 +63,7 @@ public class TemporaryAccountCreationEndpoint : EndpointBaseAsync
         var account = await accountService.CreateTemporaryAccount(dto.EmailAddress, dto.PreferredCulture, token);
         if (string.IsNullOrEmpty(account.SecurityStamp))
         {
+            logger.LogError("Missing security stamp.");
             return StatusCode(500);
         }
 

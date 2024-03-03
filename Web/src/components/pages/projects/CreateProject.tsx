@@ -30,6 +30,10 @@ export function CreateProject(props: ICreateProjectProps) {
                         </Box>
 
                         <IntroText displayDetails />
+                        <hr />
+                        <Box fontSize="xl" fontWeight="semibold" as="h3" lineHeight="tight" isTruncated>
+                            {t('project.general').toString()}
+                        </Box>
                         <ProjectBasicInfo groupId={id} />
 
                         {/*

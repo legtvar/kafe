@@ -30,10 +30,7 @@ export function Footer(props: IFooterProps) {
         >
             <span className="kafe-footer-content">
                 <Trans i18nKey="layout.footer.copy">
-                    Created with <Heart>❤️</Heart> and ☕ by
-                    <a href="https://lemma.fi.muni.cz/" target="_blank" rel="noreferrer">
-                        LEMMA
-                    </a>
+                    Created with <Heart>❤️</Heart> and ☕ by LeGTVaR.
                 </Trans>
                 <br />
                 &copy; 2022 - {new Date().getFullYear()}

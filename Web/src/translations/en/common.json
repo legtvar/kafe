@@ -12,20 +12,26 @@
     "selectRoles": "Select person roles",
     "uco": "UCO"
   },
-  "beta": {
-    "button": "I understand",
-    "contactus": "In case of any problems, please contact us via email at",
-    "description": "This application is currently under development. Please be patient with any issues while we build the app with our sweat, tears and coffee.",
-    "title": "Development in progress...",
-    "toggleLanguage": "Switch to {{language}}",
-    "warning": "KAFE is in beta",
-    "muniLogin": "The Unified MUNI login is not yet available."
+  "staging": {
+    "warning": "Staging",
+    "title": "This is Staging!",
+    "description": "All changes on this domain get thrown away at athe end of the day (around 3:00 AM)."
+  },
+  "localhost": {
+    "warning": "Localhost",
+    "title": "This is localhost!",
+    "description": "The app is connected to a locally running back-end."
+  },
+  "troubleshooting": {
+    "title": "Report an issue",
+    "contactUs": "If you bump into any unsolvable problems, contact us at <email>kafe@fi.muni.cz</email>."
   },
   "common": {
     "backHome": "Back Home",
     "cancel": "Cancel",
     "edit": "Edit",
-    "save": "Save"
+    "save": "Save",
+    "understood": "I understand"
   },
   "content": {
     "noFileSelected": "No file selected",
@@ -98,7 +104,7 @@
   },
   "layout": {
     "footer": {
-      "copy": "Created with <1>❤️</1> and ☕ by <3>LEMMA</3>"
+      "copy": "Made by LeGTVaR with ❤️ and ☕."
     },
     "title-prefix": "KAFE"
   },

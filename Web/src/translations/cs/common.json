@@ -12,20 +12,26 @@
     "selectRoles": "Vybrat role osoby",
     "uco": "UČO"
   },
-  "beta": {
-    "button": "Chápu",
-    "contactus": "V případě jakýchkoli potíží nás prosím kontaktujte emailem na",
-    "description": "Právě probíhá vývoj této aplikace. Prosím buďte shovívaví k případným problémům zatímco za vás proléváme krev, pot a kafe (té tekuté).",
-    "title": "Právě probíhá vývoj...",
-    "toggleLanguage": "Přepnout na {{language}}",
-    "warning": "KAFE je v testovacím provozu",
-    "muniLogin": "Jednotné přihlašování MUNI zatím není dostupné."
+  "staging": {
+    "warning": "Staging",
+    "title": "Tohle je Staging!",
+    "description": "Všechny změny na této doméně se na konci dne (kolem 3:00 ráno) zahodí."
+  },
+  "localhost": {
+    "warning": "Localhost",
+    "title": "Tohle je localhost!",
+    "description": "Tahle appka je přikonektěná k lokálně běžícímu back-endu."
+  },
+  "troubleshooting": {
+    "title": "Nahlásit problém",
+    "contactUs": "V případě neřešitelných potíží nás kontaktujte na <email>kafe@fi.muni.cz</email>."
   },
   "common": {
     "backHome": "Zpět na domovskou stránku",
     "cancel": "Zrušit",
     "edit": "Upravit",
-    "save": "Uložit"
+    "save": "Uložit",
+    "understood": "Chápu"
   },
   "content": {
     "noFileSelected": "Žádný vybraný soubor",
@@ -99,7 +105,7 @@
   },
   "layout": {
     "footer": {
-      "copy": "Vytvořil tým <3>LEMMA</3> z <1>❤️</1> a ☕"
+      "copy": "Vytvořil LeGTVaR s ❤️ a ☕."
     },
     "title-prefix": "KAFE"
   },

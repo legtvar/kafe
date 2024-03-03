@@ -16,7 +16,6 @@ import { useState } from 'react';
 import { useApi } from '../../../hooks/Caffeine';
 import { Loading } from '../../utils/Loading';
 import { MuniIcon } from '../../utils/MuniIcon';
-import { AiFillWarning } from 'react-icons/ai';
 
 export function Login() {
     const [state, setState] = useState<'ready' | 'submitting' | 'submited' | 'error'>('ready');
@@ -68,11 +67,6 @@ export function Login() {
                             >
                                 {t('register.button').toString()}
                             </Button>
-                            <hr />
-                            <HStack color="red.500">
-                                <AiFillWarning />
-                                <Text>{t('beta.muniLogin').toString()}</Text>
-                            </HStack>
                             <Link href={api.accounts.external.loginUrl()}>
                                 <Button
                                     size="lg"

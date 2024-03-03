@@ -8,5 +8,5 @@ namespace Kafe.Data.Events;
 
 public record TemporaryAccountRefreshed(
     [Hrib] string AccountId,
-    string SecurityStamp
+    string? SecurityStamp
 );

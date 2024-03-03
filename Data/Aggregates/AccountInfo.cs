@@ -77,15 +77,15 @@ public class AccountInfoProjection : SingleStreamProjection<AccountInfo>
         };
     }
 
-    // TODO: Add a "ticket" entity that will be identified by a guid, and will be one-time only instead of these
-    //       tokens.
-    //public AccountInfo Apply(TemporaryAccountClosed e, AccountInfo a)
-    //{
+    // // TODO: Add a "ticket" entity that will be identified by a guid, and will be one-time only instead of these
+    // //       tokens.
+    // public AccountInfo Apply(TemporaryAccountClosed e, AccountInfo a)
+    // {
     //    return a with
     //    {
     //        SecurityStamp = null
     //    };
-    //}
+    // }
 
     public AccountInfo Apply(AccountInfoChanged e, AccountInfo a)
     {

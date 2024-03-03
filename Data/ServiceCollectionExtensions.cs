@@ -39,6 +39,7 @@ public static class ServiceCollectionExtensions
             {
                 options.AutoCreateSchemaObjects = AutoCreate.All;
             }
+
             options.CreateDatabasesForTenants(c =>
             {
                 c.MaintenanceDatabase(configuration.GetConnectionString("postgres")
@@ -67,6 +68,7 @@ public static class ServiceCollectionExtensions
             options.Events.Upcast<PlaylistVideoAddedUpcaster>();
             options.Events.Upcast<PlaylistVideoRemovedUpcaster>();
             options.Events.Upcast<TemporaryAccountCreatedUpcaster>();
+            options.Events.Upcast<TemporaryAccountClosedUpcaster>();
             options.UseDefaultSerialization(serializerType: SerializerType.Newtonsoft);
 
             RegisterEmbeddedSql(options);

@@ -6,10 +6,12 @@ import { Group } from '../../../data/Group';
 import { AwaitAPI } from '../../utils/AwaitAPI';
 import { OutletOrChildren } from '../../utils/OutletOrChildren';
 import { IntroText } from '../projects/create/IntroText';
+import { useTitle } from '../../../utils/useTitle';
 
 interface IHomeFestivalProps {}
 
 export function HomeFestival(props: IHomeFestivalProps) {
+    useTitle(t("homeFestival.title"));
     const CountdownItem = (props: { children: number; title: string }) => (
         <Box textAlign="center" py={8} px={4}>
             <Text fontSize="2em" fontWeight="bold">

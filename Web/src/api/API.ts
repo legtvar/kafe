@@ -34,7 +34,7 @@ export class API {
 
     public constructor() {
         if (window.location.hostname.startsWith('localhost') || window.location.hostname.startsWith('127.0.0.1')) {
-            this.apiUrl = 'https://localhost:44369' + this.apiUrl;
+            this.apiUrl = 'https://kafe-stage.fi.muni.cz' + this.apiUrl;
         } else {
             this.apiUrl = window.location.origin + this.apiUrl;
         }

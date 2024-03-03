@@ -16,11 +16,13 @@ import { useState } from 'react';
 import { useApi } from '../../../hooks/Caffeine';
 import { Loading } from '../../utils/Loading';
 import { MuniIcon } from '../../utils/MuniIcon';
+import { useTitle } from '../../../utils/useTitle';
 
 export function Login() {
     const [state, setState] = useState<'ready' | 'submitting' | 'submited' | 'error'>('ready');
     const [email, setEmail] = useState<string>('');
     const api = useApi();
+    useTitle(t("title.login"));
 
     const login = async () => {
         setState('submitting');

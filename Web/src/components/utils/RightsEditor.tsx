@@ -81,6 +81,7 @@ export function RightsEditor({ perms, readonly, explanation, options }: IRightsE
                                 ...perms.accountPermissions.filter((a) => a.id),
                                 ...(newNewItems.filter((a) => a.emailAddress) as EntityPermissionsUser[]),
                             ];
+                            perms.changed.add('accountPermissions');
                         }}
                     />
                 ))}

@@ -47,18 +47,22 @@ public class EntityPermissionsEditEndpoint : EndpointBaseAsync
         EntityPermissionsEditDto dto,
         CancellationToken cancellationToken = default)
     {
-        var entity = await entityService.Load(dto.Id, cancellationToken);
-        if (entity is null)
+        // TODO: Remove this hack once permission masks for project groups are implemented.
+        if (dto.Id != Hrib.System)
         {
-            return NotFound();
-        }
-
-        if (entity is ProjectInfo project)
-        {
-            var auth = await authorizationService.AuthorizeAsync(User, project.ProjectGroupId, EndpointPolicy.Write);
-            if (!auth.Succeeded)
+            var entity = await entityService.Load(dto.Id, cancellationToken);
+            if (entity is null)
             {
-                return Unauthorized();
+                return NotFound();
+            }
+
+            if (entity is ProjectInfo project)
+            {
+                var auth = await authorizationService.AuthorizeAsync(User, project.ProjectGroupId, EndpointPolicy.Write);
+                if (!auth.Succeeded)
+                {
+                    return Unauthorized();
+                }
             }
         }
 

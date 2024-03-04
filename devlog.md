@@ -23,7 +23,7 @@ It has these specs:
 
 - Debian 12
 - 8 GB RAM
-- 2 GM of swap space
+- 2 GB of swap space
 - 64 GB system storage
 - 2 TB archive storage
 

@@ -14,7 +14,44 @@
 
 # Architecture Decisions
 
-# Use `ProblemDetails` (2024-03-03)
+## `mlejnek` (2024-03-04)
+
+Since I need to describe the process of creating KAFE's new VM to the admins of LEMMA RS, I might as well put it here:
+
+KAFE's new home is called `mlejnek` and it is a VM in [Stratus.FI](https://www.fi.muni.cz/tech/unix/stratus.html).
+It has these specs:
+
+- Debian 12
+- 8 GB RAM
+- 2 GM of swap space
+- 64 GB system storage
+- 2 TB archive storage
+
+We use the following software for KAFE's basic operation:
+
+- _GitLab Runner_ for running CI jobs.
+- _Docker_ for KAFE's individual containers.
+- _Portainer_ for management of Docker containers.
+- _Traefik_ as a reverse proxy configured by container labels. It also obtains certs from Let's Encrypt.
+- _FFMpeg_ as a provider of video metadata and for converting videos.
+
+Once we had this basic setup, we communicated with CVT FI to set up the following services:
+
+- Put the VM into production mode:
+    - Get a public IPv4 and IPv6.
+    - Change the owner of the VM to an employee of FI.
+    - Set up _Nagios_ for automatic notification of downtime.
+    - Point `kafe-stage.fi.muni.cz` at the VM.
+- New group in faculty administration, `adm_kafe`, that manages `mail_kafe`.
+- New group in GitLab - `LeGTVaR` - that is synced to `mail_kafe`.
+- _Bacula_ to backup of the archival storage and the VM itself through.
+- CNAME records for `kafe-stage.fi.muni.cz` and `kafe.lemma.fi.muni.cz`. Both point to `kafe.fi.muni.cz`
+
+Finally for the Games extension, we contacted ICS MU, who then pointed `games.muni.cz` to a nameserver of FI.
+CVT then added a CNAME from `games.muni.cz` to `kafe.fi.muni.cz`.
+
+
+## Use `ProblemDetails` (2024-03-03)
 
 With KAFE finally safely resting in its new home, `mlejnek` on Stratus.FI, I finally have time to work directly on KAFE.
 
@@ -29,7 +66,7 @@ Based on that, I realized that the JSON that ASP.NET Core returns is actually st
 [RFC 7807](https://datatracker.ietf.org/doc/html/rfc7807).
 So now we use `Microsoft.AspNetCore.Mvc.ProblemDetails` and log the error as well.
 
-# Static `Create`s (2023-12-16)
+## Static `Create`s (2023-12-16)
 
 Made the `Create` methods on all projections `static`.
 

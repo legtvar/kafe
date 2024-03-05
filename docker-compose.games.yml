@@ -10,6 +10,6 @@ services:
       - 80
     restart: always
     labels:
-      - "traefik.http.routers.kafe-announcer.rule=Host(`games.muni.cz`)"
+      - "traefik.http.routers.kafe-announcer.rule=Host(`games.muni.cz`, `www.games.muni.cz`)"
       - "traefik.http.routers.kafe-announcer.tls=true"
       - "traefik.http.routers.kafe-announcer.tls.certresolver=lets-encrypt"

@@ -39,7 +39,12 @@
             "request": "launch",
             "preLaunchTask": "build-api",
             "program": "${workspaceFolder}/Api/bin/Debug/net7.0/Kafe.Api.dll",
-            "args": ["projections", "-r", "-p", "AccountInfo"],
+            "args": [
+                "projections",
+                "-r",
+                "-p",
+                "AccountInfo"
+            ],
             "cwd": "${workspaceFolder}/Api",
             "stopAtEntry": false,
             "env": {
@@ -47,15 +52,24 @@
             }
         },
         {
-            "name": "Attach to Production",
+            "name": "Attach to Staging",
             "type": "coreclr",
             "request": "attach",
             "processId": "${command:pickRemoteProcess}",
             "pipeTransport": {
                 "pipeCwd": "${workspaceFolder}",
                 "pipeProgram": "ssh",
-                "pipeArgs": ["-T", "lemma-new", "docker", "exec", "-i", "kafe_api_1", "sh", "-c"],
-                "debuggerPath": "~/vsdbg/vsdbg"
+                "pipeArgs": [
+                    "-T",
+                    "kafe.fi.muni.cz",
+                    "docker",
+                    "exec",
+                    "-i",
+                    "kafe-staging-api-1",
+                    "sh",
+                    "-c"
+                ],
+                "debuggerPath": "/root/vsdbg/vsdbg"
             },
             "sourceFileMap": {
                 "/kafe/src": "${workspaceRoot}"

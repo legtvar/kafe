@@ -1,13 +1,13 @@
 ```
-      █      █                                                                              
-     █      █                                                                               
-      █      █         █  █▀ ██   ▄████  ▄███▄       ██▄   ▄███▄      ▄   █    ████▄   ▄▀   
-                       █▄█   █ █  █▀   ▀ █▀   ▀      █  █  █▀   ▀      █  █    █   █ ▄▀     
-  ███████████████      █▀▄   █▄▄█ █▀▀    ██▄▄        █   █ ██▄▄   █     █ █    █   █ █ ▀▄   
-  █            ███     █  █  █  █ █      █▄   ▄▀     █  █  █▄   ▄▀ █    █ ███▄ ▀████ █   █  
-   █           ███       █      █  █     ▀███▀       ███▀  ▀███▀    █  █      ▀       ███   
-    █         █  █      ▀      █    ▀                                █▐                     
-     █████████                ▀                                      ▐                      
+      █      █
+     █      █
+      █      █         █  █▀ ██   ▄████  ▄███▄       ██▄   ▄███▄      ▄   █    ████▄   ▄▀
+                       █▄█   █ █  █▀   ▀ █▀   ▀      █  █  █▀   ▀      █  █    █   █ ▄▀
+  ███████████████      █▀▄   █▄▄█ █▀▀    ██▄▄        █   █ ██▄▄   █     █ █    █   █ █ ▀▄
+  █            ███     █  █  █  █ █      █▄   ▄▀     █  █  █▄   ▄▀ █    █ ███▄ ▀████ █   █
+   █           ███       █      █  █     ▀███▀       ███▀  ▀███▀    █  █      ▀       ███
+    █         █  █      ▀      █    ▀                                █▐
+     █████████                ▀                                      ▐
 ```
 
 > A very minimalistic [_architecture design record_](https://github.com/joelparkerhenderson/architecture-decision-record).
@@ -38,10 +38,10 @@ We use the following software for KAFE's basic operation:
 Once we had this basic setup, we communicated with CVT FI to set up the following services:
 
 - Put the VM into production mode:
-    - Get a public IPv4 and IPv6.
-    - Change the owner of the VM to an employee of FI.
-    - Set up _Nagios_ for automatic notification of downtime.
-    - Point `kafe-stage.fi.muni.cz` at the VM.
+  - Get a public IPv4 and IPv6.
+  - Change the owner of the VM to an employee of FI.
+  - Set up _Nagios_ for automatic notification of downtime.
+  - Point `kafe-stage.fi.muni.cz` at the VM.
 - New group in faculty administration, `adm_kafe`, that manages `mail_kafe`.
 - New group in GitLab - `LeGTVaR` - that is synced to `mail_kafe`.
 - _Bacula_ to backup of the archival storage and the VM itself through.
@@ -49,7 +49,6 @@ Once we had this basic setup, we communicated with CVT FI to set up the followin
 
 Finally for the Games extension, we contacted ICS MU, who then pointed `games.muni.cz` to a nameserver of FI.
 CVT then added a CNAME from `games.muni.cz` to `kafe.fi.muni.cz`.
-
 
 ## Use `ProblemDetails` (2024-03-03)
 
@@ -86,7 +85,6 @@ Nevertheless, they are important to remember.
 We use string Human-Readable Identifier Ballast (`Hrib`) for Ids on pretty much everything.
 These are essentially YouTube's 11-chars-long Ids but without the checks for swear words.
 
-
 # Other
 
 ## `pg_dump`
@@ -112,8 +110,8 @@ tar -xzvf $NAME.tar.gz -C $NAME
 pg_restore -U postgres --clean --create --dbname postgres --format d lemma-2023-12-16
 ```
 
-> NOTE: `--dbname postgres` is there because the first thing the restore does is `CREATE DATABASE lemma`. See [this](https://stackoverflow.com/questions/40784677/pg-restore-with-c-option-does-not-create-the-database).
-
+> NOTE: `--dbname postgres` is there because the first thing the restore does is `CREATE DATABASE lemma`.
+>       See [this](https://stackoverflow.com/questions/40784677/pg-restore-with-c-option-does-not-create-the-database).
 
 ## Useful SQL queries
 
@@ -131,7 +129,7 @@ To find artifacts in a project group 'CafMk2sO9fL':
 select id from mt_doc_videoshardinfo
 where data ->> 'ArtifactId' in
 	(select data ->> 'Id' from mt_doc_artifactdetail
-	where data -> 'ContainingProjectIds' ->> 0 in 
+	where data -> 'ContainingProjectIds' ->> 0 in
 	(select data ->> 'Id' from mt_doc_projectinfo
 	 where data ->> 'ProjectGroupId' = 'CafMk2sO9fL'
 ))
@@ -143,7 +141,7 @@ where data ->> 'ArtifactId' in
 select sum((data -> 'Variants' -> 'sd' ->> 'FileLength')::int) from mt_doc_videoshardinfo
 where data ->> 'ArtifactId' in
 	(select data ->> 'Id' from mt_doc_artifactdetail
-	where data -> 'ContainingProjectIds' ->> 0 in 
+	where data -> 'ContainingProjectIds' ->> 0 in
 	(select data ->> 'Id' from mt_doc_projectinfo
 	 where data ->> 'ProjectGroupId' = 'CafMk2sO9fL'
 ))
@@ -171,7 +169,6 @@ docker volume create --driver local --opt type=none --opt device=/data/kafe/$nam
 
 > NOTE: This solution is based on [this SO question](https://stackoverflow.com/questions/39496564/docker-volume-custom-mount-point).
 
-
 To create volumes for staging using Linux's overlay filesystem:
 
 ```bash
@@ -197,3 +194,40 @@ To create an overlay filesystem, where data in `lowerdir` is read-only, data in 
 ```
 
 ...and the final mountpoint is `/data/kafe-stage/temp`.
+
+### Remote Debugging
+
+To remote debug staging, use this VSCode's `launch.json` config:
+
+```json
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Attach to Staging",
+      "type": "coreclr",
+      "request": "attach",
+      "processId": "${command:pickRemoteProcess}",
+      "pipeTransport": {
+        "pipeCwd": "${workspaceFolder}",
+        "pipeProgram": "ssh",
+        "pipeArgs": [
+          "-T",
+          "kafe.fi.muni.cz",
+          "docker",
+          "exec",
+          "-i",
+          "kafe-staging-api-1",
+          "sh",
+          "-c"
+        ],
+        "debuggerPath": "~/vsdbg/vsdbg"
+      },
+      "sourceFileMap": {
+        "/kafe/src": "${workspaceRoot}"
+      },
+      "justMyCode": false
+    }
+  ]
+}
+```

@@ -21,7 +21,7 @@ export function IntroText(props: IIntroTextProps) {
         <Box maxWidth="70rem">
             <TransWithTags i18nKey="homeFestival.general" />
 
-            {props.displayDetails && <TransWithTags i18nKey="homeFestival.details"></TransWithTags>}
+            {/* {props.displayDetails && <TransWithTags i18nKey="homeFestival.details"></TransWithTags>} */}
         </Box>
     );
 }

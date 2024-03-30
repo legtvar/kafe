@@ -231,3 +231,22 @@ To remote debug staging, use this VSCode's `launch.json` config:
   ]
 }
 ```
+
+
+### Drop `test*` schemas in Postgres
+
+```sql
+DO $$
+DECLARE
+    s text;
+BEGIN
+    FOR s IN 
+        SELECT schema_name 
+        FROM information_schema.schemata 
+        WHERE schema_name LIKE 'test%'
+    LOOP
+        EXECUTE format('DROP SCHEMA IF EXISTS %I CASCADE', s);
+        RAISE NOTICE 'Dropped schema: %', s;
+    END LOOP;
+END $$ LANGUAGE plpgsql;
+```

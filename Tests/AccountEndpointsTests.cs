@@ -22,4 +22,34 @@ public class AccountEndpointsTests(ApiFixture fixture) : ApiContext(fixture)
             c.StatusCodeShouldBe(200);
         });
     }
+
+    [Fact]
+    public async Task TemporaryAccountCreation_WithNullEmail_ShouldFail()
+    {
+        var result = await Host.Scenario(c =>
+        {
+            c.Post
+                .Json(new TemporaryAccountCreationDto(
+                    EmailAddress: null!,
+                    PreferredCulture: null
+                ))
+                .ToUrl("/api/v1/tmp-account");
+            c.StatusCodeShouldBe(400);
+        });
+    }
+
+    [Fact]
+    public async Task TemporaryAccountCreation_WithInvalidEmail_ShouldFail()
+    {
+        var result = await Host.Scenario(c =>
+        {
+            c.Post
+                .Json(new TemporaryAccountCreationDto(
+                    EmailAddress: "!@#$%^&*()",
+                    PreferredCulture: null
+                ))
+                .ToUrl("/api/v1/tmp-account");
+            c.StatusCodeShouldBe(400);
+        });
+    }
 }

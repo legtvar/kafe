@@ -1,7 +1,7 @@
 <Project>
   <PropertyGroup>
-    <DefaultTargetFrameworks>net7.0</DefaultTargetFrameworks>
-    <DefaultExecutableFramework>net7.0</DefaultExecutableFramework>
+    <DefaultTargetFrameworks>net8.0</DefaultTargetFrameworks>
+    <DefaultExecutableFramework>net8.0</DefaultExecutableFramework>
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>

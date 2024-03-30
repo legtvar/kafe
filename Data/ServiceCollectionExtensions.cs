@@ -8,6 +8,7 @@ using Marten.Events.Projections;
 using Marten.Services.Json;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -30,17 +31,24 @@ public static class ServiceCollectionExtensions
             var configuration = services.GetRequiredService<IConfiguration>();
             var environment = services.GetRequiredService<IHostEnvironment>();
 
-            var options = new StoreOptions();
-
-            options.Connection(configuration.GetConnectionString("KAFE")
-                ?? throw new ArgumentException("The KAFE connection string is missing!"));
-            options.Events.StreamIdentity = StreamIdentity.AsString;
-            if (environment.IsDevelopment())
+            var options = services.GetRequiredService<IOptions<StorageOptions>>().Value;
+            var mo = new StoreOptions();
+            
+            if (!string.IsNullOrEmpty(options.Schema))
             {
-                options.AutoCreateSchemaObjects = AutoCreate.All;
+                mo.DatabaseSchemaName = options.Schema;
+                mo.Events.DatabaseSchemaName = options.Schema;
             }
 
-            options.CreateDatabasesForTenants(c =>
+            mo.Connection(configuration.GetConnectionString("KAFE")
+                ?? throw new ArgumentException("The KAFE connection string is missing!"));
+            mo.Events.StreamIdentity = StreamIdentity.AsString;
+            if (environment.IsDevelopment())
+            {
+                mo.AutoCreateSchemaObjects = AutoCreate.All;
+            }
+
+            mo.CreateDatabasesForTenants(c =>
             {
                 c.MaintenanceDatabase(configuration.GetConnectionString("postgres")
                     ?? throw new ArgumentException("The postgres connection string is missing!"));
@@ -51,29 +59,29 @@ public static class ServiceCollectionExtensions
                     .ConnectionLimit(-1);
             });
 
-            options.Projections.Add<AuthorInfoProjection>(ProjectionLifecycle.Inline);
-            options.Projections.Add<ArtifactInfoProjection>(ProjectionLifecycle.Inline);
-            options.Projections.Add<VideoShardInfoProjection>(ProjectionLifecycle.Inline);
-            options.Projections.Add<ImageShardInfoProjection>(ProjectionLifecycle.Inline);
-            options.Projections.Add<SubtitlesShardInfoProjection>(ProjectionLifecycle.Inline);
-            options.Projections.Add<NotificationInfoProjection>(ProjectionLifecycle.Inline);
-            options.Projections.Add<PlaylistInfoProjection>(ProjectionLifecycle.Inline);
-            options.Projections.Add<ProjectInfoProjection>(ProjectionLifecycle.Inline);
-            options.Projections.Add<ProjectGroupInfoProjection>(ProjectionLifecycle.Inline);
-            options.Projections.Add<VideoConversionInfoProjection>(ProjectionLifecycle.Inline);
-            options.Projections.Add<ArtifactDetailProjection>(ProjectionLifecycle.Inline);
-            options.Projections.Add<AccountInfoProjection>(ProjectionLifecycle.Inline);
-            options.Events.Upcast<AccountCapabilityAddedUpcaster>();
-            options.Events.Upcast<AccountCapabilityRemovedUpcaster>();
-            options.Events.Upcast<PlaylistVideoAddedUpcaster>();
-            options.Events.Upcast<PlaylistVideoRemovedUpcaster>();
-            options.Events.Upcast<TemporaryAccountCreatedUpcaster>();
-            options.Events.Upcast<TemporaryAccountClosedUpcaster>();
-            options.UseDefaultSerialization(serializerType: SerializerType.Newtonsoft);
+            mo.Projections.Add<AuthorInfoProjection>(ProjectionLifecycle.Inline);
+            mo.Projections.Add<ArtifactInfoProjection>(ProjectionLifecycle.Inline);
+            mo.Projections.Add<VideoShardInfoProjection>(ProjectionLifecycle.Inline);
+            mo.Projections.Add<ImageShardInfoProjection>(ProjectionLifecycle.Inline);
+            mo.Projections.Add<SubtitlesShardInfoProjection>(ProjectionLifecycle.Inline);
+            mo.Projections.Add<NotificationInfoProjection>(ProjectionLifecycle.Inline);
+            mo.Projections.Add<PlaylistInfoProjection>(ProjectionLifecycle.Inline);
+            mo.Projections.Add<ProjectInfoProjection>(ProjectionLifecycle.Inline);
+            mo.Projections.Add<ProjectGroupInfoProjection>(ProjectionLifecycle.Inline);
+            mo.Projections.Add<VideoConversionInfoProjection>(ProjectionLifecycle.Inline);
+            mo.Projections.Add<ArtifactDetailProjection>(ProjectionLifecycle.Inline);
+            mo.Projections.Add<AccountInfoProjection>(ProjectionLifecycle.Inline);
+            mo.Events.Upcast<AccountCapabilityAddedUpcaster>();
+            mo.Events.Upcast<AccountCapabilityRemovedUpcaster>();
+            mo.Events.Upcast<PlaylistVideoAddedUpcaster>();
+            mo.Events.Upcast<PlaylistVideoRemovedUpcaster>();
+            mo.Events.Upcast<TemporaryAccountCreatedUpcaster>();
+            mo.Events.Upcast<TemporaryAccountClosedUpcaster>();
+            mo.UseDefaultSerialization(serializerType: SerializerType.Newtonsoft);
 
-            RegisterEmbeddedSql(options);
+            RegisterEmbeddedSql(mo);
 
-            return options;
+            return mo;
         }
 
         services.AddMarten(ConfigureMarten)

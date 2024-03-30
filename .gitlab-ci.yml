@@ -41,7 +41,12 @@ test-api:
       junit:
         - ./**/*test-result.xml
   script:
-    - apk update && apk add ffmpeg
+    - apk update && apk add ffmpeg jq
+    - jq
+      --arg postgres "host=postgres;database=postgres;password=postgres;username=postgres;Include Error Detail=true"
+      --arg kafe "host=postgres;database=kafe;password=postgres;username=postgres;Include Error Detail=true"
+      '.ConnectionStrings.postgres=$postgres | .ConnectionStrings.KAFE=$kafe'
+      ./Api/appsettings.local.json> ./Api/appsettings.local.json
     - dotnet test Tests
       --logger:"junit;LogFilePath=./artifacts/{assembly}-test-result.xml;MethodFormat=Class;FailureBodyFormat=Verbose"
 

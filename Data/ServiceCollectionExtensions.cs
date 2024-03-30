@@ -1,4 +1,5 @@
-﻿using Kafe.Data.Aggregates;
+﻿using Kafe.Data;
+using Kafe.Data.Aggregates;
 using Kafe.Data.Events.Upcasts;
 using Kafe.Data.Options;
 using Kafe.Data.Services;
@@ -86,7 +87,8 @@ public static class ServiceCollectionExtensions
 
         services.AddMarten(ConfigureMarten)
             .ApplyAllDatabaseChangesOnStartup()
-            .UseIdentitySessions();
+            .UseIdentitySessions()
+            .InitializeWith<SeedData>();
 
         services.AddSingleton<StorageService>();
 

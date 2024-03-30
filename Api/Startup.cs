@@ -259,7 +259,6 @@ public class Startup
             .ValidateDataAnnotations()
             .ValidateOnStart();
 
-        services.AddHostedService<SeedDaemon>();
         services.AddHostedService<VideoConversionDaemon>();
 
         var emailServiceType = Configuration.GetSection("Email").Get<EmailOptions>()?.ServiceType

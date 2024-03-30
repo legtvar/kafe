@@ -11,7 +11,7 @@ public class ApiContext : IAsyncLifetime
     public ApiContext(ApiFixture fixture)
     {
         Host = fixture.Host;
-        Store = fixture.Host.Services.GetRequiredService<IDocumentStore>();
+        Store = fixture.Host.Server.Services.GetRequiredService<IDocumentStore>();
     }
 
     public IAlbaHost Host { get; }

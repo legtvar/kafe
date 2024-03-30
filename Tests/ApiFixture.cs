@@ -9,7 +9,7 @@ namespace Kafe.Tests;
 
 public class ApiFixture : IAsyncLifetime
 {
-    private readonly string testSchema = "sch" + Guid.NewGuid().ToString().Replace("-", string.Empty);
+    private readonly string testSchema = "test" + Guid.NewGuid().ToString().Replace("-", string.Empty);
 
     public IAlbaHost Host { get; private set; } = null!;
 

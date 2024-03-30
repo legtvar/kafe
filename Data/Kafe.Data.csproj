@@ -10,13 +10,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Marten" Version="6.4.1" /> 
-    <PackageReference Include="Microsoft.Extensions.Options" Version="7.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="7.0.0" />
+    <PackageReference Include="Marten" Version="7.5.0" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="8.0.2" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="8.0.0" />
   </ItemGroup>
   
   <ItemGroup>
-    <EmbeddedResource Include="Sql/Functions/*.sql" LogicalName="Sql/Functions/%(filename)%(extension)"/>
+    <EmbeddedResource Include="Sql/Functions/*.sql" LogicalName="Sql/Functions/%(filename)%(extension)" />
   </ItemGroup>
 
 </Project>

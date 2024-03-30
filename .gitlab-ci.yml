@@ -41,6 +41,7 @@ test-api:
       junit:
         - ./**/*test-result.xml
   script:
+    - apk update && apk add ffmpeg
     - dotnet test Tests
       --logger:"junit;LogFilePath=./artifacts/{assembly}-test-result.xml;MethodFormat=Class;FailureBodyFormat=Verbose"
 

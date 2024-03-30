@@ -92,10 +92,12 @@ public static class ServiceCollectionExtensions
         services.AddScoped<EntityService>();
 
         services.AddOptions<StorageOptions>()
-            .BindConfiguration("Storage");
+            .BindConfiguration("Storage")
+            .ValidateDataAnnotations();
 
         services.AddOptions<SeedOptions>()
-            .BindConfiguration("Seed");
+            .BindConfiguration("Seed")
+            .ValidateDataAnnotations();
 
         return services;
     }

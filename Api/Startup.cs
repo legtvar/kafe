@@ -250,8 +250,14 @@ public class Startup
 
         services.AddScoped<IAuthorizationHandler, PermissionHandler>();
 
-        services.Configure<ApiOptions>(Configuration);
-        services.Configure<EmailOptions>(Configuration.GetSection("Email"));
+        services.AddOptions<ApiOptions>()
+            .Bind(Configuration)
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+        services.AddOptions<EmailOptions>()
+            .BindConfiguration("Email")
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
 
         services.AddHostedService<SeedDaemon>();
         services.AddHostedService<VideoConversionDaemon>();

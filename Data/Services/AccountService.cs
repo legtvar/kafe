@@ -64,16 +64,16 @@ $@"TRUE = ALL(
     public async Task<AccountInfo> CreateTemporaryAccount(
         string emailAddress,
         string? preferredCulture,
+        Hrib? id = null,
         CancellationToken token = default)
     {
         // TODO: Add a "ticket" entity that will be identified by a guid, and will be one-time only instead of these
         //       tokens.
 
         var account = await db.Query<AccountInfo>().SingleOrDefaultAsync(a => a.EmailAddress == emailAddress, token);
-        Hrib? id;
         if (account is null)
         {
-            id = Hrib.Create();
+            id ??= Hrib.Create();
             var created = new AccountCreated(
                 AccountId: id.Value,
                 CreationMethod: CreationMethod.Api,

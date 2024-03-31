@@ -50,7 +50,8 @@ public class UserProvider
         Permission permission,
         CancellationToken token = default)
     {
-        var result = await query.QueryAsync<bool>(
+        var result = await query.AdvancedSqlQueryAsync<bool>(
+            // $"SET search_path TO {query.DocumentStore.Options.Events.DatabaseSchemaName}; "
             $"SELECT {SqlFunctions.GetResourcePerms}(?, ?) & ? = ?",
             token,
             entityId.Value,

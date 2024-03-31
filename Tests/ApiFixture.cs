@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Alba;
+using Alba.Security;
 using Kafe.Data.Options;
 using Marten;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,6 +17,7 @@ public class ApiFixture : IAsyncLifetime
 
     public async Task InitializeAsync()
     {
+        var authenticationStub = new AuthenticationStub();
         Host = await AlbaHost.For<Api.Program>(b =>
         {
             b.ConfigureServices((context, services) =>
@@ -27,7 +29,7 @@ public class ApiFixture : IAsyncLifetime
                     o.Schema = testSchema;
                 });
             });
-        });
+        }, authenticationStub);
     }
 
     public async Task DisposeAsync()

@@ -52,7 +52,7 @@ public class SeedData : IInitialData
                 var id = (await accounts.CreateTemporaryAccount(
                     account.EmailAddress,
                     account.PreferredCulture,
-                    token)).Id;
+                    token: token)).Id;
                 data = await accounts.FindByEmail(id, token);
                 if (data is null)
                 {

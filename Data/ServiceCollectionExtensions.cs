@@ -129,7 +129,7 @@ public static class ServiceCollectionExtensions
 
             var objectName = Path.GetFileNameWithoutExtension(sqlFile);
             options.Storage.ExtendedSchemaObjects.Add(
-                new Function(new PostgresqlObjectName("public", objectName), contents));
+                new Function(new PostgresqlObjectName(options.DatabaseSchemaName, objectName), contents));
         }
     }
 }

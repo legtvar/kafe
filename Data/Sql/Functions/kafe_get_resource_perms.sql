@@ -1,10 +1,12 @@
-CREATE OR REPLACE FUNCTION kafe_get_resource_perms(
+CREATE OR REPLACE FUNCTION {databaseSchema}.kafe_get_resource_perms(
 	IN resource_id character varying,
 	IN account_id character varying
 ) RETURNS int AS $$
 DECLARE
 	resource_type character varying;
 BEGIN
+	SET search_path TO {databaseSchema};
+
 	IF resource_id IS NULL THEN
 		RAISE '`resource_id` must be non-null.';
 	END IF;

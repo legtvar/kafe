@@ -125,7 +125,7 @@ public static class ServiceCollectionExtensions
             using var stream = assembly.GetManifestResourceStream(sqlFile)
                 ?? throw new NotSupportedException($"Embedded Sql '{sqlFile}' could not be found.");
             using var reader = new StreamReader(stream);
-            var contents = reader.ReadToEnd();
+            var contents = reader.ReadToEnd().Replace("{databaseSchema}", options.DatabaseSchemaName);
 
             var objectName = Path.GetFileNameWithoutExtension(sqlFile);
             options.Storage.ExtendedSchemaObjects.Add(

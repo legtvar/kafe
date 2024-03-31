@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION kafe_get_artifact_perms(
+CREATE OR REPLACE FUNCTION {databaseSchema}.kafe_get_artifact_perms(
 	IN artifact_id character varying,
 	IN account_id character varying
 ) RETURNS int AS $$
@@ -8,6 +8,8 @@ DECLARE
 	account jsonb;
 	perms int := 0;
 BEGIN
+	SET search_path TO {databaseSchema};
+
 	IF artifact_id IS NULL THEN
 		RAISE '`artifact_id` must be non-null.';
 	END IF;

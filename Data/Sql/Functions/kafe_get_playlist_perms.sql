@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION kafe_get_playlist_perms(
+CREATE OR REPLACE FUNCTION {databaseSchema}.kafe_get_playlist_perms(
 	IN playlist_id character varying,
 	IN accessing_account_id character varying
 ) RETURNS int AS $$
@@ -6,6 +6,8 @@ DECLARE
 	playlist jsonb;
 	account jsonb;
 BEGIN
+	SET search_path TO {databaseSchema};
+
 	IF playlist_id IS NULL THEN
 		RAISE '`playlist_id` must be non-null.';
 	END IF;

@@ -1,10 +1,12 @@
-CREATE OR REPLACE FUNCTION kafe_get_project_perms_core(
+CREATE OR REPLACE FUNCTION {databaseSchema}.kafe_get_project_perms_core(
 	IN project jsonb,
 	IN account jsonb
 ) RETURNS int AS $$
 DECLARE
 	perms int := 0;
 BEGIN
+	SET search_path TO {databaseSchema};
+
 	IF project IS NULL THEN
 		RAISE 'Project not found.';
 	END IF;

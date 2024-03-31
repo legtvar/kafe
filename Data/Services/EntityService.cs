@@ -37,7 +37,7 @@ public class EntityService
                 .Cast<IEntity>()
                 .FirstOrDefault();
     }
-    
+
     // public async Task<ImmutableArray<bool>> AllExist<TEntity>(IEnumerable<Hrib> ids, CancellationToken token = default)
     // {
     //     var tableName = await db.Database.ExistingTableFor(typeof(TEntity));
@@ -50,7 +50,7 @@ public class EntityService
         CancellationToken token = default)
     {
         var perms = await db.QueryAsync<int>(
-            $"SELECT {SqlFunctions.GetResourcePerms}(?, ?)",
+            $"SELECT {db.DocumentStore.Options.DatabaseSchemaName}.{SqlFunctions.GetResourcePerms}(?, ?)",
             token,
             entityId.Value,
             accessingAccountId?.Value!);
@@ -68,7 +68,8 @@ public class EntityService
         }
 
         var perms = await db.QueryAsync<int>(
-            $"SELECT {SqlFunctions.GetResourcePerms}(id, ?) FROM unnest(?) as id",
+            $"SELECT {db.DocumentStore.Options.DatabaseSchemaName}.{SqlFunctions.GetResourcePerms}(id, ?) "
+            + "FROM unnest(?) as id",
             token,
             accessingAccountId?.Value!,
             entityIds.Select(i => i.Value).ToArray()

@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION kafe_get_project_perms(
+CREATE OR REPLACE FUNCTION {databaseSchema}.kafe_get_project_perms(
 	IN project_id character varying,
 	IN account_id character varying
 ) RETURNS int AS $$
@@ -6,6 +6,8 @@ DECLARE
 	account jsonb;
 	project jsonb;
 BEGIN
+	SET search_path TO {databaseSchema};
+
 	IF project_id IS NULL THEN
 		RAISE '`project_id` must be non-null.';
 	END IF;

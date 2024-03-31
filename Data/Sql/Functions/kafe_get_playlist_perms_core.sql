@@ -1,10 +1,12 @@
-CREATE OR REPLACE FUNCTION kafe_get_playlist_perms_core(
+CREATE OR REPLACE FUNCTION {databaseSchema}.kafe_get_playlist_perms_core(
 	IN playlist jsonb,
 	IN accessing_account jsonb
 ) RETURNS int AS $$
 DECLARE
 	perms int := 0;
 BEGIN
+	SET search_path TO {databaseSchema};
+
 	IF playlist IS NULL THEN
 		RAISE 'Playlist not found.';
 	END IF;

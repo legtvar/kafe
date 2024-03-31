@@ -52,7 +52,7 @@ public class UserProvider
     {
         var result = await query.AdvancedSqlQueryAsync<bool>(
             // $"SET search_path TO {query.DocumentStore.Options.Events.DatabaseSchemaName}; "
-            $"SELECT {SqlFunctions.GetResourcePerms}(?, ?) & ? = ?",
+            $"SELECT {query.DocumentStore.Options.DatabaseSchemaName}.{SqlFunctions.GetResourcePerms}(?, ?) & ? = ?",
             token,
             entityId.Value,
             Account?.Id!,

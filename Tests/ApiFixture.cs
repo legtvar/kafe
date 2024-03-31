@@ -11,7 +11,8 @@ namespace Kafe.Tests;
 
 public class ApiFixture : IAsyncLifetime
 {
-    private readonly string testSchema = "test" + Guid.NewGuid().ToString().Replace("-", string.Empty);
+    private readonly string testSchema
+        = $"test_{DateTimeOffset.UtcNow:yyyy_MM_dd_T_HH_mm}_{Guid.NewGuid().ToString()[..8]}";
 
     public IAlbaHost Host { get; private set; } = null!;
 

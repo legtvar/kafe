@@ -28,6 +28,8 @@ public record StorageOptions
 
     public string Schema { get; set; } = DefaultSchema;
 
+    public bool AllowSeedData { get; set; } = true;
+
     public Dictionary<ShardKind, string> ShardDirectories { get; init; } = new()
     {
         [ShardKind.Image] = "images",

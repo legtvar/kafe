@@ -15,22 +15,31 @@ namespace Kafe.Data;
 
 public class SeedData : IInitialData
 {
+    private readonly IOptions<StorageOptions> storageOptions;
     private readonly IOptions<SeedOptions> options;
     private readonly IServiceProvider services;
     private readonly ILogger<SeedData> logger;
 
     public SeedData(
+        IOptions<StorageOptions> storageOptions,
         IOptions<SeedOptions> options,
         IServiceProvider services,
         ILogger<SeedData> logger)
     {
+        this.storageOptions = storageOptions;
         this.options = options;
         this.services = services;
         this.logger = logger;
     }
-    
+
     public async Task Populate(IDocumentStore store, CancellationToken token)
     {
+        if (!storageOptions.Value.AllowSeedData)
+        {
+            logger.LogInformation("Skipping seed data since it is disabled in config.");
+            return;
+        }
+
         using var scope = services.CreateScope();
         var accounts = scope.ServiceProvider.GetRequiredService<AccountService>();
         var projectGroups = scope.ServiceProvider.GetRequiredService<ProjectGroupService>();
@@ -58,7 +67,7 @@ public class SeedData : IInitialData
             {
                 var missingPermissions = account.Permissions
                     .ToDictionary(p => p.Key, p => p.Value)
-                    .Except([..data.Permissions])
+                    .Except([.. data.Permissions])
                     .Select(kv => (kv.Key, kv.Value))
                     .ToImmutableArray();
 

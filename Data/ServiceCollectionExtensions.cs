@@ -85,7 +85,7 @@ public static class ServiceCollectionExtensions
             return mo;
         }
 
-        services.AddMarten(ConfigureMarten)
+        var mce = services.AddMarten(ConfigureMarten)
             .ApplyAllDatabaseChangesOnStartup()
             .UseIdentitySessions()
             .InitializeWith<SeedData>();

@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Alba;
 using Kafe.Data.Options;
+using Marten;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
@@ -19,8 +20,10 @@ public class ApiFixture : IAsyncLifetime
         {
             b.ConfigureServices((context, services) =>
             {
+                services.InitializeMartenWith<TestSeedData>();
                 services.Configure<StorageOptions>(o =>
                 {
+                    o.AllowSeedData = false;
                     o.Schema = testSchema;
                 });
             });

@@ -1,7 +1,7 @@
 CREATE OR REPLACE FUNCTION {databaseSchema}.kafe_get_resource_perms(
 	IN resource_id character varying,
 	IN account_id character varying
-) RETURNS int AS $$
+) RETURNS TABLE(is_found boolean, perms int) AS $$
 DECLARE
 	resource_type character varying;
 BEGIN
@@ -12,31 +12,45 @@ BEGIN
 	END IF;
 	
 	IF resource_id = 'system' THEN
-		RETURN kafe_get_system_perms(account_id);
+		is_found := TRUE;
+		perms := kafe_get_system_perms(account_id);
+		RETURN NEXT;
+		RETURN;
 	END IF;
 	
 	resource_type := (SELECT type
 					  FROM mt_streams
 					  WHERE id = resource_id);
 	IF resource_type IS NULL THEN
-		RETURN 0;
+		-- Return false so that no exception is thrown and instead 
+		is_found := FALSE;
+		perms := 0;
+		RETURN NEXT;
+		RETURN;
 	END IF;
 	
 	CASE
 		WHEN resource_type = 'account_info' THEN
-			RETURN kafe_get_account_perms(resource_id, account_id);
+			perms := kafe_get_account_perms(resource_id, account_id);
 		WHEN resource_type = 'artifact_info' THEN
-			RETURN kafe_get_artifact_perms(resource_id, account_id);
+			perms := kafe_get_artifact_perms(resource_id, account_id);
 		WHEN resource_type = 'author_info' THEN
-			RETURN kafe_get_author_perms(resource_id, account_id);
+			perms := kafe_get_author_perms(resource_id, account_id);
 		WHEN resource_type = 'project_info' THEN
-			RETURN kafe_get_project_perms(resource_id, account_id);
+			perms := kafe_get_project_perms(resource_id, account_id);
 		WHEN resource_type = 'project_group_info' THEN
-			RETURN kafe_get_projectgroup_perms(resource_id, account_id);
+			perms := kafe_get_projectgroup_perms(resource_id, account_id);
 		WHEN resource_type = 'playlist_info' THEN
-			RETURN kafe_get_playlist_perms(resource_id, account_id);
+			perms := kafe_get_playlist_perms(resource_id, account_id);
 		ELSE
-			RETURN 0;
+			is_found := FALSE;
+			perms := 0;
+			RETURN NEXT;
+			RETURN;
 	END CASE;
+
+	is_found := TRUE;
+	RETURN NEXT;
+	RETURN;
 END;
 $$ LANGUAGE plpgsql;

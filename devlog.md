@@ -14,6 +14,14 @@
 
 # Architecture Decisions
 
+## Tests (2024-03-31)
+
+I set up tests [Alba](https://jasperfx.github.io/alba/) for the API endpoints.
+Each test run creates its own schema in the DB.
+CI is configured to spawn its own postgres container just to have something to run tests agains.
+The first endpoints to tests are those from the _Accounts_ group.
+I already found a bug with (lack of) email validation when creating a new account.
+
 ## `mlejnek` (2024-03-04)
 
 Since I need to describe the process of creating KAFE's new VM to the admins of LEMMA RS, I might as well put it here:

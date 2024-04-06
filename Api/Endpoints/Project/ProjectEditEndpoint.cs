@@ -45,38 +45,43 @@ public class ProjectEditEndpoint : EndpointBaseAsync
             return Unauthorized();
         }
 
-        var authors = ImmutableArray<ProjectAuthorInfo>.Empty;
-        if (request.Crew.HasValue)
-        {
-            authors = authors.AddRange(request.Crew.Value.Select(c => new ProjectAuthorInfo(
-                Id: c.Id.Value,
-                Kind: ProjectAuthorKind.Crew,
-                Roles: c.Roles
-            )));
-        }
-        if (request.Cast.HasValue)
-        {
-            authors = authors.AddRange(request.Cast.Value.Select(c => new ProjectAuthorInfo(
-                Id: c.Id.Value,
-                Kind: ProjectAuthorKind.Cast,
-                Roles: c.Roles
-            )));
-        }
-
         var @old = await projectService.Load(request.Id, token: cancellationToken);
         if (@old is null)
         {
             return NotFound();
         }
 
+        var authors = old.Authors;
+        if (request.Crew.HasValue)
+        {
+            authors = authors
+                .RemoveAll(a => a.Kind == ProjectAuthorKind.Crew)
+                .AddRange(request.Crew.Value.Select(c => new ProjectAuthorInfo(
+                    Id: c.Id.Value,
+                    Kind: ProjectAuthorKind.Crew,
+                    Roles: c.Roles
+                ))
+            );
+        }
+
+        if (request.Cast.HasValue)
+        {
+            authors = authors
+                .RemoveAll(a => a.Kind == ProjectAuthorKind.Cast)
+                .AddRange(request.Cast.Value.Select(c => new ProjectAuthorInfo(
+                    Id: c.Id.Value,
+                    Kind: ProjectAuthorKind.Cast,
+                    Roles: c.Roles
+                ))
+            );
+        }
+
         var @new = @old with
         {
-            Name = request.Name ?? @old.Name,
-            Genre = request.Genre ?? @old.Genre,
-            Description = request.Description ?? @old.Description,
-            Authors = (request.Crew.HasValue || request.Cast.HasValue)
-                ? authors
-                : @old.Authors,
+            Name = LocalizedString.Override(@old.Name, request.Name),
+            Genre = LocalizedString.Override(@old.Genre, request.Genre),
+            Description = LocalizedString.Override(@old.Description, request.Description),
+            Authors = authors,
             Artifacts = request.Artifacts.HasValue
                 ? request.Artifacts.Value.Select(a => new ProjectArtifactInfo(
                     Id: a.Id.Value,
@@ -89,7 +94,7 @@ public class ProjectEditEndpoint : EndpointBaseAsync
         {
             return ValidationProblem(title: result.Errors.FirstOrDefault());
         }
-        
+
         return Ok();
     }
 }

@@ -4,9 +4,11 @@ using Kafe.Data.Events;
 using Marten;
 using Marten.Linq;
 using Marten.Linq.MatchesSql;
+using MimeKit;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading;
@@ -69,6 +71,13 @@ $@"TRUE = ALL(
     {
         // TODO: Add a "ticket" entity that will be identified by a guid, and will be one-time only instead of these
         //       tokens.
+
+        if (!IsValidEmailAddress(emailAddress))
+        {
+            throw new ArgumentException(
+                "The provided email address does not have a valid format.",
+                nameof(emailAddress));
+        }
 
         var account = await db.Query<AccountInfo>().SingleOrDefaultAsync(a => a.EmailAddress == emailAddress, token);
         if (account is null)
@@ -202,5 +211,11 @@ $@"TRUE = ALL(
         await db.SaveChangesAsync(token);
         return await db.Events.AggregateStreamAsync<AccountInfo>(id, token: token)
             ?? throw new InvalidOperationException($"Account '{id}' could not be live-aggregated.");
+    }
+
+    public static bool IsValidEmailAddress(string emailAddress)
+    {
+        return MailboxAddress.TryParse(emailAddress, out var address)
+            && address.Address == emailAddress;
     }
 }

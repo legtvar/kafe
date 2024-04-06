@@ -14,8 +14,8 @@ export const localizedMapper = (localized: localizedString) => {
 
     const res: localizedString = { iv };
 
-    if (cs && iv !== cs) res['cs'] = cs;
-    if (en && iv !== en) res['en'] = en;
+    if (cs) res['cs'] = cs;
+    if (en) res['en'] = en;
 
     return res;
 };

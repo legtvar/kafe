@@ -1,37 +1,45 @@
-﻿using Kafe.Api.Transfer;
-using Kafe.Data;
-using Kafe.Data.Options;
-using Kafe.Data.Services;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Kafe.Data.Options;
+using Kafe.Data.Services;
+using Marten;
+using Marten.Schema;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
-namespace Kafe.Api.Daemons;
+namespace Kafe.Data;
 
-public class SeedDaemon : BackgroundService
+public class SeedData : IInitialData
 {
+    private readonly IOptions<StorageOptions> storageOptions;
     private readonly IOptions<SeedOptions> options;
     private readonly IServiceProvider services;
-    private readonly ILogger<SeedDaemon> logger;
+    private readonly ILogger<SeedData> logger;
 
-    public SeedDaemon(
+    public SeedData(
+        IOptions<StorageOptions> storageOptions,
         IOptions<SeedOptions> options,
         IServiceProvider services,
-        ILogger<SeedDaemon> logger)
+        ILogger<SeedData> logger)
     {
+        this.storageOptions = storageOptions;
         this.options = options;
         this.services = services;
         this.logger = logger;
     }
 
-    protected override async Task ExecuteAsync(CancellationToken token)
+    public async Task Populate(IDocumentStore store, CancellationToken token)
     {
+        if (!storageOptions.Value.AllowSeedData)
+        {
+            logger.LogInformation("Skipping seed data since it is disabled in config.");
+            return;
+        }
+
         using var scope = services.CreateScope();
         var accounts = scope.ServiceProvider.GetRequiredService<AccountService>();
         var projectGroups = scope.ServiceProvider.GetRequiredService<ProjectGroupService>();
@@ -44,7 +52,7 @@ public class SeedDaemon : BackgroundService
                 var id = (await accounts.CreateTemporaryAccount(
                     account.EmailAddress,
                     account.PreferredCulture,
-                    token)).Id;
+                    token: token)).Id;
                 data = await accounts.FindByEmail(id, token);
                 if (data is null)
                 {
@@ -59,7 +67,7 @@ public class SeedDaemon : BackgroundService
             {
                 var missingPermissions = account.Permissions
                     .ToDictionary(p => p.Key, p => p.Value)
-                    .Except(data.Permissions ?? ImmutableDictionary<string, Permission>.Empty)
+                    .Except([.. data.Permissions])
                     .Select(kv => (kv.Key, kv.Value))
                     .ToImmutableArray();
 
@@ -86,7 +94,6 @@ public class SeedDaemon : BackgroundService
             }
 
             var deadline = group.Deadline is null ? default : DateTimeOffset.Parse(group.Deadline);
-            var creationInfo = new ProjectGroupCreationDto(name, null, deadline);
             var id = await projectGroups.Create(
                 name: name,
                 description: null,

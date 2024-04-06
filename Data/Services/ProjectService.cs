@@ -230,7 +230,7 @@ public partial class ProjectService
 
     public async Task<ImmutableArray<ProjectInfo>> LoadMany(ImmutableArray<Hrib> ids, CancellationToken token = default)
     {
-        return (await db.LoadManyAsync<ProjectInfo>(token, ids.Cast<string>())).ToImmutableArray();
+        return [.. (await db.LoadManyAsync<ProjectInfo>(token, ids.Select(id => id.Value)))];
     }
 
     // private async Task<ImmutableArray<ProjectAuthorInfo>> GetProjectAuthors(

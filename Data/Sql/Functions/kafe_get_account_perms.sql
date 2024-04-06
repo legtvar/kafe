@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION kafe_get_account_perms(
+CREATE OR REPLACE FUNCTION {databaseSchema}.kafe_get_account_perms(
 	IN account_id character varying,
 	IN accessing_account_id character varying
 ) RETURNS int AS $$
@@ -7,6 +7,8 @@ DECLARE
 	account jsonb;
 	perms int := 0;
 BEGIN
+	SET search_path TO {databaseSchema};
+
 	IF account_id IS NULL THEN
 		RAISE '`account_id` must be non-null.';
 	END IF;

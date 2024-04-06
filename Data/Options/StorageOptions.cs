@@ -12,17 +12,23 @@ namespace Kafe.Data.Options;
 
 public record StorageOptions
 {
-    [Required]
-    public string SecretsDirectory { get; init; } = null!;
+    public const string DefaultSchema = "public";
 
     [Required]
-    public string TempDirectory { get; init; } = null!;
+    public string SecretsDirectory { get; set; } = null!;
 
     [Required]
-    public string ArchiveDirectory { get; init; } = null!;
+    public string TempDirectory { get; set; } = null!;
 
     [Required]
-    public string GeneratedDirectory { get; init; } = null!;
+    public string ArchiveDirectory { get; set; } = null!;
+
+    [Required]
+    public string GeneratedDirectory { get; set; } = null!;
+
+    public string Schema { get; set; } = DefaultSchema;
+
+    public bool AllowSeedData { get; set; } = true;
 
     public Dictionary<ShardKind, string> ShardDirectories { get; init; } = new()
     {

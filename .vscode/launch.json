@@ -17,7 +17,7 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build-api",
-            "program": "${workspaceFolder}/Api/bin/Debug/net7.0/Kafe.Api.dll",
+            "program": "${workspaceFolder}/Api/bin/Debug/net8.0/Kafe.Api.dll",
             "args": [],
             "cwd": "${workspaceFolder}/Api",
             "stopAtEntry": false,

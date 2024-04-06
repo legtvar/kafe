@@ -14,7 +14,7 @@ export function TransWithTags(props: ITransWithTags) {
             components={{
                 a: <Autolink />,
                 email: <Autoemail />,
-                p: <Text mb={4} mt={4} textAlign="justify" />,
+                p: <Text mb={4} mt={4} style={{hyphens: "auto"}} />,
                 h3: <Text mb={4} mt={8} fontSize="xx-large" fontWeight="semibold" as="h3" />,
                 h4: <Text mb={4} mt={8} fontSize="x-large" fontWeight="semibold" as="h4" />,
                 ul: <UnorderedList pl={4} mb={4}></UnorderedList>,

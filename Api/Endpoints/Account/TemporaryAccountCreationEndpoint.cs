@@ -60,7 +60,7 @@ public class TemporaryAccountCreationEndpoint : EndpointBaseAsync
 
         dto = dto with { EmailAddress = dto.EmailAddress.Trim() };
 
-        var account = await accountService.CreateTemporaryAccount(dto.EmailAddress, dto.PreferredCulture, token);
+        var account = await accountService.CreateTemporaryAccount(dto.EmailAddress, dto.PreferredCulture, token: token);
         if (string.IsNullOrEmpty(account.SecurityStamp))
         {
             logger.LogError("Missing security stamp.");

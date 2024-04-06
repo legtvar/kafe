@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -196,6 +197,14 @@ public sealed partial class LocalizedString : IEquatable<LocalizedString>
     public override string? ToString()
     {
         return this[CultureInfo.CurrentCulture];
+    }
+
+    public static LocalizedString Override(LocalizedString? old, LocalizedString? @new)
+    {
+        return old is not null && @new is null ? old
+            : old is null && @new is not null ? @new
+            : old is not null && @new is not null ? old.data.SetItems(@new)
+            : LocalizedString.Empty;
     }
 }
 

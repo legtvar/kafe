@@ -1,3 +1,5 @@
+using System;
+
 namespace Kafe.Common;
 
 public class KafeErrorException : Exception

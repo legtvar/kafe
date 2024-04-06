@@ -29,6 +29,7 @@ public partial class ProjectService
     public const string VideoMinBitrateDescription = "10 Mbps";
     public const long VideoMaxBitrate = 20_000_000;
     public const string VideoMaxBitrateDescription = "20 Mbps";
+    public const long VideoBitrateTolerance = 1_000_000;
     public const int VideoShorterSideResolution = 1080;
     public const int CoverPhotoShorterSideResolution = 1080;
     public const double CoverPhotoMaxRatio = 16 / 9.0;
@@ -919,11 +920,11 @@ public partial class ProjectService
             yield break;
         }
 
-        if (originalVariant.Bitrate < VideoMinBitrate)
+        if (originalVariant.Bitrate < VideoMinBitrate - VideoBitrateTolerance)
         {
             yield return bitrateTooLowError;
         }
-        else if (originalVariant.Bitrate > VideoMaxBitrate)
+        else if (originalVariant.Bitrate > VideoMaxBitrate + VideoBitrateTolerance)
         {
             yield return bitrateTooHighError;
         }

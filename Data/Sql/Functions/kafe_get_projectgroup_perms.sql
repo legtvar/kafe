@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION kafe_get_projectgroup_perms(
+CREATE OR REPLACE FUNCTION {databaseSchema}.kafe_get_projectgroup_perms(
 	IN projectgroup_id character varying,
 	IN account_id character varying
 ) RETURNS int AS $$
@@ -7,6 +7,8 @@ DECLARE
 	projectgroup jsonb;
 	perms int := 0;
 BEGIN
+	SET search_path TO {databaseSchema};
+
 	IF projectgroup_id IS NULL THEN
 		RAISE '`projectgroup_id` must be non-null.';
 	END IF;

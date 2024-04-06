@@ -1,9 +1,20 @@
-import { Link } from "@chakra-ui/react";
+import { Link } from '@chakra-ui/react';
 
 interface IAutolinkProps {
-    children?: string
+    children?: string;
 }
 
 export function Autolink(props: IAutolinkProps) {
-    return <Link href={props.children ?? "/"}>{props.children}</Link>
+    return (
+        <Link
+            href={props.children ?? '/'}
+            overflow="clip"
+            textOverflow="ellipsis"
+            whiteSpace="nowrap"
+            display="inline-block"
+            maxWidth="100%"
+        >
+            {props.children}
+        </Link>
+    );
 }

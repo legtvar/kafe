@@ -13,7 +13,7 @@ interface IHomeFestivalProps {}
 export function HomeFestival(props: IHomeFestivalProps) {
     useTitle(t('homeFestival.title'));
     const CountdownItem = (props: { children: number; title: string }) => (
-        <Box textAlign="center" py={8} px={4}>
+        <Box textAlign="center" py={8} px={4} wordBreak="keep-all">
             <Text fontSize="2em" fontWeight="bold">
                 {props.children}
             </Text>
@@ -30,7 +30,6 @@ export function HomeFestival(props: IHomeFestivalProps) {
                     as="h2"
                     lineHeight="tight"
                     mb={8}
-                    isTruncated
                 >
                     {t('homeFestival.title')}
                 </Box>

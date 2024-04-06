@@ -22,16 +22,16 @@ export function CreateProject(props: ICreateProjectProps) {
             <AwaitAPI request={(api) => api.groups.getById(id)} error={<Status statusCode={404} embeded />}>
                 {(group: Group) => (
                     <Stack spacing={4} m={6} direction="column">
-                        <Box fontSize="xl" as="h2" lineHeight="tight" color="gray.500" isTruncated>
+                        <Box fontSize="xl" as="h2" lineHeight="tight" color="gray.500">
                             {t('createProject.title').toString()}
                         </Box>
-                        <Box fontSize="4xl" fontWeight="semibold" as="h2" lineHeight="tight" isTruncated>
+                        <Box fontSize="4xl" fontWeight="semibold" as="h2" lineHeight="tight">
                             {group.getName()}
                         </Box>
 
                         <IntroText displayDetails />
                         <hr />
-                        <Box fontSize="xl" fontWeight="semibold" as="h3" lineHeight="tight" isTruncated>
+                        <Box fontSize="xl" fontWeight="semibold" as="h3" lineHeight="tight">
                             {t('project.general').toString()}
                         </Box>
                         <ProjectBasicInfo groupId={id} />

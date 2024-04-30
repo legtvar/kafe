@@ -1,0 +1,7 @@
+.navbar-brand {
+    gap: 1em;
+}
+
+.navbar-brand > img {
+    height: 2em;
+}

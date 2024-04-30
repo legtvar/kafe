@@ -1,0 +1,55 @@
+{
+  "metadata": [
+    {
+      "src": [
+        {
+          "src": "../",
+          "files": [
+            "Api/Kafe.Api.csproj",
+            "Common/Kafe.Common.csproj",
+            "Data/Kafe.Data.csproj",
+            "Media/Kafe.Media.csproj"
+          ]
+        }
+      ],
+      "dest": "reference"
+    }
+  ],
+  "build": {
+    "content": [
+      {
+        "files": [
+          "**/*.{md,yml}"
+        ],
+        "exclude": [
+          "_site/**"
+        ]
+      }
+    ],
+    "resource": [
+      {
+        "files": [
+          "images/**"
+        ]
+      }
+    ],
+    "output": "_site",
+    "template": [
+      "default",
+      "modern",
+      "custom"
+    ],
+    "globalMetadata": {
+      "_appName": "KAFE Docs",
+      "_appTitle": "KAFE Docs",
+      "_enableSearch": true,
+      "_appLogoPath": "./images/icon-cosmic_latte.svg",
+      "_appFaviconPath": "./images/icon-cosmic_latte.svg",
+      "_gitContribute": {
+        "repo": "https://gitlab.fi.muni.cz/legtvar/kafe",
+        "branch": "main"
+      },
+      "pdf": true
+    }
+  }
+}

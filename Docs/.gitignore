@@ -1,0 +1,5 @@
+# output files
+_site/
+
+# content generated using `docfx metadata`
+reference/

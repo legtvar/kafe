@@ -135,3 +135,6 @@ pages:
     - shared-fi
   rules:
     - if: $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev"
+  environment:
+    name: pages
+    url: https://legtvar.pages.fi.muni.cz/kafe

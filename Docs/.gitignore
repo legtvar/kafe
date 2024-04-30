@@ -3,3 +3,6 @@ _site/
 
 # content generated using `docfx metadata`
 reference/
+
+# content generated with `Swashbuckle.AspNetCore.Cli`
+endpoints/

@@ -2,3 +2,5 @@
   href: manual/
 - name: Reference
   href: reference/
+- name: Devlog
+  href: devlog/index.md

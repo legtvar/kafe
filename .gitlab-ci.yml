@@ -116,3 +116,22 @@ deploy-games:
     name: games
     url: https://games.muni.cz
   when: manual
+
+pages:
+  image: mcr.microsoft.com/dotnet/sdk:8.0-alpine
+  stage: deploy
+  artifacts:
+    paths:
+      - public/
+    expire_in: 42 seconds
+  script:
+    - cd Docs
+    - dotnet tool restore
+    - dotnet docfx metadata
+    - dotnet docfx build
+    - cd ..
+    - cp -r Docs/_site public/
+  tags:
+    - shared-fi
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev"

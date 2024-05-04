@@ -1,0 +1,15 @@
+- name: Devlog
+  href: index.md
+
+- name: Tests
+  href: 2024-03-31_tests.md
+- name: Use ProblemDetails
+  href: 2024-03-04_problemdetails.md
+- name: Mlejnek
+  href: 2024-03-04_mlejnek.md
+- name: Static Creates
+  href: 2023-12-16_static-creates.md
+- name: System HRIB
+  href: 2023-12-15_system-hrib.md
+- name: Historical decisions
+  href: historical-decisions.md

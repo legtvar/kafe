@@ -1,0 +1,8 @@
+- name: Getting Started
+  href: getting-started.md
+- name: VM setup
+  href: vm-setup.md
+- name: Useful commands
+  href: useful-commands.md
+- name: Useful SQL
+  href: useful-sql.md

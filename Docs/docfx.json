@@ -49,6 +49,7 @@
         "repo": "https://gitlab.fi.muni.cz/legtvar/kafe",
         "branch": "main"
       },
+      "_gitUrlPattern": "github",
       "pdf": false
     }
   }

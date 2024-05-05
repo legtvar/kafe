@@ -8,12 +8,11 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);CS1591;CS1573</NoWarn>
   </PropertyGroup>
-
+  
   <ItemGroup>
-    <PackageReference Update="GitInfo" Version="3.3.4">
-      <PrivateAssets>all</PrivateAssets>
+    <PackageReference Include="GitInfo" Version="3.3.4">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
     </PackageReference>
   </ItemGroup>
-
 </Project>

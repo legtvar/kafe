@@ -73,6 +73,7 @@ public class Startup
                     + "{NewLine}{Message:lj}{NewLine}{Exception}"
             )
         );
+        services.AddSingleton<SmtpLogger>();
 
         services.AddHttpContextAccessor();
 

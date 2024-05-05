@@ -14,10 +14,10 @@ public class DefaultEmailService : IEmailService, IDisposable
     private readonly IOptions<EmailOptions> options;
     private readonly SmtpClient smtp;
 
-    public DefaultEmailService(IOptions<EmailOptions> options)
+    public DefaultEmailService(IOptions<EmailOptions> options, SmtpLogger protocolLogger)
     {
         this.options = options;
-        smtp = new SmtpClient(new ProtocolLogger("smtp.log"));
+        smtp = new SmtpClient(protocolLogger);
     }
 
     public void Dispose()

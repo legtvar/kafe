@@ -43,6 +43,9 @@ using Microsoft.Extensions.Logging;
 using System.Net;
 using Microsoft.Extensions.Logging.Abstractions;
 using Serilog;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Trace;
 
 namespace Kafe.Api;
 
@@ -63,7 +66,7 @@ public class Startup
     public void ConfigureServices(IServiceCollection services)
     {
         IdentityModelEventSource.ShowPII = true;
-        
+
         services.AddSerilog((sp, lc) => lc
             .ReadFrom.Configuration(Configuration)
             .ReadFrom.Services(sp)
@@ -187,6 +190,25 @@ public class Startup
         // });
 
         RegisterKafe(services);
+
+        var otel = services.AddOpenTelemetry();
+        otel.ConfigureResource(r =>
+            r.AddService(serviceName: Environment.ApplicationName));
+        otel.WithMetrics(m => m
+            .AddAspNetCoreInstrumentation()
+            .AddMeter("Microsoft.AspNetCore.Hosting")
+            .AddMeter("Microsoft.AspNetCore.Server.Kestrel")
+            .AddOtlpExporter(o =>
+            {
+                o.Endpoint = new Uri("http://127.0.0.1:4317");
+            }));
+        otel.WithTracing(t => t
+            .AddAspNetCoreInstrumentation()
+            .AddHttpClientInstrumentation()
+            .AddOtlpExporter(o =>
+            {
+                o.Endpoint = new Uri("http://127.0.0.1:4317");
+            }));
     }
 
     public void Configure(IApplicationBuilder app)

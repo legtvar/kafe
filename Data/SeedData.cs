@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
@@ -67,14 +68,16 @@ public class SeedData : IInitialData
             {
                 var missingPermissions = account.Permissions
                     .ToDictionary(p => p.Key, p => p.Value)
-                    .Except([.. data.Permissions])
+                    .Except(data.Permissions ?? Enumerable.Empty<KeyValuePair<string, Permission>>())
                     .Select(kv => (kv.Key, kv.Value))
                     .ToImmutableArray();
 
                 if (missingPermissions.Length > 0)
                 {
                     await accounts.AddPermissions(data.Id, missingPermissions, token);
-                    logger.LogInformation("Permissions of seed account '{}' updated.", account.EmailAddress);
+                    logger.LogInformation(
+                        "Permissions of seed account '{EmailAddress}' updated.",
+                        account.EmailAddress);
                 }
             }
         }

@@ -66,7 +66,9 @@ public static class Program
         var projectGroupCount = await kafe.CountProjectGroups();
         var projectCount = await kafe.CountProjects();
         var artifactCount = await kafe.CountArtifacts();
-        logger.LogInformation("Found {} authors, {} playlist, {} project groups, {} projects, {} artifacts.",
+        logger.LogInformation(
+            "Found {AuthorCount} authors, {PlaylistCount} playlist, {ProjectGroupCount} project groups, "
+                + "{ProjectCount} projects, {ArtifactCount} artifacts.",
             authorCount,
             playlistCount,
             projectGroupCount,
@@ -202,27 +204,34 @@ public static class Program
 
             if (migrationInfoFile is null)
             {
-                logger.LogWarning($"'{subdir}' does not contain a {MigrationInfoFileName}.");
+                logger.LogWarning(
+                    "'{Directory}' does not contain a {FileName}.",
+                    subdir,
+                    MigrationInfoFileName);
                 continue;
             }
 
             try
             {
                 VideoShardMigrationInfo? migrationInfo;
-                using(var stream = migrationInfoFile.OpenRead())
+                using (var stream = migrationInfoFile.OpenRead())
                 {
                     migrationInfo = await JsonSerializer.DeserializeAsync<VideoShardMigrationInfo>(stream);
                     if (migrationInfo is null)
                     {
-                        logger.LogWarning($"'{migrationInfoFile}' could not be deserialized from JSON.");
+                        logger.LogWarning(
+                            "'{FilePath}' could not be deserialized from JSON.",
+                            migrationInfoFile.FullName);
                         continue;
                     }
                 }
 
                 if (!wmaVideos.TryGetValue(migrationInfo.WmaId, out var wmaVideo))
                 {
-                    logger.LogWarning("Could not find a video with id '{}' in the WMA DB. " +
-                        "This is a little weird since it was already migrated.", migrationInfo.WmaId);
+                    logger.LogWarning(
+                        "Could not find a video with id '{VideoId}' in the WMA DB. "
+                            + "This is a little weird since it was already migrated.",
+                        migrationInfo.WmaId);
                 }
                 else
                 {
@@ -245,7 +254,7 @@ public static class Program
             }
             catch (JsonException e)
             {
-                logger.LogCritical(e, $"Could not read '{migrationInfoFile}'.");
+                logger.LogCritical(e, "Could not read '{FilePath}'.", migrationInfoFile.FullName);
                 throw;
             }
         }
@@ -306,23 +315,32 @@ public static class Program
         var originalDir = new DirectoryInfo(Path.Combine(migratorOptions.WmaVideosDirectory, wmaId.ToString()));
         if (!originalDir.Exists)
         {
-            logger.LogError("Video '{}' ({}) could not be migrated because its directory could not be found on disk.",
-                name, wmaId);
+            logger.LogError(
+                "Video '{VideoName}' ({VideoId}) could not be migrated because its directory "
+                    + "could not be found on disk.",
+                name,
+                wmaId);
             return;
         }
 
         var originalCandidates = originalDir.GetFiles("original.*").OrderBy(f => f.Name).ToArray();
         if (originalCandidates.Length == 0)
         {
-            logger.LogError("Video '{}' ({}) could not be migrated because the original footage could not be found.",
-                name, wmaId);
+            logger.LogError(
+                "Video '{VideoName}' ({VideoId}) could not be migrated "
+                    + "because the original footage could not be found.",
+                name,
+                wmaId);
             return;
         }
 
         if (originalCandidates.Length > 1)
         {
-            logger.LogWarning("Video '{}' ({}) has multiple original footage files. Picking '{}'.",
-                name, wmaId, originalCandidates.First().Name);
+            logger.LogWarning(
+                "Video '{VideoName}' ({VideoId}) has multiple original footage files. Picking '{FilePath}'.",
+                name,
+                wmaId,
+                originalCandidates.First().FullName);
         }
 
         var originalFile = originalCandidates.First();
@@ -330,9 +348,12 @@ public static class Program
         var shardDir = new DirectoryInfo(Path.Combine(migratorOptions.KafeVideosDirectory!, shardId.Value));
         if (shardDir.Exists)
         {
-            logger.LogError("Video '{}' ({}) with shard id '{}' has already been migrated. " +
-                "Hopefully this is not a hrib conflict.",
-                name, wmaId, shardId);
+            logger.LogError(
+                "Video '{VideoName}' ({VideoId}) with shard id '{VideoShardID}' has already been migrated. "
+                    + "Hopefully this is not a hrib conflict.",
+                name,
+                wmaId,
+                shardId);
             return;
         }
 
@@ -376,7 +397,10 @@ public static class Program
         var shardDir = new DirectoryInfo(Path.Combine(migratorOptions.KafeVideosDirectory!, shardId.Value));
         if (!shardDir.Exists)
         {
-            logger.LogError($"Shard directory '{shardId}' does not exist. Video will be migrated without MediaInfo.");
+            logger.LogError(
+                "Shard directory '{VideoShardId}' does not exist. "
+                    + "Video will be migrated without MediaInfo.",
+                shardId);
             return MediaInfo.Invalid;
         }
 
@@ -397,7 +421,9 @@ public static class Program
         {
             if (!artifactMap.TryGetValue(item.Video, out var artifactId))
             {
-                logger.LogWarning($"Video '{item.Video}' could not be found but is referenced by a playlist.");
+                logger.LogWarning(
+                    "Video '{VideoId}' could not be found but is referenced by a playlist.",
+                    item.Video);
                 continue;
             }
             artifactIds.Add(artifactId);

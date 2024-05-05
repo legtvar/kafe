@@ -46,6 +46,9 @@ public class SemanticExceptionFilter : IExceptionFilter
 
         context.ExceptionHandled = true;
         
-        logger.LogError(context.Exception, "An exception occured while processing {}.", context.ActionDescriptor.DisplayName);
+        logger.LogError(
+            context.Exception,
+            "An exception occured while processing {ActionDisplayName}.",
+            context.ActionDescriptor.DisplayName);
     }
 }

@@ -57,11 +57,11 @@ public class SeedData : IInitialData
                 data = await accounts.FindByEmail(id, token);
                 if (data is null)
                 {
-                    logger.LogError("Seed account '{}' could not be created.", account.EmailAddress);
+                    logger.LogError("Seed account '{AccountEmailAddress}' could not be created.", account.EmailAddress);
                     continue;
                 }
 
-                logger.LogInformation("Seed account '{}' created.", account.EmailAddress);
+                logger.LogInformation("Seed account '{AccountEmailAddress}' created.", account.EmailAddress);
             }
 
             if (account.Permissions is not null)
@@ -76,7 +76,7 @@ public class SeedData : IInitialData
                 {
                     await accounts.AddPermissions(data.Id, missingPermissions, token);
                     logger.LogInformation(
-                        "Permissions of seed account '{EmailAddress}' updated.",
+                        "Permissions of seed account '{AccountEmailAddress}' updated.",
                         account.EmailAddress);
                 }
             }
@@ -103,7 +103,7 @@ public class SeedData : IInitialData
                 deadline: deadline,
                 id: group.Id,
                 token: token);
-            logger.LogInformation($"Seed project group '{id}' created.");
+            logger.LogInformation("Seed project group '{ProjectGroupId}' created.", id);
         }
     }
 }

@@ -42,6 +42,7 @@ using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.Extensions.Logging;
 using System.Net;
 using Microsoft.Extensions.Logging.Abstractions;
+using Serilog;
 
 namespace Kafe.Api;
 
@@ -62,6 +63,13 @@ public class Startup
     public void ConfigureServices(IServiceCollection services)
     {
         IdentityModelEventSource.ShowPII = true;
+        
+        services.AddSerilog((sp, lc) => lc
+            .ReadFrom.Configuration(Configuration)
+            .ReadFrom.Services(sp)
+            .Enrich.FromLogContext()
+            .WriteTo.Console()
+        );
 
         services.AddHttpContextAccessor();
 
@@ -177,12 +185,8 @@ public class Startup
         RegisterKafe(services);
     }
 
-    public void Configure(IApplicationBuilder app, IHostEnvironment environment)
+    public void Configure(IApplicationBuilder app)
     {
-        Logger = app.ApplicationServices.GetRequiredService<ILogger<Startup>>();
-        Logger.LogInformation("BaseUrl: {}", ApiOptions.BaseUrl);
-
-        // app.UseHttpLogging();
         app.UseForwardedHeaders();
 
         app.UseHttpsRedirection();
@@ -191,6 +195,7 @@ public class Startup
         app.UseRewriter(new RewriteOptions()
             .AddRewrite($"^{apiOptions.Value.AccountConfirmPath.Trim('/')}/(.*)$", "api/v1/tmp-account/$1", true));
 
+        app.UseSerilogRequestLogging();
         app.UseDefaultFiles();
         app.UseStaticFiles();
 

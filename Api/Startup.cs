@@ -205,9 +205,11 @@ public class Startup
         RegisterKafe(services);
 
         var otel = services.AddOpenTelemetry();
-        otel.ConfigureResource(r =>
-            r.AddService(serviceName: otlpName));
+        otel.ConfigureResource(r => r
+            .AddTelemetrySdk()
+            .AddService(serviceName: otlpName));
         otel.WithMetrics(m => m
+            .AddRuntimeInstrumentation()
             .AddAspNetCoreInstrumentation()
             .AddMeter("Microsoft.AspNetCore.Hosting")
             .AddMeter("Microsoft.AspNetCore.Server.Kestrel")
@@ -218,6 +220,7 @@ public class Startup
         otel.WithTracing(t => t
             .AddAspNetCoreInstrumentation()
             .AddHttpClientInstrumentation()
+            .AddSource("APITracing")
             .AddOtlpExporter(o =>
             {
                 o.Endpoint = new Uri(otlpEndpoint);

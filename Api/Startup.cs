@@ -54,7 +54,6 @@ public class Startup
     public IConfiguration Configuration { get; }
     public ApiOptions ApiOptions { get; }
     public IHostEnvironment Environment { get; }
-    public ILogger<Startup> Logger { get; private set; } = NullLogger<Startup>.Instance;
 
     public Startup(IConfiguration configuration, IHostEnvironment environment)
     {
@@ -67,6 +66,10 @@ public class Startup
     {
         IdentityModelEventSource.ShowPII = true;
 
+        var otlpEndpoint = Configuration.GetValue<string>("Otlp:Endpoint") ?? "http://localhost:4317";
+        var otlpName = Configuration.GetValue<string>("Otlp:Name") ?? "Kafe";
+        Log.Logger.Information("OTLP: Endpoint={OtlpEndpoint}, Name={Name}", otlpEndpoint, otlpName);
+
         services.AddSerilog((sp, lc) => lc
             .ReadFrom.Configuration(Configuration)
             .ReadFrom.Services(sp)
@@ -74,6 +77,16 @@ public class Startup
             .WriteTo.Console(
                 outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3} {SourceContext}]"
                     + "{NewLine}{Message:lj}{NewLine}{Exception}"
+            )
+            .WriteTo.OpenTelemetry(options =>
+                {
+                    options.Endpoint = $"{otlpEndpoint}/v1/logs";
+                    options.Protocol = Serilog.Sinks.OpenTelemetry.OtlpProtocol.Grpc;
+                    options.ResourceAttributes = new Dictionary<string, object>
+                    {
+                        ["service.name"] = otlpName
+                    };
+                }
             )
         );
         services.AddSingleton<SmtpLogger>();
@@ -193,21 +206,21 @@ public class Startup
 
         var otel = services.AddOpenTelemetry();
         otel.ConfigureResource(r =>
-            r.AddService(serviceName: Environment.ApplicationName));
+            r.AddService(serviceName: otlpName));
         otel.WithMetrics(m => m
             .AddAspNetCoreInstrumentation()
             .AddMeter("Microsoft.AspNetCore.Hosting")
             .AddMeter("Microsoft.AspNetCore.Server.Kestrel")
             .AddOtlpExporter(o =>
             {
-                o.Endpoint = new Uri("http://127.0.0.1:4317");
+                o.Endpoint = new Uri(otlpEndpoint);
             }));
         otel.WithTracing(t => t
             .AddAspNetCoreInstrumentation()
             .AddHttpClientInstrumentation()
             .AddOtlpExporter(o =>
             {
-                o.Endpoint = new Uri("http://127.0.0.1:4317");
+                o.Endpoint = new Uri(otlpEndpoint);
             }));
     }
 

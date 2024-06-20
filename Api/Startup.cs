@@ -46,6 +46,7 @@ using Serilog;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
+using Npgsql;
 
 namespace Kafe.Api;
 
@@ -220,7 +221,8 @@ public class Startup
         otel.WithTracing(t => t
             .AddAspNetCoreInstrumentation()
             .AddHttpClientInstrumentation()
-            .AddSource("APITracing")
+            .AddSource(otlpName)
+            .AddNpgsql()
             .AddOtlpExporter(o =>
             {
                 o.Endpoint = new Uri(otlpEndpoint);

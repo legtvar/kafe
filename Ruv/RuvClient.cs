@@ -19,7 +19,7 @@ public class RuvClient : IDisposable
     {
         client = new RestClient(new RestClientOptions(RuvBaseUrl)
         {
-            MaxTimeout = -1,
+            Timeout = null,
             UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:108.0) Gecko/20100101 Firefox/108.0",
             CookieContainer = cookieJar,
             EncodeQuery = HttpUtility.UrlEncode

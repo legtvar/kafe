@@ -6,7 +6,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using JasperFx.Core.Reflection;
 using Kafe.Data.Aggregates;
-using Kafe.Data.Documents;
 using Marten;
 using Marten.Events;
 using Microsoft.Extensions.Logging;
@@ -22,24 +21,25 @@ namespace Kafe.Data.Events
 
 namespace Kafe.Data.Events.Corrections
 {
-    internal class GlobalPermissionChangedCorrection : IEventCorrection<object>
+    [AutoCorrection("2024-06-23")]
+    internal class GlobalPermissionsChangedCorrection : IEventCorrection
     {
         private readonly IServiceProvider services;
-        private readonly ILogger<GlobalPermissionChangedCorrection> logger;
+        private readonly ILogger<GlobalPermissionsChangedCorrection> logger;
 
-        public GlobalPermissionChangedCorrection(
+        public GlobalPermissionsChangedCorrection(
             IServiceProvider services,
-            ILogger<GlobalPermissionChangedCorrection> logger)
+            ILogger<GlobalPermissionsChangedCorrection> logger)
         {
             this.services = services;
             this.logger = logger;
         }
 
-        public async Task<object?> Apply(IDocumentSession db, CancellationToken ct = default)
+        public async Task Apply(IDocumentSession db, CancellationToken ct = default)
         {
             var events = await db.Events.QueryAllRawEvents()
                 .Where(e => e.EventTypeName
-                    == EventMappingExtensions.GetEventTypeName<GlobalPermissionChangedCorrection>())
+                    == EventMappingExtensions.GetEventTypeName<GlobalPermissionsChanged>())
                 .ToListAsync(token: ct);
             var groups = events.GroupBy(e => e.StreamKey!);
             foreach (var group in groups)
@@ -86,17 +86,9 @@ namespace Kafe.Data.Events.Corrections
                 {
                     throw new ArgumentException($"The aggregate type of stream '{group.Key}' could not be determined.");
                 }
-                
+
                 db.Events.Append(group.Key, newEvent);
             }
-            await db.SaveChangesAsync(ct);
-
-            return null;
-        }
-
-        public Task Revert(IDocumentSession db, EventCorrectionInfo<object> info, CancellationToken ct = default)
-        {
-            throw new NotImplementedException();
         }
     }
 }

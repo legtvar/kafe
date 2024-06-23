@@ -1,22 +1,14 @@
 using System;
+using System.Collections.Immutable;
 
 namespace Kafe.Data.Documents;
-
-public enum EventCorrectionStatus
-{
-    Applied,
-    Reverted
-}
 
 /// <summary>
 /// A document (not event-sourced) describing a set of corrective events appended to fix a mistake.
 /// </summary>
-/// <param name="CustomData">Any data the correction decided to store to, for example, revert itself later.</param>
-public record EventCorrectionInfo<T>(
+public record EventCorrectionInfo(
     string Id,
     DateTimeOffset AppliedOn,
-    T? CustomData
+    ImmutableArray<string> AffectedStreams
 )
-{
-    public EventCorrectionStatus Status { get; set; } = EventCorrectionStatus.Applied;
-}
+{ }

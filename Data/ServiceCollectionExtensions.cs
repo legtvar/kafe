@@ -89,6 +89,7 @@ public static class ServiceCollectionExtensions
         var mce = services.AddMarten(ConfigureMarten)
             .ApplyAllDatabaseChangesOnStartup()
             .UseIdentitySessions()
+            .InitializeWith<Corrector>()
             .InitializeWith<SeedData>();
 
         services.AddSingleton<StorageService>();

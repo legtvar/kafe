@@ -26,3 +26,8 @@ public record PlaylistEntryRemovedFirst(
 public record PlaylistEntriesSet(
     [Hrib] string PlaylistId,
     ImmutableArray<string> EntryIds);
+
+public record PlaylistGlobalPermissionsChanged(
+    [Hrib] string PlaylistId,
+    Permission GlobalPermissions
+);

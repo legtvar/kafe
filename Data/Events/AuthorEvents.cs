@@ -17,3 +17,8 @@ public record AuthorInfoChanged(
     string? Email = null,
     string? Phone = null
 );
+
+public record AuthorGlobalPermissionsChanged(
+    [Hrib] string AuthorId,
+    Permission GlobalPermissions
+);

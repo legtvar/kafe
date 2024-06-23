@@ -24,3 +24,8 @@ public record ProjectGroupOpened(
 public record ProjectGroupClosed(
     [Hrib] string ProjectGroupId
 );
+
+public record ProjectGroupGlobalPermissionsChanged(
+    [Hrib] string ProjectGroupId,
+    Permission GlobalPermissions
+);

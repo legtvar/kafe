@@ -104,18 +104,18 @@ deploy-staging:
     url: https://kafe-stage.fi.muni.cz
   when: manual
 
-deploy-games:
-  stage: deploy
-  script:
-    - docker compose -f docker-compose.games.yml build
-    - docker compose -f docker-compose.games.yml down
-    - docker compose -f docker-compose.games.yml up -d 
-  tags:
-    - mlejnek
-  environment:
-    name: games
-    url: https://games.muni.cz
-  when: manual
+# deploy-games:
+#   stage: deploy
+#   script:
+#     - docker compose -f docker-compose.games.yml build
+#     - docker compose -f docker-compose.games.yml down
+#     - docker compose -f docker-compose.games.yml up -d 
+#   tags:
+#     - mlejnek
+#   environment:
+#     name: games
+#     url: https://games.muni.cz
+#   when: manual
 
 pages:
   image: mcr.microsoft.com/dotnet/sdk:8.0-alpine
@@ -134,7 +134,7 @@ pages:
   tags:
     - shared-fi
   rules:
-    - if: $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev"
+    - if: $CI_COMMIT_BRANCH == "main"
   environment:
     name: pages
     url: https://legtvar.pages.fi.muni.cz/kafe

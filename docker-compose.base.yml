@@ -38,6 +38,7 @@ services:
       default:
         aliases:
           - kafe-api
+      backbone:
     restart: always
 
   web:

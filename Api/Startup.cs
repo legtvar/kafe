@@ -42,6 +42,11 @@ using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.Extensions.Logging;
 using System.Net;
 using Microsoft.Extensions.Logging.Abstractions;
+using Serilog;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Trace;
+using Npgsql;
 
 namespace Kafe.Api;
 
@@ -50,7 +55,6 @@ public class Startup
     public IConfiguration Configuration { get; }
     public ApiOptions ApiOptions { get; }
     public IHostEnvironment Environment { get; }
-    public ILogger<Startup> Logger { get; private set; } = NullLogger<Startup>.Instance;
 
     public Startup(IConfiguration configuration, IHostEnvironment environment)
     {
@@ -62,6 +66,31 @@ public class Startup
     public void ConfigureServices(IServiceCollection services)
     {
         IdentityModelEventSource.ShowPII = true;
+
+        var otlpEndpoint = Configuration.GetValue<string>("Otlp:Endpoint") ?? "http://localhost:4317";
+        var otlpName = Configuration.GetValue<string>("Otlp:Name") ?? "Kafe";
+        Log.Logger.Information("OTLP: Endpoint={OtlpEndpoint}, Name={Name}", otlpEndpoint, otlpName);
+
+        services.AddSerilog((sp, lc) => lc
+            .ReadFrom.Configuration(Configuration)
+            .ReadFrom.Services(sp)
+            .Enrich.FromLogContext()
+            .WriteTo.Console(
+                outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3} {SourceContext}]"
+                    + "{NewLine}{Message:lj}{NewLine}{Exception}"
+            )
+            .WriteTo.OpenTelemetry(options =>
+                {
+                    options.Endpoint = $"{otlpEndpoint}/v1/logs";
+                    options.Protocol = Serilog.Sinks.OpenTelemetry.OtlpProtocol.Grpc;
+                    options.ResourceAttributes = new Dictionary<string, object>
+                    {
+                        ["service.name"] = otlpName
+                    };
+                }
+            )
+        );
+        services.AddSingleton<SmtpLogger>();
 
         services.AddHttpContextAccessor();
 
@@ -175,14 +204,33 @@ public class Startup
         // });
 
         RegisterKafe(services);
+
+        var otel = services.AddOpenTelemetry();
+        otel.ConfigureResource(r => r
+            .AddTelemetrySdk()
+            .AddService(serviceName: otlpName));
+        otel.WithMetrics(m => m
+            .AddRuntimeInstrumentation()
+            .AddAspNetCoreInstrumentation()
+            .AddMeter("Microsoft.AspNetCore.Hosting")
+            .AddMeter("Microsoft.AspNetCore.Server.Kestrel")
+            .AddOtlpExporter(o =>
+            {
+                o.Endpoint = new Uri(otlpEndpoint);
+            }));
+        otel.WithTracing(t => t
+            .AddAspNetCoreInstrumentation()
+            .AddHttpClientInstrumentation()
+            .AddSource(otlpName)
+            .AddNpgsql()
+            .AddOtlpExporter(o =>
+            {
+                o.Endpoint = new Uri(otlpEndpoint);
+            }));
     }
 
-    public void Configure(IApplicationBuilder app, IHostEnvironment environment)
+    public void Configure(IApplicationBuilder app)
     {
-        Logger = app.ApplicationServices.GetRequiredService<ILogger<Startup>>();
-        Logger.LogInformation("BaseUrl: {}", ApiOptions.BaseUrl);
-
-        // app.UseHttpLogging();
         app.UseForwardedHeaders();
 
         app.UseHttpsRedirection();
@@ -191,6 +239,7 @@ public class Startup
         app.UseRewriter(new RewriteOptions()
             .AddRewrite($"^{apiOptions.Value.AccountConfirmPath.Trim('/')}/(.*)$", "api/v1/tmp-account/$1", true));
 
+        app.UseSerilogRequestLogging();
         app.UseDefaultFiles();
         app.UseStaticFiles();
 

@@ -96,3 +96,8 @@ public record ProjectReviewAdded(
 //public record ProjectValidationReset(
 //    Hrib ProjectId
 //);
+
+public record ProjectGlobalPermissionsChanged(
+    [Hrib] string ProjectId,
+    Permission GlobalPermissions
+);

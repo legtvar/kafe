@@ -60,7 +60,7 @@ public class ProjectGroupInfoProjection : SingleStreamProjection<ProjectGroupInf
         return g with { IsOpen = false };
     }
 
-    public ProjectGroupInfo Apply(GlobalPermissionsChanged e, ProjectGroupInfo a)
+    public ProjectGroupInfo Apply(ProjectGroupGlobalPermissionsChanged e, ProjectGroupInfo a)
     {
         return a with
         {

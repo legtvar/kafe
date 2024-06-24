@@ -15,7 +15,7 @@ public class DebugEmailService : IEmailService
 
     public Task SendEmail(string to, string subject, string message, string? secretCopy = null, CancellationToken token = default)
     {
-        logger.LogInformation("\tTo: {}\n\tSubject: {}\n\tMessage:\n\n{}", 
+        logger.LogInformation("\tTo: {To}\n\tSubject: {Subject}\n\tMessage:\n\n{Message}", 
             to,
             subject,
             message);

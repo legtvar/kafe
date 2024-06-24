@@ -287,7 +287,7 @@ public sealed class KafeClient : IAsyncDisposable
     {
         if (logger.IsEnabled(LogLevel.Information))
         {
-            logger.LogInformation("[{}]: {}", hrib, @event);
+            logger.LogInformation("[{EntityId}]: {Event}", hrib, @event);
         }
     }
 }

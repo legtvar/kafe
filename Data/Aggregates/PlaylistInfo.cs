@@ -73,7 +73,7 @@ public class PlaylistInfoProjection : SingleStreamProjection<PlaylistInfo>
         };
     }
 
-    public PlaylistInfo Apply(GlobalPermissionsChanged e, PlaylistInfo a)
+    public PlaylistInfo Apply(PlaylistGlobalPermissionsChanged e, PlaylistInfo a)
     {
         return a with
         {

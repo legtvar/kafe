@@ -99,10 +99,16 @@ public class EntityService
 
             if (visible.GlobalPermissions != permissions)
             {
-                db.Events.Append(entityId.Value, new GlobalPermissionsChanged(
-                    EntityId: entityId.Value,
-                    GlobalPermissions: permissions
-                ));
+                object newEvent = entity switch
+                {
+                    ProjectGroupInfo pg => new ProjectGroupGlobalPermissionsChanged(pg.Id, permissions),
+                    ProjectInfo p => new ProjectGlobalPermissionsChanged(p.Id, permissions),
+                    PlaylistInfo p => new PlaylistGlobalPermissionsChanged(p.Id, permissions),
+                    AuthorInfo a => new AuthorGlobalPermissionsChanged(a.Id, permissions),
+                    _ => throw new NotSupportedException($"{entity.GetType().Name} is not a supported entity type.")
+                };
+                
+                db.Events.Append(entityId.Value, newEvent);
             }
 
         }

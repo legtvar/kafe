@@ -47,7 +47,7 @@ public class AuthorInfoProjection : SingleStreamProjection<AuthorInfo>
         };
     }
 
-    public AuthorInfo Apply(GlobalPermissionsChanged e, AuthorInfo a)
+    public AuthorInfo Apply(AuthorGlobalPermissionsChanged e, AuthorInfo a)
     {
         return a with
         {

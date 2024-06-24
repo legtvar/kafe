@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
@@ -56,25 +57,27 @@ public class SeedData : IInitialData
                 data = await accounts.FindByEmail(id, token);
                 if (data is null)
                 {
-                    logger.LogError("Seed account '{}' could not be created.", account.EmailAddress);
+                    logger.LogError("Seed account '{AccountEmailAddress}' could not be created.", account.EmailAddress);
                     continue;
                 }
 
-                logger.LogInformation("Seed account '{}' created.", account.EmailAddress);
+                logger.LogInformation("Seed account '{AccountEmailAddress}' created.", account.EmailAddress);
             }
 
             if (account.Permissions is not null)
             {
                 var missingPermissions = account.Permissions
                     .ToDictionary(p => p.Key, p => p.Value)
-                    .Except([.. data.Permissions])
+                    .Except(data.Permissions ?? Enumerable.Empty<KeyValuePair<string, Permission>>())
                     .Select(kv => (kv.Key, kv.Value))
                     .ToImmutableArray();
 
                 if (missingPermissions.Length > 0)
                 {
                     await accounts.AddPermissions(data.Id, missingPermissions, token);
-                    logger.LogInformation("Permissions of seed account '{}' updated.", account.EmailAddress);
+                    logger.LogInformation(
+                        "Permissions of seed account '{AccountEmailAddress}' updated.",
+                        account.EmailAddress);
                 }
             }
         }
@@ -100,7 +103,7 @@ public class SeedData : IInitialData
                 deadline: deadline,
                 id: group.Id,
                 token: token);
-            logger.LogInformation($"Seed project group '{id}' created.");
+            logger.LogInformation("Seed project group '{ProjectGroupId}' created.", id);
         }
     }
 }

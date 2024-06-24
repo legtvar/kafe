@@ -78,16 +78,18 @@ public static class ServiceCollectionExtensions
             mo.Events.Upcast<PlaylistVideoRemovedUpcaster>();
             mo.Events.Upcast<TemporaryAccountCreatedUpcaster>();
             mo.Events.Upcast<TemporaryAccountClosedUpcaster>();
-            mo.UseDefaultSerialization(serializerType: SerializerType.Newtonsoft);
+            mo.UseNewtonsoftForSerialization();
 
             RegisterEmbeddedSql(mo);
 
             return mo;
         }
 
+
         var mce = services.AddMarten(ConfigureMarten)
             .ApplyAllDatabaseChangesOnStartup()
             .UseIdentitySessions()
+            .InitializeWith<Corrector>()
             .InitializeWith<SeedData>();
 
         services.AddSingleton<StorageService>();

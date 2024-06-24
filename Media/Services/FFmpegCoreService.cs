@@ -111,7 +111,11 @@ public class FFmpegCoreService : IMediaService
                     .WithVideoFilters(f => f.Scale(-2, preset.ToHeight()))
                     .WithFastStart())
                 // .NotifyOnProgress(p => logger.LogDebug($"Progress {Path.GetFileName(filePath)} ({name}): '{p}'"))
-                .NotifyOnOutput(p => logger.LogError(p))
+                .NotifyOnOutput(p => logger.LogError(
+                    "An FFmpeg error occurred while processing '{FilePath}' ({Preset}):\n{Message}",
+                    filePath,
+                    preset,
+                    p))
                 .CancellableThrough(token, 1_000)
                 .ProcessAsynchronously(true);
         }

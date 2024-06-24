@@ -45,7 +45,7 @@ public class RelayedEmailService : IEmailService, IDisposable
         var response = await client.SendAsync(request, token);
 
         var responseString = await response.Content.ReadAsStringAsync(token);
-        logger.LogInformation("The email relay responded with:\n{}", responseString);
+        logger.LogInformation("The email relay responded with:\n{Response}", responseString);
     }
 
     public void Dispose()

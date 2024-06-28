@@ -36,7 +36,7 @@ public class AuthorCreationEndpoint : EndpointBaseAsync
     }
 
     [HttpPost]
-    [SwaggerOperation(Tags = new[] { EndpointArea.Author })]
+    [SwaggerOperation(Tags = [EndpointArea.Author])]
     public override async Task<ActionResult<Hrib?>> HandleAsync(
         AuthorCreationDto dto,
         CancellationToken cancellationToken = default)
@@ -55,6 +55,6 @@ public class AuthorCreationEndpoint : EndpointBaseAsync
             return ValidationProblem(title: author.Errors.First().Message);
         }
 
-        return Ok(author.Id);
+        return Ok(author.Value.Id);
     }
 }

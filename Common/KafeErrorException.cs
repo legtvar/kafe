@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Immutable;
+using System.Linq;
 
 namespace Kafe.Common;
 
@@ -7,7 +8,7 @@ public class KafeErrorException : Exception
 {
     public KafeErrorException(Error error) : base(error.Message, error.InnerException)
     {
-        InnerErrors = ImmutableArray.Create(error);
+        InnerErrors = [error];
         StackTrace = error.StackTrace;
     }
 

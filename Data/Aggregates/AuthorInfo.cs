@@ -1,6 +1,7 @@
 using Marten.Events.Aggregation;
 using Kafe.Data.Events;
 using System.Collections.Immutable;
+using Npgsql;
 
 namespace Kafe.Data.Aggregates;
 
@@ -14,9 +15,20 @@ public record AuthorInfo(
     string? Email = null,
     string? Phone = null) : IVisibleEntity
 {
-    public AuthorInfo() : this(Hrib.InvalidValue, CreationMethod.Unknown, Const.InvalidName)
+    public AuthorInfo() : this(Invalid)
     {
     }
+    
+    public static readonly AuthorInfo Invalid = new AuthorInfo(
+        Id: Hrib.InvalidValue,
+        CreationMethod: CreationMethod.Unknown,
+        Name: Const.InvalidName,
+        GlobalPermissions: Permission.None,
+        Bio: null,
+        Uco: null,
+        Email: null,
+        Phone: null
+    );
 }
 
 public class AuthorInfoProjection : SingleStreamProjection<AuthorInfo>

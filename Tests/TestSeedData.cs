@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Kafe.Data;
+using Kafe.Data.Aggregates;
 using Kafe.Data.Services;
 using Marten;
 using Marten.Schema;
@@ -30,13 +31,21 @@ public class TestSeedData : IInitialData
         using var scope = services.CreateScope();
         var accountService = scope.ServiceProvider.GetRequiredService<AccountService>();
 
-        var admin = await accountService.CreateTemporaryAccount(AdminEmail, null, AdminHrib, ct);
-        await accountService.AddPermissions(admin.Id, [(Hrib.System.Value, Permission.All)], ct);
+        var admin = await accountService.CreateOrRefreshTemporaryAccount(AdminEmail, null, AdminHrib, ct);
+        if (admin.HasErrors)
+        {
+            throw admin.AsException();
+        }
 
-        await accountService.CreateTemporaryAccount(UserEmail, null, UserHrib, ct);
+        await accountService.AddPermissions(admin.Value.Id, [(Hrib.System.Value, Permission.All)], ct);
+
+        await accountService.CreateOrRefreshTemporaryAccount(UserEmail, null, UserHrib, ct);
 
         var projectGroupService = scope.ServiceProvider.GetRequiredService<ProjectGroupService>();
-        await projectGroupService.Create((LocalizedString)"TestGroup", null, default, TestGroupHrib, ct);
+        await projectGroupService.Create(ProjectGroupInfo.Invalid with {
+            Id = TestGroupHrib,
+            Name = (LocalizedString)"TestGroup",
+        }, ct);
 
         var projectService = scope.ServiceProvider.GetRequiredService<ProjectService>();
         await projectService.Create(TestGroupHrib, (LocalizedString)"TestProject", null, null, null, ct);

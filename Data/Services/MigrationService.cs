@@ -226,7 +226,7 @@ public class MigrationService
         {
             var createResult = await accountService.Create(AccountInfo.Create(order.Email) with
             {
-                Id = (order.AccountId ?? Hrib.Empty).Value,
+                Id = (order.AccountId ?? Hrib.Empty).RawValue,
                 Name = order.Name,
                 EmailAddress = order.Email,
                 Uco = order.Uco,
@@ -364,7 +364,7 @@ public class MigrationService
         {
             var createResult = await authorService.Create(AuthorInfo.Create(order.Name) with
             {
-                Id = (order.AuthorId ?? Hrib.Empty).Value,
+                Id = (order.AuthorId ?? Hrib.Empty).RawValue,
                 Email = order.Email,
                 Uco = order.Uco,
                 Phone = order.Phone

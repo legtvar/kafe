@@ -41,7 +41,7 @@ public record MigrationInfo(
             Id = Hrib.EmptyValue,
             OriginalStorageName = originalStorageName,
             OriginalId = originalId,
-            EntityId = migratedEntityId.Value
+            EntityId = migratedEntityId.RawValue
         };
     }
 }

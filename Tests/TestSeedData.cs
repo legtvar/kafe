@@ -38,7 +38,7 @@ public class TestSeedData : IInitialData
             throw admin.AsException();
         }
 
-        await accountService.AddPermissions(admin.Value.Id, [(Hrib.System.Value, Permission.All)], ct);
+        await accountService.AddPermissions(admin.Value.Id, [(Hrib.System.ToString(), Permission.All)], ct);
 
         await accountService.CreateOrRefreshTemporaryAccount(UserEmail, null, UserHrib, ct);
 

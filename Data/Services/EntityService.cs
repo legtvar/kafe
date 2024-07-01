@@ -108,7 +108,7 @@ public class EntityService
                     _ => throw new NotSupportedException($"{entity.GetType().Name} is not a supported entity type.")
                 };
                 
-                db.Events.Append(entityId.Value, newEvent);
+                db.Events.Append(entityId.ToString(), newEvent);
             }
 
         }

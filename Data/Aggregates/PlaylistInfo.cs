@@ -41,7 +41,7 @@ public record PlaylistInfo(
         return new PlaylistInfo() with
         {
             Id = Hrib.EmptyValue,
-            OrganizationId = organizationId.Value,
+            OrganizationId = organizationId.RawValue,
             Name = name
         };
     }

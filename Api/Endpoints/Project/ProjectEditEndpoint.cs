@@ -57,7 +57,7 @@ public class ProjectEditEndpoint : EndpointBaseAsync
             authors = authors
                 .RemoveAll(a => a.Kind == ProjectAuthorKind.Crew)
                 .AddRange(request.Crew.Value.Select(c => new ProjectAuthorInfo(
-                    Id: c.Id.Value,
+                    Id: c.Id.ToString(),
                     Kind: ProjectAuthorKind.Crew,
                     Roles: c.Roles
                 ))
@@ -69,7 +69,7 @@ public class ProjectEditEndpoint : EndpointBaseAsync
             authors = authors
                 .RemoveAll(a => a.Kind == ProjectAuthorKind.Cast)
                 .AddRange(request.Cast.Value.Select(c => new ProjectAuthorInfo(
-                    Id: c.Id.Value,
+                    Id: c.Id.ToString(),
                     Kind: ProjectAuthorKind.Cast,
                     Roles: c.Roles
                 ))

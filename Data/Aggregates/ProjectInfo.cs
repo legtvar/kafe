@@ -52,7 +52,7 @@ public record ProjectInfo(
         return new()
         {
             Id = Hrib.EmptyValue,
-            ProjectGroupId = projectGroupId.Value,
+            ProjectGroupId = projectGroupId.RawValue,
             Name = name
         };
     }

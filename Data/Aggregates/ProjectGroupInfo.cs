@@ -39,7 +39,7 @@ public record ProjectGroupInfo(
         {
             Id = Hrib.EmptyValue,
             Name = name,
-            OrganizationId = organizationId.Value
+            OrganizationId = organizationId.RawValue
         };
     }
 }

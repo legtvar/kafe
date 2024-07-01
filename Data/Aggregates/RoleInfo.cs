@@ -40,7 +40,7 @@ public record RoleInfo(
         return new RoleInfo
         {
             Id = Hrib.EmptyValue,
-            OrganizationId = organizationId.Value,
+            OrganizationId = organizationId.RawValue,
             Name = name
         };
     }

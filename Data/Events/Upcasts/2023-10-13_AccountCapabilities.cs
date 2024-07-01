@@ -102,7 +102,7 @@ namespace Kafe.Data.Capabilities
 
         public ProjectOwnership(Hrib projectId)
         {
-            ProjectId = IsValidCapabilitySubvalue(projectId.Value)
+            ProjectId = IsValidCapabilitySubvalue(projectId.RawValue)
                 ? projectId
                 : throw new ArgumentException($"Capability subvalues can contain only ASCII letters " +
                     $"and digits except '{SubvalueSeparator}'.", nameof(projectId));
@@ -116,7 +116,7 @@ namespace Kafe.Data.Capabilities
 
         public AuthorManagement(Hrib authorId)
         {
-            AuthorId = IsValidCapabilitySubvalue(authorId.Value)
+            AuthorId = IsValidCapabilitySubvalue(authorId.RawValue)
                 ? authorId
                 : throw new ArgumentException($"Capability subvalues can contain only ASCII letters " +
                     $"and digits except '{SubvalueSeparator}'.", nameof(authorId));

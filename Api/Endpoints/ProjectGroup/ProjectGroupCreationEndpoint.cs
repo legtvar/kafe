@@ -33,10 +33,8 @@ public class ProjectGroupCreationEndpoint : EndpointBaseAsync
         ProjectGroupCreationDto dto,
         CancellationToken cancellationToken = default)
     {
-        var group = await projectGroupService.Create(ProjectGroupInfo.Invalid with
+        var group = await projectGroupService.Create(ProjectGroupInfo.Create(dto.OrganizationId, dto.Name) with
         {
-            Name = dto.Name,
-            OrganizationId = dto.OrganizationId.ToString(),
             Description = dto.Description,
             Deadline = dto.Deadline
         }, cancellationToken);

@@ -19,9 +19,22 @@ public record Hrib
 
     public const string InvalidValue = "invalid";
     public const string SystemValue = "system";
+    public const string EmptyValue = "empty";
 
-    public static readonly Hrib System = new Hrib(SystemValue);
-    public static readonly Hrib Invalid = new Hrib(InvalidValue);
+    /// <summary>
+    /// Special HRIB representing a non-entity, the system itself.
+    /// </summary>
+    public static readonly Hrib System = new(SystemValue);
+
+    /// <summary>
+    /// Special HRIB representing an error state.
+    /// </summary>
+    public static readonly Hrib Invalid = new(InvalidValue);
+
+    /// <summary>
+    /// Special HRIB for newly-created entities that don't have an Id yet.
+    /// </summary>
+    public static readonly Hrib Empty = new(EmptyValue);
 
     private Hrib(string value)
     {
@@ -77,7 +90,7 @@ public record Hrib
             return false;
         }
 
-        if (value != SystemValue || value != InvalidValue)
+        if (value == SystemValue || value == InvalidValue || value == EmptyValue)
         {
             hrib = new Hrib(value);
             return true;
@@ -115,6 +128,13 @@ public record Hrib
         {
             throw new InvalidOperationException(
                 "This Hrib is invalid and cannot be stringified to prevent accidental use in a database.");
+        }
+
+        if (Value == EmptyValue)
+        {
+            throw new InvalidOperationException(
+                "This Hrib is empty and cannot be stringified to prevent accidental use in a database."
+                    + "This value is meant to be replaced with a proper HRIB by an entity service.");
         }
 
         return Value;

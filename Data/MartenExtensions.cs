@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Kafe.Common;
@@ -42,7 +43,7 @@ public static class MartenExtensions
         Hrib id,
         params object[] events) where TAggregate : class, IEntity
     {
-        return KafeStartStream<TAggregate>(ops, id, events);
+        return KafeStartStream<TAggregate>(ops, id, events.AsEnumerable());
     }
 
     public static StreamAction KafeAppend(
@@ -58,7 +59,7 @@ public static class MartenExtensions
         Hrib streamId,
         params object[] events)
     {
-        return KafeAppend(ops, streamId, events);
+        return KafeAppend(ops, streamId, events.AsEnumerable());
     }
 
     public static Task<T?> KafeAggregateStream<T>(

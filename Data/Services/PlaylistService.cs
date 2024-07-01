@@ -82,7 +82,7 @@ public class PlaylistService
         }
 
         var id = parseResult.Value;
-        if (id == Hrib.Invalid)
+        if (id == Hrib.Empty)
         {
             id = Hrib.Create();
         }

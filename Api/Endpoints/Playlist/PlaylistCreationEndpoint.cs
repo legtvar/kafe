@@ -41,11 +41,9 @@ public class PlaylistCreationEndpoint : EndpointBaseAsync
         PlaylistCreationDto dto,
         CancellationToken cancellationToken = default)
     {
-        var playlist = await playlistService.Create(PlaylistInfo.Invalid with
+        var playlist = await playlistService.Create(PlaylistInfo.Create(dto.OrganizationId, dto.Name) with
         {
-            OrganizationId = dto.OrganizationId.ToString(),
             EntryIds = dto.EntryIds ?? ImmutableArray<string>.Empty,
-            Name = dto.Name,
             Description = dto.Description,
             GlobalPermissions = dto.GlobalPermissions is not null
                     ? TransferMaps.FromPermissionArray(dto.GlobalPermissions)

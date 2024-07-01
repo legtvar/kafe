@@ -3,6 +3,7 @@ using System.Collections.Immutable;
 using Kafe.Data.Events;
 using Marten.Events;
 using Marten.Events.Aggregation;
+using Marten.Events.CodeGeneration;
 
 namespace Kafe.Data.Aggregates;
 
@@ -16,15 +17,33 @@ public record RoleInfo(
     ImmutableDictionary<string, Permission> Permissions
 ) : IEntity
 {
+    public RoleInfo() : this(Invalid)
+    {
+    }
+
     public static readonly RoleInfo Invalid = new(
         Id: Hrib.InvalidValue,
         CreationMethod: CreationMethod.Unknown,
         OrganizationId: Hrib.InvalidValue,
-        Name: null!,
+        Name: LocalizedString.CreateInvariant(Const.InvalidName),
         Description: null,
         CreatedOn: default,
-        Permissions: null!
+        Permissions: ImmutableDictionary<string, Permission>.Empty
     );
+
+    /// <summary>
+    /// Creates a bare-bones but valid <see cref="RoleInfo"/>.
+    /// </summary>
+    [MartenIgnore]
+    public static RoleInfo Create(Hrib organizationId, LocalizedString name)
+    {
+        return new RoleInfo
+        {
+            Id = Hrib.EmptyValue,
+            OrganizationId = organizationId.Value,
+            Name = name
+        };
+    }
 }
 
 public class RoleInfoProjection : SingleStreamProjection<RoleInfo>

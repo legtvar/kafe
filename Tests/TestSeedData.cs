@@ -18,6 +18,7 @@ public class TestSeedData : IInitialData
     public const string AdminEmail = "admin@example.com";
     public const string UserHrib = "testuser000";
     public const string UserEmail = "user@example.com";
+    public const string TestOrganizationHrib = "testorganiz";
     public const string TestGroupHrib = "testgroup00";
     public const string TestProjectHrib = "testproject";
 
@@ -41,11 +42,24 @@ public class TestSeedData : IInitialData
 
         await accountService.CreateOrRefreshTemporaryAccount(UserEmail, null, UserHrib, ct);
 
+        var organizationService = scope.ServiceProvider.GetRequiredService<OrganizationService>();
+        await organizationService.Create(
+            OrganizationInfo.Create(LocalizedString.CreateInvariant("TestOrganization")) with
+            {
+                Id = TestOrganizationHrib
+            },
+            ct
+        );
+
         var projectGroupService = scope.ServiceProvider.GetRequiredService<ProjectGroupService>();
-        await projectGroupService.Create(ProjectGroupInfo.Invalid with {
-            Id = TestGroupHrib,
-            Name = (LocalizedString)"TestGroup",
-        }, ct);
+        await projectGroupService.Create(
+            ProjectGroupInfo.Create(TestOrganizationHrib, (LocalizedString)"TestGroup") with
+            {
+                Id = TestGroupHrib,
+                IsOpen = true
+            },
+            ct
+        );
 
         var projectService = scope.ServiceProvider.GetRequiredService<ProjectService>();
         await projectService.Create(TestGroupHrib, (LocalizedString)"TestProject", null, null, null, ct);

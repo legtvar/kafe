@@ -4,6 +4,7 @@ using System.Linq;
 using Kafe.Data.Events;
 using Marten.Events;
 using Marten.Events.Aggregation;
+using Marten.Events.CodeGeneration;
 
 namespace Kafe.Data.Aggregates;
 
@@ -22,16 +23,38 @@ public record ProjectInfo(
     bool IsLocked = false
 ) : IVisibleEntity
 {
-    public ProjectInfo() : this(
-        Hrib.InvalidValue,
-        CreationMethod.Unknown,
-        Hrib.InvalidValue,
-        ImmutableArray<ProjectAuthorInfo>.Empty,
-        ImmutableArray<ProjectArtifactInfo>.Empty,
-        ImmutableArray<ProjectReviewInfo>.Empty,
-        LocalizedString.Empty
-    )
+    public ProjectInfo() : this(Invalid)
     {
+    }
+
+    public static readonly ProjectInfo Invalid = new()
+    {
+        Id = Hrib.InvalidValue,
+        CreationMethod = CreationMethod.Unknown,
+        ProjectGroupId = Hrib.InvalidValue,
+        Authors = [],
+        Artifacts = [],
+        Reviews = [],
+        Name = LocalizedString.CreateInvariant(Const.InvalidName),
+        Description = null,
+        Genre = null,
+        GlobalPermissions = Permission.None,
+        ReleasedOn = default,
+        IsLocked = false
+    };
+
+    /// <summary>
+    /// Creates a bare-bones but valid <see cref="ProjectInfo"/>.
+    /// </summary>
+    [MartenIgnore]
+    public static ProjectInfo Create(Hrib projectGroupId, LocalizedString name)
+    {
+        return new()
+        {
+            Id = Hrib.EmptyValue,
+            ProjectGroupId = projectGroupId.Value,
+            Name = name
+        };
     }
 }
 

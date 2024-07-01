@@ -105,6 +105,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<PlaylistService>();
         services.AddScoped<EntityService>();
         services.AddScoped<MigrationService>();
+        services.AddScoped<OrganizationService>();
+        services.AddScoped<RoleService>();
 
         services.AddOptions<StorageOptions>()
             .BindConfiguration("Storage")

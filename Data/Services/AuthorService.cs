@@ -36,7 +36,7 @@ public class AuthorService
             return new Error(error);
         }
 
-        if (id == Hrib.Invalid)
+        if (id == Hrib.Empty)
         {
             id = Hrib.Create();
         }

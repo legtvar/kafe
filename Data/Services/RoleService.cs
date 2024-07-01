@@ -51,7 +51,7 @@ public class RoleService
         }
 
         var id = parseResult.Value;
-        if (id == Hrib.Invalid)
+        if (id == Hrib.Empty)
         {
             id = Hrib.Create();
         }

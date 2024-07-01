@@ -1,5 +1,6 @@
 using Kafe.Data.Events;
 using Marten.Events.Aggregation;
+using Marten.Events.CodeGeneration;
 using System;
 using System.Collections.Immutable;
 
@@ -17,15 +18,30 @@ public record ProjectGroupInfo(
 ) : IVisibleEntity
 {
     public ProjectGroupInfo() : this(Invalid)
-    {}
+    {
+    }
 
     public static readonly ProjectGroupInfo Invalid = new(
         Id: Hrib.InvalidValue,
         CreationMethod: CreationMethod.Unknown,
         OrganizationId: Hrib.InvalidValue,
-        Name: null!,
+        Name: LocalizedString.CreateInvariant(Const.InvalidName),
         Description: null
     );
+
+    /// <summary>
+    /// Creates a bare-bones but valid <see cref="ProjectGroupInfo"/>.
+    /// </summary>
+    [MartenIgnore]
+    public static ProjectGroupInfo Create(Hrib organizationId, LocalizedString name)
+    {
+        return new ProjectGroupInfo
+        {
+            Id = Hrib.EmptyValue,
+            Name = name,
+            OrganizationId = organizationId.Value
+        };
+    }
 }
 
 public class ProjectGroupInfoProjection : SingleStreamProjection<ProjectGroupInfo>

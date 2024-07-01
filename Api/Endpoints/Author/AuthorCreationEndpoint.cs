@@ -41,9 +41,8 @@ public class AuthorCreationEndpoint : EndpointBaseAsync
         AuthorCreationDto dto,
         CancellationToken cancellationToken = default)
     {
-        var author = await authorService.Create(AuthorInfo.Invalid with
+        var author = await authorService.Create(AuthorInfo.Create(dto.Name) with
         {
-            Name = dto.Name,
             Bio = dto.Bio,
             Uco = dto.Uco,
             Email = dto.Email,

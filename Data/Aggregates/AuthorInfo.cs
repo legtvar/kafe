@@ -2,6 +2,7 @@ using Marten.Events.Aggregation;
 using Kafe.Data.Events;
 using System.Collections.Immutable;
 using Npgsql;
+using Marten.Events.CodeGeneration;
 
 namespace Kafe.Data.Aggregates;
 
@@ -29,6 +30,19 @@ public record AuthorInfo(
         Email: null,
         Phone: null
     );
+
+    /// <summary>
+    /// Creates a bare-bones but valid <see cref="AuthorInfo"/>.
+    /// </summary>
+    [MartenIgnore]
+    public static AuthorInfo Create(string name)
+    {
+        return new AuthorInfo() with
+        {
+            Id = Hrib.EmptyValue,
+            Name = name
+        };
+    }
 }
 
 public class AuthorInfoProjection : SingleStreamProjection<AuthorInfo>

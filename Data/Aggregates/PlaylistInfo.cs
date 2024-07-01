@@ -2,6 +2,7 @@ using System.Collections.Immutable;
 using Kafe.Data.Events;
 using Marten.Events;
 using Marten.Events.Aggregation;
+using Marten.Events.CodeGeneration;
 
 namespace Kafe.Data.Aggregates;
 
@@ -16,17 +17,34 @@ public record PlaylistInfo(
 ) : IVisibleEntity
 {
     public PlaylistInfo() : this(Invalid)
-    { }
+    {
+    }
 
     public static readonly PlaylistInfo Invalid = new(
         Id: Hrib.InvalidValue,
         CreationMethod: CreationMethod.Unknown,
         OrganizationId: Hrib.InvalidValue,
         EntryIds: ImmutableArray<string>.Empty,
-        Name: null!,
+        Name: LocalizedString.CreateInvariant(Const.InvalidName),
         Description: null,
         GlobalPermissions: Permission.None
     );
+
+    /// <summary>
+    /// Creates a bare-bones but valid <see cref="PlaylistInfo"/>.
+    /// </summary>
+    /// <param name="name"></param>
+    /// <returns></returns>
+    [MartenIgnore]
+    public static PlaylistInfo Create(Hrib organizationId, LocalizedString name)
+    {
+        return new PlaylistInfo() with
+        {
+            Id = Hrib.EmptyValue,
+            OrganizationId = organizationId.Value,
+            Name = name
+        };
+    }
 }
 
 public class PlaylistInfoProjection : SingleStreamProjection<PlaylistInfo>

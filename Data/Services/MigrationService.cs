@@ -49,7 +49,7 @@ public class MigrationService
         }
 
         var id = parseResult.Value;
-        if (id == Hrib.Invalid)
+        if (id == Hrib.Empty)
         {
             id = Hrib.Create();
         }
@@ -224,9 +224,9 @@ public class MigrationService
 
         if (entity is null)
         {
-            var createResult = await accountService.Create(AccountInfo.Invalid with
+            var createResult = await accountService.Create(AccountInfo.Create(order.Email) with
             {
-                Id = (order.AccountId ?? Hrib.Invalid).Value,
+                Id = (order.AccountId ?? Hrib.Empty).Value,
                 Name = order.Name,
                 EmailAddress = order.Email,
                 Uco = order.Uco,
@@ -362,10 +362,9 @@ public class MigrationService
 
         if (entity is null)
         {
-            var createResult = await authorService.Create(AuthorInfo.Invalid with
+            var createResult = await authorService.Create(AuthorInfo.Create(order.Name) with
             {
-                Id = (order.AuthorId ?? Hrib.Invalid).Value,
-                Name = order.Name,
+                Id = (order.AuthorId ?? Hrib.Empty).Value,
                 Email = order.Email,
                 Uco = order.Uco,
                 Phone = order.Phone
@@ -396,11 +395,8 @@ public class MigrationService
             entity = editResult.Value;
         }
 
-        var newOrModifiedMigration = (existingMigration ?? MigrationInfo.Invalid) with
+        var newOrModifiedMigration = (existingMigration ?? MigrationInfo.Create(order.OriginalStorageName, order.OriginalId, entity.Id)) with
         {
-            EntityId = entity.Id,
-            OriginalId = order.OriginalId,
-            OriginalStorageName = order.OriginalStorageName,
             MigrationMetadata = order.MigrationMetadata ?? ImmutableDictionary<string, string>.Empty
         };
 
@@ -479,7 +475,7 @@ public class MigrationService
             }
         }
 
-        entity ??= ProjectGroupInfo.Invalid;
+        entity ??= ProjectGroupInfo.Create(order.OrganizationId, orderName);
         entity = entity with
         {
             Id = order.ProjectGroupId?.ToString() ?? entity.Id,
@@ -491,11 +487,8 @@ public class MigrationService
         };
         entity = (await projectGroupService.CreateOrEdit(entity, token)).Unwrap();
 
-        var newOrModifiedMigration = (existingMigration ?? MigrationInfo.Invalid) with
+        var newOrModifiedMigration = (existingMigration ?? MigrationInfo.Create(order.OriginalStorageName, order.OriginalId, entity.Id)) with
         {
-            EntityId = entity.Id,
-            OriginalId = order.OriginalId,
-            OriginalStorageName = order.OriginalStorageName,
             MigrationMetadata = order.MigrationMetadata ?? ImmutableDictionary<string, string>.Empty
         };
 

@@ -1,6 +1,7 @@
 ﻿using Kafe.Data.Events;
 using Marten.Events;
 using Marten.Events.Aggregation;
+using Marten.Events.CodeGeneration;
 using Marten.Schema;
 using System;
 using System.Collections.Generic;
@@ -27,6 +28,10 @@ public record AccountInfo(
     ImmutableArray<string> RoleIds
 ) : IEntity
 {
+    public AccountInfo() : this(Invalid)
+    {
+    }
+
     public static readonly AccountInfo Invalid = new(
         Id: Hrib.InvalidValue,
         CreationMethod: CreationMethod.Unknown,
@@ -39,9 +44,23 @@ public record AccountInfo(
         Phone: null,
         SecurityStamp: null,
         RefreshedOn: default,
-        Permissions: null!,
-        RoleIds: default
+        Permissions: ImmutableDictionary<string, Permission>.Empty,
+        RoleIds: []
     );
+
+
+    /// <summary>
+    /// Creates a bare-bones but valid <see cref="AccountInfo"/>.
+    /// </summary>
+    [MartenIgnore]
+    public static AccountInfo Create(string emailAddress)
+    {
+        return new AccountInfo() with
+        {
+            Id = Hrib.EmptyValue,
+            EmailAddress = emailAddress
+        };
+    }
 }
 
 public class AccountInfoProjection : SingleStreamProjection<AccountInfo>

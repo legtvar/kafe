@@ -51,7 +51,7 @@ public class AccountService
         }
 
         var id = parseResult.Value;
-        if (id == Hrib.Invalid)
+        if (id == Hrib.Empty)
         {
             id = Hrib.Create();
         }
@@ -68,7 +68,11 @@ public class AccountService
         switch (@new.Kind)
         {
             case AccountKind.Temporary:
-                RefreshTemporaryAccountCore(id.ToString());
+                var refreshed = new TemporaryAccountRefreshed(
+                    AccountId: id.ToString(),
+                    SecurityStamp: Guid.NewGuid().ToString()
+                );
+                db.Events.KafeAppend(id, refreshed);
                 break;
             case AccountKind.External:
                 if (string.IsNullOrEmpty(@new.IdentityProvider))
@@ -98,7 +102,7 @@ public class AccountService
             db.Events.KafeAppend(id, infoChanged);
         }
 
-        foreach (var permission in @new.Permissions)
+        foreach (var permission in (@new.Permissions ?? ImmutableDictionary<string, Permission>.Empty))
         {
             db.Events.KafeAppend(@new.Id, new AccountPermissionSet(
                 AccountId: @new.Id,
@@ -251,29 +255,23 @@ $@"TRUE = ALL(
         var account = await FindByEmail(emailAddress, token);
         if (account is null)
         {
-            return await Create(AccountInfo.Invalid with
+            return await Create(AccountInfo.Create(emailAddress) with
             {
                 Id = (id ?? Hrib.Create()).ToString(),
                 Kind = AccountKind.Temporary,
-                EmailAddress = emailAddress,
                 PreferredCulture = preferredCulture ?? Const.InvariantCultureCode
             }, token);
         }
         else
         {
-            RefreshTemporaryAccountCore(emailAddress);
+            var refreshed = new TemporaryAccountRefreshed(
+                AccountId: account.Id,
+                SecurityStamp: Guid.NewGuid().ToString()
+            );
+            db.Events.KafeAppend(account.Id, refreshed);
             await db.SaveChangesAsync(token);
             return await db.Events.KafeAggregateRequiredStream<AccountInfo>(account.Id, token: token);
         }
-    }
-
-    private void RefreshTemporaryAccountCore(Hrib id)
-    {
-        var refreshed = new TemporaryAccountRefreshed(
-            AccountId: id.ToString(),
-            SecurityStamp: Guid.NewGuid().ToString()
-        );
-        db.Events.KafeAppend(id, refreshed);
     }
 
     public async Task<bool> TryConfirmTemporaryAccount(

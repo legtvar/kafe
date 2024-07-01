@@ -38,10 +38,13 @@ public record Hrib
 
     private Hrib(string value)
     {
-        Value = value;
+        RawValue = value;
     }
 
-    public string Value { get; init; }
+    /// <summary>
+    /// The raw identifier string. Use only if you know what you're doing. Prefer <see cref="ToString"/> instead.
+    /// </summary>
+    public string RawValue { get; init; }
 
     // NB: this conversion is deliberately left `explicit` to prevent type casting issues with Marten/Postgres
     [return: NotNullIfNotNull(nameof(hrib))]
@@ -124,19 +127,19 @@ public record Hrib
     }
     public override string ToString()
     {
-        if (Value == InvalidValue)
+        if (RawValue == InvalidValue)
         {
             throw new InvalidOperationException(
                 "This Hrib is invalid and cannot be stringified to prevent accidental use in a database.");
         }
 
-        if (Value == EmptyValue)
+        if (RawValue == EmptyValue)
         {
             throw new InvalidOperationException(
                 "This Hrib is empty and cannot be stringified to prevent accidental use in a database."
                     + "This value is meant to be replaced with a proper HRIB by an entity service.");
         }
 
-        return Value;
+        return RawValue;
     }
 }

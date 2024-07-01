@@ -19,7 +19,7 @@ public class HribJsonConverter : JsonConverter<Hrib>
         Hrib value,
         JsonSerializerOptions options)
     {
-        JsonSerializer.Serialize(writer, value.Value, options);
+        JsonSerializer.Serialize(writer, value.ToString(), options);
     }
 
     public override Hrib ReadAsPropertyName(
@@ -41,6 +41,6 @@ public class HribJsonConverter : JsonConverter<Hrib>
         Hrib value,
         JsonSerializerOptions options)
     {
-        writer.WritePropertyName(value.Value);
+        writer.WritePropertyName(value.ToString());
     }
 }

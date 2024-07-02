@@ -2,9 +2,11 @@
 using Kafe.Data.Aggregates;
 using Kafe.Data.Events.Upcasts;
 using Kafe.Data.Options;
+using Kafe.Data.Projections;
 using Kafe.Data.Services;
 using Marten;
 using Marten.Events;
+using Marten.Events.Daemon.Resiliency;
 using Marten.Events.Projections;
 using Marten.Services.Json;
 using Microsoft.Extensions.Configuration;
@@ -34,7 +36,7 @@ public static class ServiceCollectionExtensions
 
             var options = services.GetRequiredService<IOptions<StorageOptions>>().Value;
             var mo = new StoreOptions();
-            
+
             if (!string.IsNullOrEmpty(options.Schema))
             {
                 mo.DatabaseSchemaName = options.Schema;
@@ -74,6 +76,9 @@ public static class ServiceCollectionExtensions
             mo.Projections.Add<AccountInfoProjection>(ProjectionLifecycle.Inline);
             mo.Projections.Add<OrganizationInfoProjection>(ProjectionLifecycle.Inline);
             mo.Projections.Add<RoleInfoProjection>(ProjectionLifecycle.Inline);
+            // mo.Projections.Add<EntityPermissionEventProjection>(
+            //     ProjectionLifecycle.Async,
+            //     ao => ao.EnableDocumentTrackingByIdentity = true);
             mo.Events.Upcast<AccountCapabilityAddedUpcaster>();
             mo.Events.Upcast<AccountCapabilityRemovedUpcaster>();
             mo.Events.Upcast<PlaylistVideoAddedUpcaster>();
@@ -91,6 +96,7 @@ public static class ServiceCollectionExtensions
         var mce = services.AddMarten(ConfigureMarten)
             .ApplyAllDatabaseChangesOnStartup()
             .UseIdentitySessions()
+            .AddAsyncDaemon(DaemonMode.Solo)
             .InitializeWith<Corrector>()
             .InitializeWith<SeedData>();
 

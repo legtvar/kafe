@@ -43,26 +43,26 @@ public class SeedData : IInitialData
         }
 
         using var scope = services.CreateScope();
-        var accounts = scope.ServiceProvider.GetRequiredService<AccountService>();
-        var projectGroups = scope.ServiceProvider.GetRequiredService<ProjectGroupService>();
+        var accountService = scope.ServiceProvider.GetRequiredService<AccountService>();
+        var projectGroupService = scope.ServiceProvider.GetRequiredService<ProjectGroupService>();
+        var organizationService = scope.ServiceProvider.GetRequiredService<OrganizationService>();
 
         foreach (var account in options.Value.Accounts)
         {
-            var data = await accounts.FindByEmail(account.EmailAddress, token);
+            var data = await accountService.FindByEmail(account.EmailAddress, token);
             if (data is null)
             {
-                var res = await accounts.CreateOrRefreshTemporaryAccount(
+                var res = await accountService.CreateOrRefreshTemporaryAccount(
                     account.EmailAddress,
                     account.PreferredCulture,
                     token: token);
-                data = await accounts.FindByEmail(res.Value.Id, token);
-                if (data is null)
+                if (res.HasErrors)
                 {
-                    logger.LogError("Seed account '{AccountEmailAddress}' could not be created.", account.EmailAddress);
-                    continue;
+                    throw res.AsException();
                 }
 
                 logger.LogInformation("Seed account '{AccountEmailAddress}' created.", account.EmailAddress);
+                data = res.Value;
             }
 
             if (account.Permissions is not null)
@@ -75,7 +75,7 @@ public class SeedData : IInitialData
 
                 if (missingPermissions.Length > 0)
                 {
-                    await accounts.AddPermissions(data.Id, missingPermissions, token);
+                    await accountService.AddPermissions(data.Id, missingPermissions, token);
                     logger.LogInformation(
                         "Permissions of seed account '{AccountEmailAddress}' updated.",
                         account.EmailAddress);
@@ -83,22 +83,57 @@ public class SeedData : IInitialData
             }
         }
 
+        foreach (var organization in options.Value.Organizations)
+        {
+            if (string.IsNullOrWhiteSpace(organization.Name))
+            {
+                logger.LogWarning(
+                    "Ignoring seed organization {@Organization} as its name is null or empty.",
+                    organization);
+                continue;
+            }
+
+            var name = LocalizedString.CreateInvariant(organization.Name);
+            var existing = await organizationService.Load(organization.Id, token);
+            if (existing is not null)
+            {
+                logger.LogDebug(
+                    "Not seed organization '{OrganizationId}' as it already exists.",
+                    organization.Id);
+                continue;
+            }
+
+            var createResult = await organizationService.Create(
+                OrganizationInfo.Create(name) with { Id = organization.Id },
+                token);
+            if (createResult.HasErrors)
+            {
+                throw createResult.AsException();
+            }
+
+            logger.LogInformation("Seed organization '{OrganizationId}' created.", organization.Id);
+        }
+
         foreach (var group in options.Value.ProjectGroups)
         {
-            if (group.Name is null)
+            if (string.IsNullOrWhiteSpace(group.Name))
             {
+                logger.LogWarning("Ignoring seed project group {@ProjectGroup} as its name is null or empty.", group);
                 continue;
             }
 
             var name = LocalizedString.CreateInvariant(group.Name);
-            var existing = await projectGroups.Load(group.Id, token);
+            var existing = await projectGroupService.Load(group.Id, token);
             if (existing is not null)
             {
+                logger.LogDebug(
+                    "Not seed project group '{ProjectGroupId}' as it already exists.",
+                    group.Id);
                 continue;
             }
 
             var deadline = group.Deadline is null ? default : DateTimeOffset.Parse(group.Deadline);
-            var id = await projectGroups.Create(new ProjectGroupInfo(
+            var createResult = await projectGroupService.Create(new ProjectGroupInfo(
                 Id: group.Id,
                 CreationMethod: CreationMethod.Seed,
                 OrganizationId: group.OrganizationId,
@@ -106,7 +141,12 @@ public class SeedData : IInitialData
                 Description: null,
                 Deadline: deadline
             ));
-            logger.LogInformation("Seed project group '{ProjectGroupId}' created.", id);
+            if (createResult.HasErrors)
+            {
+                throw createResult.AsException();
+            }
+
+            logger.LogInformation("Seed project group '{ProjectGroupId}' created.", group.Id);
         }
     }
 }

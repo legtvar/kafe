@@ -51,7 +51,10 @@ public class Corrector : IInitialData
             var correctionType = correctionTypes[i];
             if (appliedCorrections.Contains(correctionType.type.Name))
             {
-                lastAppliedCorrectionIndex = i;
+                if (lastAppliedCorrectionIndex < 0)
+                {
+                    lastAppliedCorrectionIndex = i;
+                }
             }
             else if (lastAppliedCorrectionIndex > 0)
             {

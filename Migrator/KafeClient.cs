@@ -177,6 +177,7 @@ public sealed class KafeClient : IAsyncDisposable
 
     public async Task<PlaylistInfo> CreatePlaylist(
         string name,
+        Hrib organizationId,
         string? description,
         IEnumerable<Hrib>? videos,
         Hrib? hrib = null)
@@ -186,6 +187,7 @@ public sealed class KafeClient : IAsyncDisposable
         var created = new PlaylistCreated(
             PlaylistId: hrib.ToString(),
             CreationMethod: CreationMethod.Migrator,
+            OrganizationId: organizationId.ToString(),
             Name: (LocalizedString)name);
         LogEvent(hrib, created);
         session.Events.StartStream<PlaylistInfo>(hrib.ToString(), created);
@@ -264,12 +266,14 @@ public sealed class KafeClient : IAsyncDisposable
 
     public async Task<ProjectGroupInfo> CreateProjectGroup(
         string name,
+        Hrib organizationId,
         Hrib? hrib = null)
     {
         hrib ??= Hrib.Create();
         var created = new ProjectGroupCreated(
             ProjectGroupId: hrib.ToString(),
             CreationMethod.Migrator,
+            OrganizationId: organizationId.ToString(),
             (LocalizedString)name);
         LogEvent(hrib, created);
 

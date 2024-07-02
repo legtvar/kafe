@@ -1,4 +1,5 @@
-﻿using Kafe.Data.Aggregates;
+﻿using Kafe.Common;
+using Kafe.Data.Aggregates;
 using Kafe.Data.Events;
 using Marten;
 using System;
@@ -47,32 +48,31 @@ public class ArtifactService
             .ToImmutableArray();
     }
 
-    public async Task<Hrib> Create(
-        LocalizedString name,
-        DateTimeOffset? addedOn,
-        Hrib? containingProject,
-        string? blueprintSlot,
-        CancellationToken token = default)
+    public async Task<Err<ArtifactInfo>> Create(ArtifactInfo @new, CancellationToken token = default)
     {
+        var parseResult = Hrib.Parse(@new.Id);
+        if (parseResult.HasErrors)
+        {
+            return parseResult.Errors;
+        }
+
+        var id = parseResult.Value;
+        if (id == Hrib.Empty)
+        {
+            id = Hrib.Create();
+        }
+
         var created = new ArtifactCreated(
-            ArtifactId: Hrib.Create().ToString(),
-            CreationMethod: CreationMethod.Api,
-            Name: name,
-            AddedOn: addedOn?.ToUniversalTime() ?? DateTimeOffset.UtcNow
+            ArtifactId: id.ToString(),
+            CreationMethod: @new.CreationMethod is not CreationMethod.Unknown
+                ? @new.CreationMethod
+                : CreationMethod.Api,
+            Name: @new.Name,
+            AddedOn: @new.AddedOn != default ? @new.AddedOn.ToUniversalTime() : DateTimeOffset.UtcNow
         );
         db.Events.KafeStartStream<ArtifactInfo>(created.ArtifactId, created);
 
-        if (containingProject is not null)
-        {
-            var artifactAdded = new ProjectArtifactAdded(
-                ProjectId: containingProject.ToString(),
-                ArtifactId: created.ArtifactId,
-                BlueprintSlot: blueprintSlot);
-            var projectStream = await db.Events.FetchForWriting<ProjectInfo>(containingProject.ToString(), token);
-            projectStream.AppendOne(artifactAdded);
-        }
-
         await db.SaveChangesAsync(token);
-        return created.ArtifactId;
+        return await db.Events.KafeAggregateRequiredStream<ArtifactInfo>(id, token: token);
     }
 }

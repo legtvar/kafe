@@ -270,4 +270,38 @@ public partial class ProjectService
 
     //     return authors;
     // }
+
+    public async Task<Err<ProjectInfo>> AddArtifacts(
+        Hrib projectId,
+        ImmutableArray<(Hrib id, string? blueprintSlot)> artifacts,
+        CancellationToken token = default)
+    {
+        var project = await Load(projectId, token);
+        if (project is null)
+        {
+            return Error.NotFound(projectId, "A project");
+        }
+        
+        var existingArtifactIds = (await artifactService.LoadMany(artifacts.Select(a => a.id), token))
+            .Select(a => a.Id)
+            .ToImmutableHashSet();
+        if (existingArtifactIds.Count != artifacts.Length)
+        {
+            return artifacts.Where(a => !existingArtifactIds.Contains(a.id.ToString()))
+                .Select(a => Error.NotFound(a.id, "An artifact"))
+                .ToImmutableArray();
+        }
+
+        var projectStream = await db.Events.FetchForWriting<ProjectInfo>(projectId.ToString(), token);
+        foreach (var artifact in artifacts)
+        {
+            var artifactAdded = new ProjectArtifactAdded(
+                ProjectId: projectId.ToString(),
+                ArtifactId: artifact.id.ToString(),
+                BlueprintSlot: artifact.blueprintSlot?.ToString());
+            projectStream.AppendOne(artifactAdded);
+        }
+        await db.SaveChangesAsync(token);
+        return await db.Events.KafeAggregateRequiredStream<ProjectInfo>(projectId, token: token);
+    }
 }

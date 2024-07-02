@@ -112,7 +112,7 @@ public static class Program
         var projectGroups = await wma.GetAllProjectGroups();
         foreach (var projectGroup in projectGroups)
         {
-            var kafeGroup = await kafe.CreateProjectGroup(projectGroup.Name);
+            var kafeGroup = await kafe.CreateProjectGroup(projectGroup.Name, migratorOptions.OrganizationId);
             foreach (var project in projectGroup.Projects)
             {
                 await MigrateProject(project, kafeGroup.Id);
@@ -428,6 +428,7 @@ public static class Program
 
         return await kafe.CreatePlaylist(
             name: playlist.Name,
+            organizationId: migratorOptions.OrganizationId,
             description: playlist.Desc,
             videos: artifactIds.ToImmutable());
     }

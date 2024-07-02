@@ -1,10 +1,14 @@
 ﻿using Ardalis.ApiEndpoints;
 using Asp.Versioning;
 using Kafe.Api.Transfer;
+using Kafe.Data;
+using Kafe.Data.Aggregates;
 using Kafe.Data.Services;
+using Marten.Linq.SoftDeletes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
+using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -18,13 +22,16 @@ public class ArtifactCreationEndpoint : EndpointBaseAsync
     .WithActionResult<Hrib>
 {
     private readonly ArtifactService artifacts;
+    private readonly ProjectService projectService;
     private readonly IAuthorizationService authorization;
 
     public ArtifactCreationEndpoint(
         ArtifactService artifacts,
+        ProjectService projectService,
         IAuthorizationService authorization)
     {
         this.artifacts = artifacts;
+        this.projectService = projectService;
         this.authorization = authorization;
     }
 
@@ -41,13 +48,30 @@ public class ArtifactCreationEndpoint : EndpointBaseAsync
         {
             return Unauthorized();
         }
-        
-        var hrib = await artifacts.Create(
-            name: request.Name,
-            addedOn: request.AddedOn,
-            containingProject: request.ContainingProject,
-            blueprintSlot: request.BlueprintSlot,
-            token: cancellationToken);
-        return Ok(hrib);
+
+        var createResult = await artifacts.Create(ArtifactInfo.Create(name: request.Name) with
+        {
+            AddedOn = request.AddedOn ?? default,
+            CreationMethod = CreationMethod.Api
+        },
+            cancellationToken);
+
+        if (createResult.HasErrors)
+        {
+            return createResult.ToActionResult();
+        }
+
+        if (request.ContainingProject is not null)
+        {
+            var addArtifactsResult = await projectService.AddArtifacts(
+                request.ContainingProject,
+                [(createResult.Value.Id, request.BlueprintSlot)]);
+            if (addArtifactsResult.HasErrors)
+            {
+                return addArtifactsResult.ToActionResult();
+            }
+        }
+
+        return Ok(createResult.Value.Id);
     }
 }

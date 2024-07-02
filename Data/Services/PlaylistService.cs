@@ -87,7 +87,7 @@ public class PlaylistService
             id = Hrib.Create();
         }
 
-        var created = new PlaylistEstablished(
+        var created = new PlaylistCreated(
             PlaylistId: id.ToString(),
             CreationMethod: CreationMethod.Api,
             OrganizationId: @new.OrganizationId,
@@ -147,6 +147,14 @@ public class PlaylistService
             eventStream.AppendOne(new PlaylistEntriesSet(
                 PlaylistId: @new.Id,
                 EntryIds: old.EntryIds));
+        }
+
+        if (@new.OrganizationId != old.OrganizationId)
+        {
+            eventStream.AppendOne(new PlaylistMovedToOrganization(
+                PlaylistId: @new.Id,
+                OrganizationId: @new.OrganizationId
+            ));
         }
 
         await db.SaveChangesAsync(token);

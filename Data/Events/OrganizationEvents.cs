@@ -2,7 +2,7 @@ using System.Collections.Immutable;
 
 namespace Kafe.Data.Events;
 
-public record OrganizationEstablished(
+public record OrganizationCreated(
     [Hrib] string OrganizationId,
     CreationMethod CreationMethod,
     [LocalizedString] ImmutableDictionary<string, string> Name

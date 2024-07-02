@@ -53,13 +53,13 @@ public class PlaylistInfoProjection : SingleStreamProjection<PlaylistInfo>
     {
     }
 
-    public static PlaylistInfo Create(PlaylistEstablished e)
+    public static PlaylistInfo Create(PlaylistCreated e)
     {
         return new PlaylistInfo(
             Id: e.PlaylistId,
             CreationMethod: e.CreationMethod,
-            OrganizationId: e.OrganizationId,
-            EntryIds: ImmutableArray.Create<string>(),
+            OrganizationId: e.OrganizationId ?? Hrib.InvalidValue,
+            EntryIds: [],
             Name: e.Name
         );
     }
@@ -98,11 +98,19 @@ public class PlaylistInfoProjection : SingleStreamProjection<PlaylistInfo>
         };
     }
 
-    public PlaylistInfo Apply(PlaylistGlobalPermissionsChanged e, PlaylistInfo a)
+    public PlaylistInfo Apply(PlaylistGlobalPermissionsChanged e, PlaylistInfo p)
     {
-        return a with
+        return p with
         {
             GlobalPermissions = e.GlobalPermissions
+        };
+    }
+
+    public PlaylistInfo Apply(PlaylistMovedToOrganization e, PlaylistInfo p)
+    {
+        return p with
+        {
+            OrganizationId = e.OrganizationId
         };
     }
 }

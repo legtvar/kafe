@@ -47,7 +47,7 @@ public class ProjectGroupService
             id = Hrib.Create();
         }
 
-        var created = new ProjectGroupEstablished(
+        var created = new ProjectGroupCreated(
             ProjectGroupId: id.ToString(),
             CreationMethod: CreationMethod.Api,
             OrganizationId: @new.OrganizationId,
@@ -151,6 +151,14 @@ public class ProjectGroupService
             eventStream.AppendOne(@new.IsOpen
                 ? new ProjectGroupOpened(@new.Id)
                 : new ProjectGroupClosed(@new.Id));
+        }
+
+        if (@old.OrganizationId != @new.OrganizationId)
+        {
+            eventStream.AppendOne(new ProjectGroupMovedToOrganization(
+                @old.Id,
+                @new.OrganizationId
+            ));
         }
 
         await db.SaveChangesAsync(token);

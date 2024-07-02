@@ -45,7 +45,7 @@ public class OrganizationInfoProjection : SingleStreamProjection<OrganizationInf
     {
     }
 
-    public static OrganizationInfo Create(IEvent<OrganizationEstablished> e)
+    public static OrganizationInfo Create(IEvent<OrganizationCreated> e)
     {
         return new OrganizationInfo(
             Id: e.Data.OrganizationId,

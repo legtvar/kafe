@@ -2,10 +2,17 @@ using System.Collections.Immutable;
 
 namespace Kafe.Data.Events;
 
-public record PlaylistEstablished(
+/// <summary>
+/// When a playlist gets created.
+/// </summary>
+/// <param name="OrganizationId">
+/// The Id of the group's owning organization.
+/// Is nullable, since organizations were added after project groups.
+/// </param>
+public record PlaylistCreated(
     [Hrib] string PlaylistId,
     CreationMethod CreationMethod,
-    [Hrib] string OrganizationId,
+    [Hrib] string? OrganizationId,
     [LocalizedString] ImmutableDictionary<string, string> Name
 );
 
@@ -32,4 +39,9 @@ public record PlaylistEntriesSet(
 public record PlaylistGlobalPermissionsChanged(
     [Hrib] string PlaylistId,
     Permission GlobalPermissions
+);
+
+public record PlaylistMovedToOrganization(
+    [Hrib] string PlaylistId,
+    [Hrib] string OrganizationId
 );

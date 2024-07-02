@@ -50,12 +50,12 @@ public class ProjectGroupInfoProjection : SingleStreamProjection<ProjectGroupInf
     {
     }
 
-    public static ProjectGroupInfo Create(ProjectGroupEstablished e)
+    public static ProjectGroupInfo Create(ProjectGroupCreated e)
     {
         return new ProjectGroupInfo(
             Id: e.ProjectGroupId,
             CreationMethod: e.CreationMethod,
-            OrganizationId: e.OrganizationId,
+            OrganizationId: e.OrganizationId ?? Hrib.InvalidValue,
             Name: e.Name
         );
     }
@@ -86,6 +86,14 @@ public class ProjectGroupInfoProjection : SingleStreamProjection<ProjectGroupInf
         return a with
         {
             GlobalPermissions = e.GlobalPermissions
+        };
+    }
+
+    public ProjectGroupInfo Apply(PlaylistMovedToOrganization e, ProjectGroupInfo p)
+    {
+        return p with
+        {
+            OrganizationId = e.OrganizationId
         };
     }
 }

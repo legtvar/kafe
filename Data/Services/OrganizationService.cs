@@ -46,7 +46,7 @@ public class OrganizationService
             id = Hrib.Create();
         }
 
-        var created = new OrganizationEstablished(
+        var created = new OrganizationCreated(
             OrganizationId: id.ToString(),
             CreationMethod: CreationMethod.Api,
             Name: @new.Name

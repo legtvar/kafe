@@ -104,7 +104,11 @@ public class SeedData : IInitialData
             }
 
             var createResult = await organizationService.Create(
-                OrganizationInfo.Create(name) with { Id = organization.Id },
+                OrganizationInfo.Create(name) with
+                {
+                    Id = organization.Id,
+                    CreationMethod = CreationMethod.Seed
+                },
                 token);
             if (createResult.HasErrors)
             {

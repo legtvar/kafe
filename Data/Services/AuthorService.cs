@@ -43,7 +43,9 @@ public class AuthorService
 
         var created = new AuthorCreated(
             AuthorId: id.ToString(),
-            CreationMethod: CreationMethod.Api,
+            CreationMethod: @new.CreationMethod is not CreationMethod.Unknown
+                ? @new.CreationMethod
+                : CreationMethod.Api,
             Name: @new.Name);
         db.Events.KafeStartStream<AuthorInfo>(id, created);
 

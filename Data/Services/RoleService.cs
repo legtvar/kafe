@@ -59,7 +59,9 @@ public class RoleService
         var created = new RoleCreated(
             RoleId: id.ToString(),
             OrganizationId: id.ToString(),
-            CreationMethod: CreationMethod.Api,
+            CreationMethod: @new.CreationMethod is not CreationMethod.Unknown
+                ? @new.CreationMethod
+                : CreationMethod.Api,
             Name: @new.Name
         );
         db.Events.KafeStartStream<RoleInfo>(id, created);

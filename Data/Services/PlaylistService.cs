@@ -89,7 +89,9 @@ public class PlaylistService
 
         var created = new PlaylistCreated(
             PlaylistId: id.ToString(),
-            CreationMethod: CreationMethod.Api,
+            CreationMethod: @new.CreationMethod is not CreationMethod.Unknown
+                ? @new.CreationMethod
+                : CreationMethod.Api,
             OrganizationId: @new.OrganizationId,
             Name: @new.Name);
         db.Events.KafeStartStream<PlaylistInfo>(id, created);

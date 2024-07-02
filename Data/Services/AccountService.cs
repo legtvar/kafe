@@ -58,7 +58,9 @@ public class AccountService
 
         var created = new AccountCreated(
             AccountId: id.ToString(),
-            CreationMethod: @new.CreationMethod,
+            CreationMethod: @new.CreationMethod is not CreationMethod.Unknown
+                ? @new.CreationMethod
+                : CreationMethod.Api,
             EmailAddress: @new.EmailAddress,
             PreferredCulture: @new.PreferredCulture
         );

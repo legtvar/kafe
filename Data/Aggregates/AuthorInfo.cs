@@ -16,11 +16,7 @@ public record AuthorInfo(
     string? Email = null,
     string? Phone = null) : IVisibleEntity
 {
-    public AuthorInfo() : this(Invalid)
-    {
-    }
-    
-    public static readonly AuthorInfo Invalid = new AuthorInfo(
+    public static readonly AuthorInfo Invalid = new(
         Id: Hrib.InvalidValue,
         CreationMethod: CreationMethod.Unknown,
         Name: Const.InvalidName,
@@ -30,6 +26,10 @@ public record AuthorInfo(
         Email: null,
         Phone: null
     );
+
+    public AuthorInfo() : this(Invalid)
+    {
+    }
 
     /// <summary>
     /// Creates a bare-bones but valid <see cref="AuthorInfo"/>.

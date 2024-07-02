@@ -17,10 +17,6 @@ public record RoleInfo(
     ImmutableDictionary<string, Permission> Permissions
 ) : IEntity
 {
-    public RoleInfo() : this(Invalid)
-    {
-    }
-
     public static readonly RoleInfo Invalid = new(
         Id: Hrib.InvalidValue,
         CreationMethod: CreationMethod.Unknown,
@@ -30,6 +26,10 @@ public record RoleInfo(
         CreatedOn: default,
         Permissions: ImmutableDictionary<string, Permission>.Empty
     );
+
+    public RoleInfo() : this(Invalid)
+    {
+    }
 
     /// <summary>
     /// Creates a bare-bones but valid <see cref="RoleInfo"/>.

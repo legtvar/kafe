@@ -14,17 +14,16 @@ public record OrganizationInfo(
     DateTimeOffset CreatedOn
 ) : IEntity
 {
-    public OrganizationInfo() : this(Invalid)
-    {
-        
-    }
-
     public static readonly OrganizationInfo Invalid = new(
         Id: Hrib.InvalidValue,
         CreationMethod: CreationMethod.Unknown,
         Name: LocalizedString.CreateInvariant(Const.InvalidName),
         CreatedOn: default
     );
+
+    public OrganizationInfo() : this(Invalid)
+    {
+    }
 
     /// <summary>
     /// Creates a bare-bones but valid <see cref="OrganizationInfo"/>.

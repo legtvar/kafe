@@ -17,10 +17,6 @@ public record ProjectGroupInfo(
     Permission GlobalPermissions = Permission.None
 ) : IVisibleEntity
 {
-    public ProjectGroupInfo() : this(Invalid)
-    {
-    }
-
     public static readonly ProjectGroupInfo Invalid = new(
         Id: Hrib.InvalidValue,
         CreationMethod: CreationMethod.Unknown,
@@ -28,6 +24,10 @@ public record ProjectGroupInfo(
         Name: LocalizedString.CreateInvariant(Const.InvalidName),
         Description: null
     );
+
+    public ProjectGroupInfo() : this(Invalid)
+    {
+    }
 
     /// <summary>
     /// Creates a bare-bones but valid <see cref="ProjectGroupInfo"/>.

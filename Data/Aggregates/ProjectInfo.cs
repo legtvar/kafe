@@ -23,25 +23,24 @@ public record ProjectInfo(
     bool IsLocked = false
 ) : IVisibleEntity
 {
+    public static readonly ProjectInfo Invalid = new(
+        Id: Hrib.InvalidValue,
+        CreationMethod: CreationMethod.Unknown,
+        ProjectGroupId: Hrib.InvalidValue,
+        Authors: [],
+        Artifacts: [],
+        Reviews: [],
+        Name: LocalizedString.CreateInvariant(Const.InvalidName),
+        Description: null,
+        Genre: null,
+        GlobalPermissions: Permission.None,
+        ReleasedOn: default,
+        IsLocked: false
+    );
+
     public ProjectInfo() : this(Invalid)
     {
     }
-
-    public static readonly ProjectInfo Invalid = new()
-    {
-        Id = Hrib.InvalidValue,
-        CreationMethod = CreationMethod.Unknown,
-        ProjectGroupId = Hrib.InvalidValue,
-        Authors = [],
-        Artifacts = [],
-        Reviews = [],
-        Name = LocalizedString.CreateInvariant(Const.InvalidName),
-        Description = null,
-        Genre = null,
-        GlobalPermissions = Permission.None,
-        ReleasedOn = default,
-        IsLocked = false
-    };
 
     /// <summary>
     /// Creates a bare-bones but valid <see cref="ProjectInfo"/>.

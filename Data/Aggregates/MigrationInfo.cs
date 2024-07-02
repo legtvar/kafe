@@ -17,10 +17,6 @@ public record MigrationInfo(
     DateTimeOffset ChangedOn)
     : IEntity
 {
-    public MigrationInfo() : this(Invalid)
-    {
-    }
-
     public static readonly MigrationInfo Invalid = new(
         Id: Hrib.InvalidValue,
         EntityId: Hrib.InvalidValue,
@@ -28,7 +24,12 @@ public record MigrationInfo(
         OriginalId: string.Empty,
         MigrationMetadata: ImmutableDictionary<string, string>.Empty,
         CreatedOn: default,
-        ChangedOn: default);
+        ChangedOn: default
+    );
+
+    public MigrationInfo() : this(Invalid)
+    {
+    }
 
     /// <summary>
     /// Creates a bare-bones but valid <see cref="MigrationInfo"/>.

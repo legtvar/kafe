@@ -98,7 +98,7 @@ public class SeedData : IInitialData
             if (existing is not null)
             {
                 logger.LogDebug(
-                    "Not seed organization '{OrganizationId}' as it already exists.",
+                    "Ignoring seed organization '{OrganizationId}' as it already exists.",
                     organization.Id);
                 continue;
             }
@@ -131,7 +131,7 @@ public class SeedData : IInitialData
             if (existing is not null)
             {
                 logger.LogDebug(
-                    "Not seed project group '{ProjectGroupId}' as it already exists.",
+                    "Ignoring seed project group '{ProjectGroupId}' as it already exists.",
                     group.Id);
                 continue;
             }

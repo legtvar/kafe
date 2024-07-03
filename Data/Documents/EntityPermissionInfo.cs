@@ -10,7 +10,7 @@ public record EntityPermissionSource(
     DateTimeOffset GrantedAt
 );
 
-public record EntityPermissionItem(
+public record EntityPermissionEntry(
     Permission EffectivePermission,
     ImmutableDictionary<string, EntityPermissionSource> Sources
 );
@@ -18,27 +18,31 @@ public record EntityPermissionItem(
 /// <summary>
 /// Describes all accounts that can have any permissions (other than <see cref="IVisibleEntity.GlobalPermissions"/>).
 /// </summary>
+/// 
 /// <param name="Id">The Id of the entity---the object the permissions affect.</param>
+/// 
 /// <param name="GrantorIds">
 /// Ids of all transitive parent entities whose permission affect this entity.
 /// For example, if this entity is a project, <see cref="GrantorIds"/> will contain the Ids of the
 /// containing project group.
 /// In other words, contains all entities, whose change, may affect this <see cref="EntityPermissionInfo"/>.
 /// </param>
+/// 
 /// <param name="ParentIds">Ids of all direct parent entities whose permission affect this entity.</param>
-/// <param name="Accounts">The list of accounts with permissions to this entity along with source metadata.</param>
+/// 
+/// <param name="Entries">The list of accounts with permissions to this entity along with source metadata.</param>
 public record EntityPermissionInfo(
     [Hrib] string Id,
     ImmutableHashSet<string> GrantorIds,
     ImmutableHashSet<string> ParentIds,
-    ImmutableDictionary<string, EntityPermissionItem> Accounts
+    ImmutableDictionary<string, EntityPermissionEntry> Entries
 )
 {
     public static readonly EntityPermissionInfo Invalid = new(
         Id: Hrib.InvalidValue,
         GrantorIds: [],
         ParentIds: [],
-        Accounts: ImmutableDictionary<string, EntityPermissionItem>.Empty
+        Entries: ImmutableDictionary<string, EntityPermissionEntry>.Empty
     );
 
     public EntityPermissionInfo() : this(Invalid)

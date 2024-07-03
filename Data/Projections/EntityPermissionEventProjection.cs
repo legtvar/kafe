@@ -20,9 +20,12 @@ public class EntityPermissionEventProjection : EventProjection
         {
             perms = perms with
             {
-                ParentEntityIds = perms.ParentEntityIds.Add(e.OrganizationId)
+                ParentIds = perms.ParentIds.Add(e.OrganizationId),
+                GrantorIds = perms.GrantorIds.Add(e.OrganizationId)
             };
         }
+
+        // TODO: Implement transitive perms from the org.
 
         return perms;
     }
@@ -33,16 +36,16 @@ public class EntityPermissionEventProjection : EventProjection
         var perms = EntityPermissionInfo.Create(e.ProjectId);
         perms = perms with
         {
-            ParentEntityIds = perms.ParentEntityIds.Add(e.ProjectGroupId)
+            ParentIds = perms.ParentIds.Add(e.ProjectGroupId),
+            GrantorIds = perms.GrantorIds.Add(e.ProjectGroupId)
         };
 
         if (groupPerms is not null)
         {
-            perms = perms with
-            {
-                ParentEntityIds = perms.ParentEntityIds.Union(groupPerms.ParentEntityIds)
-            };
+            // TODO: Implement transitive perms from the project group.
         }
+
+        // TODO: Implement transitive perms from the org.
 
         return perms;
     }
@@ -54,9 +57,12 @@ public class EntityPermissionEventProjection : EventProjection
         {
             perms = perms with
             {
-                ParentEntityIds = perms.ParentEntityIds.Add(e.OrganizationId)
+                ParentIds = perms.ParentIds.Add(e.OrganizationId),
+                GrantorIds = perms.GrantorIds.Add(e.OrganizationId)
             };
         }
+
+        // TODO: Implement transitive perms from the org.
 
         return perms;
     }
@@ -65,7 +71,7 @@ public class EntityPermissionEventProjection : EventProjection
     {
         return EntityPermissionInfo.Create(e.AuthorId);
     }
-    
+
     // public EntityPermissionInfo Create(ArtifactCreated e)
     // {
     //     var perms = EntityPermissionInfo.Create(e.ArtifactId);

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
@@ -6,6 +7,7 @@ using Kafe.Data.Aggregates;
 using Kafe.Data.Documents;
 using Kafe.Data.Events;
 using Marten;
+using Marten.Events;
 using Marten.Events.Projections;
 
 namespace Kafe.Data.Projections;
@@ -70,6 +72,29 @@ public class EntityPermissionEventProjection : EventProjection
         return perms;
     }
 
+    public async Task Project(AccountPermissionSet e, IEvent metadata, IDocumentOperations ops)
+    {
+        var entityPerms = await ops.LoadAsync<EntityPermissionInfo>(e.EntityId)
+            ?? throw new InvalidOperationException($"No permission info exists for '{e.EntityId}'. "
+                + "Either the events are out of order or the permission info projection is broken.");
+        
+        entityPerms = AddAccountPermission(
+            perms: entityPerms,
+            accountId: e.AccountId,
+            // NB: Explicit permissions have source Id equal to the entity Id.
+            //     This makes them easy to find and allows for consistent source info inheritance.
+            sourceId: e.EntityId,
+            permission: e.Permission,
+            grantedAt: metadata.Timestamp);
+        ops.Update(entityPerms);
+
+        var inheritedPermission = InheritPermission(e.Permission);
+        if (inheritedPermission != Permission.None)
+        {
+            await SpreadAccountPermission(ops, e.AccountId, e.EntityId, inheritedPermission, metadata.Timestamp);
+        }
+    }
+
     private static async Task<EntityPermissionInfo> AddSystem(
         IDocumentOperations ops,
         EntityPermissionInfo perms
@@ -100,13 +125,13 @@ public class EntityPermissionEventProjection : EventProjection
 
         return perms with
         {
-            Entries = MergeEntries(perms.Entries, InheritPermissions(ancestorPerms.Entries)),
+            Entries = MergeEntries(perms.Entries, InheritEntries(ancestorPerms.Entries)),
             GrantorIds = perms.GrantorIds.Union([parentId.ToString(), .. ancestorPerms.GrantorIds]),
             ParentIds = perms.ParentIds.Add(parentId.ToString())
         };
     }
 
-    private static ImmutableDictionary<string, EntityPermissionEntry> InheritPermissions(
+    private static ImmutableDictionary<string, EntityPermissionEntry> InheritEntries(
         ImmutableDictionary<string, EntityPermissionEntry> perms
     )
     {
@@ -115,13 +140,19 @@ public class EntityPermissionEventProjection : EventProjection
             .ToImmutableDictionary(
                 p => p.Key,
                 p => new EntityPermissionEntry(
-                    EffectivePermission: (p.Value.EffectivePermission.HasFlag(Permission.Inspect)
-                            ? Permission.Read
-                            : Permission.None)
-                        | (p.Value.EffectivePermission & Permission.Inheritable),
+                    EffectivePermission: InheritPermission(p.Value.EffectivePermission),
                     Sources: p.Value.Sources
                 )
             );
+    }
+
+    // NB: This is KAFE's implementation of permission inheritance. Tread carefully. I'm watching you.
+    private static Permission InheritPermission(Permission parentPermission)
+    {
+        return (parentPermission.HasFlag(Permission.Inspect)
+                ? Permission.Read
+                : Permission.None)
+            | (parentPermission & Permission.Inheritable);
     }
 
     private static ImmutableDictionary<string, EntityPermissionEntry> MergeEntries(
@@ -157,5 +188,69 @@ public class EntityPermissionEventProjection : EventProjection
         }
 
         return result.ToImmutable();
+    }
+
+    private static EntityPermissionInfo AddAccountPermission(
+        EntityPermissionInfo perms,
+        Hrib accountId,
+        Hrib sourceId,
+        Permission permission,
+        DateTimeOffset grantedAt)
+    {
+        if (perms.Entries.TryGetValue(accountId.ToString(), out var accountEntry))
+        {
+            // NB: The Sources and EffectivePermission need to be updated separately
+            //     so that the event has any effect.
+            accountEntry = accountEntry with
+            {
+                Sources = accountEntry.Sources.SetItem(sourceId.ToString(), new EntityPermissionSource(
+                    Permission: permission,
+                    GrantedAt: grantedAt
+                ))
+            };
+            accountEntry = accountEntry with
+            {
+                EffectivePermission = accountEntry.Sources.Values.Aggregate(
+                    Permission.None,
+                    (e, s) => e | s.Permission)
+            };
+        }
+        else
+        {
+            accountEntry = new EntityPermissionEntry(
+                EffectivePermission: permission,
+                Sources: ImmutableDictionary.CreateRange([new KeyValuePair<string, EntityPermissionSource>(
+                    sourceId.ToString(),
+                    new EntityPermissionSource(
+                        Permission: permission,
+                        GrantedAt: grantedAt
+                    )
+                )])
+            );
+        }
+
+        perms = perms with
+        {
+            Entries = perms.Entries.SetItem(accountId.ToString(), accountEntry)
+        };
+        return perms;
+    }
+
+    private async Task SpreadAccountPermission(
+        IDocumentOperations ops,
+        Hrib accountId,
+        Hrib sourceId,
+        Permission permission,
+        DateTimeOffset grantedAt)
+    {
+        var affectedEntities = ops.Query<EntityPermissionInfo>()
+            .Where(p => p.GrantorIds.Contains(sourceId.ToString()))
+            .ToAsyncEnumerable();
+
+        await foreach (var affected in affectedEntities)
+        {
+            var changed = AddAccountPermission(affected, accountId, sourceId, permission, grantedAt);
+            ops.Update(changed);
+        }
     }
 }

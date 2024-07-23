@@ -269,7 +269,7 @@ public class EntityPermissionEventProjection : EventProjection
         return perms;
     }
 
-    private async Task SpreadAccountPermission(
+    private static async Task SpreadAccountPermission(
         IDocumentOperations ops,
         Hrib accountId,
         Hrib sourceId,

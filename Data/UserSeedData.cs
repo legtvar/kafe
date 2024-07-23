@@ -15,18 +15,18 @@ using Microsoft.Extensions.Options;
 
 namespace Kafe.Data;
 
-public class SeedData : IInitialData
+public class UserSeedData : IInitialData
 {
     private readonly IOptions<StorageOptions> storageOptions;
     private readonly IOptions<SeedOptions> options;
     private readonly IServiceProvider services;
-    private readonly ILogger<SeedData> logger;
+    private readonly ILogger<UserSeedData> logger;
 
-    public SeedData(
+    public UserSeedData(
         IOptions<StorageOptions> storageOptions,
         IOptions<SeedOptions> options,
         IServiceProvider services,
-        ILogger<SeedData> logger)
+        ILogger<UserSeedData> logger)
     {
         this.storageOptions = storageOptions;
         this.options = options;

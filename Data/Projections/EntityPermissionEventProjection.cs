@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Data.Common;
 using System.Linq;
 using System.Threading.Tasks;
 using Kafe.Data.Aggregates;
@@ -9,6 +10,8 @@ using Kafe.Data.Events;
 using Marten;
 using Marten.Events;
 using Marten.Events.Projections;
+using Marten.Services.Json.Transformations;
+using Newtonsoft.Json.Linq;
 
 namespace Kafe.Data.Projections;
 
@@ -71,22 +74,45 @@ public class EntityPermissionEventProjection : EventProjection
         perms = await AddSystem(ops, perms);
         return perms;
     }
+    
+    public async Task<EntityPermissionInfo> Create(AccountCreated e, IDocumentOperations ops)
+    {
+        var perms = EntityPermissionInfo.Create(e.AccountId);
+        perms = await AddSystem(ops, perms);
+        return perms;
+    }
 
     public async Task Project(AccountPermissionSet e, IEvent metadata, IDocumentOperations ops)
     {
-        var entityPerms = await ops.LoadAsync<EntityPermissionInfo>(e.EntityId)
-            ?? throw new InvalidOperationException($"No permission info exists for '{e.EntityId}'. "
-                + "Either the events are out of order or the permission info projection is broken.");
-        
+        // NB: Once upon a time, we used "*" to identify the whole system. Then we changed it, but we've got total of
+        //     THREE AccountPermissionSet events in the DB that would break this method. Implementing an upcast that
+        //     would have to run on any past or future AccountPermissionSet seems inefficient so I just added this `if`.
+        //     We all have to live with our mistakes.
+        if (e.EntityId == "*")
+        {
+            e = e with
+            {
+                EntityId = Hrib.SystemValue
+            };
+        }
+    
+        var entityPerms = await ops.KafeLoadAsync<EntityPermissionInfo>(e.EntityId);
+        if (entityPerms.HasErrors)
+        {
+            throw new InvalidOperationException($"No permission info exists for '{e.EntityId}'. "
+                + "Either the events are out of order or the permission info projection is broken.",
+                entityPerms.AsException());
+        }
+
         entityPerms = AddAccountPermission(
-            perms: entityPerms,
+            perms: entityPerms.Value,
             accountId: e.AccountId,
             // NB: Explicit permissions have source Id equal to the entity Id.
             //     This makes them easy to find and allows for consistent source info inheritance.
             sourceId: e.EntityId,
             permission: e.Permission,
             grantedAt: metadata.Timestamp);
-        ops.Update(entityPerms);
+        ops.Store(entityPerms.Value);
 
         var inheritedPermission = InheritPermission(e.Permission);
         if (inheritedPermission != Permission.None)
@@ -100,13 +126,17 @@ public class EntityPermissionEventProjection : EventProjection
         EntityPermissionInfo perms
     )
     {
-        var systemPerms = await ops.LoadAsync<EntityPermissionInfo>(Hrib.System)
-            ?? throw new InvalidOperationException("No permission info exists for the 'system' HRIB. "
-                + "The DB is in an invalid state.");
+        var systemPerms = await ops.KafeLoadAsync<EntityPermissionInfo>(Hrib.System);
+        if (systemPerms.HasErrors)
+        {
+            throw new InvalidOperationException("No permission info exists for the 'system' HRIB. "
+                + "The DB is in an invalid state.", systemPerms.AsException());
+        }
+
         return perms with
         {
             GrantorIds = perms.GrantorIds.Add(Hrib.SystemValue),
-            Entries = MergeEntries(perms.Entries, systemPerms.Entries)
+            Entries = MergeEntries(perms.Entries, systemPerms.Value.Entries)
         };
     }
 
@@ -119,14 +149,17 @@ public class EntityPermissionEventProjection : EventProjection
         EntityPermissionInfo perms,
         Hrib parentId)
     {
-        var ancestorPerms = await ops.LoadAsync<EntityPermissionInfo>(parentId)
-            ?? throw new InvalidOperationException($"The parent entity with the '{parentId}' Id does not exist."
-                + "Either the Id is wrong or the DB is in an invalid state.");
+        var ancestorPerms = await ops.KafeLoadAsync<EntityPermissionInfo>(parentId);
+        if (ancestorPerms.HasErrors)
+        {
+            throw new InvalidOperationException($"The parent entity with the '{parentId}' Id does not exist."
+                + "Either the Id is wrong or the DB is in an invalid state.", ancestorPerms.AsException());
+        }
 
         return perms with
         {
-            Entries = MergeEntries(perms.Entries, InheritEntries(ancestorPerms.Entries)),
-            GrantorIds = perms.GrantorIds.Union([parentId.ToString(), .. ancestorPerms.GrantorIds]),
+            Entries = MergeEntries(perms.Entries, InheritEntries(ancestorPerms.Value.Entries)),
+            GrantorIds = perms.GrantorIds.Union([parentId.ToString(), .. ancestorPerms.Value.GrantorIds]),
             ParentIds = perms.ParentIds.Add(parentId.ToString())
         };
     }
@@ -250,7 +283,7 @@ public class EntityPermissionEventProjection : EventProjection
         await foreach (var affected in affectedEntities)
         {
             var changed = AddAccountPermission(affected, accountId, sourceId, permission, grantedAt);
-            ops.Update(changed);
+            ops.Store(changed);
         }
     }
 }

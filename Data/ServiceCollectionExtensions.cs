@@ -76,9 +76,9 @@ public static class ServiceCollectionExtensions
             mo.Projections.Add<AccountInfoProjection>(ProjectionLifecycle.Inline);
             mo.Projections.Add<OrganizationInfoProjection>(ProjectionLifecycle.Inline);
             mo.Projections.Add<RoleInfoProjection>(ProjectionLifecycle.Inline);
-            // mo.Projections.Add<EntityPermissionEventProjection>(
-            //     ProjectionLifecycle.Async,
-            //     ao => ao.EnableDocumentTrackingByIdentity = true);
+            mo.Projections.Add<EntityPermissionEventProjection>(
+                ProjectionLifecycle.Async,
+                ao => ao.EnableDocumentTrackingByIdentity = true);
             mo.Events.Upcast<AccountCapabilityAddedUpcaster>();
             mo.Events.Upcast<AccountCapabilityRemovedUpcaster>();
             mo.Events.Upcast<PlaylistVideoAddedUpcaster>();
@@ -97,8 +97,9 @@ public static class ServiceCollectionExtensions
             .ApplyAllDatabaseChangesOnStartup()
             .UseIdentitySessions()
             .AddAsyncDaemon(DaemonMode.Solo)
+            .InitializeWith<SystemSeedData>()
             .InitializeWith<Corrector>()
-            .InitializeWith<SeedData>();
+            .InitializeWith<UserSeedData>();
 
         services.AddSingleton<StorageService>();
 

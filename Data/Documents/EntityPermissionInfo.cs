@@ -36,7 +36,7 @@ public record EntityPermissionInfo(
     ImmutableHashSet<string> GrantorIds,
     ImmutableHashSet<string> ParentIds,
     ImmutableDictionary<string, EntityPermissionEntry> Entries
-)
+) : IEntity
 {
     public static readonly EntityPermissionInfo Invalid = new(
         Id: Hrib.InvalidValue,

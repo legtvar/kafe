@@ -33,7 +33,7 @@ system
 
 - The `system` entity is special. It rules all. Permissions for the `system` entity are "inherited" by all others.
 - Permissions are always additive. If one can explictly `Inspect` and organization and `Write` to one of its project groups, one inherited the `Read` and `Write` to all of the project group's projects.
-- Playlists are just lists. That's it. Especially, parents are not _parents_ of any artifacts. No permissions trickle down from playlists to artifacts.
+- Playlists are just lists. That's it. Especially, playlists are not _parents_ of any artifacts. No permissions trickle down from playlists to artifacts.
 - There is no _administrator_ role in KAFE. Administrators are accounts with an explicit `All` permission on the `system` entity.
 
 ## `EntityPermissionInfo`
@@ -43,13 +43,13 @@ Complete descriptions of who has which permissions for an entity with specific `
 **Parents**
 
 Direct parent entities whose permissions affect the described entity.
-Is important when the entity is reparented.
+It is important when the entity is reparented.
 
 **Grantors**
 
 All transitive parent entities whose permissions affect the described entity.
 For example, if this entity is a project, _Grantors_ are the parent project group, the organization, and `system`.
-Is important when propagating changes from parents to all of their descendants.
+It is important when propagating changes from parents to all of their descendants.
 
 
 ## `EntityPermissionEventProjection`
@@ -58,7 +58,8 @@ The core of the KAFE's permission system.
 Creates and changes `EntityPermissionInfo` documents.
 Each subset of events has specific effects:
 
-**Entity creation events**
+### Entity creation events
+
 - `OrganizationCreated`
 - `ProjectGroupCreated`
 - `ProjectCreated`
@@ -67,6 +68,8 @@ Each subset of events has specific effects:
 - `ArtifactCreated`
 - `AccountCreated`
 - `RoleCreated`
+
+
 
 **Entity change events**
 - `ProjectGroupGlobalPermissionsChanged`

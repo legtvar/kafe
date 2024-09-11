@@ -81,6 +81,13 @@ public class EntityPermissionEventProjection : EventProjection
         perms = await AddSystem(ops, perms);
         return perms;
     }
+    
+    public async Task<EntityPermissionInfo> Create(RoleCreated e, IDocumentOperations ops)
+    {
+        var perms = EntityPermissionInfo.Create(e.RoleId);
+        perms = await AddSystem(ops, perms);
+        return perms;
+    }
 
     public async Task Project(AccountPermissionSet e, IEvent metadata, IDocumentOperations ops)
     {
@@ -108,7 +115,7 @@ public class EntityPermissionEventProjection : EventProjection
             perms: entityPerms.Value,
             accountId: e.AccountId,
             // NB: Explicit permissions have source Id equal to the entity Id.
-            //     This makes them easy to find and allows for consistent source info inheritance.
+            //     This makes them easy to find and allows for consistent inheriting of info about perms sources.
             sourceId: e.EntityId,
             permission: e.Permission,
             grantedAt: metadata.Timestamp);
@@ -136,7 +143,7 @@ public class EntityPermissionEventProjection : EventProjection
         return perms with
         {
             GrantorIds = perms.GrantorIds.Add(Hrib.SystemValue),
-            Entries = MergeEntries(perms.Entries, systemPerms.Value.Entries)
+            Entries = MergeEntries(perms.Entries, InheritEntries(systemPerms.Value.Entries))
         };
     }
 
@@ -164,6 +171,9 @@ public class EntityPermissionEventProjection : EventProjection
         };
     }
 
+    /// <summary>
+    /// Applies <see cref="InheritPermission"/> to a dictionary of <see cref="EntityPermissionEntry"/>es.
+    /// </summary>
     private static ImmutableDictionary<string, EntityPermissionEntry> InheritEntries(
         ImmutableDictionary<string, EntityPermissionEntry> perms
     )
@@ -269,6 +279,9 @@ public class EntityPermissionEventProjection : EventProjection
         return perms;
     }
 
+    /// <summary>
+    /// Spreads an account permission to all entities that have <paramref name="sourceId"/> among its grantors.
+    /// </summary>
     private static async Task SpreadAccountPermission(
         IDocumentOperations ops,
         Hrib accountId,

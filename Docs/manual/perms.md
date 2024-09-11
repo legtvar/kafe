@@ -1,5 +1,38 @@
 # Permissions in KAFE
 
+An `Account` or a `Role` can have any of the following permissions:
+
+- `None` - You can't see and do nothing.
+- `Read` - You can view the entity's metadata.
+- `Append` - You can modify the list of the entity's children but only non-destructively.
+- † `Inspect` - Gives `Read` and `Inspect` on all descendant entities.
+- † `Write` - You can modify the entity and any of its descendants.
+- † `Review` - You can send a review to a project owner. (Only makes sense on projects.)
+- † `Administer` - You can edit the entity's global and explicit permissions.
+
+Permissions with the dagger symbol (†) are inheritable -- have effects on the entity's descendants -- the others concern only the entity itself.
+
+## Explicit and inherited permissions
+
+Permissions can be either explicit for a specific entity or trickle down from its ancestors:
+
+```
+system
+- authors
+- accounts
+- organizations
+    - playlists
+    - roles
+    - project groups
+        - projects
+            - artifacts
+                - shards
+```
+
+- The `system` entity is special. It rules all. Permissions for the `system` entity are "inherited" by all others.
+- Permissions are always additive. If one can explictly `Inspect` and organization and `Write` to one of its project groups, one inherited the `Read` and `Write` to all of the project group's projects.
+- Playlists are just lists. That's it. Especially, parents are not _parents_ of any artifacts. No permissions trickle down from playlists to artifacts.
+
 ## `EntityPermissionInfo`
 
 Complete descriptions of who has which permissions for an entity with specific `Id` and how they got 'em. 
@@ -37,7 +70,6 @@ Is important when propagating changes from parents to all of their descendants.
 - `ProjectArtifactRemoved`
 - `PlaylistGlobalPermissionsChanged`
 - `PlaylistMovedToOrganization`
-
 
 **Account changes**
 - `AccountPermissionSet`

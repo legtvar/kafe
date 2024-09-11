@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.Data.Common;
 using System.Linq;
 using System.Threading.Tasks;
+using JasperFx.CodeGeneration.Frames;
 using Kafe.Data.Aggregates;
 using Kafe.Data.Documents;
 using Kafe.Data.Events;
@@ -74,14 +75,14 @@ public class EntityPermissionEventProjection : EventProjection
         perms = await AddSystem(ops, perms);
         return perms;
     }
-    
+
     public async Task<EntityPermissionInfo> Create(AccountCreated e, IDocumentOperations ops)
     {
         var perms = EntityPermissionInfo.Create(e.AccountId);
         perms = await AddSystem(ops, perms);
         return perms;
     }
-    
+
     public async Task<EntityPermissionInfo> Create(RoleCreated e, IDocumentOperations ops)
     {
         var perms = EntityPermissionInfo.Create(e.RoleId);
@@ -102,7 +103,7 @@ public class EntityPermissionEventProjection : EventProjection
                 EntityId = Hrib.SystemValue
             };
         }
-    
+
         var entityPerms = await ops.KafeLoadAsync<EntityPermissionInfo>(e.EntityId);
         if (entityPerms.HasErrors)
         {
@@ -111,7 +112,7 @@ public class EntityPermissionEventProjection : EventProjection
                 entityPerms.AsException());
         }
 
-        entityPerms = AddAccountPermission(
+        entityPerms = SetAccountPermission(
             perms: entityPerms.Value,
             accountId: e.AccountId,
             // NB: Explicit permissions have source Id equal to the entity Id.
@@ -122,10 +123,9 @@ public class EntityPermissionEventProjection : EventProjection
         ops.Store(entityPerms.Value);
 
         var inheritedPermission = InheritPermission(e.Permission);
-        if (inheritedPermission != Permission.None)
-        {
-            await SpreadAccountPermission(ops, e.AccountId, e.EntityId, inheritedPermission, metadata.Timestamp);
-        }
+        // NB: Since we don't know if we're adding or removing permissions we have to try to update all of the entity's
+        //     descendants.
+        await SpreadAccountPermission(ops, e.AccountId, e.EntityId, inheritedPermission, metadata.Timestamp);
     }
 
     private static async Task<EntityPermissionInfo> AddSystem(
@@ -198,6 +198,16 @@ public class EntityPermissionEventProjection : EventProjection
             | (parentPermission & Permission.Inheritable);
     }
 
+    private static EntityPermissionEntry RecalculateEffectivePermission(EntityPermissionEntry entry)
+    {
+        return entry with
+        {
+            EffectivePermission = entry.Sources.Values.Aggregate(
+                Permission.None,
+                (e, s) => e | s.Permission)
+        };
+    }
+
     private static ImmutableDictionary<string, EntityPermissionEntry> MergeEntries(
         ImmutableDictionary<string, EntityPermissionEntry> one,
         ImmutableDictionary<string, EntityPermissionEntry> two
@@ -233,7 +243,10 @@ public class EntityPermissionEventProjection : EventProjection
         return result.ToImmutable();
     }
 
-    private static EntityPermissionInfo AddAccountPermission(
+    /// <summary>
+    /// Adds perms for a specific account to a specific entity.
+    /// </summary>
+    private static EntityPermissionInfo SetAccountPermission(
         EntityPermissionInfo perms,
         Hrib accountId,
         Hrib sourceId,
@@ -246,19 +259,16 @@ public class EntityPermissionEventProjection : EventProjection
             //     so that the event has any effect.
             accountEntry = accountEntry with
             {
-                Sources = accountEntry.Sources.SetItem(sourceId.ToString(), new EntityPermissionSource(
-                    Permission: permission,
-                    GrantedAt: grantedAt
-                ))
+                Sources = permission == Permission.None
+                    ? accountEntry.Sources.Remove(sourceId.ToString())
+                    : accountEntry.Sources.SetItem(sourceId.ToString(), new EntityPermissionSource(
+                        Permission: permission,
+                        GrantedAt: grantedAt
+                    ))
             };
-            accountEntry = accountEntry with
-            {
-                EffectivePermission = accountEntry.Sources.Values.Aggregate(
-                    Permission.None,
-                    (e, s) => e | s.Permission)
-            };
+            accountEntry = RecalculateEffectivePermission(accountEntry);
         }
-        else
+        else if (permission != Permission.None)
         {
             accountEntry = new EntityPermissionEntry(
                 EffectivePermission: permission,
@@ -272,15 +282,23 @@ public class EntityPermissionEventProjection : EventProjection
             );
         }
 
+        if (accountEntry is null)
+        {
+            return perms;
+        }
+
         perms = perms with
         {
-            Entries = perms.Entries.SetItem(accountId.ToString(), accountEntry)
+            Entries = accountEntry.EffectivePermission == Permission.None
+                ? perms.Entries.Remove(accountId.ToString())
+                : perms.Entries.SetItem(accountId.ToString(), accountEntry)
         };
         return perms;
     }
 
     /// <summary>
-    /// Spreads an account permission to all entities that have <paramref name="sourceId"/> among its grantors.
+    /// Spreads (add, removes or overwries) an account permission to all entities
+    /// that have <paramref name="sourceId"/> among its grantors.
     /// </summary>
     private static async Task SpreadAccountPermission(
         IDocumentOperations ops,
@@ -295,7 +313,7 @@ public class EntityPermissionEventProjection : EventProjection
 
         await foreach (var affected in affectedEntities)
         {
-            var changed = AddAccountPermission(affected, accountId, sourceId, permission, grantedAt);
+            var changed = SetAccountPermission(affected, accountId, sourceId, permission, grantedAt);
             ops.Store(changed);
         }
     }

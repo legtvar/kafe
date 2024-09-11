@@ -20,8 +20,3 @@ public record RolePermissionSet(
     [Hrib] string EntityId,
     Permission Permission
 );
-
-public record RolePermissionUnset(
-    [Hrib] string RoleId,
-    [Hrib] string EntityId
-);

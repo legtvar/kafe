@@ -105,9 +105,10 @@ public class RoleService
         foreach (var removedPermission in removedPermissions)
         {
             hasChanged = true;
-            db.Events.Append(@old.Id, new RolePermissionUnset(
+            db.Events.Append(@old.Id, new RolePermissionSet(
                 RoleId: @old.Id,
-                EntityId: removedPermission
+                EntityId: removedPermission,
+                Permission: Permission.None
             ));
         }
 

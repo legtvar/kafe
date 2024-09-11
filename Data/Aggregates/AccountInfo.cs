@@ -144,20 +144,9 @@ public class AccountInfoProjection : SingleStreamProjection<AccountInfo>
 
         return a with
         {
-            Permissions = a.Permissions.SetItem(e.EntityId, e.Permission)
-        };
-    }
-
-    public AccountInfo Apply(AccountPermissionUnset e, AccountInfo a)
-    {
-        if (a.Permissions is null)
-        {
-            a = a with { Permissions = ImmutableDictionary<string, Permission>.Empty };
-        }
-
-        return a with
-        {
-            Permissions = a.Permissions.Remove(e.EntityId)
+            Permissions = e.Permission == Permission.None
+                ? a.Permissions.Remove(e.EntityId)
+                : a.Permissions.SetItem(e.EntityId, e.Permission)
         };
     }
 

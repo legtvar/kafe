@@ -174,9 +174,10 @@ public class AccountService
         foreach (var removedPermission in removedPermissions)
         {
             hasChanged = true;
-            db.Events.KafeAppend(old.Id, new AccountPermissionUnset(
+            db.Events.KafeAppend(old.Id, new AccountPermissionSet(
                 AccountId: old.Id,
-                EntityId: removedPermission
+                EntityId: removedPermission,
+                Permission: Permission.None
             ));
         }
 

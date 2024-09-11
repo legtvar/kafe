@@ -21,17 +21,12 @@ public record AccountPermissionSet(
     Permission Permission
 );
 
-public record AccountPermissionUnset(
-    [Hrib] string AccountId,
-    [Hrib] string EntityId
-);
-
 public record AccountRoleSet(
     [Hrib] string AccountId,
     [Hrib] string RoleId
 );
 
 public record AccountRoleUnset(
-    [Hrib] string AccountId,
-    [Hrib] string RoleId
-);
+        [Hrib] string AccountId,
+        [Hrib] string RoleId
+    );

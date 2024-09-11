@@ -69,9 +69,12 @@ Each subset of events has specific effects:
 - `AccountCreated`
 - `RoleCreated`
 
+When any of the events above is recorded, a new `EntityPermissionInfo` is created.
+Those accounts with inheritable permission to any ancestor entity (or `system`) are given those inheritable permissions to this entity as well.
 
 
-**Entity change events**
+### Entity change events
+
 - `ProjectGroupGlobalPermissionsChanged`
 - `ProjectGroupMovedToOrganization`
 - `ProjectGlobalPermissionsChanged`
@@ -81,12 +84,17 @@ Each subset of events has specific effects:
 - `PlaylistGlobalPermissionsChanged`
 - `PlaylistMovedToOrganization`
 
-**Account changes**
-- `AccountPermissionSet`
-- `AccountPermissionUnset`
+### Explicit `Account` or `Role` permissions
+
+```csharp
+AccountPermissionSet    (AccountId, EntityId, Permission);
+RolePermissionSet       (RoleId,    EntityId, Permission);
+```
+
+When any of the events above is recorded, a new explicit `Permission` is assigned to `EntityPermissionInfo` for `EntityId` for the specified `AccountId` or `RoleId`.
+If `Permission` (or any of its flags) is inheritable it is _spread_ (using the list of _grantors_) to all descendant entities of `EntityId`. 
+
+### Role 
+
 - `AccountRoleSet`
 - `AccountRoleUnset`
-
-**Role changes**
-- `RolePermissionSet`
-- `RolePermissionUnset`

@@ -82,20 +82,9 @@ public class RoleInfoProjection : SingleStreamProjection<RoleInfo>
 
         return r with
         {
-            Permissions = r.Permissions.SetItem(e.EntityId, e.Permission)
-        };
-    }
-
-    public RoleInfo Apply(RolePermissionUnset e, RoleInfo r)
-    {
-        if (r.Permissions is null)
-        {
-            r = r with { Permissions = ImmutableDictionary<string, Permission>.Empty };
-        }
-
-        return r with
-        {
-            Permissions = r.Permissions.Remove(e.EntityId)
+            Permissions = e.Permission == Permission.None
+                ? r.Permissions.Remove(e.EntityId)
+                : r.Permissions.SetItem(e.EntityId, e.Permission)
         };
     }
 }

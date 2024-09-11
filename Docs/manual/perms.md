@@ -9,6 +9,8 @@ An `Account` or a `Role` can have any of the following permissions:
 - † `Write` - You can modify the entity and any of its descendants.
 - † `Review` - You can send a review to a project owner. (Only makes sense on projects.)
 - † `Administer` - You can edit the entity's global and explicit permissions.
+- † `Inheritable` = `Inspect | Write | Review | Administer`
+- `All` - All of the above.
 
 Permissions with the dagger symbol (†) are inheritable -- have effects on the entity's descendants -- the others concern only the entity itself.
 
@@ -32,6 +34,7 @@ system
 - The `system` entity is special. It rules all. Permissions for the `system` entity are "inherited" by all others.
 - Permissions are always additive. If one can explictly `Inspect` and organization and `Write` to one of its project groups, one inherited the `Read` and `Write` to all of the project group's projects.
 - Playlists are just lists. That's it. Especially, parents are not _parents_ of any artifacts. No permissions trickle down from playlists to artifacts.
+- There is no _administrator_ role in KAFE. Administrators are accounts with an explicit `All` permission on the `system` entity.
 
 ## `EntityPermissionInfo`
 
@@ -50,6 +53,10 @@ Is important when propagating changes from parents to all of their descendants.
 
 
 ## `EntityPermissionEventProjection`
+
+The core of the KAFE's permission system.
+Creates and changes `EntityPermissionInfo` documents.
+Each subset of events has specific effects:
 
 **Entity creation events**
 - `OrganizationCreated`

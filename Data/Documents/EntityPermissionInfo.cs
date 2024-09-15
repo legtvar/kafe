@@ -30,19 +30,22 @@ public record EntityPermissionEntry(
 /// 
 /// <param name="ParentIds">Ids of all direct parent entities whose permission affect this entity.</param>
 /// 
-/// <param name="Entries">The list of accounts with permissions to this entity along with source metadata.</param>
+/// <param name="AccountEntries"> Accounts with permissions to this entity along with source metadata.</param>
+/// <param name="RoleEntries"> Roles with permissions to this entity along with source metadata.</param>
 public record EntityPermissionInfo(
     [Hrib] string Id,
     ImmutableHashSet<string> GrantorIds,
     ImmutableHashSet<string> ParentIds,
-    ImmutableDictionary<string, EntityPermissionEntry> Entries
+    ImmutableDictionary<string, EntityPermissionEntry> RoleEntries,
+    ImmutableDictionary<string, EntityPermissionEntry> AccountEntries
 ) : IEntity
 {
     public static readonly EntityPermissionInfo Invalid = new(
         Id: Hrib.InvalidValue,
         GrantorIds: [],
         ParentIds: [],
-        Entries: ImmutableDictionary<string, EntityPermissionEntry>.Empty
+        RoleEntries: ImmutableDictionary<string, EntityPermissionEntry>.Empty,
+        AccountEntries: ImmutableDictionary<string, EntityPermissionEntry>.Empty
     );
 
     public EntityPermissionInfo() : this(Invalid)

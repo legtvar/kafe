@@ -112,20 +112,52 @@ public class EntityPermissionEventProjection : EventProjection
                 entityPerms.AsException());
         }
 
-        entityPerms = SetAccountPermission(
-            perms: entityPerms.Value,
-            accountId: e.AccountId,
+        entityPerms = entityPerms.Value with
+        {
+            AccountEntries = SetPermission(
+            entries: entityPerms.Value.AccountEntries,
+            accountOrRoleId: e.AccountId,
             // NB: Explicit permissions have source Id equal to the entity Id.
             //     This makes them easy to find and allows for consistent inheriting of info about perms sources.
             sourceId: e.EntityId,
             permission: e.Permission,
-            grantedAt: metadata.Timestamp);
+            grantedAt: metadata.Timestamp)
+        };
         ops.Store(entityPerms.Value);
 
         var inheritedPermission = InheritPermission(e.Permission);
         // NB: Since we don't know if we're adding or removing permissions we have to try to update all of the entity's
         //     descendants.
-        await SpreadAccountPermission(ops, e.AccountId, e.EntityId, inheritedPermission, metadata.Timestamp);
+        await SpreadAccountPermission(ops, [e.AccountId], e.EntityId, inheritedPermission, metadata.Timestamp);
+    }
+
+    public async Task Project(RolePermissionSet e, IEvent metadata, IDocumentOperations ops)
+    {
+        var entityPerms = await ops.KafeLoadAsync<EntityPermissionInfo>(e.EntityId);
+        if (entityPerms.HasErrors)
+        {
+            throw new InvalidOperationException($"No permission info exists for '{e.EntityId}'. "
+                + "Either the events are out of order or the permission info projection is broken.",
+                entityPerms.AsException());
+        }
+
+        entityPerms = entityPerms.Value with
+        {
+            RoleEntries = SetPermission(
+                entries: entityPerms.Value.RoleEntries,
+                accountOrRoleId: e.RoleId,
+                // NB: Explicit permissions have source Id equal to the entity Id.
+                //     This makes them easy to find and allows for consistent inheriting of info about perms sources.
+                sourceId: e.EntityId,
+                permission: e.Permission,
+                grantedAt: metadata.Timestamp
+            )
+        };
+        ops.Store(entityPerms);
+
+        var inheritedPermission = InheritPermission(e.Permission);
+        await SpreadRolePermission(ops, e.RoleId, e.EntityId, inheritedPermission, metadata.Timestamp);
+
     }
 
     private static async Task<EntityPermissionInfo> AddSystem(
@@ -143,7 +175,7 @@ public class EntityPermissionEventProjection : EventProjection
         return perms with
         {
             GrantorIds = perms.GrantorIds.Add(Hrib.SystemValue),
-            Entries = MergeEntries(perms.Entries, InheritEntries(systemPerms.Value.Entries))
+            AccountEntries = MergeEntries(perms.AccountEntries, InheritEntries(systemPerms.Value.AccountEntries))
         };
     }
 
@@ -165,7 +197,7 @@ public class EntityPermissionEventProjection : EventProjection
 
         return perms with
         {
-            Entries = MergeEntries(perms.Entries, InheritEntries(ancestorPerms.Value.Entries)),
+            AccountEntries = MergeEntries(perms.AccountEntries, InheritEntries(ancestorPerms.Value.AccountEntries)),
             GrantorIds = perms.GrantorIds.Union([parentId.ToString(), .. ancestorPerms.Value.GrantorIds]),
             ParentIds = perms.ParentIds.Add(parentId.ToString())
         };
@@ -244,16 +276,16 @@ public class EntityPermissionEventProjection : EventProjection
     }
 
     /// <summary>
-    /// Adds perms for a specific account to a specific entity.
+    /// Sets perms for a specific account/role id to a specific entity, in a dictionary of entries.
     /// </summary>
-    private static EntityPermissionInfo SetAccountPermission(
-        EntityPermissionInfo perms,
-        Hrib accountId,
+    private static ImmutableDictionary<string, EntityPermissionEntry> SetPermission(
+        ImmutableDictionary<string, EntityPermissionEntry> entries,
+        Hrib accountOrRoleId,
         Hrib sourceId,
         Permission permission,
         DateTimeOffset grantedAt)
     {
-        if (perms.Entries.TryGetValue(accountId.ToString(), out var accountEntry))
+        if (entries.TryGetValue(accountOrRoleId.ToString(), out var accountEntry))
         {
             // NB: The Sources and EffectivePermission need to be updated separately
             //     so that the event has any effect.
@@ -284,36 +316,99 @@ public class EntityPermissionEventProjection : EventProjection
 
         if (accountEntry is null)
         {
-            return perms;
+            return entries;
         }
 
-        perms = perms with
-        {
-            Entries = accountEntry.EffectivePermission == Permission.None
-                ? perms.Entries.Remove(accountId.ToString())
-                : perms.Entries.SetItem(accountId.ToString(), accountEntry)
-        };
-        return perms;
+        return accountEntry.EffectivePermission == Permission.None
+                ? entries.Remove(accountOrRoleId.ToString())
+                : entries.SetItem(accountOrRoleId.ToString(), accountEntry);
     }
 
     /// <summary>
-    /// Spreads (add, removes or overwries) an account permission to all entities
+    /// Spreads (add, removes or overwries) a set of account permissions to all entities
     /// that have <paramref name="sourceId"/> among its grantors.
     /// </summary>
     private static async Task SpreadAccountPermission(
         IDocumentOperations ops,
-        Hrib accountId,
+        ImmutableHashSet<Hrib> accountIds,
         Hrib sourceId,
         Permission permission,
-        DateTimeOffset grantedAt)
+        DateTimeOffset grantedAt
+    )
     {
+        if (accountIds.IsEmpty)
+        {
+            return;
+        }
+
         var affectedEntities = ops.Query<EntityPermissionInfo>()
             .Where(p => p.GrantorIds.Contains(sourceId.ToString()))
             .ToAsyncEnumerable();
 
         await foreach (var affected in affectedEntities)
         {
-            var changed = SetAccountPermission(affected, accountId, sourceId, permission, grantedAt);
+            var changed = affected;
+            foreach (var accountId in accountIds)
+            {
+                changed = changed with
+                {
+                    AccountEntries = SetPermission(
+                        changed.AccountEntries,
+                        accountId,
+                        sourceId,
+                        permission,
+                        grantedAt)
+                };
+            }
+            ops.Store(changed);
+        }
+    }
+
+    private static async Task SpreadRolePermission(
+        IDocumentOperations ops,
+        Hrib roleId,
+        Hrib sourceId,
+        Permission permission,
+        DateTimeOffset grantedAt
+    )
+    {
+        var roleInfo = await ops.KafeLoadAsync<RoleMembersInfo>(roleId);
+        if (roleInfo.HasErrors)
+        {
+            throw new InvalidOperationException($"No role members info exists for '{roleId}'. "
+                + "Either the events are out of order or the permission info projection is broken.",
+                roleInfo.AsException());
+        }
+
+        var affectedEntities = ops.Query<EntityPermissionInfo>()
+            .Where(p => p.GrantorIds.Contains(sourceId.ToString()))
+            .ToAsyncEnumerable();
+
+        await foreach (var affected in affectedEntities)
+        {
+            var changed = affected with
+            {
+                RoleEntries = SetPermission(
+                    affected.RoleEntries,
+                    roleId,
+                    sourceId,
+                    permission,
+                    grantedAt)
+            };
+
+            foreach (var accountId in roleInfo.Value.MemberIds)
+            {
+                changed = changed with
+                {
+                    AccountEntries = SetPermission(
+                        changed.AccountEntries,
+                        accountId,
+                        roleId,
+                        permission,
+                        grantedAt
+                    )
+                };
+            }
             ops.Store(changed);
         }
     }

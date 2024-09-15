@@ -87,6 +87,9 @@ public class EntityPermissionEventProjection : EventProjection
     {
         var perms = EntityPermissionInfo.Create(e.RoleId);
         perms = await AddSystem(ops, perms);
+        
+        var roleMembers = RoleMembersInfo.Create(e.RoleId);
+        ops.Store(roleMembers);
         return perms;
     }
 
@@ -161,6 +164,36 @@ public class EntityPermissionEventProjection : EventProjection
         return SetGlobalPermission(ops, e.PlaylistId, e.GlobalPermissions);
     }
 
+    public async Task Project(AccountRoleSet e, IEvent metadata, IDocumentOperations ops)
+    {
+        var affectedEntities = ops.Query<EntityPermissionInfo>()
+            .Where(p => p.RoleEntries.ContainsKey(e.RoleId))
+            .ToAsyncEnumerable();
+        await foreach(var affected in affectedEntities)
+        {
+            if (!affected.RoleEntries.TryGetValue(e.RoleId, out var roleEntry))
+            {
+                continue;
+            }
+
+            var changed = affected;
+            foreach(var source in roleEntry.Sources)
+            {
+                changed = changed with
+                {
+                    AccountEntries = SetPermission(
+                        affected.AccountEntries,
+                        e.AccountId,
+                        source.Key,
+                        source.Value.Permission,
+                        metadata.Timestamp
+                    )
+                };
+            }
+            ops.Store(changed);
+        }
+    }
+
     private static async Task SetGlobalPermission(IDocumentOperations ops, Hrib entityId, Permission globalPermission)
     {
         var entityPerms = await RequireEntityPermissionInfo(ops, entityId);
@@ -183,6 +216,20 @@ public class EntityPermissionEventProjection : EventProjection
                 entityPerms.AsException());
         }
         return entityPerms.Value;
+    }
+    
+    private static async Task<RoleMembersInfo> RequireRoleMembersInfo(
+        IDocumentOperations ops,
+        Hrib roleId)
+    {
+        var roleInfo = await ops.KafeLoadAsync<RoleMembersInfo>(roleId);
+        if (roleInfo.HasErrors)
+        {
+            throw new InvalidOperationException($"No role members info exists for '{roleId}'. "
+                + "Either the events are out of order or the permission info projection is broken.",
+                roleInfo.AsException());
+        }
+        return roleInfo.Value;
     }
 
     private static async Task<EntityPermissionInfo> AddSystem(
@@ -397,13 +444,7 @@ public class EntityPermissionEventProjection : EventProjection
         DateTimeOffset grantedAt
     )
     {
-        var roleInfo = await ops.KafeLoadAsync<RoleMembersInfo>(roleId);
-        if (roleInfo.HasErrors)
-        {
-            throw new InvalidOperationException($"No role members info exists for '{roleId}'. "
-                + "Either the events are out of order or the permission info projection is broken.",
-                roleInfo.AsException());
-        }
+        var roleInfo = await RequireRoleMembersInfo(ops, roleId);
 
         var affectedEntities = ops.Query<EntityPermissionInfo>()
             .Where(p => p.GrantorIds.Contains(sourceId.ToString()))
@@ -421,7 +462,7 @@ public class EntityPermissionEventProjection : EventProjection
                     grantedAt)
             };
 
-            foreach (var accountId in roleInfo.Value.MemberIds)
+            foreach (var accountId in roleInfo.MemberIds)
             {
                 changed = changed with
                 {

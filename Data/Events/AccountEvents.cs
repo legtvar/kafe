@@ -27,6 +27,6 @@ public record AccountRoleSet(
 );
 
 public record AccountRoleUnset(
-        [Hrib] string AccountId,
-        [Hrib] string RoleId
-    );
+    [Hrib] string AccountId,
+    [Hrib] string RoleId
+);

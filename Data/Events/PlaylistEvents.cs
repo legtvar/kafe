@@ -19,8 +19,7 @@ public record PlaylistCreated(
 public record PlaylistInfoChanged(
     [Hrib] string PlaylistId,
     [LocalizedString] ImmutableDictionary<string, string>? Name = null,
-    [LocalizedString] ImmutableDictionary<string, string>? Description = null,
-    Permission? GlobalPermissions = null
+    [LocalizedString] ImmutableDictionary<string, string>? Description = null
 );
 
 public record PlaylistEntryAppended(

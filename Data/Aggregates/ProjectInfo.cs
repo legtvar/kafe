@@ -99,7 +99,6 @@ public class ProjectInfoProjection : SingleStreamProjection<ProjectInfo>
         {
             Name = e.Name ?? p.Name,
             Description = e.Description ?? p.Description,
-            GlobalPermissions = e.GlobalPermissions ?? p.GlobalPermissions,
             ReleasedOn = e.ReleasedOn ?? p.ReleasedOn,
             Genre = e.Genre ?? p.Genre
         };
@@ -124,9 +123,7 @@ public class ProjectInfoProjection : SingleStreamProjection<ProjectInfo>
             author = new ProjectAuthorInfo(
                 Id: e.AuthorId,
                 Kind: e.Kind,
-                Roles: e.Roles.HasValue && !e.Roles.Value.IsDefault
-                    ? e.Roles.Value
-                    : ImmutableArray.Create<string>());
+                Roles: e.Roles.HasValue && !e.Roles.Value.IsDefault ? e.Roles.Value : []);
         }
 
         return p with

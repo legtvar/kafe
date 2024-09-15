@@ -70,7 +70,6 @@ public class PlaylistInfoProjection : SingleStreamProjection<PlaylistInfo>
         {
             Name = e.Name ?? p.Name,
             Description = e.Description ?? p.Name,
-            GlobalPermissions = e.GlobalPermissions ?? p.GlobalPermissions
         };
     }
 

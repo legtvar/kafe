@@ -67,7 +67,6 @@ public class ProjectGroupInfoProjection : SingleStreamProjection<ProjectGroupInf
             Name = e.Name ?? g.Name,
             Description = e.Description ?? g.Description,
             Deadline = e.Deadline ?? g.Deadline,
-            GlobalPermissions = e.GlobalPermissions ?? g.GlobalPermissions
         };
     }
 

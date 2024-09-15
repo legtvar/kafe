@@ -21,8 +21,8 @@ public record ProjectGroupInfoChanged(
     [Hrib] string ProjectGroupId,
     [LocalizedString] ImmutableDictionary<string, string>? Name = null,
     [LocalizedString] ImmutableDictionary<string, string>? Description = null,
-    DateTimeOffset? Deadline = null,
-    Permission? GlobalPermissions = null);
+    DateTimeOffset? Deadline = null
+);
 
 public record ProjectGroupOpened(
     [Hrib] string ProjectGroupId

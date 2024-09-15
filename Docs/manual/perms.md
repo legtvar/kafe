@@ -61,14 +61,14 @@ Each subset of events has specific effects:
 ### Entity creation events
 
 ```csharp
-OrganizationCreated (OrganizationId, ...)
-ProjectGroupCreated (ProjectGroupId, ...)
-ProjectCreated      (ProjectId, ...)
-PlaylistCreated     (PlaylistId, ...)
-AuthorCreated       (AuthorId, ...)
-ArtifactCreated     (ArtifactId, ...)
-AccountCreated      (AccountId, ...)
-RoleCreated         (RoleId, ...)
+OrganizationCreated (OrganizationId,    ...)
+ProjectGroupCreated (ProjectGroupId,    ...)
+ProjectCreated      (ProjectId,         ...)
+PlaylistCreated     (PlaylistId,        ...)
+AuthorCreated       (AuthorId,          ...)
+ArtifactCreated     (ArtifactId,        ...)
+AccountCreated      (AccountId,         ...)
+RoleCreated         (RoleId,            ...)
 ```
 
 When any of the events above is recorded, a new `EntityPermissionInfo` is created.
@@ -90,9 +90,9 @@ With role permission changes, `EntityPermissionInfo` gains an entry for the role
 ### Global permission changes
 
 ```csharp
-ProjectGroupGlobalPermissionsChanged    (ProjectGroupId, GlobalPermissions)
-ProjectGlobalPermissionsChanged         (ProjectId, GlobalPermissions)
-PlaylistGlobalPermissionsChanged        (PlaylistId, GlobalPermissions)
+ProjectGroupGlobalPermissionsChanged    (ProjectGroupId,    GlobalPermissions)
+ProjectGlobalPermissionsChanged         (ProjectId,         GlobalPermissions)
+PlaylistGlobalPermissionsChanged        (PlaylistId,        GlobalPermissions)
 ```
 
 ### Moves

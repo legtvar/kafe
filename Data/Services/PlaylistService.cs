@@ -96,13 +96,21 @@ public class PlaylistService
             Name: @new.Name);
         db.Events.KafeStartStream<PlaylistInfo>(id, created);
 
-        if (@new.GlobalPermissions != Permission.None || @new.Description is not null)
+        if (@new.Description is not null)
         {
             var changed = new PlaylistInfoChanged(
                 PlaylistId: id.ToString(),
-                Description: @new.Description,
-                GlobalPermissions: @new.GlobalPermissions);
+                Description: @new.Description);
             db.Events.Append(id.ToString(), changed);
+        }
+        
+        if (@new.GlobalPermissions != Permission.None)
+        {
+            var globalPermissionChanged = new PlaylistGlobalPermissionsChanged(
+                PlaylistId: id.ToString(),
+                GlobalPermissions: @new.GlobalPermissions
+            );
+            db.Events.Append(id.ToString(), globalPermissionChanged);
         }
 
         if (!@new.EntryIds.IsDefaultOrEmpty)
@@ -135,13 +143,21 @@ public class PlaylistService
         var infoChanged = new PlaylistInfoChanged(
             PlaylistId: @new.Id,
             Name: @new.Name,
-            Description: @new.Description,
-            GlobalPermissions: @new.GlobalPermissions);
+            Description: @new.Description);
         if (infoChanged.Name is not null
-            || infoChanged.Description is not null
-            || infoChanged.GlobalPermissions is not null)
+            || infoChanged.Description is not null)
         {
             eventStream.AppendOne(infoChanged);
+        }
+        
+        if (@new.GlobalPermissions != Permission.None
+            && @new.GlobalPermissions != old.GlobalPermissions)
+        {
+            var globalPermissionChanged = new PlaylistGlobalPermissionsChanged(
+                PlaylistId: @new.Id,
+                GlobalPermissions: @new.GlobalPermissions
+            );
+            eventStream.AppendOne(globalPermissionChanged);
         }
 
         if (@new.EntryIds.SequenceEqual(old.EntryIds))

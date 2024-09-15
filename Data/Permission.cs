@@ -73,6 +73,12 @@ public enum Permission : int
     Inheritable = Inspect | Write | Review | Administer,
 
     /// <summary>
+    /// All permissions that can be published -- set as GlobalPermissions.
+    /// </summary>
+    // NB: This value is actually used to implement the inheritability. Tread carefully.
+    Publishable = Read | Inspect | Append,
+
+    /// <summary>
     /// Future-proof omnipotency over an entity.
     /// </summary>
     All = int.MaxValue

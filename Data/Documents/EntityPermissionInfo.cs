@@ -34,6 +34,7 @@ public record EntityPermissionEntry(
 /// <param name="RoleEntries"> Roles with permissions to this entity along with source metadata.</param>
 public record EntityPermissionInfo(
     [Hrib] string Id,
+    Permission GlobalPermission,
     ImmutableHashSet<string> GrantorIds,
     ImmutableHashSet<string> ParentIds,
     ImmutableDictionary<string, EntityPermissionEntry> RoleEntries,
@@ -42,6 +43,7 @@ public record EntityPermissionInfo(
 {
     public static readonly EntityPermissionInfo Invalid = new(
         Id: Hrib.InvalidValue,
+        GlobalPermission: Permission.None,
         GrantorIds: [],
         ParentIds: [],
         RoleEntries: ImmutableDictionary<string, EntityPermissionEntry>.Empty,

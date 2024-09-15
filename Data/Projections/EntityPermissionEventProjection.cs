@@ -104,18 +104,11 @@ public class EntityPermissionEventProjection : EventProjection
             };
         }
 
-        var entityPerms = await ops.KafeLoadAsync<EntityPermissionInfo>(e.EntityId);
-        if (entityPerms.HasErrors)
-        {
-            throw new InvalidOperationException($"No permission info exists for '{e.EntityId}'. "
-                + "Either the events are out of order or the permission info projection is broken.",
-                entityPerms.AsException());
-        }
-
-        entityPerms = entityPerms.Value with
+        var entityPerms = await RequireEntityPermissionInfo(ops, e.EntityId);
+        entityPerms = entityPerms with
         {
             AccountEntries = SetPermission(
-            entries: entityPerms.Value.AccountEntries,
+            entries: entityPerms.AccountEntries,
             accountOrRoleId: e.AccountId,
             // NB: Explicit permissions have source Id equal to the entity Id.
             //     This makes them easy to find and allows for consistent inheriting of info about perms sources.
@@ -123,7 +116,7 @@ public class EntityPermissionEventProjection : EventProjection
             permission: e.Permission,
             grantedAt: metadata.Timestamp)
         };
-        ops.Store(entityPerms.Value);
+        ops.Store(entityPerms);
 
         var inheritedPermission = InheritPermission(e.Permission);
         // NB: Since we don't know if we're adding or removing permissions we have to try to update all of the entity's
@@ -133,18 +126,12 @@ public class EntityPermissionEventProjection : EventProjection
 
     public async Task Project(RolePermissionSet e, IEvent metadata, IDocumentOperations ops)
     {
-        var entityPerms = await ops.KafeLoadAsync<EntityPermissionInfo>(e.EntityId);
-        if (entityPerms.HasErrors)
-        {
-            throw new InvalidOperationException($"No permission info exists for '{e.EntityId}'. "
-                + "Either the events are out of order or the permission info projection is broken.",
-                entityPerms.AsException());
-        }
+        var entityPerms = await RequireEntityPermissionInfo(ops, e.EntityId);
 
-        entityPerms = entityPerms.Value with
+        entityPerms = entityPerms with
         {
             RoleEntries = SetPermission(
-                entries: entityPerms.Value.RoleEntries,
+                entries: entityPerms.RoleEntries,
                 accountOrRoleId: e.RoleId,
                 // NB: Explicit permissions have source Id equal to the entity Id.
                 //     This makes them easy to find and allows for consistent inheriting of info about perms sources.
@@ -157,7 +144,45 @@ public class EntityPermissionEventProjection : EventProjection
 
         var inheritedPermission = InheritPermission(e.Permission);
         await SpreadRolePermission(ops, e.RoleId, e.EntityId, inheritedPermission, metadata.Timestamp);
+    }
 
+    public Task Project(ProjectGroupGlobalPermissionsChanged e, IDocumentOperations ops)
+    {
+        return SetGlobalPermission(ops, e.ProjectGroupId, e.GlobalPermissions);
+    }
+
+    public Task Project(ProjectGlobalPermissionsChanged e, IDocumentOperations ops)
+    {
+        return SetGlobalPermission(ops, e.ProjectId, e.GlobalPermissions);
+    }
+
+    public Task Project(PlaylistGlobalPermissionsChanged e, IDocumentOperations ops)
+    {
+        return SetGlobalPermission(ops, e.PlaylistId, e.GlobalPermissions);
+    }
+
+    private static async Task SetGlobalPermission(IDocumentOperations ops, Hrib entityId, Permission globalPermission)
+    {
+        var entityPerms = await RequireEntityPermissionInfo(ops, entityId);
+        entityPerms = entityPerms with
+        {
+            GlobalPermission = globalPermission & Permission.Publishable
+        };
+        ops.Store(entityPerms);
+    }
+
+    private static async Task<EntityPermissionInfo> RequireEntityPermissionInfo(
+        IDocumentOperations ops,
+        Hrib entityId)
+    {
+        var entityPerms = await ops.KafeLoadAsync<EntityPermissionInfo>(entityId);
+        if (entityPerms.HasErrors)
+        {
+            throw new InvalidOperationException($"No permission info exists for '{entityId}'. "
+                + "Either the events are out of order or the permission info projection is broken.",
+                entityPerms.AsException());
+        }
+        return entityPerms.Value;
     }
 
     private static async Task<EntityPermissionInfo> AddSystem(

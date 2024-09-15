@@ -95,6 +95,11 @@ ProjectGlobalPermissionsChanged         (ProjectId,         GlobalPermissions)
 PlaylistGlobalPermissionsChanged        (PlaylistId,        GlobalPermissions)
 ```
 
+Project groups, projects, and playlist can have _global permissions_.
+These permissions apply to all users with accounts **and also anonymous users**.
+They are limited to `Permission.Publishable` which includes `Read`, `Inspect`, and `Append`.
+These perms are not recorded as entries but are instead saved into a special `GlobalPermission` property that **must** be added to any explicit or inherited account or role permissions.
+
 ### Moves
 
 - `ProjectGroupMovedToOrganization`

@@ -60,29 +60,20 @@ Each subset of events has specific effects:
 
 ### Entity creation events
 
-- `OrganizationCreated`
-- `ProjectGroupCreated`
-- `ProjectCreated`
-- `PlaylistCreated`
-- `AuthorCreated`
-- `ArtifactCreated`
-- `AccountCreated`
-- `RoleCreated`
+```csharp
+OrganizationCreated (OrganizationId, ...)
+ProjectGroupCreated (ProjectGroupId, ...)
+ProjectCreated      (ProjectId, ...)
+PlaylistCreated     (PlaylistId, ...)
+AuthorCreated       (AuthorId, ...)
+ArtifactCreated     (ArtifactId, ...)
+AccountCreated      (AccountId, ...)
+RoleCreated         (RoleId, ...)
+```
 
 When any of the events above is recorded, a new `EntityPermissionInfo` is created.
 Those accounts with inheritable permission to any ancestor entity (or `system`) are given those inheritable permissions to this entity as well.
 
-
-### Entity change events
-
-- `ProjectGroupGlobalPermissionsChanged`
-- `ProjectGroupMovedToOrganization`
-- `ProjectGlobalPermissionsChanged`
-- (`ProjectMovedToProjectGroup`)
-- `ProjectArtifactAdded`
-- `ProjectArtifactRemoved`
-- `PlaylistGlobalPermissionsChanged`
-- `PlaylistMovedToOrganization`
 
 ### Explicit `Account` or `Role` permissions
 
@@ -93,8 +84,26 @@ RolePermissionSet       (RoleId,    EntityId, Permission);
 
 When any of the events above is recorded, a new explicit `Permission` is assigned to `EntityPermissionInfo` for `EntityId` for the specified `AccountId` or `RoleId`.
 If `Permission` (or any of its flags) is inheritable it is _spread_ (using the list of _grantors_) to all descendant entities of `EntityId`. 
+With role permission changes, `EntityPermissionInfo` gains an entry for the role and an entry for each member of that role.
 
-### Role 
+
+### Global permission changes
+
+```csharp
+ProjectGroupGlobalPermissionsChanged    (ProjectGroupId, GlobalPermissions)
+ProjectGlobalPermissionsChanged         (ProjectId, GlobalPermissions)
+PlaylistGlobalPermissionsChanged        (PlaylistId, GlobalPermissions)
+```
+
+### Moves
+
+- `ProjectGroupMovedToOrganization`
+- (`ProjectMovedToProjectGroup`)
+- `ProjectArtifactAdded`
+- `ProjectArtifactRemoved`
+- `PlaylistMovedToOrganization`
+
+### Role assignments
 
 - `AccountRoleSet`
 - `AccountRoleUnset`

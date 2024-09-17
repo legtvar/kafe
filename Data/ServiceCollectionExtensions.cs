@@ -78,7 +78,13 @@ public static class ServiceCollectionExtensions
             mo.Projections.Add<RoleInfoProjection>(ProjectionLifecycle.Inline);
             mo.Projections.Add<EntityPermissionEventProjection>(
                 ProjectionLifecycle.Async,
-                ao => ao.EnableDocumentTrackingByIdentity = true);
+                ao =>
+                {
+                    ao.EnableDocumentTrackingByIdentity = true;
+                    // NB: Since some of the projections query other perm infos, the events need to be processed
+                    //     one by one.
+                    ao.BatchSize = 1;
+                });
             mo.Events.Upcast<AccountCapabilityAddedUpcaster>();
             mo.Events.Upcast<AccountCapabilityRemovedUpcaster>();
             mo.Events.Upcast<PlaylistVideoAddedUpcaster>();

@@ -301,6 +301,11 @@ public class EntityPermissionEventProjection : EventProjection
                 p => new EntityPermissionEntry(
                     EffectivePermission: InheritPermission(p.Value.EffectivePermission),
                     Sources: p.Value.Sources
+                        .Where(s => (s.Value.Permission & Permission.Inheritable) != 0)
+                        .ToImmutableDictionary(s => s.Key, s => s.Value with
+                        {
+                            Permission = InheritPermission(s.Value.Permission)
+                        })
                 )
             );
     }

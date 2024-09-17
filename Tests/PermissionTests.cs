@@ -8,6 +8,7 @@ using Kafe.Data.Aggregates;
 using Kafe.Data.Documents;
 using Kafe.Data.Events;
 using Kafe.Data.Projections;
+using Marten;
 using Marten.Events;
 using Xunit;
 
@@ -44,6 +45,32 @@ public class PermissionTests(ApiFixture fixture) : ApiContext(fixture)
         Assert.Equal(Permission.All, systemPerms
             .AccountEntries[TestSeedData.AdminHrib]
             .EffectivePermission);
+    }
+
+    [Fact]
+    public async Task EntityPermissionInfo_All_ShouldHaveAdmin()
+    {
+        await Store.WaitForNonStaleProjectionDataAsync(TimeSpan.FromHours(1));
+        await using var query = Store.QuerySession();
+        var allPerms = query.Query<EntityPermissionInfo>().ToAsyncEnumerable();
+        await foreach(var perms in allPerms)
+        {
+            Assert.True(perms.AccountEntries.ContainsKey(TestSeedData.AdminHrib));
+            Assert.True(perms
+                .AccountEntries[TestSeedData.AdminHrib]
+                .Sources
+                .ContainsKey(Hrib.System.ToString()));
+            var expected = perms.Id == Hrib.System
+                ? Permission.All
+                : Permission.Read | Permission.Inheritable;
+            Assert.Equal(expected, perms
+                .AccountEntries[TestSeedData.AdminHrib]
+                .Sources[Hrib.System.ToString()]
+                .Permission);
+            Assert.Equal(expected, perms
+                .AccountEntries[TestSeedData.AdminHrib]
+                .EffectivePermission & expected);
+        }
     }
 
     [Fact]

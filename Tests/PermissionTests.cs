@@ -19,12 +19,31 @@ public class PermissionTests(ApiFixture fixture) : ApiContext(fixture)
     [Fact]
     public async Task EntityPermissionInfo_System_ShouldExist()
     {
-        using var daemon = await Store.BuildProjectionDaemonAsync();
-        await daemon.RebuildProjectionAsync<EntityPermissionEventProjection>(CancellationToken.None);
+        await Store.WaitForNonStaleProjectionDataAsync(TimeSpan.FromHours(1));
         await using var query = Store.QuerySession();
         var systemPerms = await query.KafeLoadAsync<EntityPermissionInfo>(Hrib.System);
         Assert.False(systemPerms.HasErrors);
         Assert.NotNull(systemPerms.Value);
+    }
+
+    [Fact]
+    public async Task EntityPermissionInfo_System_ShouldHaveAdmin()
+    {
+        await Store.WaitForNonStaleProjectionDataAsync(TimeSpan.FromHours(1));
+        await using var query = Store.QuerySession();
+        var systemPerms = (await query.KafeLoadAsync<EntityPermissionInfo>(Hrib.System)).Unwrap();
+        Assert.True(systemPerms.AccountEntries.ContainsKey(TestSeedData.AdminHrib));
+        Assert.True(systemPerms
+            .AccountEntries[TestSeedData.AdminHrib]
+            .Sources
+            .ContainsKey(Hrib.System.ToString()));
+        Assert.Equal(Permission.All, systemPerms
+            .AccountEntries[TestSeedData.AdminHrib]
+            .Sources[Hrib.System.ToString()]
+            .Permission);
+        Assert.Equal(Permission.All, systemPerms
+            .AccountEntries[TestSeedData.AdminHrib]
+            .EffectivePermission);
     }
 
     [Fact]

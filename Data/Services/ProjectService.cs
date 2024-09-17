@@ -36,6 +36,7 @@ public partial class ProjectService
         LocalizedString? description,
         LocalizedString? genre,
         Hrib? ownerId,
+        Hrib? id = null,
         CancellationToken token = default)
     {
         var group = await db.LoadAsync<ProjectGroupInfo>(projectGroupId, token);
@@ -49,14 +50,16 @@ public partial class ProjectService
             throw new ArgumentException($"Project group '{projectGroupId}' is not open.");
         }
 
+        var projectId = (id ?? Hrib.Create()).ToString();
+
         var created = new ProjectCreated(
-            ProjectId: Hrib.Create().ToString(),
+            ProjectId: projectId,
             CreationMethod: CreationMethod.Api,
             ProjectGroupId: projectGroupId,
             Name: name);
 
         var infoChanged = new ProjectInfoChanged(
-            ProjectId: Hrib.Create().ToString(),
+            ProjectId: projectId,
             Name: name,
             Description: description,
             Genre: genre);

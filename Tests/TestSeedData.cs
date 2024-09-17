@@ -62,6 +62,13 @@ public class TestSeedData : IInitialData
         );
 
         var projectService = scope.ServiceProvider.GetRequiredService<ProjectService>();
-        await projectService.Create(TestGroupHrib, (LocalizedString)"TestProject", null, null, null, ct);
+        await projectService.Create(
+            TestGroupHrib,
+            (LocalizedString)"TestProject",
+            null,
+            null,
+            null,
+            TestProjectHrib,
+            ct);
     }
 }

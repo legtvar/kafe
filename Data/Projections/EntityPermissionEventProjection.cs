@@ -83,14 +83,14 @@ public class EntityPermissionEventProjection : EventProjection
         return perms;
     }
 
-    public async Task<EntityPermissionInfo> Create(RoleCreated e, IDocumentOperations ops)
+    public async Task Project(RoleCreated e, IDocumentOperations ops)
     {
         var perms = EntityPermissionInfo.Create(e.RoleId);
         perms = await AddSystem(ops, perms);
-        
+        ops.Store(perms);
+
         var roleMembers = RoleMembersInfo.Create(e.RoleId);
         ops.Store(roleMembers);
-        return perms;
     }
 
     public async Task Project(AccountPermissionSet e, IEvent metadata, IDocumentOperations ops)
@@ -130,6 +130,7 @@ public class EntityPermissionEventProjection : EventProjection
     public async Task Project(RolePermissionSet e, IEvent metadata, IDocumentOperations ops)
     {
         var entityPerms = await RequireEntityPermissionInfo(ops, e.EntityId);
+        var roleInfo = await RequireRoleMembersInfo(ops, e.RoleId);
 
         entityPerms = entityPerms with
         {
@@ -143,6 +144,19 @@ public class EntityPermissionEventProjection : EventProjection
                 grantedAt: metadata.Timestamp
             )
         };
+        foreach (var accountId in roleInfo.MemberIds)
+        {
+            entityPerms = entityPerms with
+            {
+                AccountEntries = SetPermission(
+                    entries: entityPerms.AccountEntries,
+                    accountOrRoleId: accountId,
+                    sourceId: e.RoleId,
+                    permission: e.Permission,
+                    grantedAt: metadata.Timestamp
+                )
+            };
+        }
         ops.Store(entityPerms);
 
         var inheritedPermission = InheritPermission(e.Permission);
@@ -166,10 +180,11 @@ public class EntityPermissionEventProjection : EventProjection
 
     public async Task Project(AccountRoleSet e, IEvent metadata, IDocumentOperations ops)
     {
-        var affectedEntities = ops.Query<EntityPermissionInfo>()
-            .Where(p => p.RoleEntries.ContainsKey(e.RoleId))
+        var query = ops.Query<EntityPermissionInfo>()
+            .Where(p => p.RoleEntries.ContainsKey(e.RoleId));
+        var affectedEntities = query
             .ToAsyncEnumerable();
-        await foreach(var affected in affectedEntities)
+        await foreach (var affected in affectedEntities)
         {
             if (!affected.RoleEntries.TryGetValue(e.RoleId, out var roleEntry))
             {
@@ -177,19 +192,16 @@ public class EntityPermissionEventProjection : EventProjection
             }
 
             var changed = affected;
-            foreach(var source in roleEntry.Sources)
+            changed = changed with
             {
-                changed = changed with
-                {
-                    AccountEntries = SetPermission(
-                        affected.AccountEntries,
-                        e.AccountId,
-                        source.Key,
-                        source.Value.Permission,
-                        metadata.Timestamp
-                    )
-                };
-            }
+                AccountEntries = SetPermission(
+                    entries: affected.AccountEntries,
+                    accountOrRoleId: e.AccountId,
+                    sourceId: e.RoleId,
+                    permission: affected.RoleEntries[e.RoleId].EffectivePermission,
+                    grantedAt: metadata.Timestamp
+                )
+            };
             ops.Store(changed);
         }
     }
@@ -217,7 +229,7 @@ public class EntityPermissionEventProjection : EventProjection
         }
         return entityPerms.Value;
     }
-    
+
     private static async Task<RoleMembersInfo> RequireRoleMembersInfo(
         IDocumentOperations ops,
         Hrib roleId)
@@ -455,11 +467,11 @@ public class EntityPermissionEventProjection : EventProjection
             var changed = affected with
             {
                 RoleEntries = SetPermission(
-                    affected.RoleEntries,
-                    roleId,
-                    sourceId,
-                    permission,
-                    grantedAt)
+                    entries: affected.RoleEntries,
+                    accountOrRoleId: roleId,
+                    sourceId: sourceId,
+                    permission: permission,
+                    grantedAt: grantedAt)
             };
 
             foreach (var accountId in roleInfo.MemberIds)
@@ -467,11 +479,11 @@ public class EntityPermissionEventProjection : EventProjection
                 changed = changed with
                 {
                     AccountEntries = SetPermission(
-                        changed.AccountEntries,
-                        accountId,
-                        roleId,
-                        permission,
-                        grantedAt
+                        entries: changed.AccountEntries,
+                        accountOrRoleId: accountId,
+                        sourceId: roleId,
+                        permission: changed.RoleEntries[roleId.ToString()].EffectivePermission,
+                        grantedAt: grantedAt
                     )
                 };
             }

@@ -32,8 +32,8 @@ public record RoleMembersInfo
     /// Creates a bare-bones but valid <see cref="RoleMembersInfo"/> with nothing but the entity's HRIB.
     /// </summary>
     [MartenIgnore]
-    public static EntityPermissionInfo Create(Hrib id)
+    public static RoleMembersInfo Create(Hrib id)
     {
-        return new EntityPermissionInfo() with { Id = id.ToString() };
+        return new RoleMembersInfo() with { Id = id.ToString() };
     }
 }

@@ -7,6 +7,7 @@ using Marten;
 using Marten.Events.Daemon.Coordination;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
+using Serilog.Events;
 using Serilog.Sinks.XUnit.Injectable;
 using Serilog.Sinks.XUnit.Injectable.Abstract;
 using Serilog.Sinks.XUnit.Injectable.Extensions;
@@ -35,6 +36,7 @@ public class ApiFixture : IAsyncLifetime
                 services.AddSerilog((sp, lc) => lc
                     .ReadFrom.Configuration(context.Configuration)
                     .ReadFrom.Services(sp)
+                    .MinimumLevel.Override("Marten.Events.Daemon", LogEventLevel.Information)
                     .Enrich.FromLogContext()
                     .WriteTo.InjectableTestOutput(injectableSink)
                 );

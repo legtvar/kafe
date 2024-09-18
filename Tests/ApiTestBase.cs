@@ -7,6 +7,7 @@ using Marten.Events;
 using Marten.Events.Daemon.Coordination;
 using Marten.Storage;
 using Microsoft.Extensions.DependencyInjection;
+using Serilog;
 using Serilog.Sinks.XUnit.Injectable.Abstract;
 using Xunit;
 using Xunit.Abstractions;
@@ -27,6 +28,7 @@ public class ApiTestBase : IAsyncLifetime
     public IAlbaHost Host { get; }
     public IDocumentStore Store { get; }
     public IProjectionCoordinator? ProjectionCoordinator { get; private set; }
+    public ILogger? Log { get; private set; }
 
     public async Task InitializeAsync()
     {
@@ -35,7 +37,8 @@ public class ApiTestBase : IAsyncLifetime
         await Store.Advanced.ResetAllData();
         ProjectionCoordinator = Host.Server.Services.GetRequiredService<IProjectionCoordinator>();
         await ProjectionCoordinator.DaemonForMainDatabase().StartAllAsync();
-
+        Log = Host.Server.Services.GetRequiredService<ILogger>().ForContext(GetType());
+        Log.Information("Initialization complete.");
     }
 
     public async Task DisposeAsync()
@@ -44,6 +47,7 @@ public class ApiTestBase : IAsyncLifetime
         {
             await ProjectionCoordinator.DaemonForMainDatabase().StopAllAsync();
         }
+        Log?.Information("Disposal complete.");
     }
 
     public async Task WaitForProjections()

@@ -12,7 +12,7 @@ using Xunit.Abstractions;
 namespace Kafe.Tests;
 
 [Collection(Const.Collections.Api)]
-public class AccountEndpointsTests(ApiFixture fixture, ITestOutputHelper testOutput) : ApiContext(fixture, testOutput)
+public class AccountEndpointsTests(ApiFixture fixture, ITestOutputHelper testOutput) : ApiTestBase(fixture, testOutput)
 {
     [Fact]
     public async Task TemporaryAccountCreation_WithValidEmail_ShouldSucceed()

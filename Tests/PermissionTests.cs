@@ -15,7 +15,7 @@ using Xunit.Abstractions;
 namespace Kafe.Tests;
 
 [Collection(Const.Collections.Api)]
-public class PermissionTests(ApiFixture fixture, ITestOutputHelper testOutput) : ApiContext(fixture, testOutput)
+public class PermissionTests(ApiFixture fixture, ITestOutputHelper testOutput) : ApiTestBase(fixture, testOutput)
 {
     [Fact]
     public async Task EntityPermissionInfo_System_ShouldExist()

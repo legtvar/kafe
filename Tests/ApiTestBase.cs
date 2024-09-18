@@ -12,11 +12,11 @@ using Xunit.Abstractions;
 
 namespace Kafe.Tests;
 
-public class ApiContext : IAsyncLifetime
+public class ApiTestBase : IAsyncLifetime
 {
     private readonly ITestOutputHelper testOutput;
 
-    public ApiContext(ApiFixture fixture, ITestOutputHelper testOutput)
+    public ApiTestBase(ApiFixture fixture, ITestOutputHelper testOutput)
     {
         Host = fixture.Host;
         Store = fixture.Host.Server.Services.GetRequiredService<IDocumentStore>();

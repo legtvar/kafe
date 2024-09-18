@@ -9,18 +9,18 @@ using Kafe.Data.Documents;
 using Kafe.Data.Events;
 using Kafe.Data.Projections;
 using Marten;
-using Marten.Events;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Kafe.Tests;
 
 [Collection(Const.Collections.Api)]
-public class PermissionTests(ApiFixture fixture) : ApiContext(fixture)
+public class PermissionTests(ApiFixture fixture, ITestOutputHelper testOutput) : ApiContext(fixture, testOutput)
 {
     [Fact]
     public async Task EntityPermissionInfo_System_ShouldExist()
     {
-        await Store.WaitForNonStaleProjectionDataAsync(TimeSpan.FromHours(1));
+        await WaitForProjections();
         await using var query = Store.QuerySession();
         var systemPerms = await query.KafeLoadAsync<EntityPermissionInfo>(Hrib.System);
         Assert.False(systemPerms.HasErrors);
@@ -30,7 +30,7 @@ public class PermissionTests(ApiFixture fixture) : ApiContext(fixture)
     [Fact]
     public async Task EntityPermissionInfo_System_ShouldHaveAdmin()
     {
-        await Store.WaitForNonStaleProjectionDataAsync(TimeSpan.FromHours(1));
+        await WaitForProjections();
         await using var query = Store.QuerySession();
         var systemPerms = (await query.KafeLoadAsync<EntityPermissionInfo>(Hrib.System)).Unwrap();
         Assert.True(systemPerms.AccountEntries.ContainsKey(TestSeedData.AdminHrib));
@@ -50,7 +50,7 @@ public class PermissionTests(ApiFixture fixture) : ApiContext(fixture)
     [Fact]
     public async Task EntityPermissionInfo_All_ShouldHaveAdmin()
     {
-        await Store.WaitForNonStaleProjectionDataAsync(TimeSpan.FromHours(1));
+        await WaitForProjections();
         await using var query = Store.QuerySession();
         var allPerms = query.Query<EntityPermissionInfo>().ToAsyncEnumerable();
         await foreach(var perms in allPerms)
@@ -98,7 +98,7 @@ public class PermissionTests(ApiFixture fixture) : ApiContext(fixture)
             await session.SaveChangesAsync();
         }
 
-        await Store.WaitForNonStaleProjectionDataAsync(TimeSpan.FromHours(1));
+        await WaitForProjections();
 
         using var query = Store.QuerySession();
         var projectPerms = (await query.KafeLoadAsync<EntityPermissionInfo>(TestSeedData.TestProjectHrib)).Unwrap();

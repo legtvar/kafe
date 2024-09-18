@@ -5,7 +5,12 @@ using Alba.Security;
 using Kafe.Data.Options;
 using Marten;
 using Microsoft.Extensions.DependencyInjection;
+using Serilog;
+using Serilog.Sinks.XUnit.Injectable;
+using Serilog.Sinks.XUnit.Injectable.Abstract;
+using Serilog.Sinks.XUnit.Injectable.Extensions;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Kafe.Tests;
 
@@ -23,6 +28,15 @@ public class ApiFixture : IAsyncLifetime
         {
             b.ConfigureServices((context, services) =>
             {
+                var injectableSink = new InjectableTestOutputSink(
+                    outputTemplate: Api.Program.LogTemplate);
+                services.AddSingleton<IInjectableTestOutputSink>(injectableSink);
+                services.AddSerilog((sp, lc) => lc
+                    .ReadFrom.Configuration(context.Configuration)
+                    .ReadFrom.Services(sp)
+                    .Enrich.FromLogContext()
+                    .WriteTo.InjectableTestOutput(injectableSink)
+                );
                 services.InitializeMartenWith<TestSeedData>();
                 services.Configure<StorageOptions>(o =>
                 {

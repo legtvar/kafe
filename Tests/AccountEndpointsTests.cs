@@ -7,11 +7,12 @@ using Alba;
 using Kafe.Api.Transfer;
 using Kafe.Data;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Kafe.Tests;
 
 [Collection(Const.Collections.Api)]
-public class AccountEndpointsTests(ApiFixture fixture) : ApiContext(fixture)
+public class AccountEndpointsTests(ApiFixture fixture, ITestOutputHelper testOutput) : ApiContext(fixture, testOutput)
 {
     [Fact]
     public async Task TemporaryAccountCreation_WithValidEmail_ShouldSucceed()

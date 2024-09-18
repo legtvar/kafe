@@ -7,13 +7,14 @@ using Kafe.Data.Services;
 using Marten;
 using Marten.Schema;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace Kafe.Tests;
 
 public class TestSeedData : IInitialData
 {
     private readonly IServiceProvider services;
-
+    private readonly ILogger<TestSeedData> logger;
     public const string AdminHrib = "testadmin00";
     public const string AdminEmail = "admin@example.com";
     public const string UserHrib = "testuser000";
@@ -22,13 +23,15 @@ public class TestSeedData : IInitialData
     public const string TestGroupHrib = "testgroup00";
     public const string TestProjectHrib = "testproject";
 
-    public TestSeedData(IServiceProvider services)
+    public TestSeedData(IServiceProvider services, ILogger<TestSeedData> logger)
     {
         this.services = services;
+        this.logger = logger;
     }
 
     public async Task Populate(IDocumentStore store, CancellationToken ct)
     {
+        logger.LogInformation("Populating test seed data.");
         using var scope = services.CreateScope();
         var accountService = scope.ServiceProvider.GetRequiredService<AccountService>();
 
@@ -70,5 +73,6 @@ public class TestSeedData : IInitialData
             null,
             TestProjectHrib,
             ct);
+        logger.LogInformation("Test seed data populated.");
     }
 }

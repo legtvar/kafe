@@ -11,9 +11,9 @@ namespace Kafe.Api;
 public class Program
 {
     public const string LogTemplate
-        = "[{Timestamp:HH:mm:ss} {Level:u3} {SourceContext}]{NewLine}{Message:lj}{NewLine}{Exception}";
+        = "[{Timestamp:HH:mm:ss.fff} {Level:u3} {SourceContext}]{NewLine}{Message:lj}{NewLine}{Exception}";
     public const string BootstrapLogTemplate
-        = "[{Timestamp:HH:mm:ss} {Level:u3} {SourceContext} (bootstrap)]{NewLine}{Message:lj}{NewLine}{Exception}";
+        = "[{Timestamp:HH:mm:ss.fff} {Level:u3} {SourceContext} (bootstrap)]{NewLine}{Message:lj}{NewLine}{Exception}";
 
     public static async Task<int> Main(string[] args)
     {

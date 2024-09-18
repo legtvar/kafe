@@ -103,10 +103,10 @@ public static class ServiceCollectionExtensions
         var mce = services.AddMarten(ConfigureMarten)
             .ApplyAllDatabaseChangesOnStartup()
             .UseIdentitySessions()
-            .AddAsyncDaemon(DaemonMode.Solo)
             .InitializeWith<SystemSeedData>()
             .InitializeWith<Corrector>()
-            .InitializeWith<UserSeedData>();
+            .InitializeWith<UserSeedData>()
+            .AddAsyncDaemon(DaemonMode.Solo);
 
         services.AddSingleton<StorageService>();
 

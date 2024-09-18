@@ -32,12 +32,15 @@ public class ApiTestBase : IAsyncLifetime
 
     public async Task InitializeAsync()
     {
+        Log = Host.Server.Services.GetRequiredService<ILogger>().ForContext(GetType());
+        Log.Information("Initializing.");
+
         var outputSink = Host.Server.Services.GetRequiredService<IInjectableTestOutputSink>();
         outputSink.Inject(testOutput);
         await Store.Advanced.ResetAllData();
         ProjectionCoordinator = Host.Server.Services.GetRequiredService<IProjectionCoordinator>();
         await ProjectionCoordinator.DaemonForMainDatabase().StartAllAsync();
-        Log = Host.Server.Services.GetRequiredService<ILogger>().ForContext(GetType());
+
         Log.Information("Initialization complete.");
     }
 

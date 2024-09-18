@@ -36,6 +36,7 @@ public class UserSeedData : IInitialData
 
     public async Task Populate(IDocumentStore store, CancellationToken token)
     {
+        logger.LogInformation("Populating user seed data.");
         if (!storageOptions.Value.AllowSeedData)
         {
             logger.LogInformation("Skipping seed data since it is disabled in config.");
@@ -151,6 +152,7 @@ public class UserSeedData : IInitialData
             }
 
             logger.LogInformation("Seed project group '{ProjectGroupId}' created.", group.Id);
+            logger.LogInformation("User seed data populated.");
         }
     }
 }

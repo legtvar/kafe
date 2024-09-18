@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Alba;
 using Marten;
+using Marten.Events;
 using Marten.Events.Daemon.Coordination;
 using Marten.Storage;
 using Microsoft.Extensions.DependencyInjection;
@@ -33,27 +34,20 @@ public class ApiTestBase : IAsyncLifetime
         outputSink.Inject(testOutput);
         await Store.Advanced.ResetAllData();
         ProjectionCoordinator = Host.Server.Services.GetRequiredService<IProjectionCoordinator>();
+        await ProjectionCoordinator.DaemonForMainDatabase().StartAllAsync();
 
     }
 
-    public Task DisposeAsync()
+    public async Task DisposeAsync()
     {
-        return Task.CompletedTask;
+        if (ProjectionCoordinator is not null)
+        {
+            await ProjectionCoordinator.DaemonForMainDatabase().StopAllAsync();
+        }
     }
 
     public async Task WaitForProjections()
     {
-        var projectionsCount = ((MartenDatabase)Store.Storage.Database).Options.Projections.AllShards().Count + 1;
-        var stats = await Store.Advanced.FetchEventStoreStatistics();
-        while(true)
-        {
-            var progress = await Store.Storage.Database.AllProjectionProgress();
-            if (progress.Count >= projectionsCount && progress.All(p => p.Sequence >= stats.EventSequenceNumber))
-            {
-                return;
-            }
-
-            await Task.Delay(250);
-        }
+        await Store.WaitForNonStaleProjectionDataAsync(TimeSpan.FromMinutes(1));
     }
 }

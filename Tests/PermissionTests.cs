@@ -185,6 +185,16 @@ public class PermissionTests(ApiFixture fixture, ITestOutputHelper testOutput) :
                 TestSeedData.TestOrganizationHrib,
                 LocalizedString.CreateInvariant("CreateEventTest playlist")
             )
+        },
+        {
+            Hrib.Parse("createtst-r").Unwrap().ToString(),
+            typeof(RoleInfo),
+            new RoleCreated(
+                Hrib.Parse("createtst-r").Unwrap().ToString(),
+                CreationMethod.Manual,
+                TestSeedData.TestOrganizationHrib,
+                LocalizedString.CreateInvariant("CreateEventTest role")
+            )
         }
     };
 

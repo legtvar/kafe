@@ -53,7 +53,7 @@ public class PermissionTests(ApiFixture fixture, ITestOutputHelper testOutput) :
         await WaitForProjections();
         await using var query = Store.QuerySession();
         var allPerms = query.Query<EntityPermissionInfo>().ToAsyncEnumerable();
-        await foreach(var perms in allPerms)
+        await foreach (var perms in allPerms)
         {
             Assert.True(perms.AccountEntries.ContainsKey(TestSeedData.AdminHrib));
             Assert.True(perms
@@ -78,7 +78,7 @@ public class PermissionTests(ApiFixture fixture, ITestOutputHelper testOutput) :
     {
         var roleHrib = Hrib.Parse("testrole000").Unwrap().ToString();
         var expectedPerm = Permission.Read | Permission.Write | Permission.Administer;
-        using (var session = Store.LightweightSession())
+        await using (var session = Store.LightweightSession())
         {
             session.Events.StartStream<RoleInfo>(
                 roleHrib,
@@ -100,7 +100,7 @@ public class PermissionTests(ApiFixture fixture, ITestOutputHelper testOutput) :
 
         await WaitForProjections();
 
-        using var query = Store.QuerySession();
+        await using var query = Store.QuerySession();
         var projectPerms = (await query.KafeLoadAsync<EntityPermissionInfo>(TestSeedData.TestProjectHrib)).Unwrap();
 
         // NB: Check the explicit role permission exists
@@ -116,6 +116,102 @@ public class PermissionTests(ApiFixture fixture, ITestOutputHelper testOutput) :
             .Sources.ContainsKey(roleHrib));
         Assert.Equal(expectedPerm, projectPerms.AccountEntries[TestSeedData.UserHrib]
             .Sources[roleHrib].Permission);
+    }
+
+    public static readonly TheoryData<string, Type, object> CreateEvents = new() {
+        {
+            Hrib.Parse("createtst-o").Unwrap().ToString(),
+            typeof(OrganizationInfo),
+            new OrganizationCreated(
+                Hrib.Parse("createtst-o").Unwrap().ToString(),
+                CreationMethod.Manual,
+                LocalizedString.CreateInvariant("CreateEventTest organization"))
+        },
+        {
+            Hrib.Parse("createtst-g").Unwrap().ToString(),
+            typeof(ProjectGroupInfo),
+            new ProjectGroupCreated(
+                Hrib.Parse("createtst-g").Unwrap().ToString(),
+                CreationMethod.Manual,
+                TestSeedData.TestOrganizationHrib,
+                LocalizedString.CreateInvariant("CreateEventTest project group")
+            )
+        },
+        {
+            Hrib.Parse("createtst-p").Unwrap().ToString(),
+            typeof(ProjectInfo),
+            new ProjectCreated(
+                Hrib.Parse("createtst-p").Unwrap().ToString(),
+                CreationMethod.Manual,
+                TestSeedData.TestGroupHrib,
+                LocalizedString.CreateInvariant("CreateEventTest project")
+            )
+        },
+        {
+            Hrib.Parse("createtst-a").Unwrap().ToString(),
+            typeof(ArtifactInfo),
+            new ArtifactCreated(
+                Hrib.Parse("createtst-a").Unwrap().ToString(),
+                CreationMethod.Manual,
+                LocalizedString.CreateInvariant("CreateEventTest artifact"),
+                default
+            )
+        },
+        {
+            Hrib.Parse("createtst-c").Unwrap().ToString(),
+            typeof(AccountInfo),
+            new AccountCreated(
+                Hrib.Parse("createtst-c").Unwrap().ToString(),
+                CreationMethod.Manual,
+                "account@example.com",
+                Kafe.Const.InvariantCultureCode
+            )
+        },
+        {
+            Hrib.Parse("createtst-u").Unwrap().ToString(),
+            typeof(AuthorInfo),
+            new AuthorCreated(
+                Hrib.Parse("createtst-u").Unwrap().ToString(),
+                CreationMethod.Manual,
+                "Author Authorson"
+            )
+        },
+        {
+            Hrib.Parse("createtst-l").Unwrap().ToString(),
+            typeof(PlaylistInfo),
+            new PlaylistCreated(
+                Hrib.Parse("createtst-l").Unwrap().ToString(),
+                CreationMethod.Manual,
+                TestSeedData.TestOrganizationHrib,
+                LocalizedString.CreateInvariant("CreateEventTest playlist")
+            )
+        }
+    };
+
+    [Theory]
+    [MemberData(nameof(CreateEvents))]
+    public async Task EntityPermissionInfo_CreateEvent_ShouldCreateInfo(
+        string hrib,
+        Type aggregateType,
+        object createEvent)
+    {
+        await using (var session = Store.LightweightSession())
+        {
+            session.Events.StartStream(
+                aggregateType: aggregateType,
+                streamKey: hrib,
+                events: [createEvent]);
+            await session.SaveChangesAsync();
+        }
+        
+        await WaitForProjections();
+        await using var query = Store.QuerySession();
+        var perms = (await query.KafeLoadAsync<EntityPermissionInfo>(hrib)).Unwrap();
+        Assert.NotEmpty(perms.AccountEntries);
+        Assert.True(perms.AccountEntries.ContainsKey(TestSeedData.AdminHrib));
+        Assert.Equal(
+            Permission.Read | Permission.Inheritable,
+            perms.AccountEntries[TestSeedData.AdminHrib].EffectivePermission);
     }
 
     // TODO: Test case: Role has Inspect on a group and Review on an org.

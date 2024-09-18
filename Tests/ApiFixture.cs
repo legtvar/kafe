@@ -4,6 +4,7 @@ using Alba;
 using Alba.Security;
 using Kafe.Data.Options;
 using Marten;
+using Marten.Events.Daemon.Coordination;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Serilog.Sinks.XUnit.Injectable;
@@ -45,6 +46,8 @@ public class ApiFixture : IAsyncLifetime
                 });
             });
         }, authenticationStub);
+        // NB: Let the test start the daemon
+        await Host.Server.Services.GetRequiredService<IProjectionCoordinator>().DaemonForMainDatabase().StopAllAsync();
     }
 
     public async Task DisposeAsync()

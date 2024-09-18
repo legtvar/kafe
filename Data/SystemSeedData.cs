@@ -33,6 +33,7 @@ public class SystemSeedData : IInitialData
             session.Store(EntityPermissionInfo.Create(Hrib.System));
         }
 
+        logger.LogInformation("Applying system seed data.");
         await session.SaveChangesAsync(token);
     }
 }

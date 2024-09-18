@@ -1,18 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Data.Common;
 using System.Linq;
 using System.Threading.Tasks;
-using JasperFx.CodeGeneration.Frames;
-using Kafe.Data.Aggregates;
 using Kafe.Data.Documents;
 using Kafe.Data.Events;
 using Marten;
 using Marten.Events;
 using Marten.Events.Projections;
-using Marten.Services.Json.Transformations;
-using Newtonsoft.Json.Linq;
 
 namespace Kafe.Data.Projections;
 

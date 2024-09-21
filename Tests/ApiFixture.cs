@@ -36,7 +36,7 @@ public class ApiFixture : IAsyncLifetime
                 services.AddSerilog((sp, lc) => lc
                     .ReadFrom.Configuration(context.Configuration)
                     .ReadFrom.Services(sp)
-                    .MinimumLevel.Override("Marten.Events.Daemon", LogEventLevel.Information)
+                    .MinimumLevel.Override("Marten", LogEventLevel.Verbose)
                     .Enrich.FromLogContext()
                     .WriteTo.InjectableTestOutput(injectableSink)
                 );

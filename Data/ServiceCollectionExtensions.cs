@@ -103,7 +103,6 @@ public static class ServiceCollectionExtensions
         var mce = services.AddMarten(ConfigureMarten)
             .ApplyAllDatabaseChangesOnStartup()
             .UseIdentitySessions()
-            .InitializeWith<SystemSeedData>()
             .InitializeWith<Corrector>()
             .InitializeWith<UserSeedData>()
             .AddAsyncDaemon(DaemonMode.Solo);

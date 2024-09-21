@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
+using Kafe.Common;
 using Kafe.Data.Documents;
 using Kafe.Data.Events;
 using Marten;
@@ -245,10 +246,10 @@ public class EntityPermissionEventProjection : EventProjection
     )
     {
         var systemPerms = await ops.KafeLoadAsync<EntityPermissionInfo>(Hrib.System);
-        if (systemPerms.HasErrors)
+        if (systemPerms.HasErrors && systemPerms.Errors.Length == 1 && systemPerms.Errors[0].Id == Error.NotFoundId)
         {
-            throw new InvalidOperationException("No permission info exists for the 'system' HRIB. "
-                + "The DB is in an invalid state.", systemPerms.AsException());
+            systemPerms = EntityPermissionInfo.Create(Hrib.SystemValue);
+            ops.Store(systemPerms.Value);
         }
 
         return perms with

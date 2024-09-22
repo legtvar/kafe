@@ -16,12 +16,14 @@ namespace Kafe.Tests;
 
 public class ApiTestBase : IAsyncLifetime
 {
+    private readonly ApiFixture fixture;
     private readonly ITestOutputHelper testOutput;
 
     public ApiTestBase(ApiFixture fixture, ITestOutputHelper testOutput)
     {
         Host = fixture.Host;
         Store = fixture.Host.Server.Services.GetRequiredService<IDocumentStore>();
+        this.fixture = fixture;
         this.testOutput = testOutput;
     }
 
@@ -36,9 +38,13 @@ public class ApiTestBase : IAsyncLifetime
         Log.Information("Initializing.");
 
         var outputSink = Host.Server.Services.GetRequiredService<IInjectableTestOutputSink>();
-        outputSink.Inject(testOutput);
-        await Store.Advanced.ResetAllData();
+        outputSink.Inject(testOutput, fixture.DiagnosticSink);
+
         ProjectionCoordinator = Host.Server.Services.GetRequiredService<IProjectionCoordinator>();
+        await ProjectionCoordinator.DaemonForMainDatabase().StopAllAsync();
+
+        await Store.Advanced.ResetAllData();
+
         await ProjectionCoordinator.DaemonForMainDatabase().StartAllAsync();
 
         Log.Information("Initialization complete.");

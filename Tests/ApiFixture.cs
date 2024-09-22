@@ -21,7 +21,13 @@ public class ApiFixture : IAsyncLifetime
     private readonly string testSchema
         = $"test_{DateTimeOffset.UtcNow:yyyy_MM_dd_T_HH_mm}_{Guid.NewGuid().ToString()[..8]}";
 
+    public ApiFixture(IMessageSink diagnosticSink)
+    {
+        DiagnosticSink = diagnosticSink;
+    }
+
     public IAlbaHost Host { get; private set; } = null!;
+    public IMessageSink DiagnosticSink { get; }
 
     public async Task InitializeAsync()
     {

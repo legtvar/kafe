@@ -176,6 +176,8 @@ public class EntityPermissionEventProjection : EventProjection
 
     public async Task Project(AccountRoleSet e, IEvent metadata, IDocumentOperations ops)
     {
+        _ = await RequireRoleMembersInfo(ops, e.RoleId);
+
         var query = ops.Query<EntityPermissionInfo>()
             .Where(p => p.RoleEntries.ContainsKey(e.RoleId));
         var affectedEntities = query

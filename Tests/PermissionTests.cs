@@ -92,6 +92,10 @@ public class PermissionTests(ApiFixture fixture, ITestOutputHelper testOutput) :
                     TestSeedData.TestProjectHrib,
                     expectedPerm
                 ));
+            // NB: For whatever reason Marten 7.28 would order the following appended event *before* the StartStream
+            // ones above, thus this Save needs to happen here as well.
+            await session.SaveChangesAsync();
+
             session.Events.Append(
                 TestSeedData.UserHrib,
                 new AccountRoleSet(TestSeedData.UserHrib, roleHrib));

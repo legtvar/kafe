@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Alba;
 using Marten;
@@ -29,7 +30,7 @@ public class ApiTestBase : IAsyncLifetime
 
     public IAlbaHost Host { get; }
     public IDocumentStore Store { get; }
-    public IProjectionCoordinator? ProjectionCoordinator { get; private set; }
+    public ProjectionCoordinator? ProjectionCoordinator { get; private set; }
     public ILogger? Log { get; private set; }
 
     public async Task InitializeAsync()
@@ -40,12 +41,12 @@ public class ApiTestBase : IAsyncLifetime
         var outputSink = Host.Server.Services.GetRequiredService<IInjectableTestOutputSink>();
         outputSink.Inject(testOutput, fixture.DiagnosticSink);
 
-        ProjectionCoordinator = Host.Server.Services.GetRequiredService<IProjectionCoordinator>();
-        await ProjectionCoordinator.DaemonForMainDatabase().StopAllAsync();
+        ProjectionCoordinator = (ProjectionCoordinator)Host.Server.Services.GetRequiredService<IProjectionCoordinator>();
+        await ProjectionCoordinator.PauseAsync();
 
         await Store.Advanced.ResetAllData();
 
-        await ProjectionCoordinator.DaemonForMainDatabase().StartAllAsync();
+        await ProjectionCoordinator.ResumeAsync();
 
         Log.Information("Initialization complete.");
     }
@@ -54,7 +55,7 @@ public class ApiTestBase : IAsyncLifetime
     {
         if (ProjectionCoordinator is not null)
         {
-            await ProjectionCoordinator.DaemonForMainDatabase().StopAllAsync();
+            await ProjectionCoordinator.PauseAsync();
         }
         Log?.Information("Disposal complete.");
     }

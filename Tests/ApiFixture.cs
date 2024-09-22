@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Alba;
 using Alba.Security;
@@ -55,7 +56,8 @@ public class ApiFixture : IAsyncLifetime
             });
         }, authenticationStub);
         // NB: Let the test start the daemon
-        await Host.Server.Services.GetRequiredService<IProjectionCoordinator>().DaemonForMainDatabase().StopAllAsync();
+        var coordinator = (ProjectionCoordinator)Host.Server.Services.GetRequiredService<IProjectionCoordinator>();
+        await coordinator.PauseAsync();
     }
 
     public async Task DisposeAsync()

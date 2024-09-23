@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Threading;
 using System.Threading.Tasks;
+using JasperFx.CodeGeneration.Model;
 using Kafe.Data;
 using Kafe.Data.Aggregates;
 using Kafe.Data.Documents;
@@ -33,18 +34,11 @@ public class PermissionTests(ApiFixture fixture, ITestOutputHelper testOutput) :
         await WaitForProjections();
         await using var query = Store.QuerySession();
         var systemPerms = (await query.KafeLoadAsync<EntityPermissionInfo>(Hrib.System)).Unwrap();
-        Assert.True(systemPerms.AccountEntries.ContainsKey(TestSeedData.AdminHrib));
-        Assert.True(systemPerms
-            .AccountEntries[TestSeedData.AdminHrib]
-            .Sources
-            .ContainsKey(Hrib.System.ToString()));
-        Assert.Equal(Permission.All, systemPerms
-            .AccountEntries[TestSeedData.AdminHrib]
-            .Sources[Hrib.System.ToString()]
-            .Permission);
-        Assert.Equal(Permission.All, systemPerms
-            .AccountEntries[TestSeedData.AdminHrib]
-            .EffectivePermission);
+        AssertAccountPermission(
+            perms: systemPerms,
+            accountHrib: TestSeedData.AdminHrib,
+            permission: Permission.All,
+            sourceHrib: Hrib.System);
     }
 
     [Fact]
@@ -55,21 +49,15 @@ public class PermissionTests(ApiFixture fixture, ITestOutputHelper testOutput) :
         var allPerms = query.Query<EntityPermissionInfo>().ToAsyncEnumerable();
         await foreach (var perms in allPerms)
         {
-            Assert.True(perms.AccountEntries.ContainsKey(TestSeedData.AdminHrib));
-            Assert.True(perms
-                .AccountEntries[TestSeedData.AdminHrib]
-                .Sources
-                .ContainsKey(Hrib.System.ToString()));
             var expected = perms.Id == Hrib.System
                 ? Permission.All
                 : Permission.Read | Permission.Inheritable;
-            Assert.Equal(expected, perms
-                .AccountEntries[TestSeedData.AdminHrib]
-                .Sources[Hrib.System.ToString()]
-                .Permission);
-            Assert.Equal(expected, perms
-                .AccountEntries[TestSeedData.AdminHrib]
-                .EffectivePermission & expected);
+            AssertAccountPermission(
+                perms: perms,
+                accountHrib: TestSeedData.AdminHrib,
+                permission: expected,
+                sourceHrib: Hrib.System
+            );
         }
     }
 
@@ -114,12 +102,12 @@ public class PermissionTests(ApiFixture fixture, ITestOutputHelper testOutput) :
         Assert.Equal(expectedPerm, projectPerms.RoleEntries[roleHrib].Sources[TestSeedData.TestProjectHrib].Permission);
 
         // NB: Check the account permission implied by the role exists
-        Assert.NotEmpty(projectPerms.AccountEntries);
-        Assert.True(projectPerms.AccountEntries.ContainsKey(TestSeedData.UserHrib));
-        Assert.True(projectPerms.AccountEntries[TestSeedData.UserHrib]
-            .Sources.ContainsKey(roleHrib));
-        Assert.Equal(expectedPerm, projectPerms.AccountEntries[TestSeedData.UserHrib]
-            .Sources[roleHrib].Permission);
+        AssertAccountPermission(
+            perms: projectPerms,
+            accountHrib: TestSeedData.UserHrib,
+            permission: expectedPerm,
+            sourceHrib: roleHrib
+        );
     }
 
     public static readonly TheoryData<string, Type, object> CreateEvents = new() {
@@ -221,11 +209,49 @@ public class PermissionTests(ApiFixture fixture, ITestOutputHelper testOutput) :
         await WaitForProjections();
         await using var query = Store.QuerySession();
         var perms = (await query.KafeLoadAsync<EntityPermissionInfo>(hrib)).Unwrap();
-        Assert.NotEmpty(perms.AccountEntries);
-        Assert.True(perms.AccountEntries.ContainsKey(TestSeedData.AdminHrib));
-        Assert.Equal(
-            Permission.Read | Permission.Inheritable,
-            perms.AccountEntries[TestSeedData.AdminHrib].EffectivePermission);
+        AssertAccountPermission(
+            perms: perms,
+            accountHrib: TestSeedData.AdminHrib,
+            permission: Permission.Read | Permission.Inheritable,
+            sourceHrib: Hrib.System
+        );
+    }
+    
+    [Fact]
+    public async Task EntityPermissionInfo_AccountSetPermission_ShouldSetPermission()
+    {
+        var testHrib = Hrib.Parse("setpermtest").Unwrap().ToString();
+        await using (var session = Store.LightweightSession())
+        {
+            session.Events.StartStream<ProjectInfo>(
+                testHrib,
+                new ProjectCreated(
+                    testHrib,
+                    CreationMethod.Manual,
+                    TestSeedData.TestOrganizationHrib,
+                    LocalizedString.CreateInvariant("SetPermissionTest project"))
+            );
+            await session.SaveChangesAsync();
+            
+            session.Events.Append(
+                TestSeedData.UserHrib,
+                new AccountPermissionSet(
+                    TestSeedData.UserHrib,
+                    testHrib,
+                    Permission.Read
+                ));
+            await session.SaveChangesAsync();
+        }
+        
+        await WaitForProjections();
+        await using var query = Store.QuerySession();
+        var perms = (await query.KafeLoadAsync<EntityPermissionInfo>(testHrib)).Unwrap();
+        AssertAccountPermission(
+            perms: perms,
+            accountHrib: TestSeedData.UserHrib,
+            permission: Permission.Read,
+            sourceHrib: testHrib
+        );
     }
 
     // TODO: Test case: Role has Inspect on a group and Review on an org.
@@ -233,4 +259,30 @@ public class PermissionTests(ApiFixture fixture, ITestOutputHelper testOutput) :
     //       The effective permission is Read | Inspect | Review. All members must also have this effective permission.
     //       All accounts in it must have Read | Inspect | Review on all of the group's projects
     //       with the role as source.
+    
+    private static void AssertAccountPermission(
+        EntityPermissionInfo perms,
+        Hrib accountHrib,
+        Permission permission,
+        Hrib? sourceHrib = null)
+    {
+        Assert.NotEmpty(perms.AccountEntries);
+        Assert.True(perms
+            .AccountEntries
+            .ContainsKey(accountHrib.ToString()));
+        Assert.Equal(permission, perms
+            .AccountEntries[accountHrib.ToString()]
+            .EffectivePermission & permission);
+        if (sourceHrib is not null)
+        {
+            Assert.True(perms
+                .AccountEntries[accountHrib.ToString()]
+                .Sources
+                .ContainsKey(sourceHrib.ToString()));
+            Assert.Equal(permission, perms
+                .AccountEntries[accountHrib.ToString()]
+                .Sources[sourceHrib.ToString()]
+                .Permission);
+        }
+    }
 }

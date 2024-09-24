@@ -46,21 +46,31 @@ public class DefaultEmailService : IEmailService, IDisposable
         {
             Text = message
         };
-        
-        if (!smtp.IsConnected)
+
+        try
         {
             await smtp.ConnectAsync(options.Value.Host, options.Value.Port, true, token);
         }
-
-        if (!string.IsNullOrEmpty(options.Value.Username) || !string.IsNullOrEmpty(options.Value.Password))
+        catch (InvalidOperationException)
         {
-            await smtp.AuthenticateAsync(options.Value.Username, options.Value.Password, token);
+            // no-op since the smtp client is already connected
+        }
+
+        try {
+            
+            if (!string.IsNullOrEmpty(options.Value.Username) || !string.IsNullOrEmpty(options.Value.Password))
+            {
+                await smtp.AuthenticateAsync(options.Value.Username, options.Value.Password, token);
+            }
+        }
+        catch (InvalidOperationException)
+        {
+            // no-op since the smtp client is already authenticated
         }
 
         var envelopeSender = new MailboxAddress(
             options.Value.FromName,
             options.Value.EnvelopeSender ?? options.Value.FromAddress);
         await smtp.SendAsync(mimeMessage, envelopeSender, new[] { toAddress }, token);
-        await smtp.DisconnectAsync(true, token);
     }
 }

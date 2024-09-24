@@ -72,5 +72,6 @@ public class DefaultEmailService : IEmailService, IDisposable
             options.Value.FromName,
             options.Value.EnvelopeSender ?? options.Value.FromAddress);
         await smtp.SendAsync(mimeMessage, envelopeSender, new[] { toAddress }, token);
+        await smtp.DisconnectAsync(true, token);
     }
 }

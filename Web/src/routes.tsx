@@ -1,5 +1,7 @@
 import { IconType } from 'react-icons';
 import {
+    IoCube,
+    IoCubeOutline,
     IoFolderOpen,
     IoFolderOpenOutline,
     IoHome,
@@ -7,9 +9,7 @@ import {
     IoListCircle,
     IoListCircleOutline,
     IoSettingsOutline,
-    IoSettingsSharp,
-    IoVideocam,
-    IoVideocamOutline,
+    IoSettingsSharp
 } from 'react-icons/io5';
 import { Navigate, RouteObject } from 'react-router-dom';
 import { Login } from './components/pages/account/Login';
@@ -33,10 +33,10 @@ import { AccountRoot } from './components/pages/root/AccountRoot';
 import { AuthRoot } from './components/pages/root/AuthRoot';
 import { Root } from './components/pages/root/Root';
 import { UnauthRoot } from './components/pages/root/UnauthRoot';
+import { ServerError } from './components/pages/ServerError';
 import { SystemComponent } from './components/pages/system/SystemComponent';
 import { OutletOrChildren } from './components/utils/OutletOrChildren';
 import { Status } from './components/utils/Status';
-import { ServerError } from './components/pages/ServerError';
 
 export type SelectableIcon = {
     default: IconType;
@@ -111,8 +111,8 @@ export const authRoutes = (t: (id: string) => string): AppRoute[] => [
         element: <Projects />,
         inMenu: true,
         icon: {
-            default: IoVideocamOutline,
-            selected: IoVideocam,
+            default: IoCubeOutline,
+            selected: IoCube,
         },
         children: [
             {

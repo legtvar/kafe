@@ -1,10 +1,11 @@
-import http from 'http';
+import fs from 'fs';
 import httpProxy from 'http-proxy';
+import https from 'https';
 
-const sourcePort = 8000;
+const sourcePort = 44369;
 const sourceAddress = 'localhost';
 const targetPort = 443;
-const targetAddress = 'kafe.fi.muni.cz';
+const targetAddress = 'kafe-stage.fi.muni.cz';
 
 const target = {
     protocol: 'https:',
@@ -18,6 +19,7 @@ var proxy = httpProxy.createProxyServer({
     cookieDomainRewrite: {
         [targetAddress]: sourceAddress,
     },
+    secure: false
 });
 
 proxy.on('proxyRes', (proxyRes, req, res) => {
@@ -39,7 +41,10 @@ proxy.on('proxyReq', (proxyReq, req) => {
     console.log(`${sourceAddress} [ ->] ${targetAddress}    ${req.method} ${req.url}`);
 });
 
-var server = http.createServer((req, res) => {
+var server = https.createServer({
+    cert: fs.readFileSync('certs/cert.pem'),
+    key: fs.readFileSync('certs/key.pem'),
+}, (req, res) => {
     proxy.web(req, res);
 });
 

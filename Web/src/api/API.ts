@@ -1,4 +1,5 @@
 import axios, { Axios, AxiosProgressEvent, AxiosResponse } from 'axios';
+import { Artifact } from '../data/Artifact';
 import { Author } from '../data/Author';
 import { EntityPermissions } from '../data/EntityPermissions';
 import { Group } from '../data/Group';
@@ -143,6 +144,9 @@ export class API {
                     name: name as any,
                     blueprintSlot,
                 });
+            },
+            async getById(id: string) {
+                return api.requestSingle(`artifact/${id}`, Artifact);
             },
         };
     }

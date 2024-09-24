@@ -2,7 +2,7 @@ import { Box, Flex, Icon, Stack, Text, useColorModeValue } from '@chakra-ui/reac
 import { IoPlayOutline } from 'react-icons/io5';
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import { Playlist } from '../../../data/Playlist';
-import { Project } from '../../../data/Project';
+import { getPrefered } from '../../../utils/preferedLanguage';
 import { ContentViewer } from '../../media/ContentViewer';
 import { AwaitAPI } from '../../utils/AwaitAPI';
 import { Status } from '../../utils/Status';
@@ -33,35 +33,37 @@ export function PlaylistDetail(props: IPlaylistDetailProps) {
         <AwaitAPI request={(api) => api.playlists.getById(id)} error={<Status statusCode={404} embeded />}>
             {(playlist: Playlist) => (
                 <AwaitAPI
-                    request={(api) => api.projects.getById('7ZkIq-1Up2B')}
+                    request={(api) => api.playlists.getById(playlist.id)}
                     error={<Status statusCode={404} embeded />}
                 >
-                    {(tempProject: Project) => {
-                        const artifacts = tempProject.artifacts.filter((artifact) =>
-                            artifact.shards.some((shard) => shard.kind === 'video'),
-                        );
+                    {(playlist: Playlist) => {
+                        const artifacts = playlist.entries
                         return (
                             <Stack direction={{ base: 'column', lg: 'row' }} spacing={4}>
                                 <Box width="full">
                                     {artifacts.length < item ? (
                                         <Navigate to="./1" />
                                     ) : (
-                                        <ContentViewer
-                                            key={0}
-                                            artifact={artifacts[item - 1]}
-                                            autoplay
-                                            videoProps={{
-                                                onEnded: () => {
-                                                    if (item < artifacts.length) {
-                                                        navigate(`./${item + 1}`);
+                                        <AwaitAPI request={(api) => api.artifacts.getById(artifacts[item - 1].id)} key={artifacts[item - 1].id}>
+                                            {(artifact) => (
+                                                <ContentViewer
+                                                    key={0}
+                                                    artifact={artifact}
+                                                    autoplay
+                                                    videoProps={{
+                                                        onEnded: () => {
+                                                            if (item < artifacts.length) {
+                                                                navigate(`./${item + 1}`);
+                                                            }
+                                                        },
+                                                    }}
+                                                    onNext={
+                                                        item < artifacts.length ? () => navigate(`./${item + 1}`) : undefined
                                                     }
-                                                },
-                                            }}
-                                            onNext={
-                                                item < artifacts.length ? () => navigate(`./${item + 1}`) : undefined
-                                            }
-                                            onPrevious={item > 1 ? () => navigate(`./${item - 1}`) : undefined}
-                                        />
+                                                    onPrevious={item > 1 ? () => navigate(`./${item - 1}`) : undefined}
+                                                />
+                                            )}
+                                        </AwaitAPI>
                                     )}
                                 </Box>
                                 <Box borderWidth={1} w={{ base: '100%', lg: 'sm', xl: 'md' }} h="100%" py={3}>
@@ -91,7 +93,7 @@ export function PlaylistDetail(props: IPlaylistDetailProps) {
                                                     >
                                                         <Flex direction="row" flex="1" alignItems="center">
                                                             {item === i + 1 && <Icon mr={2} as={IoPlayOutline} />}
-                                                            <Text>{artifact.getName()}</Text>
+                                                            <Text>{getPrefered(artifact.name)}</Text>
                                                         </Flex>
                                                     </Flex>
                                                 </Link>

@@ -5,5 +5,5 @@ interface IAutoemailProps {
 }
 
 export function Autoemail(props: IAutoemailProps) {
-    return <Link href={"mailto:" + props.children ?? "/"}>{props.children}</Link>
+    return <Link href={"mailto:" + props.children}>{props.children}</Link>
 }

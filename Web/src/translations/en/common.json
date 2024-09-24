@@ -387,5 +387,8 @@
       "en": "English"
     },
     "none": "Hide subtitles"
+  },
+  "player": {
+    "loadingError": "Unfortunately, this video cannot be played in this quality"
   }
 }

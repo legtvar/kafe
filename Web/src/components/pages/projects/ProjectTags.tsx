@@ -13,7 +13,7 @@ export function ProjectTags({ project }: IProjectTagsProps) {
 
     return (
         <HStack spacing={2} mb={6}>
-            {project.getgenre().length > 0 && <Text pr={8}>{project.getgenre()}</Text>}
+            {project.getGenre().length > 0 && <Text pr={8}>{project.getGenre()}</Text>}
             <Link to={`/auth/groups/${project.projectGroupId}`}>
                 <Tag bg={bgDarker}>{project.getGroupName()}</Tag>
             </Link>

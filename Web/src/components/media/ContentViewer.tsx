@@ -2,6 +2,7 @@ import { Text } from '@chakra-ui/react';
 import { t } from 'i18next';
 import { ReactPlayerProps } from 'react-player';
 import { Artifact } from '../../data/Artifact';
+import { Shard } from '../../data/Shard';
 import { useApi } from '../../hooks/Caffeine';
 import { Video } from './Player/Video';
 
@@ -30,10 +31,13 @@ export function ContentViewer({ artifact, autoplay, videoProps, onPrevious, onNe
     if (type) {
         switch (type.split('/')[0]) {
             case 'Video':
-                const video = artifact.shards.filter((shard) => shard.kind === 'video')[0];
-                const subtitles = artifact.shards.filter((shard) => shard.kind === 'subtitles');
+                let video = artifact.shards.filter((shard) => shard.kind === 'video')[0];
+                let subtitles = artifact.shards.filter((shard) => shard.kind === 'subtitles');
 
-                const videoSources = video.variants.reduce(
+                video = new Shard(video);
+                subtitles = subtitles.map((sub) => new Shard(sub));
+
+                const videoSources = video.getVariantIds().reduce(
                     (prev, curr) => ({
                         ...prev,
                         [curr]: api.shards.streamUrl(video.id, curr),

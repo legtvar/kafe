@@ -64,7 +64,7 @@ export class Project extends AbstractType {
         return getPrefered(this.projectGroupName);
     }
 
-    public getgenre() {
+    public getGenre() {
         return getPrefered(this.genre);
     }
 

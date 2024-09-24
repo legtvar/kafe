@@ -11,7 +11,7 @@ export class Artifact extends AbstractType {
     public shards!: Shard[];
     public addedOn!: Date | null;
     public blueprintSlot!: string | null;
-    // containingProjectIds: (string)[];
+    public containingProjectIds!: string[];
 
     public constructor(struct: any) {
         super();

@@ -2,6 +2,7 @@ import {
     Box,
     BoxProps,
     Center,
+    DarkMode,
     Flex,
     Icon,
     IconButton,
@@ -25,7 +26,6 @@ import { BsDownload, BsGear } from 'react-icons/bs';
 import {
     IoChatboxEllipsesOutline,
     IoEaselOutline,
-    IoLink,
     IoPauseOutline,
     IoPlayOutline,
     IoPlaySkipBackOutline,
@@ -33,12 +33,11 @@ import {
     IoScan,
     IoVolumeHighOutline,
     IoVolumeMuteOutline,
-    IoWarning,
+    IoWarning
 } from 'react-icons/io5';
 import ReactPlayer, { ReactPlayerProps } from 'react-player';
 import { OnProgressProps } from 'react-player/base';
 import { TrackProps } from 'react-player/file';
-import { Link } from 'react-router-dom';
 import screenfull from 'screenfull';
 import { capitalize } from '../../../utils/capitalize';
 import { Subtitles } from './Subtitles';
@@ -71,6 +70,17 @@ export function Video({ sources, subtitles, autoplay, videoProps, onNext, onPrev
     const keyboardHandlerRef = createRef<HTMLInputElement>();
 
     useEffect(() => {
+        setLoaded(false);
+        setBuffering(false);
+        setError(null);
+        setPlaying(true);
+        // if (playing) playerRef.current?.getInternalPlayer()?.play();
+        playerRef.current?.seekTo(progressState?.playedSeconds || 0, 'seconds');
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [subtitles, quality]);
+
+    useEffect(() => {
         if (playerRef.current) {
             playerRef.current.seekTo(0, 'seconds');
         }
@@ -83,7 +93,7 @@ export function Video({ sources, subtitles, autoplay, videoProps, onNext, onPrev
         setError(null);
         setSubtitleTrack(null);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [sources, autoplay, subtitles]);
+    }, [sources, autoplay]);
 
     const updateMouse = () => {
         if (controlsShown) clearTimeout(controlsShown);
@@ -91,6 +101,7 @@ export function Video({ sources, subtitles, autoplay, videoProps, onNext, onPrev
     };
 
     return (
+        <DarkMode>
         <Box
             ref={wrapperRef}
             width={'100%'}
@@ -101,6 +112,7 @@ export function Video({ sources, subtitles, autoplay, videoProps, onNext, onPrev
             onClick={() => {
                 wrapperRef.current?.focus();
             }}
+            color="white"
             onKeyDown={(e) => {
                 if (playerRef.current) {
                     if (e.key === ' ') {
@@ -145,7 +157,7 @@ export function Video({ sources, subtitles, autoplay, videoProps, onNext, onPrev
                 config={{
                     file: {
                         attributes: {
-                            crossorigin: 'use-credentials',
+                            crossOrigin: 'use-credentials',
                         },
                         tracks: (subtitles ? Object.entries(subtitles) : []).map(
                             ([id, url]): TrackProps => ({
@@ -159,7 +171,13 @@ export function Video({ sources, subtitles, autoplay, videoProps, onNext, onPrev
                 }}
                 onError={(error) => {
                     setPlaying(false);
-                    setError(error.message ?? t('error.title'));
+                    if (!error.message) {
+                        setError(t('player.loadingError'));
+                    } else if (error.message.includes("no supported source")) {
+                        setError(t('player.loadingError'));
+                    } else if (!error.message.includes("play()")) {
+                        setError(error.message);
+                    }
                 }}
                 onProgress={(state) => {
                     setProgressState(state);
@@ -173,10 +191,13 @@ export function Video({ sources, subtitles, autoplay, videoProps, onNext, onPrev
                 onDuration={(duration) => setDuration(duration)}
                 onBuffer={() => setBuffering(true)}
                 onBufferEnd={() => setBuffering(false)}
-                onPlay={() => setPlaying(true)}
+                onPlay={() => {
+                    setPlaying(true);
+                    setLoaded(true);
+                    setError(null);
+                }}
                 onPause={() => setPlaying(false)}
                 onReady={() => setLoaded(true)}
-                onStarted={() => setLoaded(true)}
             />
             <Flex
                 position="absolute"
@@ -203,16 +224,16 @@ export function Video({ sources, subtitles, autoplay, videoProps, onNext, onPrev
                     right={0}
                     background={error ? 'rgba(0,0,0,0.8)' : undefined}
                 >
-                    {(buffering || !loaded) && <Spinner size={'xl'} />}
-                    {error && (
+                    {}
+                    {error ? (
                         <VStack>
                             <Icon color={'yellow.500'} as={IoWarning} fontSize="5em" />
                             <Text>{error.toString()}</Text>
                         </VStack>
-                    )}
+                    ) : ((buffering || !loaded) && <Spinner size={'xl'} />)}
                 </Center>
             )}
-            {loaded && (
+            {true && (
                 <Box
                     position="absolute"
                     inset={0}
@@ -458,7 +479,7 @@ export function Video({ sources, subtitles, autoplay, videoProps, onNext, onPrev
                                         ))}
                                     </MenuList>
                                 </Menu>
-                                <Link
+                                {/* <Link
                                     tabIndex={-1}
                                     to={`/play/${sources['original'].split('/').reverse()[1]}`}
                                     target="_blank"
@@ -474,7 +495,7 @@ export function Video({ sources, subtitles, autoplay, videoProps, onNext, onPrev
                                         icon={<IoLink />}
                                         tabIndex={-1}
                                     />
-                                </Link>
+                                </Link> */}
                                 <IconButton
                                     ml={6}
                                     variant="ghost"
@@ -514,6 +535,7 @@ export function Video({ sources, subtitles, autoplay, videoProps, onNext, onPrev
                 </Box>
             )}
         </Box>
+        </DarkMode>
     );
 }
 

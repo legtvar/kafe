@@ -385,5 +385,8 @@
       "en": "Anglické"
     },
     "none": "Skrýt titulky"
+  },
+  "player": {
+    "loadingError": "Toto video bohužel nelze přehrát v této kvalitě"
   }
 }

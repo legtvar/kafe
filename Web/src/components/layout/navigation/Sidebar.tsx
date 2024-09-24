@@ -5,8 +5,8 @@ import { Link, useMatches } from 'react-router-dom';
 import { AppRoute, authRoutes } from '../../../routes';
 import { Footer } from '../Footer';
 import { Logo } from '../Logo';
-import { NavItem } from './NavItem';
 import { MessageButton } from '../MessageButton';
+import { NavItem } from './NavItem';
 
 interface ISidebarProps extends BoxProps {
     onClose: () => void;
@@ -114,6 +114,7 @@ export function Sidebar({ onClose, ...rest }: ISidebarProps) {
                     descriptionKey="troubleshooting.contactUs"
                     alignSelf="stretch"
                     mx={4}
+                    opacity={0.3}
                 />
                 <Footer key="footer" />
             </Flex>

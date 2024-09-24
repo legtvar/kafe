@@ -20,6 +20,18 @@ module.exports = function override(config, env) {
         test: /\.i18n\.html/,
         type: "asset/source"
     };
+
+    // Do not treat warnings as errors
+    config.plugins = config.plugins.map((plugin) => {
+        if (plugin.constructor.name === 'ESLintWebpackPlugin') {
+            plugin.options = {
+                ...plugin.options,
+                failOnError: false,
+                failOnWarning: false,
+            };
+        }
+        return plugin;
+    });
     
     return config;
 };

@@ -9,7 +9,7 @@ import {
     IoListCircle,
     IoListCircleOutline,
     IoSettingsOutline,
-    IoSettingsSharp
+    IoSettingsSharp,
 } from 'react-icons/io5';
 import { Navigate, RouteObject } from 'react-router-dom';
 import { Login } from './components/pages/account/Login';
@@ -20,7 +20,7 @@ import { Groups } from './components/pages/groups/Groups';
 import { GroupsCreate } from './components/pages/groups/GroupsCreate';
 import { GroupsDetail } from './components/pages/groups/GroupsDetail';
 import { GroupsEdit } from './components/pages/groups/GroupsEdit';
-import { HomeFestival } from './components/pages/home/HomeFestival';
+import { Home } from './components/pages/home/Home';
 import { Player } from './components/pages/Player';
 import { PlaylistDetail } from './components/pages/playlists/PlaylistDetail';
 import { PlaylistGallery } from './components/pages/playlists/PlaylistGallery';
@@ -98,7 +98,7 @@ export const authRoutes = (t: (id: string) => string): AppRoute[] => [
     {
         path: '',
         title: t('route.home.title'),
-        element: <HomeFestival />,
+        element: <Home />,
         inMenu: true,
         icon: {
             default: IoHomeOutline,
@@ -214,7 +214,7 @@ export const accountRoutes = (t: (id: string) => string): RouteObject[] => [
     },
     {
         path: 'temp',
-        element: <Navigate to="/account/login" />
+        element: <Navigate to="/account/login" />,
     },
 ];
 

@@ -41,7 +41,7 @@
     "days": "dní",
     "hours": "hodin",
     "minutes": "minut",
-    "seconds": "sekund"
+    "seconds": "vteřin"
   },
   "createProject": {
     "button": {
@@ -71,8 +71,9 @@
       "specs": "Technické požadavky souboru",
       "newArtefact": "Vytvořit nový artefakt"
     },
-    "signUp": "Přihlásit film",
-    "doNotforget": "Nepropásni to! Do konce přihlašování už zbývá jen"
+    "signUp": "Přidat projekt",
+    "doNotforget": "Do konce přihlašování už zbývá jen",
+    "details": "Zobrazit podrobnosti"
   },
   "error": {
     "invalidPath": "URL adresa je nesprávná",
@@ -93,7 +94,11 @@
     "allowMarkdown": "Toto pole umožňuje zadat text formátovaný, jako Markdown"
   },
   "home": {
-    "signin": "Přihlásit se"
+    "signin": "Přihlásit se",
+    "title": "Domů",
+    "openProjects": "Aktuálně otevřené projekty",
+    "openGroups": "Otevřené skupiny projektů",
+    "myProjects": "Moje projekty"
   },
   "homeFestival": {
     "title": "24. Filmový festival FI MU"
@@ -165,7 +170,9 @@
         "bonus": "Šablona bonus blok",
         "custom": "Vlastní"
       }
-    }
+    },
+    "edit": "Upravit projekt",
+    "details": "Zobrazit podrobnosti"
   },
   "projectEdit": {
     "quit": "Ukončit editaci",

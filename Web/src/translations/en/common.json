@@ -40,8 +40,8 @@
   "countdown": {
     "days": "days",
     "hours": "hours",
-    "minutes": "minutes",
-    "seconds": "seconds"
+    "minutes": "min",
+    "seconds": "sec"
   },
   "createProject": {
     "button": {
@@ -71,8 +71,9 @@
       "specs": "Technical requirements",
       "newArtefact": "Create a new artifact"
     },
-    "signUp": "Submit a movie",
-    "doNotforget": "Don't miss it! Until the end of the registration remains"
+    "signUp": "Create a project",
+    "doNotforget": "The registration closes in",
+    "details": "Show detials"
   },
   "error": {
     "invalidPath": "URL path is invalid",
@@ -92,7 +93,11 @@
     "construction": "This section is under construction..."
   },
   "home": {
-    "signin": "Sign in"
+    "signin": "Sign in",
+    "title": "Home",
+    "openProjects": "Currently open projects",
+    "openGroups": "Open project groups",
+    "myProjects": "My projects"
   },
   "homeFestival": {
     "title": "24th Film Festival FI MU"
@@ -167,7 +172,9 @@
         "bonus": "Template bonus block",
         "custom": "Vlastní"
       }
-    }
+    },
+    "edit": "Edit project",
+    "details": "View details"
   },
   "projectEdit": {
     "quit": "Quit edit mode",

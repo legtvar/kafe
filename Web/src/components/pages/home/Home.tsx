@@ -16,6 +16,7 @@ import {
 } from '@chakra-ui/react';
 import { t } from 'i18next';
 import Countdown from 'react-countdown';
+import { IoCubeOutline, IoFolderOpenOutline } from 'react-icons/io5';
 import { Link } from 'react-router-dom';
 import { useTitle } from '../../../utils/useTitle';
 import { Brand } from '../../brand/Brand';
@@ -53,7 +54,10 @@ export function Home(props: IHomeProps) {
                 </HStack>
                 <hr />
                 <Heading size="lg" mb={4} mt={6}>
-                    {t('home.openGroups')}
+                    <HStack>
+                        <IoCubeOutline />
+                        <Text>{t('home.openGroups')}</Text>
+                    </HStack>
                 </Heading>
                 <AwaitAPI request={(api) => api.groups.getAll()}>
                     {(groups) => (
@@ -133,8 +137,11 @@ export function Home(props: IHomeProps) {
                     )}
                 </AwaitAPI>
 
-                <Heading size="lg" mb={4} mt={10}>
-                    {t('home.myProjects')}
+                <Heading size="lg" mb={4} mt={6}>
+                    <HStack>
+                        <IoFolderOpenOutline />
+                        <Text>{t('home.myProjects')}</Text>
+                    </HStack>
                 </Heading>
                 <AwaitAPI request={(api) => api.projects.getAll()}>
                     {(projects) => {

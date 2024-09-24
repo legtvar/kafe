@@ -94,10 +94,11 @@
   },
   "home": {
     "signin": "Sign in",
-    "title": "Home",
+    "title": "Welcome to KAFE",
     "openProjects": "Currently open projects",
     "openGroups": "Open project groups",
-    "myProjects": "My projects"
+    "myProjects": "My projects",
+    "subtitle": "Check out, what is new!"
   },
   "homeFestival": {
     "title": "24th Film Festival FI MU"
@@ -174,7 +175,7 @@
       }
     },
     "edit": "Edit project",
-    "details": "View details"
+    "details": "Show details"
   },
   "projectEdit": {
     "quit": "Quit edit mode",

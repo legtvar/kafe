@@ -95,10 +95,11 @@
   },
   "home": {
     "signin": "Přihlásit se",
-    "title": "Domů",
+    "title": "Vítej v KAFE",
     "openProjects": "Aktuálně otevřené projekty",
     "openGroups": "Otevřené skupiny projektů",
-    "myProjects": "Moje projekty"
+    "myProjects": "Moje projekty",
+    "subtitle": "Podívej se, co je nového!"
   },
   "homeFestival": {
     "title": "24. Filmový festival FI MU"
@@ -171,7 +172,7 @@
         "custom": "Vlastní"
       }
     },
-    "edit": "Upravit projekt",
+    "edit": "Upravit",
     "details": "Zobrazit podrobnosti"
   },
   "projectEdit": {

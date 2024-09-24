@@ -26,7 +26,12 @@ public class DefaultEmailService : IEmailService, IDisposable
         GC.SuppressFinalize(this);
     }
 
-    public async Task SendEmail(string to, string subject, string message, string? secretCopy = null, CancellationToken token = default)
+    public async Task SendEmail(
+        string to,
+        string subject,
+        string message,
+        string? secretCopy = null,
+        CancellationToken token = default)
     {
         var mimeMessage = new MimeMessage();
         mimeMessage.From.Add(new MailboxAddress(options.Value.FromName, options.Value.FromAddress));
@@ -41,8 +46,12 @@ public class DefaultEmailService : IEmailService, IDisposable
         {
             Text = message
         };
+        
+        if (!smtp.IsConnected)
+        {
+            await smtp.ConnectAsync(options.Value.Host, options.Value.Port, true, token);
+        }
 
-        await smtp.ConnectAsync(options.Value.Host, options.Value.Port, true, token);
         if (!string.IsNullOrEmpty(options.Value.Username) || !string.IsNullOrEmpty(options.Value.Password))
         {
             await smtp.AuthenticateAsync(options.Value.Username, options.Value.Password, token);

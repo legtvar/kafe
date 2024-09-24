@@ -12,6 +12,7 @@
 
 * [.NET SDK 8.0 or later](https://dotnet.microsoft.com/en-us/download).
 * [PostgreSQL](https://www.postgresql.org/)
+* [FFmpeg](https://ffmpeg.org/) in your [PATH](https://en.wikipedia.org/wiki/PATH_(variable))
 
 **Front end (Web)**
 
@@ -53,8 +54,9 @@ You can get it to work locally, if you really want to, but then it's just easier
 
 1. Open in an editor of your choice.
 2. Restore NuGet packages: `dotnet restore`
-3. While in the `Api/` dir, to run the API: `dotnet run`
-4. Run the front end or use Postman.
+3. If you haven't already, create a self-signed dev certificate: `dotnet dev-certs https`
+4. While in the `Api/` dir, to run the API: `dotnet run`
+5. Run the front end or use Postman.
 
 **Front end (Web)**
 

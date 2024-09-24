@@ -197,10 +197,20 @@ export function PlaylistDetail(props: IPlaylistDetailProps) {
                                                                                         />
                                                                                     )}
                                                                                 </Box>
-                                                                                <Box flexGrow={1}>
+                                                                                <Box
+                                                                                    flexGrow={1}
+                                                                                    textOverflow="ellipsis"
+                                                                                    overflowX="hidden"
+                                                                                    whiteSpace="nowrap"
+                                                                                >
                                                                                     {getPrefered(artifact.name)}
                                                                                 </Box>
-                                                                                <Box>
+                                                                                <Box
+                                                                                    w={20}
+                                                                                    flexShrink={0}
+                                                                                    flexGrow={0}
+                                                                                    textAlign="end"
+                                                                                >
                                                                                     {(
                                                                                         shards[i]?.variants as any
                                                                                     ).original?.duration?.split(

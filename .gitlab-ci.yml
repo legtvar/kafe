@@ -91,6 +91,8 @@ deploy-production:
 
 deploy-staging:
   stage: deploy
+  variables:
+    CI: false
   script:
     - cp "$APPSETTINGS_STAGE" "./Api/appsettings.local.json"
     - docker compose -f docker-compose.base.yml -f docker-compose.staging.yml build

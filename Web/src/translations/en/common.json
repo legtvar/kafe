@@ -73,7 +73,7 @@
     },
     "signUp": "Create a project",
     "doNotforget": "The registration closes in",
-    "details": "Show detials"
+    "details": "Details"
   },
   "error": {
     "invalidPath": "URL path is invalid",

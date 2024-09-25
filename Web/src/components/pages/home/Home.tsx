@@ -61,12 +61,12 @@ export function Home(props: IHomeProps) {
                 </Heading>
                 <AwaitAPI request={(api) => api.groups.getAll()}>
                     {(groups) => (
-                        <Box w="full" overflowX="auto" py={4}>
+                        <Box w="full" overflowX="auto" py={4} scrollSnapType="x mandatory">
                             <HStack alignItems="start">
                                 {groups
                                     .filter((group) => group.isOpen)
                                     .map((group, i) => (
-                                        <Card w="sm" key={i} flexShrink={0}>
+                                        <Card w="sm" maxW="100%" key={i} flexShrink={0} scrollSnapAlign="start">
                                             <CardBody>
                                                 <Stack spacing="3">
                                                     <Heading size="md">{group.getName()}</Heading>
@@ -146,12 +146,12 @@ export function Home(props: IHomeProps) {
                 <AwaitAPI request={(api) => api.projects.getAll()}>
                     {(projects) => {
                         return (
-                            <Box w="full" overflowX="auto" py={4}>
+                            <Box w="full" overflowX="auto" py={4} scrollSnapType="x mandatory">
                                 <HStack alignItems="start">
                                     {projects
                                         .filter((project) => project.userPermissions.includes('write'))
                                         .map((project, i) => (
-                                            <Card w="sm" key={i} flexShrink={0}>
+                                            <Card w="sm" maxW="100%" key={i} flexShrink={0} scrollSnapAlign="start">
                                                 <CardBody>
                                                     <Stack spacing="3">
                                                         <Heading size="md">{project.getName()}</Heading>

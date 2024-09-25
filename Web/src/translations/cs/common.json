@@ -73,7 +73,7 @@
     },
     "signUp": "Přidat projekt",
     "doNotforget": "Do konce přihlašování už zbývá jen",
-    "details": "Zobrazit podrobnosti"
+    "details": "Podrobnosti"
   },
   "error": {
     "invalidPath": "URL adresa je nesprávná",
@@ -173,7 +173,7 @@
       }
     },
     "edit": "Upravit",
-    "details": "Zobrazit podrobnosti"
+    "details": "Podrobnosti"
   },
   "projectEdit": {
     "quit": "Ukončit editaci",

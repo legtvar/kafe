@@ -24,14 +24,24 @@
   },
   "troubleshooting": {
     "title": "Nahlásit problém",
-    "contactUs": "V případě neřešitelných potíží nás kontaktujte na <email>kafe@fi.muni.cz</email>."
+    "contactUs": "Objevili jste problém? Můžete odeslat hlášení o tom, co se stalo.",
+    "sendTo": "Prosíme odešlete nám toto hlášení na <1>kafe@fi.muni.cz</1>, děkujeme!",
+    "mailContents": "Dobrý den,\n\npři používání KAFE jsem zaznamenal následující problém:\n{{message}}\n\nPřikládám vygenerovaný report\n\nDěkuji a přeji hezký den\n\n---\n\n",
+    "selectAttachments": "Budeme rádi za co nejvíce podrobností o problému. Můžete si ale sami vybrat, jaké informace nám poskytnete:",
+    "page": "Stránku, na které k problému došlo",
+    "browser": "Prohlížeč, který používáte",
+    "user": "Účet, u kterého došlo k problému",
+    "logs": "Chybová hlášení prohlížeče",
+    "description": "Prosím popište co nejpodrobněji, co se stalo špatně:",
+    "generated": "Vygenerované hlášení:"
   },
   "common": {
     "backHome": "Zpět na domovskou stránku",
     "cancel": "Zrušit",
     "edit": "Upravit",
     "save": "Uložit",
-    "understood": "Chápu"
+    "understood": "Chápu",
+    "send": "Odeslat"
   },
   "content": {
     "noFileSelected": "Žádný vybraný soubor",
@@ -325,7 +335,8 @@
     "rights": "Oprávnění",
     "homepage": "Domovská obrazovka",
     "status": "Stav systému",
-    "runningFrom": "Běží od"
+    "runningFrom": "Běží od",
+    "console": "Konzole"
   },
   "rights": {
     "read": "Zobrazit",
@@ -401,5 +412,8 @@
   },
   "player": {
     "loadingError": "Toto video bohužel nelze přehrát v této kvalitě"
+  },
+  "general": {
+    "copied": "Zkopírováno!"
   }
 }

@@ -24,14 +24,24 @@
   },
   "troubleshooting": {
     "title": "Report an issue",
-    "contactUs": "If you bump into any unsolvable problems, contact us at <email>kafe@fi.muni.cz</email>."
+    "contactUs": "Did you discover a problem? \nYou can send a report about what happened.",
+    "sendTo": "Please send us this report to <1>kafe@fi.muni.cz</1>, thank you!",
+    "mailContents": "Good morning,\n\nI experienced the following problem while using KAFE:\n{{message}}\n\nI am attaching the generated report\n\nThank you and have a nice day\n\n---\n\n",
+    "selectAttachments": "We would appreciate as much detail as possible about the problem. However, you can choose what information you provide us:",
+    "page": "The page where the problem occurred",
+    "browser": "The browser you are using",
+    "user": "The account that had a problem",
+    "logs": "Browser error messages",
+    "description": "Please describe in as much detail as possible what went wrong:",
+    "generated": "Generated report:"
   },
   "common": {
     "backHome": "Back Home",
     "cancel": "Cancel",
     "edit": "Edit",
     "save": "Save",
-    "understood": "I understand"
+    "understood": "I understand",
+    "send": "Send"
   },
   "content": {
     "noFileSelected": "No file selected",
@@ -327,7 +337,8 @@
     "rights": "Rights",
     "homepage": "Homepage",
     "status": "System status",
-    "runningFrom": "Running since"
+    "runningFrom": "Running since",
+    "console": "Console"
   },
   "rights": {
     "read": "View",
@@ -403,5 +414,8 @@
   },
   "player": {
     "loadingError": "Unfortunately, this video cannot be played in this quality"
+  },
+  "general": {
+    "copied": "Copied!"
   }
 }

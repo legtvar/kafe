@@ -11,7 +11,10 @@ import { ChakraProvider, ColorModeScript } from '@chakra-ui/react';
 import moment from 'moment';
 import 'moment/locale/cs';
 import { CookiesProvider } from 'react-cookie';
+import { overrideConsole } from './consoleOverride';
 import theme from './theme';
+
+overrideConsole();
 
 (async () => {
     i18next.init(languageConfig);

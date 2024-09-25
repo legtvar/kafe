@@ -6,7 +6,7 @@ import { useAuth } from '../../../hooks/Caffeine';
 import { AppRoute, authRoutes } from '../../../routes';
 import { Footer } from '../Footer';
 import { Logo } from '../Logo';
-import { MessageButton } from '../MessageButton';
+import { ReportButton } from '../ReportButton';
 import { NavItem } from './NavItem';
 
 interface ISidebarProps extends BoxProps {
@@ -109,10 +109,7 @@ export function Sidebar({ onClose, ...rest }: ISidebarProps) {
                 <Flex direction="column" grow={1}>
                     {items}
                 </Flex>
-                <MessageButton
-                    warningKey="troubleshooting.title"
-                    titleKey="troubleshooting.title"
-                    descriptionKey="troubleshooting.contactUs"
+                <ReportButton
                     alignSelf="stretch"
                     mx={4}
                     opacity={0.3}

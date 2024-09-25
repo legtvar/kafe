@@ -108,7 +108,8 @@
   },
   "layout": {
     "footer": {
-      "copy": "Made by LeGTVaR with <1>❤️</1> and ☕."
+      "copy": "Made by LeGTVaR with <1>❤️</1> and ☕.",
+      "appName": "Kontrol and Archival of Fantastic Entertainment"
     },
     "title-prefix": "KAFE"
   },
@@ -324,7 +325,9 @@
     "title": "System settings",
     "warning": "Please be careful! Anything you change here can have a catastrophic impact on the final taste of KAFE! Proceed with caution!",
     "rights": "Rights",
-    "homepage": "Homepage"
+    "homepage": "Homepage",
+    "status": "System status",
+    "runningFrom": "Running since"
   },
   "rights": {
     "read": "View",

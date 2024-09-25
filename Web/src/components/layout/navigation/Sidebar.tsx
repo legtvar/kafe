@@ -2,6 +2,7 @@ import { Box, BoxProps, CloseButton, Flex, useColorModeValue } from '@chakra-ui/
 import { useTranslation } from 'react-i18next';
 import { IoReader, IoReaderOutline } from 'react-icons/io5';
 import { Link, useMatches } from 'react-router-dom';
+import { useAuth } from '../../../hooks/Caffeine';
 import { AppRoute, authRoutes } from '../../../routes';
 import { Footer } from '../Footer';
 import { Logo } from '../Logo';
@@ -17,7 +18,7 @@ export function Sidebar({ onClose, ...rest }: ISidebarProps) {
     const i18next = useTranslation();
     const fgColor = useColorModeValue('gray.900', 'white');
 
-    const routeValues = authRoutes(i18next.t);
+    const routeValues = authRoutes(i18next.t, useAuth().user);
 
     const match = matches[matches.length - 1].id
         .split('-')
@@ -115,6 +116,10 @@ export function Sidebar({ onClose, ...rest }: ISidebarProps) {
                     alignSelf="stretch"
                     mx={4}
                     opacity={0.3}
+                    _hover={{
+                        opacity: 1,
+                    }}
+                    transition="opacity 0.2s linear"
                 />
                 <Footer key="footer" />
             </Flex>

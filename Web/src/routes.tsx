@@ -37,6 +37,8 @@ import { ServerError } from './components/pages/ServerError';
 import { SystemComponent } from './components/pages/system/SystemComponent';
 import { OutletOrChildren } from './components/utils/OutletOrChildren';
 import { Status } from './components/utils/Status';
+import { User } from './data/User';
+import { Permission } from './schemas/generic';
 
 export type SelectableIcon = {
     default: IconType;
@@ -94,7 +96,7 @@ export const routerConfig = (t: (id: string) => string): RouteObject[] => [
     },
 ];
 
-export const authRoutes = (t: (id: string) => string): AppRoute[] => [
+export const authRoutes = (t: (id: string) => string, user?: User | null): AppRoute[] => [
     {
         path: '',
         title: t('route.home.title'),
@@ -178,7 +180,9 @@ export const authRoutes = (t: (id: string) => string): AppRoute[] => [
         path: 'system',
         title: t('route.system.title'),
         element: <SystemComponent />,
-        inMenu: true,
+        inMenu: (['read', 'append', 'inspect', 'write', 'all'] as Permission[]).some((perm) =>
+            user?.permissions['system']?.includes(perm),
+        ),
         icon: {
             default: IoSettingsOutline,
             selected: IoSettingsSharp,

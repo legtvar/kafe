@@ -3,15 +3,18 @@ import {
     Button,
     Heading,
     HStack,
+    ListItem,
     Tab,
     TabList,
     TabPanel,
     TabPanels,
     Tabs,
     Text,
+    UnorderedList,
     useColorModeValue,
 } from '@chakra-ui/react';
 import { t } from 'i18next';
+import moment from 'moment';
 import { IoWarning } from 'react-icons/io5';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../hooks/Caffeine';
@@ -31,6 +34,8 @@ export function SystemComponent(props: ISystemComponentProps) {
     const { user } = useAuth();
     const navigate = useNavigate();
     useTitle(t('title.system'));
+
+    const readonly = !user?.permissions['system']?.includes('write');
 
     return (
         <OutletOrChildren>
@@ -56,22 +61,24 @@ export function SystemComponent(props: ISystemComponentProps) {
                                         >
                                             {t('system.title').toString()}
                                         </Heading>
-                                        <Button
-                                            colorScheme="blue"
-                                            ml={{
-                                                base: '0',
-                                                xl: '4',
-                                            }}
-                                            mt={{
-                                                base: '2',
-                                                xl: '0',
-                                            }}
-                                            onClick={onSubmit}
-                                            isLoading={status === 'sending'}
-                                            isDisabled={status === 'sending'}
-                                        >
-                                            {t('generic.save').toString()}
-                                        </Button>
+                                        {!readonly && (
+                                            <Button
+                                                colorScheme="blue"
+                                                ml={{
+                                                    base: '0',
+                                                    xl: '4',
+                                                }}
+                                                mt={{
+                                                    base: '2',
+                                                    xl: '0',
+                                                }}
+                                                onClick={onSubmit}
+                                                isLoading={status === 'sending'}
+                                                isDisabled={status === 'sending'}
+                                            >
+                                                {t('generic.save').toString()}
+                                            </Button>
+                                        )}
                                     </HStack>
 
                                     <HStack color="red.500" mb={8}>
@@ -84,7 +91,7 @@ export function SystemComponent(props: ISystemComponentProps) {
                         <Tabs>
                             <TabList>
                                 <Tab>{t('system.rights').toString()}</Tab>
-                                {/* <Tab>{t('system.homepage').toString()}</Tab> */}
+                                <Tab>{t('system.status').toString()}</Tab>
                             </TabList>
 
                             <TabPanels pt={6}>
@@ -99,9 +106,37 @@ export function SystemComponent(props: ISystemComponentProps) {
                                             append: t('rights.groups.system.append').toString(),
                                             review: t('rights.groups.system.review').toString(),
                                         }}
+                                        readonly={readonly}
                                     />
                                 </TabPanel>
-                                {/* <TabPanel>{t('generic.construction').toString()}</TabPanel> */}
+                                <TabPanel>
+                                    <AwaitAPI request={(api) => api.system.status()}>
+                                        {(status) => (
+                                            <>
+                                                <Heading as="h1" fontSize="2xl">
+                                                    {status.name}
+                                                </Heading>
+                                                <UnorderedList>
+                                                    <ListItem>
+                                                        Version <strong>{status.version}</strong>
+                                                    </ListItem>
+                                                    <ListItem>
+                                                        Commit <strong>{status.commit}</strong>{' '}
+                                                        {moment(status.commitDate).calendar()}
+                                                    </ListItem>
+                                                    <ListItem>
+                                                        {t('system.runningFrom')}{' '}
+                                                        <strong>
+                                                            {moment(status.runningSince).format(
+                                                                'YYYY-MM-DD HH:mm:ss Z',
+                                                            )}
+                                                        </strong>
+                                                    </ListItem>
+                                                </UnorderedList>
+                                            </>
+                                        )}
+                                    </AwaitAPI>
+                                </TabPanel>
                             </TabPanels>
                         </Tabs>
                     </Box>

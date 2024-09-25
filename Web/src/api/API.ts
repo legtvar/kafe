@@ -6,6 +6,7 @@ import { Group } from '../data/Group';
 import { Playlist } from '../data/Playlist';
 import { Project } from '../data/Project';
 import { Shard } from '../data/Shard';
+import { System } from '../data/System';
 import { User } from '../data/User';
 import { components } from '../schemas/api';
 import { HRIB, localizedString } from '../schemas/generic';
@@ -255,6 +256,16 @@ export class API {
                         perms.serialize(true),
                     );
                 },
+            },
+        };
+    }
+
+    public get system() {
+        const api = this;
+
+        return {
+            async status() {
+                return await api.requestSingle(`system`, System);
             },
         };
     }

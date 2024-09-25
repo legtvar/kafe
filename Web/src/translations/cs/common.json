@@ -173,7 +173,9 @@
       }
     },
     "edit": "Upravit",
-    "details": "Podrobnosti"
+    "details": "Podrobnosti",
+    "cast": "Herecké obsazení",
+    "media": "Přílohy"
   },
   "projectEdit": {
     "quit": "Ukončit editaci",

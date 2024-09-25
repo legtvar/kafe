@@ -12,11 +12,21 @@ interface IContentViewerProps {
     videoProps?: ReactPlayerProps;
     onNext?: () => void;
     onPrevious?: () => void;
+    height?: string;
+    width?: string;
 }
 
 type ContentType = 'Video' | 'Image' | 'Unknown';
 
-export function ContentViewer({ artifact, autoplay, videoProps, onPrevious, onNext }: IContentViewerProps) {
+export function ContentViewer({
+    artifact,
+    autoplay,
+    videoProps,
+    onPrevious,
+    onNext,
+    width,
+    height,
+}: IContentViewerProps) {
     const api = useApi();
 
     let type: ContentType = 'Unknown';
@@ -58,9 +68,9 @@ export function ContentViewer({ artifact, autoplay, videoProps, onPrevious, onNe
                         videoProps={videoProps}
                         sources={videoSources}
                         subtitles={subtitleSources}
-                        minW="100%"
-                        maxW="100%"
-                        h="60vmin"
+                        minW={width || '100%'}
+                        maxW={width || '100%'}
+                        h={height || '60vmin'}
                         autoplay={autoplay}
                         onPrevious={onPrevious}
                         onNext={onNext}
@@ -73,8 +83,8 @@ export function ContentViewer({ artifact, autoplay, videoProps, onPrevious, onNe
                         src={api.shards.defaultStreamUrl(image.id)}
                         alt={artifact.getName()}
                         style={{
-                            width: '100%',
-                            height: '60vmin',
+                            width: width || '100%',
+                            height: height || '60vmin',
                             objectFit: 'contain',
                             objectPosition: 'center center',
                         }}

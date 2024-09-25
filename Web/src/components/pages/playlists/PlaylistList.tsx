@@ -1,21 +1,22 @@
-import { Box, Flex, FormControl, Highlight, Input, Text, useColorModeValue } from '@chakra-ui/react';
+import { Box, Flex, FormControl, Highlight, Icon, Input, Text, useColorModeValue } from '@chakra-ui/react';
 import { t } from 'i18next';
 import { useState } from 'react';
+import { IoListCircleOutline } from 'react-icons/io5';
 import { Link } from 'react-router-dom';
 import { Playlist } from '../../../data/Playlist';
 import { useColorScheme, useHighlightStyle } from '../../../hooks/useColorScheme';
 import { fulltextFilter } from '../../../utils/fulltextFilter';
+import { useTitle } from '../../../utils/useTitle';
 import { AwaitAPI } from '../../utils/AwaitAPI';
 import { OutletOrChildren } from '../../utils/OutletOrChildren';
 import { Pagination } from '../../utils/Pagination';
-import { useTitle } from '../../../utils/useTitle';
 
 interface IPlaylistListProps {}
 
 export function PlaylistList(props: IPlaylistListProps) {
     const borderColor = useColorModeValue('gray.300', 'gray.700');
     const hoverColor = useColorModeValue('gray.200', 'gray.700');
-    useTitle(t("title.playlists"));
+    useTitle(t('title.playlists'));
 
     const { border, bg } = useColorScheme();
     const highlightStyle = useHighlightStyle();
@@ -64,6 +65,7 @@ export function PlaylistList(props: IPlaylistListProps) {
                                                 background: hoverColor,
                                             }}
                                         >
+                                            <Icon as={IoListCircleOutline} mb="auto" mr={3} mt={1} fontSize="xl" />
                                             <Flex direction="column" flex="1">
                                                 <Text>
                                                     <Highlight styles={highlightStyle} query={filter}>

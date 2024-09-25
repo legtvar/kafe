@@ -6,9 +6,9 @@ import { Group } from '../../../data/Group';
 import { AwaitAPI } from '../../utils/AwaitAPI';
 import { OutletOrChildren } from '../../utils/OutletOrChildren';
 import { Status } from '../../utils/Status';
+import { WithTitle } from '../../utils/WithTitle';
 import { IntroText } from '../projects/create/IntroText';
 import { ProjectListComponent } from '../projects/ProjectListComponent';
-import { WithTitle } from '../../utils/WithTitle';
 
 interface IGroupsDetailProps {}
 
@@ -27,7 +27,7 @@ export function GroupsDetail(props: IGroupsDetailProps) {
             >
                 {(group: Group) => (
                     <Stack spacing={4} m={6} direction="column" pb={16}>
-                        <WithTitle title={t("title.group", {group: group.getName()})} />
+                        <WithTitle title={t('title.group', { group: group.getName() })} />
                         <Flex mb={2}>
                             <Heading fontSize="4xl" fontWeight="semibold" as="h2" lineHeight="tight" mr="auto">
                                 {group.getName()}

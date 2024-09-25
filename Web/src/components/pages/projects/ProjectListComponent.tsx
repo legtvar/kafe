@@ -1,7 +1,8 @@
-import { Box, Flex, FormControl, Highlight, Input, Text, useColorModeValue } from '@chakra-ui/react';
+import { Box, Flex, FormControl, Highlight, Icon, Input, Text, useColorModeValue } from '@chakra-ui/react';
 import { t } from 'i18next';
 import moment from 'moment';
 import { useState } from 'react';
+import { IoCubeOutline } from 'react-icons/io5';
 import { Link } from 'react-router-dom';
 import { Project } from '../../../data/Project';
 import { useColorScheme, useHighlightStyle } from '../../../hooks/useColorScheme';
@@ -64,6 +65,7 @@ export function ProjectListComponent({ projects }: IProjectListComponentProps) {
                                     background: hoverColor,
                                 }}
                             >
+                                <Icon as={IoCubeOutline} mb="auto" mr={3} mt={1} fontSize="xl" />
                                 <Flex direction="column" flex="1">
                                     <Text>
                                         {

@@ -16,7 +16,7 @@ import {
 import { t } from 'i18next';
 import { AiOutlineUnlock } from 'react-icons/ai';
 import { BsX } from 'react-icons/bs';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Project } from '../../../data/Project';
 import { useAuth } from '../../../hooks/Caffeine';
 import { AwaitAPI } from '../../utils/AwaitAPI';
@@ -35,6 +35,7 @@ interface IProjectEditProps {}
 export function ProjectEdit(props: IProjectEditProps) {
     const { id } = useParams();
     const { user } = useAuth();
+    const navigate = useNavigate();
 
     if (!id) {
         return <Status statusCode={404} embeded />;
@@ -100,7 +101,7 @@ export function ProjectEdit(props: IProjectEditProps) {
                                             <SendAPI
                                                 value={perms}
                                                 request={(api, value) => api.entities.perms.update(value)}
-                                                onSubmited={() => {}}
+                                                onSubmited={() => navigate(0) /* Refresh the page */}
                                                 repeatable={true}
                                             >
                                                 {(onSubmit, status) => (

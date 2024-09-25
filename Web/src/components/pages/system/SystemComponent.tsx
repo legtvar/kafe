@@ -13,14 +13,15 @@ import {
 } from '@chakra-ui/react';
 import { t } from 'i18next';
 import { IoWarning } from 'react-icons/io5';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../hooks/Caffeine';
 import { useColorScheme } from '../../../hooks/useColorScheme';
+import { AllPermissions, SystemHRIB } from '../../../schemas/generic';
+import { useTitle } from '../../../utils/useTitle';
+import { AwaitAPI } from '../../utils/AwaitAPI';
 import { OutletOrChildren } from '../../utils/OutletOrChildren';
 import { RightsEditor } from '../../utils/RightsEditor';
-import { AwaitAPI } from '../../utils/AwaitAPI';
-import { AllPermissions, SystemHRIB } from '../../../schemas/generic';
 import { SendAPI } from '../../utils/SendAPI';
-import { useTitle } from '../../../utils/useTitle';
 
 interface ISystemComponentProps {}
 
@@ -28,7 +29,8 @@ export function SystemComponent(props: ISystemComponentProps) {
     const borderColor = useColorModeValue('gray.300', 'gray.700');
     const { border } = useColorScheme();
     const { user } = useAuth();
-    useTitle(t("title.system"));
+    const navigate = useNavigate();
+    useTitle(t('title.system'));
 
     return (
         <OutletOrChildren>
@@ -37,7 +39,7 @@ export function SystemComponent(props: ISystemComponentProps) {
                     <Box m={6} pb={12}>
                         <SendAPI
                             request={(api, value) => api.entities.perms.update(value)}
-                            onSubmited={() => {}}
+                            onSubmited={() => navigate(0) /* Refresh the page */}
                             value={perms}
                             repeatable={true}
                         >

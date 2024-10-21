@@ -1,0 +1,29 @@
+@use "fonts";
+
+@use "sass:color";
+
+$font-header: "Lato", sans-serif !default;
+$font-navigation: "Bitter", serif !default;
+$font-text: sans-serif !default;
+$font-monospace: "Cascadia Mono", monospace !default;
+
+$color-light: #eae0e0 !default;
+$color-gray: #aaa0a0 !default;
+$color-dark: #1e1919 !default;
+$color-accent: #ac162c !default;
+
+$width-desktop: 980px !default;
+$width-tablet: 768px !default;
+$width-mobile: 560px !default;
+
+:root {
+    --bg: #{$color-dark};
+    --fg: #{$color-gray};
+    --hfg: #{$color-light};
+    --accent: #{$color-accent};
+    --accent-fg: #{$color-light};
+    --accent-hover: #{color.adjust($color-accent, $lightness: +16%)};
+    --accent-disabled: #{color.adjust($color-accent, $lightness: -16%)};
+    --text: #{$font-text};
+    --monospace: #{$font-monospace};
+}

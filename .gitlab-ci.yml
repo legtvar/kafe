@@ -120,23 +120,22 @@ deploy-staging:
 #   when: manual
 
 pages:
-  image: mcr.microsoft.com/dotnet/sdk:8.0-alpine
+  image: denoland/deno:alpine
   stage: deploy
   artifacts:
     paths:
       - public/
     expire_in: 42 seconds
   script:
+    - apk update && apk add curl
     - cd Docs
-    - dotnet tool restore
-    - dotnet docfx metadata
-    - dotnet docfx build
+    - deno task build
     - cd ..
     - cp -r Docs/_site public/
   tags:
     - shared-fi
   rules:
-    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "docs"
   environment:
     name: pages
     url: https://legtvar.pages.fi.muni.cz/kafe

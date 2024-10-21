@@ -1,0 +1,32 @@
+@use "config";
+// Overrides for pagefind.
+
+:root {
+    --pagefind-ui-scale: 0.75;
+    --pagefind-ui-primary: var(--accent);
+    --pagefind-ui-text: var(--fg);
+    --pagefind-ui-background: var(--bg);
+    --pagefind-ui-border: var(--fg);
+    --pagefind-ui-tag: var(--fg);
+    --pagefind-ui-border-width: 1px;
+    --pagefind-ui-border-radius: 0;
+    --pagefind-ui-image-border-radius: 0;
+    --pagefind-ui-image-box-ratio: 3 / 2;
+    --pagefind-ui-font: var(--text);
+}
+
+.pagefind-ui {
+    padding-bottom: 1rem;
+
+    &__drawer {
+        position: fixed;
+        top: 11rem;
+        max-width: min(32rem, 80vw);
+        max-height: calc(100vh - 12rem);
+        overflow-y: scroll;
+        background-color: var(--bg);
+        outline: 1px solid var(--fg);
+        padding: 0 1rem 1rem 1rem;
+        width: 200%;
+    }
+}

@@ -1,0 +1,136 @@
+@use "responsive";
+
+nav {
+    overflow: visible;
+    .logo {
+        font-family: var(--monospace);
+        text-decoration: none;
+        font-size: 2rem;
+        font-weight: 900;
+        padding: 1rem 0 1rem 4rem;
+        color: var(--hfg);
+        display: flex;
+        flex-direction: row;
+        gap: 0.25rem;
+        position: relative;
+
+        &:hover {
+            text-decoration: underline;
+        }
+
+        &::before {
+            content: url("/img/favicon.svg");
+            height: 4rem;
+            width: 4rem;
+            display: block;
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+    }
+
+    .sidebar {
+        width: 16rem;
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        padding: 3rem 2rem 3rem 2rem;
+        overflow-x: hidden;
+        overflow-y: scroll;
+        background-color: var(--bg);
+        z-index: 3;
+
+        ul {
+            list-style: none;
+            font-size: 0.75rem;
+            padding: 0;
+
+            a {
+                text-decoration: none;
+
+                &:hover {
+                    text-decoration: underline;
+                }
+            }
+
+            ul {
+                padding-left: 1rem;
+            }
+        }
+
+        // NB: this only applies to the first level
+        >ul>li>a {
+            color: var(--hfg);
+            font-size: 1rem;
+        }
+    }
+
+    #sidebar-toggle,
+    .menu-bar,
+    #darkness {
+        display: none;
+    }
+
+    @include responsive.phone {
+        position: absolute;
+        inset: 0 0 0 0;
+        width: 100%;
+        height: 100%;
+        display: block;
+
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            transform: translateX(-100%);
+            transition: transform 0.2s ease-in-out;
+            background-color: var(--bg);
+            overflow-x: hidden;
+        }
+        
+        .menu-bar {
+            display: block;
+            inset: 0 0 auto 0;
+            width: 100%;
+            height: 3rem;
+            z-index: 1;
+            position: fixed;
+
+            border-bottom: 0.125rem solid var(--fg);
+            background-color: var(--bg);
+
+            label {
+                cursor: pointer;
+                svg {
+                    width: 2rem;
+                    height: 2rem;
+                    display: block;
+                    margin: 0.5rem;
+                }
+                
+                &:hover svg {
+                    color: var(--hfg);
+                }
+            }
+        }
+
+        #darkness {
+            position: fixed;
+            width: 100vw;
+            height: 100vh;
+            inset: 0 0 0 0;
+            background-color: black;
+            opacity: 50%;
+            z-index: 2;
+        }
+
+        #sidebar-toggle:checked~.sidebar {
+            transform: none;
+        }
+
+        #sidebar-toggle:checked~#darkness {
+            display: block;
+        }
+    }
+}

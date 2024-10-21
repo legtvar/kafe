@@ -1,0 +1,93 @@
+@use "reset";
+@use "config";
+@use "nav";
+@use "typography";
+@use "responsive";
+@use "media";
+@use "search";
+
+html {
+    width: 100%;
+    height: 100%;
+}
+
+body {
+    margin: 0 auto;
+    max-width: 88rem;
+    background-color: var(--bg);
+    display: flex;
+    flex-direction: row;
+    padding: 0 2rem 0 2rem;
+    align-items: stretch;
+
+    main {
+        flex-grow: 1;
+        flex-shrink: 1;
+        min-width: 0;
+        padding: 3rem 1.5rem 30rem 1.5rem;
+        z-index: 0;
+    }
+
+    @include responsive.phone {
+        padding: 0;
+
+        main {
+            padding-left: 2rem;
+            padding-right: 2rem;
+
+            max-width: 100%;
+        }
+
+        table {
+            display: block;
+            width: 100%;
+            overflow-x: scroll;
+        }
+        
+        pre {
+            overflow-x: scroll;
+        }
+    }
+}
+
+main {
+    max-width: 64rem;
+}
+
+.index-header {
+    position: relative;
+    padding: 4rem 0 6rem 0;
+    text-align: center;
+    font-size: 1.5rem;
+    margin-bottom: 2rem;
+
+    * {
+        margin: 0;
+        padding: 0;
+        border: none;
+    }
+
+    h1 {
+        font-size: 4rem;
+        font-family: var(--monospace);
+    }
+
+    &::before {
+        content: ' ';
+        background-image: url("/img/helveg-bg.webp");
+        background-repeat: no-repeat;
+        background-position: 50% 50%;
+        background-size: 100%;
+        opacity: 15%;
+        position: absolute;
+        inset: 0 0 0 0;
+        z-index: -1;
+    }
+}
+
+.swatch {
+    width: 100%;
+    height: 1em;
+    padding: 0.25rem;
+    border: 1px solid var(--fg);
+}

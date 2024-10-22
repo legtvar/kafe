@@ -127,11 +127,10 @@ pages:
       - public/
     expire_in: 42 seconds
   script:
-    - apk update && apk add curl
     - cd Docs
     - deno task build
     - cd ..
-    - cp -r Docs/_site public/
+    - cp -r Docs/public public/
   tags:
     - shared-fi
   rules:

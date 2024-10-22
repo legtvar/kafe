@@ -120,7 +120,7 @@ deploy-staging:
 #   when: manual
 
 pages:
-  image: denoland/deno:alpine
+  image: denoland/deno:latest
   stage: deploy
   artifacts:
     paths:

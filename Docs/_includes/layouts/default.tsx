@@ -1,37 +1,38 @@
-import { Page, PageData } from "lume/core.ts";
 import { Node as TocNode } from "lume_markdown_plugins/toc/mod.ts";
 
 export const layout = "layouts/base.tsx";
 
-interface DocPageData extends PageData {
+interface DocPageData extends Lume.Data {
   priority?: number;
   toc?: TocNode[];
+  entries?: TocNode[];
+  showDate: boolean;
 }
 
-export default ({ children, search }: PageData) => (
-  <>
-    <nav>
-      <div class="menu-bar">
+export default function ({ children, search, date, showDate }: Lume.Data) {
+  return (
+    <>
+      <nav>
+        <div class="menu-bar">
           <label for="sidebar-toggle">
             <img src="/img/vsc/layout-sidebar-left.svg" data-inline />
           </label>
-      </div>
-      <input type="checkbox" id="sidebar-toggle" />
-      <label id="darkness" for="sidebar-toggle">
-      </label>
-      <div class="sidebar">
-        <a class="logo" href="/">
-          Helveg
-        </a>
-        <div id="search"></div>
-        <ul>
-          {(search.pages("doc", "priority=desc") as Page<DocPageData>[]).map(
-            (p) => (
+        </div>
+        <input type="checkbox" id="sidebar-toggle" />
+        <label id="darkness" for="sidebar-toggle"></label>
+        <div class="sidebar">
+          <a class="logo" href="/">
+            KAFE
+          </a>
+          <div id="search"></div>
+          <ul>
+            {search.pages<DocPageData>("doc", "priority=desc").map((p) => (
               <li>
-                <a href={p.data.url.toString()}>{p.data.title}</a>
-                {p.data.toc && p.data.toc.length > 0 && (
+                <a href={p.url.toString()}>{p.title}</a>
+                {((p.toc && p.toc.length > 0) ||
+                  (p.entries && p.entries.length > 0)) && (
                   <ul>
-                    {p.data.toc.map((n) => (
+                    {(p.toc?.length ?? 0 > 0 ? p.toc : p.entries)!.map((n) => (
                       <li>
                         <a href={n.url}>{n.text}</a>
                       </li>
@@ -39,11 +40,14 @@ export default ({ children, search }: PageData) => (
                   </ul>
                 )}
               </li>
-            )
-          )}
-        </ul>
-      </div>
-    </nav>
-    <main>{children}</main>
-  </>
-);
+            ))}
+          </ul>
+        </div>
+      </nav>
+      <main>
+        {showDate && date && <span>{date.getFullYear()}-{(date.getMonth()+1).toString().padStart(2, "0")}-{date.getDate().toString().padStart(2, "0")}</span>}
+        {children}
+      </main>
+    </>
+  );
+}

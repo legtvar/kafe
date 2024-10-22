@@ -1,3 +1,11 @@
+---
+title: Devlog
+tags: doc
+priority: 10
+collection: devlog
+showDate: false
+---
+
 ```
       █      █
      █      █

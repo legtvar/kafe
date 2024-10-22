@@ -1,6 +1,4 @@
-import type { PageData } from "lume/core.ts";
-
-export interface FrontPageData extends PageData {
+export interface FrontPageData extends Lume.Data {
   styles?: string[];
   math?: boolean;
 }
@@ -15,7 +13,7 @@ export default ({ title, children }: FrontPageData) => {
         <link rel="apple-touch-icon" size={256} href="/img/favicon-256.png" />
         <meta name="viewport" content="width=device-width,initial-scale=1.0" />
         <meta name="theme-color" content="#ac162c" />
-        <title>{title ? `${title} – Helveg` : "Helveg – An experimental visual alternative to an API reference"}</title>
+        <title>{title ? `${title} – KAFE` : "KAFE – Kontrol and Archival of Fantastic Entertainment"}</title>
         <link href="/styles/main.css" rel="stylesheet" />
       </head>
 

@@ -3,27 +3,46 @@ import markdown from "lume/plugins/markdown.ts";
 import jsx from "lume/plugins/jsx_preact.ts";
 import sass from "lume/plugins/sass.ts";
 import postcss from "lume/plugins/postcss.ts";
-import imagick from "lume/plugins/imagick.ts";
+import transformImages from "lume/plugins/transform_images.ts";
 import picture from "lume/plugins/picture.ts";
 import metas from "lume/plugins/metas.ts";
 import resolveUrls from "lume/plugins/resolve_urls.ts";
 import sitemap from "lume/plugins/sitemap.ts";
 import inline from "lume/plugins/inline.ts";
 import toc from "lume_markdown_plugins/toc.ts";
-import { Gravity } from "lume/deps/imagick.ts";
+import { Node as TocNode } from "lume_markdown_plugins/toc/mod.ts";
 import { linkInsideHeader } from "lume_markdown_plugins/toc/anchors.ts";
 import pagefind from "lume/plugins/pagefind.ts";
+import { default as markdownItAlerts } from "npm:markdown-it-github-alerts";
+import codeHighlight from "./_plugins/shiki.ts";
 
 const site = lume({
     dest: "public/",
-    includes: "_includes/",
     src: ".",
-    location: new URL("https://helveg.net")
+    location: new URL("https://legtvar.pages.fi.muni.cz/kafe")
 });
 
-site.ignore("old", ".vscode")
+site.ignore(".vscode", "public", "_plugins")
     .ignore("README.md")
-    .use(markdown())
+    .use(markdown({
+        plugins: [[markdownItAlerts, {
+            titles: {
+                "tip": "",
+                "note": "",
+                "important": "",
+                "warning": "",
+                "caution": ""
+            },
+            icons: {
+                "tip": " ",
+                "note": " ",
+                "important": " ",
+                "warning": " ",
+                "caution": " "
+            },
+            classPrefix: "alert"
+        }]]
+    }))
     .use(toc({
         tabIndex: false,
         // anchor: false,
@@ -43,33 +62,42 @@ site.ignore("old", ".vscode")
         attribute: "data-inline"
     }))
     .use(picture())
-    .use(imagick({
+    .use(transformImages({
         extensions: [".png", ".jpg", ".jpeg", ".gif", ".webp"],
-        name: "data-imagick",
         functions: {
-            resizeCrop(img, size) {
-                if (typeof (size) == "number") {
-                    if (img.width < img.height) {
-                        img.resize(size, 0);
-                    } else {
-                        img.resize(0, size);
-                    }
+            async resizeCrop(img, size) {
+                const metadata = await img.metadata();
+                let width = -1;
+                let height = -1;
 
-                    img.crop(size, size, Gravity.Center);
-                } else {
-                    img.resize(size[0], size[1]);
-                    img.crop(size[0], size[1], Gravity.Center);
+                if (typeof (size) == "number") {
+                    width = size;
+                    height = size;
                 }
+                else {
+                    width = size[0];
+                    height = size[1];
+                }
+
+                if (metadata.width! < metadata.height!) {
+                    img.resize(width, null);
+                } else {
+                    img.resize(null, height);
+                }
+
+                img.extract({
+                    width: width,
+                    height: height,
+                    left: Math.floor((metadata.width! - width) / 2),
+                    top: Math.floor((metadata.height! - height) / 2)
+                });
             }
+
         }
     }))
+    .use(await codeHighlight())
     .copy([".svg", ".png", ".webm", ".mp4"])
-    .copy("video")
     .copy("fonts")
-    .copy("samples")
-    .remoteFile("schema/data.json", "https://gitlab.com/helveg/helveg/-/raw/main/schema/data.json")
-    .remoteFile("schema/icon-set.json", "https://gitlab.com/helveg/helveg/-/raw/main/schema/icon-set.json")
-    .copy("schema")
     .use(pagefind({
         indexing: {
             rootSelector: "main"
@@ -77,6 +105,22 @@ site.ignore("old", ".vscode")
         ui: {
             showSubResults: true
         }
-    }));
+    }))
+    .preprocess("*", (pages) => {
+        for (const page of pages) {
+            if (page.data.collection && typeof(page.data.collection) == "string") {
+                const entries = pages.filter(p => p.data.tags.includes(page.data.collection));
+                page.data.entries = entries.map<TocNode>(p => {
+                    return {
+                        level: p.data?.toc?.level ?? 0 + 1,
+                        text: p.data.title ?? "",
+                        url: p.data.url,
+                        children: [],
+                        slug: ""
+                    }
+                });
+            }
+        }
+    });
 
 export default site;

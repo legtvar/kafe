@@ -1,3 +1,9 @@
+---
+title: VM Setup
+tags: doc
+priority: 100
+---
+
 # VM Setup
 
 You should be able to set up KAFE on any Linux machine with Docker installed using the `docker-compose.yml` file.

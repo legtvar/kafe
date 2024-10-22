@@ -1,6 +1,13 @@
+---
+title: Historical Decisions
+tags: devlog
+date: 2022-08-11
+---
+
 # Historical Decisions
 
 These decisions were made before we started writing this devlog.
+(This page bears the date of the first commit to the KAFE repo.)
 Nevertheless, they are important to remember.
 
 ## Event Sourcing

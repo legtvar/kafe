@@ -106,35 +106,15 @@ deploy-staging:
     url: https://kafe-stage.fi.muni.cz
   when: manual
 
-# deploy-games:
-#   stage: deploy
-#   script:
-#     - docker compose -f docker-compose.games.yml build
-#     - docker compose -f docker-compose.games.yml down
-#     - docker compose -f docker-compose.games.yml up -d 
-#   tags:
-#     - mlejnek
-#   environment:
-#     name: games
-#     url: https://games.muni.cz
-#   when: manual
-
-pages:
-  image: denoland/deno:latest
+docs:
   stage: deploy
-  artifacts:
-    paths:
-      - public/
-    expire_in: 42 seconds
   script:
-    - cd Docs
-    - deno task build
-    - cd ..
-    - cp -r Docs/public public/
+    - docker compose -f docker-compose.docs.yml build
+    - docker compose -f docker-compose.docs.yml down
+    - docker compose -f docker-compose.docs.yml up -d 
   tags:
-    - shared-fi
-  rules:
-    - if: $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "docs"
+    - mlejnek
   environment:
     name: pages
-    url: https://legtvar.pages.fi.muni.cz/kafe
+    url: https://kafe.fi.muni.cz/docs
+  when: manual

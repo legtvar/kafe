@@ -24,6 +24,7 @@ export default function ({ children, search, date, showDate }: DocPageData) {
         <label id="darkness" for="sidebar-toggle"></label>
         <div class="sidebar">
           <a class="logo" href="/">
+            <img src="/img/favicon.svg" class="icon" />
             KAFE
           </a>
           <div id="search"></div>

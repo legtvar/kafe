@@ -18,8 +18,7 @@ nav {
             text-decoration: underline;
         }
 
-        &::before {
-            content: url("/img/favicon.svg");
+        > .icon {
             height: 3rem;
             width: 3rem;
             display: block;

@@ -4,7 +4,7 @@ services:
   docs:
     build:
       context: ./Docs
-      dockerfile: ./Docs/Docs.Dockerfile
+      dockerfile: ./Docs.Dockerfile
     restart: always
     labels:
       - "traefik.http.routers.kafe-production-web.rule=Host(`kafe.fi.muni.cz`,`kafe.lemma.fi.muni.cz`)\

@@ -4,6 +4,7 @@ tags: doc
 priority: 10
 collection: devlog
 showDate: false
+showEntries: false
 layout: layouts/list.tsx
 ---
 

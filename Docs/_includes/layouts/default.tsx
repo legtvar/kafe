@@ -8,6 +8,7 @@ interface DocPageData extends Lume.Data {
   toc?: TocNode[];
   entries?: TocNode[];
   showDate: boolean;
+  showEntries?: boolean;
 }
 
 export default function ({ children, search, date, showDate }: DocPageData) {
@@ -31,9 +32,15 @@ export default function ({ children, search, date, showDate }: DocPageData) {
               <li>
                 <a href={p.url.toString()}>{p.title}</a>
                 {((p.toc && p.toc.length > 0) ||
-                  (p.entries && p.entries.length > 0)) && (
+                  ((p.showEntries ?? true) &&
+                    p.entries &&
+                    p.entries.length > 0)) && (
                   <ul>
-                    {(p.toc?.length ?? 0 > 0 ? p.toc : p.entries)!.map((n) => (
+                    {(p.toc?.length ?? 0 > 0
+                      ? p.toc
+                      : (p.showEntries ?? true)
+                      ? p.entries
+                      : [])!.map((n) => (
                       <li>
                         <a href={n.url}>{n.text}</a>
                       </li>

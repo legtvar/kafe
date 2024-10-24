@@ -1,4 +1,5 @@
 import { Node as TocNode } from "lume_markdown_plugins/toc/mod.ts";
+import { formatDate } from "../../_plugins/utils.ts";
 
 export const layout = "layouts/base.tsx";
 
@@ -9,7 +10,7 @@ interface DocPageData extends Lume.Data {
   showDate: boolean;
 }
 
-export default function ({ children, search, date, showDate }: Lume.Data) {
+export default function ({ children, search, date, showDate }: DocPageData) {
   return (
     <>
       <nav>
@@ -45,7 +46,7 @@ export default function ({ children, search, date, showDate }: Lume.Data) {
         </div>
       </nav>
       <main>
-        {showDate && date && <span>{date.getFullYear()}-{(date.getMonth()+1).toString().padStart(2, "0")}-{date.getDate().toString().padStart(2, "0")}</span>}
+        {showDate && date && <span>{formatDate(date)}</span>}
         {children}
       </main>
     </>

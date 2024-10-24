@@ -24,6 +24,10 @@ body {
 a {
     color: var(--fg);
     text-decoration: underline;
+    
+    &:hover {
+        text-decoration: underline;
+    }
 }
 
 h1,
@@ -156,7 +160,7 @@ table {
     }
 }
 
-code, pre {
+code, pre, .monospace {
     font-family: var(--monospace);
 }
 
@@ -174,4 +178,17 @@ button, a[role=button] {
     &:hover {
         background-color: var(--accent-hover);
     }
+}
+
+.asciiart {
+    display: inline-block;
+    line-height: 1;
+}
+
+.no-list {
+    list-style: none;
+}
+
+.no-decoration {
+    text-decoration: none;
 }

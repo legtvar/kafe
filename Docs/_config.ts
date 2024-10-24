@@ -110,17 +110,21 @@ site.ignore(".vscode", "public", "_plugins", "Docs.Dockerfile")
     }))
     .preprocess("*", (pages) => {
         for (const page of pages) {
-            if (page.data.collection && typeof(page.data.collection) == "string") {
+            if (page.data.collection && typeof (page.data.collection) == "string") {
                 const entries = pages.filter(p => p.data.tags.includes(page.data.collection));
-                page.data.entries = entries.map<TocNode>(p => {
-                    return {
-                        level: p.data?.toc?.level ?? 0 + 1,
-                        text: p.data.title ?? "",
-                        url: p.data.url,
-                        children: [],
-                        slug: ""
-                    }
-                });
+                page.data.entries = entries
+                    .sort((a, b) => a.data.date < b.data.date ? +1
+                        : a.data.date > b.data.date ? -1
+                        : (a.data.title ?? "").localeCompare(b.data.title ?? ""))
+                    .map<TocNode>(p => {
+                        return {
+                            level: p.data?.toc?.level ?? 0 + 1,
+                            text: p.data.title ?? "",
+                            url: p.data.url,
+                            children: [],
+                            slug: ""
+                        }
+                    });
             }
         }
     });

@@ -7,9 +7,8 @@ services:
       dockerfile: ./Docs.Dockerfile
     restart: always
     labels:
-      - "traefik.http.routers.kafe-production-web.rule=Host(`kafe.fi.muni.cz`,`kafe.lemma.fi.muni.cz`)\
-          && PathPrefix(`/docs`)"
-      - "traefik.http.routers.kafe-production-web.middlewares=kafe-lemma-redirect"
-      - "traefik.http.routers.kafe-production-web.priority=100"
-      - "traefik.http.routers.kafe-production-web.tls=true"
-      - "traefik.http.routers.kafe-production-web.tls.certresolver=lets-encrypt"
+      - "traefik.http.routers.kafe-docs.rule=Host(`kafe.fi.muni.cz`,`kafe.lemma.fi.muni.cz`) && PathPrefix(`/docs`)"
+      - "traefik.http.routers.kafe-docs.middlewares=kafe-lemma-redirect"
+      - "traefik.http.routers.kafe-docs.priority=100"
+      - "traefik.http.routers.kafe-docs.tls=true"
+      - "traefik.http.routers.kafe-docs.tls.certresolver=lets-encrypt"

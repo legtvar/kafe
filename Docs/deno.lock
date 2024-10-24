@@ -42,6 +42,7 @@
     "npm:ico-endec@0.1.6": "0.1.6",
     "npm:markdown-it-attrs@4.1.6": "4.1.6_markdown-it@13.0.2",
     "npm:markdown-it-attrs@4.2.0": "4.2.0_markdown-it@13.0.2",
+    "npm:markdown-it-deflist@*": "3.0.0",
     "npm:markdown-it-deflist@2.1.0": "2.1.0",
     "npm:markdown-it-deflist@3.0.0": "3.0.0",
     "npm:markdown-it-github-alerts@*": "0.3.0_markdown-it@14.1.0",

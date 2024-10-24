@@ -8,10 +8,11 @@ interface DocPageData extends Lume.Data {
   toc?: TocNode[];
   entries?: TocNode[];
   showDate: boolean;
+  endDate?: Date;
   showEntries?: boolean;
 }
 
-export default function ({ children, search, date, showDate }: DocPageData) {
+export default function ({ children, search, date, showDate, endDate }: DocPageData) {
   return (
     <>
       <nav>
@@ -54,7 +55,11 @@ export default function ({ children, search, date, showDate }: DocPageData) {
         </div>
       </nav>
       <main>
-        {showDate && date && <span>{formatDate(date)}</span>}
+        {showDate && date && <span>
+          {formatDate(date)}
+          {endDate && " – " + formatDate(endDate)}
+          </span>}
+        
         {children}
       </main>
     </>

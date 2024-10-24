@@ -1,4 +1,8 @@
-# Automatic Video Conversion (2023-09-20)
+---
+title: Automatic Video Conversion
+---
+
+# Automatic Video Conversion
 
 Added a daemon that periodically checks if any videos were added that need a web-friendly smaller-resolution variant.
 If there's a backlog of videos to convert, forms a queue.

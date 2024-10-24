@@ -1,4 +1,8 @@
-## Autodiscover generated video variants (2023-12-17)
+---
+title: Autodiscover generated video variants
+---
+
+# Autodiscover generated video variants
 
 Since I managed to drop the whole production database on October's Friday 13th, we lost all records about the month the conversion daemon spent converting the twenty years of videos into webm.
 Since the videos were just sitting there, I added told the daemon to first check if a uncorrupted video already sits there.

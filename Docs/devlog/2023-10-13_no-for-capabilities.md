@@ -1,4 +1,8 @@
-# Stop putting capabilities into the session cookie (2023-10-13)
+---
+title: Stop putting capabilities into the session cookie
+---
+
+# Stop putting capabilities into the session cookie
 
 That was a dumb idea.
 If one were to add a capability to a user, the change had seemingly no effect because capabilities were extracted from the session cookie, to avoid a trip to the DB.

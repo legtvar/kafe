@@ -1,6 +1,5 @@
 ---
 title: Static Creates
-tags: devlog
 ---
 
 # Static `Create`s

@@ -1,4 +1,8 @@
-## `AccountCreated` (2023-12-24)
+---
+title: AccountCreated
+---
+
+# `AccountCreated`
 
 `TemporaryAccountCreated` got deprecated in favour of `AccountCreated` because that event can be used for both temporary and external accounts.
 

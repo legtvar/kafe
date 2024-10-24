@@ -1,6 +1,5 @@
 ---
 title: System HRIB
-tags: devlog
 ---
 
 # System HRIB

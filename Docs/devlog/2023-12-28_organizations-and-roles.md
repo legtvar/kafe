@@ -1,4 +1,8 @@
-# Organizations and Roles (2023-12-28)
+---
+title: Organizations and Roles
+---
+
+# Organizations and Roles
 
 To migrate accounts from WMA we need a concept of _organizations_.
 The reason is the fact that WMA had no true _public_ visibility.

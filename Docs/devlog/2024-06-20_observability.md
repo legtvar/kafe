@@ -1,4 +1,8 @@
-# Observability (2024-06-20)
+---
+title: Observability
+---
+
+# Observability
 
 This year's film festival has shown me how difficult it is for me to replicate bugs users report to me.
 I can't realistically expect KAFE's users to write me detailed reports with screenshots and replication steps (as amazing as that would be).

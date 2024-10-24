@@ -1,4 +1,8 @@
-# Kafpocalypse (2023-10-13)
+---
+title: Kafpocalypse
+---
+
+# Kafpocalypse
 
 I accidentally dropped the production DB.
 Thankfully, I found a snapshot I made in September for testing purposes.

@@ -1,4 +1,8 @@
-## Debugging production (2023-12-23)
+---
+title: Debugging production
+---
+
+# Debugging production (2023-12-23)
 
 Changed the image API runs on to the .NET SDK, so that the `dotnet` command would be available in production.
 

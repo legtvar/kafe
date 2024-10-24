@@ -1,6 +1,5 @@
 ---
 title: Historical Decisions
-tags: devlog
 ---
 
 # Historical Decisions

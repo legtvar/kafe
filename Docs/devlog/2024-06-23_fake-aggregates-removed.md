@@ -1,4 +1,8 @@
-# Fake Aggregates Removed (2024-06-23)
+---
+title: Fake Aggregates Removed
+---
+
+# Fake Aggregates Removed
 
 Turns out two Marten aggregate types cannot share an event type.
 Well, actually it's fine as long as the event always updates all aggregates whose projections use it.

@@ -115,6 +115,6 @@ deploy-docs:
   tags:
     - mlejnek
   environment:
-    name: pages
+    name: docs
     url: https://kafe.fi.muni.cz/docs
   when: manual

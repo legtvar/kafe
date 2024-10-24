@@ -1,5 +1,4 @@
 @use "config";
-@use "vs";
 
 * {
     scrollbar-width: thin;
@@ -166,6 +165,10 @@ code, pre, .monospace {
 
 pre {
     overflow-x: auto;
+}
+
+pre.shiki {
+    padding: 0.5rem;
 }
 
 button, a[role=button] {

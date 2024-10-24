@@ -20,12 +20,12 @@ nav {
 
         &::before {
             content: url("/img/favicon.svg");
-            height: 4rem;
-            width: 4rem;
+            height: 3rem;
+            width: 3rem;
             display: block;
             position: absolute;
             left: 0;
-            top: 0;
+            top: 1rem;
         }
     }
 

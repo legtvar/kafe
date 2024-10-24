@@ -3,6 +3,6 @@ COPY . /src
 RUN cd /src && deno task build
 
 FROM nginx
-ARG PREFIX=""
+ARG PREFIX="/docs"
 ENV PREFIX=$PREFIX
 COPY --from=builder /src/public /usr/share/nginx/html${PREFIX}

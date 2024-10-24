@@ -37,6 +37,7 @@
 !*.webp
 !*.webm
 !*.mp4
+!*.Dockerfile
 
 .pnpm-store/
 node_modules/

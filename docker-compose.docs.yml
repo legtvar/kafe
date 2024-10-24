@@ -1,0 +1,15 @@
+version: "3.8"
+
+services:
+  docs:
+    build:
+      context: ./Docs
+      dockerfile: ./Docs/Docs.Dockerfile
+    restart: always
+    labels:
+      - "traefik.http.routers.kafe-production-web.rule=Host(`kafe.fi.muni.cz`,`kafe.lemma.fi.muni.cz`)\
+          && PathPrefix(`/docs`)"
+      - "traefik.http.routers.kafe-production-web.middlewares=kafe-lemma-redirect"
+      - "traefik.http.routers.kafe-production-web.priority=100"
+      - "traefik.http.routers.kafe-production-web.tls=true"
+      - "traefik.http.routers.kafe-production-web.tls.certresolver=lets-encrypt"

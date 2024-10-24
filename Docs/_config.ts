@@ -15,15 +15,17 @@ import { linkInsideHeader } from "lume_markdown_plugins/toc/anchors.ts";
 import pagefind from "lume/plugins/pagefind.ts";
 import { default as markdownItAlerts } from "npm:markdown-it-github-alerts";
 import codeHighlight from "./_plugins/shiki.ts";
+import basePath from "lume/plugins/base_path.ts";
 
 const site = lume({
     dest: "public/",
     src: ".",
-    location: new URL("https://legtvar.pages.fi.muni.cz/kafe")
+    location: new URL("https://kafe.fi.muni.cz/docs")
 });
 
-site.ignore(".vscode", "public", "_plugins")
+site.ignore(".vscode", "public", "_plugins", "Docs.Dockerfile")
     .ignore("README.md")
+    .use(basePath())
     .use(markdown({
         plugins: [[markdownItAlerts, {
             titles: {

@@ -1,4 +1,9 @@
-# Use `ProblemDetails` (2024-03-03)
+---
+title: Use ProblemDetails
+tags: devlog
+---
+
+# Use `ProblemDetails`
 
 With KAFE finally safely resting in its new home, `mlejnek` on Stratus.FI, I finally have time to work directly on KAFE.
 

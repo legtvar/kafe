@@ -1,0 +1,15 @@
+{
+  "tasks": {
+    "lume": "echo \"import 'lume/cli.ts'\" | deno run --unstable -A -",
+    "build": "deno task lume",
+    "serve": "deno task lume -s"
+  },
+  "imports": {
+    "lume/": "https://deno.land/x/lume@v2.3.3/",
+    "lume_markdown_plugins/": "https://deno.land/x/lume_markdown_plugins@v0.7.1/"
+  },
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "npm:preact"
+  }
+}

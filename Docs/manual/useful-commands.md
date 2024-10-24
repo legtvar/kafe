@@ -1,3 +1,10 @@
+---
+title: Useful Commands
+tags: doc
+priority: 90
+---
+
+
 # Useful Commands
 
 ## `pg_dump`

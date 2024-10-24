@@ -1,3 +1,9 @@
+---
+title: Useful SQL
+tags: doc
+priority: 80
+---
+
 # Useful SQL queries
 
 ## Find projects referencing a certain artifact

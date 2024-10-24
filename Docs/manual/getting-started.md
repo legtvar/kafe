@@ -1,3 +1,9 @@
+---
+title: Getting Started
+tags: doc
+priority: 110
+---
+
 # Getting Started
 
 1. Install the prerequisites below.

@@ -106,7 +106,7 @@ deploy-staging:
     url: https://kafe-stage.fi.muni.cz
   when: manual
 
-docs:
+deploy-docs:
   stage: deploy
   script:
     - docker compose -f docker-compose.docs.yml build

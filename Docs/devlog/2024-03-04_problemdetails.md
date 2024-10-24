@@ -1,7 +1,6 @@
 ---
 title: Use ProblemDetails
 tags: devlog
-date: 2024-03-03
 ---
 
 # Use `ProblemDetails`

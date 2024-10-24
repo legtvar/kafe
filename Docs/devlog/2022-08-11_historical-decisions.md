@@ -1,7 +1,6 @@
 ---
 title: Historical Decisions
 tags: devlog
-date: 2022-08-11
 ---
 
 # Historical Decisions

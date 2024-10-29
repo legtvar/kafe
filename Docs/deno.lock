@@ -16,6 +16,7 @@
     "jsr:@std/html@1.0.0": "1.0.0",
     "jsr:@std/http@1.0.7": "1.0.7",
     "jsr:@std/io@~0.224.9": "0.224.9",
+    "jsr:@std/json@1": "1.0.1",
     "jsr:@std/jsonc@1.0.1": "1.0.1",
     "jsr:@std/log@0.224.8": "0.224.8",
     "jsr:@std/media-types@1.0.3": "1.0.3",
@@ -122,8 +123,14 @@
     "@std/io@0.224.9": {
       "integrity": "4414664b6926f665102e73c969cfda06d2c4c59bd5d0c603fd4f1b1c840d6ee3"
     },
+    "@std/json@1.0.1": {
+      "integrity": "1f0f70737e8827f9acca086282e903677bc1bb0c8ffcd1f21bca60039563049f"
+    },
     "@std/jsonc@1.0.1": {
-      "integrity": "6b36956e2a7cbb08ca5ad7fbec72e661e6217c202f348496ea88747636710dda"
+      "integrity": "6b36956e2a7cbb08ca5ad7fbec72e661e6217c202f348496ea88747636710dda",
+      "dependencies": [
+        "jsr:@std/json"
+      ]
     },
     "@std/log@0.224.8": {
       "integrity": "8938225caf405cbf0a4871191fa3d55f2fabe3363f4235fdb20ebe2620ecda43",

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -29,7 +30,25 @@ public static class MartenExtensions
 
         return Error.NotFound(id, DataConst.GetLocalizedName(typeof(T)).Invariant);
     }
-    
+
+    public static async Task<Err<ImmutableArray<T>>> KafeLoadManyAsync<T>(
+        this IQuerySession db,
+        ImmutableArray<Hrib> ids,
+        CancellationToken token = default
+    ) where T : notnull, IEntity
+    {
+        var entities = (await db.LoadManyAsync<T>(
+            token: token,
+            ids: ids.Select(i => i.ToString())
+        )).ToImmutableArray();
+        if (entities.Length != ids.Length || entities.Any(e => e is null))
+        {
+            return Error.NotFound("Some of the entities could not be found.");
+        }
+
+        return entities;
+    }
+
     public static StreamAction KafeStartStream<TAggregate>(
         this IEventOperations ops,
         Hrib id,

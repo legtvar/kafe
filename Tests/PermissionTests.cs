@@ -106,7 +106,8 @@ public class PermissionTests(ApiFixture fixture, ITestOutputHelper testOutput) :
             perms: projectPerms,
             accountHrib: TestSeedData.UserHrib,
             permission: expectedPerm,
-            sourceHrib: roleHrib
+            sourceHrib: TestSeedData.TestProjectHrib,
+            intermediaryRoleHrib: roleHrib
         );
     }
 
@@ -205,7 +206,7 @@ public class PermissionTests(ApiFixture fixture, ITestOutputHelper testOutput) :
                 events: [createEvent]);
             await session.SaveChangesAsync();
         }
-        
+
         await WaitForProjections();
         await using var query = Store.QuerySession();
         var perms = (await query.KafeLoadAsync<EntityPermissionInfo>(hrib)).Unwrap();
@@ -216,7 +217,7 @@ public class PermissionTests(ApiFixture fixture, ITestOutputHelper testOutput) :
             sourceHrib: Hrib.System
         );
     }
-    
+
     [Fact]
     public async Task EntityPermissionInfo_AccountSetPermission_ShouldSetPermission()
     {
@@ -232,7 +233,7 @@ public class PermissionTests(ApiFixture fixture, ITestOutputHelper testOutput) :
                     LocalizedString.CreateInvariant("SetPermissionTest project"))
             );
             await session.SaveChangesAsync();
-            
+
             session.Events.Append(
                 TestSeedData.UserHrib,
                 new AccountPermissionSet(
@@ -242,7 +243,7 @@ public class PermissionTests(ApiFixture fixture, ITestOutputHelper testOutput) :
                 ));
             await session.SaveChangesAsync();
         }
-        
+
         await WaitForProjections();
         await using var query = Store.QuerySession();
         var perms = (await query.KafeLoadAsync<EntityPermissionInfo>(testHrib)).Unwrap();
@@ -254,17 +255,91 @@ public class PermissionTests(ApiFixture fixture, ITestOutputHelper testOutput) :
         );
     }
 
+    [Fact]
+    public async Task EntityPermissionInfo_ProjectArtifactAdded_ShouldInheritPermissions()
+    {
+        await using (var session = Store.LightweightSession())
+        {
+            session.Events.Append(
+                TestSeedData.UserHrib,
+                new AccountPermissionSet(
+                    TestSeedData.UserHrib,
+                    TestSeedData.TestProjectHrib,
+                    Permission.Read | Permission.Inspect | Permission.Write
+                )
+            );
+            session.Events.Append(
+                TestSeedData.TestProjectHrib,
+                new ProjectArtifactAdded(
+                    TestSeedData.TestProjectHrib,
+                    TestSeedData.TestArtifactHrib,
+                    null)
+            );
+            await session.SaveChangesAsync();
+        }
+
+        await WaitForProjections();
+        await using var query = Store.QuerySession();
+        var perms = (await query.KafeLoadAsync<EntityPermissionInfo>(TestSeedData.TestArtifactHrib)).Unwrap();
+
+        Assert.Equal(
+            [
+                TestSeedData.TestProjectHrib
+            ],
+            perms.ParentIds
+        );
+        Assert.Equal(
+            [
+                TestSeedData.TestProjectHrib,
+                TestSeedData.TestGroupHrib,
+                TestSeedData.TestOrganizationHrib,
+                Hrib.SystemValue
+            ],
+            perms.GrantorIds);
+        AssertAccountPermission(
+            perms: perms,
+            accountHrib: TestSeedData.UserHrib,
+            permission: Permission.Read | Permission.Inspect | Permission.Write,
+            sourceHrib: TestSeedData.TestProjectHrib
+        );
+    }
+
+    [Fact]
+    public async Task EntityPermissionInfo_ProjectArtifactRemoved_ShouldUninheritPermissions()
+    {
+        // NB: Ensure permissions can be inherited first.
+        await EntityPermissionInfo_ProjectArtifactAdded_ShouldInheritPermissions();
+
+        await using (var session = Store.LightweightSession())
+        {
+            session.Events.Append(
+                TestSeedData.TestProjectHrib,
+                new ProjectArtifactRemoved(
+                    TestSeedData.TestProjectHrib,
+                    TestSeedData.TestArtifactHrib
+                )
+            );
+            await session.SaveChangesAsync();
+        }
+
+        await WaitForProjections();
+        await using var query = Store.QuerySession();
+        var perms = (await query.KafeLoadAsync<EntityPermissionInfo>(TestSeedData.TestArtifactHrib)).Unwrap();
+
+    }
+
     // TODO: Test case: Role has Inspect on a group and Review on an org.
     //       Role must have two sources on the group: the org and the group.
     //       The effective permission is Read | Inspect | Review. All members must also have this effective permission.
     //       All accounts in it must have Read | Inspect | Review on all of the group's projects
     //       with the role as source.
-    
+
     private static void AssertAccountPermission(
         EntityPermissionInfo perms,
         Hrib accountHrib,
         Permission permission,
-        Hrib? sourceHrib = null)
+        Hrib? sourceHrib = null,
+        Hrib? intermediaryRoleHrib = null)
     {
         Assert.NotEmpty(perms.AccountEntries);
         Assert.True(perms
@@ -283,6 +358,14 @@ public class PermissionTests(ApiFixture fixture, ITestOutputHelper testOutput) :
                 .AccountEntries[accountHrib.ToString()]
                 .Sources[sourceHrib.ToString()]
                 .Permission);
+
+            if (intermediaryRoleHrib is not null)
+            {
+                Assert.Equal(intermediaryRoleHrib, perms
+                    .AccountEntries[accountHrib.ToString()]
+                    .Sources[sourceHrib.ToString()]
+                    .RoleId);
+            }
         }
     }
 }

@@ -22,6 +22,7 @@ public class TestSeedData : IInitialData
     public const string TestOrganizationHrib = "testorganiz";
     public const string TestGroupHrib = "testgroup00";
     public const string TestProjectHrib = "testproject";
+    public const string TestArtifactHrib = "testartifac";
 
     public TestSeedData(IServiceProvider services, ILogger<TestSeedData> logger)
     {
@@ -73,6 +74,16 @@ public class TestSeedData : IInitialData
             null,
             TestProjectHrib,
             ct);
+
+        var artifactService = scope.ServiceProvider.GetRequiredService<ArtifactService>();
+        await artifactService.Create(
+            ArtifactInfo.Create(LocalizedString.CreateInvariant("TestArtifact")) with
+            {
+                Id = TestArtifactHrib
+            },
+            ct
+        );
+
         logger.LogInformation("Test seed data populated.");
     }
 }

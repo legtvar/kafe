@@ -147,9 +147,10 @@ public class EntityPermissionEventProjection : EventProjection
                 AccountEntries = SetPermission(
                     entries: entityPerms.AccountEntries,
                     accountOrRoleId: accountId,
-                    sourceId: e.RoleId,
+                    sourceId: e.EntityId,
                     permission: e.Permission,
-                    grantedAt: metadata.Timestamp
+                    grantedAt: metadata.Timestamp,
+                    intermediaryRoleId: e.RoleId
                 )
             };
         }
@@ -190,18 +191,36 @@ public class EntityPermissionEventProjection : EventProjection
             }
 
             var changed = affected;
-            changed = changed with
+            foreach (var source in roleEntry.Sources)
             {
-                AccountEntries = SetPermission(
-                    entries: affected.AccountEntries,
-                    accountOrRoleId: e.AccountId,
-                    sourceId: e.RoleId,
-                    permission: affected.RoleEntries[e.RoleId].EffectivePermission,
-                    grantedAt: metadata.Timestamp
-                )
-            };
+                changed = changed with
+                {
+                    AccountEntries = SetPermission(
+                        entries: affected.AccountEntries,
+                        accountOrRoleId: e.AccountId,
+                        sourceId: source.Key,
+                        permission: source.Value.Permission,
+                        grantedAt: metadata.Timestamp,
+                        intermediaryRoleId: e.RoleId
+                    )
+                };
+            }
             ops.Store(changed);
         }
+    }
+
+    public async Task Project(ProjectArtifactAdded e, IDocumentOperations ops)
+    {
+        var perms = await RequireEntityPermissionInfo(ops, e.ArtifactId);
+        perms = await AddParent(ops, perms, e.ProjectId);
+        ops.Store(perms);
+    }
+
+    public async Task Project(ProjectArtifactRemoved e, IDocumentOperations ops)
+    {
+        var perms = await RequireEntityPermissionInfo(ops, e.ArtifactId);
+        perms = await RemoveParent(ops, perms, e.ProjectId);
+        ops.Store(perms);
     }
 
     private static async Task SetGlobalPermission(IDocumentOperations ops, Hrib entityId, Permission globalPermission)
@@ -242,6 +261,10 @@ public class EntityPermissionEventProjection : EventProjection
         return roleInfo.Value;
     }
 
+    /// <summary>
+    /// Add Hrib.System among <see cref="EntityPermissionInfo.GrantorIds"/> (NOT parents!).
+    /// Also, adds account entries for all accounts that have permissions for System with inherited permissions values.
+    /// </summary>
     private static async Task<EntityPermissionInfo> AddSystem(
         IDocumentOperations ops,
         EntityPermissionInfo perms
@@ -268,7 +291,8 @@ public class EntityPermissionEventProjection : EventProjection
     private static async Task<EntityPermissionInfo> AddParent(
         IDocumentOperations ops,
         EntityPermissionInfo perms,
-        Hrib parentId)
+        Hrib parentId
+    )
     {
         var ancestorPerms = await ops.KafeLoadAsync<EntityPermissionInfo>(parentId);
         if (ancestorPerms.HasErrors)
@@ -280,8 +304,43 @@ public class EntityPermissionEventProjection : EventProjection
         return perms with
         {
             AccountEntries = MergeEntries(perms.AccountEntries, InheritEntries(ancestorPerms.Value.AccountEntries)),
+            RoleEntries = MergeEntries(perms.RoleEntries, InheritEntries(ancestorPerms.Value.RoleEntries)),
             GrantorIds = perms.GrantorIds.Union([parentId.ToString(), .. ancestorPerms.Value.GrantorIds]),
             ParentIds = perms.ParentIds.Add(parentId.ToString())
+        };
+    }
+
+    /// <summary>
+    /// Removes a parent along with the grantors and entries it implies.
+    /// Keeps Hrib.System as a grantor.
+    /// </summary>
+    private static async Task<EntityPermissionInfo> RemoveParent(
+        IDocumentOperations ops,
+        EntityPermissionInfo perms,
+        Hrib parentId
+    )
+    {
+        var ancestorsPerms = (await ops.KafeLoadManyAsync<EntityPermissionInfo>(
+            perms.ParentIds
+                .Where(i => i != parentId.ToString())
+                .Select(i => Hrib.Parse(i).Unwrap())
+                .ToImmutableArray()
+        )).Unwrap();
+
+        var grantors = ancestorsPerms.Aggregate(new HashSet<string>(), (s, p) =>
+        {
+            s.UnionWith(p.GrantorIds);
+            return s;
+        });
+        grantors.Add(Hrib.SystemValue);
+        var removedGrantors = perms.GrantorIds.Except(grantors);
+
+        return perms with
+        {
+            ParentIds = perms.ParentIds.Remove(parentId.ToString()),
+            GrantorIds = grantors.ToImmutableHashSet(),
+            AccountEntries = RemoveEntrySources(perms.AccountEntries, removedGrantors),
+            RoleEntries = RemoveEntrySources(perms.RoleEntries, removedGrantors)
         };
     }
 
@@ -362,6 +421,32 @@ public class EntityPermissionEventProjection : EventProjection
         return result.ToImmutable();
     }
 
+    private static ImmutableDictionary<string, EntityPermissionEntry> RemoveEntrySources(
+        ImmutableDictionary<string, EntityPermissionEntry> entries,
+        ImmutableHashSet<string> sources
+    )
+    {
+        var result = entries.ToBuilder();
+        foreach (var pair in entries)
+        {
+            var newSources = pair.Value.Sources.ExceptBy(sources, s => s.Key).ToImmutableDictionary();
+            if (newSources.Count < pair.Value.Sources.Count)
+            {
+                result[pair.Key] = RecalculateEffectivePermission(pair.Value with
+                {
+                    Sources = newSources
+                });
+
+                if (result[pair.Key].EffectivePermission == Permission.None)
+                {
+                    result.Remove(pair.Key);
+                }
+            }
+        }
+
+        return result.ToImmutable();
+    }
+
     /// <summary>
     /// Sets perms for a specific account/role id to a specific entity, in a dictionary of entries.
     /// </summary>
@@ -370,7 +455,8 @@ public class EntityPermissionEventProjection : EventProjection
         Hrib accountOrRoleId,
         Hrib sourceId,
         Permission permission,
-        DateTimeOffset grantedAt)
+        DateTimeOffset grantedAt,
+        string? intermediaryRoleId = null)
     {
         if (entries.TryGetValue(accountOrRoleId.ToString(), out var accountEntry))
         {
@@ -382,7 +468,9 @@ public class EntityPermissionEventProjection : EventProjection
                     ? accountEntry.Sources.Remove(sourceId.ToString())
                     : accountEntry.Sources.SetItem(sourceId.ToString(), new EntityPermissionSource(
                         Permission: permission,
-                        GrantedAt: grantedAt
+                        GrantedAt: grantedAt,
+                        // NB: Roles cannot get their permissions from other roles.
+                        RoleId: null
                     ))
             };
             accountEntry = RecalculateEffectivePermission(accountEntry);
@@ -395,7 +483,8 @@ public class EntityPermissionEventProjection : EventProjection
                     sourceId.ToString(),
                     new EntityPermissionSource(
                         Permission: permission,
-                        GrantedAt: grantedAt
+                        GrantedAt: grantedAt,
+                        RoleId: intermediaryRoleId
                     )
                 )])
             );
@@ -484,9 +573,10 @@ public class EntityPermissionEventProjection : EventProjection
                     AccountEntries = SetPermission(
                         entries: changed.AccountEntries,
                         accountOrRoleId: accountId,
-                        sourceId: roleId,
-                        permission: changed.RoleEntries[roleId.ToString()].EffectivePermission,
-                        grantedAt: grantedAt
+                        sourceId: sourceId,
+                        permission: permission,
+                        grantedAt: grantedAt,
+                        intermediaryRoleId: roleId.ToString()
                     )
                 };
             }

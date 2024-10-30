@@ -93,6 +93,11 @@ public class PermissionTests(ApiFixture fixture, ITestOutputHelper testOutput) :
         await WaitForProjections();
 
         await using var query = Store.QuerySession();
+
+        var membersInfo = (await query.KafeLoadAsync<RoleMembersInfo>(roleHrib)).Unwrap();
+        Assert.NotEmpty(membersInfo.MemberIds);
+        Assert.Contains(TestSeedData.UserHrib, membersInfo.MemberIds);
+
         var projectPerms = (await query.KafeLoadAsync<EntityPermissionInfo>(TestSeedData.TestProjectHrib)).Unwrap();
 
         // NB: Check the explicit role permission exists

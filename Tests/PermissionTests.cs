@@ -332,7 +332,11 @@ public class PermissionTests(ApiFixture fixture, ITestOutputHelper testOutput) :
     //       Role must have two sources on the group: the org and the group.
     //       The effective permission is Read | Inspect | Review. All members must also have this effective permission.
     //       All accounts in it must have Read | Inspect | Review on all of the group's projects
-    //       with the role as source.
+    //       with the role as (intermediary) RoleId on the source.
+
+    // TODO: Test case: When an artifact is referenced by multiple projects, all of those projects are parents.
+
+    // TODO: Test case: global permission events set global permissions.
 
     private static void AssertAccountPermission(
         EntityPermissionInfo perms,

@@ -133,7 +133,7 @@ public class EntityPermissionEventProjection : EventProjection
             RoleEntries = SetPermission(
                 entries: entityPerms.RoleEntries,
                 accountOrRoleId: e.RoleId,
-                // NB: Explicit permissions have source Id equal to the entity Id.
+                // NB: Explicit permissions have sourceId equal to the entity Id.
                 //     This makes them easy to find and allows for consistent inheriting of info about perms sources.
                 sourceId: e.EntityId,
                 permission: e.Permission,
@@ -201,7 +201,7 @@ public class EntityPermissionEventProjection : EventProjection
                 changed = changed with
                 {
                     AccountEntries = SetPermission(
-                        entries: affected.AccountEntries,
+                        entries: changed.AccountEntries,
                         accountOrRoleId: e.AccountId,
                         sourceId: source.Key,
                         permission: source.Value.Permission,
@@ -210,6 +210,53 @@ public class EntityPermissionEventProjection : EventProjection
                     )
                 };
             }
+            ops.Store(changed);
+        }
+    }
+
+    public async Task Project(AccountRoleUnset e, IDocumentOperations ops)
+    {
+        var membersInfo = await RequireRoleMembersInfo(ops, e.RoleId);
+        membersInfo = membersInfo with
+        {
+            MemberIds = membersInfo.MemberIds.Remove(e.AccountId)
+        };
+        ops.Store(membersInfo);
+
+        var query = ops.Query<EntityPermissionInfo>()
+            .Where(p => p.RoleEntries.ContainsKey(e.RoleId));
+        var affectedEntities = query
+            .ToAsyncEnumerable();
+        await foreach (var affected in affectedEntities)
+        {
+            if (!affected.RoleEntries.TryGetValue(e.RoleId, out var roleEntry))
+            {
+                continue;
+            }
+
+            if (!affected.AccountEntries.TryGetValue(e.AccountId, out var entry))
+            {
+                throw new InvalidOperationException("A role-implied permission cannot be removed from an entity "
+                    + "because it is not present. This is a bug.");
+            }
+
+            entry = entry with
+            {
+                Sources = entry.Sources.Where(s => s.Value.RoleId != e.RoleId).ToImmutableDictionary()
+            };
+            entry = RecalculateEffectivePermission(entry);
+
+            var changed = affected;
+
+            changed = entry.EffectivePermission == Permission.None
+                ? changed with
+                {
+                    AccountEntries = changed.AccountEntries.Remove(e.AccountId)
+                }
+                : changed with
+                {
+                    AccountEntries = changed.AccountEntries.SetItem(e.AccountId, entry)
+                };
             ops.Store(changed);
         }
     }
@@ -474,8 +521,7 @@ public class EntityPermissionEventProjection : EventProjection
                     : accountEntry.Sources.SetItem(sourceId.ToString(), new EntityPermissionSource(
                         Permission: permission,
                         GrantedAt: grantedAt,
-                        // NB: Roles cannot get their permissions from other roles.
-                        RoleId: null
+                        RoleId: intermediaryRoleId
                     ))
             };
             accountEntry = RecalculateEffectivePermission(accountEntry);

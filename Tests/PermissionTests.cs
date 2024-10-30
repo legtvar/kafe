@@ -116,6 +116,32 @@ public class PermissionTests(ApiFixture fixture, ITestOutputHelper testOutput) :
         );
     }
 
+    [Fact]
+    public async Task EntityPermissionInfo_RoleUnassignment_ShouldRemoveAccountPerms()
+    {
+        await EntityPermissionInfo_RoleAssignment_ShouldSetAccountPerms();
+
+        var roleHrib = Hrib.Parse("testrole000").Unwrap().ToString();
+        await using (var session = Store.LightweightSession())
+        {
+            session.Events.Append(
+                TestSeedData.UserHrib,
+                new AccountRoleUnset(TestSeedData.UserHrib, roleHrib)
+            );
+            await session.SaveChangesAsync();
+        }
+
+        await WaitForProjections();
+
+        await using var query = Store.QuerySession();
+
+        var membersInfo = (await query.KafeLoadAsync<RoleMembersInfo>(roleHrib)).Unwrap();
+        Assert.DoesNotContain(TestSeedData.UserHrib, membersInfo.MemberIds);
+
+        var projectPerms = (await query.KafeLoadAsync<EntityPermissionInfo>(TestSeedData.TestProjectHrib)).Unwrap();
+        Assert.DoesNotContain(TestSeedData.UserHrib, projectPerms.AccountEntries.Keys);
+    }
+
     public static readonly TheoryData<string, Type, object> CreateEvents = new() {
         {
             Hrib.Parse("createtst-o").Unwrap().ToString(),
@@ -342,6 +368,10 @@ public class PermissionTests(ApiFixture fixture, ITestOutputHelper testOutput) :
     // TODO: Test case: When an artifact is referenced by multiple projects, all of those projects are parents.
 
     // TODO: Test case: global permission events set global permissions.
+
+    // TODO: Test case: Using AccountPermissionSet to *remove* permissions.
+
+    // TODO: Test case: Using RolePermissionSet to *remove* permissions.
 
     private static void AssertAccountPermission(
         EntityPermissionInfo perms,

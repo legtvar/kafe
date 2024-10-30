@@ -42,7 +42,7 @@ public record EntityPermissionEntry(
 /// In other words, contains all entities, whose change, may affect this <see cref="EntityPermissionInfo"/>.
 /// Please NOTE that Roles CANNOT be grantors.
 /// If they were, we woulnd't be able to correctly recalculate permissions when an entity moves or changes parent
-/// (e.g., <see cref="ProjectArtifactRemoved"/>).
+/// (e.g., <see cref="Events.ProjectArtifactRemoved"/>).
 /// </param>
 /// 
 /// <param name="ParentIds">Ids of all direct parent entities whose permission affect this entity.</param>

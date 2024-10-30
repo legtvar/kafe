@@ -388,7 +388,12 @@
     "fields": {
       "propositions": "Propositions",
       "description": "Project group annotation",
-      "name": "The name of the project group"
+      "name": "The name of the project group",
+      "deadline": "Registration deadline",
+      "section": {
+        "registration": "Registration"
+      },
+      "isOpen": "Registration is open"
     },
     "button": {
       "create": "Create a project group",

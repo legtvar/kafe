@@ -14,18 +14,18 @@ import { t } from 'i18next';
 import { useState } from 'react';
 import Markdown from 'react-markdown';
 
-export function TextareaMarkdown(props: TextareaProps) {
-    const [value, setValue] = useState<string>(props.value?.toString() || props.defaultValue?.toString() || '');
+export function TextareaMarkdown({ value, defaultValue, ...props }: TextareaProps) {
+    const [textareaValue, setTextareaValue] = useState<string>(value?.toString() || defaultValue?.toString() || '');
 
     return (
         <>
             <FormHelperText opacity={0.5}>{t('textareaMarkdown.allowMarkdown').toString()}</FormHelperText>
             <Textarea
                 {...props}
-                value={value}
+                value={textareaValue}
                 onChange={(event) => {
                     props.onChange && props.onChange(event);
-                    setValue(event.target.value);
+                    setTextareaValue(event.target.value);
                 }}
             />
 
@@ -39,7 +39,7 @@ export function TextareaMarkdown(props: TextareaProps) {
                     </AccordionButton>
                     <AccordionPanel pb={4}>
                         <Markdown components={ChakraUIRenderer()} skipHtml>
-                            {value}
+                            {textareaValue}
                         </Markdown>
                     </AccordionPanel>
                 </AccordionItem>

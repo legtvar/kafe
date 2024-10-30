@@ -96,11 +96,14 @@ export class API {
                 return api.requestSingle(`project-group/${id}`, Group);
             },
             async create(group: Group) {
-                return api.post<components['schemas']['ProjectGroupCreationDto'], HRIB>(`group`, group.serialize());
+                return api.post<components['schemas']['ProjectGroupCreationDto'], HRIB>(
+                    `project-group`,
+                    group.serialize(),
+                );
             },
             async update(group: Group) {
                 return api.patch<components['schemas']['ProjectGroupCreationDto'], HRIB>(
-                    `group`,
+                    `project-group`,
                     group.serialize(true),
                 );
             },

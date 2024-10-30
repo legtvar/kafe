@@ -386,7 +386,12 @@
     "fields": {
       "name": "Název skupiny projektů",
       "description": "Anotace skupiny projektů",
-      "propositions": "Propozice"
+      "propositions": "Propozice",
+      "deadline": "Konec přihlašování projektů",
+      "section": {
+        "registration": "Parametry přihlašování"
+      },
+      "isOpen": "Přihlašování je otevřeno"
     },
     "button": {
       "update": "Uložit skupinu projektů",

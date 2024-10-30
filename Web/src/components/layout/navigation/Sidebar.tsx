@@ -1,4 +1,5 @@
 import { Box, BoxProps, CloseButton, Flex, useColorModeValue } from '@chakra-ui/react';
+import { Fragment } from 'react';
 import { useTranslation } from 'react-i18next';
 import { IoReader, IoReaderOutline } from 'react-icons/io5';
 import { Link, useMatches } from 'react-router-dom';
@@ -44,7 +45,7 @@ export function Sidebar({ onClose, ...rest }: ISidebarProps) {
                 (fullPathStripped.length > 1 || matchPathStripped === fullPathStripped); // Special case for the "Home" path
 
             return (
-                <>
+                <Fragment key={i}>
                     <Link to={'/auth' + fullPath}>
                         <NavItem
                             key={i}
@@ -83,7 +84,7 @@ export function Sidebar({ onClose, ...rest }: ISidebarProps) {
                             {children}
                         </Flex>
                     )}
-                </>
+                </Fragment>
             );
         };
 

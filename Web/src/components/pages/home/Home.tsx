@@ -14,9 +14,11 @@ import {
     Text,
     VStack,
 } from '@chakra-ui/react';
+import ChakraUIRenderer from 'chakra-ui-markdown-renderer';
 import { t } from 'i18next';
 import Countdown from 'react-countdown';
 import { IoCubeOutline, IoFolderOpenOutline } from 'react-icons/io5';
+import Markdown from 'react-markdown';
 import { Link } from 'react-router-dom';
 import { useTitle } from '../../../utils/useTitle';
 import { Brand } from '../../brand/Brand';
@@ -72,9 +74,14 @@ export function Home(props: IHomeProps) {
                                                     <Heading size="md">{group.getName()}</Heading>
                                                     {group.description && (
                                                         <Box mb={4}>
-                                                            {group.getDescription().substring(0, DESCRIPTION_LENGTH)}
-                                                            {group.getDescription().length > DESCRIPTION_LENGTH &&
-                                                                '...'}
+                                                            <Markdown components={ChakraUIRenderer()} skipHtml>
+                                                                {group
+                                                                    .getDescription()
+                                                                    .substring(0, DESCRIPTION_LENGTH) +
+                                                                    (group.getDescription().length > DESCRIPTION_LENGTH
+                                                                        ? '...'
+                                                                        : '')}
+                                                            </Markdown>
                                                         </Box>
                                                     )}
                                                     {group.deadline && (
@@ -123,7 +130,7 @@ export function Home(props: IHomeProps) {
                                                             {t('createProject.signUp').toString()}
                                                         </Button>
                                                     </Link>
-                                                    <Link to={`/auth/groups/${group.id}/create`}>
+                                                    <Link to={`/auth/groups/${group.id}`}>
                                                         <Button variant="outline" colorScheme="brand">
                                                             {t('createProject.details').toString()}
                                                         </Button>

@@ -47,6 +47,7 @@ using OpenTelemetry.Resources;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 using Npgsql;
+using HotChocolate.Data;
 
 namespace Kafe.Api;
 
@@ -227,6 +228,13 @@ public class Startup
             {
                 o.Endpoint = new Uri(otlpEndpoint);
             }));
+        
+        services
+            .AddGraphQLServer()
+            .AddQueryType<Query>()
+            .AddProjections()
+            .AddMartenFiltering()
+            .AddMartenSorting();
     }
 
     public void Configure(IApplicationBuilder app)
@@ -287,6 +295,7 @@ public class Startup
         app.UseEndpoints(e =>
         {
             e.MapControllers();
+            e.MapGraphQL();
         });
     }
 

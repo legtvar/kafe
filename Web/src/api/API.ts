@@ -120,6 +120,15 @@ export class API {
             async getById(id: string) {
                 return api.requestSingle(`playlist/${id}`, Playlist);
             },
+            async create(playlist: Playlist) {
+                return api.post<components['schemas']['PlaylistCreationDto'], HRIB>(`playlist`, playlist.serialize());
+            },
+            async update(playlist: Playlist) {
+                return api.patch<components['schemas']['PlaylistCreationDto'], HRIB>(
+                    `playlist`,
+                    playlist.serialize(true),
+                );
+            },
         };
     }
 

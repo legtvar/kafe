@@ -17,7 +17,7 @@ import {
 import ChakraUIRenderer from 'chakra-ui-markdown-renderer';
 import { t } from 'i18next';
 import Countdown from 'react-countdown';
-import { IoCubeOutline, IoFolderOpenOutline } from 'react-icons/io5';
+import { IoCubeOutline } from 'react-icons/io5';
 import Markdown from 'react-markdown';
 import { Link } from 'react-router-dom';
 import { useTitle } from '../../../utils/useTitle';
@@ -144,7 +144,7 @@ export function Home(props: IHomeProps) {
                     )}
                 </AwaitAPI>
 
-                <Heading size="lg" mb={4} mt={6}>
+                {/* <Heading size="lg" mb={4} mt={6}>
                     <HStack>
                         <IoFolderOpenOutline />
                         <Text>{t('home.myProjects')}</Text>
@@ -194,7 +194,7 @@ export function Home(props: IHomeProps) {
                             </Box>
                         );
                     }}
-                </AwaitAPI>
+                </AwaitAPI> */}
             </VStack>
         </OutletOrChildren>
     );

@@ -1,7 +1,7 @@
-import { Box, Flex, FormControl, Highlight, Icon, Input, Text, useColorModeValue } from '@chakra-ui/react';
+import { Button, Flex, FormControl, Highlight, Icon, Input, Text, useColorModeValue } from '@chakra-ui/react';
 import { t } from 'i18next';
 import { useState } from 'react';
-import { IoListCircleOutline } from 'react-icons/io5';
+import { IoAdd, IoListCircleOutline } from 'react-icons/io5';
 import { Link } from 'react-router-dom';
 import { Playlist } from '../../../data/Playlist';
 import { useColorScheme, useHighlightStyle } from '../../../hooks/useColorScheme';
@@ -27,7 +27,14 @@ export function PlaylistList(props: IPlaylistListProps) {
             <AwaitAPI request={(api) => api.playlists.getAll()}>
                 {(data: Playlist[]) => (
                     <>
-                        <Box mx={-4} px={4} pb={4} borderBottomWidth="1px" borderBottomColor={borderColor}>
+                        <Flex
+                            direction="row"
+                            mx={-4}
+                            px={4}
+                            pb={4}
+                            borderBottomWidth="1px"
+                            borderBottomColor={borderColor}
+                        >
                             <FormControl>
                                 <Input
                                     type="text"
@@ -38,7 +45,12 @@ export function PlaylistList(props: IPlaylistListProps) {
                                     onChange={(event) => setFilter(event.target.value.toLowerCase())}
                                 />
                             </FormControl>
-                        </Box>
+                            <Link to="create">
+                                <Button ml={4} leftIcon={<IoAdd />} colorScheme="blue">
+                                    {t('playlistList.create').toString()}
+                                </Button>
+                            </Link>
+                        </Flex>
                         <Flex direction="column" w="full">
                             <Pagination
                                 data={data.filter(

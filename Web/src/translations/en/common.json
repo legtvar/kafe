@@ -145,7 +145,8 @@
     "play": "Play the playlist",
     "readmore": "More info",
     "videoCount": "videos",
-    "watchNewest": "Watch the newest playlist"
+    "watchNewest": "Watch the newest playlist",
+    "empty": "This playlist is empty"
   },
   "project": {
     "general": "Project information",
@@ -252,7 +253,13 @@
       "detail": {
         "title": "Playlist detail"
       },
-      "title": "Playlists"
+      "title": "Playlists",
+      "create": {
+        "title": "Create new playlist"
+      },
+      "edit": {
+        "title": "Edit playlist"
+      }
     },
     "projects": {
       "detail": {
@@ -325,7 +332,8 @@
     "search": "Filter projects"
   },
   "playlistList": {
-    "search": "Filter playlists"
+    "search": "Filter playlists",
+    "create": "Create playlist"
   },
   "groupsList": {
     "search": "Filter project groups",
@@ -422,5 +430,21 @@
   },
   "general": {
     "copied": "Copied!"
+  },
+  "reatePlaylist": {
+    "fields": {
+      "name": "Playlist name",
+      "description": "Playlist description"
+    }
+  },
+  "playlistCreate": {
+    "title": "Create new playlist"
+  },
+  "playlistsEdit": {
+    "tabs": {
+      "info": "Basic info",
+      "files": "Files",
+      "rights": "Rights"
+    }
   }
 }

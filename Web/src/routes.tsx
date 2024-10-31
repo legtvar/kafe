@@ -22,7 +22,9 @@ import { GroupsDetail } from './components/pages/groups/GroupsDetail';
 import { GroupsEdit } from './components/pages/groups/GroupsEdit';
 import { Home } from './components/pages/home/Home';
 import { Player } from './components/pages/Player';
+import { PlaylistCreate } from './components/pages/playlists/PlaylistCreate';
 import { PlaylistDetail } from './components/pages/playlists/PlaylistDetail';
+import { PlaylistEdit } from './components/pages/playlists/PlaylistEdit';
 import { PlaylistGallery } from './components/pages/playlists/PlaylistGallery';
 import { PlaylistList } from './components/pages/playlists/PlaylistList';
 import { CreateProject } from './components/pages/projects/CreateProject';
@@ -187,7 +189,6 @@ export const authRoutes = (t: (id: string) => string, user?: User | null): AppRo
             default: IoSettingsOutline,
             selected: IoSettingsSharp,
         },
-        children: playlistChildRoutes(t),
     },
 ];
 
@@ -224,10 +225,20 @@ export const accountRoutes = (t: (id: string) => string): RouteObject[] => [
 
 export const playlistChildRoutes = (t: (id: string) => string): AppRoute[] => [
     {
+        path: 'create',
+        title: t('route.playlists.create.title'),
+        element: <PlaylistCreate />,
+    },
+    {
         path: ':id',
         title: t('route.playlists.detail.title'),
         element: <PlaylistDetail />,
         children: [
+            {
+                path: 'edit',
+                title: t('route.playlists.edit.title'),
+                element: <PlaylistEdit />,
+            },
             {
                 path: ':itemId',
                 title: t('route.playlists.detail.title'),

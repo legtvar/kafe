@@ -1,0 +1,17 @@
+.chakra-ui-light .sortable-ghost div {
+    background: var(--kafe-colors-blue-300);
+}
+
+.chakra-ui-dark .sortable-ghost div {
+    background: var(--kafe-colors-blue-800);
+}
+
+.sortable .sortable-ghost div {
+    margin-left: 20px;
+}
+
+.sortable > div > div {
+    /* Margin and background color transition */
+    margin-left: 0px;
+    transition: margin 0.1s, background-color 0.1s;
+}

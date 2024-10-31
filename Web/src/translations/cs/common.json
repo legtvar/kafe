@@ -143,7 +143,8 @@
     "play": "Přehrát playlist",
     "readmore": "Více informací",
     "videoCount": "videí",
-    "watchNewest": "Podívejte se na nejnovější playlist"
+    "watchNewest": "Podívejte se na nejnovější playlist",
+    "empty": "Tento playlist je prázdný"
   },
   "project": {
     "general": "Informace o projektu",
@@ -250,7 +251,13 @@
       "detail": {
         "title": "Detail playlistu"
       },
-      "title": "Playlisty"
+      "title": "Playlisty",
+      "create": {
+        "title": "Vytvořit nový playlist"
+      },
+      "edit": {
+        "title": "Upravit playlist"
+      }
     },
     "projects": {
       "detail": {
@@ -323,7 +330,8 @@
     "search": "Hledat projekty"
   },
   "playlistList": {
-    "search": "Hledat playlisty"
+    "search": "Hledat playlisty",
+    "create": "Vytvořit playlist"
   },
   "groupsList": {
     "search": "Hledat skupiny projektů",
@@ -373,6 +381,11 @@
         "inspect": "Zobrazit všechny projekty ve skupině projektů",
         "append": "Vytvořit nový projekt v této skupině",
         "review": "Hodnotit projekty ve skupině"
+      },
+      "playlist": {
+        "read": "Vidět tento playlist",
+        "write": "Měnit metadata a nastavení playlistu",
+        "inspect": "Zobrazit všechny soubory ve playlistu"
       }
     }
   },
@@ -420,5 +433,21 @@
   },
   "general": {
     "copied": "Zkopírováno!"
+  },
+  "reatePlaylist": {
+    "fields": {
+      "name": "Název playlistu",
+      "description": "Anotace playlistu"
+    }
+  },
+  "playlistCreate": {
+    "title": "Vytvořit nový playlist"
+  },
+  "playlistsEdit": {
+    "tabs": {
+      "info": "Základní informace",
+      "files": "Soubory",
+      "rights": "Oprávnění"
+    }
   }
 }

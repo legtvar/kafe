@@ -11,6 +11,7 @@ import { ChakraProvider, ColorModeScript } from '@chakra-ui/react';
 import moment from 'moment';
 import 'moment/locale/cs';
 import { CookiesProvider } from 'react-cookie';
+import { SortableProvider } from 'use-sortablejs';
 import { overrideConsole } from './consoleOverride';
 import theme from './theme';
 
@@ -32,12 +33,14 @@ overrideConsole();
     root.render(
         <I18nextProvider i18n={i18next}>
             <CookiesProvider>
-                <ChakraProvider theme={theme}>
-                    <CaffeineProvider value={caffeine}>
-                        <ColorModeScript initialColorMode={theme.config.initialColorMode} />
-                        <RouterProvider router={router} />
-                    </CaffeineProvider>
-                </ChakraProvider>
+                <SortableProvider>
+                    <ChakraProvider theme={theme}>
+                        <CaffeineProvider value={caffeine}>
+                            <ColorModeScript initialColorMode={theme.config.initialColorMode} />
+                            <RouterProvider router={router} />
+                        </CaffeineProvider>
+                    </ChakraProvider>
+                </SortableProvider>
             </CookiesProvider>
         </I18nextProvider>,
     );

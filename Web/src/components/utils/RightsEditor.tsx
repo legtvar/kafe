@@ -11,12 +11,18 @@ export interface IRightsEditorProps {
     readonly?: boolean;
     options: Readonly<Array<Permission>>;
     explanation: Partial<Record<Permission, string>>;
+    onChange?: (perms: EntityPermissions) => void;
 }
 
-export function RightsEditor({ perms, readonly, explanation, options }: IRightsEditorProps) {
+export function RightsEditor({ perms, readonly, explanation, options, onChange }: IRightsEditorProps) {
     const { border } = useColorScheme();
 
-    const [newItems, setNewItems] = useState<Array<Partial<EntityPermissionsUser>>>([{}]);
+    const [newItems, setNewItems] = useState<Array<EntityPermissionsUser>>([
+        {
+            emailAddress: '',
+            permissions: [],
+        },
+    ]);
 
     return (
         <>
@@ -38,7 +44,11 @@ export function RightsEditor({ perms, readonly, explanation, options }: IRightsE
                         user={0}
                         initialPerms={perms.globalPermissions}
                         {...{ readonly, options }}
-                        onChange={(user) => perms.set('globalPermissions', user.permissions)}
+                        onChange={(permissions) => {
+                            perms.set('globalPermissions', permissions);
+
+                            onChange?.(perms);
+                        }}
                     />
                 )}
 
@@ -52,36 +62,45 @@ export function RightsEditor({ perms, readonly, explanation, options }: IRightsE
                             user={a}
                             initialPerms={a.permissions}
                             {...{ readonly, options }}
-                            onChange={(user) => {
+                            onChange={(permissions) => {
                                 perms.accountPermissions
                                     .filter((b) => b.id === a.id)
-                                    .forEach((b) => (b.permissions = user.permissions));
-                                perms.changed.add('accountPermissions');
+                                    .forEach((b) => (b.permissions = permissions));
+                                perms.set('accountPermissions', perms.accountPermissions);
+
+                                onChange?.(perms);
                             }}
                         />
                     ))}
 
                 <Spacer borderBottomColor={border} borderBottomWidth={1} mx={-4} mt={1} />
 
-                {newItems.map((a, i) => (
+                {newItems.map((item, i) => (
                     <RightsItem
                         key={i}
                         user={null}
                         initialPerms={[]}
                         {...{ readonly, options }}
-                        onChange={(user) => {
-                            const newNewItems = newItems.map((n, j) => (i == j ? user : n));
-
-                            if (newNewItems.filter((e) => !e.emailAddress).length == 0) {
-                                newNewItems.push({});
+                        onChange={(permissions, email) => {
+                            newItems[i] = {
+                                emailAddress: email || '',
+                                permissions,
+                            };
+                            if (newItems.length === 0 || newItems.at(-1)!.emailAddress.length > 0) {
+                                newItems.push({
+                                    emailAddress: '',
+                                    permissions: [],
+                                });
                             }
-                            setNewItems(newNewItems);
+                            setNewItems([...newItems]);
 
                             perms.accountPermissions = [
                                 ...perms.accountPermissions.filter((a) => a.id),
-                                ...(newNewItems.filter((a) => a.emailAddress) as EntityPermissionsUser[]),
+                                ...(newItems.filter((a) => a.emailAddress) as EntityPermissionsUser[]),
                             ];
-                            perms.changed.add('accountPermissions');
+                            perms.set('accountPermissions', perms.accountPermissions);
+
+                            onChange?.(perms);
                         }}
                     />
                 ))}

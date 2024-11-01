@@ -33,6 +33,9 @@ const theme = extendTheme({
             800: 'rgba(23,25,35,0.80)',
             900: 'rgba(23,25,35,0.92)',
         },
+        gray: {
+            650: '#374358',
+        },
     },
     fonts: {
         body: "'Open Sans', sans-serif",

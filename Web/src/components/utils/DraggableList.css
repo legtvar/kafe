@@ -10,6 +10,10 @@
     margin-left: 20px;
 }
 
+.sortable .sortable-ghost .hide-on-drag {
+    opacity: 0.1;
+}
+
 .sortable > div > div {
     /* Margin and background color transition */
     margin-left: 0px;

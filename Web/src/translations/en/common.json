@@ -146,7 +146,17 @@
     "readmore": "More info",
     "videoCount": "videos",
     "watchNewest": "Watch the newest playlist",
-    "empty": "This playlist is empty"
+    "empty": "This playlist is empty",
+    "addNewFile": {
+      "title": "Add a file",
+      "groups": "Project groups",
+      "allGroups": "All groups",
+      "projects": "Projects",
+      "noProjectSelected": "No project is selected",
+      "artifacts": "Artifacts",
+      "add": "Add selected files",
+      "selectedFiles": "You have {{count}} files selected"
+    }
   },
   "project": {
     "general": "Project information",
@@ -444,7 +454,12 @@
     "tabs": {
       "info": "Basic info",
       "files": "Files",
-      "rights": "Rights"
+      "rights": "Rights",
+      "addFile": "Add new file"
+    },
+    "addFile": "Add file",
+    "files": {
+      "description": "Drag to change the order of files or add a new file to the playlist"
     }
   }
 }

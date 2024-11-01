@@ -144,7 +144,17 @@
     "readmore": "Více informací",
     "videoCount": "videí",
     "watchNewest": "Podívejte se na nejnovější playlist",
-    "empty": "Tento playlist je prázdný"
+    "empty": "Tento playlist je prázdný",
+    "addNewFile": {
+      "title": "Přidat soubor",
+      "groups": "Skupiny projektů",
+      "allGroups": "Všechny skupiny",
+      "projects": "Projekty",
+      "noProjectSelected": "Není vybraný žádný projekt",
+      "artifacts": "Artefakty",
+      "add": "Přidat vybrané soubory",
+      "selectedFiles": "Máte vybráno {{count}} souborů"
+    }
   },
   "project": {
     "general": "Informace o projektu",
@@ -447,7 +457,12 @@
     "tabs": {
       "info": "Základní informace",
       "files": "Soubory",
-      "rights": "Oprávnění"
+      "rights": "Oprávnění",
+      "addFile": "Přidat nový soubor"
+    },
+    "addFile": "Přidat soubor",
+    "files": {
+      "description": "Tahem můžete měnit pořadí souborů, či přidat nový soubor do playlistu"
     }
   }
 }

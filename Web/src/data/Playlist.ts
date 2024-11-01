@@ -6,14 +6,16 @@ import { entriesMapper } from './serialize/entriesMapper';
 import { localizedMapper } from './serialize/localizedMapper';
 import { Serializer } from './serialize/Serializer';
 
+export type PlaylistEntry = {
+    id: HRIB;
+    name: localizedString;
+};
+
 export class Playlist extends AbstractType {
     // API object
     public name!: localizedString;
     public description?: localizedString;
-    public entries!: {
-        id: HRIB;
-        name: localizedString;
-    }[];
+    public entries!: PlaylistEntry[];
 
     public constructor(struct: components['schemas']['PlaylistListDto'] | components['schemas']['PlaylistDetailDto']) {
         super();

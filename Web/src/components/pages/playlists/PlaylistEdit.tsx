@@ -29,6 +29,7 @@ import { DraggableList } from '../../utils/DraggableList';
 import { RightsEditor } from '../../utils/RightsEditor';
 import { SendAPI } from '../../utils/SendAPI';
 import { Status } from '../../utils/Status';
+import { WithTitle } from '../../utils/WithTitle';
 import { PlaylistAddNewFile } from './addNewFile/PlaylistAddNewFile';
 import { PlaylistBasicInfo } from './PlaylistBasicInfo';
 
@@ -51,6 +52,7 @@ export function PlaylistEdit(props: IPlaylistEditProps) {
                     <AwaitAPI request={(api) => api.entities.perms.getById(playlist.id)}>
                         {observeAbstactType((perms: EntityPermissions) => (
                             <Box m={6} pb={12}>
+                                <WithTitle title={t('title.playlist', { playlist: playlist.getName() })} />
                                 <HStack mb={2}>
                                     <Heading fontSize="4xl" fontWeight="semibold" as="h2" lineHeight="tight" mr="auto">
                                         {playlist.getName()}

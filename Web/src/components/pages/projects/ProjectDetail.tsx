@@ -8,6 +8,7 @@ import { AwaitAPI } from '../../utils/AwaitAPI';
 import { OutletOrChildren } from '../../utils/OutletOrChildren';
 import { ProjectAuthorList } from '../../utils/ProjectAuthorList';
 import { Status } from '../../utils/Status';
+import { WithTitle } from '../../utils/WithTitle';
 import { ProjectTags } from './ProjectTags';
 
 interface IProjectDetailProps {}
@@ -24,6 +25,7 @@ export function ProjectDetail(props: IProjectDetailProps) {
             <AwaitAPI request={(api) => api.projects.getById(id)} error={<Status statusCode={404} embeded />}>
                 {(project: Project) => (
                     <Box m={6} pb={12}>
+                        <WithTitle title={t('title.project', { project: project.getName() })} />
                         <Flex mb={2}>
                             <Heading fontSize="4xl" fontWeight="semibold" as="h2" lineHeight="tight" mr="auto">
                                 {project.getName()}

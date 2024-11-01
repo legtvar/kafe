@@ -1,9 +1,9 @@
-import { Avatar, CloseButton, HStack, SimpleGrid, Text, VStack } from '@chakra-ui/react';
+import { CloseButton, HStack, SimpleGrid, Text, VStack } from '@chakra-ui/react';
 import { Author } from '../../data/Author';
 import { components } from '../../schemas/api';
 import { HRIB } from '../../schemas/generic';
-import { avatarUrl } from '../../utils/avatarUrl';
 import { AwaitAPI } from './AwaitAPI';
+import { KafeAvatar } from './KafeAvatar';
 
 interface IProjectAuthorListProps {
     authors: components['schemas']['ProjectAuthorDto'][];
@@ -37,7 +37,7 @@ function SimpleProjectAuthorList({
 }: { author: components['schemas']['ProjectAuthorDto'] } & IProjectAuthorListProps) {
     return (
         <HStack alignItems="start">
-            <Avatar size={'md'} src={avatarUrl(author.id)} />
+            <KafeAvatar size={'md'} person={author} />
             <VStack alignItems="start" pl={2} spacing={0}>
                 <Text fontWeight="bolder">{author.name}</Text>
                 <Text color="gray.500">{author.roles.join(', ')}</Text>

@@ -5,7 +5,7 @@ import { IoAdd, IoEarth } from 'react-icons/io5';
 import { EntityPermissionsUser } from '../../data/EntityPermissions';
 import { useColorScheme } from '../../hooks/useColorScheme';
 import { Permission } from '../../schemas/generic';
-import { avatarUrl } from '../../utils/avatarUrl';
+import { KafeAvatar } from './KafeAvatar';
 
 export interface IRightsItemProps {
     user: EntityPermissionsUser | number | null; // User, 0 for anyone, null for new user
@@ -93,7 +93,7 @@ export function RightsItem({ user, options, initialPerms, readonly, onChange }: 
                 </Flex>
             ) : (
                 <Flex direction="row" flex="1" align={'center'}>
-                    <Avatar size={'sm'} src={avatarUrl(user!.id ?? null)} mr={4} />
+                    <KafeAvatar size={'sm'} person={user} mr={4} />
                     <Text>{user.emailAddress}</Text>
                 </Flex>
             )}

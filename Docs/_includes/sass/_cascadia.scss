@@ -1,27 +1,27 @@
 @font-face {
     font-family: "Cascadia Code";
-    src: url("/fonts/cascadia/CascadiaCode.woff2");
+    src: url(base-path() + "/fonts/cascadia/CascadiaCode.woff2");
     font-style: normal;
     text-rendering: optimizeLegibility;
 }
 
 @font-face {
     font-family: "Cascadia Code";
-    src: url("/fonts/cascadia/CascadiaCodeItalic.woff2");
+    src: url(base-path() + "/fonts/cascadia/CascadiaCodeItalic.woff2");
     font-style: italic;
     text-rendering: optimizeLegibility;
 }
 
 @font-face {
     font-family: "Cascadia Mono";
-    src: url("/fonts/cascadia/CascadiaMono.woff2");
+    src: url(base-path() + "/fonts/cascadia/CascadiaMono.woff2");
     font-style: normal;
     text-rendering: optimizeLegibility;
 }
 
 @font-face {
     font-family: "Cascadia Mono";
-    src: url("/fonts/cascadia/CascadiaMonoItalic.woff2");
+    src: url(base-path() + "/fonts/cascadia/CascadiaMonoItalic.woff2");
     font-style: italic;
     text-rendering: optimizeLegibility;
 }

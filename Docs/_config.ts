@@ -18,6 +18,7 @@ import { default as markdownItAlerts } from "npm:markdown-it-github-alerts";
 import markdownDl from "npm:markdown-it-deflist";
 import codeHighlight from "./_plugins/shiki.ts";
 import basePath from "lume/plugins/base_path.ts";
+import { SassString } from "lume/deps/sass.ts";
 
 const site = lume({
     dest: "public/",
@@ -57,7 +58,18 @@ site.ignore(".vscode", "public", "_plugins", "Docs.Dockerfile")
     }))
     .use(markdownTitle())
     .use(jsx())
-    .use(sass())
+    .use(sass({
+        options: {
+            functions: {
+                'base-path()': _ => {
+                    const basepath = site.options.location.hostname === "localhost"
+                        ? ""
+                        : site.options.location.pathname;
+                    return new SassString(basepath);
+                }
+            }
+        }
+    }))
     .use(postcss())
     .use(metas())
     .use(resolveUrls())

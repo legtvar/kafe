@@ -1,7 +1,7 @@
 ---
 title: Getting Started
 tags: doc
-priority: 110
+priority: 010
 ---
 
 # Getting Started

@@ -1,3 +1,8 @@
+---
+tags: doc
+priority: 040
+---
+
 # Permissions in KAFE
 
 An `Account` or a `Role` can have any of the following permissions:

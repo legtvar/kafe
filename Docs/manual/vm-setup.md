@@ -1,7 +1,7 @@
 ---
 title: VM Setup
 tags: doc
-priority: 100
+priority: 030
 ---
 
 # VM Setup

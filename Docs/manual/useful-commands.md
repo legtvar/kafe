@@ -1,7 +1,7 @@
 ---
 title: Useful Commands
 tags: doc
-priority: 90
+priority: 050
 ---
 
 

@@ -68,3 +68,20 @@ WHERE (
 `JOIN` took between 38 and 65 ms (~40 ms avg). `MatchesSql` took between 47 and 99 ms (~50 ms avg).
 The 10 ms performance hit is a sacrifice I'm willing to make in order to not have to implement
 anything related to `IQueryable`.
+
+
+## Even later...
+
+I forgot about `GlobalPermission`. :D
+
+```sql
+SELECT * FROM mt_doc_projectinfo as p
+WHERE
+    (
+        SELECT
+            (data -> 'AccountEntries' -> 'Ugc5qcZtLLp' -> 'EffectivePermission')::int
+            | (data -> 'GlobalPermission')::int
+        FROM mt_doc_entitypermissioninfo AS perms
+        WHERE perms.id = p.id
+    ) != 0
+```

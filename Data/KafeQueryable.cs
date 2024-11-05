@@ -35,7 +35,13 @@ public static class KafeQueryable
             ON
                 entity.id = perms.id
             WHERE
-                ((perms.data -> 'AccountEntries' -> ? -> 'EffectivePermission')::int & ?) = ?
+                (
+                    (
+                        (perms.data -> 'AccountEntries' -> ? -> 'EffectivePermission')::int
+                        | perms.data -> 'GlobalPermission'
+                    )
+                    & ?
+                ) = ?
             """,
             token,
             accountId.ToString(),
@@ -56,10 +62,11 @@ public static class KafeQueryable
         return query.Where(e => e.MatchesSql(
             $"""
             (
-                (SELECT data FROM mt_doc_entitypermissioninfo AS perms WHERE perms.id = d.id)
-                    -> 'AccountEntries'
-                    -> ?
-                    -> 'EffectivePermission')::int & ? = ?
+                SELECT
+                    (perms.data -> 'AccountEntries' -> ? -> 'EffectivePermission')::int
+                        | (perms.data -> 'GlobalPermission')::int
+                FROM mt_doc_entitypermissioninfo AS perms WHERE perms.id = d.id
+            )::int & ? = ?
             """,
             accountId.ToString(),
             (int)requiredPermission,

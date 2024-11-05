@@ -42,7 +42,7 @@ public class AccountDetailEndpoint : EndpointBaseAsync
         string? id,
         CancellationToken token = default)
     {
-        id ??= userProvider.Account?.Id;
+        id ??= userProvider.AccountId.ToString();
 
         if (id is null)
         {

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Kafe.Data.Aggregates;
 using Kafe.Data.Documents;
 using Marten;
+using Marten.Linq;
 using Marten.Linq.MatchesSql;
 
 namespace Kafe.Data;
@@ -13,7 +14,7 @@ namespace Kafe.Data;
 public static class KafeQueryable
 {
     public static Task<IReadOnlyList<(T, EntityPermissionInfo)>> GetEntitiesWithPermission<T>(
-        IDocumentSession db,
+        IQuerySession db,
         Permission requiredPermission,
         Hrib accountId,
         CancellationToken token = default
@@ -49,9 +50,10 @@ public static class KafeQueryable
             (int)requiredPermission
         );
     }
-    
+
     public static IQueryable<T> WhereAccountHasPermission<T>(
         this IQueryable<T> query,
+        IDocumentSchemaResolver schema,
         Permission requiredPermission,
         Hrib accountId
     ) where T : IEntity
@@ -59,20 +61,40 @@ public static class KafeQueryable
         EnsureValidPermission(requiredPermission);
         EnsureValidAccountId(accountId);
 
-        return query.Where(e => e.MatchesSql(
+        // NB: Anonymous users
+        if (accountId.IsEmpty)
+        {
+            var anonSql =
             $"""
             (
-                SELECT
-                    (perms.data -> 'AccountEntries' -> ? -> 'EffectivePermission')::int
-                        | (perms.data -> 'GlobalPermission')::int
-                FROM mt_doc_entitypermissioninfo AS perms WHERE perms.id = d.id
+                SELECT (perms.data -> 'GlobalPermission')::int
+                FROM {schema.For<EntityPermissionInfo>()} AS perms
+                WHERE perms.id = d.id
             )::int & ? = ?
-            """,
+            """;
+
+            return query.Where(e => e.MatchesSql(
+                anonSql,
+                (int)requiredPermission,
+                (int)requiredPermission));
+        }
+
+        var sql = $"""
+        (
+            SELECT
+                (perms.data -> 'AccountEntries' -> ? -> 'EffectivePermission')::int
+                    | (perms.data -> 'GlobalPermission')::int
+            FROM {schema.For<EntityPermissionInfo>()} AS perms
+            WHERE perms.id = d.id
+        )::int & ? = ?
+        """;
+        return query.Where(e => e.MatchesSql(
+            sql,
             accountId.ToString(),
             (int)requiredPermission,
             (int)requiredPermission));
     }
-    
+
     private static void EnsureValidPermission(Permission requiredPermission)
     {
         if (requiredPermission == Permission.None)
@@ -83,9 +105,9 @@ public static class KafeQueryable
 
     private static void EnsureValidAccountId(Hrib accountId)
     {
-        if (!accountId.IsValidNonEmpty)
+        if (accountId.IsInvalid)
         {
-            throw new ArgumentException("The account id must be a non-empty valid HRIB.", nameof(accountId));
+            throw new ArgumentException("The account id must be a valid HRIB.", nameof(accountId));
         }
     }
 }

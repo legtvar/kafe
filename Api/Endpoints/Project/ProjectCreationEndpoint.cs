@@ -50,7 +50,7 @@ public class ProjectCreationEndpoint : EndpointBaseAsync
             name: request.Name,
             description: request.Description,
             genre: request.Genre,
-            ownerId: userProvider.Account?.Id,
+            ownerId: userProvider.AccountId,
             token: cancellationToken);
 
         return Ok(project.Id);

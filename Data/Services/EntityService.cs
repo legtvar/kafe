@@ -63,19 +63,19 @@ public class EntityService
 
     public async Task<Permission> GetPermission(
         Hrib entityId,
-        Hrib? accessingAccountId = null,
+        Hrib accessingAccountId,
         CancellationToken token = default
     )
     {
         var perms = (await LoadPermissionInfo(entityId, token)).Unwrap();
-        return accessingAccountId is null
+        return accessingAccountId.IsEmpty
             ? perms.GlobalPermission
-            : perms.GetAccountPermission(accessingAccountId);
+            : perms.GetAccountPermission(accessingAccountId) | perms.GlobalPermission;
     }
 
     public async Task<ImmutableArray<Permission>> GetPermissions(
         IEnumerable<Hrib> entityIds,
-        Hrib? accessingAccountId = null,
+        Hrib accessingAccountId,
         CancellationToken token = default
     )
     {
@@ -85,19 +85,21 @@ public class EntityService
         }
         
         var manyPerms = (await LoadPermissionInfoMany(entityIds, token)).Unwrap();
-        return manyPerms.Select(p => accessingAccountId is null
+        return manyPerms.Select(p => accessingAccountId.IsEmpty
                 ? p.GlobalPermission
-                : p.GetAccountPermission(accessingAccountId))
+                : p.GetAccountPermission(accessingAccountId) | p.GlobalPermission)
             .ToImmutableArray();
     }
 
+    // TODO: Refactor into SetAccountPermissions, SetRolePermissions, and SetGlobalPermissions.
+    //       This is less than intuitive.
     public async Task SetPermissions(
         Hrib entityId,
         Permission permissions,
-        Hrib? accessingAccountId = null,
+        Hrib accessingAccountId,
         CancellationToken token = default)
     {
-        if (accessingAccountId is null)
+        if (accessingAccountId.IsEmpty)
         {
             if (entityId == Hrib.System)
             {

@@ -35,7 +35,7 @@ public class AuthorListEndpoint : EndpointBaseAsync
         CancellationToken cancellationToken = default)
     {
         var filter = new AuthorService.AuthorFilter(
-            AccessingAccountId: userProvider.Account?.Id
+            AccessingAccountId: userProvider.AccountId
         );
         
         return Ok((await authorService.List(filter, cancellationToken))

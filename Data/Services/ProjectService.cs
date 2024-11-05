@@ -165,6 +165,19 @@ public partial class ProjectService
         return true;
     }
 
+    /// <summary>
+    /// Filter of projects.
+    /// </summary>
+    /// <param name="AccessingAccountId">
+    /// <list type="bullet">
+    /// <item> If null, doesn't filter by account access at all.</item>
+    /// <item>
+    ///     If <see cref="Hrib.Empty"/> assumes the account is an anonymous user
+    ///     and filters only by global permissions.
+    /// </item>
+    /// <item> If <see cref="Hrib.Invalid"/>, throws an exception. </item>
+    /// </list>
+    /// </param>
     public record ProjectFilter(
         Hrib? ProjectGroupId = null,
         Hrib? AccessingAccountId = null
@@ -179,7 +192,10 @@ public partial class ProjectService
         if (filter.AccessingAccountId is not null)
         {
             query = (IMartenQueryable<ProjectInfo>)query
-                .WhereAccountHasPermission(Permission.Read, filter.AccessingAccountId);
+                .WhereAccountHasPermission(
+                    db.DocumentStore.Options.Schema,
+                    Permission.Read,
+                    filter.AccessingAccountId);
         }
 
         if (filter.ProjectGroupId is not null)

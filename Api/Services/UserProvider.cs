@@ -1,4 +1,5 @@
-﻿using Kafe.Data;
+﻿using Kafe.Api.Transfer;
+using Kafe.Data;
 using Kafe.Data.Aggregates;
 using Kafe.Data.Services;
 using Marten;
@@ -39,6 +40,11 @@ public class UserProvider
 
     public AccountInfo? Account { get; private set; }
 
+    /// <summary>
+    /// Returns the logged users's account HRIB or <see cref="Hrib.Empty"/> if the user is anonymous.
+    /// </summary>
+    public Hrib AccountId => Account?.Id ?? Hrib.Empty;
+
     public bool HasExplicitPermission(Hrib entityId, Permission permission)
     {
         return Account is not null
@@ -52,7 +58,7 @@ public class UserProvider
     {
         var effectivePermission = await entityService.GetPermission(
             entityId,
-            Account?.Id!,
+            AccountId,
             token);
         return (effectivePermission & permission) == permission;
     }

@@ -108,6 +108,19 @@ public class AuthorService
         return Error.Unmodified($"author {modified.Id}");
     }
 
+    /// <summary>
+    /// Filter of authors.
+    /// </summary>
+    /// <param name="AccessingAccountId">
+    /// <list type="bullet">
+    /// <item> If null, doesn't filter by account access at all.</item>
+    /// <item>
+    ///     If <see cref="Hrib.Empty"/> assumes the account is an anonymous user
+    ///     and filters only by global permissions.
+    /// </item>
+    /// <item> If <see cref="Hrib.Invalid"/>, throws an exception. </item>
+    /// </list>
+    /// </param>
     public record AuthorFilter(
         Hrib? AccessingAccountId = null,
         string? Name = null,
@@ -122,7 +135,10 @@ public class AuthorService
         if (filter?.AccessingAccountId is not null)
         {
             query = (IMartenQueryable<AuthorInfo>)query
-                .WhereAccountHasPermission(Permission.Read, filter.AccessingAccountId);
+                .WhereAccountHasPermission(
+                    db.DocumentStore.Options.Schema,
+                    Permission.Read,
+                    filter.AccessingAccountId);
         }
 
         if (filter?.Name is not null)

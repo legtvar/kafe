@@ -77,6 +77,19 @@ public class ProjectGroupService
         return await db.Events.KafeAggregateRequiredStream<ProjectGroupInfo>(id, token: token);
     }
 
+    /// <summary>
+    /// Filter of project groups.
+    /// </summary>
+    /// <param name="AccessingAccountId">
+    /// <list type="bullet">
+    /// <item> If null, doesn't filter by account access at all.</item>
+    /// <item>
+    ///     If <see cref="Hrib.Empty"/> assumes the account is an anonymous user
+    ///     and filters only by global permissions.
+    /// </item>
+    /// <item> If <see cref="Hrib.Invalid"/>, throws an exception. </item>
+    /// </list>
+    /// </param>
     public record ProjectGroupFilter(
         Hrib? AccessingAccountId = null,
         LocalizedString? Name = null
@@ -90,7 +103,10 @@ public class ProjectGroupService
         if (filter?.AccessingAccountId is not null)
         {
             query = (IMartenQueryable<ProjectGroupInfo>)query
-                .WhereAccountHasPermission(Permission.Read, filter.AccessingAccountId);
+                .WhereAccountHasPermission(
+                    db.DocumentStore.Options.Schema,
+                    Permission.Read,
+                    filter.AccessingAccountId);
         }
 
         if (filter?.Name is not null)

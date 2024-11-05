@@ -32,11 +32,22 @@ public class PlaylistService
         this.organizationService = organizationService;
     }
 
+    /// <summary>
+    /// Filter of playlists.
+    /// </summary>
+    /// <param name="AccessingAccountId">
+    /// <list type="bullet">
+    /// <item> If null, doesn't filter by account access at all.</item>
+    /// <item>
+    ///     If <see cref="Hrib.Empty"/> assumes the account is an anonymous user
+    ///     and filters only by global permissions.
+    /// </item>
+    /// <item> If <see cref="Hrib.Invalid"/>, throws an exception. </item>
+    /// </list>
+    /// </param>
     public record PlaylistFilter(
         Hrib? AccessingAccountId
     );
-
-
 
     public async Task<ImmutableArray<PlaylistInfo>> List(
         PlaylistFilter? filter = null,
@@ -46,7 +57,10 @@ public class PlaylistService
         if (filter?.AccessingAccountId is not null)
         {
             query = (IMartenQueryable<PlaylistInfo>)query
-                .WhereAccountHasPermission(Permission.Read, filter.AccessingAccountId);
+                .WhereAccountHasPermission(
+                    db.DocumentStore.Options.Schema,
+                    Permission.Read,
+                    filter.AccessingAccountId);
         }
         var result = (await query.ToListAsync(token)).ToImmutableArray();
         return result;
@@ -104,7 +118,7 @@ public class PlaylistService
                 Description: @new.Description);
             db.Events.Append(id.ToString(), changed);
         }
-        
+
         if (@new.GlobalPermissions != Permission.None)
         {
             var globalPermissionChanged = new PlaylistGlobalPermissionsChanged(
@@ -150,7 +164,7 @@ public class PlaylistService
         {
             eventStream.AppendOne(infoChanged);
         }
-        
+
         if (@new.GlobalPermissions != Permission.None
             && @new.GlobalPermissions != old.GlobalPermissions)
         {

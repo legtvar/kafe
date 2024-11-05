@@ -45,12 +45,16 @@ public record Hrib
     /// The raw identifier string. Use only if you know what you're doing. Prefer <see cref="ToString"/> instead.
     /// </summary>
     public string RawValue { get; init; }
-    
+
+    public bool IsEmpty => RawValue == EmptyValue;
+
+    public bool IsInvalid => RawValue == InvalidValue;
+
     /// <summary>
     /// Checks whether this HRIB is a regular id or `system`.
     /// Returns false for <see cref="Invalid"/> and <see cref="Empty"/>.
     /// </summary>
-    public bool IsValidNonEmpty => RawValue != EmptyValue && RawValue != InvalidValue;
+    public bool IsValidNonEmpty => !IsInvalid && !IsEmpty;
 
     // NB: this conversion is deliberately left `explicit` to prevent type casting issues with Marten/Postgres
     [return: NotNullIfNotNull(nameof(hrib))]

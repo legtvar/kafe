@@ -110,7 +110,7 @@ public class EntityPermissionsEditEndpoint : EndpointBaseAsync
             await entityService.SetPermissions(
                 entityId: (Hrib)dto.Id,
                 permissions: TransferMaps.FromPermissionArray(dto.GlobalPermissions),
-                accessingAccountId: null, // sets global permissions
+                accessingAccountId: Hrib.Empty, // sets global permissions
                 token: cancellationToken);
         }
 

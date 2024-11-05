@@ -75,7 +75,7 @@ public class ProjectDetailEndpoint : EndpointBaseAsync
             return NotFound();
         }
 
-        var userPerms = await entityService.GetPermission(project.Id, userProvider.Account?.Id, cancellationToken);
+        var userPerms = await entityService.GetPermission(project.Id, userProvider.AccountId, cancellationToken);
 
         var dto = TransferMaps.ToProjectDetailDto(project, userPerms) with
         {

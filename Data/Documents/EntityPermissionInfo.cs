@@ -79,4 +79,10 @@ public record EntityPermissionInfo(
     {
         return new EntityPermissionInfo() with { Id = id.ToString() };
     }
+
+    public Permission GetAccountPermission(Hrib accountId)
+    {
+        return (AccountEntries.GetValueOrDefault(accountId.ToString())?.EffectivePermission ?? Permission.None)
+            | GlobalPermission;
+    }
 }

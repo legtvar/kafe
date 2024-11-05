@@ -1,15 +1,18 @@
 ﻿using Kafe.Common;
 using Kafe.Data.Aggregates;
+using Kafe.Data.Documents;
 using Kafe.Data.Events;
 using Marten;
 using Marten.Linq;
 using Marten.Linq.MatchesSql;
 using Marten.Linq.SoftDeletes;
+using Serilog;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Data.Common;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -33,22 +36,20 @@ public class PlaylistService
         Hrib? AccessingAccountId
     );
 
+
+
     public async Task<ImmutableArray<PlaylistInfo>> List(
         PlaylistFilter? filter = null,
         CancellationToken token = default)
     {
         var query = db.Query<PlaylistInfo>();
-
         if (filter?.AccessingAccountId is not null)
         {
             query = (IMartenQueryable<PlaylistInfo>)query
-                .Where(e => e.MatchesSql(
-                    $"({SqlFunctions.GetPlaylistPerms}(data ->> 'Id', ?) & ?) != 0",
-                    filter.AccessingAccountId.ToString(),
-                    (int)Permission.Read));
+                .WhereAccountHasPermission(Permission.Read, filter.AccessingAccountId);
         }
-
-        return (await query.ToListAsync(token)).ToImmutableArray();
+        var result = (await query.ToListAsync(token)).ToImmutableArray();
+        return result;
     }
 
     public async Task<PlaylistInfo?> Load(Hrib id, CancellationToken token = default)

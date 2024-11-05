@@ -179,10 +179,7 @@ public partial class ProjectService
         if (filter.AccessingAccountId is not null)
         {
             query = (IMartenQueryable<ProjectInfo>)query
-                .Where(e => e.MatchesSql(
-                    $"({SqlFunctions.GetProjectPerms}(data ->> 'Id', ?) & ?) != 0",
-                    filter.AccessingAccountId.ToString(),
-                    (int)Permission.Read));
+                .WhereAccountHasPermission(Permission.Read, filter.AccessingAccountId);
         }
 
         if (filter.ProjectGroupId is not null)

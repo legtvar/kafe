@@ -90,10 +90,7 @@ public class ProjectGroupService
         if (filter?.AccessingAccountId is not null)
         {
             query = (IMartenQueryable<ProjectGroupInfo>)query
-                .Where(e => e.MatchesSql(
-                    $"({SqlFunctions.GetProjectGroupPerms}(data ->> 'Id', ?) & ?) != 0",
-                    filter.AccessingAccountId.ToString(),
-                    (int)Permission.Read));
+                .WhereAccountHasPermission(Permission.Read, filter.AccessingAccountId);
         }
 
         if (filter?.Name is not null)

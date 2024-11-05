@@ -409,7 +409,11 @@ public static class TransferMaps
         }
 
         return Enum.GetValues<Permission>()
-            .Where(v => v != Permission.None && v != Permission.All && (value & v) == v)
+            .Where(v => v != Permission.None
+                && v != Permission.All
+                && v != Permission.Inheritable
+                && v != Permission.Publishable
+                && (value & v) == v)
             .ToImmutableArray();
     }
 }

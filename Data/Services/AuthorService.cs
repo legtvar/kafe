@@ -122,10 +122,7 @@ public class AuthorService
         if (filter?.AccessingAccountId is not null)
         {
             query = (IMartenQueryable<AuthorInfo>)query
-                .Where(e => e.MatchesSql(
-                    $"({SqlFunctions.GetAuthorPerms}(data ->> 'Id', ?) & ?) != 0",
-                    filter.AccessingAccountId.ToString(),
-                    (int)Permission.Read));
+                .WhereAccountHasPermission(Permission.Read, filter.AccessingAccountId);
         }
 
         if (filter?.Name is not null)

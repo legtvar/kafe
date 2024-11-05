@@ -50,15 +50,11 @@ public class UserProvider
         Permission permission,
         CancellationToken token = default)
     {
-        var result = await query.AdvancedSqlQueryAsync<bool>(
-            // $"SET search_path TO {query.DocumentStore.Options.Events.DatabaseSchemaName}; "
-            $"SELECT {query.DocumentStore.Options.DatabaseSchemaName}.{SqlFunctions.GetResourcePerms}(?, ?) & ? = ?",
-            token,
-            entityId.ToString(),
+        var effectivePermission = await entityService.GetPermission(
+            entityId,
             Account?.Id!,
-            (int)permission,
-            (int)permission);
-        return result?.Single() ?? false;
+            token);
+        return (effectivePermission & permission) == permission;
     }
 
     public Task<bool> HasPermission(

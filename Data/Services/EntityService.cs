@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Data;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
+using Kafe.Common;
 using Kafe.Data.Aggregates;
+using Kafe.Data.Documents;
 using Kafe.Data.Events;
 using Marten;
 
@@ -44,37 +45,50 @@ public class EntityService
     //     if (tableName )
     // }
 
+    public async Task<Err<EntityPermissionInfo>> LoadPermissionInfo(
+        Hrib entityId,
+        CancellationToken token = default
+    )
+    {
+        return await db.KafeLoadAsync<EntityPermissionInfo>(entityId, token);
+    }
+    
+    public async Task<Err<ImmutableArray<EntityPermissionInfo>>> LoadPermissionInfoMany(
+        IEnumerable<Hrib> entityIds,
+        CancellationToken token = default
+    )
+    {
+        return await db.KafeLoadManyAsync<EntityPermissionInfo>(entityIds.ToImmutableArray(), token);
+    }
+
     public async Task<Permission> GetPermission(
         Hrib entityId,
         Hrib? accessingAccountId = null,
-        CancellationToken token = default)
+        CancellationToken token = default
+    )
     {
-        var perms = await db.QueryAsync<int>(
-            $"SELECT {db.DocumentStore.Options.DatabaseSchemaName}.{SqlFunctions.GetResourcePerms}(?, ?)",
-            token,
-            entityId.ToString(),
-            accessingAccountId?.ToString()!);
-        return (Permission)perms.Single();
+        var perms = (await LoadPermissionInfo(entityId, token)).Unwrap();
+        return accessingAccountId is null
+            ? perms.GlobalPermission
+            : perms.GetAccountPermission(accessingAccountId);
     }
 
     public async Task<ImmutableArray<Permission>> GetPermissions(
         IEnumerable<Hrib> entityIds,
         Hrib? accessingAccountId = null,
-        CancellationToken token = default)
+        CancellationToken token = default
+    )
     {
         if (entityIds.IsEmpty())
         {
             return ImmutableArray<Permission>.Empty;
         }
-
-        var perms = await db.QueryAsync<int>(
-            $"SELECT {db.DocumentStore.Options.DatabaseSchemaName}.{SqlFunctions.GetResourcePerms}(id, ?) "
-            + "FROM unnest(?) as id",
-            token,
-            accessingAccountId?.ToString()!,
-            entityIds.Select(i => i.ToString()).ToArray()
-        );
-        return perms.Select(p => (Permission)p).ToImmutableArray();
+        
+        var manyPerms = (await LoadPermissionInfoMany(entityIds, token)).Unwrap();
+        return manyPerms.Select(p => accessingAccountId is null
+                ? p.GlobalPermission
+                : p.GetAccountPermission(accessingAccountId))
+            .ToImmutableArray();
     }
 
     public async Task SetPermissions(
@@ -107,7 +121,7 @@ public class EntityService
                     AuthorInfo a => new AuthorGlobalPermissionsChanged(a.Id, permissions),
                     _ => throw new NotSupportedException($"{entity.GetType().Name} is not a supported entity type.")
                 };
-                
+
                 db.Events.Append(entityId.ToString(), newEvent);
             }
 

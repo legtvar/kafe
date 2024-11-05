@@ -1,9 +1,9 @@
-FROM node:21-alpine as builder
+FROM alpine:latest as builder
+RUN apk update && apk add nodejs-current npm
 RUN corepack enable && corepack prepare pnpm@latest --activate
 WORKDIR /app
-COPY ./Web/package*.json ./
-RUN pnpm i
 COPY ./Web ./
+RUN pnpm i
 RUN pnpm run build
 
 FROM nginx:alpine

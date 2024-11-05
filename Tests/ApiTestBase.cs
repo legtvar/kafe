@@ -47,6 +47,8 @@ public class ApiTestBase : IAsyncLifetime
         await Store.Advanced.ResetAllData();
 
         await ProjectionCoordinator.ResumeAsync();
+        
+        await WaitForProjections();
 
         Log.Information("Initialization complete.");
     }

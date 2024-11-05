@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using Alba;
 using Kafe.Api.Transfer;
 using Kafe.Data;
+using Kafe.Data.Aggregates;
+using Kafe.Data.Documents;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -64,6 +66,7 @@ public class AccountEndpointsTests(ApiFixture fixture, ITestOutputHelper testOut
     [Fact]
     public async Task AccountDetailEndpoint_AnonCheckingAny_ShouldBeUnauthorized()
     {
+        var user = await Store.QuerySession().LoadAsync<EntityPermissionInfo>(TestSeedData.UserHrib);
         var result = await Host.Scenario(c =>
         {
             c.Get.Url($"/api/v1/account/{TestSeedData.UserHrib}");

@@ -67,6 +67,11 @@ public record Hrib
     [return: NotNullIfNotNull(nameof(value))]
     public static implicit operator Hrib?(string? value)
     {
+        if (value is null)
+        {
+            return null;
+        }
+
         if (TryParse(value, out var hrib, out var error))
         {
             return hrib;

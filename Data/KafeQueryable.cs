@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -93,6 +94,20 @@ public static class KafeQueryable
             accountId.ToString(),
             (int)requiredPermission,
             (int)requiredPermission));
+    }
+
+    public static IQueryable<T> WhereContainsLocalized<T>(
+        this IQueryable<T> query,
+        string fieldName,
+        LocalizedString value
+    )
+        where T : IEntity
+    {
+        var dictName = (ImmutableDictionary<string, string>)value;
+        query = query.Where(e => e.MatchesSql(
+                $"data -> {fieldName} @> (?)::jsonb",
+                dictName));
+        return query;
     }
 
     private static void EnsureValidPermission(Permission requiredPermission)

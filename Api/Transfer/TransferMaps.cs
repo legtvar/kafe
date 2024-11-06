@@ -390,7 +390,7 @@ public static class TransferMaps
             )).ToImmutableArray()
         );
     }
-    
+
     public static Permission FromPermissionArray(ImmutableArray<Permission>? array)
     {
         if (array is null || array.Value.IsDefaultOrEmpty)
@@ -415,5 +415,22 @@ public static class TransferMaps
                 && v != Permission.Publishable
                 && (value & v) == v)
             .ToImmutableArray();
+    }
+
+    public static OrganizationDetailDto ToOrganizationDetailDto(OrganizationInfo data)
+    {
+        return new(
+            Id: data.Id,
+            Name: data.Name,
+            CreatedOn: data.CreatedOn
+        );
+    }
+
+    public static OrganizationListDto ToOrganizationListDto(OrganizationInfo data)
+    {
+        return new(
+            Id: data.Id,
+            Name: data.Name
+        );
     }
 }

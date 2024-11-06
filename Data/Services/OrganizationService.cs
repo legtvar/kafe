@@ -8,6 +8,7 @@ using Kafe.Common;
 using Kafe.Data.Aggregates;
 using Kafe.Data.Events;
 using Marten;
+using Marten.Linq;
 
 namespace Kafe.Data.Services;
 
@@ -80,5 +81,46 @@ public class OrganizationService
         }
 
         return Error.Unmodified($"organization {modified.Id}");
+    }
+    
+    /// <summary>
+    /// Filter of authors.
+    /// </summary>
+    /// <param name="AccessingAccountId">
+    /// <list type="bullet">
+    /// <item> If null, doesn't filter by account access at all.</item>
+    /// <item>
+    ///     If <see cref="Hrib.Empty"/> assumes the account is an anonymous user
+    ///     and filters only by global permissions.
+    /// </item>
+    /// <item> If <see cref="Hrib.Invalid"/>, throws an exception. </item>
+    /// </list>
+    /// </param>
+    public record OrganizationFilter(
+        Hrib? AccessingAccountId = null,
+        LocalizedString? Name = null
+    );
+
+    public async Task<ImmutableArray<OrganizationInfo>> List(
+        OrganizationFilter? filter = null,
+        CancellationToken token = default)
+    {
+        var query = db.Query<OrganizationInfo>();
+        if (filter?.AccessingAccountId is not null)
+        {
+            query = (IMartenQueryable<OrganizationInfo>)query
+                .WhereAccountHasPermission(
+                    db.DocumentStore.Options.Schema,
+                    Permission.Read,
+                    filter.AccessingAccountId);
+        }
+
+        if (filter?.Name is not null)
+        {
+            query = (IMartenQueryable<OrganizationInfo>)query
+                .WhereContainsLocalized(nameof(OrganizationInfo.Name), filter.Name);
+        }
+
+        return (await query.ToListAsync(token)).ToImmutableArray();
     }
 }

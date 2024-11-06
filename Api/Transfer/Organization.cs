@@ -11,3 +11,7 @@ public record OrganizationListDto(
     Hrib Id,
     LocalizedString Name
 );
+
+public record OrganizationCreationDto(
+    LocalizedString Name
+);

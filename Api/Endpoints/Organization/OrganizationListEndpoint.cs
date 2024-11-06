@@ -30,7 +30,7 @@ public class OrganizationListEndpoint : EndpointBaseAsync
     }
 
     [HttpGet]
-    [SwaggerOperation(Tags = new[] { EndpointArea.Author })]
+    [SwaggerOperation(Tags = new[] { EndpointArea.Organization })]
     public override async Task<ActionResult<ImmutableArray<OrganizationListDto>>> HandleAsync(
         CancellationToken cancellationToken = default)
     {

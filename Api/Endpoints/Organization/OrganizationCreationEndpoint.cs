@@ -12,7 +12,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Kafe.Api.Endpoints.Author;
+namespace Kafe.Api.Endpoints.Organization;
 
 [ApiVersion("1")]
 [Route("organization")]

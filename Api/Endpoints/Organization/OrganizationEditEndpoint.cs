@@ -7,19 +7,21 @@ using System.Threading;
 using System.Threading.Tasks;
 using Swashbuckle.AspNetCore.Annotations;
 using Kafe.Data.Services;
+using System.Linq;
 
 namespace Kafe.Api.Endpoints.Organization;
 
 [ApiVersion("1")]
-[Route("organization/{id}")]
-public class OrganizationDetailEndpoint : EndpointBaseAsync
-    .WithRequest<string>
-    .WithActionResult<OrganizationDetailDto?>
+[Route("organization")]
+[Authorize(EndpointPolicy.Write)]
+public class OrganizationEditEndpoint : EndpointBaseAsync
+    .WithRequest<OrganizationEditDto>
+    .WithActionResult<Hrib>
 {
     private readonly OrganizationService organizationService;
     private readonly IAuthorizationService authorizationService;
 
-    public OrganizationDetailEndpoint(
+    public OrganizationEditEndpoint(
         OrganizationService organizationService,
         IAuthorizationService authorizationService)
     {
@@ -27,26 +29,35 @@ public class OrganizationDetailEndpoint : EndpointBaseAsync
         this.authorizationService = authorizationService;
     }
 
-    [HttpGet]
+    [HttpPatch]
     [SwaggerOperation(Tags = new[] { EndpointArea.Organization })]
-    [ProducesResponseType(typeof(OrganizationDetailDto), 200)]
-    [ProducesResponseType(404)]
-    public override async Task<ActionResult<OrganizationDetailDto?>> HandleAsync(
-        string id,
+    public override async Task<ActionResult<Hrib>> HandleAsync(
+        OrganizationEditDto dto,
         CancellationToken cancellationToken = default)
     {
-        var auth = await authorizationService.AuthorizeAsync(User, id, EndpointPolicy.Read);
+        var auth = await authorizationService.AuthorizeAsync(User, dto.Id, EndpointPolicy.Write);
         if (!auth.Succeeded)
         {
             return Unauthorized();
         }
 
-        var data = await organizationService.Load(id, cancellationToken);
-        if (data is null)
+        var old = await organizationService.Load(dto.Id, cancellationToken);
+        if (old is null)
         {
             return NotFound();
         }
 
-        return Ok(TransferMaps.ToOrganizationDetailDto(data));
+        var @new = old with
+        {
+            Name = dto.Name ?? old.Name
+        };
+
+        var result = await organizationService.Edit(@new, cancellationToken);
+        if (result.HasErrors)
+        {
+            return ValidationProblem(title: result.Errors.FirstOrDefault().Message);
+        }
+
+        return Ok(dto.Id);
     }
 }

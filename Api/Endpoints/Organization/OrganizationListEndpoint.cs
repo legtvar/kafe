@@ -10,7 +10,7 @@ using Kafe.Api.Services;
 using System.Collections.Immutable;
 using Kafe.Data.Services;
 
-namespace Kafe.Api.Endpoints.Author;
+namespace Kafe.Api.Endpoints.Organization;
 
 [ApiVersion("1")]
 [Route("organizations")]

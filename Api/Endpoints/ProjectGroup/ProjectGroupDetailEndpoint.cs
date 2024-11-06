@@ -69,7 +69,7 @@ public class ProjectGroupDetailEndpoint : EndpointBaseAsync
             var projects = await projectService.List(new(ProjectGroupId: projectGroup.Id), token: cancellationToken);
             var projectPerms = await entityService.GetPermissions(
                 projects.Select(p => (Hrib)p.Id),
-                userProvider.Account?.Id,
+                userProvider.AccountId,
                 cancellationToken);
             var preferredCulture = userProvider.Account?.PreferredCulture ?? Const.InvariantCultureCode;
             dto = dto with

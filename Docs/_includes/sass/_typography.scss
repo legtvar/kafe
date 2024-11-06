@@ -6,10 +6,12 @@
 }
 
 html {
-    &, &[data-theme=dark] {
+
+    &,
+    &[data-theme=dark] {
         color-scheme: dark;
     }
-    
+
     &[data-theme=light] {
         color-scheme: light;
     }
@@ -23,7 +25,7 @@ body {
 a {
     color: var(--fg);
     text-decoration: underline;
-    
+
     &:hover {
         text-decoration: underline;
     }
@@ -53,7 +55,9 @@ h6 {
     }
 }
 
-h1, h2, h3 {
+h1,
+h2,
+h3 {
     color: var(--hfg);
 }
 
@@ -149,8 +153,9 @@ table {
     thead {
         border-bottom: 1px solid var(--fg);
     }
-    
-    td, th {
+
+    td,
+    th {
         padding: 0.125rem 0.5rem;
 
         &:not(:first-child) {
@@ -159,25 +164,45 @@ table {
     }
 }
 
-code, pre, .monospace {
+code,
+pre,
+.monospace {
     font-family: var(--monospace);
+}
+
+code {
+    background-color: black;
+    border-width: 0.125rem 0.25rem;
+    border-style: solid;
+    border-color: black;
+    border-radius: 0.25rem;
 }
 
 pre {
     overflow-x: auto;
+    padding: 0.5rem;
+    background-color: black;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+
+    code {
+        background-color: transparent;
+        border: none;
+    }
 }
 
 pre.shiki {
     padding: 0.5rem;
 }
 
-button, a[role=button] {
+button,
+a[role=button] {
     background-color: var(--accent);
     color: var(--accent-fg);
     text-decoration: none;
     padding: 0.5rem 1rem;
     border: 1px solid var(--accent-disabled);
-    
+
     &:hover {
         background-color: var(--accent-hover);
     }

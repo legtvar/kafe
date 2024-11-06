@@ -15,40 +15,84 @@ namespace Kafe.Data.Services;
 public class ProjectGroupService
 {
     private readonly IDocumentSession db;
+    private readonly OrganizationService organizationService;
 
-    public ProjectGroupService(IDocumentSession db)
+    public ProjectGroupService(
+        IDocumentSession db,
+        OrganizationService organizationService)
     {
         this.db = db;
+        this.organizationService = organizationService;
     }
 
-    public async Task<Hrib> Create(
-        LocalizedString name,
-        LocalizedString? description,
-        DateTimeOffset deadline,
-        Hrib? id = null,
+    public async Task<Err<ProjectGroupInfo>> Create(
+        ProjectGroupInfo @new,
         CancellationToken token = default)
     {
-        id ??= Hrib.Create();
+        var parseResult = Hrib.Parse(@new.Id);
+        if (parseResult.HasErrors)
+        {
+            return parseResult.Errors;
+        }
+
+        var organization = await organizationService.Load(@new.OrganizationId, token);
+        if (organization is null)
+        {
+            return Error.NotFound(@new.OrganizationId, "An organization");
+        }
+
+        var id = parseResult.Value;
+        if (id == Hrib.Empty)
+        {
+            id = Hrib.Create();
+        }
+
         var created = new ProjectGroupCreated(
-            ProjectGroupId: id.Value,
-            CreationMethod: CreationMethod.Api,
-            Name: name);
+            ProjectGroupId: id.ToString(),
+            CreationMethod: @new.CreationMethod is not CreationMethod.Unknown
+                ? @new.CreationMethod
+                : CreationMethod.Api,
+            OrganizationId: @new.OrganizationId,
+            Name: @new.Name);
+        db.Events.KafeStartStream<ProjectGroupInfo>(id, created);
 
-        var changed = new ProjectGroupInfoChanged(
-            ProjectGroupId: created.ProjectGroupId,
-            Description: description,
-            Deadline: deadline);
+        if (@new.Description is not null
+            || @new.Deadline != default)
+        {
+            var changed = new ProjectGroupInfoChanged(
+                ProjectGroupId: created.ProjectGroupId,
+                Description: @new.Description,
+                Deadline: @new.Deadline);
+            db.Events.KafeAppend(id, changed);
+        }
 
-        var opened = new ProjectGroupOpened(
-            ProjectGroupId: created.ProjectGroupId);
+        if (@new.IsOpen)
+        {
+            var opened = new ProjectGroupOpened(
+                ProjectGroupId: created.ProjectGroupId);
+            db.Events.KafeAppend(id, opened);
+        }
 
-        db.Events.StartStream<ProjectGroupInfo>(created.ProjectGroupId, created, changed, opened);
         await db.SaveChangesAsync(token);
-        return created.ProjectGroupId;
+        return await db.Events.KafeAggregateRequiredStream<ProjectGroupInfo>(id, token: token);
     }
 
+    /// <summary>
+    /// Filter of project groups.
+    /// </summary>
+    /// <param name="AccessingAccountId">
+    /// <list type="bullet">
+    /// <item> If null, doesn't filter by account access at all.</item>
+    /// <item>
+    ///     If <see cref="Hrib.Empty"/> assumes the account is an anonymous user
+    ///     and filters only by global permissions.
+    /// </item>
+    /// <item> If <see cref="Hrib.Invalid"/>, throws an exception. </item>
+    /// </list>
+    /// </param>
     public record ProjectGroupFilter(
-        Hrib? AccessingAccountId = null
+        Hrib? AccessingAccountId = null,
+        LocalizedString? Name = null
     );
 
     public async Task<ImmutableArray<ProjectGroupInfo>> List(
@@ -59,10 +103,18 @@ public class ProjectGroupService
         if (filter?.AccessingAccountId is not null)
         {
             query = (IMartenQueryable<ProjectGroupInfo>)query
-                .Where(e => e.MatchesSql(
-                    $"({SqlFunctions.GetProjectGroupPerms}(data ->> 'Id', ?) & ?) != 0",
-                    filter.AccessingAccountId.Value,
-                    (int)Permission.Read));
+                .WhereAccountHasPermission(
+                    db.DocumentStore.Options.Schema,
+                    Permission.Read,
+                    filter.AccessingAccountId);
+        }
+
+        if (filter?.Name is not null)
+        {
+            var dictName = (ImmutableDictionary<string, string>)filter.Name;
+            query = (IMartenQueryable<ProjectGroupInfo>)query.Where(e => e.MatchesSql(
+                $"data -> {nameof(ProjectGroupInfo.Name)} @> (?)::jsonb",
+                dictName));
         }
 
         return (await query.ToListAsync(token)).ToImmutableArray();
@@ -84,10 +136,10 @@ public class ProjectGroupService
 
     public async Task<ProjectGroupInfo?> Load(Hrib id, CancellationToken token = default)
     {
-        return await db.LoadAsync<ProjectGroupInfo>(id.Value, token);
+        return await db.LoadAsync<ProjectGroupInfo>(id.ToString(), token);
     }
 
-    public async Task<Err<bool>> Edit(ProjectGroupInfo @new, CancellationToken token = default)
+    public async Task<Err<ProjectGroupInfo>> Edit(ProjectGroupInfo @new, CancellationToken token = default)
     {
         var @old = await Load(@new.Id, token);
         if (@old is null)
@@ -108,15 +160,32 @@ public class ProjectGroupService
         {
             eventStream.AppendOne(infoChanged);
         }
-        
+
         if (@old.IsOpen != @new.IsOpen)
         {
             eventStream.AppendOne(@new.IsOpen
                 ? new ProjectGroupOpened(@new.Id)
                 : new ProjectGroupClosed(@new.Id));
         }
-        
+
+        if (@old.OrganizationId != @new.OrganizationId)
+        {
+            eventStream.AppendOne(new ProjectGroupMovedToOrganization(
+                @old.Id,
+                @new.OrganizationId
+            ));
+        }
+
         await db.SaveChangesAsync(token);
-        return true;
+        return await db.Events.AggregateStreamAsync<ProjectGroupInfo>(@old.Id, token: token)
+            ?? throw new InvalidOperationException($"The project group is no longer present in the database. "
+                + "This should never happen.");
+    }
+
+    public async Task<Err<ProjectGroupInfo>> CreateOrEdit(ProjectGroupInfo info, CancellationToken token = default)
+    {
+        // TODO: Get rid of the unnecessary trip to DB (by calling Load twice).
+        var existing = info.Id == Hrib.InvalidValue ? null : await Load(info.Id, token);
+        return existing is null ? await Create(info, token) : await Edit(info, token);
     }
 }

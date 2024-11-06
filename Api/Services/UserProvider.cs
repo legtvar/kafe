@@ -1,4 +1,5 @@
-﻿using Kafe.Data;
+﻿using Kafe.Api.Transfer;
+using Kafe.Data;
 using Kafe.Data.Aggregates;
 using Kafe.Data.Services;
 using Marten;
@@ -39,10 +40,15 @@ public class UserProvider
 
     public AccountInfo? Account { get; private set; }
 
+    /// <summary>
+    /// Returns the logged users's account HRIB or <see cref="Hrib.Empty"/> if the user is anonymous.
+    /// </summary>
+    public Hrib AccountId => Account?.Id ?? Hrib.Empty;
+
     public bool HasExplicitPermission(Hrib entityId, Permission permission)
     {
         return Account is not null
-            && (Account.Permissions?.GetValueOrDefault(entityId.Value) & permission) == permission;
+            && (Account.Permissions?.GetValueOrDefault(entityId.ToString()) & permission) == permission;
     }
 
     public async Task<bool> HasPermission(
@@ -50,15 +56,11 @@ public class UserProvider
         Permission permission,
         CancellationToken token = default)
     {
-        var result = await query.AdvancedSqlQueryAsync<bool>(
-            // $"SET search_path TO {query.DocumentStore.Options.Events.DatabaseSchemaName}; "
-            $"SELECT {query.DocumentStore.Options.DatabaseSchemaName}.{SqlFunctions.GetResourcePerms}(?, ?) & ? = ?",
-            token,
-            entityId.Value,
-            Account?.Id!,
-            (int)permission,
-            (int)permission);
-        return result?.Single() ?? false;
+        var effectivePermission = await entityService.GetPermission(
+            entityId,
+            AccountId,
+            token);
+        return (effectivePermission & permission) == permission;
     }
 
     public Task<bool> HasPermission(

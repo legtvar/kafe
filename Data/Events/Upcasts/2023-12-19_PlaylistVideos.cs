@@ -4,13 +4,13 @@ using Marten.Services.Json.Transformations;
 #pragma warning disable 0618
 namespace Kafe.Data.Events
 {
-    [Obsolete($"This event has been superceded by PlaylistEntryAppended.")]
+    [Obsolete($"Use {nameof(PlaylistEntryAppended)} instead.")]
     public record PlaylistVideoAdded(
         [Hrib] string PlaylistId,
         [Hrib] string VideoId
     );
 
-    [Obsolete($"This event has been superceded by PlaylistEntryRemovedFirst.")]
+    [Obsolete($"Use {nameof(PlaylistEntryRemovedFirst)} instead.")]
     public record PlaylistVideoRemoved(
         [Hrib] string PlaylistId,
         [Hrib] string VideoId

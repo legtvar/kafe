@@ -13,7 +13,10 @@ public record SeedOptions
 {
     public List<SeedAccount> Accounts { get; set; } = new();
 
+    public List<SeedOrganization> Organizations { get; set; } = new();
+
     public List<SeedProjectGroup> ProjectGroups { get; set; } = new();
+    
 
     public record SeedAccount
     {
@@ -25,6 +28,15 @@ public record SeedOptions
         public Dictionary<string, Permission>? Permissions { get; set; } = new();
     }
 
+    public record SeedOrganization
+    {
+        [Hrib, Required]
+        public string Id { get; set; } = null!;
+
+        [Required]
+        public string Name { get; set; } = null!;
+    }
+
     public record SeedProjectGroup
     {
         [Hrib, Required]
@@ -32,6 +44,9 @@ public record SeedOptions
 
         [Required]
         public string Name { get; set; } = null!;
+
+        [Hrib, Required]
+        public string OrganizationId { get; set; } = null!;
 
         public string? Deadline { get; set; }
     }

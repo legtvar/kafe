@@ -39,7 +39,7 @@ public class ProjectGroupListEndpoint : EndpointBaseAsync
         CancellationToken cancellationToken = default)
     {
         var filter = new ProjectGroupService.ProjectGroupFilter(
-            AccessingAccountId: userProvider.Account?.Id
+            AccessingAccountId: userProvider.AccountId
         );
         
         var groups = await projectGroupService.List(filter, cancellationToken);

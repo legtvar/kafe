@@ -76,8 +76,7 @@ public class Startup
             .ReadFrom.Services(sp)
             .Enrich.FromLogContext()
             .WriteTo.Console(
-                outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3} {SourceContext}]"
-                    + "{NewLine}{Message:lj}{NewLine}{Exception}"
+                outputTemplate: Program.LogTemplate
             )
             .WriteTo.OpenTelemetry(options =>
                 {

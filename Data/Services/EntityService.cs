@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Data;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
+using Kafe.Common;
 using Kafe.Data.Aggregates;
+using Kafe.Data.Documents;
 using Kafe.Data.Events;
 using Marten;
 
@@ -23,7 +24,7 @@ public class EntityService
 
     public async Task<IEntity?> Load(Hrib id, CancellationToken token = default)
     {
-        var parentState = await db.Events.FetchStreamStateAsync(id.Value, token);
+        var parentState = await db.Events.FetchStreamStateAsync(id.ToString(), token);
         if (parentState?.AggregateType is null)
         {
             return null;
@@ -44,46 +45,61 @@ public class EntityService
     //     if (tableName )
     // }
 
+    public async Task<Err<EntityPermissionInfo>> LoadPermissionInfo(
+        Hrib entityId,
+        CancellationToken token = default
+    )
+    {
+        return await db.KafeLoadAsync<EntityPermissionInfo>(entityId, token);
+    }
+    
+    public async Task<Err<ImmutableArray<EntityPermissionInfo>>> LoadPermissionInfoMany(
+        IEnumerable<Hrib> entityIds,
+        CancellationToken token = default
+    )
+    {
+        return await db.KafeLoadManyAsync<EntityPermissionInfo>(entityIds.ToImmutableArray(), token);
+    }
+
     public async Task<Permission> GetPermission(
         Hrib entityId,
-        Hrib? accessingAccountId = null,
-        CancellationToken token = default)
+        Hrib accessingAccountId,
+        CancellationToken token = default
+    )
     {
-        var perms = await db.QueryAsync<int>(
-            $"SELECT {db.DocumentStore.Options.DatabaseSchemaName}.{SqlFunctions.GetResourcePerms}(?, ?)",
-            token,
-            entityId.Value,
-            accessingAccountId?.Value!);
-        return (Permission)perms.Single();
+        var perms = (await LoadPermissionInfo(entityId, token)).Unwrap();
+        return accessingAccountId.IsEmpty
+            ? perms.GlobalPermission
+            : perms.GetAccountPermission(accessingAccountId) | perms.GlobalPermission;
     }
 
     public async Task<ImmutableArray<Permission>> GetPermissions(
         IEnumerable<Hrib> entityIds,
-        Hrib? accessingAccountId = null,
-        CancellationToken token = default)
+        Hrib accessingAccountId,
+        CancellationToken token = default
+    )
     {
         if (entityIds.IsEmpty())
         {
             return ImmutableArray<Permission>.Empty;
         }
-
-        var perms = await db.QueryAsync<int>(
-            $"SELECT {db.DocumentStore.Options.DatabaseSchemaName}.{SqlFunctions.GetResourcePerms}(id, ?) "
-            + "FROM unnest(?) as id",
-            token,
-            accessingAccountId?.Value!,
-            entityIds.Select(i => i.Value).ToArray()
-        );
-        return perms.Select(p => (Permission)p).ToImmutableArray();
+        
+        var manyPerms = (await LoadPermissionInfoMany(entityIds, token)).Unwrap();
+        return manyPerms.Select(p => accessingAccountId.IsEmpty
+                ? p.GlobalPermission
+                : p.GetAccountPermission(accessingAccountId) | p.GlobalPermission)
+            .ToImmutableArray();
     }
 
+    // TODO: Refactor into SetAccountPermissions, SetRolePermissions, and SetGlobalPermissions.
+    //       This is less than intuitive.
     public async Task SetPermissions(
         Hrib entityId,
         Permission permissions,
-        Hrib? accessingAccountId = null,
+        Hrib accessingAccountId,
         CancellationToken token = default)
     {
-        if (accessingAccountId is null)
+        if (accessingAccountId.IsEmpty)
         {
             if (entityId == Hrib.System)
             {
@@ -107,14 +123,14 @@ public class EntityService
                     AuthorInfo a => new AuthorGlobalPermissionsChanged(a.Id, permissions),
                     _ => throw new NotSupportedException($"{entity.GetType().Name} is not a supported entity type.")
                 };
-                
-                db.Events.Append(entityId.Value, newEvent);
+
+                db.Events.Append(entityId.ToString(), newEvent);
             }
 
         }
         else
         {
-            var account = await db.LoadAsync<AccountInfo>(accessingAccountId.Value, token)
+            var account = await db.LoadAsync<AccountInfo>(accessingAccountId.ToString(), token)
                 ?? throw new NullReferenceException("Account could not be found.");
 
             if (entityId != Hrib.System)
@@ -122,17 +138,13 @@ public class EntityService
                 _ = await Load(entityId, token) ?? throw new NullReferenceException("Entity could not be found.");
             }
 
-            if ((account.Permissions?.GetValueOrDefault(entityId.Value) ?? Permission.None) != permissions)
+            if ((account.Permissions?.GetValueOrDefault(entityId.ToString()) ?? Permission.None) != permissions)
             {
-                object @event = permissions != Permission.None
-                    ? new AccountPermissionSet(
-                        AccountId: accessingAccountId.Value,
-                        EntityId: entityId.Value,
-                        Permission: permissions)
-                    : new AccountPermissionUnset(
-                        AccountId: accessingAccountId.Value,
-                        EntityId: entityId.Value);
-                db.Events.Append(accessingAccountId.Value, @event);
+                object @event = new AccountPermissionSet(
+                        AccountId: accessingAccountId.ToString(),
+                        EntityId: entityId.ToString(),
+                        Permission: permissions);
+                db.Events.Append(accessingAccountId.ToString(), @event);
             }
 
         }

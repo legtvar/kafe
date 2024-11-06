@@ -2,24 +2,48 @@ using System.Collections.Immutable;
 using Kafe.Data.Events;
 using Marten.Events;
 using Marten.Events.Aggregation;
+using Marten.Events.CodeGeneration;
 
 namespace Kafe.Data.Aggregates;
 
 public record PlaylistInfo(
     [Hrib] string Id,
     CreationMethod CreationMethod,
+    [Hrib] string OrganizationId,
     [KafeType(typeof(ImmutableArray<Hrib>))] ImmutableArray<string> EntryIds,
     [LocalizedString] ImmutableDictionary<string, string> Name,
     [LocalizedString] ImmutableDictionary<string, string>? Description = null,
     Permission GlobalPermissions = Permission.None
 ) : IVisibleEntity
 {
-    public PlaylistInfo() : this(
-        Hrib.InvalidValue,
-        CreationMethod.Unknown,
-        ImmutableArray<string>.Empty,
-        LocalizedString.Empty)
+    public static readonly PlaylistInfo Invalid = new(
+        Id: Hrib.InvalidValue,
+        CreationMethod: CreationMethod.Unknown,
+        OrganizationId: Hrib.InvalidValue,
+        EntryIds: ImmutableArray<string>.Empty,
+        Name: LocalizedString.CreateInvariant(Const.InvalidName),
+        Description: null,
+        GlobalPermissions: Permission.None
+    );
+
+    public PlaylistInfo() : this(Invalid)
     {
+    }
+
+    /// <summary>
+    /// Creates a bare-bones but valid <see cref="PlaylistInfo"/>.
+    /// </summary>
+    /// <param name="name"></param>
+    /// <returns></returns>
+    [MartenIgnore]
+    public static PlaylistInfo Create(Hrib organizationId, LocalizedString name)
+    {
+        return new PlaylistInfo() with
+        {
+            Id = Hrib.EmptyValue,
+            OrganizationId = organizationId.RawValue,
+            Name = name
+        };
     }
 }
 
@@ -34,7 +58,8 @@ public class PlaylistInfoProjection : SingleStreamProjection<PlaylistInfo>
         return new PlaylistInfo(
             Id: e.PlaylistId,
             CreationMethod: e.CreationMethod,
-            EntryIds: ImmutableArray.Create<string>(),
+            OrganizationId: e.OrganizationId ?? Hrib.InvalidValue,
+            EntryIds: [],
             Name: e.Name
         );
     }
@@ -45,7 +70,6 @@ public class PlaylistInfoProjection : SingleStreamProjection<PlaylistInfo>
         {
             Name = e.Name ?? p.Name,
             Description = e.Description ?? p.Name,
-            GlobalPermissions = e.GlobalPermissions ?? p.GlobalPermissions
         };
     }
 
@@ -73,11 +97,19 @@ public class PlaylistInfoProjection : SingleStreamProjection<PlaylistInfo>
         };
     }
 
-    public PlaylistInfo Apply(PlaylistGlobalPermissionsChanged e, PlaylistInfo a)
+    public PlaylistInfo Apply(PlaylistGlobalPermissionsChanged e, PlaylistInfo p)
     {
-        return a with
+        return p with
         {
             GlobalPermissions = e.GlobalPermissions
+        };
+    }
+
+    public PlaylistInfo Apply(PlaylistMovedToOrganization e, PlaylistInfo p)
+    {
+        return p with
+        {
+            OrganizationId = e.OrganizationId
         };
     }
 }

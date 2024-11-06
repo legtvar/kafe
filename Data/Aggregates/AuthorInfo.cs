@@ -1,7 +1,8 @@
 using Marten.Events.Aggregation;
 using Kafe.Data.Events;
-using Marten.Events;
 using System.Collections.Immutable;
+using Npgsql;
+using Marten.Events.CodeGeneration;
 
 namespace Kafe.Data.Aggregates;
 
@@ -15,8 +16,32 @@ public record AuthorInfo(
     string? Email = null,
     string? Phone = null) : IVisibleEntity
 {
-    public AuthorInfo() : this(Hrib.InvalidValue, CreationMethod.Unknown, Const.InvalidName)
+    public static readonly AuthorInfo Invalid = new(
+        Id: Hrib.InvalidValue,
+        CreationMethod: CreationMethod.Unknown,
+        Name: Const.InvalidName,
+        GlobalPermissions: Permission.None,
+        Bio: null,
+        Uco: null,
+        Email: null,
+        Phone: null
+    );
+
+    public AuthorInfo() : this(Invalid)
     {
+    }
+
+    /// <summary>
+    /// Creates a bare-bones but valid <see cref="AuthorInfo"/>.
+    /// </summary>
+    [MartenIgnore]
+    public static AuthorInfo Create(string name)
+    {
+        return new AuthorInfo() with
+        {
+            Id = Hrib.EmptyValue,
+            Name = name
+        };
     }
 }
 

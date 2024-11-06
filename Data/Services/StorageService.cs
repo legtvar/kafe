@@ -33,7 +33,7 @@ public class StorageService
         {
             variant ??= Const.OriginalShardVariant;
             var storageDir = GetShardKindDirectory(kind, create: true);
-            var shardDir = storageDir.CreateSubdirectory(id.Value);
+            var shardDir = storageDir.CreateSubdirectory(id.ToString());
             var originalPath = Path.Combine(shardDir.FullName, $"{variant}{fileExtension}");
             using var originalStream = new FileStream(originalPath, FileMode.Create, FileAccess.Write);
             await stream.CopyToAsync(originalStream, token);
@@ -90,7 +90,7 @@ public class StorageService
             variant: variant ?? Const.OriginalShardVariant,
             create: false);
 
-        var shardDir = new DirectoryInfo(Path.Combine(storageDir.FullName, id.Value));
+        var shardDir = new DirectoryInfo(Path.Combine(storageDir.FullName, id.ToString()));
         if (!shardDir.Exists)
         {
             return shouldThrow

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json.Serialization;
+using Kafe.Common;
 
 namespace Kafe;
 
@@ -18,16 +19,42 @@ public record Hrib
 
     public const string InvalidValue = "invalid";
     public const string SystemValue = "system";
+    public const string EmptyValue = "empty";
 
-    public static readonly Hrib System = new Hrib(SystemValue);
-    public static readonly Hrib Invalid = new Hrib(InvalidValue);
+    /// <summary>
+    /// Special HRIB representing a non-entity, the system itself.
+    /// </summary>
+    public static readonly Hrib System = new(SystemValue);
+
+    /// <summary>
+    /// Special HRIB representing an error state.
+    /// </summary>
+    public static readonly Hrib Invalid = new(InvalidValue);
+
+    /// <summary>
+    /// Special HRIB for newly-created entities that don't have an Id yet.
+    /// </summary>
+    public static readonly Hrib Empty = new(EmptyValue);
 
     private Hrib(string value)
     {
-        Value = value;
+        RawValue = value;
     }
 
-    public string Value { get; init; }
+    /// <summary>
+    /// The raw identifier string. Use only if you know what you're doing. Prefer <see cref="ToString"/> instead.
+    /// </summary>
+    public string RawValue { get; init; }
+
+    public bool IsEmpty => RawValue == EmptyValue;
+
+    public bool IsInvalid => RawValue == InvalidValue;
+
+    /// <summary>
+    /// Checks whether this HRIB is a regular id or `system`.
+    /// Returns false for <see cref="Invalid"/> and <see cref="Empty"/>.
+    /// </summary>
+    public bool IsValidNonEmpty => !IsInvalid && !IsEmpty;
 
     // NB: this conversion is deliberately left `explicit` to prevent type casting issues with Marten/Postgres
     [return: NotNullIfNotNull(nameof(hrib))]
@@ -38,12 +65,17 @@ public record Hrib
             return null;
         }
 
-        return hrib.Value;
+        return hrib.ToString();
     }
 
     [return: NotNullIfNotNull(nameof(value))]
     public static implicit operator Hrib?(string? value)
     {
+        if (value is null)
+        {
+            return null;
+        }
+
         if (TryParse(value, out var hrib, out var error))
         {
             return hrib;
@@ -76,7 +108,7 @@ public record Hrib
             return false;
         }
 
-        if (value != SystemValue || value != InvalidValue)
+        if (value == SystemValue || value == InvalidValue || value == EmptyValue)
         {
             hrib = new Hrib(value);
             return true;
@@ -99,8 +131,30 @@ public record Hrib
         return true;
     }
 
+    public static Err<Hrib> Parse(string? value)
+    {
+        if (TryParse(value, out var hrib, out var error))
+        {
+            return hrib;
+        }
+
+        return new Error(Error.BadHribId, error);
+    }
     public override string ToString()
     {
-        return Value;
+        if (RawValue == InvalidValue)
+        {
+            throw new InvalidOperationException(
+                "This Hrib is invalid and cannot be stringified to prevent accidental use in a database.");
+        }
+
+        if (RawValue == EmptyValue)
+        {
+            throw new InvalidOperationException(
+                "This Hrib is empty and cannot be stringified to prevent accidental use in a database."
+                    + "This value is meant to be replaced with a proper HRIB by an entity service.");
+        }
+
+        return RawValue;
     }
 }

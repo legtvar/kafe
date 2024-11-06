@@ -4,6 +4,7 @@ using System.Linq;
 using Kafe.Data.Events;
 using Marten.Events;
 using Marten.Events.Aggregation;
+using Marten.Events.CodeGeneration;
 
 namespace Kafe.Data.Aggregates;
 
@@ -22,16 +23,37 @@ public record ProjectInfo(
     bool IsLocked = false
 ) : IVisibleEntity
 {
-    public ProjectInfo() : this(
-        Hrib.InvalidValue,
-        CreationMethod.Unknown,
-        Hrib.InvalidValue,
-        ImmutableArray<ProjectAuthorInfo>.Empty,
-        ImmutableArray<ProjectArtifactInfo>.Empty,
-        ImmutableArray<ProjectReviewInfo>.Empty,
-        LocalizedString.Empty
-    )
+    public static readonly ProjectInfo Invalid = new(
+        Id: Hrib.InvalidValue,
+        CreationMethod: CreationMethod.Unknown,
+        ProjectGroupId: Hrib.InvalidValue,
+        Authors: [],
+        Artifacts: [],
+        Reviews: [],
+        Name: LocalizedString.CreateInvariant(Const.InvalidName),
+        Description: null,
+        Genre: null,
+        GlobalPermissions: Permission.None,
+        ReleasedOn: default,
+        IsLocked: false
+    );
+
+    public ProjectInfo() : this(Invalid)
     {
+    }
+
+    /// <summary>
+    /// Creates a bare-bones but valid <see cref="ProjectInfo"/>.
+    /// </summary>
+    [MartenIgnore]
+    public static ProjectInfo Create(Hrib projectGroupId, LocalizedString name)
+    {
+        return new()
+        {
+            Id = Hrib.EmptyValue,
+            ProjectGroupId = projectGroupId.RawValue,
+            Name = name
+        };
     }
 }
 
@@ -77,7 +99,6 @@ public class ProjectInfoProjection : SingleStreamProjection<ProjectInfo>
         {
             Name = e.Name ?? p.Name,
             Description = e.Description ?? p.Description,
-            GlobalPermissions = e.GlobalPermissions ?? p.GlobalPermissions,
             ReleasedOn = e.ReleasedOn ?? p.ReleasedOn,
             Genre = e.Genre ?? p.Genre
         };
@@ -102,9 +123,7 @@ public class ProjectInfoProjection : SingleStreamProjection<ProjectInfo>
             author = new ProjectAuthorInfo(
                 Id: e.AuthorId,
                 Kind: e.Kind,
-                Roles: e.Roles.HasValue && !e.Roles.Value.IsDefault
-                    ? e.Roles.Value
-                    : ImmutableArray.Create<string>());
+                Roles: e.Roles.HasValue && !e.Roles.Value.IsDefault ? e.Roles.Value : []);
         }
 
         return p with

@@ -73,7 +73,8 @@ public class EntityPermissionsEditEndpoint : EndpointBaseAsync
         }
 
         var accountPermissions = dto.AccountPermissions ?? ImmutableArray<EntityPermissionsAccountEditDto>.Empty;
-        if (accountPermissions.Any(a => string.IsNullOrEmpty(a.Id?.Value) && string.IsNullOrEmpty(a.EmailAddress)))
+        if (accountPermissions.Any(a => string.IsNullOrEmpty(a.Id?.ToString())
+            && string.IsNullOrEmpty(a.EmailAddress)))
         {
             return ValidationProblem(title: "All accounts must be identified by either id or email address.");
         }
@@ -109,7 +110,7 @@ public class EntityPermissionsEditEndpoint : EndpointBaseAsync
             await entityService.SetPermissions(
                 entityId: (Hrib)dto.Id,
                 permissions: TransferMaps.FromPermissionArray(dto.GlobalPermissions),
-                accessingAccountId: null, // sets global permissions
+                accessingAccountId: Hrib.Empty, // sets global permissions
                 token: cancellationToken);
         }
 

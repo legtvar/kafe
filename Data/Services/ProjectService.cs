@@ -36,6 +36,7 @@ public partial class ProjectService
         LocalizedString? description,
         LocalizedString? genre,
         Hrib? ownerId,
+        Hrib? id = null,
         CancellationToken token = default)
     {
         var group = await db.LoadAsync<ProjectGroupInfo>(projectGroupId, token);
@@ -49,26 +50,28 @@ public partial class ProjectService
             throw new ArgumentException($"Project group '{projectGroupId}' is not open.");
         }
 
+        var projectId = (id ?? Hrib.Create()).ToString();
+
         var created = new ProjectCreated(
-            ProjectId: Hrib.Create().Value,
+            ProjectId: projectId,
             CreationMethod: CreationMethod.Api,
             ProjectGroupId: projectGroupId,
             Name: name);
 
         var infoChanged = new ProjectInfoChanged(
-            ProjectId: Hrib.Create().Value,
+            ProjectId: projectId,
             Name: name,
             Description: description,
             Genre: genre);
 
-        db.Events.StartStream<ProjectInfo>(created.ProjectId, created, infoChanged);
+        db.Events.KafeStartStream<ProjectInfo>(created.ProjectId, created, infoChanged);
         await db.SaveChangesAsync(token);
 
         if (ownerId is not null)
         {
             await accountService.AddPermissions(
                 ownerId,
-                new[] { (created.ProjectId, Permission.Read | Permission.Write | Permission.Append) },
+                [((Hrib)created.ProjectId, Permission.Read | Permission.Write | Permission.Append)],
                 token);
         }
 
@@ -87,11 +90,11 @@ public partial class ProjectService
     {
         var authorsAdded = authors
             .Select(a => new ProjectAuthorAdded(
-                ProjectId: projectId.Value,
+                ProjectId: projectId.ToString(),
                 AuthorId: a.id,
                 Kind: a.kind,
                 Roles: a.roles));
-        db.Events.Append(projectId.Value, authorsAdded);
+        db.Events.KafeAppend(projectId, authorsAdded);
         await db.SaveChangesAsync();
     }
 
@@ -101,67 +104,80 @@ public partial class ProjectService
     {
         var authorsAdded = authors
             .Select(a => new ProjectAuthorRemoved(
-                ProjectId: projectId.Value,
+                ProjectId: projectId.ToString(),
                 AuthorId: a.id,
                 Kind: a.kind,
                 Roles: a.roles));
-        db.Events.Append(projectId.Value, authorsAdded);
+        db.Events.KafeAppend(projectId, authorsAdded);
         await db.SaveChangesAsync();
     }
 
-    public async Task<Err<bool>> Edit(ProjectInfo @new, CancellationToken token = default)
+    public async Task<Err<bool>> Edit(ProjectInfo modified, CancellationToken token = default)
     {
-        var @old = await Load(@new.Id, token);
+        var @old = await Load(modified.Id, token);
         if (@old is null)
         {
-            return Error.NotFound(@new.Id);
+            return Error.NotFound(modified.Id);
         }
 
-        if (LocalizedString.IsTooLong(@new.Name, NameMaxLength))
+        if (LocalizedString.IsTooLong(modified.Name, NameMaxLength))
         {
             return new Error("Name is too long.");
         }
 
-        if (LocalizedString.IsTooLong(@new.Genre, GenreMaxLength))
+        if (LocalizedString.IsTooLong(modified.Genre, GenreMaxLength))
         {
             return new Error("Genre is too long.");
         }
 
-        if (LocalizedString.IsTooLong(@new.Description, DescriptionMaxLength))
+        if (LocalizedString.IsTooLong(modified.Description, DescriptionMaxLength))
         {
             return new Error("Description is too long.");
         }
 
-        var eventStream = await db.Events.FetchForExclusiveWriting<ProjectInfo>(@new.Id, token);
+        var eventStream = await db.Events.FetchForExclusiveWriting<ProjectInfo>(modified.Id, token);
 
         var infoChanged = new ProjectInfoChanged(
-            ProjectId: @new.Id,
-            Name: (LocalizedString)@old.Name != @new.Name ? @new.Name : null,
-            Description: (LocalizedString?)@old.Description != @new.Description ? @new.Description : null,
-            Genre: (LocalizedString?)@old.Genre != @new.Genre ? @new.Genre : null);
+            ProjectId: modified.Id,
+            Name: (LocalizedString)@old.Name != modified.Name ? modified.Name : null,
+            Description: (LocalizedString?)@old.Description != modified.Description ? modified.Description : null,
+            Genre: (LocalizedString?)@old.Genre != modified.Genre ? modified.Genre : null);
         if (infoChanged.Name is not null || infoChanged.Description is not null || infoChanged.Genre is not null)
         {
             eventStream.AppendOne(infoChanged);
         }
 
-        var authorsRemoved = @old.Authors.Except(@new.Authors)
-            .Select(a => new ProjectAuthorRemoved(@new.Id, a.Id, a.Kind, a.Roles));
+        var authorsRemoved = @old.Authors.Except(modified.Authors)
+            .Select(a => new ProjectAuthorRemoved(modified.Id, a.Id, a.Kind, a.Roles));
         eventStream.AppendMany(authorsRemoved);
-        var authorsAdded = @new.Authors.Except(@old.Authors)
-            .Select(a => new ProjectAuthorAdded(@new.Id, a.Id, a.Kind, a.Roles));
+        var authorsAdded = modified.Authors.Except(@old.Authors)
+            .Select(a => new ProjectAuthorAdded(modified.Id, a.Id, a.Kind, a.Roles));
         eventStream.AppendMany(authorsAdded);
 
-        var artifactsRemoved = @old.Artifacts.Except(@new.Artifacts)
-            .Select(a => new ProjectArtifactRemoved(@new.Id, a.Id));
+        var artifactsRemoved = @old.Artifacts.Except(modified.Artifacts)
+            .Select(a => new ProjectArtifactRemoved(modified.Id, a.Id));
         eventStream.AppendMany(artifactsRemoved);
-        var artifactsAdded = @new.Artifacts.Except(@old.Artifacts)
-            .Select(a => new ProjectArtifactAdded(@new.Id, a.Id, a.BlueprintSlot));
+        var artifactsAdded = modified.Artifacts.Except(@old.Artifacts)
+            .Select(a => new ProjectArtifactAdded(modified.Id, a.Id, a.BlueprintSlot));
         eventStream.AppendMany(artifactsAdded);
 
         await db.SaveChangesAsync(token);
         return true;
     }
 
+    /// <summary>
+    /// Filter of projects.
+    /// </summary>
+    /// <param name="AccessingAccountId">
+    /// <list type="bullet">
+    /// <item> If null, doesn't filter by account access at all.</item>
+    /// <item>
+    ///     If <see cref="Hrib.Empty"/> assumes the account is an anonymous user
+    ///     and filters only by global permissions.
+    /// </item>
+    /// <item> If <see cref="Hrib.Invalid"/>, throws an exception. </item>
+    /// </list>
+    /// </param>
     public record ProjectFilter(
         Hrib? ProjectGroupId = null,
         Hrib? AccessingAccountId = null
@@ -176,16 +192,16 @@ public partial class ProjectService
         if (filter.AccessingAccountId is not null)
         {
             query = (IMartenQueryable<ProjectInfo>)query
-                .Where(e => e.MatchesSql(
-                    $"({SqlFunctions.GetProjectPerms}(data ->> 'Id', ?) & ?) != 0",
-                    filter.AccessingAccountId.Value,
-                    (int)Permission.Read));
+                .WhereAccountHasPermission(
+                    db.DocumentStore.Options.Schema,
+                    Permission.Read,
+                    filter.AccessingAccountId);
         }
 
         if (filter.ProjectGroupId is not null)
         {
             query = (IMartenQueryable<ProjectInfo>)query
-                .Where(e => e.ProjectGroupId == filter.ProjectGroupId.Value);
+                .Where(e => e.ProjectGroupId == filter.ProjectGroupId.ToString());
         }
         var results = (await query.ToListAsync(token)).ToImmutableArray();
         return results;
@@ -193,7 +209,7 @@ public partial class ProjectService
 
     public async Task<ProjectInfo?> Load(Hrib id, CancellationToken token = default)
     {
-        return await db.LoadAsync<ProjectInfo>(id.Value, token);
+        return await db.LoadAsync<ProjectInfo>(id.ToString(), token);
         // if (data is null)
         // {
         //     return null;
@@ -230,7 +246,7 @@ public partial class ProjectService
 
     public async Task<ImmutableArray<ProjectInfo>> LoadMany(ImmutableArray<Hrib> ids, CancellationToken token = default)
     {
-        return [.. (await db.LoadManyAsync<ProjectInfo>(token, ids.Select(id => id.Value)))];
+        return [.. (await db.LoadManyAsync<ProjectInfo>(token, ids.Select(id => id.ToString())))];
     }
 
     // private async Task<ImmutableArray<ProjectAuthorInfo>> GetProjectAuthors(
@@ -270,4 +286,38 @@ public partial class ProjectService
 
     //     return authors;
     // }
+
+    public async Task<Err<ProjectInfo>> AddArtifacts(
+        Hrib projectId,
+        ImmutableArray<(Hrib id, string? blueprintSlot)> artifacts,
+        CancellationToken token = default)
+    {
+        var project = await Load(projectId, token);
+        if (project is null)
+        {
+            return Error.NotFound(projectId, "A project");
+        }
+        
+        var existingArtifactIds = (await artifactService.LoadMany(artifacts.Select(a => a.id), token))
+            .Select(a => a.Id)
+            .ToImmutableHashSet();
+        if (existingArtifactIds.Count != artifacts.Length)
+        {
+            return artifacts.Where(a => !existingArtifactIds.Contains(a.id.ToString()))
+                .Select(a => Error.NotFound(a.id, "An artifact"))
+                .ToImmutableArray();
+        }
+
+        var projectStream = await db.Events.FetchForWriting<ProjectInfo>(projectId.ToString(), token);
+        foreach (var artifact in artifacts)
+        {
+            var artifactAdded = new ProjectArtifactAdded(
+                ProjectId: projectId.ToString(),
+                ArtifactId: artifact.id.ToString(),
+                BlueprintSlot: artifact.blueprintSlot?.ToString());
+            projectStream.AppendOne(artifactAdded);
+        }
+        await db.SaveChangesAsync(token);
+        return await db.Events.KafeAggregateRequiredStream<ProjectInfo>(projectId, token: token);
+    }
 }

@@ -1,7 +1,7 @@
 ---
 title: Useful SQL
 tags: doc
-priority: 80
+priority: 060
 ---
 
 # Useful SQL queries

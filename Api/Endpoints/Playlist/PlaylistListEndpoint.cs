@@ -39,7 +39,7 @@ public class PlaylistListEndpoint : EndpointBaseAsync
     public override async Task<ActionResult<List<PlaylistListDto>>> HandleAsync(
         CancellationToken cancellationToken = default)
     {
-        var filter = new PlaylistService.PlaylistFilter(userProvider.Account?.Id);
+        var filter = new PlaylistService.PlaylistFilter(userProvider.AccountId);
         var list = await playlistService.List(filter, cancellationToken);
         return Ok(list.Select(TransferMaps.ToPlaylistListDto).ToImmutableArray());
     }

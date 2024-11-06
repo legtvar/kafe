@@ -2,9 +2,11 @@
 using Kafe.Data.Aggregates;
 using Kafe.Data.Events.Upcasts;
 using Kafe.Data.Options;
+using Kafe.Data.Projections;
 using Kafe.Data.Services;
 using Marten;
 using Marten.Events;
+using Marten.Events.Daemon.Resiliency;
 using Marten.Events.Projections;
 using Marten.Services.Json;
 using Microsoft.Extensions.Configuration;
@@ -34,7 +36,7 @@ public static class ServiceCollectionExtensions
 
             var options = services.GetRequiredService<IOptions<StorageOptions>>().Value;
             var mo = new StoreOptions();
-            
+
             if (!string.IsNullOrEmpty(options.Schema))
             {
                 mo.DatabaseSchemaName = options.Schema;
@@ -72,12 +74,24 @@ public static class ServiceCollectionExtensions
             mo.Projections.Add<VideoConversionInfoProjection>(ProjectionLifecycle.Inline);
             mo.Projections.Add<ArtifactDetailProjection>(ProjectionLifecycle.Inline);
             mo.Projections.Add<AccountInfoProjection>(ProjectionLifecycle.Inline);
+            mo.Projections.Add<OrganizationInfoProjection>(ProjectionLifecycle.Inline);
+            mo.Projections.Add<RoleInfoProjection>(ProjectionLifecycle.Inline);
+            mo.Projections.Add<EntityPermissionEventProjection>(
+                ProjectionLifecycle.Async,
+                ao =>
+                {
+                    ao.EnableDocumentTrackingByIdentity = true;
+                    // NB: Since some of the projections query other perm infos, the events need to be processed
+                    //     one by one.
+                    ao.BatchSize = 1;
+                });
             mo.Events.Upcast<AccountCapabilityAddedUpcaster>();
             mo.Events.Upcast<AccountCapabilityRemovedUpcaster>();
             mo.Events.Upcast<PlaylistVideoAddedUpcaster>();
             mo.Events.Upcast<PlaylistVideoRemovedUpcaster>();
             mo.Events.Upcast<TemporaryAccountCreatedUpcaster>();
             mo.Events.Upcast<TemporaryAccountClosedUpcaster>();
+            mo.Events.Upcast<AccountPermissionUnsetUpcaster>();
             mo.UseNewtonsoftForSerialization();
 
             RegisterEmbeddedSql(mo);
@@ -90,7 +104,8 @@ public static class ServiceCollectionExtensions
             .ApplyAllDatabaseChangesOnStartup()
             .UseIdentitySessions()
             .InitializeWith<Corrector>()
-            .InitializeWith<SeedData>();
+            .InitializeWith<UserSeedData>()
+            .AddAsyncDaemon(DaemonMode.Solo);
 
         services.AddSingleton<StorageService>();
 
@@ -102,6 +117,9 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ShardService>();
         services.AddScoped<PlaylistService>();
         services.AddScoped<EntityService>();
+        services.AddScoped<MigrationService>();
+        services.AddScoped<OrganizationService>();
+        services.AddScoped<RoleService>();
 
         services.AddOptions<StorageOptions>()
             .BindConfiguration("Storage")

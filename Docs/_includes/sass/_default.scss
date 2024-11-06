@@ -43,7 +43,7 @@ body {
             width: 100%;
             overflow-x: scroll;
         }
-        
+
         pre {
             overflow-x: scroll;
         }
@@ -90,4 +90,18 @@ main {
     height: 1em;
     padding: 0.25rem;
     border: 1px solid var(--fg);
+}
+
+dl {
+    >dt {
+        font-weight: bold;
+        
+        &:not(:first-child) {
+            padding-top: 0.5rem;
+        }
+    }
+
+    >dd {
+        padding-left: 2rem;
+    }
 }

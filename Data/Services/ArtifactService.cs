@@ -1,4 +1,5 @@
-﻿using Kafe.Data.Aggregates;
+﻿using Kafe.Common;
+using Kafe.Data.Aggregates;
 using Kafe.Data.Events;
 using Marten;
 using System;
@@ -21,7 +22,7 @@ public class ArtifactService
 
     public async Task<ArtifactInfo?> Load(Hrib id, CancellationToken token = default)
     {
-        return await db.LoadAsync<ArtifactInfo>(id.Value, token);
+        return await db.LoadAsync<ArtifactInfo>(id.ToString(), token);
     }
 
     public async Task<ImmutableArray<ArtifactInfo>> LoadMany(
@@ -35,7 +36,7 @@ public class ArtifactService
 
     public async Task<ArtifactDetail?> LoadDetail(Hrib id, CancellationToken token = default)
     {
-        return await db.LoadAsync<ArtifactDetail>(id.Value, token);
+        return await db.LoadAsync<ArtifactDetail>(id.ToString(), token);
     }
 
     public async Task<ImmutableArray<ArtifactDetail>> LoadDetailMany(
@@ -47,32 +48,31 @@ public class ArtifactService
             .ToImmutableArray();
     }
 
-    public async Task<Hrib> Create(
-        LocalizedString name,
-        DateTimeOffset? addedOn,
-        Hrib? containingProject,
-        string? blueprintSlot,
-        CancellationToken token = default)
+    public async Task<Err<ArtifactInfo>> Create(ArtifactInfo @new, CancellationToken token = default)
     {
-        var created = new ArtifactCreated(
-            ArtifactId: Hrib.Create().Value,
-            CreationMethod: CreationMethod.Api,
-            Name: name,
-            AddedOn: addedOn?.ToUniversalTime() ?? DateTimeOffset.UtcNow
-        );
-        db.Events.StartStream<ArtifactInfo>(created.ArtifactId, created);
-
-        if (containingProject is not null)
+        var parseResult = Hrib.Parse(@new.Id);
+        if (parseResult.HasErrors)
         {
-            var artifactAdded = new ProjectArtifactAdded(
-                ProjectId: containingProject.Value,
-                ArtifactId: created.ArtifactId,
-                BlueprintSlot: blueprintSlot);
-            var projectStream = await db.Events.FetchForWriting<ProjectInfo>(containingProject.Value, token);
-            projectStream.AppendOne(artifactAdded);
+            return parseResult.Errors;
         }
 
+        var id = parseResult.Value;
+        if (id == Hrib.Empty)
+        {
+            id = Hrib.Create();
+        }
+
+        var created = new ArtifactCreated(
+            ArtifactId: id.ToString(),
+            CreationMethod: @new.CreationMethod is not CreationMethod.Unknown
+                ? @new.CreationMethod
+                : CreationMethod.Api,
+            Name: @new.Name,
+            AddedOn: @new.AddedOn != default ? @new.AddedOn.ToUniversalTime() : DateTimeOffset.UtcNow
+        );
+        db.Events.KafeStartStream<ArtifactInfo>(created.ArtifactId, created);
+
         await db.SaveChangesAsync(token);
-        return created.ArtifactId;
+        return await db.Events.KafeAggregateRequiredStream<ArtifactInfo>(id, token: token);
     }
 }

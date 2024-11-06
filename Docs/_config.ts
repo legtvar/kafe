@@ -9,13 +9,16 @@ import metas from "lume/plugins/metas.ts";
 import resolveUrls from "lume/plugins/resolve_urls.ts";
 import sitemap from "lume/plugins/sitemap.ts";
 import inline from "lume/plugins/inline.ts";
-import toc from "lume_markdown_plugins/toc.ts";
+import markdownToc from "lume_markdown_plugins/toc.ts";
+import markdownTitle from "lume_markdown_plugins/title.ts";
 import { Node as TocNode } from "lume_markdown_plugins/toc/mod.ts";
 import { linkInsideHeader } from "lume_markdown_plugins/toc/anchors.ts";
 import pagefind from "lume/plugins/pagefind.ts";
 import { default as markdownItAlerts } from "npm:markdown-it-github-alerts";
+import markdownDl from "npm:markdown-it-deflist";
 import codeHighlight from "./_plugins/shiki.ts";
 import basePath from "lume/plugins/base_path.ts";
+import { SassString } from "lume/deps/sass.ts";
 
 const site = lume({
     dest: "public/",
@@ -43,17 +46,30 @@ site.ignore(".vscode", "public", "_plugins", "Docs.Dockerfile")
                 "caution": " "
             },
             classPrefix: "alert"
-        }]]
+        }],
+        [markdownDl, {}]]
     }))
-    .use(toc({
+    .use(markdownToc({
         tabIndex: false,
         // anchor: false,
         anchor: linkInsideHeader({
             placement: "before"
         })
     }))
+    .use(markdownTitle())
     .use(jsx())
-    .use(sass())
+    .use(sass({
+        options: {
+            functions: {
+                'base-path()': _ => {
+                    const basepath = site.options.location.hostname === "localhost"
+                        ? ""
+                        : site.options.location.pathname;
+                    return new SassString(basepath);
+                }
+            }
+        }
+    }))
     .use(postcss())
     .use(metas())
     .use(resolveUrls())
@@ -98,7 +114,7 @@ site.ignore(".vscode", "public", "_plugins", "Docs.Dockerfile")
         }
     }))
     .use(await codeHighlight())
-    .copy([".svg", ".png", ".webm", ".mp4"])
+    .copy([".svg", ".png", ".webm", ".mp4", ".woff2"])
     .copy("fonts")
     .use(pagefind({
         indexing: {
@@ -115,7 +131,7 @@ site.ignore(".vscode", "public", "_plugins", "Docs.Dockerfile")
                 page.data.entries = entries
                     .sort((a, b) => a.data.date < b.data.date ? +1
                         : a.data.date > b.data.date ? -1
-                        : (a.data.title ?? "").localeCompare(b.data.title ?? ""))
+                            : (a.data.title ?? "").localeCompare(b.data.title ?? ""))
                     .map<TocNode>(p => {
                         return {
                             level: p.data?.toc?.level ?? 0 + 1,

@@ -35,7 +35,6 @@ public record ProjectInfoChanged(
     [Hrib] string ProjectId,
     [LocalizedString] ImmutableDictionary<string, string>? Name = null,
     [LocalizedString] ImmutableDictionary<string, string>? Description = null,
-    Permission? GlobalPermissions = null,
     DateTimeOffset? ReleasedOn = null,
     [LocalizedString] ImmutableDictionary<string, string>? Genre = null
 );

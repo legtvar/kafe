@@ -22,6 +22,7 @@ public record PlaylistEntryDto(
 
 public record PlaylistCreationDto(
     LocalizedString Name,
+    Hrib OrganizationId,
     LocalizedString? Description,
     ImmutableArray<Permission>? GlobalPermissions,
     ImmutableArray<string>? EntryIds);

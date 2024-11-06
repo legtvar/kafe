@@ -64,7 +64,7 @@ public class EntityPermissionsDetailEndpoint : EndpointBaseAsync
             }
         }
 
-        var userPermissions = await entityService.GetPermission(entityId, userProvider.Account?.Id, cancellationToken);
+        var userPermissions = await entityService.GetPermission(entityId, userProvider.AccountId, cancellationToken);
 
         var relevantAccounts = await accountService.List(new()
         {

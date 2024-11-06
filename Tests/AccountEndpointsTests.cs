@@ -6,12 +6,15 @@ using System.Threading.Tasks;
 using Alba;
 using Kafe.Api.Transfer;
 using Kafe.Data;
+using Kafe.Data.Aggregates;
+using Kafe.Data.Documents;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Kafe.Tests;
 
 [Collection(Const.Collections.Api)]
-public class AccountEndpointsTests(ApiFixture fixture) : ApiContext(fixture)
+public class AccountEndpointsTests(ApiFixture fixture, ITestOutputHelper testOutput) : ApiTestBase(fixture, testOutput)
 {
     [Fact]
     public async Task TemporaryAccountCreation_WithValidEmail_ShouldSucceed()
@@ -63,6 +66,7 @@ public class AccountEndpointsTests(ApiFixture fixture) : ApiContext(fixture)
     [Fact]
     public async Task AccountDetailEndpoint_AnonCheckingAny_ShouldBeUnauthorized()
     {
+        var user = await Store.QuerySession().LoadAsync<EntityPermissionInfo>(TestSeedData.UserHrib);
         var result = await Host.Scenario(c =>
         {
             c.Get.Url($"/api/v1/account/{TestSeedData.UserHrib}");

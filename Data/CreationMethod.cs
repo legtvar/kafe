@@ -6,5 +6,6 @@ public enum CreationMethod
     Manual,
     Migrator,
     Api,
-    Seed
+    Seed,
+    Correction
 }

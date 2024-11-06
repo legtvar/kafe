@@ -14,6 +14,7 @@ namespace Kafe.Migrator;
 public static class Program
 {
     private const string MigrationInfoFileName = "migration.json";
+    private const string WmaStorageName = "WMA";
 
     private static IConfiguration configuration = null!;
     private static MigratorOptions migratorOptions = null!;
@@ -44,10 +45,6 @@ public static class Program
         configuration = host.Services.GetRequiredService<IConfiguration>();
         migratorOptions = configuration.Get<MigratorOptions>()!;
         logger = host.Services.GetRequiredService<ILogger<Migrator>>();
-        if (TryDropDb(host))
-        {
-            logger.LogInformation("Database dropped.");
-        }
 
         wma = host.Services.GetRequiredService<WmaClient>();
         kafe = host.Services.GetRequiredService<KafeClient>();
@@ -115,7 +112,7 @@ public static class Program
         var projectGroups = await wma.GetAllProjectGroups();
         foreach (var projectGroup in projectGroups)
         {
-            var kafeGroup = await kafe.CreateProjectGroup(projectGroup.Name);
+            var kafeGroup = await kafe.CreateProjectGroup(projectGroup.Name, migratorOptions.OrganizationId);
             foreach (var project in projectGroup.Projects)
             {
                 await MigrateProject(project, kafeGroup.Id);
@@ -345,7 +342,7 @@ public static class Program
 
         var originalFile = originalCandidates.First();
 
-        var shardDir = new DirectoryInfo(Path.Combine(migratorOptions.KafeVideosDirectory!, shardId.Value));
+        var shardDir = new DirectoryInfo(Path.Combine(migratorOptions.KafeVideosDirectory!, shardId.ToString()));
         if (shardDir.Exists)
         {
             logger.LogError(
@@ -361,8 +358,8 @@ public static class Program
 
         var migrationInfo = new VideoShardMigrationInfo(
             WmaId: wmaId,
-            ArtifactId: artifactId.Value,
-            VideoShardId: shardId.Value,
+            ArtifactId: artifactId.ToString(),
+            VideoShardId: shardId.ToString(),
             Name: name,
             AddedOn: addedOn);
         await SerializedVideoShardMigrationInfo(migrationInfo);
@@ -394,7 +391,7 @@ public static class Program
 
     private static async Task<MediaInfo> GetOriginalVariant(Hrib shardId)
     {
-        var shardDir = new DirectoryInfo(Path.Combine(migratorOptions.KafeVideosDirectory!, shardId.Value));
+        var shardDir = new DirectoryInfo(Path.Combine(migratorOptions.KafeVideosDirectory!, shardId.ToString()));
         if (!shardDir.Exists)
         {
             logger.LogError(
@@ -431,6 +428,7 @@ public static class Program
 
         return await kafe.CreatePlaylist(
             name: playlist.Name,
+            organizationId: migratorOptions.OrganizationId,
             description: playlist.Desc,
             videos: artifactIds.ToImmutable());
     }

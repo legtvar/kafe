@@ -29,9 +29,11 @@ public class ArtifactService
         IEnumerable<Hrib> ids,
         CancellationToken token = default)
     {
-        return (await db.LoadManyAsync<ArtifactInfo>(token, ids.Select(i => (string)i)))
+        var stringIds = ids.Select(i => (string)i).ToImmutableArray();
+        return (await db.LoadManyAsync<ArtifactInfo>(token, stringIds))
             .Where(a => a is not null)
-            .ToImmutableArray();
+            .ToImmutableArray()
+            .RelativeSortBy(stringIds, a => a.Id);
     }
 
     public async Task<ArtifactDetail?> LoadDetail(Hrib id, CancellationToken token = default)

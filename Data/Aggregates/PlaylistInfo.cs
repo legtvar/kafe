@@ -93,7 +93,7 @@ public class PlaylistInfoProjection : SingleStreamProjection<PlaylistInfo>
     {
         return p with
         {
-            EntryIds = p.EntryIds
+            EntryIds = e.EntryIds
         };
     }
 

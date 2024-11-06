@@ -23,13 +23,16 @@ public class PlaylistService
 {
     private readonly IDocumentSession db;
     private readonly OrganizationService organizationService;
+    private readonly ArtifactService artifactService;
 
     public PlaylistService(
         IDocumentSession db,
-        OrganizationService organizationService)
+        OrganizationService organizationService,
+        ArtifactService artifactService)
     {
         this.db = db;
         this.organizationService = organizationService;
+        this.artifactService = artifactService;
     }
 
     /// <summary>
@@ -175,8 +178,17 @@ public class PlaylistService
             eventStream.AppendOne(globalPermissionChanged);
         }
 
-        if (@new.EntryIds.SequenceEqual(old.EntryIds))
+        if (!@new.EntryIds.SequenceEqual(old.EntryIds))
         {
+            var addedEntryIds = @new.EntryIds.Except(old.EntryIds).Select(i => (Hrib)i).ToImmutableArray();
+            var addedEntries = await artifactService.LoadMany(addedEntryIds, token);
+            var nonExistentEntryIds = addedEntryIds.ExceptBy(addedEntries.Select(e => e.Id), a => a.ToString())
+                .ToImmutableArray();
+            if (nonExistentEntryIds.Length > 0)
+            {
+                return Error.NotFound($"Could not found some entries: {string.Join(", ", nonExistentEntryIds)}.");
+            }
+
             eventStream.AppendOne(new PlaylistEntriesSet(
                 PlaylistId: @new.Id,
                 EntryIds: @new.EntryIds));

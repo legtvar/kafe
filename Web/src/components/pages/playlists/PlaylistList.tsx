@@ -71,13 +71,16 @@ export function PlaylistList(props: IPlaylistListProps) {
                                             px={8}
                                             borderBottomWidth="1px"
                                             borderBottomColor={borderColor}
-                                            align={'center'}
+                                            align={{
+                                                base: 'start',
+                                                md: 'center',
+                                            }}
                                             cursor="pointer"
                                             _hover={{
                                                 background: hoverColor,
                                             }}
                                         >
-                                            <Icon as={IoListCircleOutline} mb="auto" mr={3} mt={1} fontSize="xl" />
+                                            <Icon as={IoListCircleOutline} mb="auto" mr={3} my={1} fontSize="xl" />
                                             <Flex direction="column" flex="1">
                                                 <Text>
                                                     <Highlight styles={highlightStyle} query={filter}>

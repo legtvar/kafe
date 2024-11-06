@@ -15,7 +15,7 @@ import {
 } from '@chakra-ui/react';
 import { t } from 'i18next';
 import moment from 'moment';
-import { IoWarning } from 'react-icons/io5';
+import { IoSaveOutline, IoWarning } from 'react-icons/io5';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../hooks/Caffeine';
 import { useColorScheme } from '../../../hooks/useColorScheme';
@@ -63,6 +63,7 @@ export function SystemComponent(props: ISystemComponentProps) {
                                         </Heading>
                                         {!readonly && (
                                             <Button
+                                                leftIcon={<IoSaveOutline />}
                                                 colorScheme="blue"
                                                 ml={{
                                                     base: '0',

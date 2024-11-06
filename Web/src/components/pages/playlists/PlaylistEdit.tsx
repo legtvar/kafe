@@ -59,7 +59,7 @@ export function PlaylistEdit(props: IPlaylistEditProps) {
                                     </Heading>
                                     <SendAPI
                                         value={playlist}
-                                        request={(api: API, value: Playlist) => api.playlists.create(value)}
+                                        request={(api: API, value: Playlist) => api.playlists.update(value)}
                                         onSubmited={() => navigate(0)}
                                         repeatable={true}
                                     >

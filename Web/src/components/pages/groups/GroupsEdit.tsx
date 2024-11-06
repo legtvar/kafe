@@ -1,8 +1,12 @@
-import { Box, Button, Flex, HStack, Heading, Tab, TabList, TabPanel, TabPanels, Tabs, VStack } from '@chakra-ui/react';
+import { Box, Button, HStack, Heading, Tab, TabList, TabPanel, TabPanels, Tabs, VStack } from '@chakra-ui/react';
 import { t } from 'i18next';
 import { BsX } from 'react-icons/bs';
+import { IoSaveOutline } from 'react-icons/io5';
 import { Link, useNavigate, useParams } from 'react-router-dom';
+import { API } from '../../../api/API';
+import { EntityPermissions } from '../../../data/EntityPermissions';
 import { Group } from '../../../data/Group';
+import { observeAbstactType } from '../../utils/AbstractTypeObserver';
 import { AwaitAPI } from '../../utils/AwaitAPI';
 import { RightsEditor } from '../../utils/RightsEditor';
 import { SendAPI } from '../../utils/SendAPI';
@@ -22,58 +26,64 @@ export function GroupsEdit(props: IGroupsEditProps) {
 
     return (
         <AwaitAPI request={(api) => api.groups.getById(id)} error={<Status statusCode={404} embeded />}>
-            {(group: Group) => (
-                <Box m={6} pb={12}>
-                    <WithTitle title={t('title.group', { group: group.getName() })} />
-                    <Flex mb={2}>
-                        <Heading fontSize="4xl" fontWeight="semibold" as="h2" lineHeight="tight" mr="auto">
-                            {group.getName()}
-                        </Heading>
-                        <Link to="..">
-                            <Button leftIcon={<BsX />}>{t('generic.quitEdit').toString()}</Button>
-                        </Link>
-                    </Flex>
-                    <Tabs>
-                        <TabList>
-                            <Tab>{t('groupsEdit.tabs.info').toString()}</Tab>
-                            <Tab>{t('groupsEdit.tabs.rights').toString()}</Tab>
-                        </TabList>
+            {observeAbstactType((group: Group) => (
+                <AwaitAPI request={(api) => api.entities.perms.getById(group.id)}>
+                    {observeAbstactType((perms: EntityPermissions) => (
+                        <Box m={6} pb={12}>
+                            <WithTitle title={t('title.group', { group: group.getName() })} />
+                            <HStack mb={2}>
+                                <Heading fontSize="4xl" fontWeight="semibold" as="h2" lineHeight="tight" mr="auto">
+                                    {group.getName()}
+                                </Heading>
+                                <SendAPI
+                                    value={group}
+                                    request={(api: API, value: Group) => api.groups.update(value)}
+                                    onSubmited={() => navigate(0)}
+                                    repeatable={true}
+                                >
+                                    {(saveGroup, groupSaveStatus) => (
+                                        <SendAPI
+                                            value={perms}
+                                            request={(api, value) => api.entities.perms.update(value)}
+                                            onSubmited={() => navigate(0)}
+                                            repeatable={true}
+                                        >
+                                            {(savePerms, permsSaveStatus) => (
+                                                <Button
+                                                    leftIcon={<IoSaveOutline />}
+                                                    colorScheme="blue"
+                                                    isDisabled={group.changed.size === 0 && perms.changed.size === 0}
+                                                    onClick={() => {
+                                                        if (group.changed.size > 0) {
+                                                            saveGroup();
+                                                        }
+                                                        if (perms.changed.size > 0) {
+                                                            savePerms();
+                                                        }
+                                                    }}
+                                                >
+                                                    {t('generic.save').toString()}
+                                                </Button>
+                                            )}
+                                        </SendAPI>
+                                    )}
+                                </SendAPI>
+                                <Link to="..">
+                                    <Button leftIcon={<BsX />}>{t('generic.quitEdit').toString()}</Button>
+                                </Link>
+                            </HStack>
+                            <Tabs>
+                                <TabList>
+                                    <Tab>{t('groupsEdit.tabs.info').toString()}</Tab>
+                                    <Tab>{t('groupsEdit.tabs.rights').toString()}</Tab>
+                                </TabList>
 
-                        <TabPanels pt={6}>
-                            <TabPanel>
-                                <GroupBasicInfo group={group} />
-                            </TabPanel>
-                            <TabPanel>
-                                <AwaitAPI request={(api) => api.entities.perms.getById(group.id)}>
-                                    {(perms) => (
+                                <TabPanels pt={6}>
+                                    <TabPanel>
+                                        <GroupBasicInfo group={group} noSelfSubmit />
+                                    </TabPanel>
+                                    <TabPanel>
                                         <VStack align="stretch">
-                                            <SendAPI
-                                                value={perms}
-                                                request={(api, value) => api.entities.perms.update(value)}
-                                                onSubmited={() => navigate(0) /* Refresh the page */}
-                                                repeatable={true}
-                                            >
-                                                {(onSubmit, status) => (
-                                                    <HStack align="stretch" justifyContent="flex-end">
-                                                        <Button
-                                                            colorScheme="blue"
-                                                            ml={{
-                                                                base: '0',
-                                                                xl: '4',
-                                                            }}
-                                                            mt={{
-                                                                base: '2',
-                                                                xl: '0',
-                                                            }}
-                                                            onClick={onSubmit}
-                                                            isLoading={status === 'sending'}
-                                                            isDisabled={status === 'sending'}
-                                                        >
-                                                            {t('generic.save').toString()}
-                                                        </Button>
-                                                    </HStack>
-                                                )}
-                                            </SendAPI>
                                             <RightsEditor
                                                 perms={perms}
                                                 options={['read', 'write', 'inspect', 'append', 'review']}
@@ -86,13 +96,13 @@ export function GroupsEdit(props: IGroupsEditProps) {
                                                 }}
                                             />
                                         </VStack>
-                                    )}
-                                </AwaitAPI>
-                            </TabPanel>
-                        </TabPanels>
-                    </Tabs>
-                </Box>
-            )}
+                                    </TabPanel>
+                                </TabPanels>
+                            </Tabs>
+                        </Box>
+                    ))}
+                </AwaitAPI>
+            ))}
         </AwaitAPI>
     );
 }

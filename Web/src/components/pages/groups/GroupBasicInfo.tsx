@@ -24,6 +24,7 @@ import { TextareaMarkdown } from '../../utils/TextareaMarkdown';
 interface IGroupBasicInfoProps {
     // Cannot be changed after initial draw
     group?: Group;
+    noSelfSubmit?: boolean;
 }
 
 export function GroupBasicInfo(props: IGroupBasicInfoProps) {
@@ -175,18 +176,20 @@ export function GroupBasicInfo(props: IGroupBasicInfoProps) {
                         />
                     </FormControl>
 
-                    <HStack w="100%">
-                        <Button
-                            colorScheme="blue"
-                            ml="auto"
-                            isDisabled={status === 'sending' || status === 'ok'}
-                            onClick={onSubmit}
-                        >
-                            {update
-                                ? t('createGroup.button.update').toString()
-                                : t('createGroup.button.create').toString()}
-                        </Button>
-                    </HStack>
+                    {!props.noSelfSubmit && (
+                        <HStack w="100%">
+                            <Button
+                                colorScheme="blue"
+                                ml="auto"
+                                isDisabled={status === 'sending' || status === 'ok'}
+                                onClick={onSubmit}
+                            >
+                                {update
+                                    ? t('createGroup.button.update').toString()
+                                    : t('createGroup.button.create').toString()}
+                            </Button>
+                        </HStack>
+                    )}
                 </Stack>
             )}
         </SendAPI>

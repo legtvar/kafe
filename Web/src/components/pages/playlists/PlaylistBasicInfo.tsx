@@ -12,7 +12,6 @@ import { TextareaMarkdown } from '../../utils/TextareaMarkdown';
 interface IGroupBasicInfoProps {
     // Cannot be changed after initial draw
     playlist?: Playlist;
-    onChange?: (playlist: Playlist) => void;
     noSelfSubmit?: boolean;
 }
 
@@ -24,7 +23,6 @@ export function PlaylistBasicInfo(props: IGroupBasicInfoProps) {
     const navigate = useNavigate();
 
     const forceUpdate = (any: any) => {
-        props.onChange?.(any);
         fu();
     };
 

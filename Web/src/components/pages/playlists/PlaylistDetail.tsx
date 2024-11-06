@@ -30,19 +30,23 @@ export function PlaylistDetail(props: IPlaylistDetailProps) {
     }
 
     if (itemId === undefined) {
-        return <Navigate to="1" />;
+        return <Navigate to="1" replace />;
     }
 
     const item = parseInt(itemId);
 
     if (!(item > 0)) {
-        return <Navigate to="./1" />;
+        return <Navigate to="../1" replace />;
     }
 
     return (
         <AwaitAPI request={(api) => api.playlists.getById(id)} error={<Status statusCode={404} embeded />}>
             {(playlist: Playlist) => {
                 const artifacts = playlist.entries;
+
+                if (item > artifacts.length) {
+                    return <Navigate to="../1" replace />;
+                }
 
                 return (
                     <>

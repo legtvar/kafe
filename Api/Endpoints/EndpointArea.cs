@@ -12,4 +12,5 @@ public static class EndpointArea
     public const string Entity = "Entity";
     public const string System = "System";
     public const string Organization = "Organization";
+    public const string Role = "Role";
 }

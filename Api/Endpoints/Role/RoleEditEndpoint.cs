@@ -9,30 +9,30 @@ using Swashbuckle.AspNetCore.Annotations;
 using Kafe.Data.Services;
 using System.Linq;
 
-namespace Kafe.Api.Endpoints.Organization;
+namespace Kafe.Api.Endpoints.Role;
 
 [ApiVersion("1")]
-[Route("organization")]
+[Route("role")]
 [Authorize]
-public class OrganizationEditEndpoint : EndpointBaseAsync
-    .WithRequest<OrganizationEditDto>
+public class RoleEditEndpoint : EndpointBaseAsync
+    .WithRequest<RoleEditDto>
     .WithActionResult<Hrib>
 {
-    private readonly OrganizationService organizationService;
+    private readonly RoleService roleService;
     private readonly IAuthorizationService authorizationService;
 
-    public OrganizationEditEndpoint(
-        OrganizationService organizationService,
+    public RoleEditEndpoint(
+        RoleService roleService,
         IAuthorizationService authorizationService)
     {
-        this.organizationService = organizationService;
+        this.roleService = roleService;
         this.authorizationService = authorizationService;
     }
 
     [HttpPatch]
-    [SwaggerOperation(Tags = new[] { EndpointArea.Organization })]
+    [SwaggerOperation(Tags = new[] { EndpointArea.Role })]
     public override async Task<ActionResult<Hrib>> HandleAsync(
-        OrganizationEditDto dto,
+        RoleEditDto dto,
         CancellationToken cancellationToken = default)
     {
         var auth = await authorizationService.AuthorizeAsync(User, dto.Id, EndpointPolicy.Write);
@@ -41,7 +41,7 @@ public class OrganizationEditEndpoint : EndpointBaseAsync
             return Unauthorized();
         }
 
-        var old = await organizationService.Load(dto.Id, cancellationToken);
+        var old = await roleService.Load(dto.Id, cancellationToken);
         if (old is null)
         {
             return NotFound();
@@ -49,10 +49,11 @@ public class OrganizationEditEndpoint : EndpointBaseAsync
 
         var @new = old with
         {
-            Name = dto.Name ?? old.Name
+            Name = dto.Name ?? old.Name,
+            Description = dto.Description ?? old.Description,
         };
 
-        var result = await organizationService.Edit(@new, cancellationToken);
+        var result = await roleService.Edit(@new, cancellationToken);
         if (result.HasErrors)
         {
             return ValidationProblem(title: result.Errors.FirstOrDefault().Message);

@@ -8,6 +8,7 @@ using Kafe.Common;
 using Kafe.Data.Aggregates;
 using Kafe.Data.Events;
 using Marten;
+using Marten.Linq;
 
 namespace Kafe.Data.Services;
 
@@ -58,13 +59,24 @@ public class RoleService
 
         var created = new RoleCreated(
             RoleId: id.ToString(),
-            OrganizationId: id.ToString(),
+            OrganizationId: @new.OrganizationId.ToString(),
             CreationMethod: @new.CreationMethod is not CreationMethod.Unknown
                 ? @new.CreationMethod
                 : CreationMethod.Api,
             Name: @new.Name
         );
         db.Events.KafeStartStream<RoleInfo>(id, created);
+
+        if (!LocalizedString.IsNullOrEmpty(@new.Description))
+        {
+            var changed = new RoleInfoChanged(
+                RoleId: id.ToString(),
+                Name: null,
+                Description: @new.Description
+            );
+            db.Events.KafeAppend(id, changed);
+        }
+
         await db.SaveChangesAsync(token);
 
         return await db.Events.KafeAggregateRequiredStream<RoleInfo>(id, token: token);
@@ -158,5 +170,53 @@ public class RoleService
         params (Hrib entityId, Permission permission)[] permissions)
     {
         return AddPermissions(roleId, permissions, token);
+    }
+
+    /// <summary>
+    /// Filter of roles.
+    /// </summary>
+    /// <param name="AccessingAccountId">
+    /// <list type="bullet">
+    /// <item> If null, doesn't filter by account access at all.</item>
+    /// <item>
+    ///     If <see cref="Hrib.Empty"/> assumes the account is an anonymous user
+    ///     and filters only by global permissions.
+    /// </item>
+    /// <item> If <see cref="Hrib.Invalid"/>, throws an exception. </item>
+    /// </list>
+    /// </param>
+    public record RoleFilter(
+        Hrib? AccessingAccountId = null,
+        Hrib? OrganizationId = null,
+        LocalizedString? Name = null
+    );
+
+    public async Task<ImmutableArray<RoleInfo>> List(
+        RoleFilter? filter = null,
+        CancellationToken token = default)
+    {
+        var query = db.Query<RoleInfo>();
+        if (filter?.OrganizationId is not null)
+        {
+            query = (IMartenQueryable<RoleInfo>)query
+                .Where(r => r.OrganizationId == filter.OrganizationId.ToString());
+        }
+
+        if (filter?.AccessingAccountId is not null)
+        {
+            query = (IMartenQueryable<RoleInfo>)query
+                .WhereAccountHasPermission(
+                    db.DocumentStore.Options.Schema,
+                    Permission.Read,
+                    filter.AccessingAccountId);
+        }
+
+        if (filter?.Name is not null)
+        {
+            query = (IMartenQueryable<RoleInfo>)query
+                .WhereContainsLocalized(nameof(RoleInfo.Name), filter.Name);
+        }
+
+        return (await query.ToListAsync(token)).ToImmutableArray();
     }
 }

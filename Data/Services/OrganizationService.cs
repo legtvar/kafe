@@ -84,7 +84,7 @@ public class OrganizationService
     }
     
     /// <summary>
-    /// Filter of authors.
+    /// Filter of organizations.
     /// </summary>
     /// <param name="AccessingAccountId">
     /// <list type="bullet">

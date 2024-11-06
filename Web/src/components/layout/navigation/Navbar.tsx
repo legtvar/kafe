@@ -1,5 +1,4 @@
 import {
-    Avatar,
     Box,
     Button,
     Flex,
@@ -21,7 +20,7 @@ import i18next, { t } from 'i18next';
 import { FiChevronDown, FiMenu, FiMoon, FiSun } from 'react-icons/fi';
 import { Link, useNavigate } from 'react-router-dom';
 import { useApi, useAuth } from '../../../hooks/Caffeine';
-import { avatarUrl } from '../../../utils/avatarUrl';
+import { KafeAvatar } from '../../utils/KafeAvatar';
 import { LanguageToggle } from '../../utils/LanguageToggle';
 import { Logo } from '../Logo';
 import { MessageButton } from '../MessageButton';
@@ -123,7 +122,7 @@ export function Navbar({ onOpen, forceReload, signedIn, ...rest }: INavbarProps)
                                     fontWeight="normal"
                                 >
                                     <HStack>
-                                        <Avatar size={'sm'} src={avatarUrl(user!.emailAddress, user!.id)} />
+                                        <KafeAvatar size={'sm'} person={user!} />
                                         <VStack
                                             display={{ base: 'none', md: 'flex' }}
                                             alignItems="flex-start"

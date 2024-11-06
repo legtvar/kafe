@@ -1,5 +1,17 @@
-import { Button, FormControl, FormLabel, HStack, Input, Stack, useConst, useForceUpdate } from '@chakra-ui/react';
+import {
+    Button,
+    Checkbox,
+    FormControl,
+    FormLabel,
+    Heading,
+    HStack,
+    Input,
+    Stack,
+    useConst,
+    useForceUpdate,
+} from '@chakra-ui/react';
 import { t } from 'i18next';
+import moment from 'moment';
 import { useNavigate } from 'react-router-dom';
 import { API } from '../../../api/API';
 import { Group } from '../../../data/Group';
@@ -134,53 +146,33 @@ export function GroupBasicInfo(props: IGroupBasicInfoProps) {
                         </Stack>
                     </FormControl>
 
-                    <FormControl>
-                        <FormLabel>{t('createGroup.fields.propositions').toString()}</FormLabel>
-                        <Stack direction={{ base: 'column', md: 'row' }}>
-                            <FormControl id="propositions.cs">
-                                <TextareaMarkdown
-                                    placeholder={`${t('createGroup.fields.propositions').toString()} ${t(
-                                        'createProject.language.cs',
-                                    )}`}
-                                    borderColor={border}
-                                    bg={bg}
-                                    defaultValue={getPrefered(group.description, 'cs')}
-                                    onChange={(event) =>
-                                        forceUpdate(
-                                            group.set('customFields', {
-                                                ...group.customFields,
-                                                propositions: {
-                                                    ...group.customFields.propositions,
-                                                    cs: event.target.value,
-                                                },
-                                            }),
-                                        )
-                                    }
-                                />
-                            </FormControl>
+                    <Heading as="h3" size="md" mt={8}>
+                        {t('createGroup.fields.section.registration').toString()}
+                    </Heading>
 
-                            <FormControl id="propositions.en">
-                                <TextareaMarkdown
-                                    placeholder={`${t('createGroup.fields.propositions').toString()} ${t(
-                                        'createProject.language.en',
-                                    )}`}
-                                    borderColor={border}
-                                    bg={bg}
-                                    defaultValue={getPrefered(group.description, 'en')}
-                                    onChange={(event) =>
-                                        forceUpdate(
-                                            group.set('customFields', {
-                                                ...group.customFields,
-                                                propositions: {
-                                                    ...group.customFields.propositions,
-                                                    en: event.target.value,
-                                                },
-                                            }),
-                                        )
-                                    }
-                                />
-                            </FormControl>
-                        </Stack>
+                    <FormControl id="isOpen">
+                        <Checkbox
+                            borderColor={border}
+                            defaultChecked={group.isOpen}
+                            onChange={(event) => forceUpdate(group.set('isOpen', event.target.checked))}
+                        >
+                            {t('createGroup.fields.isOpen').toString()}
+                        </Checkbox>
+                    </FormControl>
+
+                    <FormControl id="deadline">
+                        <FormLabel>{t('createGroup.fields.deadline').toString()}</FormLabel>
+                        <Input
+                            type="datetime-local"
+                            borderColor={border}
+                            bg={bg}
+                            placeholder={t('createGroup.fields.deadline').toString()}
+                            defaultValue={moment(group.deadline).format('YYYY-MM-DD HH:mm:ss')}
+                            onChange={(event) =>
+                                forceUpdate(group.set('deadline', moment(event.target.value).toISOString()))
+                            }
+                            maxW={96}
+                        />
                     </FormControl>
 
                     <HStack w="100%">

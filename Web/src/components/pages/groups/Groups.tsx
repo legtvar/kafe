@@ -1,22 +1,22 @@
-import { Button, Flex, FormControl, Highlight, Input, Text, useColorModeValue } from '@chakra-ui/react';
+import { Button, Flex, FormControl, Highlight, Icon, Input, Text, useColorModeValue } from '@chakra-ui/react';
 import { t } from 'i18next';
 import { useState } from 'react';
-import { IoAdd } from 'react-icons/io5';
+import { IoAdd, IoFolderOpenOutline } from 'react-icons/io5';
 import { Link } from 'react-router-dom';
 import { Group } from '../../../data/Group';
 import { useColorScheme, useHighlightStyle } from '../../../hooks/useColorScheme';
 import { fulltextFilter } from '../../../utils/fulltextFilter';
+import { useTitle } from '../../../utils/useTitle';
 import { AwaitAPI } from '../../utils/AwaitAPI';
 import { OutletOrChildren } from '../../utils/OutletOrChildren';
 import { Pagination } from '../../utils/Pagination';
-import { useTitle } from '../../../utils/useTitle';
 
 interface IGroupsProps {}
 
 export function Groups(props: IGroupsProps) {
     const borderColor = useColorModeValue('gray.300', 'gray.700');
     const hoverColor = useColorModeValue('gray.200', 'gray.700');
-    useTitle(t("title.groups"));
+    useTitle(t('title.groups'));
 
     const { border, bg } = useColorScheme();
     const highlightStyle = useHighlightStyle();
@@ -76,6 +76,7 @@ export function Groups(props: IGroupsProps) {
                                                 background: hoverColor,
                                             }}
                                         >
+                                            <Icon as={IoFolderOpenOutline} mb="auto" mr={3} mt={1} fontSize="xl" />
                                             <Flex direction="column" flex="1">
                                                 <Text>
                                                     <Highlight styles={highlightStyle} query={filter}>

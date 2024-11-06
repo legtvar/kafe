@@ -1,9 +1,12 @@
 import axios, { Axios, AxiosProgressEvent, AxiosResponse } from 'axios';
+import { Artifact } from '../data/Artifact';
 import { Author } from '../data/Author';
 import { EntityPermissions } from '../data/EntityPermissions';
 import { Group } from '../data/Group';
 import { Playlist } from '../data/Playlist';
 import { Project } from '../data/Project';
+import { Shard } from '../data/Shard';
+import { System } from '../data/System';
 import { User } from '../data/User';
 import { components } from '../schemas/api';
 import { HRIB, localizedString } from '../schemas/generic';
@@ -29,8 +32,8 @@ export type ApiResponse<T> =
 export class API {
     private apiUrl = '/api/v1/';
     private client: Axios;
-    private static Production = "https://kafe.fi.muni.cz";
-    private static Staging = "https://kafe-stage.fi.muni.cz";
+    private static Production = 'https://kafe.fi.muni.cz';
+    private static Staging = 'https://kafe-stage.fi.muni.cz';
 
     public constructor() {
         if (window.location.hostname.startsWith('localhost') || window.location.hostname.startsWith('127.0.0.1')) {
@@ -45,7 +48,7 @@ export class API {
             validateStatus: (status) => [200].includes(status) || (status >= 400 && status < 500),
         });
     }
-    
+
     public get isProduction() {
         return new URL(this.apiUrl).origin === API.Production;
     }
@@ -53,10 +56,10 @@ export class API {
     public get isStaging() {
         return new URL(this.apiUrl).origin === API.Staging;
     }
-    
+
     public get isLocalhost() {
         const url = new URL(this.apiUrl);
-        return url.hostname === "localhost" || url.hostname === "127.0.0.1";
+        return url.hostname === 'localhost' || url.hostname === '127.0.0.1';
     }
 
     // API fetch functions
@@ -93,11 +96,14 @@ export class API {
                 return api.requestSingle(`project-group/${id}`, Group);
             },
             async create(group: Group) {
-                return api.post<components['schemas']['ProjectGroupCreationDto'], HRIB>(`group`, group.serialize());
+                return api.post<components['schemas']['ProjectGroupCreationDto'], HRIB>(
+                    `project-group`,
+                    group.serialize(),
+                );
             },
             async update(group: Group) {
                 return api.patch<components['schemas']['ProjectGroupCreationDto'], HRIB>(
-                    `group`,
+                    `project-group`,
                     group.serialize(true),
                 );
             },
@@ -113,6 +119,15 @@ export class API {
             },
             async getById(id: string) {
                 return api.requestSingle(`playlist/${id}`, Playlist);
+            },
+            async create(playlist: Playlist) {
+                return api.post<components['schemas']['PlaylistCreationDto'], HRIB>(`playlist`, playlist.serialize());
+            },
+            async update(playlist: Playlist) {
+                return api.patch<components['schemas']['PlaylistCreationDto'], HRIB>(
+                    `playlist`,
+                    playlist.serialize(true),
+                );
             },
         };
     }
@@ -143,6 +158,9 @@ export class API {
                     name: name as any,
                     blueprintSlot,
                 });
+            },
+            async getById(id: string) {
+                return api.requestSingle(`artifact/${id}`, Artifact);
             },
         };
     }
@@ -191,6 +209,9 @@ export class API {
             },
             defaultStreamUrl(id: string) {
                 return `${api.apiUrl}shard-download/${id}`;
+            },
+            getById(id: string) {
+                return api.requestSingle(`shard/${id}`, Shard);
             },
         };
     }
@@ -247,6 +268,16 @@ export class API {
                         perms.serialize(true),
                     );
                 },
+            },
+        };
+    }
+
+    public get system() {
+        const api = this;
+
+        return {
+            async status() {
+                return await api.requestSingle(`system`, System);
             },
         };
     }

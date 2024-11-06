@@ -1,11 +1,9 @@
 import { components } from '../schemas/api';
-import { HRIB, Permission } from '../schemas/generic';
+import { Permission } from '../schemas/generic';
 import { AbstractType } from './AbstractType';
-import { User } from './User';
 import { Serializer } from './serialize/Serializer';
 
-export type EntityPermissionsUser = components["schemas"]["EntityPermissionsAccountListDto"]
-    & { permissions: Array<Permission> };
+export type EntityPermissionsUser = { permissions: Array<Permission>; emailAddress: string; id?: string };
 
 export class EntityPermissions extends AbstractType {
     public globalPermissions!: Array<Permission> | null;
@@ -16,11 +14,8 @@ export class EntityPermissions extends AbstractType {
         super();
         Object.assign(this, struct);
     }
-    
+
     serialize(update: boolean = false): components['schemas']['EntityPermissionsAccountEditDto'] {
-        return new Serializer(this, update)
-            .add('globalPermissions')
-            .add('accountPermissions')
-            .build();
+        return new Serializer(this, update).add('globalPermissions').add('accountPermissions').build();
     }
 }

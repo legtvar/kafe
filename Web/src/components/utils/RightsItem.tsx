@@ -1,38 +1,34 @@
 import { Avatar, Box, Checkbox, Flex, Input, InputGroup, Text, useColorModeValue } from '@chakra-ui/react';
 import { t } from 'i18next';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { IoAdd, IoEarth } from 'react-icons/io5';
+import { EntityPermissionsUser } from '../../data/EntityPermissions';
 import { useColorScheme } from '../../hooks/useColorScheme';
-import { HRIB, Permission } from '../../schemas/generic';
-import { avatarUrl } from '../../utils/avatarUrl';
-
-export interface IUser {
-    id?: HRIB;
-    emailAddress?: string;
-    name?: string;
-    permissions: Array<Permission>;
-}
+import { Permission } from '../../schemas/generic';
+import { KafeAvatar } from './KafeAvatar';
 
 export interface IRightsItemProps {
-    user: IUser | number | null; // User, 0 for anyone, null for new user
+    user: EntityPermissionsUser | number | null; // User, 0 for anyone, null for new user
     options: Readonly<Array<Permission>>;
     initialPerms: Array<Permission>;
-    onChange: (user: IUser) => void;
+    onChange: (permissions: Array<Permission>, email?: string) => void;
     readonly?: boolean;
 }
 
 export function RightsItem({ user, options, initialPerms, readonly, onChange }: IRightsItemProps) {
     const borderColor = useColorModeValue('gray.300', 'gray.700');
     const { border, bg } = useColorScheme();
-    const [newEmail, setNewEmail] = useState<string>('');
+
+    const [newEmail, setNewEmail] = useState<string | undefined>(
+        user === 0 ? undefined : user === null ? '' : (user as EntityPermissionsUser).emailAddress,
+    );
     const [perms, setPerms] = useState<Permission[]>(initialPerms);
 
-    useEffect(() => {
-        const newUser: IUser = typeof user === 'number' ? { permissions: [] } : { ...user, permissions: [] };
-        newUser.emailAddress = newEmail;
-        newUser.permissions = perms;
-        onChange(newUser);
-    }, [perms, newEmail]);
+    const onValueChanges = (perms: Permission[], email?: string) => {
+        setPerms(perms);
+        setNewEmail(email);
+        onChange(perms, email);
+    };
 
     const rightNames: Record<Permission, string> = {
         read: t('rights.read').toString(),
@@ -91,14 +87,14 @@ export function RightsItem({ user, options, initialPerms, readonly, onChange }: 
                         placeholder={t('rights.special.new.title').toString()}
                         type="text"
                         value={newEmail}
-                        onChange={(event) => setNewEmail(event.target.value)}
+                        onChange={(event) => onValueChanges(perms, event.target.value)}
                         {...{ border, bg }}
                     />
                 </Flex>
             ) : (
                 <Flex direction="row" flex="1" align={'center'}>
-                    <Avatar size={'sm'} src={avatarUrl(user!.id ?? null)} mr={4} />
-                    <Text>{user.name || user.emailAddress}</Text>
+                    <KafeAvatar size={'sm'} person={user} mr={4} />
+                    <Text>{user.emailAddress}</Text>
                 </Flex>
             )}
             <Box
@@ -132,9 +128,12 @@ export function RightsItem({ user, options, initialPerms, readonly, onChange }: 
                                 isChecked={perms.includes(right)}
                                 onChange={(event) => {
                                     if (event.target.checked) {
-                                        setPerms([...perms, right]);
+                                        onValueChanges([...perms, right], newEmail);
                                     } else {
-                                        setPerms(perms.filter((r) => r !== right));
+                                        onValueChanges(
+                                            perms.filter((r) => r !== right),
+                                            newEmail,
+                                        );
                                     }
                                 }}
                             >

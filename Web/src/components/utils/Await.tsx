@@ -5,6 +5,7 @@ interface IAwaitProps<T> {
     loading?: JSX.Element;
     error?: (error: any) => JSX.Element;
     children: ((data: T) => JSX.Element) | JSX.Element;
+    ignoreError?: boolean;
 }
 
 export function Await<T>(props: IAwaitProps<T>) {
@@ -35,6 +36,12 @@ export function Await<T>(props: IAwaitProps<T>) {
             return props.children;
         case 'rejected':
             // console.warn(error);
+            if (props.ignoreError) {
+                if (typeof props.children === 'function') {
+                    return (props.children as (data: T) => JSX.Element)(null!);
+                }
+                return props.children;
+            }
             if (props.error) return props.error(error);
             return <></>;
     }

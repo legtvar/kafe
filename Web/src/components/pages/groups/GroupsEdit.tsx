@@ -1,18 +1,20 @@
 import { Box, Button, Flex, HStack, Heading, Tab, TabList, TabPanel, TabPanels, Tabs, VStack } from '@chakra-ui/react';
 import { t } from 'i18next';
 import { BsX } from 'react-icons/bs';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Group } from '../../../data/Group';
 import { AwaitAPI } from '../../utils/AwaitAPI';
 import { RightsEditor } from '../../utils/RightsEditor';
-import { Status } from '../../utils/Status';
-import { GroupBasicInfo } from './GroupBasicInfo';
 import { SendAPI } from '../../utils/SendAPI';
+import { Status } from '../../utils/Status';
+import { WithTitle } from '../../utils/WithTitle';
+import { GroupBasicInfo } from './GroupBasicInfo';
 
 interface IGroupsEditProps {}
 
 export function GroupsEdit(props: IGroupsEditProps) {
     const { id } = useParams();
+    const navigate = useNavigate();
 
     if (!id) {
         return <Status statusCode={404} embeded />;
@@ -22,6 +24,7 @@ export function GroupsEdit(props: IGroupsEditProps) {
         <AwaitAPI request={(api) => api.groups.getById(id)} error={<Status statusCode={404} embeded />}>
             {(group: Group) => (
                 <Box m={6} pb={12}>
+                    <WithTitle title={t('title.group', { group: group.getName() })} />
                     <Flex mb={2}>
                         <Heading fontSize="4xl" fontWeight="semibold" as="h2" lineHeight="tight" mr="auto">
                             {group.getName()}
@@ -47,7 +50,7 @@ export function GroupsEdit(props: IGroupsEditProps) {
                                             <SendAPI
                                                 value={perms}
                                                 request={(api, value) => api.entities.perms.update(value)}
-                                                onSubmited={() => {}}
+                                                onSubmited={() => navigate(0) /* Refresh the page */}
                                                 repeatable={true}
                                             >
                                                 {(onSubmit, status) => (

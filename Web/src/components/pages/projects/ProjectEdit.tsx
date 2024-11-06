@@ -16,7 +16,7 @@ import {
 import { t } from 'i18next';
 import { AiOutlineUnlock } from 'react-icons/ai';
 import { BsX } from 'react-icons/bs';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Project } from '../../../data/Project';
 import { useAuth } from '../../../hooks/Caffeine';
 import { AwaitAPI } from '../../utils/AwaitAPI';
@@ -24,6 +24,7 @@ import { RightsEditor } from '../../utils/RightsEditor';
 import { SendAPI } from '../../utils/SendAPI';
 import { Status } from '../../utils/Status';
 import { ArtifactGroupUpload } from '../../utils/Upload/ArtifactGroup';
+import { WithTitle } from '../../utils/WithTitle';
 import { AddReview } from './AddReview';
 import { ProjectStatus } from './ProjectStatus';
 import { ProjectTags } from './ProjectTags';
@@ -35,6 +36,7 @@ interface IProjectEditProps {}
 export function ProjectEdit(props: IProjectEditProps) {
     const { id } = useParams();
     const { user } = useAuth();
+    const navigate = useNavigate();
 
     if (!id) {
         return <Status statusCode={404} embeded />;
@@ -44,6 +46,7 @@ export function ProjectEdit(props: IProjectEditProps) {
         <AwaitAPI request={(api) => api.projects.getById(id)} error={<Status statusCode={404} embeded />}>
             {(project: Project) => (
                 <Box m={6} pb={12}>
+                    <WithTitle title={t('title.project', { project: project.getName() })} />
                     <Flex mb={2}>
                         <Heading fontSize="4xl" fontWeight="semibold" as="h2" lineHeight="tight" mr="auto">
                             {project.getName()}
@@ -100,7 +103,7 @@ export function ProjectEdit(props: IProjectEditProps) {
                                             <SendAPI
                                                 value={perms}
                                                 request={(api, value) => api.entities.perms.update(value)}
-                                                onSubmited={() => {}}
+                                                onSubmited={() => navigate(0) /* Refresh the page */}
                                                 repeatable={true}
                                             >
                                                 {(onSubmit, status) => (

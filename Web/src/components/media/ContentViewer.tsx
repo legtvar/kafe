@@ -2,6 +2,7 @@ import { Text } from '@chakra-ui/react';
 import { t } from 'i18next';
 import { ReactPlayerProps } from 'react-player';
 import { Artifact } from '../../data/Artifact';
+import { Shard } from '../../data/Shard';
 import { useApi } from '../../hooks/Caffeine';
 import { Video } from './Player/Video';
 
@@ -11,11 +12,21 @@ interface IContentViewerProps {
     videoProps?: ReactPlayerProps;
     onNext?: () => void;
     onPrevious?: () => void;
+    height?: string;
+    width?: string;
 }
 
 type ContentType = 'Video' | 'Image' | 'Unknown';
 
-export function ContentViewer({ artifact, autoplay, videoProps, onPrevious, onNext }: IContentViewerProps) {
+export function ContentViewer({
+    artifact,
+    autoplay,
+    videoProps,
+    onPrevious,
+    onNext,
+    width,
+    height,
+}: IContentViewerProps) {
     const api = useApi();
 
     let type: ContentType = 'Unknown';
@@ -30,10 +41,13 @@ export function ContentViewer({ artifact, autoplay, videoProps, onPrevious, onNe
     if (type) {
         switch (type.split('/')[0]) {
             case 'Video':
-                const video = artifact.shards.filter((shard) => shard.kind === 'video')[0];
-                const subtitles = artifact.shards.filter((shard) => shard.kind === 'subtitles');
+                let video = artifact.shards.filter((shard) => shard.kind === 'video')[0];
+                let subtitles = artifact.shards.filter((shard) => shard.kind === 'subtitles');
 
-                const videoSources = video.variants.reduce(
+                video = new Shard(video);
+                subtitles = subtitles.map((sub) => new Shard(sub));
+
+                const videoSources = video.getVariantIds().reduce(
                     (prev, curr) => ({
                         ...prev,
                         [curr]: api.shards.streamUrl(video.id, curr),
@@ -54,9 +68,9 @@ export function ContentViewer({ artifact, autoplay, videoProps, onPrevious, onNe
                         videoProps={videoProps}
                         sources={videoSources}
                         subtitles={subtitleSources}
-                        minW="100%"
-                        maxW="100%"
-                        h="60vmin"
+                        minW={width || '100%'}
+                        maxW={width || '100%'}
+                        h={height || '60vmin'}
                         autoplay={autoplay}
                         onPrevious={onPrevious}
                         onNext={onNext}
@@ -69,8 +83,8 @@ export function ContentViewer({ artifact, autoplay, videoProps, onPrevious, onNe
                         src={api.shards.defaultStreamUrl(image.id)}
                         alt={artifact.getName()}
                         style={{
-                            width: '100%',
-                            height: '60vmin',
+                            width: width || '100%',
+                            height: height || '60vmin',
                             objectFit: 'contain',
                             objectPosition: 'center center',
                         }}

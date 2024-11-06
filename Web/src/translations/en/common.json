@@ -24,14 +24,24 @@
   },
   "troubleshooting": {
     "title": "Report an issue",
-    "contactUs": "If you bump into any unsolvable problems, contact us at <email>kafe@fi.muni.cz</email>."
+    "contactUs": "Did you discover a problem? \nYou can send a report about what happened.",
+    "sendTo": "Please send us this report to <1>kafe@fi.muni.cz</1>, thank you!",
+    "mailContents": "Good morning,\n\nI experienced the following problem while using KAFE:\n{{message}}\n\nI am attaching the generated report\n\nThank you and have a nice day\n\n---\n\n",
+    "selectAttachments": "We would appreciate as much detail as possible about the problem. However, you can choose what information you provide us:",
+    "page": "The page where the problem occurred",
+    "browser": "The browser you are using",
+    "user": "The account that had a problem",
+    "logs": "Browser error messages",
+    "description": "Please describe in as much detail as possible what went wrong:",
+    "generated": "Generated report:"
   },
   "common": {
     "backHome": "Back Home",
     "cancel": "Cancel",
     "edit": "Edit",
     "save": "Save",
-    "understood": "I understand"
+    "understood": "I understand",
+    "send": "Send"
   },
   "content": {
     "noFileSelected": "No file selected",
@@ -40,8 +50,8 @@
   "countdown": {
     "days": "days",
     "hours": "hours",
-    "minutes": "minutes",
-    "seconds": "seconds"
+    "minutes": "min",
+    "seconds": "sec"
   },
   "createProject": {
     "button": {
@@ -71,8 +81,9 @@
       "specs": "Technical requirements",
       "newArtefact": "Create a new artifact"
     },
-    "signUp": "Submit a movie",
-    "doNotforget": "Don't miss it! Until the end of the registration remains"
+    "signUp": "Create a project",
+    "doNotforget": "The registration closes in",
+    "details": "Details"
   },
   "error": {
     "invalidPath": "URL path is invalid",
@@ -92,7 +103,12 @@
     "construction": "This section is under construction..."
   },
   "home": {
-    "signin": "Sign in"
+    "signin": "Sign in",
+    "title": "Welcome to KAFE",
+    "openProjects": "Currently open projects",
+    "openGroups": "Open project groups",
+    "myProjects": "My projects",
+    "subtitle": "Check out, what is new!"
   },
   "homeFestival": {
     "title": "24th Film Festival FI MU"
@@ -102,7 +118,8 @@
   },
   "layout": {
     "footer": {
-      "copy": "Made by LeGTVaR with ❤️ and ☕."
+      "copy": "Made by LeGTVaR with <1>❤️</1> and ☕.",
+      "appName": "Kontrol and Archival of Fantastic Entertainment"
     },
     "title-prefix": "KAFE"
   },
@@ -128,7 +145,18 @@
     "play": "Play the playlist",
     "readmore": "More info",
     "videoCount": "videos",
-    "watchNewest": "Watch the newest playlist"
+    "watchNewest": "Watch the newest playlist",
+    "empty": "This playlist is empty",
+    "addNewFile": {
+      "title": "Add a file",
+      "groups": "Project groups",
+      "allGroups": "All groups",
+      "projects": "Projects",
+      "noProjectSelected": "No project is selected",
+      "artifacts": "Artifacts",
+      "add": "Add selected files",
+      "selectedFiles": "You have {{count}} files selected"
+    }
   },
   "project": {
     "general": "Project information",
@@ -167,7 +195,11 @@
         "bonus": "Template bonus block",
         "custom": "Vlastní"
       }
-    }
+    },
+    "edit": "Edit project",
+    "details": "Show details",
+    "cast": "Movie cast",
+    "media": "Multimedia"
   },
   "projectEdit": {
     "quit": "Quit edit mode",
@@ -231,7 +263,13 @@
       "detail": {
         "title": "Playlist detail"
       },
-      "title": "Playlists"
+      "title": "Playlists",
+      "create": {
+        "title": "Create new playlist"
+      },
+      "edit": {
+        "title": "Edit playlist"
+      }
     },
     "projects": {
       "detail": {
@@ -304,7 +342,8 @@
     "search": "Filter projects"
   },
   "playlistList": {
-    "search": "Filter playlists"
+    "search": "Filter playlists",
+    "create": "Create playlist"
   },
   "groupsList": {
     "search": "Filter project groups",
@@ -314,7 +353,10 @@
     "title": "System settings",
     "warning": "Please be careful! Anything you change here can have a catastrophic impact on the final taste of KAFE! Proceed with caution!",
     "rights": "Rights",
-    "homepage": "Homepage"
+    "homepage": "Homepage",
+    "status": "System status",
+    "runningFrom": "Running since",
+    "console": "Console"
   },
   "rights": {
     "read": "View",
@@ -364,7 +406,12 @@
     "fields": {
       "propositions": "Propositions",
       "description": "Project group annotation",
-      "name": "The name of the project group"
+      "name": "The name of the project group",
+      "deadline": "Registration deadline",
+      "section": {
+        "registration": "Registration"
+      },
+      "isOpen": "Registration is open"
     },
     "button": {
       "create": "Create a project group",
@@ -387,5 +434,32 @@
       "en": "English"
     },
     "none": "Hide subtitles"
+  },
+  "player": {
+    "loadingError": "Unfortunately, this video cannot be played in this quality"
+  },
+  "general": {
+    "copied": "Copied!"
+  },
+  "reatePlaylist": {
+    "fields": {
+      "name": "Playlist name",
+      "description": "Playlist description"
+    }
+  },
+  "playlistCreate": {
+    "title": "Create new playlist"
+  },
+  "playlistsEdit": {
+    "tabs": {
+      "info": "Basic info",
+      "files": "Files",
+      "rights": "Rights",
+      "addFile": "Add new file"
+    },
+    "addFile": "Add file",
+    "files": {
+      "description": "Drag to change the order of files or add a new file to the playlist"
+    }
   }
 }

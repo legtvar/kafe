@@ -10,6 +10,7 @@ interface IAwaitAPIProps<T> {
     loader?: JSX.Element;
     error?: JSX.Element | ((response: ApiResponse<T> | any) => JSX.Element);
     children: (data: T) => JSX.Element;
+    ignoreError?: boolean;
 }
 
 export function AwaitAPI<T>(props: IAwaitAPIProps<T>) {
@@ -20,6 +21,7 @@ export function AwaitAPI<T>(props: IAwaitAPIProps<T>) {
         <Await
             for={request}
             loading={props.loader || <Loading large center />}
+            ignoreError={props.ignoreError}
             error={(error) => {
                 return props.error ? (
                     typeof props.error === 'function' ? (
@@ -35,6 +37,8 @@ export function AwaitAPI<T>(props: IAwaitAPIProps<T>) {
             {(data) =>
                 data.status === 200 ? (
                     props.children(data.data)
+                ) : props.ignoreError ? (
+                    props.children(null as any)
                 ) : props.error ? (
                     typeof props.error === 'function' ? (
                         props.error(data)

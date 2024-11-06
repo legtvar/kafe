@@ -24,14 +24,24 @@
   },
   "troubleshooting": {
     "title": "Nahlásit problém",
-    "contactUs": "V případě neřešitelných potíží nás kontaktujte na <email>kafe@fi.muni.cz</email>."
+    "contactUs": "Objevili jste problém? Můžete odeslat hlášení o tom, co se stalo.",
+    "sendTo": "Prosíme odešlete nám toto hlášení na <1>kafe@fi.muni.cz</1>, děkujeme!",
+    "mailContents": "Dobrý den,\n\npři používání KAFE jsem zaznamenal následující problém:\n{{message}}\n\nPřikládám vygenerovaný report\n\nDěkuji a přeji hezký den\n\n---\n\n",
+    "selectAttachments": "Budeme rádi za co nejvíce podrobností o problému. Můžete si ale sami vybrat, jaké informace nám poskytnete:",
+    "page": "Stránku, na které k problému došlo",
+    "browser": "Prohlížeč, který používáte",
+    "user": "Účet, u kterého došlo k problému",
+    "logs": "Chybová hlášení prohlížeče",
+    "description": "Prosím popište co nejpodrobněji, co se stalo špatně:",
+    "generated": "Vygenerované hlášení:"
   },
   "common": {
     "backHome": "Zpět na domovskou stránku",
     "cancel": "Zrušit",
     "edit": "Upravit",
     "save": "Uložit",
-    "understood": "Chápu"
+    "understood": "Chápu",
+    "send": "Odeslat"
   },
   "content": {
     "noFileSelected": "Žádný vybraný soubor",
@@ -41,7 +51,7 @@
     "days": "dní",
     "hours": "hodin",
     "minutes": "minut",
-    "seconds": "sekund"
+    "seconds": "vteřin"
   },
   "createProject": {
     "button": {
@@ -61,7 +71,7 @@
       "cs": "česky",
       "en": "anglicky"
     },
-    "title": "Vytvořte nový projekt ve skupině projektů",
+    "title": "Vytvořte nový projekt",
     "upload": {
       "filetype": {
         "Image": "Obrázkový soubor",
@@ -71,8 +81,9 @@
       "specs": "Technické požadavky souboru",
       "newArtefact": "Vytvořit nový artefakt"
     },
-    "signUp": "Přihlásit film",
-    "doNotforget": "Nepropásni to! Do konce přihlašování už zbývá jen"
+    "signUp": "Přidat projekt",
+    "doNotforget": "Do konce přihlašování už zbývá jen",
+    "details": "Podrobnosti"
   },
   "error": {
     "invalidPath": "URL adresa je nesprávná",
@@ -93,14 +104,20 @@
     "allowMarkdown": "Toto pole umožňuje zadat text formátovaný, jako Markdown"
   },
   "home": {
-    "signin": "Přihlásit se"
+    "signin": "Přihlásit se",
+    "title": "Vítej v KAFE",
+    "openProjects": "Aktuálně otevřené projekty",
+    "openGroups": "Otevřené skupiny projektů",
+    "myProjects": "Moje projekty",
+    "subtitle": "Podívej se, co je nového!"
   },
   "homeFestival": {
     "title": "24. Filmový festival FI MU"
   },
   "layout": {
     "footer": {
-      "copy": "Vytvořil LeGTVaR s ❤️ a ☕."
+      "copy": "Vytvořil LeGTVaR s <1>❤️</1> a ☕.",
+      "appName": "Kontrola a Archivace Filmů Elektronicky"
     },
     "title-prefix": "KAFE"
   },
@@ -126,7 +143,18 @@
     "play": "Přehrát playlist",
     "readmore": "Více informací",
     "videoCount": "videí",
-    "watchNewest": "Podívejte se na nejnovější playlist"
+    "watchNewest": "Podívejte se na nejnovější playlist",
+    "empty": "Tento playlist je prázdný",
+    "addNewFile": {
+      "title": "Přidat soubor",
+      "groups": "Skupiny projektů",
+      "allGroups": "Všechny skupiny",
+      "projects": "Projekty",
+      "noProjectSelected": "Není vybraný žádný projekt",
+      "artifacts": "Artefakty",
+      "add": "Přidat vybrané soubory",
+      "selectedFiles": "Máte vybráno {{count}} souborů"
+    }
   },
   "project": {
     "general": "Informace o projektu",
@@ -165,7 +193,11 @@
         "bonus": "Šablona bonus blok",
         "custom": "Vlastní"
       }
-    }
+    },
+    "edit": "Upravit",
+    "details": "Podrobnosti",
+    "cast": "Herecké obsazení",
+    "media": "Přílohy"
   },
   "projectEdit": {
     "quit": "Ukončit editaci",
@@ -229,7 +261,13 @@
       "detail": {
         "title": "Detail playlistu"
       },
-      "title": "Playlisty"
+      "title": "Playlisty",
+      "create": {
+        "title": "Vytvořit nový playlist"
+      },
+      "edit": {
+        "title": "Upravit playlist"
+      }
     },
     "projects": {
       "detail": {
@@ -302,7 +340,8 @@
     "search": "Hledat projekty"
   },
   "playlistList": {
-    "search": "Hledat playlisty"
+    "search": "Hledat playlisty",
+    "create": "Vytvořit playlist"
   },
   "groupsList": {
     "search": "Hledat skupiny projektů",
@@ -312,7 +351,10 @@
     "title": "Systémová nastavení",
     "warning": "Prosím pozor! Cokoliv změníš tady může mít katastrofický dopad na finální chuť KAFE! Postupujte opatrně!",
     "rights": "Oprávnění",
-    "homepage": "Domovská obrazovka"
+    "homepage": "Domovská obrazovka",
+    "status": "Stav systému",
+    "runningFrom": "Běží od",
+    "console": "Konzole"
   },
   "rights": {
     "read": "Zobrazit",
@@ -349,6 +391,11 @@
         "inspect": "Zobrazit všechny projekty ve skupině projektů",
         "append": "Vytvořit nový projekt v této skupině",
         "review": "Hodnotit projekty ve skupině"
+      },
+      "playlist": {
+        "read": "Vidět tento playlist",
+        "write": "Měnit metadata a nastavení playlistu",
+        "inspect": "Zobrazit všechny soubory ve playlistu"
       }
     }
   },
@@ -362,7 +409,12 @@
     "fields": {
       "name": "Název skupiny projektů",
       "description": "Anotace skupiny projektů",
-      "propositions": "Propozice"
+      "propositions": "Propozice",
+      "deadline": "Konec přihlašování projektů",
+      "section": {
+        "registration": "Parametry přihlašování"
+      },
+      "isOpen": "Přihlašování je otevřeno"
     },
     "button": {
       "update": "Uložit skupinu projektů",
@@ -385,5 +437,32 @@
       "en": "Anglické"
     },
     "none": "Skrýt titulky"
+  },
+  "player": {
+    "loadingError": "Toto video bohužel nelze přehrát v této kvalitě"
+  },
+  "general": {
+    "copied": "Zkopírováno!"
+  },
+  "reatePlaylist": {
+    "fields": {
+      "name": "Název playlistu",
+      "description": "Anotace playlistu"
+    }
+  },
+  "playlistCreate": {
+    "title": "Vytvořit nový playlist"
+  },
+  "playlistsEdit": {
+    "tabs": {
+      "info": "Základní informace",
+      "files": "Soubory",
+      "rights": "Oprávnění",
+      "addFile": "Přidat nový soubor"
+    },
+    "addFile": "Přidat soubor",
+    "files": {
+      "description": "Tahem můžete měnit pořadí souborů, či přidat nový soubor do playlistu"
+    }
   }
 }

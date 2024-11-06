@@ -1,5 +1,7 @@
 import { IconType } from 'react-icons';
 import {
+    IoCube,
+    IoCubeOutline,
     IoFolderOpen,
     IoFolderOpenOutline,
     IoHome,
@@ -8,8 +10,6 @@ import {
     IoListCircleOutline,
     IoSettingsOutline,
     IoSettingsSharp,
-    IoVideocam,
-    IoVideocamOutline,
 } from 'react-icons/io5';
 import { Navigate, RouteObject } from 'react-router-dom';
 import { Login } from './components/pages/account/Login';
@@ -20,9 +20,11 @@ import { Groups } from './components/pages/groups/Groups';
 import { GroupsCreate } from './components/pages/groups/GroupsCreate';
 import { GroupsDetail } from './components/pages/groups/GroupsDetail';
 import { GroupsEdit } from './components/pages/groups/GroupsEdit';
-import { HomeFestival } from './components/pages/home/HomeFestival';
+import { Home } from './components/pages/home/Home';
 import { Player } from './components/pages/Player';
+import { PlaylistCreate } from './components/pages/playlists/PlaylistCreate';
 import { PlaylistDetail } from './components/pages/playlists/PlaylistDetail';
+import { PlaylistEdit } from './components/pages/playlists/PlaylistEdit';
 import { PlaylistGallery } from './components/pages/playlists/PlaylistGallery';
 import { PlaylistList } from './components/pages/playlists/PlaylistList';
 import { CreateProject } from './components/pages/projects/CreateProject';
@@ -33,10 +35,12 @@ import { AccountRoot } from './components/pages/root/AccountRoot';
 import { AuthRoot } from './components/pages/root/AuthRoot';
 import { Root } from './components/pages/root/Root';
 import { UnauthRoot } from './components/pages/root/UnauthRoot';
+import { ServerError } from './components/pages/ServerError';
 import { SystemComponent } from './components/pages/system/SystemComponent';
 import { OutletOrChildren } from './components/utils/OutletOrChildren';
 import { Status } from './components/utils/Status';
-import { ServerError } from './components/pages/ServerError';
+import { User } from './data/User';
+import { Permission } from './schemas/generic';
 
 export type SelectableIcon = {
     default: IconType;
@@ -94,11 +98,11 @@ export const routerConfig = (t: (id: string) => string): RouteObject[] => [
     },
 ];
 
-export const authRoutes = (t: (id: string) => string): AppRoute[] => [
+export const authRoutes = (t: (id: string) => string, user?: User | null): AppRoute[] => [
     {
         path: '',
         title: t('route.home.title'),
-        element: <HomeFestival />,
+        element: <Home />,
         inMenu: true,
         icon: {
             default: IoHomeOutline,
@@ -111,8 +115,8 @@ export const authRoutes = (t: (id: string) => string): AppRoute[] => [
         element: <Projects />,
         inMenu: true,
         icon: {
-            default: IoVideocamOutline,
-            selected: IoVideocam,
+            default: IoCubeOutline,
+            selected: IoCube,
         },
         children: [
             {
@@ -178,12 +182,13 @@ export const authRoutes = (t: (id: string) => string): AppRoute[] => [
         path: 'system',
         title: t('route.system.title'),
         element: <SystemComponent />,
-        inMenu: true,
+        inMenu: (['read', 'append', 'inspect', 'write', 'all'] as Permission[]).some((perm) =>
+            user?.permissions['system']?.includes(perm),
+        ),
         icon: {
             default: IoSettingsOutline,
             selected: IoSettingsSharp,
         },
-        children: playlistChildRoutes(t),
     },
 ];
 
@@ -214,16 +219,26 @@ export const accountRoutes = (t: (id: string) => string): RouteObject[] => [
     },
     {
         path: 'temp',
-        element: <Navigate to="/account/login" />
+        element: <Navigate to="/account/login" />,
     },
 ];
 
 export const playlistChildRoutes = (t: (id: string) => string): AppRoute[] => [
     {
+        path: 'create',
+        title: t('route.playlists.create.title'),
+        element: <PlaylistCreate />,
+    },
+    {
         path: ':id',
         title: t('route.playlists.detail.title'),
         element: <PlaylistDetail />,
         children: [
+            {
+                path: 'edit',
+                title: t('route.playlists.edit.title'),
+                element: <PlaylistEdit />,
+            },
             {
                 path: ':itemId',
                 title: t('route.playlists.detail.title'),

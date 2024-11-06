@@ -1,5 +1,5 @@
 import { components } from '../schemas/api';
-import { HRIB } from '../schemas/generic';
+import { HRIB, Permission } from '../schemas/generic';
 import { AbstractType } from './AbstractType';
 
 export class User extends AbstractType {
@@ -7,7 +7,7 @@ export class User extends AbstractType {
     public emailAddress!: string;
     public preferredCulture!: string;
     public role!: 'admin' | 'temp' | 'user';
-    public permissions!: Record<HRIB, Array<components["schemas"]["Permission"]>>;
+    public permissions!: Record<HRIB, Array<Permission>>;
 
     /*
         id: string;
@@ -18,8 +18,9 @@ export class User extends AbstractType {
         projects: (components["schemas"]["ProjectListDto"])[];
     */
 
-    public constructor(struct: components['schemas']['AccountDetailDto']
-            | components['schemas']['EntityPermissionsAccountListDto']) {
+    public constructor(
+        struct: components['schemas']['AccountDetailDto'] | components['schemas']['EntityPermissionsAccountListDto'],
+    ) {
         super();
         Object.assign(this, struct);
         this.role = this.name ? 'user' : 'temp';

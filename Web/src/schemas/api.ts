@@ -4,14 +4,11 @@
  */
 
 
-/** WithRequired type helpers */
-type WithRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] };
-
 export interface paths {
   "/api/v1/account": {
     get: {
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": components["schemas"]["AccountDetailDto"];
@@ -46,7 +43,7 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": components["schemas"]["AccountDetailDto"];
@@ -81,7 +78,7 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": components["schemas"]["AccountListDto"][];
@@ -95,7 +92,7 @@ export interface paths {
   "/api/v1/account/logout": {
     get: {
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: never;
         };
@@ -112,7 +109,7 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": string;
@@ -139,7 +136,7 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": string;
@@ -168,7 +165,7 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": string;
@@ -187,7 +184,7 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": components["schemas"]["AuthorDetailDto"];
@@ -209,7 +206,7 @@ export interface paths {
   "/api/v1/authors": {
     get: {
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": components["schemas"]["AuthorListDto"][];
@@ -228,7 +225,7 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": components["schemas"]["EntityPermissionsDetailDto"];
@@ -249,7 +246,62 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
+        200: {
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
+          };
+        };
+      };
+    };
+  };
+  "/api/v1/account/external-login": {
+    get: {
+      parameters: {
+        query?: {
+          Redirect?: string;
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          content: never;
+        };
+      };
+    };
+  };
+  "/api/v1/playlist": {
+    post: {
+      requestBody?: {
+        content: {
+          "application/json": components["schemas"]["PlaylistCreationDto"];
+          "text/json": components["schemas"]["PlaylistCreationDto"];
+          "application/*+json": components["schemas"]["PlaylistCreationDto"];
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
+          };
+        };
+      };
+    };
+    patch: {
+      requestBody?: {
+        content: {
+          "application/json": components["schemas"]["PlaylistEditDto"];
+          "text/json": components["schemas"]["PlaylistEditDto"];
+          "application/*+json": components["schemas"]["PlaylistEditDto"];
+        };
+      };
+      responses: {
+        /** @description OK */
         200: {
           content: {
             "text/plain": string;
@@ -268,7 +320,7 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": components["schemas"]["PlaylistDetailDto"];
@@ -290,7 +342,7 @@ export interface paths {
   "/api/v1/playlists": {
     get: {
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": components["schemas"]["PlaylistListDto"][];
@@ -311,7 +363,7 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": string;
@@ -330,7 +382,7 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: never;
         };
@@ -345,7 +397,7 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": components["schemas"]["ProjectDetailDto"];
@@ -374,7 +426,7 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": string;
@@ -393,7 +445,7 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: never;
         };
@@ -408,7 +460,7 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": components["schemas"]["ProjectGroupDetailDto"];
@@ -430,7 +482,7 @@ export interface paths {
   "/api/v1/project-groups": {
     get: {
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": components["schemas"]["ProjectGroupListDto"][];
@@ -444,7 +496,7 @@ export interface paths {
   "/api/v1/projects": {
     get: {
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": components["schemas"]["ProjectListDto"][];
@@ -465,7 +517,7 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: never;
         };
@@ -480,7 +532,7 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": components["schemas"]["ProjectValidationDto"];
@@ -531,7 +583,7 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": components["schemas"]["VideoShardDetailDto"] | components["schemas"]["ImageShardDetailDto"];
@@ -566,7 +618,7 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": string;
@@ -586,7 +638,7 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": string;
@@ -600,7 +652,7 @@ export interface paths {
   "/api/v1/system": {
     get: {
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": components["schemas"]["SystemDetailDto"];
@@ -619,7 +671,7 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: never;
         };
@@ -652,7 +704,7 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: never;
         };
@@ -841,12 +893,13 @@ export interface components {
       height: number;
       isCorrupted: boolean;
     };
-    ImageShardDetailDto: WithRequired<{
+    ImageShardDetailDto: {
       kind: "Image";
-      variants: {
+    } & Omit<components["schemas"]["ShardDetailBaseDto"], "kind"> & {
+      variants?: {
         [key: string]: components["schemas"]["ImageDto"];
       };
-    } & Omit<components["schemas"]["ShardDetailBaseDto"], "kind">, "variants">;
+    };
     MediaDto: {
       fileExtension: string;
       mimeType: string;
@@ -865,6 +918,22 @@ export interface components {
     };
     /** @enum {string} */
     Permission: "none" | "read" | "append" | "inspect" | "write" | "review" | "all";
+    PlaylistCreationDto: {
+      /** LocalizedString */
+      name: {
+        iv: string;
+        cs?: string | null;
+        en?: string | null;
+      };
+      /** LocalizedString */
+      description?: ({
+        iv: string;
+        cs?: string | null;
+        en?: string | null;
+      }) | null;
+      globalPermissions?: components["schemas"]["Permission"][] | null;
+      entryIds?: string[] | null;
+    };
     PlaylistDetailDto: {
       /**
        * Format: hrib
@@ -884,8 +953,44 @@ export interface components {
         cs?: string | null;
         en?: string | null;
       }) | null;
-      globalPermissions: components["schemas"]["Permission"];
-      videos: string[];
+      globalPermissions: components["schemas"]["Permission"][];
+      entries: components["schemas"]["PlaylistEntryDto"][];
+    };
+    PlaylistEditDto: {
+      /**
+       * Format: hrib
+       * @description Human-Readable Identifier Ballast
+       * @example AAAAbadf00d
+       */
+      id: string;
+      /** LocalizedString */
+      name?: ({
+        iv: string;
+        cs?: string | null;
+        en?: string | null;
+      }) | null;
+      /** LocalizedString */
+      description?: ({
+        iv: string;
+        cs?: string | null;
+        en?: string | null;
+      }) | null;
+      globalPermissions?: components["schemas"]["Permission"][] | null;
+      entryIds?: string[] | null;
+    };
+    PlaylistEntryDto: {
+      /**
+       * Format: hrib
+       * @description Human-Readable Identifier Ballast
+       * @example AAAAbadf00d
+       */
+      id: string;
+      /** LocalizedString */
+      name: {
+        iv: string;
+        cs?: string | null;
+        en?: string | null;
+      };
     };
     PlaylistListDto: {
       /**
@@ -906,7 +1011,7 @@ export interface components {
         cs?: string | null;
         en?: string | null;
       }) | null;
-      globalPermissions: components["schemas"]["Permission"];
+      globalPermissions: components["schemas"]["Permission"][];
     };
     ProblemDetails: {
       type?: string | null;
@@ -941,7 +1046,10 @@ export interface components {
       }) | null;
       arity: components["schemas"]["ArgumentArity"];
       shardBlueprints: {
-        [key: string]: components["schemas"]["ProjectArtifactShardBlueprintDto"];
+        unknown: components["schemas"]["ProjectArtifactShardBlueprintDto"];
+        video: components["schemas"]["ProjectArtifactShardBlueprintDto"];
+        image: components["schemas"]["ProjectArtifactShardBlueprintDto"];
+        subtitles: components["schemas"]["ProjectArtifactShardBlueprintDto"];
       };
     };
     ProjectArtifactDto: {
@@ -1334,12 +1442,13 @@ export interface components {
       emailAddress: string;
       preferredCulture?: string | null;
     };
-    VideoShardDetailDto: WithRequired<{
+    VideoShardDetailDto: {
       kind: "Video";
-      variants: {
+    } & Omit<components["schemas"]["ShardDetailBaseDto"], "kind"> & {
+      variants?: {
         [key: string]: components["schemas"]["MediaDto"];
       };
-    } & Omit<components["schemas"]["ShardDetailBaseDto"], "kind">, "variants">;
+    };
     VideoStreamDto: {
       codec: string;
       /** Format: int64 */

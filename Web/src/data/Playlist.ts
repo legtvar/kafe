@@ -1,15 +1,21 @@
 import { components } from '../schemas/api';
-import { localizedString } from '../schemas/generic';
+import { HRIB, localizedString } from '../schemas/generic';
 import { getPrefered } from '../utils/preferedLanguage';
 import { AbstractType } from './AbstractType';
+import { entriesMapper } from './serialize/entriesMapper';
+import { localizedMapper } from './serialize/localizedMapper';
+import { Serializer } from './serialize/Serializer';
+
+export type PlaylistEntry = {
+    id: HRIB;
+    name: localizedString;
+};
 
 export class Playlist extends AbstractType {
     // API object
     public name!: localizedString;
     public description?: localizedString;
-    // public visibility?: components['schemas']['Visibility'];
-    public videos!: string[];
-    public customFields: Record<string, any> = {};
+    public entries!: PlaylistEntry[];
 
     public constructor(struct: components['schemas']['PlaylistListDto'] | components['schemas']['PlaylistDetailDto']) {
         super();
@@ -22,5 +28,13 @@ export class Playlist extends AbstractType {
 
     public getDescription() {
         return getPrefered(this.description);
+    }
+
+    serialize(update: boolean = false): components['schemas']['PlaylistCreationDto'] {
+        return new Serializer(this, update)
+            .add('name', localizedMapper)
+            .add('description', localizedMapper)
+            .add('entries', entriesMapper)
+            .build();
     }
 }

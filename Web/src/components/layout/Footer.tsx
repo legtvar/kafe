@@ -1,4 +1,5 @@
-import { Box, BoxProps } from '@chakra-ui/react';
+import { Box, BoxProps, Text } from '@chakra-ui/react';
+import { t } from 'i18next';
 import { Trans } from 'react-i18next';
 import styled, { keyframes } from 'styled-components';
 
@@ -28,13 +29,16 @@ export function Footer(props: IFooterProps) {
             }}
             {...props}
         >
-            <span className="kafe-footer-content">
+            <Box className="kafe-footer-content">
+                <Text fontStyle="italic" mb={4}>
+                    {t('layout.footer.appName')}
+                </Text>
                 <Trans i18nKey="layout.footer.copy">
                     Created with <Heart>❤️</Heart> and ☕ by LeGTVaR.
                 </Trans>
                 <br />
                 &copy; 2022 - {new Date().getFullYear()}
-            </span>
+            </Box>
         </Box>
     );
 }

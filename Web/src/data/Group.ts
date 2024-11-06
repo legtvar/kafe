@@ -32,19 +32,11 @@ export class Group extends AbstractType {
     }
 
     serialize(update: boolean = false): components['schemas']['ProjectGroupCreationDto'] {
-        return (
-            new Serializer(this, update)
-                .add('name', localizedMapper)
-                // .add('genre', localizedMapper)
-                .add('description', localizedMapper)
-                // .add('visibility')
-                // .add('artifacts', (artifacts: Artifact[]) =>
-                //     artifacts ? artifacts.map((artifact) => artifact.serialize(false)) : undefined,
-                // )
-                // .add('releasedOn', (date: Date | null) => moment(date).toISOString())
-                // .add('crew', rolesMapper)
-                // .add('cast', rolesMapper)
-                .build()
-        );
+        return new Serializer(this, update)
+            .add('name', localizedMapper)
+            .add('description', localizedMapper)
+            .add('isOpen')
+            .add('deadline')
+            .build();
     }
 }

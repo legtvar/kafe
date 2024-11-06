@@ -1,8 +1,16 @@
 {
-    "workbench.colorCustomizations": {
-        "activityBar.background": "#483f39",
-        "titleBar.activeBackground": "#362d26",
-        "titleBar.activeForeground": "#FFF8E7" // cosmic latte
-    },
-    "deno.config": "./Docs/deno.json"
+  "workbench.colorCustomizations": {
+    "activityBar.background": "#483f39",
+    "titleBar.activeBackground": "#362d26",
+    "titleBar.activeForeground": "#FFF8E7" // cosmic latte
+  },
+  "deno.config": "./Docs/deno.json",
+  "i18n-ally.localesPaths": "Web/translations",
+  "i18n-ally.enabledFrameworks": [
+    "react",
+    "react-i18next",
+    "general",
+    "i18next",
+    "vscode"
+  ]
 }

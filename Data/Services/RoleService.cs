@@ -34,7 +34,7 @@ public class RoleService
         IEnumerable<Hrib> ids,
         CancellationToken token = default)
     {
-        return (await db.LoadManyAsync<RoleInfo>(token, ids.Select(i => i.ToString()))).ToImmutableArray();
+        return (await db.KafeLoadManyAsync<RoleInfo>(ids.ToImmutableArray(), token)).Unwrap();
     }
 
     public async Task<Err<RoleInfo>> Create(RoleInfo @new, CancellationToken token = default)

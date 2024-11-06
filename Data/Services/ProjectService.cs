@@ -244,9 +244,9 @@ public partial class ProjectService
         // return dto;
     }
 
-    public async Task<ImmutableArray<ProjectInfo>> LoadMany(ImmutableArray<Hrib> ids, CancellationToken token = default)
+    public async Task<ImmutableArray<ProjectInfo>> LoadMany(IEnumerable<Hrib> ids, CancellationToken token = default)
     {
-        return [.. (await db.LoadManyAsync<ProjectInfo>(token, ids.Select(id => id.ToString())))];
+        return (await db.KafeLoadManyAsync<ProjectInfo>(ids.ToImmutableArray(), token)).Unwrap();
     }
 
     // private async Task<ImmutableArray<ProjectAuthorInfo>> GetProjectAuthors(

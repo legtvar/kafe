@@ -78,9 +78,7 @@ public class PlaylistService
         IEnumerable<Hrib> ids,
         CancellationToken token = default)
     {
-        return (await db.LoadManyAsync<PlaylistInfo>(token, ids.Select(i => (string)i)))
-            .Where(a => a is not null)
-            .ToImmutableArray();
+        return (await db.KafeLoadManyAsync<PlaylistInfo>(ids.ToImmutableArray(), token)).Unwrap();
     }
 
     public async Task<Err<PlaylistInfo>> Create(

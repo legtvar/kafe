@@ -30,7 +30,7 @@ public class OrganizationService
         IEnumerable<Hrib> ids,
         CancellationToken token = default)
     {
-        return (await db.LoadManyAsync<OrganizationInfo>(token, ids.Select(i => i.ToString()))).ToImmutableArray();
+        return (await db.KafeLoadManyAsync<OrganizationInfo>(ids.ToImmutableArray(), token)).Unwrap();
     }
 
     public async Task<Err<OrganizationInfo>> Create(OrganizationInfo @new, CancellationToken token = default)

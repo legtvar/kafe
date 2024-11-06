@@ -81,7 +81,7 @@ public class AuthorService
         {
             return Error.NotFound(modified.Id);
         }
-        
+
         if (@old.Uco != modified.Uco
             || @old.Bio != modified.Bio
             || @old.Email != modified.Email
@@ -175,8 +175,6 @@ public class AuthorService
 
     public async Task<ImmutableArray<AuthorInfo>> LoadMany(IEnumerable<Hrib> ids, CancellationToken token = default)
     {
-        return (await db.LoadManyAsync<AuthorInfo>(token, ids.Select(i => i.ToString())))
-            .Where(a => a is not null)
-            .ToImmutableArray();
+        return (await db.KafeLoadManyAsync<AuthorInfo>(ids.ToImmutableArray(), token)).Unwrap();
     }
 }

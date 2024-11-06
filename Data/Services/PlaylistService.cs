@@ -179,16 +179,17 @@ public class PlaylistService
         {
             eventStream.AppendOne(new PlaylistEntriesSet(
                 PlaylistId: @new.Id,
-                EntryIds: old.EntryIds));
+                EntryIds: @new.EntryIds));
         }
 
-        if (@new.OrganizationId != old.OrganizationId)
-        {
-            eventStream.AppendOne(new PlaylistMovedToOrganization(
-                PlaylistId: @new.Id,
-                OrganizationId: @new.OrganizationId
-            ));
-        }
+        // TODO: Allow moving playlists between organizations.
+        // if (@new.OrganizationId != old.OrganizationId)
+        // {
+        //     eventStream.AppendOne(new PlaylistMovedToOrganization(
+        //         PlaylistId: @new.Id,
+        //         OrganizationId: @new.OrganizationId
+        //     ));
+        // }
 
         await db.SaveChangesAsync(token);
         return await db.Events.KafeAggregateRequiredStream<PlaylistInfo>(@old.Id, token: token);

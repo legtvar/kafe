@@ -439,7 +439,8 @@
     "loadingError": "Unfortunately, this video cannot be played in this quality"
   },
   "general": {
-    "copied": "Copied!"
+    "copied": "Copied!",
+    "autosave": "Changes made on this page are saved automatically"
   },
   "reatePlaylist": {
     "fields": {

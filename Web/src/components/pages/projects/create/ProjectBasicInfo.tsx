@@ -15,6 +15,7 @@ interface IProjectBasicInfoProps {
     // Cannot be changed after initial draw
     project?: Project;
     groupId?: HRIB;
+    noSelfSubmit?: boolean;
 }
 
 export function ProjectBasicInfo(props: IProjectBasicInfoProps) {
@@ -98,7 +99,6 @@ export function ProjectBasicInfo(props: IProjectBasicInfoProps) {
                             </FormControl>
                         </Stack>
                     </FormControl>
-
                     <FormControl>
                         <FormLabel>{t('createProject.fields.genre').toString()}</FormLabel>
                         <Stack direction={{ base: 'column', md: 'row' }}>
@@ -143,7 +143,6 @@ export function ProjectBasicInfo(props: IProjectBasicInfoProps) {
                             </FormControl>
                         </Stack>
                     </FormControl>
-
                     <FormControl>
                         <FormLabel>{t('createProject.fields.description').toString()}</FormLabel>
                         <Stack direction={{ base: 'column', md: 'row' }}>
@@ -190,7 +189,6 @@ export function ProjectBasicInfo(props: IProjectBasicInfoProps) {
                             </FormControl>
                         </Stack>
                     </FormControl>
-
                     <FormControl pb={12}>
                         <FormLabel>{t('createProject.fields.crew').toString()}</FormLabel>
                         <ProjectAuthorList
@@ -220,7 +218,6 @@ export function ProjectBasicInfo(props: IProjectBasicInfoProps) {
                             }
                         />
                     </FormControl>
-
                     <FormControl pb={12}>
                         <FormLabel>{t('createProject.fields.cast').toString()}</FormLabel>
                         <ProjectAuthorList
@@ -250,18 +247,20 @@ export function ProjectBasicInfo(props: IProjectBasicInfoProps) {
                             }
                         />
                     </FormControl>
-                    <HStack w="100%">
-                        <Button
-                            colorScheme="blue"
-                            ml="auto"
-                            isDisabled={status === 'sending' || status === 'ok'}
-                            onClick={onSubmit}
-                        >
-                            {update
-                                ? t('createProject.button.update').toString()
-                                : t('createProject.button.create').toString()}
-                        </Button>
-                    </HStack>
+                    {!props.noSelfSubmit && (
+                        <HStack w="100%">
+                            <Button
+                                colorScheme="blue"
+                                ml="auto"
+                                isDisabled={status === 'sending' || status === 'ok'}
+                                onClick={onSubmit}
+                            >
+                                {update
+                                    ? t('createProject.button.update').toString()
+                                    : t('createProject.button.create').toString()}
+                            </Button>
+                        </HStack>
+                    )}
                 </Stack>
             )}
         </SendAPI>

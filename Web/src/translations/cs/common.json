@@ -442,7 +442,8 @@
     "loadingError": "Toto video bohužel nelze přehrát v této kvalitě"
   },
   "general": {
-    "copied": "Zkopírováno!"
+    "copied": "Zkopírováno!",
+    "autosave": "Změny provedené na této stránce se ukládají automaticky"
   },
   "reatePlaylist": {
     "fields": {

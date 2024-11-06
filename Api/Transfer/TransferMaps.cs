@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Security.Claims;
@@ -390,7 +391,7 @@ public static class TransferMaps
             )).ToImmutableArray()
         );
     }
-    
+
     public static Permission FromPermissionArray(ImmutableArray<Permission>? array)
     {
         if (array is null || array.Value.IsDefaultOrEmpty)
@@ -415,5 +416,44 @@ public static class TransferMaps
                 && v != Permission.Publishable
                 && (value & v) == v)
             .ToImmutableArray();
+    }
+
+    public static OrganizationDetailDto ToOrganizationDetailDto(OrganizationInfo data)
+    {
+        return new(
+            Id: data.Id,
+            Name: data.Name,
+            CreatedOn: data.CreatedOn
+        );
+    }
+
+    public static OrganizationListDto ToOrganizationListDto(OrganizationInfo data)
+    {
+        return new(
+            Id: data.Id,
+            Name: data.Name
+        );
+    }
+
+    public static RoleDetailDto ToRoleDetailDto(RoleInfo data)
+    {
+        return new(
+            Id: data.Id,
+            OrganizationId: data.OrganizationId,
+            Name: data.Name,
+            Description: data.Description,
+            CreatedOn: data.CreatedOn,
+            Permissions: data.Permissions?.ToImmutableDictionary(p => (Hrib)p.Key, p => ToPermissionArray(p.Value))
+                ?? ImmutableDictionary<Hrib, ImmutableArray<Permission>>.Empty
+        );
+    }
+
+    public static RoleListDto ToRoleListDto(RoleInfo data)
+    {
+        return new(
+            Id: data.Id,
+            OrganizationId: data.OrganizationId,
+            Name: data.Name
+        );
     }
 }

@@ -111,10 +111,8 @@ public class ProjectGroupService
 
         if (filter?.Name is not null)
         {
-            var dictName = (ImmutableDictionary<string, string>)filter.Name;
-            query = (IMartenQueryable<ProjectGroupInfo>)query.Where(e => e.MatchesSql(
-                $"data -> {nameof(ProjectGroupInfo.Name)} @> (?)::jsonb",
-                dictName));
+            query = (IMartenQueryable<ProjectGroupInfo>)query
+                .WhereContainsLocalized(nameof(ProjectGroupInfo.Name), filter.Name);
         }
 
         return (await query.ToListAsync(token)).ToImmutableArray();

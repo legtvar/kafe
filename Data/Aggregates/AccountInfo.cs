@@ -137,6 +137,18 @@ public class AccountInfoProjection : SingleStreamProjection<AccountInfo>
 
     public AccountInfo Apply(AccountPermissionSet e, AccountInfo a)
     {
+        // NB: Once upon a time, we used "*" to identify the whole system. Then we changed it, but we've got total of
+        //     THREE AccountPermissionSet events in the DB that would break this method. Implementing an upcast that
+        //     would have to run on any past or future AccountPermissionSet seems inefficient so I just added this `if`.
+        //     We all have to live with our mistakes.
+        if (e.EntityId == "*")
+        {
+            e = e with
+            {
+                EntityId = Hrib.SystemValue
+            };
+        }
+
         if (a.Permissions is null)
         {
             a = a with { Permissions = ImmutableDictionary<string, Permission>.Empty };

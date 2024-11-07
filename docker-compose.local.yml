@@ -1,0 +1,35 @@
+name: kafe-local
+
+services:
+  api:
+    ports:
+      - 8069:8069
+      - 44369:44369
+    environment:
+      BaseUrl: https://0.0.0.0:44369
+      Kestrel__Endpoints__Http__Url: http://0.0.0.0:8069
+      Kestrel__Endpoints__Https__Url: https://0.0.0.0:44369
+      ConnectionStrings__postgres: host=kafe-db;port=5432;database=postgres;password=postgres;username=postgres
+      ConnectionStrings__KAFE: host=kafe-db;port=5432;database=kafe;password=postgres;username=postgres
+    restart: no
+
+  web:
+    ports:
+      - 3000:80
+
+volumes:
+  kafe_postgres:
+    name: kafe_local_postgres
+    driver: local
+  kafe_archive:
+    name: kafe_local_archive
+    driver: local
+  kafe_generated:
+    name: kafe_local_generated
+    driver: local
+  kafe_temp:
+    name: kafe_local_temp
+    driver: local
+  kafe_secrets:
+    name: kafe_local_secrets
+    driver: local

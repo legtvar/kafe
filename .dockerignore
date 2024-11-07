@@ -1,0 +1,13 @@
+# backend
+*/bin/
+*/obj/
+*/artifacts/
+
+# frontend
+Web/node_modules/
+Web/build/
+
+# other
+.vs/
+.config/
+.vscode/

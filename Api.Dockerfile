@@ -10,4 +10,4 @@ RUN dotnet dev-certs https --trust
 RUN curl -sSL https://aka.ms/getvsdbgsh | /bin/sh /dev/stdin -v latest -l ~/vsdbg
 COPY --from=builder /kafe/publish /app
 WORKDIR /app
-ENTRYPOINT /app/Kafe.Api
+CMD /app/Kafe.Api

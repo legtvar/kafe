@@ -25,7 +25,8 @@ public record ProjectGroupCreationDto(
     LocalizedString Name,
     Hrib OrganizationId,
     LocalizedString? Description,
-    DateTimeOffset Deadline
+    DateTimeOffset Deadline,
+    bool IsOpen
 );
 
 public record ProjectGroupEditDto(

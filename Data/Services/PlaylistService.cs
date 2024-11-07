@@ -23,13 +23,16 @@ public class PlaylistService
 {
     private readonly IDocumentSession db;
     private readonly OrganizationService organizationService;
+    private readonly ArtifactService artifactService;
 
     public PlaylistService(
         IDocumentSession db,
-        OrganizationService organizationService)
+        OrganizationService organizationService,
+        ArtifactService artifactService)
     {
         this.db = db;
         this.organizationService = organizationService;
+        this.artifactService = artifactService;
     }
 
     /// <summary>
@@ -75,9 +78,7 @@ public class PlaylistService
         IEnumerable<Hrib> ids,
         CancellationToken token = default)
     {
-        return (await db.LoadManyAsync<PlaylistInfo>(token, ids.Select(i => (string)i)))
-            .Where(a => a is not null)
-            .ToImmutableArray();
+        return (await db.KafeLoadManyAsync<PlaylistInfo>(ids.ToImmutableArray(), token)).Unwrap();
     }
 
     public async Task<Err<PlaylistInfo>> Create(
@@ -175,20 +176,30 @@ public class PlaylistService
             eventStream.AppendOne(globalPermissionChanged);
         }
 
-        if (@new.EntryIds.SequenceEqual(old.EntryIds))
+        if (!@new.EntryIds.SequenceEqual(old.EntryIds))
         {
+            var addedEntryIds = @new.EntryIds.Except(old.EntryIds).Select(i => (Hrib)i).ToImmutableArray();
+            var addedEntries = await artifactService.LoadMany(addedEntryIds, token);
+            var nonExistentEntryIds = addedEntryIds.ExceptBy(addedEntries.Select(e => e.Id), a => a.ToString())
+                .ToImmutableArray();
+            if (nonExistentEntryIds.Length > 0)
+            {
+                return Error.NotFound($"Could not found some entries: {string.Join(", ", nonExistentEntryIds)}.");
+            }
+
             eventStream.AppendOne(new PlaylistEntriesSet(
                 PlaylistId: @new.Id,
-                EntryIds: old.EntryIds));
+                EntryIds: @new.EntryIds));
         }
 
-        if (@new.OrganizationId != old.OrganizationId)
-        {
-            eventStream.AppendOne(new PlaylistMovedToOrganization(
-                PlaylistId: @new.Id,
-                OrganizationId: @new.OrganizationId
-            ));
-        }
+        // TODO: Allow moving playlists between organizations.
+        // if (@new.OrganizationId != old.OrganizationId)
+        // {
+        //     eventStream.AppendOne(new PlaylistMovedToOrganization(
+        //         PlaylistId: @new.Id,
+        //         OrganizationId: @new.OrganizationId
+        //     ));
+        // }
 
         await db.SaveChangesAsync(token);
         return await db.Events.KafeAggregateRequiredStream<PlaylistInfo>(@old.Id, token: token);

@@ -107,9 +107,7 @@ public class MigrationService
         IEnumerable<Hrib> ids,
         CancellationToken token = default)
     {
-        return (await db.LoadManyAsync<MigrationInfo>(token, ids.Select(i => i.ToString())))
-            .Where(a => a is not null)
-            .ToImmutableArray();
+        return (await db.KafeLoadManyAsync<MigrationInfo>(ids.ToImmutableArray(), token)).Unwrap();
     }
 
     public record MigrationFilter(

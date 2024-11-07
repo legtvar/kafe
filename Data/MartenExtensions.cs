@@ -8,6 +8,7 @@ using Kafe.Common;
 using Kafe.Data.Aggregates;
 using Marten;
 using Marten.Events;
+using Marten.Linq.SoftDeletes;
 
 namespace Kafe.Data;
 
@@ -37,13 +38,18 @@ public static class MartenExtensions
         CancellationToken token = default
     ) where T : notnull, IEntity
     {
+        var stringIds = ids.Select(i => (string)i).ToImmutableArray();
         var entities = (await db.LoadManyAsync<T>(
-            token: token,
-            ids: ids.Select(i => i.ToString())
-        )).ToImmutableArray();
-        if (entities.Length != ids.Length || entities.Any(e => e is null))
+                token: token,
+                ids: stringIds
+            ))
+            .ToImmutableArray()
+            .RelativeSortBy(stringIds, a => a.Id);
+        if (entities.Length != ids.Length)
         {
-            return Error.NotFound("Some of the entities could not be found.");
+            var missingIds = stringIds.Except(entities.Select(e => e.Id)).ToImmutableArray();
+            return Error.NotFound("Some of the sought entities could not be found: "
+                + $"{string.Join(", ", missingIds)}.");
         }
 
         return entities;

@@ -56,7 +56,8 @@ public class PlaylistDetailEndpoint : EndpointBaseAsync
 
         var dto = TransferMaps.ToPlaylistDetailDto(data);
 
-        var artifacts = await artifactService.LoadMany(data.EntryIds.Select(i => (Hrib)i), cancellationToken);
+        var artifacts = await artifactService
+            .LoadMany(data.EntryIds.Select(i => (Hrib)i), cancellationToken);
         dto = dto with
         {
             Entries = artifacts.Select(a => new PlaylistEntryDto((Hrib)a.Id, (LocalizedString)a.Name))

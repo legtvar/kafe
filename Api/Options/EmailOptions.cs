@@ -24,10 +24,13 @@ public record EmailOptions
 
     public string RelaySecret { get; init; } = null!;
 
+    public string RedirectedTo { get; set; } = null!;
+
     public enum EmailServiceType
     {
         Default,
         Debug,
-        Relayed
+        Relayed,
+        Redirected
     }
 }

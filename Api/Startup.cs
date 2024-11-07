@@ -319,6 +319,10 @@ public class Startup
             case EmailOptions.EmailServiceType.Relayed:
                 services.AddSingleton<IEmailService, RelayedEmailService>();
                 break;
+            case EmailOptions.EmailServiceType.Redirected:
+                services.AddSingleton<DefaultEmailService>();
+                services.AddSingleton<IEmailService, RedirectedEmailService>();
+                break;
             default:
                 services.AddSingleton<IEmailService, DefaultEmailService>();
                 break;

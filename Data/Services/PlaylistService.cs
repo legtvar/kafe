@@ -1,4 +1,5 @@
-﻿using Kafe.Common;
+﻿using FFMpegCore.Arguments;
+using Kafe.Common;
 using Kafe.Data.Aggregates;
 using Kafe.Data.Documents;
 using Kafe.Data.Events;
@@ -131,13 +132,19 @@ public class PlaylistService
 
         if (!@new.EntryIds.IsDefaultOrEmpty)
         {
+            var existanceCheck = await CheckArtifactsExist(
+                @new.EntryIds.Select(i => (Hrib)i).ToImmutableArray(),
+                token);
+            if (existanceCheck.HasErrors)
+            {
+                return existanceCheck.Errors;
+            }
+            
             var entriesSet = new PlaylistEntriesSet(
                 PlaylistId: id.ToString(),
                 EntryIds: @new.EntryIds);
             db.Events.Append(id.ToString(), entriesSet);
         }
-
-        // TODO: Check all entries exist before putting them in
 
         await db.SaveChangesAsync(token);
         var playlist = await db.Events.AggregateStreamAsync<PlaylistInfo>(id.ToString(), token: token)
@@ -178,13 +185,12 @@ public class PlaylistService
 
         if (!@new.EntryIds.SequenceEqual(old.EntryIds))
         {
-            var addedEntryIds = @new.EntryIds.Except(old.EntryIds).Select(i => (Hrib)i).ToImmutableArray();
-            var addedEntries = await artifactService.LoadMany(addedEntryIds, token);
-            var nonExistentEntryIds = addedEntryIds.ExceptBy(addedEntries.Select(e => e.Id), a => a.ToString())
-                .ToImmutableArray();
-            if (nonExistentEntryIds.Length > 0)
+            var existanceCheck = await CheckArtifactsExist(
+                @new.EntryIds.Select(i => (Hrib)i).ToImmutableArray(),
+                token);
+            if (existanceCheck.HasErrors)
             {
-                return Error.NotFound($"Could not found some entries: {string.Join(", ", nonExistentEntryIds)}.");
+                return existanceCheck.Errors;
             }
 
             eventStream.AppendOne(new PlaylistEntriesSet(
@@ -203,5 +209,19 @@ public class PlaylistService
 
         await db.SaveChangesAsync(token);
         return await db.Events.KafeAggregateRequiredStream<PlaylistInfo>(@old.Id, token: token);
+    }
+
+    private async Task<Err<bool>> CheckArtifactsExist(
+        ImmutableArray<Hrib> artifactIds,
+        CancellationToken token = default
+    )
+    {
+        var artifacts = await db.KafeLoadManyAsync<ArtifactInfo>(artifactIds, token);
+        if (artifacts.HasErrors)
+        {
+            return artifacts.Errors;
+        }
+
+        return true;
     }
 }

@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Navigate, useMatches, useOutlet } from 'react-router-dom';
-import { useApi, useAuth } from '../../../hooks/Caffeine';
+import { useApi, useAuth, useOrganizations } from '../../../hooks/Caffeine';
 import { Loading } from '../../utils/Loading';
 
 interface IRootProps {}
 
 export function Root(props: IRootProps) {
     const { user, setUser } = useAuth();
+    const { organizations, setOrganizations } = useOrganizations();
     const [status, setStatus] = useState<'ready' | 'request' | 'requesting'>('request');
     const outlet = useOutlet();
     const matches = useMatches();
@@ -20,6 +21,11 @@ export function Root(props: IRootProps) {
                     const self = await api.accounts.info.getSelf();
                     if (self.status === 200) {
                         setUser(self.data);
+                    }
+
+                    const orgs = await api.organizations.getAll();
+                    if (orgs.status === 200) {
+                        setOrganizations(orgs.data);
                     }
                 } finally {
                     setStatus('ready');

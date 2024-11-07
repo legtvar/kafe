@@ -1,22 +1,17 @@
 import React, { useContext } from 'react';
 import { API } from '../api/API';
+import { Organization } from '../data/Organization';
 import { User } from '../data/User';
 
 export class Caffeine {
     public api: API;
     public user: User | null = null;
+    public organizations: Organization[] = [];
 
     public constructor(api: API) {
         this.api = api;
-
-        // const user = new User();
-        // user.email = 'rosecky.jonas@gmail.com';
-        // user.id = '123456789';
-        // user.name = 'Jonáš Rosecký';
-        // user.role = 'admin';
-
         this.user = null;
-        // this.user = user;
+        this.organizations = [];
     }
 }
 
@@ -36,6 +31,17 @@ export function useAuth() {
         user: caffeine.user,
         setUser: (user: User | null) => {
             caffeine.user = user;
+        },
+    };
+}
+
+export function useOrganizations() {
+    const caffeine = useContext(caffeineContext);
+
+    return {
+        organizations: caffeine.organizations,
+        setOrganizations: (organizations: Organization[]) => {
+            caffeine.organizations = organizations;
         },
     };
 }

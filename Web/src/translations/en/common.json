@@ -279,6 +279,15 @@
     },
     "system": {
       "title": "System"
+    },
+    "organizations": {
+      "title": "Organizations",
+      "create": {
+        "title": "Create an organization"
+      },
+      "edit": {
+        "title": "Edit organization"
+      }
     }
   },
   "title": {
@@ -294,7 +303,10 @@
     "projectCreate": "New project",
     "error": "{{error}} | Error",
     "login": "Login",
-    "system": "System"
+    "system": "System",
+    "organizations": "Organizations",
+    "organization": "{{group}} | \nOrganization",
+    "organizationsCreate": "Create an organization"
   },
   "sendApi": {
     "error": "There is a problem with the form",
@@ -461,6 +473,31 @@
     "addFile": "Add file",
     "files": {
       "description": "Drag to change the order of files or add a new file to the playlist"
+    }
+  },
+  "organizations": {
+    "search": "Search for organizations",
+    "create": "Create an organization"
+  },
+  "createOrganization": {
+    "fields": {
+      "name": "Organization name"
+    },
+    "button": {
+      "update": "Save organization",
+      "create": "Create an organization"
+    }
+  },
+  "avatar": {
+    "clicks": {
+      "fullfilled": {
+        "title": "Impersonation has been initiated",
+        "description": "Congratulations, you've clicked 10 times on an avatar and thanks to that, we'll just turn you into that person! Hold on to your hats!"
+      },
+      "noPerson": {
+        "title": "Impersonation was not successfull",
+        "description": "Unfortunately, this person does not have the ID listed."
+      }
     }
   }
 }

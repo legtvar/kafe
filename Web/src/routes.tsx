@@ -8,6 +8,8 @@ import {
     IoHomeOutline,
     IoListCircle,
     IoListCircleOutline,
+    IoPeople,
+    IoPeopleOutline,
     IoSettingsOutline,
     IoSettingsSharp,
 } from 'react-icons/io5';
@@ -21,6 +23,9 @@ import { GroupsCreate } from './components/pages/groups/GroupsCreate';
 import { GroupsDetail } from './components/pages/groups/GroupsDetail';
 import { GroupsEdit } from './components/pages/groups/GroupsEdit';
 import { Home } from './components/pages/home/Home';
+import { Organizations } from './components/pages/organization/Organizations';
+import { OrganizationsCreate } from './components/pages/organization/OrganizationsCreate';
+import { OrganizationsEdit } from './components/pages/organization/OrganizationsEdit';
 import { Player } from './components/pages/Player';
 import { PlaylistCreate } from './components/pages/playlists/PlaylistCreate';
 import { PlaylistDetail } from './components/pages/playlists/PlaylistDetail';
@@ -177,6 +182,41 @@ export const authRoutes = (t: (id: string) => string, user?: User | null): AppRo
             selected: IoListCircle,
         },
         children: playlistChildRoutes(t),
+    },
+    {
+        path: 'organizations',
+        title: t('route.organizations.title'),
+        element: <Organizations />,
+        inMenu: (['read', 'append', 'inspect', 'write', 'all'] as Permission[]).some((perm) =>
+            user?.permissions['system']?.includes(perm),
+        ),
+        icon: {
+            default: IoPeopleOutline,
+            selected: IoPeople,
+        },
+        children: [
+            {
+                path: 'create',
+                title: t('route.organizations.create.title'),
+                element: <OrganizationsCreate />,
+            },
+            {
+                path: ':id',
+                title: '',
+                element: (
+                    <OutletOrChildren>
+                        <Navigate to="edit" replace />
+                    </OutletOrChildren>
+                ),
+                children: [
+                    {
+                        path: 'edit',
+                        title: t('route.organizations.edit.title'),
+                        element: <OrganizationsEdit />,
+                    },
+                ],
+            },
+        ],
     },
     {
         path: 'system',

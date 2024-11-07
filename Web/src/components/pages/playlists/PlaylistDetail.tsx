@@ -78,7 +78,7 @@ export function PlaylistDetail(props: IPlaylistDetailProps) {
                                                         {artifacts.length === 0 ? (
                                                             <Box></Box>
                                                         ) : artifacts.length < item ? (
-                                                            <Navigate to="./1" />
+                                                            <Navigate to="../1" />
                                                         ) : (
                                                             <ContentViewer
                                                                 key={0}
@@ -87,18 +87,18 @@ export function PlaylistDetail(props: IPlaylistDetailProps) {
                                                                 videoProps={{
                                                                     onEnded: () => {
                                                                         if (item < artifacts.length) {
-                                                                            navigate(`./${item + 1}`);
+                                                                            navigate(`../${item + 1}`);
                                                                         }
                                                                     },
                                                                 }}
                                                                 onNext={
                                                                     item < artifacts.length
-                                                                        ? () => navigate(`./${item + 1}`)
+                                                                        ? () => navigate(`../${item + 1}`)
                                                                         : undefined
                                                                 }
                                                                 onPrevious={
                                                                     item > 1
-                                                                        ? () => navigate(`./${item - 1}`)
+                                                                        ? () => navigate(`../${item - 1}`)
                                                                         : undefined
                                                                 }
                                                             />
@@ -194,7 +194,7 @@ export function PlaylistDetail(props: IPlaylistDetailProps) {
                                                                 </Flex>
                                                             ) : (
                                                                 artifacts.map((artifact, i) => (
-                                                                    <Link to={`./${i + 1}`} key={i}>
+                                                                    <Link to={`../${i + 1}`} key={i}>
                                                                         <Flex
                                                                             direction={{
                                                                                 base: 'column',

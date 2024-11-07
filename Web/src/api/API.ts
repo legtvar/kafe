@@ -3,6 +3,7 @@ import { Artifact } from '../data/Artifact';
 import { Author } from '../data/Author';
 import { EntityPermissions } from '../data/EntityPermissions';
 import { Group } from '../data/Group';
+import { Organization } from '../data/Organization';
 import { Playlist } from '../data/Playlist';
 import { Project } from '../data/Project';
 import { Shard } from '../data/Shard';
@@ -251,6 +252,9 @@ export class API {
             async logout() {
                 return api.getSimple(`account/logout`);
             },
+            async impersonate(id: string) {
+                return api.getSimple(`account/impersonate/${id}`);
+            },
         };
     }
 
@@ -268,6 +272,31 @@ export class API {
                         perms.serialize(true),
                     );
                 },
+            },
+        };
+    }
+
+    public get organizations() {
+        const api = this;
+
+        return {
+            async getAll() {
+                return api.requestArray(`organizations`, Organization);
+            },
+            async getById(id: string) {
+                return api.requestSingle(`organization/${id}`, Organization);
+            },
+            async create(organization: Organization) {
+                return api.post<components['schemas']['OrganizationCreationDto'], HRIB>(
+                    `organization`,
+                    organization.serialize(),
+                );
+            },
+            async update(organization: Organization) {
+                return api.patch<components['schemas']['OrganizationCreationDto'], HRIB>(
+                    `organization`,
+                    organization.serialize(true),
+                );
             },
         };
     }

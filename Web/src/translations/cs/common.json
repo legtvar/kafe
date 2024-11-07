@@ -277,6 +277,15 @@
     },
     "system": {
       "title": "Systém"
+    },
+    "organizations": {
+      "title": "Organizace",
+      "create": {
+        "title": "Vytvořit organizaci"
+      },
+      "edit": {
+        "title": "Upravit organizaci"
+      }
     }
   },
   "title": {
@@ -292,7 +301,10 @@
     "projectCreate": "Nový projekt",
     "error": "{{error}} | Chyba",
     "login": "Přihlášení",
-    "system": "Systém"
+    "system": "Systém",
+    "organizations": "Organizace",
+    "organization": "{{group}} | Organizace",
+    "organizationsCreate": "Vytvořit organizaci"
   },
   "sendApi": {
     "error": "Ve formuláři je chyba",
@@ -464,6 +476,31 @@
     "addFile": "Přidat soubor",
     "files": {
       "description": "Tahem můžete měnit pořadí souborů, či přidat nový soubor do playlistu"
+    }
+  },
+  "organizations": {
+    "search": "Hledat organizace",
+    "create": "Vytvořit organizaci"
+  },
+  "createOrganization": {
+    "fields": {
+      "name": "Název organizace"
+    },
+    "button": {
+      "update": "Uložit organizaci",
+      "create": "Vytvořit organizaci"
+    }
+  },
+  "avatar": {
+    "clicks": {
+      "fullfilled": {
+        "title": "Vtělení je zahájeno",
+        "description": "Gratuluji, kliknul jsi 10x na avatar a díky tomu tě právě převtělíme do dané osoby! Držte si klobouky!"
+      },
+      "noPerson": {
+        "title": "Vtělení se nepovedlo!",
+        "description": "Tato osoba bohužel nemá uvedené ID."
+      }
     }
   }
 }

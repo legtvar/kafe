@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Data.Common;
 using System.Linq;
+using System.Net.Http.Headers;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Kafe.Data.Aggregates;
@@ -108,6 +111,44 @@ public static class KafeQueryable
                 $"data -> {fieldName} @> (?)::jsonb",
                 dictName));
         return query;
+    }
+
+    public static IQueryable<T> OrderBySortString<T>(
+        this IQueryable<T> query,
+        string sortString,
+        bool isDescending = false
+    ) where T : IEntity
+    {
+        var fragments = sortString.Trim().Split('.')
+            .Select(f => f.Trim())
+            .Where(f => !string.IsNullOrEmpty(f))
+            .Select(f =>
+            {
+                var sb = new StringBuilder();
+                sb.Append('\'');
+                sb.Append(char.ToUpper(f[0]));
+                sb.Append(f[1..]);
+                sb.Append('\'');
+                return sb.ToString();
+            })
+            .ToArray();
+        var sql = new StringBuilder();
+        sql.Append("d.data");
+        if (fragments.Length > 1)
+        {
+            sql.Append(" -> ");
+            sql.Append(string.Join(" -> ", fragments[..^1]));
+        }
+
+        sql.Append(" ->> ");
+        sql.Append(fragments[^1]);
+
+        if (isDescending)
+        {
+            sql.Append(" DESC");
+        }
+        
+        return query.OrderBySql(sql.ToString());
     }
 
     private static void EnsureValidPermission(Permission requiredPermission)

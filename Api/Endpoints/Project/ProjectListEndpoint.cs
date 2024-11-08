@@ -43,7 +43,7 @@ public class ProjectListEndpoint : EndpointBaseAsync
             OrganizationId: requestData.OrganizationId,
             ProjectGroupId: requestData.ProjectGroupId
         );
-        var projects = await projectService.List(filter, cancellationToken);
+        var projects = await projectService.List(filter, requestData.Sort, cancellationToken);
         var perms = await entityService.
             GetPermissions(projects.Select(p => (Hrib)p.Id),
             userProvider.AccountId,
@@ -60,5 +60,8 @@ public class ProjectListEndpoint : EndpointBaseAsync
 
         [FromQuery(Name = "project-group")]
         public string? ProjectGroupId { get; set; }
+        
+        [FromQuery(Name = "sort")]
+        public string? Sort { get;set; }
     }
 }

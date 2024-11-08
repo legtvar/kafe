@@ -187,7 +187,10 @@ public partial class ProjectService
         Hrib? AccessingAccountId = null
     );
 
-    public async Task<ImmutableArray<ProjectInfo>> List(ProjectFilter? filter = null, CancellationToken token = default)
+    public async Task<ImmutableArray<ProjectInfo>> List(
+        ProjectFilter? filter = null,
+        string? Sort = null,
+        CancellationToken token = default)
     {
         filter ??= new ProjectFilter();
 
@@ -221,6 +224,12 @@ public partial class ProjectService
             query = (IMartenQueryable<ProjectInfo>)query
                 .Where(p => p.MatchesSql(sql, filter.OrganizationId.ToString()));
         }
+
+        if (!string.IsNullOrEmpty(Sort))
+        {
+            query = (IMartenQueryable<ProjectInfo>)query.OrderBySortString(Sort);
+        }
+
         var results = (await query.ToListAsync(token)).ToImmutableArray();
         return results;
     }

@@ -1,7 +1,9 @@
 import { HRIB } from '../../schemas/generic';
 
-export const entriesMapper = (entries: { id: HRIB }[]) => {
-    if (!entries) return undefined;
+export function entriesMapper(entries: any) {
+    const entriesTyped = entries as { id: HRIB }[];
 
-    return entries.map((entry) => entry.id);
-};
+    if (!entriesTyped) return undefined;
+
+    return entriesTyped.map((entry) => entry.id);
+}

@@ -31,13 +31,6 @@ export class Author extends AbstractType {
     }
 
     serialize(changesOnly: boolean = false): components['schemas']['AuthorCreationDto'] {
-        return new Serializer(this, changesOnly)
-            .add('name')
-            .add('visibility')
-            .add('bio')
-            .add('uco')
-            .add('email')
-            .add('phone')
-            .build();
+        return new Serializer(this, changesOnly).add('name').add('bio').add('uco').add('email').add('phone').build();
     }
 }

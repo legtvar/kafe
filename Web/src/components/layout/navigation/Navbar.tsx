@@ -25,6 +25,8 @@ import { LanguageToggle } from '../../utils/LanguageToggle';
 import { Logo } from '../Logo';
 import { MessageButton } from '../MessageButton';
 
+export const NAVBAR_HEIGHT = 20;
+
 interface INavbarProps extends FlexProps {
     onOpen?: () => void;
     forceReload: () => void;
@@ -45,19 +47,20 @@ export function Navbar({ onOpen, forceReload, signedIn, ...rest }: INavbarProps)
     return (
         <Flex
             px={{ base: 4, md: 4 }}
-            height="20"
+            height={NAVBAR_HEIGHT}
             alignItems="center"
             bg={useColorModeValue('white', 'gray.900')}
             borderBottomWidth="1px"
             borderBottomColor={useColorModeValue('gray.200', 'gray.700')}
             justifyContent={{ base: 'space-between', md: 'flex-end' }}
-            position="fixed"
-            top={0}
-            right={0}
-            left={signedIn ? { base: 0, md: 64 } : 0}
             zIndex="sticky"
             {...rest}
         >
+            <Flex h="20" alignItems="center" ml={2} mr={8} justifyContent="space-between" key="heading">
+                <Link to="/">
+                    <Logo />
+                </Link>
+            </Flex>
             {signedIn && (
                 <IconButton
                     display={{ base: 'flex', md: 'none' }}
@@ -84,9 +87,6 @@ export function Navbar({ onOpen, forceReload, signedIn, ...rest }: INavbarProps)
             )}
 
             {signedIn && <Spacer />}
-            <Link to="/">
-                <Logo display={signedIn ? { base: 'flex', md: 'none' } : 'flex'} ml={6} />
-            </Link>
 
             <Spacer />
 

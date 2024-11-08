@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { IoCubeOutline } from 'react-icons/io5';
 import { Link } from 'react-router-dom';
 import { Project } from '../../../data/Project';
+import { useAuthLink } from '../../../hooks/useAuthLink';
 import { useColorScheme, useHighlightStyle } from '../../../hooks/useColorScheme';
 import { fulltextFilter } from '../../../utils/fulltextFilter';
 import { Pagination } from '../../utils/Pagination';
@@ -48,7 +49,7 @@ export function ProjectListComponent({ projects }: IProjectListComponentProps) {
                         )}
                 >
                     {(project, i) => (
-                        <Link to={`/auth/projects/${project.id}`} key={i}>
+                        <Link to={useAuthLink(`/projects/${project.id}`)} key={i}>
                             <Flex
                                 direction={{
                                     base: 'column',

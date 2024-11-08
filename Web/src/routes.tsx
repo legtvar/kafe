@@ -23,8 +23,6 @@ import { GroupsCreate } from './components/pages/groups/GroupsCreate';
 import { GroupsDetail } from './components/pages/groups/GroupsDetail';
 import { GroupsEdit } from './components/pages/groups/GroupsEdit';
 import { Home } from './components/pages/home/Home';
-import { Organizations } from './components/pages/organization/Organizations';
-import { OrganizationsCreate } from './components/pages/organization/OrganizationsCreate';
 import { OrganizationsEdit } from './components/pages/organization/OrganizationsEdit';
 import { Player } from './components/pages/Player';
 import { PlaylistCreate } from './components/pages/playlists/PlaylistCreate';
@@ -38,12 +36,14 @@ import { ProjectEdit } from './components/pages/projects/ProjectEdit';
 import { Projects } from './components/pages/projects/Projects';
 import { AccountRoot } from './components/pages/root/AccountRoot';
 import { AuthRoot } from './components/pages/root/AuthRoot';
+import { OrganizationRedirect } from './components/pages/root/OrganizationRedirect';
 import { Root } from './components/pages/root/Root';
 import { UnauthRoot } from './components/pages/root/UnauthRoot';
 import { ServerError } from './components/pages/ServerError';
 import { SystemComponent } from './components/pages/system/SystemComponent';
 import { OutletOrChildren } from './components/utils/OutletOrChildren';
 import { Status } from './components/utils/Status';
+import { Organization } from './data/Organization';
 import { User } from './data/User';
 import { Permission } from './schemas/generic';
 
@@ -75,8 +75,14 @@ export const routerConfig = (t: (id: string) => string): RouteObject[] => [
             },
             {
                 path: 'auth',
-                element: <AuthRoot />,
-                children: authRoutes(t),
+                element: <OrganizationRedirect />,
+                children: [
+                    {
+                        path: ':organization',
+                        element: <AuthRoot />,
+                        children: authRoutes(t),
+                    },
+                ],
             },
             {
                 path: 'account',
@@ -103,7 +109,11 @@ export const routerConfig = (t: (id: string) => string): RouteObject[] => [
     },
 ];
 
-export const authRoutes = (t: (id: string) => string, user?: User | null): AppRoute[] => [
+export const authRoutes = (
+    t: (id: string) => string,
+    user?: User | null,
+    currentOrganization?: Organization,
+): AppRoute[] => [
     {
         path: '',
         title: t('route.home.title'),
@@ -184,39 +194,39 @@ export const authRoutes = (t: (id: string) => string, user?: User | null): AppRo
         children: playlistChildRoutes(t),
     },
     {
-        path: 'organizations',
+        path: 'organization',
         title: t('route.organizations.title'),
-        element: <Organizations />,
-        inMenu: (['read', 'append', 'inspect', 'write', 'all'] as Permission[]).some((perm) =>
-            user?.permissions['system']?.includes(perm),
+        element: <OrganizationsEdit />,
+        inMenu: (['append', 'write', 'all'] as Permission[]).some((perm) =>
+            currentOrganization?.userPermissions?.includes(perm),
         ),
         icon: {
             default: IoPeopleOutline,
             selected: IoPeople,
         },
-        children: [
-            {
-                path: 'create',
-                title: t('route.organizations.create.title'),
-                element: <OrganizationsCreate />,
-            },
-            {
-                path: ':id',
-                title: '',
-                element: (
-                    <OutletOrChildren>
-                        <Navigate to="edit" replace />
-                    </OutletOrChildren>
-                ),
-                children: [
-                    {
-                        path: 'edit',
-                        title: t('route.organizations.edit.title'),
-                        element: <OrganizationsEdit />,
-                    },
-                ],
-            },
-        ],
+        // children: [
+        //     {
+        //         path: 'create',
+        //         title: t('route.organizations.create.title'),
+        //         element: <OrganizationsCreate />,
+        //     },
+        //     {
+        //         path: ':id',
+        //         title: '',
+        //         element: (
+        //             <OutletOrChildren>
+        //                 <Navigate to="edit" replace />
+        //             </OutletOrChildren>
+        //         ),
+        //         children: [
+        //             {
+        //                 path: 'edit',
+        //                 title: t('route.organizations.edit.title'),
+        //                 element: <OrganizationsEdit />,
+        //             },
+        //         ],
+        //     },
+        // ],
     },
     {
         path: 'system',

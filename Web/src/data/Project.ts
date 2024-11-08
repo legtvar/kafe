@@ -74,7 +74,6 @@ export class Project extends AbstractType {
             .add('name', localizedMapper)
             .add('genre', localizedMapper)
             .add('description', localizedMapper)
-            .add('visibility')
             .add('artifacts', (artifacts: Artifact[]) =>
                 artifacts ? artifacts.map((artifact) => artifact.serialize(false)) : undefined,
             )

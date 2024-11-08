@@ -25,6 +25,16 @@ export function Root(props: IRootProps) {
 
                     const orgs = await api.organizations.getAll();
                     if (orgs.status === 200) {
+                        const orgDetails = await Promise.all(
+                            orgs.data.map((org) => api.entities.perms.getById(org.id)),
+                        );
+                        orgDetails.forEach((orgDetail, i) => {
+                            if (orgDetail.status === 200) {
+                                orgs.data[i].globalPermissions = orgDetail.data.globalPermissions;
+                                orgs.data[i].userPermissions = orgDetail.data.userPermissions;
+                            }
+                        });
+
                         setOrganizations(orgs.data);
                     }
                 } finally {

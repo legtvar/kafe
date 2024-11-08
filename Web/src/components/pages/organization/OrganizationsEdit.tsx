@@ -2,10 +2,11 @@ import { Box, Button, HStack, Heading, Tab, TabList, TabPanel, TabPanels, Tabs, 
 import { t } from 'i18next';
 import { BsX } from 'react-icons/bs';
 import { IoSaveOutline } from 'react-icons/io5';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { API } from '../../../api/API';
 import { EntityPermissions } from '../../../data/EntityPermissions';
 import { Organization } from '../../../data/Organization';
+import { useOrganizations } from '../../../hooks/Caffeine';
 import { observeAbstactType } from '../../utils/AbstractTypeObserver';
 import { AwaitAPI } from '../../utils/AwaitAPI';
 import { RightsEditor } from '../../utils/RightsEditor';
@@ -17,7 +18,8 @@ import { OrganizationBasicInfo } from './OrganizationBasicInfo';
 interface IOrganizationsEditProps {}
 
 export function OrganizationsEdit(props: IOrganizationsEditProps) {
-    const { id } = useParams();
+    const { currentOrganization } = useOrganizations();
+    const id = currentOrganization!.id;
     const navigate = useNavigate();
 
     if (!id) {

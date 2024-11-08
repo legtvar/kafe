@@ -1,4 +1,5 @@
 import React, { useContext } from 'react';
+import { useLocation } from 'react-router-dom';
 import { API } from '../api/API';
 import { Organization } from '../data/Organization';
 import { User } from '../data/User';
@@ -38,10 +39,14 @@ export function useAuth() {
 export function useOrganizations() {
     const caffeine = useContext(caffeineContext);
 
+    const location = useLocation();
+    const orgId = location.pathname.split('/')[2];
+
     return {
         organizations: caffeine.organizations,
         setOrganizations: (organizations: Organization[]) => {
             caffeine.organizations = organizations;
         },
+        currentOrganization: caffeine.organizations.find((org) => org.id === orgId),
     };
 }

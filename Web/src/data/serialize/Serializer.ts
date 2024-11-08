@@ -10,15 +10,19 @@ export class Serializer<T extends AbstractType> {
         this.update = update;
     }
 
-    public add<U extends keyof T>(key: U, mapper: (value: T[U]) => any = (value) => value): any {
+    public add<U extends keyof T>(key: U, mapper: (value: T[U]) => any = (value) => value, as?: string): Serializer<T> {
         if (!this.update || this.obj.changed.has(key)) {
-            this.result[key] = mapper(this.obj[key]);
+            this.result[as || key] = mapper(this.obj[key]);
         }
         return this;
     }
 
-    public addAlways<U extends keyof T>(key: U, mapper: (value: T[U]) => any = (value) => value): any {
-        this.result[key] = mapper(this.obj[key]);
+    public addAlways<U extends keyof T>(
+        key: U,
+        mapper: (value: T[U]) => any = (value) => value,
+        as?: string,
+    ): Serializer<T> {
+        this.result[as || key] = mapper(this.obj[key]);
         return this;
     }
 
@@ -26,14 +30,15 @@ export class Serializer<T extends AbstractType> {
         add: boolean,
         key: U,
         mapper: (value: T[U]) => any = (value) => value,
-    ): any {
+        as?: string,
+    ): Serializer<T> {
         if (add) {
-            this.add(key, mapper);
+            this.add(key, mapper, as);
         }
         return this;
     }
 
-    public build() {
+    public build(): any {
         if (this.update) {
             this.result['id'] = this.obj.id;
         }

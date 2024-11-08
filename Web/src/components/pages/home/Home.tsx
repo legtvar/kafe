@@ -20,6 +20,7 @@ import Countdown from 'react-countdown';
 import { IoCubeOutline } from 'react-icons/io5';
 import Markdown from 'react-markdown';
 import { Link } from 'react-router-dom';
+import { useAuthLink } from '../../../hooks/useAuthLink';
 import { useTitle } from '../../../utils/useTitle';
 import { Brand } from '../../brand/Brand';
 import { AwaitAPI } from '../../utils/AwaitAPI';
@@ -125,12 +126,12 @@ export function Home(props: IHomeProps) {
                                             <Divider />
                                             <CardFooter>
                                                 <ButtonGroup spacing="2">
-                                                    <Link to={`/auth/groups/${group.id}/create`}>
+                                                    <Link to={useAuthLink(`/groups/${group.id}/create`)}>
                                                         <Button variant="solid" colorScheme="brand">
                                                             {t('createProject.signUp').toString()}
                                                         </Button>
                                                     </Link>
-                                                    <Link to={`/auth/groups/${group.id}`}>
+                                                    <Link to={useAuthLink(`/groups/${group.id}`)}>
                                                         <Button variant="outline" colorScheme="brand">
                                                             {t('createProject.details').toString()}
                                                         </Button>
@@ -176,12 +177,12 @@ export function Home(props: IHomeProps) {
                                                 <Divider />
                                                 <CardFooter>
                                                     <ButtonGroup spacing="2">
-                                                        <Link to={`/auth/groups/${project.id}`}>
+                                                        <Link to={useAuthLink(`/groups/${project.id}`)}>
                                                             <Button variant="solid" colorScheme="brand">
                                                                 {t('project.details').toString()}
                                                             </Button>
                                                         </Link>
-                                                        <Link to={`/auth/groups/${project.id}/edit`}>
+                                                        <Link to={useAuthLink(`/groups/${project.id}/edit`)}>
                                                             <Button variant="outline" colorScheme="brand">
                                                                 {t('project.edit').toString()}
                                                             </Button>

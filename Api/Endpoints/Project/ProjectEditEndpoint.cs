@@ -95,6 +95,6 @@ public class ProjectEditEndpoint : EndpointBaseAsync
             return result.ToActionResult();
         }
 
-        return Ok(@new.Id.ToString());
+        return Ok(@new.Id);
     }
 }

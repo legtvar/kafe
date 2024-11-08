@@ -66,6 +66,6 @@ public class ProjectGroupEditEndpoint : EndpointBaseAsync
             return result.ToActionResult();
         }
 
-        return Ok(result.Value.Id);
+        return Ok((Hrib)result.Value.Id);
     }
 }

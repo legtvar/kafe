@@ -59,6 +59,6 @@ public class RoleEditEndpoint : EndpointBaseAsync
             return ValidationProblem(title: result.Errors.FirstOrDefault().Message);
         }
 
-        return Ok(result.Value.Id);
+        return Ok((Hrib)result.Value.Id);
     }
 }

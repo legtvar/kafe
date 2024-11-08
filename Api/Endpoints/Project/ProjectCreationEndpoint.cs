@@ -53,6 +53,6 @@ public class ProjectCreationEndpoint : EndpointBaseAsync
             ownerId: userProvider.AccountId,
             token: cancellationToken);
 
-        return Ok(project.Id);
+        return Ok((Hrib)project.Id);
     }
 }

@@ -52,6 +52,6 @@ public class ProjectGroupCreationEndpoint : EndpointBaseAsync
             return group.ToActionResult();
         }
 
-        return Ok(group.Value.Id);
+        return Ok((Hrib)group.Value.Id);
     }
 }

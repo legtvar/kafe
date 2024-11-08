@@ -47,6 +47,7 @@ using OpenTelemetry.Resources;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 using Npgsql;
+using Kafe.Api.Transfer;
 
 namespace Kafe.Api;
 
@@ -166,6 +167,7 @@ public class Startup
         {
             o.Conventions.Add(new RoutePrefixConvention(new RouteAttribute("/api/v{version:apiVersion}")));
             o.Filters.Add(typeof(SemanticExceptionFilter));
+            o.OutputFormatters.Insert(0, new HribOutputFormatter());
         })
         .AddJsonOptions(o =>
         {

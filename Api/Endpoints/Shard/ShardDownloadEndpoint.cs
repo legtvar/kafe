@@ -60,7 +60,7 @@ public class ShardDownloadEndpoint : EndpointBaseAsync
     public record RequestData
     {
         [FromRoute]
-        public string Id { get; set; }
+        public string Id { get; set; } = string.Empty;
 
         [FromRoute]
         public string? Variant { get; set; }

@@ -183,6 +183,7 @@ public partial class ProjectService
     /// </param>
     public record ProjectFilter(
         Hrib? ProjectGroupId = null,
+        Hrib? OrganizationId = null,
         Hrib? AccessingAccountId = null
     );
 
@@ -205,6 +206,20 @@ public partial class ProjectService
         {
             query = (IMartenQueryable<ProjectInfo>)query
                 .Where(e => e.ProjectGroupId == filter.ProjectGroupId.ToString());
+        }
+
+        if (filter.OrganizationId is not null)
+        {
+            var sql =
+            $"""
+            (
+                SELECT g.data ->> 'OrganizationId'
+                FROM {db.DocumentStore.Options.Schema.For<ProjectGroupInfo>()} AS g
+                WHERE g.id = d.data ->> 'ProjectGroupId'
+            ) = ?
+            """;
+            query = (IMartenQueryable<ProjectInfo>)query
+                .Where(p => p.MatchesSql(sql, filter.OrganizationId.ToString()));
         }
         var results = (await query.ToListAsync(token)).ToImmutableArray();
         return results;
@@ -300,7 +315,7 @@ public partial class ProjectService
         {
             return Error.NotFound(projectId, "A project");
         }
-        
+
         var existingArtifactIds = (await artifactService.LoadMany(artifacts.Select(a => a.id), token))
             .Select(a => a.Id)
             .ToImmutableHashSet();

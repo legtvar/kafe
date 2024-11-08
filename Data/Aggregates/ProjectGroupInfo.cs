@@ -88,7 +88,7 @@ public class ProjectGroupInfoProjection : SingleStreamProjection<ProjectGroupInf
         };
     }
 
-    public ProjectGroupInfo Apply(PlaylistMovedToOrganization e, ProjectGroupInfo p)
+    public ProjectGroupInfo Apply(ProjectGroupMovedToOrganization e, ProjectGroupInfo p)
     {
         return p with
         {

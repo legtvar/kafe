@@ -41,7 +41,7 @@ public class ProjectGroupListEndpoint : EndpointBaseAsync
         var filter = new ProjectGroupService.ProjectGroupFilter(
             AccessingAccountId: userProvider.AccountId
         );
-        
+
         var groups = await projectGroupService.List(filter, cancellationToken);
         return Ok(groups.Select(TransferMaps.ToProjectGroupListDto));
     }

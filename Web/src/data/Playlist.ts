@@ -34,7 +34,7 @@ export class Playlist extends AbstractType {
         return new Serializer(this, update)
             .add('name', localizedMapper)
             .add('description', localizedMapper)
-            .add('entries', entriesMapper)
+            .add('entryIds', entriesMapper)
             .build();
     }
 }

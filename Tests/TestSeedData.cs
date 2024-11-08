@@ -67,12 +67,11 @@ public class TestSeedData : IInitialData
 
         var projectService = scope.ServiceProvider.GetRequiredService<ProjectService>();
         await projectService.Create(
-            TestGroupHrib,
-            (LocalizedString)"TestProject",
+            ProjectInfo.Create(TestGroupHrib, (LocalizedString)"TestProject") with
+            {
+                Id = TestProjectHrib
+            },
             null,
-            null,
-            null,
-            TestProjectHrib,
             ct);
 
         var artifactService = scope.ServiceProvider.GetRequiredService<ArtifactService>();

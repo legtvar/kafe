@@ -32,7 +32,7 @@ public class ShardDownloadEndpoint : EndpointBaseAsync
     [SwaggerOperation(Tags = new[] { EndpointArea.Shard })]
     [Produces(typeof(FileStreamResult))]
     public override async Task<ActionResult> HandleAsync(
-        [FromRoute] RequestData data,
+        RequestData data,
         CancellationToken cancellationToken = default)
     {
         var detail = await shardService.Load(data.Id, cancellationToken);
@@ -57,7 +57,12 @@ public class ShardDownloadEndpoint : EndpointBaseAsync
         return File(stream, mediaType.MimeType, $"{data.Id}.{mediaType.Variant}{mediaType.FileExtension}", true);
     }
 
-    public record RequestData(
-        [FromRoute] string Id,
-        string? Variant);
+    public record RequestData
+    {
+        [FromRoute]
+        public string Id { get; set; }
+
+        [FromRoute]
+        public string? Variant { get; set; }
+    }
 }

@@ -37,7 +37,7 @@ public class ProjectGroupListEndpoint : EndpointBaseAsync
     [HttpGet]
     [SwaggerOperation(Tags = new[] { EndpointArea.ProjectGroup })]
     public override async Task<ActionResult<ImmutableArray<ProjectGroupListDto>>> HandleAsync(
-        [FromQuery] RequestData request,
+        RequestData request,
         CancellationToken cancellationToken = default)
     {
         var filter = new ProjectGroupService.ProjectGroupFilter(
@@ -49,7 +49,9 @@ public class ProjectGroupListEndpoint : EndpointBaseAsync
         return Ok(groups.Select(TransferMaps.ToProjectGroupListDto));
     }
 
-    public record RequestData(
-        [FromQuery(Name = "organization")] string? OrganizationId
-    );
+    public record RequestData
+    {
+        [FromQuery(Name = "organization")]
+        public string? OrganizationId { get; set; }
+    }
 }

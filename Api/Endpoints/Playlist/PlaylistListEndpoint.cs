@@ -37,7 +37,7 @@ public class PlaylistListEndpoint : EndpointBaseAsync
     [HttpGet]
     [SwaggerOperation(Tags = new[] { EndpointArea.Playlist })]
     public override async Task<ActionResult<List<PlaylistListDto>>> HandleAsync(
-        [FromQuery] RequestData requestData,
+        RequestData requestData,
         CancellationToken cancellationToken = default)
     {
         var filter = new PlaylistService.PlaylistFilter(
@@ -48,7 +48,9 @@ public class PlaylistListEndpoint : EndpointBaseAsync
         return Ok(list.Select(TransferMaps.ToPlaylistListDto).ToImmutableArray());
     }
 
-    public record RequestData(
-        [FromQuery(Name = "organization")] string? OrganizationId
-    );
+    public record RequestData
+    {
+        [FromQuery(Name = "organization")]
+        public string? OrganizationId { get; set; }
+    }
 }

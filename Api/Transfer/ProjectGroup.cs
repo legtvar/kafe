@@ -6,6 +6,7 @@ namespace Kafe.Api.Transfer;
 
 public record ProjectGroupListDto(
     Hrib Id,
+    Hrib OrganizationId,
     LocalizedString Name,
     LocalizedString? Description,
     DateTimeOffset Deadline,
@@ -14,6 +15,7 @@ public record ProjectGroupListDto(
 
 public record ProjectGroupDetailDto(
     Hrib Id,
+    Hrib OrganizationId,
     LocalizedString Name,
     LocalizedString? Description,
     DateTimeOffset Deadline,
@@ -22,8 +24,8 @@ public record ProjectGroupDetailDto(
 );
 
 public record ProjectGroupCreationDto(
-    LocalizedString Name,
     Hrib OrganizationId,
+    LocalizedString Name,
     LocalizedString? Description,
     DateTimeOffset Deadline,
     bool IsOpen
@@ -31,6 +33,8 @@ public record ProjectGroupCreationDto(
 
 public record ProjectGroupEditDto(
     Hrib Id,
+    // TODO: Uncomment once moving groups between organizations is implemented.
+    // Hrib? OrganizationId,
     LocalizedString? Name,
     LocalizedString? Description,
     DateTimeOffset? Deadline,

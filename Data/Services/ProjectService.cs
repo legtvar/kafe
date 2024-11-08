@@ -30,39 +30,45 @@ public partial class ProjectService
         this.artifactService = artifactService;
     }
 
-    public async Task<ProjectInfo> Create(
-        string projectGroupId,
-        LocalizedString name,
-        LocalizedString? description,
-        LocalizedString? genre,
-        Hrib? ownerId,
-        Hrib? id = null,
+    public async Task<Err<ProjectInfo>> Create(
+        ProjectInfo @new,
+        Hrib? ownerId = null,
         CancellationToken token = default)
     {
-        var group = await db.LoadAsync<ProjectGroupInfo>(projectGroupId, token);
-        if (group is null)
+        var parseResult = Hrib.Parse(@new.Id);
+        if (parseResult.HasErrors)
         {
-            throw new ArgumentOutOfRangeException($"Project group '{projectGroupId}' does not exist.");
+            return parseResult.Errors;
         }
 
-        if (!group.IsOpen)
+        var group = await db.KafeLoadAsync<ProjectGroupInfo>(@new.ProjectGroupId, token);
+        if (group.HasErrors)
         {
-            throw new ArgumentException($"Project group '{projectGroupId}' is not open.");
+            return group.Errors;
         }
 
-        var projectId = (id ?? Hrib.Create()).ToString();
+        if (!group.Value.IsOpen)
+        {
+            return new Error($"Project group '{@new.ProjectGroupId}' is not open.");
+        }
+
+        var projectId = parseResult.Value;
+        if (projectId.IsEmpty)
+        {
+            projectId = Hrib.Create();
+        }
 
         var created = new ProjectCreated(
-            ProjectId: projectId,
+            ProjectId: projectId.ToString(),
             CreationMethod: CreationMethod.Api,
-            ProjectGroupId: projectGroupId,
-            Name: name);
+            ProjectGroupId: @new.ProjectGroupId,
+            Name: @new.Name);
 
         var infoChanged = new ProjectInfoChanged(
-            ProjectId: projectId,
-            Name: name,
-            Description: description,
-            Genre: genre);
+            ProjectId: projectId.ToString(),
+            Name: @new.Name,
+            Description: @new.Description,
+            Genre: @new.Genre);
 
         db.Events.KafeStartStream<ProjectInfo>(created.ProjectId, created, infoChanged);
         await db.SaveChangesAsync(token);
@@ -75,11 +81,8 @@ public partial class ProjectService
                 token);
         }
 
-        var project = await db.Events.AggregateStreamAsync<ProjectInfo>(created.ProjectId, token: token);
-        if (project is null)
-        {
-            throw new InvalidOperationException($"Could not persist a project with id '{created.ProjectId}'.");
-        }
+        var project = await db.Events.AggregateStreamAsync<ProjectInfo>(created.ProjectId, token: token)
+            ?? throw new InvalidOperationException($"Could not persist a project with id '{created.ProjectId}'.");
 
         return project;
     }

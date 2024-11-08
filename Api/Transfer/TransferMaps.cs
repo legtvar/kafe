@@ -192,6 +192,7 @@ public static class TransferMaps
     {
         return new ProjectGroupListDto(
             Id: data.Id,
+            OrganizationId: data.OrganizationId,
             Name: data.Name,
             Description: data.Description,
             Deadline: data.Deadline,
@@ -202,6 +203,7 @@ public static class TransferMaps
     {
         return new ProjectGroupDetailDto(
             Id: data.Id,
+            OrganizationId: data.OrganizationId,
             Name: data.Name,
             Description: data.Description,
             Deadline: data.Deadline,

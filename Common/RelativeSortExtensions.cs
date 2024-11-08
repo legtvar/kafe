@@ -15,6 +15,11 @@ public static class RelativeSortExtensions
         var indicesBuilder = ImmutableDictionary.CreateBuilder<K, int>();
         for (int i = 0; i < keys.Count; ++i)
         {
+            if (indicesBuilder.ContainsKey(keys[i]))
+            {
+                throw new ArgumentException("The keys array must not contain duplicates.", nameof(keys));
+            }
+
             indicesBuilder.Add(keys[i], i);
         }
         var indices = indicesBuilder.ToImmutable();

@@ -32,6 +32,14 @@ public static class MartenExtensions
         return Error.NotFound(id, DataConst.GetLocalizedName(typeof(T)).Invariant);
     }
 
+    /// <summary>
+    /// Asynchronously loads entities of type <typeparamref name="T"/> specified by <paramref name="ids"/>.
+    /// </summary>
+    /// <remarks>
+    /// Returns entities in the same order as in <paramref name="ids"/> and respects duplicates.
+    /// Returns an <see cref="Error"/>, if any of the ids cannot be found.
+    /// Even in case of error, returns the entities that were found.
+    /// </remarks>
     public static async Task<Err<ImmutableArray<T>>> KafeLoadManyAsync<T>(
         this IQuerySession db,
         ImmutableArray<Hrib> ids,
@@ -44,12 +52,13 @@ public static class MartenExtensions
                 ids: stringIds
             ))
             .ToImmutableArray()
-            .RelativeSortBy(stringIds, a => a.Id);
+            .SortEntitiesBy(ids);
         if (entities.Length != ids.Length)
         {
             var missingIds = stringIds.Except(entities.Select(e => e.Id)).ToImmutableArray();
-            return Error.NotFound("Some of the sought entities could not be found: "
+            var notFoundError = Error.NotFound("Some of the sought entities could not be found: "
                 + $"{string.Join(", ", missingIds)}.");
+            return (entities, notFoundError);
         }
 
         return entities;

@@ -19,26 +19,39 @@ public class ProjectGroupCreationEndpoint : EndpointBaseAsync
     .WithActionResult<Hrib>
 {
     private readonly ProjectGroupService projectGroupService;
+    private readonly IAuthorizationService authorizationService;
 
     public ProjectGroupCreationEndpoint(
         ProjectGroupService projectGroupService,
         IAuthorizationService authorizationService)
     {
         this.projectGroupService = projectGroupService;
+        this.authorizationService = authorizationService;
     }
 
     [HttpPost]
-    [SwaggerOperation(Tags = new[] { EndpointArea.ProjectGroup })]
+    [SwaggerOperation(Tags = [EndpointArea.ProjectGroup])]
     public override async Task<ActionResult<Hrib>> HandleAsync(
         ProjectGroupCreationDto dto,
         CancellationToken cancellationToken = default)
     {
+        var auth = await authorizationService.AuthorizeAsync(User, dto.OrganizationId, EndpointPolicy.Append);
+        if (!auth.Succeeded)
+        {
+            return Unauthorized();
+        }
+
         var group = await projectGroupService.Create(ProjectGroupInfo.Create(dto.OrganizationId, dto.Name) with
         {
             Description = dto.Description,
             Deadline = dto.Deadline,
             IsOpen = dto.IsOpen
         }, cancellationToken);
-        return Ok(group);
+        if (group.HasErrors)
+        {
+            return group.ToActionResult();
+        }
+
+        return Ok(group.Value.Id);
     }
 }

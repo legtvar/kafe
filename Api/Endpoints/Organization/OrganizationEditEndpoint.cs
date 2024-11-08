@@ -58,6 +58,6 @@ public class OrganizationEditEndpoint : EndpointBaseAsync
             return ValidationProblem(title: result.Errors.FirstOrDefault().Message);
         }
 
-        return Ok(dto.Id);
+        return Ok(result.Value.Id);
     }
 }

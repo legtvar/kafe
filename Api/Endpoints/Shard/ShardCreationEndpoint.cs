@@ -69,7 +69,7 @@ public class ShardCreationEndpoint : EndpointBaseAsync
             return BadRequest();
         }
 
-        return Ok(id);
+        return Ok(id.ToString());
     }
 
     public record RequestData(

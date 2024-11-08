@@ -20,7 +20,7 @@ namespace Kafe.Api.Endpoints.Project;
 [Authorize]
 public class ProjectEditEndpoint : EndpointBaseAsync
     .WithRequest<ProjectEditDto>
-    .WithActionResult
+    .WithActionResult<Hrib>
 {
     private readonly ProjectService projectService;
     private readonly IAuthorizationService authorizationService;
@@ -35,7 +35,7 @@ public class ProjectEditEndpoint : EndpointBaseAsync
 
     [HttpPatch]
     [SwaggerOperation(Tags = new[] { EndpointArea.Project })]
-    public override async Task<ActionResult> HandleAsync(
+    public override async Task<ActionResult<Hrib>> HandleAsync(
         ProjectEditDto request,
         CancellationToken cancellationToken = default)
     {
@@ -92,9 +92,9 @@ public class ProjectEditEndpoint : EndpointBaseAsync
         var result = await projectService.Edit(@new, cancellationToken);
         if (result.HasErrors)
         {
-            return ValidationProblem(title: result.Errors.FirstOrDefault());
+            return result.ToActionResult();
         }
 
-        return Ok();
+        return Ok(@new.Id.ToString());
     }
 }

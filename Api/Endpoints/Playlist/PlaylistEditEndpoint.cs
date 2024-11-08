@@ -66,9 +66,9 @@ public class PlaylistEditEndpoint : EndpointBaseAsync
         var result = await playlistService.Edit(@new, cancellationToken);
         if (result.HasErrors)
         {
-            return ValidationProblem(title: result.Errors.FirstOrDefault().Message);
+            return result.ToActionResult();
         }
 
-        return Ok(dto.Id);
+        return Ok(result.Value.Id);
     }
 }

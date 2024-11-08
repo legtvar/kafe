@@ -17,7 +17,7 @@ namespace Kafe.Api.Endpoints.Playlist;
 [ApiVersion("1")]
 [Route("playlists")]
 public class PlaylistListEndpoint : EndpointBaseAsync
-    .WithoutRequest
+    .WithRequest<PlaylistListEndpoint.RequestData>
     .WithActionResult<List<PlaylistListDto>>
 {
     private readonly PlaylistService playlistService;
@@ -37,10 +37,18 @@ public class PlaylistListEndpoint : EndpointBaseAsync
     [HttpGet]
     [SwaggerOperation(Tags = new[] { EndpointArea.Playlist })]
     public override async Task<ActionResult<List<PlaylistListDto>>> HandleAsync(
+        [FromQuery] RequestData requestData,
         CancellationToken cancellationToken = default)
     {
-        var filter = new PlaylistService.PlaylistFilter(userProvider.AccountId);
+        var filter = new PlaylistService.PlaylistFilter(
+            AccessingAccountId: userProvider.AccountId,
+            OrganizationId: requestData.OrganizationId
+        );
         var list = await playlistService.List(filter, cancellationToken);
         return Ok(list.Select(TransferMaps.ToPlaylistListDto).ToImmutableArray());
     }
+
+    public record RequestData(
+        [FromQuery(Name = "organization")] string? OrganizationId
+    );
 }

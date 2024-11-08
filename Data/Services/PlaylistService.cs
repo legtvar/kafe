@@ -50,7 +50,8 @@ public class PlaylistService
     /// </list>
     /// </param>
     public record PlaylistFilter(
-        Hrib? AccessingAccountId
+        Hrib? AccessingAccountId,
+        Hrib? OrganizationId
     );
 
     public async Task<ImmutableArray<PlaylistInfo>> List(
@@ -66,6 +67,13 @@ public class PlaylistService
                     Permission.Read,
                     filter.AccessingAccountId);
         }
+
+        if (filter?.OrganizationId is not null)
+        {
+            query = (IMartenQueryable<PlaylistInfo>)query
+                .Where(p => p.OrganizationId == filter.OrganizationId.ToString());
+        }
+
         var result = (await query.ToListAsync(token)).ToImmutableArray();
         return result;
     }
@@ -139,7 +147,7 @@ public class PlaylistService
             {
                 return existanceCheck.Errors;
             }
-            
+
             var entriesSet = new PlaylistEntriesSet(
                 PlaylistId: id.ToString(),
                 EntryIds: @new.EntryIds);

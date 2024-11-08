@@ -92,6 +92,7 @@ public class ProjectGroupService
     /// </param>
     public record ProjectGroupFilter(
         Hrib? AccessingAccountId = null,
+        Hrib? OrganizationId = null,
         LocalizedString? Name = null
     );
 
@@ -107,6 +108,12 @@ public class ProjectGroupService
                     db.DocumentStore.Options.Schema,
                     Permission.Read,
                     filter.AccessingAccountId);
+        }
+        
+        if (filter?.OrganizationId is not null)
+        {
+            query = (IMartenQueryable<ProjectGroupInfo>)query
+                .Where(g => g.OrganizationId == filter.OrganizationId.ToString());
         }
 
         if (filter?.Name is not null)

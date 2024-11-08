@@ -15,6 +15,7 @@ import moment from 'moment';
 import { useNavigate } from 'react-router-dom';
 import { API } from '../../../api/API';
 import { Group } from '../../../data/Group';
+import { useAuthLinkFunction } from '../../../hooks/useAuthLink';
 import { useColorScheme } from '../../../hooks/useColorScheme';
 import { HRIB } from '../../../schemas/generic';
 import { getPrefered } from '../../../utils/preferedLanguage';
@@ -33,6 +34,7 @@ export function GroupBasicInfo(props: IGroupBasicInfoProps) {
     const group = useConst(props.group || new Group({} as any));
     const fu = useForceUpdate();
     const navigate = useNavigate();
+    const authLink = useAuthLinkFunction();
 
     const forceUpdate = (any: any) => {
         fu();
@@ -42,14 +44,14 @@ export function GroupBasicInfo(props: IGroupBasicInfoProps) {
         ? {
               onSubmited: (id: HRIB) => {
                   if (update) navigate(0);
-                  else navigate(`/auth/groups/${id}/edit`);
+                  else navigate(authLink(`/groups/${id}/edit`));
               },
               value: group!,
               request: (api: API, value: Group) => api.groups.update(value),
           }
         : {
               onSubmited: (id: HRIB) => {
-                  navigate(`/auth/groups/${id}`);
+                  navigate(authLink(`/groups/${id}`));
               },
               value: group!,
               request: (api: API, value: Group) => api.groups.create(value),

@@ -3,6 +3,7 @@ import { t } from 'i18next';
 import { useNavigate } from 'react-router-dom';
 import { API } from '../../../../api/API';
 import { Project } from '../../../../data/Project';
+import { useAuthLinkFunction } from '../../../../hooks/useAuthLink';
 import { useColorScheme } from '../../../../hooks/useColorScheme';
 import { HRIB } from '../../../../schemas/generic';
 import { getPrefered } from '../../../../utils/preferedLanguage';
@@ -29,6 +30,7 @@ export function ProjectBasicInfo(props: IProjectBasicInfoProps) {
     );
     const fu = useForceUpdate();
     const navigate = useNavigate();
+    const authLink = useAuthLinkFunction();
 
     const forceUpdate = (any: any) => {
         fu();
@@ -38,14 +40,14 @@ export function ProjectBasicInfo(props: IProjectBasicInfoProps) {
         ? {
               onSubmited: (id: HRIB) => {
                   if (update) navigate(0);
-                  else navigate(`/auth/projects/${id}/edit`);
+                  else navigate(authLink(`/projects/${id}/edit`));
               },
               value: project!,
               request: (api: API, value: Project) => api.projects.update(value),
           }
         : {
               onSubmited: (id: HRIB) => {
-                  navigate(`/auth/projects/${id}`);
+                  navigate(authLink(`/projects/${id}`));
               },
               value: project!,
               request: (api: API, value: Project) => api.projects.create(value),

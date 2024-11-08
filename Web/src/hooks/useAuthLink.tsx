@@ -20,3 +20,26 @@ export function useAuthLink(to?: string, organization?: string) {
 
     return base + page;
 }
+
+export function useAuthLinkFunction() {
+    // Get curretn path from router
+    const location = useLocation();
+
+    return (to?: string, organization?: string) => {
+        const split = location.pathname.split('/');
+
+        // Take first three parts of the path
+        let base = split.slice(0, 3).join('/');
+        if (organization) {
+            base = split.slice(0, 2).join('/') + '/' + organization;
+        }
+
+        const page = '/' + split.slice(3).join('/');
+
+        if (to) {
+            return base + to;
+        }
+
+        return base + page;
+    };
+}

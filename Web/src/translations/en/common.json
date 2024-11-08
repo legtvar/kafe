@@ -45,7 +45,7 @@
   },
   "content": {
     "noFileSelected": "No file selected",
-    "unknownType": "Unknown file type"
+    "unknownType": "Unknown type"
   },
   "countdown": {
     "days": "days",
@@ -100,7 +100,9 @@
     "save": "Save",
     "files": "files",
     "quitEdit": "Ukončit editaci",
-    "construction": "This section is under construction..."
+    "construction": "This section is under construction...",
+    "download": "Download",
+    "file": "file"
   },
   "home": {
     "signin": "Sign in",
@@ -348,7 +350,8 @@
   },
   "artifact": {
     "delete": "Delete the artifact",
-    "deleteWarn": "Are you sure you want to delete the selected artifact? \nThis operation is irreversible!"
+    "deleteWarn": "Are you sure you want to delete the selected artifact? \nThis operation is irreversible!",
+    "noContent": "The artifact does not contain any files"
   },
   "projectList": {
     "search": "Filter projects"

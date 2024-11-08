@@ -3,6 +3,7 @@ import { t } from 'i18next';
 import { useNavigate } from 'react-router-dom';
 import { API } from '../../../api/API';
 import { Organization } from '../../../data/Organization';
+import { useAuthLinkFunction } from '../../../hooks/useAuthLink';
 import { useColorScheme } from '../../../hooks/useColorScheme';
 import { HRIB } from '../../../schemas/generic';
 import { getPrefered } from '../../../utils/preferedLanguage';
@@ -20,6 +21,7 @@ export function OrganizationBasicInfo(props: IOrganizationBasicInfoProps) {
     const organization = useConst(props.organization || new Organization({} as any));
     const fu = useForceUpdate();
     const navigate = useNavigate();
+    const authLink = useAuthLinkFunction();
 
     const forceUpdate = (any: any) => {
         fu();
@@ -29,14 +31,14 @@ export function OrganizationBasicInfo(props: IOrganizationBasicInfoProps) {
         ? {
               onSubmited: (id: HRIB) => {
                   if (update) navigate(0);
-                  else navigate(`/auth/organizations/${id}/edit`);
+                  else navigate(authLink(`/organizations/${id}/edit`));
               },
               value: organization!,
               request: (api: API, value: Organization) => api.organizations.update(value),
           }
         : {
               onSubmited: (id: HRIB) => {
-                  navigate(`/auth/organizations/${id}`);
+                  navigate(authLink(`/organizations/${id}`));
               },
               value: organization!,
               request: (api: API, value: Organization) => api.organizations.create(value),

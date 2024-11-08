@@ -1492,6 +1492,7 @@ export interface components {
       }) | null;
       /** Format: date-time */
       deadline: string;
+      isOpen: boolean;
     };
     ProjectGroupDetailDto: {
       /**

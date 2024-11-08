@@ -44,7 +44,7 @@ export function PlaylistDetail(props: IPlaylistDetailProps) {
             {(playlist: Playlist) => {
                 const artifacts = playlist.entries;
 
-                if (item > artifacts.length) {
+                if (item > artifacts.length && artifacts.length !== 0) {
                     return <Navigate to="../1" replace />;
                 }
 

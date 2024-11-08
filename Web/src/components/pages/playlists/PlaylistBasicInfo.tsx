@@ -3,6 +3,7 @@ import { t } from 'i18next';
 import { useNavigate } from 'react-router-dom';
 import { API } from '../../../api/API';
 import { Playlist } from '../../../data/Playlist';
+import { useAuthLinkFunction } from '../../../hooks/useAuthLink';
 import { useColorScheme } from '../../../hooks/useColorScheme';
 import { HRIB } from '../../../schemas/generic';
 import { getPrefered } from '../../../utils/preferedLanguage';
@@ -21,6 +22,7 @@ export function PlaylistBasicInfo(props: IGroupBasicInfoProps) {
     const playlist = useConst(props.playlist || new Playlist({} as any));
     const fu = useForceUpdate();
     const navigate = useNavigate();
+    const authLink = useAuthLinkFunction();
 
     const forceUpdate = (any: any) => {
         fu();
@@ -30,14 +32,14 @@ export function PlaylistBasicInfo(props: IGroupBasicInfoProps) {
         ? {
               onSubmited: (id: HRIB) => {
                   if (update) navigate(0);
-                  else navigate(`/auth/playlists/${id}/edit`);
+                  else navigate(authLink(`/playlists/${id}/edit`));
               },
               value: playlist!,
               request: (api: API, value: Playlist) => api.playlists.update(value),
           }
         : {
               onSubmited: (id: HRIB) => {
-                  navigate(`/auth/playlists/${id}`);
+                  navigate(authLink(`/playlists/${id}`));
               },
               value: playlist!,
               request: (api: API, value: Playlist) => api.playlists.create(value),

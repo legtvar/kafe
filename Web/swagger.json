@@ -3859,6 +3859,7 @@
       "ProjectGroupCreationDto": {
         "required": [
           "deadline",
+          "isOpen",
           "name",
           "organizationId"
         ],
@@ -3914,6 +3915,9 @@
           "deadline": {
             "type": "string",
             "format": "date-time"
+          },
+          "isOpen": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false

@@ -45,7 +45,7 @@
   },
   "content": {
     "noFileSelected": "Žádný vybraný soubor",
-    "unknownType": "Neznámý typ souboru"
+    "unknownType": "Neznámý typ"
   },
   "countdown": {
     "days": "dní",
@@ -101,7 +101,9 @@
     "files": "souborů",
     "quitEdit": "Ukončit editaci",
     "construction": "Kde nic tu nic, tato stránka se připravuje...",
-    "allowMarkdown": "Toto pole umožňuje zadat text formátovaný, jako Markdown"
+    "allowMarkdown": "Toto pole umožňuje zadat text formátovaný, jako Markdown",
+    "download": "Stáhnout",
+    "file": "soubor"
   },
   "home": {
     "signin": "Přihlásit se",
@@ -346,7 +348,8 @@
   },
   "artifact": {
     "delete": "Odstranit artefakt",
-    "deleteWarn": "Opravdu chcete odstranit vybraný artefatk? Tato operace je nevratná!"
+    "deleteWarn": "Opravdu chcete odstranit vybraný artefatk? Tato operace je nevratná!",
+    "noContent": "Artefakt neobsahuje žádné soubory"
   },
   "projectList": {
     "search": "Hledat projekty"

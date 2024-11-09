@@ -62,6 +62,6 @@ public class ProjectListEndpoint : EndpointBaseAsync
         public string? ProjectGroupId { get; set; }
         
         [FromQuery(Name = "sort")]
-        public string? Sort { get;set; }
+        public string? Sort { get;set; } = "name.iv";
     }
 }

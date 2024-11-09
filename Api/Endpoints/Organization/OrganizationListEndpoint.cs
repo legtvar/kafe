@@ -47,6 +47,6 @@ public class OrganizationListEndpoint : EndpointBaseAsync
     public record RequestData
     {
         [FromQuery(Name = "sort")]
-        public string? Sort { get; set; }
+        public string? Sort { get; set; } = "name.iv";
     }
 }

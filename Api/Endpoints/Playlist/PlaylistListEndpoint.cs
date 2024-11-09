@@ -54,6 +54,6 @@ public class PlaylistListEndpoint : EndpointBaseAsync
         public string? OrganizationId { get; set; }
 
         [FromQuery(Name = "sort")]
-        public string? Sort { get; set; }
+        public string? Sort { get; set; } = "name.iv";
     }
 }

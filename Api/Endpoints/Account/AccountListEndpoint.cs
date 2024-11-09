@@ -55,6 +55,6 @@ public class AccountListEndpoint : EndpointBaseAsync
         public string? AccessedEntityId { get; set; }
 
         [FromQuery(Name = "sort")]
-        public string? Sort { get; set; }
+        public string? Sort { get; set; } = "emailAddress";
     }
 }

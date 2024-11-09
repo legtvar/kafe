@@ -47,6 +47,7 @@ public sealed record SortableMetadata
                     + "ImmutableDictionary<string, string>.");
                 }
 
+                sortExpressionsBuilder.Add(name, $"d.data -> '{prop.Name}' ->> 'iv'");
                 sortExpressionsBuilder.Add($"{name}.iv", $"d.data -> '{prop.Name}' ->> 'iv'");
                 foreach (var language in dataOptions.Value.Languages.Except([Const.InvariantCultureCode]))
                 {

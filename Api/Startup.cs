@@ -48,6 +48,7 @@ using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 using Npgsql;
 using Kafe.Api.Transfer;
+using System.Globalization;
 
 namespace Kafe.Api;
 
@@ -161,7 +162,8 @@ public class Startup
             o.ReportApiVersions = true;
             o.DefaultApiVersion = new ApiVersion(1);
         });
-        services.AddSwaggerGen(ConfigureSwaggerGen);
+        services.AddSwaggerGen();
+        services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
 
         services.AddControllers(o =>
         {
@@ -308,6 +310,30 @@ public class Startup
             .BindConfiguration("Email")
             .ValidateDataAnnotations()
             .ValidateOnStart();
+        services.AddOptions<DataOptions>()
+            .Bind(Configuration)
+            .ValidateDataAnnotations()
+            .ValidateOnStart()
+            .Configure(o =>
+            {
+                o.Languages = o.Languages.Select(o => o.ToLower()).ToList();
+
+                if (!o.Languages.Contains(Const.InvariantCultureCode))
+                {
+                    o.Languages.Add(Const.InvariantCultureCode);
+                }
+
+                var twoLetterCodes = CultureInfo.GetCultures(CultureTypes.AllCultures)
+                    .Select(c => c.TwoLetterISOLanguageName)
+                    .ToImmutableHashSet();
+
+                var nonCultures = o.Languages.Except(twoLetterCodes).ToImmutableArray();
+                if (nonCultures.Length > 0)
+                {
+                    throw new NotSupportedException("These languages are not valid two-letter ISO language codes: "
+                        + string.Join(", ", nonCultures) + ".");
+                }
+            });
 
         services.AddHostedService<VideoConversionDaemon>();
 
@@ -350,80 +376,5 @@ public class Startup
 
         services.AddDataProtection()
             .PersistKeysToFileSystem(new DirectoryInfo(secretsFullPath));
-    }
-
-    private void ConfigureSwaggerGen(SwaggerGenOptions o)
-    {
-        o.SwaggerDoc("v1", new OpenApiInfo { Title = "KAFE API", Version = "v1" });
-        o.SupportNonNullableReferenceTypes();
-        o.SchemaFilter<RequireNonNullablePropertiesSchemaFilter>();
-        o.MapType<Hrib>(() => new OpenApiSchema
-        {
-            Type = "string",
-            Format = "hrib",
-            Example = new OpenApiString("AAAAbadf00d")
-        });
-        o.MapType<TimeSpan>(() => new OpenApiSchema
-        {
-            Type = "string",
-            Format = "time-span",
-            Example = new OpenApiString("00:00:00")
-        });
-        o.MapType<LocalizedString>(() => new OpenApiSchema
-        {
-            Title = "LocalizedString",
-            Type = "object",
-            Nullable = true,
-            Properties = new Dictionary<string, OpenApiSchema>
-            {
-                ["iv"] = new OpenApiSchema() { Type = "string" },
-                ["cs"] = new OpenApiSchema() { Type = "string", Nullable = true },
-                ["en"] = new OpenApiSchema() { Type = "string", Nullable = true }
-            }
-        });
-        // o.MapType<Permission>(() => new OpenApiSchema
-        // {
-        //     Title = nameof(Permission),
-        //     Ref
-        //     Type = "string",
-        //     Enum = Enum.GetValues<Permission>()
-        //         .Where(v => v != Permission.None && v != Permission.All)
-        //         .Select(v =>
-        //         {
-        //             var name = v.ToString();
-        //             name = char.ToLowerInvariant(name[0]) + name[1..];
-        //             return new OpenApiString(name) as IOpenApiAny;
-        //         })
-        //         .ToList()
-        // });
-        o.EnableAnnotations(
-            enableAnnotationsForInheritance: true,
-            enableAnnotationsForPolymorphism: true);
-        o.OperationFilter<RemoveVersionParameter>();
-        o.DocumentFilter<ReplaceVersionWithDocVersion>();
-        o.DocInclusionPredicate((version, desc) =>
-        {
-            if (!desc.TryGetMethodInfo(out var method))
-            {
-                return false;
-            }
-
-            var versions = method.DeclaringType!.GetCustomAttributes(true)
-                .OfType<ApiVersionAttribute>()
-                .SelectMany(attr => attr.Versions);
-
-            var maps = method.GetCustomAttributes(true)
-                .OfType<MapToApiVersionAttribute>()
-                .SelectMany(attr => attr.Versions)
-                .ToArray();
-
-            return versions.Any(v => $"v{v}" == version) && (maps.Length == 0 || maps.Any(v => $"v{v}" == version));
-        });
-        o.UseOneOfForPolymorphism();
-        var xmlFiles = new DirectoryInfo(AppContext.BaseDirectory).GetFiles("*.xml");
-        foreach (var xmlFile in xmlFiles)
-        {
-            o.IncludeXmlComments(xmlFile.FullName);
-        }
     }
 }

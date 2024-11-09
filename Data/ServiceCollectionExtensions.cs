@@ -1,6 +1,7 @@
 ﻿using Kafe.Data;
 using Kafe.Data.Aggregates;
 using Kafe.Data.Events.Upcasts;
+using Kafe.Data.Metadata;
 using Kafe.Data.Options;
 using Kafe.Data.Projections;
 using Kafe.Data.Services;
@@ -108,6 +109,7 @@ public static class ServiceCollectionExtensions
             .AddAsyncDaemon(DaemonMode.Solo);
 
         services.AddSingleton<StorageService>();
+        services.AddSingleton<EntityMetadataProvider>();
 
         services.AddScoped<AccountService>();
         services.AddScoped<ProjectGroupService>();

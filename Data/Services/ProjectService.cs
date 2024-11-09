@@ -1,6 +1,7 @@
 ﻿using Kafe.Common;
 using Kafe.Data.Aggregates;
 using Kafe.Data.Events;
+using Kafe.Data.Metadata;
 using Marten;
 using Marten.Linq;
 using Marten.Linq.MatchesSql;
@@ -19,15 +20,18 @@ public partial class ProjectService
     private readonly IDocumentSession db;
     private readonly AccountService accountService;
     private readonly ArtifactService artifactService;
+    private readonly EntityMetadataProvider entityMetadataProvider;
 
     public ProjectService(
         IDocumentSession db,
         AccountService accountService,
-        ArtifactService artifactService)
+        ArtifactService artifactService,
+        EntityMetadataProvider entityMetadataProvider)
     {
         this.db = db;
         this.accountService = accountService;
         this.artifactService = artifactService;
+        this.entityMetadataProvider = entityMetadataProvider;
     }
 
     public async Task<Err<ProjectInfo>> Create(
@@ -227,7 +231,7 @@ public partial class ProjectService
 
         if (!string.IsNullOrEmpty(Sort))
         {
-            query = (IMartenQueryable<ProjectInfo>)query.OrderBySortString(Sort);
+            query = (IMartenQueryable<ProjectInfo>)query.OrderBySortString(entityMetadataProvider, Sort);
         }
 
         var results = (await query.ToListAsync(token)).ToImmutableArray();

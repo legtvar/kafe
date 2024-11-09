@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Kafe.Data.Aggregates;
 using Kafe.Data.Documents;
+using Kafe.Data.Metadata;
 using Marten;
 using Marten.Linq;
 using Marten.Linq.MatchesSql;
@@ -115,40 +116,20 @@ public static class KafeQueryable
 
     public static IQueryable<T> OrderBySortString<T>(
         this IQueryable<T> query,
+        EntityMetadataProvider metadataProvider,
         string sortString,
         bool isDescending = false
     ) where T : IEntity
     {
-        var fragments = sortString.Trim().Split('.')
-            .Select(f => f.Trim())
-            .Where(f => !string.IsNullOrEmpty(f))
-            .Select(f =>
-            {
-                var sb = new StringBuilder();
-                sb.Append('\'');
-                sb.Append(char.ToUpper(f[0]));
-                sb.Append(f[1..]);
-                sb.Append('\'');
-                return sb.ToString();
-            })
-            .ToArray();
-        var sql = new StringBuilder();
-        sql.Append("d.data");
-        if (fragments.Length > 1)
+        var sortableMetadata = metadataProvider.GetSortableMetadata(typeof(T));
+        if (!sortableMetadata.SortExpressions.TryGetValue(sortString, out var sortExpression))
         {
-            sql.Append(" -> ");
-            sql.Append(string.Join(" -> ", fragments[..^1]));
+            throw new ArgumentException(
+                $"Sort string '{sortString}' is not a valid sort string for '{typeof(T).Name}'.",
+                nameof(sortString));
         }
 
-        sql.Append(" ->> ");
-        sql.Append(fragments[^1]);
-
-        if (isDescending)
-        {
-            sql.Append(" DESC");
-        }
-        
-        return query.OrderBySql(sql.ToString());
+        return query.OrderBySql(isDescending ? sortExpression + " DESC" : sortExpression);
     }
 
     private static void EnsureValidPermission(Permission requiredPermission)

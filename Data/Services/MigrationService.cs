@@ -459,7 +459,7 @@ public class MigrationService
         var orderName = LocalizedString.CreateInvariant(order.Name);
         if (entity is null)
         {
-            var byName = await projectGroupService.List(new(Name: orderName), token);
+            var byName = await projectGroupService.List(new(Name: orderName), null, token);
             entity = byName.FirstOrDefault();
             logger.LogInformation(
                 "Looking up by name: {}",

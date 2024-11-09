@@ -193,7 +193,7 @@ public partial class ProjectService
 
     public async Task<ImmutableArray<ProjectInfo>> List(
         ProjectFilter? filter = null,
-        string? Sort = null,
+        string? sort = null,
         CancellationToken token = default)
     {
         filter ??= new ProjectFilter();
@@ -229,9 +229,9 @@ public partial class ProjectService
                 .Where(p => p.MatchesSql(sql, filter.OrganizationId.ToString()));
         }
 
-        if (!string.IsNullOrEmpty(Sort))
+        if (!string.IsNullOrEmpty(sort))
         {
-            query = (IMartenQueryable<ProjectInfo>)query.OrderBySortString(entityMetadataProvider, Sort);
+            query = (IMartenQueryable<ProjectInfo>)query.OrderBySortString(entityMetadataProvider, sort);
         }
 
         var results = (await query.ToListAsync(token)).ToImmutableArray();

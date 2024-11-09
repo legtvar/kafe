@@ -45,7 +45,7 @@ public class ProjectGroupListEndpoint : EndpointBaseAsync
             OrganizationId: request.OrganizationId
         );
 
-        var groups = await projectGroupService.List(filter, cancellationToken);
+        var groups = await projectGroupService.List(filter, request.Sort, cancellationToken);
         return Ok(groups.Select(TransferMaps.ToProjectGroupListDto));
     }
 
@@ -53,5 +53,8 @@ public class ProjectGroupListEndpoint : EndpointBaseAsync
     {
         [FromQuery(Name = "organization")]
         public string? OrganizationId { get; set; }
+
+        [FromQuery(Name = "sort")]
+        public string? Sort { get; set; }
     }
 }

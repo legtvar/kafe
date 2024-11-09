@@ -8,12 +8,25 @@ namespace Kafe.Data.Aggregates;
 
 public record ProjectGroupInfo(
     [Hrib] string Id,
+
     CreationMethod CreationMethod,
+
     [Hrib] string OrganizationId,
-    [LocalizedString] ImmutableDictionary<string, string> Name,
-    [LocalizedString] ImmutableDictionary<string, string>? Description = null,
+
+    [property:Sortable]
+    [property:LocalizedString]
+    ImmutableDictionary<string, string> Name,
+
+    [property:Sortable]
+    [property:LocalizedString]
+    ImmutableDictionary<string, string>? Description = null,
+
+    [property:Sortable]
     DateTimeOffset Deadline = default,
+
+    [property:Sortable]
     bool IsOpen = false,
+
     Permission GlobalPermissions = Permission.None
 ) : IVisibleEntity
 {

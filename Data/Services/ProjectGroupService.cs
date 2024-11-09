@@ -1,6 +1,7 @@
 ﻿using Kafe.Common;
 using Kafe.Data.Aggregates;
 using Kafe.Data.Events;
+using Kafe.Data.Metadata;
 using Marten;
 using Marten.Linq;
 using Marten.Linq.MatchesSql;
@@ -16,13 +17,16 @@ public class ProjectGroupService
 {
     private readonly IDocumentSession db;
     private readonly OrganizationService organizationService;
+    private readonly EntityMetadataProvider entityMetadataProvider;
 
     public ProjectGroupService(
         IDocumentSession db,
-        OrganizationService organizationService)
+        OrganizationService organizationService,
+        EntityMetadataProvider entityMetadataProvider)
     {
         this.db = db;
         this.organizationService = organizationService;
+        this.entityMetadataProvider = entityMetadataProvider;
     }
 
     public async Task<Err<ProjectGroupInfo>> Create(
@@ -98,6 +102,7 @@ public class ProjectGroupService
 
     public async Task<ImmutableArray<ProjectGroupInfo>> List(
         ProjectGroupFilter? filter = null,
+        string? sort = null,
         CancellationToken token = default)
     {
         var query = db.Query<ProjectGroupInfo>();
@@ -109,7 +114,7 @@ public class ProjectGroupService
                     Permission.Read,
                     filter.AccessingAccountId);
         }
-        
+
         if (filter?.OrganizationId is not null)
         {
             query = (IMartenQueryable<ProjectGroupInfo>)query
@@ -120,6 +125,11 @@ public class ProjectGroupService
         {
             query = (IMartenQueryable<ProjectGroupInfo>)query
                 .WhereContainsLocalized(nameof(ProjectGroupInfo.Name), filter.Name);
+        }
+
+        if (!string.IsNullOrEmpty(sort))
+        {
+            query = (IMartenQueryable<ProjectGroupInfo>)query.OrderBySortString(entityMetadataProvider, sort);
         }
 
         return (await query.ToListAsync(token)).ToImmutableArray();

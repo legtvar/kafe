@@ -1,19 +1,12 @@
-﻿using FFMpegCore.Arguments;
-using Kafe.Common;
+﻿using Kafe.Common;
 using Kafe.Data.Aggregates;
-using Kafe.Data.Documents;
 using Kafe.Data.Events;
+using Kafe.Data.Metadata;
 using Marten;
 using Marten.Linq;
-using Marten.Linq.MatchesSql;
-using Marten.Linq.SoftDeletes;
-using Serilog;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Data.Common;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -25,15 +18,18 @@ public class PlaylistService
     private readonly IDocumentSession db;
     private readonly OrganizationService organizationService;
     private readonly ArtifactService artifactService;
+    private readonly EntityMetadataProvider entityMetadataProvider;
 
     public PlaylistService(
         IDocumentSession db,
         OrganizationService organizationService,
-        ArtifactService artifactService)
+        ArtifactService artifactService,
+        EntityMetadataProvider entityMetadataProvider)
     {
         this.db = db;
         this.organizationService = organizationService;
         this.artifactService = artifactService;
+        this.entityMetadataProvider = entityMetadataProvider;
     }
 
     /// <summary>
@@ -56,6 +52,7 @@ public class PlaylistService
 
     public async Task<ImmutableArray<PlaylistInfo>> List(
         PlaylistFilter? filter = null,
+        string? sort = null,
         CancellationToken token = default)
     {
         var query = db.Query<PlaylistInfo>();
@@ -72,6 +69,11 @@ public class PlaylistService
         {
             query = (IMartenQueryable<PlaylistInfo>)query
                 .Where(p => p.OrganizationId == filter.OrganizationId.ToString());
+        }
+
+        if (!string.IsNullOrEmpty(sort))
+        {
+            query = (IMartenQueryable<PlaylistInfo>)query.OrderBySortString(entityMetadataProvider, sort);
         }
 
         var result = (await query.ToListAsync(token)).ToImmutableArray();

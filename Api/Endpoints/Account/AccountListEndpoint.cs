@@ -45,7 +45,7 @@ public class AccountListEndpoint : EndpointBaseAsync
             };
         }
 
-        var data = await accounts.List(filter, cancellationToken);
+        var data = await accounts.List(filter, request.Sort, cancellationToken);
         return Ok(data.Select(TransferMaps.ToAccountListDto).ToImmutableArray());
     }
 
@@ -53,5 +53,8 @@ public class AccountListEndpoint : EndpointBaseAsync
     {
         [FromQuery(Name = "entity")]
         public string? AccessedEntityId { get; set; }
+
+        [FromQuery(Name = "sort")]
+        public string? Sort { get; set; }
     }
 }

@@ -44,7 +44,7 @@ public class PlaylistListEndpoint : EndpointBaseAsync
             AccessingAccountId: userProvider.AccountId,
             OrganizationId: requestData.OrganizationId
         );
-        var list = await playlistService.List(filter, cancellationToken);
+        var list = await playlistService.List(filter, requestData.Sort, cancellationToken);
         return Ok(list.Select(TransferMaps.ToPlaylistListDto).ToImmutableArray());
     }
 
@@ -52,5 +52,8 @@ public class PlaylistListEndpoint : EndpointBaseAsync
     {
         [FromQuery(Name = "organization")]
         public string? OrganizationId { get; set; }
+
+        [FromQuery(Name = "sort")]
+        public string? Sort { get; set; }
     }
 }

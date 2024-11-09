@@ -1,11 +1,10 @@
 ﻿using Kafe.Common;
 using Kafe.Data.Aggregates;
 using Kafe.Data.Events;
+using Kafe.Data.Metadata;
 using Marten;
 using Marten.Linq;
-using Marten.Linq.MatchesSql;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -18,13 +17,16 @@ public class AuthorService
 {
     private readonly IDocumentSession db;
     private readonly AccountService accountService;
+    private readonly EntityMetadataProvider entityMetadataProvider;
 
     public AuthorService(
         IDocumentSession db,
-        AccountService accountService)
+        AccountService accountService,
+        EntityMetadataProvider entityMetadataProvider)
     {
         this.db = db;
         this.accountService = accountService;
+        this.entityMetadataProvider = entityMetadataProvider;
     }
 
     public async Task<Err<AuthorInfo>> Create(
@@ -129,7 +131,10 @@ public class AuthorService
         string? Phone = null
     );
 
-    public async Task<ImmutableArray<AuthorInfo>> List(AuthorFilter? filter = null, CancellationToken token = default)
+    public async Task<ImmutableArray<AuthorInfo>> List(
+        AuthorFilter? filter = null,
+        string? sort = null,
+        CancellationToken token = default)
     {
         var query = db.Query<AuthorInfo>();
         if (filter?.AccessingAccountId is not null)
@@ -163,6 +168,11 @@ public class AuthorService
         {
             query = (IMartenQueryable<AuthorInfo>)query
                 .Where(a => a.Name == filter.Phone);
+        }
+        
+        if (!string.IsNullOrEmpty(sort))
+        {
+            query = (IMartenQueryable<AuthorInfo>)query.OrderBySortString(entityMetadataProvider, sort);
         }
 
         return (await query.ToListAsync(token)).ToImmutableArray();

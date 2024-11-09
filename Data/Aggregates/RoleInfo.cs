@@ -9,11 +9,22 @@ namespace Kafe.Data.Aggregates;
 
 public record RoleInfo(
     [Hrib] string Id,
+
     CreationMethod CreationMethod,
+
     [Hrib] string OrganizationId,
-    [LocalizedString] ImmutableDictionary<string, string> Name,
-    [LocalizedString] ImmutableDictionary<string, string>? Description,
+
+    [property:LocalizedString]
+    [property:Sortable]
+    ImmutableDictionary<string, string> Name,
+
+    [property:LocalizedString]
+    [property:Sortable]
+    ImmutableDictionary<string, string>? Description,
+
+    [property:Sortable]
     DateTimeOffset CreatedOn,
+
     ImmutableDictionary<string, Permission> Permissions
 ) : IEntity
 {

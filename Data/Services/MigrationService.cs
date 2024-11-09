@@ -206,7 +206,7 @@ public class MigrationService
 
         if (entity is null && !string.IsNullOrEmpty(order.Uco))
         {
-            var byUco = await accountService.List(new(Uco: order.Uco), token);
+            var byUco = await accountService.List(new(Uco: order.Uco), null, token);
             entity = byUco.FirstOrDefault();
             logger.LogInformation(
                 "Looking up by Uco: {}",
@@ -328,7 +328,7 @@ public class MigrationService
 
         if (entity is null && !string.IsNullOrEmpty(order.Email))
         {
-            var byEmail = await authorService.List(new(Email: order.Email), token);
+            var byEmail = await authorService.List(new(Email: order.Email), null, token);
             entity = byEmail.FirstOrDefault();
             logger.LogInformation(
                 "Looking up by Email: {}",
@@ -344,7 +344,7 @@ public class MigrationService
 
         if (entity is null && !string.IsNullOrEmpty(order.Uco))
         {
-            var byUco = await authorService.List(new(Uco: order.Uco), token);
+            var byUco = await authorService.List(new(Uco: order.Uco), null, token);
             entity = byUco.FirstOrDefault();
             logger.LogInformation(
                 "Looking up by Uco: {}",

@@ -9,8 +9,14 @@ namespace Kafe.Data.Aggregates;
 
 public record OrganizationInfo(
     [Hrib] string Id,
+
     CreationMethod CreationMethod,
-    [LocalizedString] ImmutableDictionary<string, string> Name,
+
+    [property:LocalizedString]
+    [property:Sortable]
+    ImmutableDictionary<string, string> Name,
+
+    [property:Sortable]
     DateTimeOffset CreatedOn
 ) : IEntity
 {

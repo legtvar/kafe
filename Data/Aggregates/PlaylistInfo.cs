@@ -8,11 +8,21 @@ namespace Kafe.Data.Aggregates;
 
 public record PlaylistInfo(
     [Hrib] string Id,
+
     CreationMethod CreationMethod,
+
     [Hrib] string OrganizationId,
+
     [KafeType(typeof(ImmutableArray<Hrib>))] ImmutableArray<string> EntryIds,
-    [LocalizedString] ImmutableDictionary<string, string> Name,
-    [LocalizedString] ImmutableDictionary<string, string>? Description = null,
+
+    [property:LocalizedString]
+    [property:Sortable]
+    ImmutableDictionary<string, string> Name,
+
+    [property:LocalizedString]
+    [property:Sortable]
+    ImmutableDictionary<string, string>? Description = null,
+
     Permission GlobalPermissions = Permission.None
 ) : IVisibleEntity
 {

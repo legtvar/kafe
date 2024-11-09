@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Kafe.Common;
 using Kafe.Data.Aggregates;
 using Kafe.Data.Events;
+using Kafe.Data.Metadata;
 using Marten;
 using Marten.Linq;
 
@@ -16,13 +17,16 @@ public class RoleService
 {
     private readonly IDocumentSession db;
     private readonly OrganizationService organizationService;
+    private readonly EntityMetadataProvider entityMetadataProvider;
 
     public RoleService(
         IDocumentSession db,
-        OrganizationService organizationService)
+        OrganizationService organizationService,
+        EntityMetadataProvider entityMetadataProvider)
     {
         this.db = db;
         this.organizationService = organizationService;
+        this.entityMetadataProvider = entityMetadataProvider;
     }
 
     public async Task<RoleInfo?> Load(Hrib id, CancellationToken token = default)
@@ -193,6 +197,7 @@ public class RoleService
 
     public async Task<ImmutableArray<RoleInfo>> List(
         RoleFilter? filter = null,
+        string? sort = null,
         CancellationToken token = default)
     {
         var query = db.Query<RoleInfo>();
@@ -215,6 +220,11 @@ public class RoleService
         {
             query = (IMartenQueryable<RoleInfo>)query
                 .WhereContainsLocalized(nameof(RoleInfo.Name), filter.Name);
+        }
+        
+        if (!string.IsNullOrEmpty(sort))
+        {
+            query = (IMartenQueryable<RoleInfo>)query.OrderBySortString(entityMetadataProvider, sort);
         }
 
         return (await query.ToListAsync(token)).ToImmutableArray();

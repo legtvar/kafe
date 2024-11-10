@@ -20,6 +20,7 @@ import Countdown from 'react-countdown';
 import { IoCubeOutline } from 'react-icons/io5';
 import Markdown from 'react-markdown';
 import { Link } from 'react-router-dom';
+import { useOrganizations } from '../../../hooks/Caffeine';
 import { useAuthLink } from '../../../hooks/useAuthLink';
 import { useTitle } from '../../../utils/useTitle';
 import { Brand } from '../../brand/Brand';
@@ -62,10 +63,15 @@ export function Home(props: IHomeProps) {
                         <Text>{t('home.openGroups')}</Text>
                     </HStack>
                 </Heading>
-                <AwaitAPI request={(api) => api.groups.getAll()}>
+                <AwaitAPI request={(api) => api.groups.getAll(useOrganizations().currentOrganization?.id)}>
                     {(groups) => (
                         <Box w="full" overflowX="auto" py={4} scrollSnapType="x mandatory">
                             <HStack alignItems="start">
+                                {groups.filter((group) => group.isOpen).length === 0 && (
+                                    <Text w="full" textAlign="center" color="gray.500" fontStyle="italic">
+                                        {t('home.noOpenGroups')}
+                                    </Text>
+                                )}
                                 {groups
                                     .filter((group) => group.isOpen)
                                     .map((group, i) => (

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { IoAdd, IoListCircleOutline } from 'react-icons/io5';
 import { Link } from 'react-router-dom';
 import { Playlist } from '../../../data/Playlist';
+import { useOrganizations } from '../../../hooks/Caffeine';
 import { useColorScheme, useHighlightStyle } from '../../../hooks/useColorScheme';
 import { fulltextFilter } from '../../../utils/fulltextFilter';
 import { useTitle } from '../../../utils/useTitle';
@@ -24,7 +25,7 @@ export function PlaylistList(props: IPlaylistListProps) {
 
     return (
         <OutletOrChildren>
-            <AwaitAPI request={(api) => api.playlists.getAll()}>
+            <AwaitAPI request={(api) => api.playlists.getAll(useOrganizations().currentOrganization?.id)}>
                 {(data: Playlist[]) => (
                     <>
                         <Flex

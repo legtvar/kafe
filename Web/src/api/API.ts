@@ -68,8 +68,8 @@ export class API {
         const api = this;
 
         return {
-            async getAll() {
-                return api.requestArray(`projects`, Project);
+            async getAll(organization?: string) {
+                return api.requestArray(`projects`, Project, { organization });
             },
             async getById(id: string) {
                 return api.requestSingle(`project/${id}`, Project);
@@ -90,8 +90,8 @@ export class API {
         const api = this;
 
         return {
-            async getAll() {
-                return api.requestArray(`project-groups`, Group);
+            async getAll(organization?: string) {
+                return api.requestArray(`project-groups`, Group, { organization });
             },
             async getById(id: string) {
                 return api.requestSingle(`project-group/${id}`, Group);
@@ -115,8 +115,8 @@ export class API {
         const api = this;
 
         return {
-            async getAll() {
-                return api.requestArray(`playlists`, Playlist);
+            async getAll(organization?: string) {
+                return api.requestArray(`playlists`, Playlist, { organization });
             },
             async getById(id: string) {
                 return api.requestSingle(`playlist/${id}`, Playlist);
@@ -315,12 +315,12 @@ export class API {
 
     // Api utils
 
-    private async requestSingle<Class>(path: string, type: new (response: any) => Class) {
-        return this.get(path, type, false) as Promise<ApiResponse<Class>>;
+    private async requestSingle<Class>(path: string, type: new (response: any) => Class, params: any = {}) {
+        return this.get(path, type, false, true, params) as Promise<ApiResponse<Class>>;
     }
 
-    private async requestArray<Class>(path: string, type: new (response: any) => Class) {
-        return this.get(path, type, true) as Promise<ApiResponse<Class[]>>;
+    private async requestArray<Class>(path: string, type: new (response: any) => Class, params: any = {}) {
+        return this.get(path, type, true, true, params) as Promise<ApiResponse<Class[]>>;
     }
 
     private async get<Class>(
@@ -328,9 +328,11 @@ export class API {
         type: new (response: any) => Class,
         isArray: boolean,
         auth: boolean = true,
+        params: any = {},
     ): Promise<ApiResponse<Class | Class[]>> {
         const response = await this.client.get(path, {
             withCredentials: auth,
+            params,
         });
 
         const res = this.handleError<any>(response);
@@ -346,9 +348,10 @@ export class API {
         return res;
     }
 
-    private async getSimple<Res>(path: string, auth: boolean = true): Promise<ApiResponse<any>> {
+    private async getSimple<Res>(path: string, auth: boolean = true, params: any = {}): Promise<ApiResponse<any>> {
         const response = await this.client.get(path, {
             withCredentials: auth,
+            params,
         });
 
         return this.handleError<Res>(response);

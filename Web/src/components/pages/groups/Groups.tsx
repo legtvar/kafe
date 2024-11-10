@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { IoAdd, IoFolderOpenOutline } from 'react-icons/io5';
 import { Link } from 'react-router-dom';
 import { Group } from '../../../data/Group';
+import { useOrganizations } from '../../../hooks/Caffeine';
 import { useColorScheme, useHighlightStyle } from '../../../hooks/useColorScheme';
 import { fulltextFilter } from '../../../utils/fulltextFilter';
 import { useTitle } from '../../../utils/useTitle';
@@ -24,7 +25,7 @@ export function Groups(props: IGroupsProps) {
 
     return (
         <OutletOrChildren>
-            <AwaitAPI request={(api) => api.groups.getAll()}>
+            <AwaitAPI request={(api) => api.groups.getAll(useOrganizations().currentOrganization?.id)}>
                 {(data: Group[]) => (
                     <>
                         <Flex

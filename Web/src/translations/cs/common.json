@@ -111,7 +111,8 @@
     "openProjects": "Aktuálně otevřené projekty",
     "openGroups": "Otevřené skupiny projektů",
     "myProjects": "Moje projekty",
-    "subtitle": "Podívej se, co je nového!"
+    "subtitle": "Podívej se, co je nového!",
+    "noOpenGroups": "Aktuálně není otevřená žádná skupina projektů"
   },
   "homeFestival": {
     "title": "24. Filmový festival FI MU"

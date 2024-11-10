@@ -110,7 +110,8 @@
     "openProjects": "Currently open projects",
     "openGroups": "Open project groups",
     "myProjects": "My projects",
-    "subtitle": "Check out, what is new!"
+    "subtitle": "Check out, what is new!",
+    "noOpenGroups": "There are currently no project groups open"
   },
   "homeFestival": {
     "title": "24th Film Festival FI MU"

@@ -278,7 +278,10 @@
       "detail": {
         "title": "Edit project"
       },
-      "title": "Projects"
+      "title": "Projects",
+      "authors": {
+        "title": "Authors"
+      }
     },
     "system": {
       "title": "System"
@@ -309,7 +312,8 @@
     "system": "System",
     "organizations": "Organizations",
     "organization": "{{group}} | \nOrganization",
-    "organizationsCreate": "Create an organization"
+    "organizationsCreate": "Create an organization",
+    "author": "{{author}} | \nAuthor"
   },
   "sendApi": {
     "error": "There is a problem with the form",

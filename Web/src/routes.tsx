@@ -30,6 +30,7 @@ import { PlaylistDetail } from './components/pages/playlists/PlaylistDetail';
 import { PlaylistEdit } from './components/pages/playlists/PlaylistEdit';
 import { PlaylistGallery } from './components/pages/playlists/PlaylistGallery';
 import { PlaylistList } from './components/pages/playlists/PlaylistList';
+import { AuthorDetail } from './components/pages/projects/authors/AuthorDetail';
 import { CreateProject } from './components/pages/projects/CreateProject';
 import { ProjectDetail } from './components/pages/projects/ProjectDetail';
 import { ProjectEdit } from './components/pages/projects/ProjectEdit';
@@ -134,6 +135,11 @@ export const authRoutes = (
             selected: IoCube,
         },
         children: [
+            {
+                path: 'authors/:id',
+                title: t('route.projects.authors.title'),
+                element: <AuthorDetail />,
+            },
             {
                 path: ':id',
                 title: t('route.projects.detail.title'),

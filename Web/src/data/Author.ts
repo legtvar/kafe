@@ -1,5 +1,6 @@
 import { components } from '../schemas/api';
 import { localizedString } from '../schemas/generic';
+import { getPrefered } from '../utils/preferedLanguage';
 import { AbstractType } from './AbstractType';
 import { Serializer } from './serialize/Serializer';
 
@@ -9,21 +10,10 @@ export class Author extends AbstractType {
     public email!: string;
     public phone!: string;
     public uco!: string;
-    // public visibility!: components['schemas']['Visibility'];
 
-    /*
-        "id": "string",
-        "name": "string",
-        "visibility": "Unknown",
-        "bio": {
-            "iv": "string",
-            "cs": "string",
-            "en": "string"
-        },
-        "uco": "string",
-        "email": "string",
-        "phone": "string"
-    */
+    public getBio(): string {
+        return getPrefered(this.bio);
+    }
 
     public constructor(struct: components['schemas']['AuthorListDto'] | components['schemas']['AuthorDetailDto']) {
         super();

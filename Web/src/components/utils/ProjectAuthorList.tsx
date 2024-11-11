@@ -1,5 +1,7 @@
 import { CloseButton, HStack, SimpleGrid, Text, VStack } from '@chakra-ui/react';
+import { Link } from 'react-router-dom';
 import { Author } from '../../data/Author';
+import { useAuthLink } from '../../hooks/useAuthLink';
 import { components } from '../../schemas/api';
 import { HRIB } from '../../schemas/generic';
 import { AwaitAPI } from './AwaitAPI';
@@ -36,13 +38,15 @@ function SimpleProjectAuthorList({
     editable,
 }: { author: components['schemas']['ProjectAuthorDto'] } & IProjectAuthorListProps) {
     return (
-        <HStack alignItems="start">
-            <KafeAvatar size={'md'} person={author} />
-            <VStack alignItems="start" pl={2} spacing={0}>
-                <Text fontWeight="bolder">{author.name}</Text>
-                <Text color="gray.500">{author.roles.join(', ')}</Text>
-            </VStack>
-            {editable && <CloseButton onClick={() => onRemove && onRemove(author.id)} />}
-        </HStack>
+        <Link to={useAuthLink('/projects/authors/' + author.id)}>
+            <HStack alignItems="start">
+                <KafeAvatar size={'md'} person={author} />
+                <VStack alignItems="start" pl={2} spacing={0}>
+                    <Text fontWeight="bolder">{author.name}</Text>
+                    <Text color="gray.500">{author.roles.join(', ')}</Text>
+                </VStack>
+                {editable && <CloseButton onClick={() => onRemove && onRemove(author.id)} />}
+            </HStack>
+        </Link>
     );
 }

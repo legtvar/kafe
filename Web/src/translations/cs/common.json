@@ -276,7 +276,10 @@
       "detail": {
         "title": "Upravit projekt"
       },
-      "title": "Projekty"
+      "title": "Projekty",
+      "authors": {
+        "title": "Autoři"
+      }
     },
     "system": {
       "title": "Systém"
@@ -307,7 +310,8 @@
     "system": "Systém",
     "organizations": "Organizace",
     "organization": "{{group}} | Organizace",
-    "organizationsCreate": "Vytvořit organizaci"
+    "organizationsCreate": "Vytvořit organizaci",
+    "author": "{{author}} | Autor"
   },
   "sendApi": {
     "error": "Ve formuláři je chyba",

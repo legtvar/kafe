@@ -318,9 +318,25 @@
     "unknownError": "Došlo k chybě při odesílání formuláře"
   },
   "status": {
+    "400": {
+      "subtitle": "Odeslaný požadavek je chybný",
+      "title": "Chybný požadavek"
+    },
+    "401": {
+      "subtitle": "Nemáte dostatečná oprávnění",
+      "title": "Neautorizováno"
+    },
+    "403": {
+      "subtitle": "Nemáte dostatečná oprávnění",
+      "title": "Zakázáno"
+    },
     "404": {
       "subtitle": "Vypadá to, že stránka kterou hledáte neexistuje",
       "title": "Stránka nebyla nalezena"
+    },
+    "500": {
+      "subtitle": "Ale ne, něco se šíleně pokazilo!",
+      "title": "Při zpracování došlo k chybě"
     },
     "offline": {
       "title": "Je nám líto, ale KAFE je momentálně offline",

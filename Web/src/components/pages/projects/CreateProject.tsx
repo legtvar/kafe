@@ -22,7 +22,12 @@ export function CreateProject(props: ICreateProjectProps) {
 
     return (
         <OutletOrChildren>
-            <AwaitAPI request={(api) => api.groups.getById(id)} error={<Status statusCode={404} embeded />}>
+            <AwaitAPI
+                request={(api) => api.groups.getById(id)}
+                error={(resp) => {
+                    return <Status statusCode={resp.response.status} log={resp.response.detail} embeded />;
+                }}
+            >
                 {(group: Group) => (
                     <Stack spacing={4} m={6} direction="column">
                         <Box fontSize="xl" as="h2" lineHeight="tight" color="gray.500">

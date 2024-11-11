@@ -19,7 +19,12 @@ export function AuthorDetail(props: IAuthorDetailProps) {
 
     return (
         <OutletOrChildren>
-            <AwaitAPI request={(api) => api.authors.getById(id)} error={<Status statusCode={404} embeded />}>
+            <AwaitAPI
+                request={(api) => api.authors.getById(id)}
+                error={(resp) => {
+                    return <Status statusCode={resp.response.status} log={resp.response.detail} embeded />;
+                }}
+            >
                 {(author: Author) => (
                     <Box m={6} pb={12}>
                         <WithTitle title={t('title.author', { author: author.name })} />

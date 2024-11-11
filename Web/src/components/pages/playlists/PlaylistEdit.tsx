@@ -47,7 +47,12 @@ export function PlaylistEdit(props: IPlaylistEditProps) {
 
     return (
         <>
-            <AwaitAPI request={(api) => api.playlists.getById(id)} error={<Status statusCode={404} embeded />}>
+            <AwaitAPI
+                request={(api) => api.playlists.getById(id)}
+                error={(resp) => {
+                    return <Status statusCode={resp.response.status} log={resp.response.detail} embeded />;
+                }}
+            >
                 {observeAbstactType((playlist: Playlist) => (
                     <AwaitAPI request={(api) => api.entities.perms.getById(playlist.id)}>
                         {observeAbstactType((perms: EntityPermissions) => (

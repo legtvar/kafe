@@ -46,7 +46,12 @@ export function ProjectEdit(props: IProjectEditProps) {
     }
 
     return (
-        <AwaitAPI request={(api) => api.projects.getById(id)} error={<Status statusCode={404} embeded />}>
+        <AwaitAPI
+            request={(api) => api.projects.getById(id)}
+            error={(resp) => {
+                return <Status statusCode={resp.response.status} log={resp.response.detail} embeded />;
+            }}
+        >
             {observeAbstactType((project: Project) => (
                 <AwaitAPI request={(api) => api.entities.perms.getById(project.id)}>
                     {observeAbstactType((perms: EntityPermissions) => (

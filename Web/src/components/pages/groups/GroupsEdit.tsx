@@ -25,7 +25,12 @@ export function GroupsEdit(props: IGroupsEditProps) {
     }
 
     return (
-        <AwaitAPI request={(api) => api.groups.getById(id)} error={<Status statusCode={404} embeded />}>
+        <AwaitAPI
+            request={(api) => api.groups.getById(id)}
+            error={(resp) => {
+                return <Status statusCode={resp.response.status} log={resp.response.detail} embeded />;
+            }}
+        >
             {observeAbstactType((group: Group) => (
                 <AwaitAPI request={(api) => api.entities.perms.getById(group.id)}>
                     {observeAbstactType((perms: EntityPermissions) => (

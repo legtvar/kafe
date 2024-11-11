@@ -320,9 +320,25 @@
     "unknownError": "An error occurred while submitting the form"
   },
   "status": {
+    "400": {
+      "subtitle": "The request was incorrect",
+      "title": "Bad request"
+    },
+    "401": {
+      "subtitle": "You are not authorized to view this page",
+      "title": "Unauthorized"
+    },
+    "403": {
+      "subtitle": "You do not have permission to view this page",
+      "title": "Forbidden"
+    },
     "404": {
       "subtitle": "The page you're looking for does not seem to exist",
       "title": "Page Not Found"
+    },
+    "500": {
+      "subtitle": "Oh no, something went terribly wrong!",
+      "title": "An error occurred while processing your request"
     },
     "offline": {
       "title": "We are sorry, but KAFE is currently offline",

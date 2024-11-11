@@ -40,7 +40,12 @@ export function PlaylistDetail(props: IPlaylistDetailProps) {
     }
 
     return (
-        <AwaitAPI request={(api) => api.playlists.getById(id)} error={<Status statusCode={404} embeded />}>
+        <AwaitAPI
+            request={(api) => api.playlists.getById(id)}
+            error={(resp) => {
+                return <Status statusCode={resp.response.status} log={resp.response.detail} embeded />;
+            }}
+        >
             {(playlist: Playlist) => {
                 const artifacts = playlist.entries;
 

@@ -22,7 +22,12 @@ export function ProjectDetail(props: IProjectDetailProps) {
 
     return (
         <OutletOrChildren>
-            <AwaitAPI request={(api) => api.projects.getById(id)} error={<Status statusCode={404} embeded />}>
+            <AwaitAPI
+                request={(api) => api.projects.getById(id)}
+                error={(resp) => {
+                    return <Status statusCode={resp.response.status} log={resp.response.detail} embeded />;
+                }}
+            >
                 {(project: Project) => (
                     <Box m={6} pb={12}>
                         <WithTitle title={t('title.project', { project: project.getName() })} />

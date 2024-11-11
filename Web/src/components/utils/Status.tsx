@@ -16,6 +16,8 @@ export const Status: React.FC<IStatusProps> = (props: IStatusProps) => {
     let statusCode = routeError?.status;
     const backlink = useLinkClickHandler('/');
 
+    console.log(statusCode);
+
     if (props.statusCode) {
         statusCode = props.statusCode;
     }

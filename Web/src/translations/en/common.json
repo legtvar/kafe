@@ -521,5 +521,9 @@
     "reject": "I don't like cookies",
     "accept": "Yum, I'll take it!",
     "title": "KAFE and cookies"
+  },
+  "organizationRedirect": {
+    "title": "Choose your organization",
+    "subtitle": "You can switch to another organization at any time in the left panel"
   }
 }

@@ -62,7 +62,7 @@ export function Navbar({ onOpen, forceReload, signedIn, ...rest }: INavbarProps)
                     <Logo />
                 </Link>
             </Flex>
-            {signedIn && (
+            {signedIn && onOpen && (
                 <IconButton
                     display={{ base: 'flex', md: 'none' }}
                     onClick={onOpen}

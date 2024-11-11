@@ -3,7 +3,6 @@ import {
     Button,
     FormControl,
     FormLabel,
-    HStack,
     Heading,
     Input,
     Link,
@@ -14,20 +13,23 @@ import {
 import i18next, { t } from 'i18next';
 import { useState } from 'react';
 import { useApi } from '../../../hooks/Caffeine';
+import { useTitle } from '../../../utils/useTitle';
 import { Loading } from '../../utils/Loading';
 import { MuniIcon } from '../../utils/MuniIcon';
-import { useTitle } from '../../../utils/useTitle';
 
 export function Login() {
     const [state, setState] = useState<'ready' | 'submitting' | 'submited' | 'error'>('ready');
     const [email, setEmail] = useState<string>('');
     const api = useApi();
-    useTitle(t("title.login"));
+    useTitle(t('title.login'));
 
     const login = async () => {
         setState('submitting');
         try {
-            await api.accounts.temporary.create(email, i18next.language);
+            const response = await api.accounts.temporary.create(email, i18next.language);
+            if (response.status !== 200) {
+                throw new Error('Error');
+            }
             setState('submited');
         } catch (e) {
             setState('error');

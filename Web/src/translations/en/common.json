@@ -511,5 +511,11 @@
   },
   "root": {
     "offline": "Offline"
+  },
+  "cookies": {
+    "description": "<1>Have you ever tried having coffee without cookies? \nQuite boring...</1><2>Cookies are important for the proper functioning of the application. \nThey take care of saving your preferences and login data.</2><3>We would like to ask you for your consent to serve cookies together with KAFE</3>",
+    "reject": "I don't like cookies",
+    "accept": "Yum, I'll take it!",
+    "title": "KAFE and cookies"
   }
 }

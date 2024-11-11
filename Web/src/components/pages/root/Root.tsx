@@ -2,6 +2,7 @@ import { Center } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
 import { Navigate, useMatches, useOutlet } from 'react-router-dom';
 import { useApi, useAuth, useOrganizations } from '../../../hooks/Caffeine';
+import { useCookieConsent } from '../../../hooks/useCookieConsent';
 import { Loading } from '../../utils/Loading';
 import { Status } from '../../utils/Status';
 
@@ -14,6 +15,8 @@ export function Root(props: IRootProps) {
     const outlet = useOutlet();
     const matches = useMatches();
     const api = useApi();
+
+    useCookieConsent();
 
     useEffect(() => {
         (async () => {

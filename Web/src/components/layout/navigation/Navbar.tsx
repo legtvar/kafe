@@ -17,9 +17,10 @@ import {
     VStack,
 } from '@chakra-ui/react';
 import i18next, { t } from 'i18next';
-import { FiChevronDown, FiMenu, FiMoon, FiSun } from 'react-icons/fi';
+import { FiChevronDown, FiMenu } from 'react-icons/fi';
 import { Link, useNavigate } from 'react-router-dom';
 import { useApi, useAuth } from '../../../hooks/Caffeine';
+import { ColorModeToggle } from '../../utils/ColorModeToggle';
 import { KafeAvatar } from '../../utils/KafeAvatar';
 import { LanguageToggle } from '../../utils/LanguageToggle';
 import { Logo } from '../Logo';
@@ -33,7 +34,7 @@ interface INavbarProps extends FlexProps {
     signedIn: boolean;
 }
 export function Navbar({ onOpen, forceReload, signedIn, ...rest }: INavbarProps) {
-    const { colorMode, toggleColorMode } = useColorMode();
+    const { toggleColorMode } = useColorMode();
     const { user, setUser } = useAuth();
     const navigate = useNavigate();
     const api = useApi();
@@ -96,14 +97,7 @@ export function Navbar({ onOpen, forceReload, signedIn, ...rest }: INavbarProps)
                     onLanguageToggled={() => forceReload()}
                     display={{ base: 'none', md: 'flex' }}
                 />
-                <IconButton
-                    display={{ base: 'none', md: 'flex' }}
-                    size="lg"
-                    variant="ghost"
-                    aria-label="Toggle Color Mode"
-                    onClick={toggleColorMode}
-                    icon={colorMode === 'light' ? <FiMoon /> : <FiSun />}
-                />
+                <ColorModeToggle display={{ base: 'none', md: 'flex' }} aria-label="Toggle Color Mode" />
                 {!signedIn && (
                     <Link to="/account/login">
                         <Button ml={4}>{t('home.signin').toString()}</Button>

@@ -16,6 +16,7 @@ import {
 } from '@chakra-ui/react';
 import ChakraUIRenderer from 'chakra-ui-markdown-renderer';
 import { t } from 'i18next';
+import moment from 'moment';
 import Countdown from 'react-countdown';
 import { IoCubeOutline } from 'react-icons/io5';
 import Markdown from 'react-markdown';
@@ -91,7 +92,7 @@ export function Home(props: IHomeProps) {
                                                             </Markdown>
                                                         </Box>
                                                     )}
-                                                    {group.deadline && (
+                                                    {group.deadline && moment(group.deadline).isAfter() && (
                                                         <Box mb={-6}>
                                                             <Countdown
                                                                 date={new Date(group.deadline)}

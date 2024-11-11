@@ -320,6 +320,11 @@
       "subtitle": "The page you're looking for does not seem to exist",
       "title": "Page Not Found"
     },
+    "offline": {
+      "title": "We are sorry, but KAFE is currently offline",
+      "subtitle": "Please try again later",
+      "code": "Offline"
+    },
     "backlink": "Go to Home"
   },
   "temp": {
@@ -503,5 +508,8 @@
         "description": "Unfortunately, this person does not have the ID listed."
       }
     }
+  },
+  "root": {
+    "offline": "Offline"
   }
 }

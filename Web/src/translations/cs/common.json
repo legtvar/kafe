@@ -318,6 +318,11 @@
       "subtitle": "Vypadá to, že stránka kterou hledáte neexistuje",
       "title": "Stránka nebyla nalezena"
     },
+    "offline": {
+      "title": "Je nám líto, ale KAFE je momentálně offline",
+      "subtitle": "Zkuste to prosím za chvíli",
+      "code": "Offline"
+    },
     "backlink": "Vrátit se zpět"
   },
   "temp": {
@@ -506,5 +511,8 @@
         "description": "Tato osoba bohužel nemá uvedené ID."
       }
     }
+  },
+  "root": {
+    "offline": "Offline"
   }
 }

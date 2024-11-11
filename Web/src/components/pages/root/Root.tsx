@@ -1,14 +1,16 @@
+import { Center } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
 import { Navigate, useMatches, useOutlet } from 'react-router-dom';
 import { useApi, useAuth, useOrganizations } from '../../../hooks/Caffeine';
 import { Loading } from '../../utils/Loading';
+import { Status } from '../../utils/Status';
 
 interface IRootProps {}
 
 export function Root(props: IRootProps) {
     const { user, setUser } = useAuth();
     const { organizations, setOrganizations } = useOrganizations();
-    const [status, setStatus] = useState<'ready' | 'request' | 'requesting'>('request');
+    const [status, setStatus] = useState<'ready' | 'request' | 'requesting' | 'offline'>('request');
     const outlet = useOutlet();
     const matches = useMatches();
     const api = useApi();
@@ -37,15 +39,26 @@ export function Root(props: IRootProps) {
 
                         setOrganizations(orgs.data);
                     }
-                } finally {
                     setStatus('ready');
+                } catch (e) {
+                    setStatus('offline');
                 }
             }
         })();
     });
 
-    if (status !== 'ready') {
-        return <Loading center large />;
+    console.log(status);
+
+    if (status === 'request' || status === 'requesting') {
+        return (
+            <Center h="100vh">
+                <Loading center large />
+            </Center>
+        );
+    }
+
+    if (status === 'offline') {
+        return <Status statusCode={'offline'} noButton />;
     }
 
     // console.log(user);

@@ -517,7 +517,7 @@
   },
   "cookies": {
     "title": "KAFE a sušenky",
-    "description": "<1>Zkoušeli jste si někdy dávat kafe bez sušenek? Celkem nuda...</1><2>Cookies jsou důležité pro správnou funkci aplikace. Starají se o ukládání vašich preferencí a přihlašovacích údajů.</2><3>Chtěli bychom vás tímto poprosit o Váš souhlas se servírováním cookies společně s KAFE</3>",
+    "description": "<1>Zkoušeli jste si někdy dávat kafe bez sušenek? Celkem nuda...</1><2>Cookies jsou důležité pro správnou funkci aplikace. Starají se o ukládání vašich preferencí a přihlašovacích údajů.</2><3>Chtěli bychom vás tímto poprosit o Váš souhlas se servírováním cookies společně s KAFE.</3>",
     "reject": "Nemám rád cookies",
     "accept": "Mňam, to beru!"
   }

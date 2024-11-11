@@ -214,6 +214,11 @@ export class API {
             getById(id: string) {
                 return api.requestSingle(`shard/${id}`, Shard);
             },
+            async getContent(id: string) {
+                return await api.client.get(`shard-download/${id}`, {
+                    withCredentials: true,
+                });
+            },
         };
     }
 

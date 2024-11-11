@@ -7,6 +7,7 @@ import lemmafimuni from './avatars/lemmafimuni.jpg';
 
 export interface IOrganizationAvatarProps extends AvatarProps {
     organization: Organization;
+    noHighlight?: boolean;
 }
 
 const organizationAvatars: Record<string, string> = {
@@ -15,7 +16,7 @@ const organizationAvatars: Record<string, string> = {
     'legacy--org': legacy,
 };
 
-export function OrganizationAvatar({ organization, ...props }: IOrganizationAvatarProps) {
+export function OrganizationAvatar({ organization, noHighlight, ...props }: IOrganizationAvatarProps) {
     let source = undefined;
     if (organizationAvatars[organization.id]) {
         source = organizationAvatars[organization.id];
@@ -28,7 +29,7 @@ export function OrganizationAvatar({ organization, ...props }: IOrganizationAvat
             <Avatar
                 name={organization.getName()}
                 src={source}
-                shadow={currentOrganization?.id === organization.id ? 'outline' : undefined}
+                shadow={currentOrganization?.id === organization.id && !noHighlight ? 'outline' : undefined}
                 {...props}
             />
         </Tooltip>

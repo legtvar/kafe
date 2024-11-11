@@ -24,8 +24,8 @@ import { Link } from 'react-router-dom';
 import { useOrganizations } from '../../../hooks/Caffeine';
 import { useAuthLink } from '../../../hooks/useAuthLink';
 import { useTitle } from '../../../utils/useTitle';
-import { Brand } from '../../brand/Brand';
 import { AwaitAPI } from '../../utils/AwaitAPI';
+import { OrganizationAvatar } from '../../utils/OrganizationAvatar/OrganizationAvatar';
 import { OutletOrChildren } from '../../utils/OutletOrChildren';
 
 interface IHomeProps {}
@@ -42,17 +42,18 @@ export function Home(props: IHomeProps) {
     );
 
     const DESCRIPTION_LENGTH = 200;
+    const { currentOrganization } = useOrganizations();
 
     return (
         <OutletOrChildren>
             <VStack w="full" px={6} py={4} alignItems="stretch">
                 <HStack spacing={6} alignItems="center" mb={6}>
                     <Center fontSize="6xl" h="auto">
-                        <Brand />
+                        <OrganizationAvatar organization={currentOrganization!} size="xl" noHighlight />
                     </Center>
                     <VStack alignItems="start">
                         <Heading size="2xl" mt={0}>
-                            {t('home.title')}
+                            {currentOrganization!.getName()}
                         </Heading>
                         <Text opacity={0.5}>{t('home.subtitle')}</Text>
                     </VStack>

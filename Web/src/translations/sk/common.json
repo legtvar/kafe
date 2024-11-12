@@ -549,6 +549,7 @@
   "languageToggle": {
     "system": "Jazyk aplikácie",
     "content": "Preferovaný jazyk obsahu",
-    "matching": "Rovnaký, ako aplikácia"
+    "matching": "Rovnaký, ako aplikácia",
+    "more": "Zobraziť ďalšie"
   }
 }

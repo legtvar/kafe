@@ -16,9 +16,14 @@ import CountryLanguage from '@ladjs/country-language';
 import * as Flags from 'country-flag-icons/react/3x2';
 import i18next, { t } from 'i18next';
 import { useMemo } from 'react';
-import { BsCopy } from 'react-icons/bs';
+import { BsChevronDown, BsCopy } from 'react-icons/bs';
 import { LS_LANGUAGE_APP_KEY } from '../../languageConfig';
-import { getRawPrefered, LS_LANGUAGE_CONTENT_KEY, setPreferedLanguage } from '../../utils/preferedLanguage';
+import {
+    getRawPrefered,
+    LS_LANGUAGE_CONTENT_KEY,
+    preferedLanguage,
+    setPreferedLanguage,
+} from '../../utils/preferedLanguage';
 
 interface ILanguageToggleProps extends IconButtonProps {
     onLanguageToggled?: (lang: string) => void;
@@ -89,7 +94,7 @@ export function LanguageToggle({ onLanguageToggled: onLanguageChange, ...rest }:
                 variant="ghost"
                 aria-label="Change language"
             />
-            <MenuList overflowY="auto" maxH="80vh">
+            <MenuList overflowY="auto" maxH="80vh" w={96}>
                 <MenuOptionGroup title={t('languageToggle.system')} value={i18next.language}>
                     {translated.map(
                         mapper((lang) => {
@@ -112,10 +117,25 @@ export function LanguageToggle({ onLanguageToggled: onLanguageChange, ...rest }:
                             <Text>{t('languageToggle.matching')}</Text>
                         </HStack>
                     </MenuItemOption>
-                    {all.map(
-                        mapper((lang) => {
-                            changeContentLanguage(lang.language);
-                        }),
+                    {getRawPrefered() === '_inherit' ? (
+                        <MenuItemOption
+                            onClick={() => {
+                                changeContentLanguage(preferedLanguage());
+                            }}
+                        >
+                            <HStack>
+                                <Center w="18px">
+                                    <BsChevronDown />
+                                </Center>
+                                <Text>{t('languageToggle.more')}</Text>
+                            </HStack>
+                        </MenuItemOption>
+                    ) : (
+                        all.map(
+                            mapper((lang) => {
+                                changeContentLanguage(lang.language);
+                            }),
+                        )
                     )}
                 </MenuOptionGroup>
             </MenuList>

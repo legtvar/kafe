@@ -546,6 +546,7 @@
   "languageToggle": {
     "system": "Application language",
     "content": "Preferred content language",
-    "matching": "Same as app"
+    "matching": "Same as app",
+    "more": "Show more"
   }
 }

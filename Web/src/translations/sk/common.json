@@ -1,0 +1,554 @@
+{
+  "authorSelect": {
+    "addButton": "Pridať",
+    "addRole": "Pridať rolu",
+    "bio": "Biografia",
+    "button": "Pridať osobu",
+    "createButtom": "Vytvoriť osobu",
+    "email": "Email",
+    "name": "Meno",
+    "new": "Nový autor",
+    "phone": "Telefón",
+    "selectRoles": "Vybrať role osoby",
+    "uco": "UČO"
+  },
+  "staging": {
+    "warning": "Staging",
+    "title": "Toto je Staging!",
+    "description": "Všetky zmeny na tejto doméne sa na konci dňa (okolo 3:00 ráno) zahodia."
+  },
+  "localhost": {
+    "warning": "Localhost",
+    "title": "Toto je localhost!",
+    "description": "Táto aplikácia je pripojená k lokálne bežiacemu back-endu."
+  },
+  "troubleshooting": {
+    "title": "Nahlásiť problém",
+    "contactUs": "Objavili ste problém? Môžete odoslať hlásenie o tom, čo sa stalo.",
+    "sendTo": "Prosíme, odošlite nám toto hlásenie na <1>kafe@fi.muni.cz</1>, ďakujeme!",
+    "mailContents": "Dobrý deň,\n\npri používaní KAFE som zaznamenal nasledujúci problém:\n{{message}}\n\nPrikladám vygenerovaný report\n\nĎakujem a prajem pekný deň\n\n---\n\n",
+    "selectAttachments": "Budeme radi za čo najviac podrobností o probléme. Môžete si ale sami vybrať, aké informácie nám poskytnete:",
+    "page": "Stránku, na ktorej k problému došlo",
+    "browser": "Prehliadač, ktorý používate",
+    "user": "Účet, u ktorého došlo k problému",
+    "logs": "Chybové hlásenia prehliadača",
+    "description": "Prosím, popíšte čo najpodrobnejšie, čo sa stalo zle:",
+    "generated": "Vygenerované hlásenie:"
+  },
+  "common": {
+    "backHome": "Späť na domovskú stránku",
+    "cancel": "Zrušiť",
+    "edit": "Upraviť",
+    "save": "Uložiť",
+    "understood": "Chápem",
+    "send": "Odoslať",
+    "invariant": "Medzinárodný"
+  },
+  "content": {
+    "noFileSelected": "Žiadny vybraný súbor",
+    "unknownType": "Neznámy typ"
+  },
+  "countdown": {
+    "days": "dní",
+    "hours": "hodín",
+    "minutes": "minút",
+    "seconds": "sekúnd"
+  },
+  "createProject": {
+    "button": {
+      "create": "Vytvoriť projekt",
+      "update": "Uložiť projekt"
+    },
+    "fields": {
+      "cast": "Herci",
+      "crew": "Štáb",
+      "description": "Anotácia",
+      "genre": "Žáner",
+      "movie": "Film",
+      "name": "Názov filmu",
+      "videoannotation": "Videoanotácia"
+    },
+    "language": {
+      "cs": "česky",
+      "en": "anglicky"
+    },
+    "title": "Vytvorte nový projekt",
+    "upload": {
+      "filetype": {
+        "Image": "Obrázkový súbor",
+        "Subtitles": "Súbor titulkov",
+        "Video": "Súbor videa"
+      },
+      "specs": "Technické požiadavky súboru",
+      "newArtefact": "Vytvoriť nový artefakt"
+    },
+    "signUp": "Pridať projekt",
+    "doNotforget": "Do konca prihlasovania už zostáva len",
+    "details": "Podrobnosti"
+  },
+  "error": {
+    "invalidPath": "URL adresa je nesprávna",
+    "projectDoesNotExist": "Projekt s daným ID neexistuje",
+    "subtitle": "Ospravedlňujeme sa za problémy. Ak máte pocit, že sa to nemalo stať (čo pravdepodobne nemalo), pošlite nám prosím tento report",
+    "title": "Jejda, tak to nešlo podľa plánu",
+    "tokenInvalid": "Token nie je platný"
+  },
+  "generic": {
+    "cancel": "Zrušiť",
+    "edit": "Upraviť",
+    "empty": "Kde nič, tu nič...",
+    "for": "pre",
+    "save": "Uložiť",
+    "files": "súborov",
+    "quitEdit": "Ukončiť editáciu",
+    "construction": "Kde nič tu nič, táto stránka sa pripravuje...",
+    "allowMarkdown": "Toto pole umožňuje zadať text formátovaný ako Markdown",
+    "download": "Stiahnuť",
+    "file": "súbor"
+  },
+  "home": {
+    "signin": "Prihlásiť sa",
+    "title": "Vitaj v KAFE",
+    "openProjects": "Aktuálne otvorené projekty",
+    "openGroups": "Otvorené skupiny projektov",
+    "myProjects": "Moje projekty",
+    "subtitle": "Pozri sa, čo je nové!",
+    "noOpenGroups": "Aktuálne nie je otvorená žiadna skupina projektov"
+  },
+  "homeFestival": {
+    "title": "24. Filmový festival FI MU"
+  },
+  "layout": {
+    "footer": {
+      "copy": "Vytvoril LeGTVaR s <1>❤️</1> a ☕.",
+      "appName": "Kontrola a Archivácia Filmov Elektronicky"
+    },
+    "title-prefix": "KAFE"
+  },
+  "login": {
+    "button": "Prihlásiť sa",
+    "email": "Emailová adresa",
+    "forgot": "Zabudli ste heslo?",
+    "password": "Heslo",
+    "register": "Nemáte ešte účet? <1>Zaregistrujte sa!</1>",
+    "remember": "Zapamätaj si ma",
+    "subtitle": "k svojmu účtu pre prístup ku všetkým funkciám KAFE",
+    "title": "Prihláste sa do KAFE",
+    "error": "Pri prihlasovaní došlo k chybe, skúste to prosím znova!"
+  },
+  "navbar": {
+    "colorMode": "Prepnúť farebný režim",
+    "language": "Jazyk / Language",
+    "profile": "Profil",
+    "settings": "Nastavenia",
+    "signout": "Odhlásiť sa"
+  },
+  "playlists": {
+    "play": "Prehrať playlist",
+    "readmore": "Viac informácií",
+    "videoCount": "videí",
+    "watchNewest": "Pozrite sa na najnovší playlist",
+    "empty": "Tento playlist je prázdny",
+    "addNewFile": {
+      "title": "Pridať súbor",
+      "groups": "Skupiny projektov",
+      "allGroups": "Všetky skupiny",
+      "projects": "Projekty",
+      "noProjectSelected": "Nie je vybraný žiadny projekt",
+      "artifacts": "Artefakty",
+      "add": "Pridať vybrané súbory",
+      "selectedFiles": "Máte vybrané {{count}} súborov"
+    }
+  },
+  "project": {
+    "general": "Informácie o projekte",
+    "actors": "Obsadenie",
+    "annotation": "Anotácia",
+    "crew": "Filmový štáb",
+    "files": "Súbory",
+    "locked": "Projekt je uzamknutý",
+    "releaseDate": {
+      "na": "Neuvedené"
+    },
+    "unknownGroup": "Neznáma skupina projektov",
+    "admin": {
+      "emailContent": "Obsah emailu",
+      "title": "Posudky",
+      "role": {
+        "tech": "Posudok technika",
+        "visual": "Posudok grafika",
+        "dramaturgy": "Posudok z dramaturgie",
+        "unknown": "Neznámy hodnotiteľ",
+        "placeholder": "-- vyberte rolu --"
+      },
+      "submit": "Odoslať posudok",
+      "kind": {
+        "accepted": "Prijať",
+        "rejected": "Zamietnuť"
+      },
+      "confirm": "Pozor! toto odošle mail autorovi projektu! Táto operácia je nevratná!",
+      "new": "Nový posudok",
+      "archive": "Archív posudkov",
+      "template": {
+        "ok": "Šablóna prijaté",
+        "nok": "Šablóna problém",
+        "pass": "Šablóna súťažný blok",
+        "reject": "Šablóna odmietnuté dramaturg",
+        "bonus": "Šablóna bonus blok",
+        "custom": "Vlastné"
+      }
+    },
+    "edit": "Upraviť",
+    "details": "Podrobnosti",
+    "cast": "Herecké obsadenie",
+    "media": "Prílohy"
+  },
+  "projectEdit": {
+    "quit": "Ukončiť editáciu",
+    "tabs": {
+      "admin": "Prístup administrátora",
+      "files": "Súbory",
+      "info": "Základné informácie",
+      "status": "Stav",
+      "rights": "Oprávnenia"
+    }
+  },
+  "projects": {
+    "detail": "Detail",
+    "empty": "Žiadne projekty",
+    "title": "Moje projekty"
+  },
+  "projectStatus": {
+    "dramaturgy": "Projekt bol prijatý na festival",
+    "file": "Súbory sú nahrané a prešli automatizovanou kontrolou",
+    "info": "Základné informácie sú dostatočne vyplnené",
+    "tech": "Projekt prešiel kontrolou technikom",
+    "visual": "Projekt prešiel kontrolou grafikom",
+    "disclaimer": "Automatická kontrola je zatiaľ v štádiu vývoja. Výsledky prosím berte s rezervou."
+  },
+  "register": {
+    "button": "Zaregistrovať sa",
+    "email": "Emailová adresa",
+    "firstName": "Krstné meno",
+    "lastName": "Priezvisko",
+    "login": "Už máte účet? <1>Prihláste sa</1>",
+    "password": "Heslo",
+    "passwordAgain": "Heslo znova",
+    "subtitle": "pre prístup k vašej dennej dávke kofeínu",
+    "title": "Zaregistrujte sa"
+  },
+  "role": {
+    "admin": "Administrátor",
+    "temp": "Dočasný účet",
+    "user": "Používateľ"
+  },
+  "route": {
+    "groups": {
+      "create": {
+        "title": "Vytvorte novú skupinu projektov"
+      },
+      "detail": {
+        "title": "Detail skupiny projektov"
+      },
+      "title": "Skupiny projektov",
+      "edit": {
+        "title": "Upraviť skupinu projektov"
+      },
+      "createProject": {
+        "title": "Vytvoriť nový projekt"
+      }
+    },
+    "home": {
+      "title": "Domov"
+    },
+    "playlists": {
+      "detail": {
+        "title": "Detail playlistu"
+      },
+      "title": "Playlisty",
+      "create": {
+        "title": "Vytvoriť nový playlist"
+      },
+      "edit": {
+        "title": "Upraviť playlist"
+      }
+    },
+    "projects": {
+      "detail": {
+        "title": "Upraviť projekt"
+      },
+      "title": "Projekty",
+      "authors": {
+        "title": "Autori"
+      }
+    },
+    "system": {
+      "title": "Systém"
+    },
+    "organizations": {
+      "title": "Organizácie",
+      "create": {
+        "title": "Vytvoriť organizáciu"
+      },
+      "edit": {
+        "title": "Upraviť organizáciu"
+      }
+    }
+  },
+  "title": {
+    "home": null,
+    "group": "{{group}} | Skupina projektov",
+    "groups": "Skupiny projektov",
+    "groupCreate": "Nová skupina projektov",
+    "playlist": "{{playlist}} | Playlist",
+    "playlists": "Playlisty",
+    "playlistCreate": "Nový playlist",
+    "project": "{{project}} | Projekt",
+    "projects": "Projekty",
+    "projectCreate": "Nový projekt",
+    "error": "{{error}} | Chyba",
+    "login": "Prihlásenie",
+    "system": "Systém",
+    "organizations": "Organizácie",
+    "organization": "{{group}} | Organizácia",
+    "organizationsCreate": "Vytvoriť organizáciu",
+    "author": "{{author}} | Autor"
+  },
+  "sendApi": {
+    "error": "Vo formulári je chyba",
+    "unknownError": "Došlo k chybe pri odosielaní formulára"
+  },
+  "status": {
+    "400": {
+      "subtitle": "Odoslaná požiadavka je chybná",
+      "title": "Chybná požiadavka"
+    },
+    "401": {
+      "subtitle": "Nemáte dostatočné oprávnenia",
+      "title": "Neautorizované"
+    },
+    "403": {
+      "subtitle": "Nemáte dostatočné oprávnenia",
+      "title": "Zakázané"
+    },
+    "404": {
+      "subtitle": "Vyzerá to, že stránka ktorú hľadáte neexistuje",
+      "title": "Stránka nebola nájdená"
+    },
+    "500": {
+      "subtitle": "Ale nie, niečo sa šialene pokazilo!",
+      "title": "Pri spracovaní došlo k chybe"
+    },
+    "offline": {
+      "title": "Je nám ľúto, ale KAFE je momentálne offline",
+      "subtitle": "Skúste to prosím za chvíľu",
+      "code": "Offline"
+    },
+    "backlink": "Vrátiť sa späť"
+  },
+  "temp": {
+    "after": "Na Vašu emailovú adresu sme odoslali informácie pre aktiváciu dočasného účtu. Prosím kliknite na odkaz v emaili pre pokračovanie do KAFE.",
+    "after2": "Ak Vám email neprišiel, môžete si oň požiadať znovu.",
+    "back": "Znovu požiadať"
+  },
+  "tempAccount": {
+    "title": "Vytvorte si dočasný účet"
+  },
+  "textarea": {
+    "characters": "znakov",
+    "min": "min"
+  },
+  "upload": {
+    "ready": "Sem pretiahnite <1>{{title}}</1><2></2>alebo kliknite pre výber z počítača<4></4>",
+    "uploaded": "<0>Úspešne nahrané</0><1></1>Formulár už môžete odoslať",
+    "failed": "<0>Nahrávanie sa nezdařilo</0><1></1>Nahrávate správny typ súboru?",
+    "uploading": "<0>Súbor sa nahráva</0><1></1>Nahrané {{progress}}%"
+  },
+  "visibility": {
+    "Internal": "Neveřejné",
+    "Private": "Súkromné",
+    "Public": "Verejné",
+    "Unknown": "Neznáma viditeľnosť"
+  },
+  "tagInput": {
+    "note": "Role oddeľujte čiarkou, alebo novým riadkom"
+  },
+  "artifact": {
+    "delete": "Odstrániť artefakt",
+    "deleteWarn": "Naozaj chcete odstrániť vybraný artefakt? Táto operácia je nevratná!",
+    "noContent": "Artefakt neobsahuje žiadne súbory"
+  },
+  "projectList": {
+    "search": "Hľadať projekty"
+  },
+  "playlistList": {
+    "search": "Hľadať playlisty",
+    "create": "Vytvoriť playlist"
+  },
+  "groupsList": {
+    "search": "Hľadať skupiny projektov",
+    "create": "Vytvoriť skupinu"
+  },
+  "system": {
+    "title": "Systémové nastavenia",
+    "warning": "Prosím pozor! Čokoľvek zmeníte tu môže mať katastrofický dopad na finálnu chuť KAFE! Postupujte opatrne!",
+    "rights": "Oprávnenia",
+    "homepage": "Domovská obrazovka",
+    "status": "Stav systému",
+    "runningFrom": "Beží od",
+    "console": "Konzola"
+  },
+  "rights": {
+    "read": "Zobraziť",
+    "write": "Upraviť",
+    "append": "Pridať",
+    "inspect": "Prehliadať",
+    "review": "Hodnotiť",
+    "special": {
+      "anyone": {
+        "title": "Ktokoľvek na internete",
+        "warning": "Pozor, akýkoľvek užívateľ bude mať tieto práva aj na zdedené položky!"
+      },
+      "new": {
+        "title": "Pridať užívateľa (email)"
+      }
+    },
+    "none": "Žiadne práva",
+    "groups": {
+      "system": {
+        "read": "Zobraziť tieto nastavenia",
+        "append": "Vytvárať nové projekty, skupiny projektov a playlisty",
+        "write": "Meniť práva a systémové nastavenia",
+        "inspect": "Zobraziť všetky projekty, skupiny projektov a playlisty",
+        "review": "Hodnotiť projekty vo všetkých skupinách"
+      },
+      "project": {
+        "append": "Pridávať nové súbory do projektu",
+        "read": "Zobraziť projekt, jeho metadata a súbory",
+        "write": "Upravovať metadata projektu"
+      },
+      "group": {
+        "read": "Vidieť túto skupinu projektov",
+        "write": "Meniť metadata a nastavenia skupiny",
+        "inspect": "Zobraziť všetky projekty v skupine projektov",
+        "append": "Vytvoriť nový projekt v tejto skupine",
+        "review": "Hodnotiť projekty v skupine"
+      },
+      "playlist": {
+        "read": "Vidieť tento playlist",
+        "write": "Meniť metadata a nastavenia playlistu",
+        "inspect": "Zobraziť všetky súbory v playliste"
+      }
+    }
+  },
+  "groupsEdit": {
+    "tabs": {
+      "info": "Základné informácie",
+      "rights": "Oprávnenia"
+    }
+  },
+  "createGroup": {
+    "fields": {
+      "name": "Názov skupiny projektov",
+      "description": "Anotácia skupiny projektov",
+      "propositions": "Propozície",
+      "deadline": "Koniec prihlasovania projektov",
+      "section": {
+        "registration": "Parametre prihlasovania"
+      },
+      "isOpen": "Prihlasovanie je otvorené"
+    },
+    "button": {
+      "update": "Uložiť skupinu projektov",
+      "create": "Vytvoriť skupinu projektov"
+    }
+  },
+  "groupsCreate": {
+    "title": "Vytvoriť skupinu projektov"
+  },
+  "textareaMarkdown": {
+    "allowMarkdown": "Toto pole umožňuje zadať text formátovaný Markdownom",
+    "preview": "Náhľad"
+  },
+  "munilogin": {
+    "button": "Prihlásiť sa cez MUNI"
+  },
+  "subtitles": {
+    "languages": {
+      "cs": "České",
+      "en": "Anglické"
+    },
+    "none": "Skryť titulky"
+  },
+  "player": {
+    "loadingError": "Toto video bohužiaľ nemožno prehrať v tejto kvalite"
+  },
+  "general": {
+    "copied": "Skopírované!",
+    "autosave": "Zmeny vykonané na tejto stránke sa ukladajú automaticky"
+  },
+  "reatePlaylist": {
+    "fields": {
+      "name": "Názov playlistu",
+      "description": "Anotácia playlistu"
+    }
+  },
+  "playlistCreate": {
+    "title": "Vytvoriť nový playlist"
+  },
+  "playlistsEdit": {
+    "tabs": {
+      "info": "Základné informácie",
+      "files": "Súbory",
+      "rights": "Oprávnenia",
+      "addFile": "Pridať nový súbor"
+    },
+    "addFile": "Pridať súbor",
+    "files": {
+      "description": "Ťahom môžete meniť poradie súborov, či pridať nový súbor do playlistu"
+    }
+  },
+  "organizations": {
+    "search": "Hľadať organizácie",
+    "create": "Vytvoriť organizáciu"
+  },
+  "createOrganization": {
+    "fields": {
+      "name": "Názov organizácie"
+    },
+    "button": {
+      "update": "Uložiť organizáciu",
+      "create": "Vytvoriť organizáciu"
+    }
+  },
+  "avatar": {
+    "clicks": {
+      "fullfilled": {
+        "title": "Vtelenie je zahájené",
+        "description": "Gratulujem, klikli ste 10x na avatar a vďaka tomu vás práve prevtelíme do danej osoby! Držte si klobúky!"
+      },
+      "noPerson": {
+        "title": "Vtelenie sa nepodarilo!",
+        "description": "Táto osoba bohužiaľ nemá uvedené ID."
+      }
+    }
+  },
+  "root": {
+    "offline": "Offline"
+  },
+  "cookies": {
+    "title": "KAFE a sušienky",
+    "description": "<1>Skúšali ste si niekedy dávať kafe bez sušienok? Celkom nuda...</1><2>Cookies sú dôležité pre správnu funkciu aplikácie. Stará sa o ukladanie vašich preferencií a prihlasovacích údajov.</2><3>Chceli by sme vás týmto poprosiť o váš súhlas so servírovaním cookies spoločne s KAFE.</3>",
+    "reject": "Nemám rád cookies",
+    "accept": "Mňam, to beriem!"
+  },
+  "organizationRedirect": {
+    "title": "Zvoľte si organizáciu",
+    "subtitle": "Na inú organizáciu môžete kedykoľvek prepnúť v ľavom paneli"
+  },
+  "languageToggle": {
+    "system": "Jazyk aplikácie",
+    "content": "Preferovaný jazyk obsahu",
+    "matching": "Rovnaký, ako aplikácia"
+  }
+}

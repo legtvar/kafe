@@ -112,6 +112,8 @@ export function Sidebar({ onClose, forceReload, ...rest }: ISidebarProps) {
         >
             <VStack
                 w={16}
+                flexGrow={0}
+                flexShrink={0}
                 align="center"
                 justify="start"
                 py={6}

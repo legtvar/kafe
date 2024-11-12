@@ -64,18 +64,7 @@ export function ReportButton({ ...box }: IReportButtonProps) {
 
     return (
         <Box {...box}>
-            <IconButton
-                display={{ base: 'flex', lg: 'none' }}
-                size="lg"
-                variant="ghost"
-                aria-label="Warning"
-                color="yellow.500"
-                icon={<AiFillWarning />}
-                onClick={onOpen}
-                width="100%"
-            />
             <Button
-                display={{ base: 'none', lg: 'flex' }}
                 variant="ghost"
                 aria-label="Warning"
                 color="yellow.500"

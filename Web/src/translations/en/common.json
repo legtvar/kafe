@@ -541,5 +541,10 @@
   "organizationRedirect": {
     "title": "Choose your organization",
     "subtitle": "You can switch to another organization at any time in the left panel"
+  },
+  "languageToggle": {
+    "system": "Application language",
+    "content": "Preferred content language",
+    "matching": "Same as app"
   }
 }

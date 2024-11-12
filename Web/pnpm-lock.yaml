@@ -23,6 +23,9 @@ importers:
       '@emotion/styled':
         specifier: ^11.11.0
         version: 11.11.0(@emotion/react@11.11.1(@types/react@18.2.43)(react@18.2.0))(@types/react@18.2.43)(react@18.2.0)
+      '@ladjs/country-language':
+        specifier: ^1.0.3
+        version: 1.0.3
       '@types/react-copy-to-clipboard':
         specifier: ^5.0.7
         version: 5.0.7
@@ -144,6 +147,9 @@ importers:
       '@types/jest':
         specifier: ^29.5.11
         version: 29.5.11
+      '@types/ladjs__country-language':
+        specifier: ^1.0.0
+        version: 1.0.0
       '@types/node':
         specifier: ^20.10.4
         version: 20.10.4
@@ -1852,6 +1858,10 @@ packages:
   '@jridgewell/trace-mapping@0.3.20':
     resolution: {integrity: sha512-R8LcPeWZol2zR8mmH3JeKQ6QRCFb7XgUhV9ZlGhHLGyg4wpPiPZNQOOWhFZhxKw8u//yTbNGI42Bx/3paXEQ+Q==}
 
+  '@ladjs/country-language@1.0.3':
+    resolution: {integrity: sha512-FJROu9/hh4eqVAGDyfL8vpv6Vb0qKHX1ozYLRZ+beUzD5xFf+3r0J+SVIWKviEa7W524Qvqou+ta1WrsRgzxGw==}
+    engines: {node: '>= 14'}
+
   '@leichtgewicht/ip-codec@2.0.4':
     resolution: {integrity: sha512-Hcv+nVC0kZnQ3tD9GVu5xSMR4VVYOteQIr/hwFPVEvPdlXqgGEuRjiheChHgdM+JyqdgNcmzZOX/tnl0JOiI7A==}
 
@@ -2140,6 +2150,9 @@ packages:
 
   '@types/json5@0.0.29':
     resolution: {integrity: sha512-dRLjCWHYg4oaA77cxO64oO+7JwCwnIzkZPdrrC71jQmQtlhM556pwKo5bUzqvZndkVbeFLIIi+9TC40JNF5hNQ==}
+
+  '@types/ladjs__country-language@1.0.0':
+    resolution: {integrity: sha512-hDnkbHDQNakf1AE2Q3WKB1xXueTZb8MdYe1+cBOR9Lm7OQx2uX2VWT/iFiP5jgoZfUIYE/li1Uv4xs1q3edEiA==}
 
   '@types/lodash.mergewith@4.6.7':
     resolution: {integrity: sha512-3m+lkO5CLRRYU0fhGRp7zbsGi6+BZj0uTVSwvcKU+nSlhjA9/QRNfuSGnD2mX6hQA7ZbmcCkzk5h4ZYGOtk14A==}
@@ -9459,6 +9472,8 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.1
       '@jridgewell/sourcemap-codec': 1.4.15
 
+  '@ladjs/country-language@1.0.3': {}
+
   '@leichtgewicht/ip-codec@2.0.4': {}
 
   '@nicolo-ribaudo/eslint-scope-5-internals@5.1.1-v1':
@@ -9779,6 +9794,8 @@ snapshots:
   '@types/json-schema@7.0.15': {}
 
   '@types/json5@0.0.29': {}
+
+  '@types/ladjs__country-language@1.0.0': {}
 
   '@types/lodash.mergewith@4.6.7':
     dependencies:

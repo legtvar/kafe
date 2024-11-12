@@ -544,5 +544,10 @@
   "organizationRedirect": {
     "title": "Zvolte si organizaci",
     "subtitle": "Na jinou organizaci můžete kdykoli přepnout v levém panelu"
+  },
+  "languageToggle": {
+    "system": "Jazyk aplikace",
+    "content": "Preferovaný jazyk obsahu",
+    "matching": "Stejný, jako aplikace"
   }
 }

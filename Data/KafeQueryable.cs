@@ -43,8 +43,8 @@ public static class KafeQueryable
             WHERE
                 (
                     (
-                        (perms.data -> 'AccountEntries' -> ? -> 'EffectivePermission')::int
-                        | perms.data -> 'GlobalPermission'
+                        COALESCE((perms.data -> 'AccountEntries' -> ? -> 'EffectivePermission')::int, 0)
+                        | COALESCE((perms.data -> 'GlobalPermission')::int, 0)
                     )
                     & ?
                 ) = ?
@@ -87,8 +87,8 @@ public static class KafeQueryable
         var sql = $"""
         (
             SELECT
-                (perms.data -> 'AccountEntries' -> ? -> 'EffectivePermission')::int
-                    | (perms.data -> 'GlobalPermission')::int
+                COALESCE((perms.data -> 'AccountEntries' -> ? -> 'EffectivePermission')::int, 0)
+                    | COALESCE((perms.data -> 'GlobalPermission')::int, 0)
             FROM {schema.For<EntityPermissionInfo>()} AS perms
             WHERE perms.id = d.id
         )::int & ? = ?

@@ -1,9 +1,6 @@
 import { Avatar, AvatarProps, Tooltip } from '@chakra-ui/react';
 import { Organization } from '../../../data/Organization';
 import { useOrganizations } from '../../../hooks/Caffeine';
-import gamesfimuni from './avatars/gamesfimuni.png';
-import legacy from './avatars/legacy--org.png';
-import lemmafimuni from './avatars/lemmafimuni.jpg';
 
 export interface IOrganizationAvatarProps extends AvatarProps {
     organization: Organization;
@@ -11,9 +8,9 @@ export interface IOrganizationAvatarProps extends AvatarProps {
 }
 
 const organizationAvatars: Record<string, string> = {
-    lemmafimuni,
-    gamesfimuni,
-    'legacy--org': legacy,
+    lemmafimuni: '/avatars/lemmafimuni.jpg',
+    gamesfimuni: '/avatars/gamesfimuni.png',
+    'legacy--org': '/avatars/legacy--org.png',
 };
 
 export function OrganizationAvatar({ organization, noHighlight, ...props }: IOrganizationAvatarProps) {

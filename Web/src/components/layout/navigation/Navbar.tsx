@@ -138,12 +138,15 @@ export function Navbar({ onOpen, forceReload, signedIn, ...rest }: INavbarProps)
                                     </HStack>
                                 </MenuButton>
                                 <MenuList>
-                                    <MenuItem display={{ base: 'flex', md: 'none' }} onClick={() => toggleLanguage()}>
-                                        {t('navbar.language').toString()}
-                                    </MenuItem>
-                                    <MenuItem display={{ base: 'flex', md: 'none' }} onClick={toggleColorMode}>
-                                        {t('navbar.colorMode').toString()}
-                                    </MenuItem>
+                                    <HStack display={{ base: 'flex', md: 'none' }} px={2}>
+                                        <LanguageToggle aria-label="Language" onLanguageToggled={() => forceReload()} />
+                                        <ColorModeToggle aria-label="Toggle Color Mode" />
+                                        {!signedIn && (
+                                            <Link to="/account/login">
+                                                <Button ml={4}>{t('home.signin').toString()}</Button>
+                                            </Link>
+                                        )}
+                                    </HStack>
                                     <MenuDivider display={{ base: 'block', md: 'none' }} />
                                     <MenuItem
                                         onClick={() => {

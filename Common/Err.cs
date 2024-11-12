@@ -21,17 +21,15 @@ public readonly record struct Err<T>
         errors = ImmutableArray<Error>.Empty;
     }
 
-    public Err(T value) : this()
+    public Err(T value) : this(value, [])
     {
-        this.value = value;
     }
 
-    public Err(ImmutableArray<Error> errors) : this()
+    public Err(ImmutableArray<Error> errors) : this(default!, errors)
     {
-        this.errors = errors;
     }
 
-    public Err(Error error) : this(ImmutableArray.Create(error))
+    public Err(Error error) : this([error])
     {
     }
 
@@ -39,6 +37,16 @@ public readonly record struct Err<T>
     {
         var stackTrace = new StackTrace(skipFrames: 1, fNeedFileInfo: true);
         errors = [new Error(exception, stackTrace.ToString())];
+    }
+
+    public Err(T value, ImmutableArray<Error> errors) : this()
+    {
+        this.value = value;
+        this.errors = errors;
+    }
+
+    public Err(T value, Error error) : this(value, [error])
+    {
     }
 
     public T Value => value;
@@ -66,6 +74,21 @@ public readonly record struct Err<T>
     public static implicit operator Err<T>(Exception exception)
     {
         return new Err<T>(exception);
+    }
+
+    public static implicit operator Err<T>((T value, ImmutableArray<Error> errors) pair)
+    {
+        return new Err<T>(pair.value, pair.errors);
+    }
+
+    public static implicit operator Err<T>((T value, Error error) pair)
+    {
+        return new Err<T>(pair.value, pair.error);
+    }
+    
+    public static implicit operator Err<T>((T value, Exception exception) pair)
+    {
+        return new Err<T>(pair.value, pair.exception);
     }
 
     // NB: This is explicit to force people to unwrap their errors properly.

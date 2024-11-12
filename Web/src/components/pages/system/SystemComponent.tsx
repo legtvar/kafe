@@ -15,8 +15,10 @@ import {
 } from '@chakra-ui/react';
 import { t } from 'i18next';
 import moment from 'moment';
-import { IoWarning } from 'react-icons/io5';
+import { useCallback } from 'react';
+import { IoSaveOutline, IoWarning } from 'react-icons/io5';
 import { useNavigate } from 'react-router-dom';
+import { API } from '../../../api/API';
 import { useAuth } from '../../../hooks/Caffeine';
 import { useColorScheme } from '../../../hooks/useColorScheme';
 import { AllPermissions, SystemHRIB } from '../../../schemas/generic';
@@ -37,9 +39,11 @@ export function SystemComponent(props: ISystemComponentProps) {
 
     const readonly = !user?.permissions['system']?.includes('write');
 
+    const getStatus = useCallback((api: API) => api.system.status(), []);
+
     return (
         <OutletOrChildren>
-            <AwaitAPI request={(api) => api.entities.perms.getById(SystemHRIB)}>
+            <AwaitAPI request={useCallback((api) => api.entities.perms.getById(SystemHRIB), [])}>
                 {(perms) => (
                     <Box m={6} pb={12}>
                         <SendAPI
@@ -63,6 +67,7 @@ export function SystemComponent(props: ISystemComponentProps) {
                                         </Heading>
                                         {!readonly && (
                                             <Button
+                                                leftIcon={<IoSaveOutline />}
                                                 colorScheme="blue"
                                                 ml={{
                                                     base: '0',
@@ -110,7 +115,7 @@ export function SystemComponent(props: ISystemComponentProps) {
                                     />
                                 </TabPanel>
                                 <TabPanel>
-                                    <AwaitAPI request={(api) => api.system.status()}>
+                                    <AwaitAPI request={getStatus}>
                                         {(status) => (
                                             <>
                                                 <Heading as="h1" fontSize="2xl">

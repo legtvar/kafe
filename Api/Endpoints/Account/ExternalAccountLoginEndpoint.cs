@@ -29,8 +29,10 @@ public class ExternalAccountLoginEndpoint : EndpointBaseSync
             },
             OpenIdConnectDefaults.AuthenticationScheme);
     }
-    
-    public record RequestData(
-        [FromQuery(Name = "redirect")] string? Redirect
-    );
+
+    public record RequestData
+    {
+        [FromQuery(Name = "redirect")]
+        public string? Redirect { get; set; }
+    }
 }

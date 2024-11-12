@@ -1,6 +1,7 @@
 import { Box, Button, Flex, Heading, Spacer, Stack } from '@chakra-ui/react';
 import ChakraUIRenderer from 'chakra-ui-markdown-renderer';
 import { t } from 'i18next';
+import { useCallback } from 'react';
 import { AiOutlineEdit } from 'react-icons/ai';
 import Markdown from 'react-markdown';
 import { Link, useParams } from 'react-router-dom';
@@ -23,7 +24,7 @@ export function GroupsDetail(props: IGroupsDetailProps) {
     return (
         <OutletOrChildren>
             <AwaitAPI
-                request={(api) => api.groups.getById(id)}
+                request={useCallback((api) => api.groups.getById(id), [id])}
                 error={(error) => <Status statusCode={404} embeded log={error} />}
             >
                 {(group: Group) => (

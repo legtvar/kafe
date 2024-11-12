@@ -76,15 +76,15 @@ export function ReportButton({ ...box }: IReportButtonProps) {
             />
             <Button
                 display={{ base: 'none', lg: 'flex' }}
-                size="lg"
                 variant="ghost"
                 aria-label="Warning"
                 color="yellow.500"
                 leftIcon={<AiFillWarning />}
                 onClick={onOpen}
                 width="100%"
+                justifyContent="start"
             >
-                {t('troubleshooting.title').toString()}
+                <Text ml={2}>{t('troubleshooting.title').toString()}</Text>
             </Button>
 
             <Modal isOpen={isOpen} onClose={closeHandler} size="xl">
@@ -130,6 +130,7 @@ export function ReportButton({ ...box }: IReportButtonProps) {
                             borderRadius="md"
                             bg={useColorModeValue('gray.100', 'gray.800')}
                             maxH="64"
+                            maxW="full"
                             overflow="auto"
                             whiteSpace="pre-wrap"
                             position="relative"

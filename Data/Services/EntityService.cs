@@ -121,6 +121,7 @@ public class EntityService
                     ProjectInfo p => new ProjectGlobalPermissionsChanged(p.Id, permissions),
                     PlaylistInfo p => new PlaylistGlobalPermissionsChanged(p.Id, permissions),
                     AuthorInfo a => new AuthorGlobalPermissionsChanged(a.Id, permissions),
+                    OrganizationInfo o => new OrganizationGlobalPermissionsChanged(o.Id, permissions),
                     _ => throw new NotSupportedException($"{entity.GetType().Name} is not a supported entity type.")
                 };
 

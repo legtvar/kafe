@@ -1,5 +1,6 @@
-import { Text } from '@chakra-ui/react';
+import { Button, Text, VStack } from '@chakra-ui/react';
 import { t } from 'i18next';
+import { AiOutlineDownload } from 'react-icons/ai';
 import { ReactPlayerProps } from 'react-player';
 import { Artifact } from '../../data/Artifact';
 import { Shard } from '../../data/Shard';
@@ -93,5 +94,19 @@ export function ContentViewer({
         }
     }
 
-    return <Text color="gray.500">{t('content.unknownType').toString()}</Text>;
+    return (
+        <VStack spacing={6}>
+            <Text color="gray.500">{t('content.unknownType').toString()}</Text>
+            {artifact.shards.map((shard) => (
+                <Button key={shard.id} leftIcon={<AiOutlineDownload />}>
+                    {t('generic.download')} {t('generic.file')} {shard.id}
+                </Button>
+            ))}
+            {artifact.shards.length === 0 && (
+                <Text color="gray.500" fontStyle="italic">
+                    {t('artifact.noContent').toString()}
+                </Text>
+            )}
+        </VStack>
+    );
 }

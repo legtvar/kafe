@@ -3,7 +3,6 @@ import {
     BoxProps,
     Button,
     IconButton,
-    Link,
     Modal,
     ModalBody,
     ModalCloseButton,
@@ -17,8 +16,8 @@ import {
 import { t } from 'i18next';
 import { Trans } from 'react-i18next';
 import { AiFillWarning } from 'react-icons/ai';
-import { Autolink } from '../utils/Autolink';
 import { Autoemail } from '../utils/Autoemail';
+import { Autolink } from '../utils/Autolink';
 
 interface IMessageButtonProps extends BoxProps {
     titleKey: string;
@@ -43,7 +42,6 @@ export function MessageButton({ titleKey, warningKey, descriptionKey, ...box }: 
             />
             <Button
                 display={{ base: 'none', lg: 'flex' }}
-                size="lg"
                 variant="ghost"
                 aria-label="Warning"
                 color="yellow.500"

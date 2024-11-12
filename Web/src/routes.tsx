@@ -8,6 +8,8 @@ import {
     IoHomeOutline,
     IoListCircle,
     IoListCircleOutline,
+    IoPeople,
+    IoPeopleOutline,
     IoSettingsOutline,
     IoSettingsSharp,
 } from 'react-icons/io5';
@@ -21,24 +23,28 @@ import { GroupsCreate } from './components/pages/groups/GroupsCreate';
 import { GroupsDetail } from './components/pages/groups/GroupsDetail';
 import { GroupsEdit } from './components/pages/groups/GroupsEdit';
 import { Home } from './components/pages/home/Home';
+import { OrganizationsEdit } from './components/pages/organization/OrganizationsEdit';
 import { Player } from './components/pages/Player';
 import { PlaylistCreate } from './components/pages/playlists/PlaylistCreate';
 import { PlaylistDetail } from './components/pages/playlists/PlaylistDetail';
 import { PlaylistEdit } from './components/pages/playlists/PlaylistEdit';
 import { PlaylistGallery } from './components/pages/playlists/PlaylistGallery';
 import { PlaylistList } from './components/pages/playlists/PlaylistList';
+import { AuthorDetail } from './components/pages/projects/authors/AuthorDetail';
 import { CreateProject } from './components/pages/projects/CreateProject';
 import { ProjectDetail } from './components/pages/projects/ProjectDetail';
 import { ProjectEdit } from './components/pages/projects/ProjectEdit';
 import { Projects } from './components/pages/projects/Projects';
 import { AccountRoot } from './components/pages/root/AccountRoot';
 import { AuthRoot } from './components/pages/root/AuthRoot';
+import { OrganizationRedirect } from './components/pages/root/OrganizationRedirect';
 import { Root } from './components/pages/root/Root';
 import { UnauthRoot } from './components/pages/root/UnauthRoot';
 import { ServerError } from './components/pages/ServerError';
 import { SystemComponent } from './components/pages/system/SystemComponent';
 import { OutletOrChildren } from './components/utils/OutletOrChildren';
 import { Status } from './components/utils/Status';
+import { Organization } from './data/Organization';
 import { User } from './data/User';
 import { Permission } from './schemas/generic';
 
@@ -70,8 +76,14 @@ export const routerConfig = (t: (id: string) => string): RouteObject[] => [
             },
             {
                 path: 'auth',
-                element: <AuthRoot />,
-                children: authRoutes(t),
+                element: <OrganizationRedirect />,
+                children: [
+                    {
+                        path: ':organization',
+                        element: <AuthRoot />,
+                        children: authRoutes(t),
+                    },
+                ],
             },
             {
                 path: 'account',
@@ -98,7 +110,11 @@ export const routerConfig = (t: (id: string) => string): RouteObject[] => [
     },
 ];
 
-export const authRoutes = (t: (id: string) => string, user?: User | null): AppRoute[] => [
+export const authRoutes = (
+    t: (id: string) => string,
+    user?: User | null,
+    currentOrganization?: Organization,
+): AppRoute[] => [
     {
         path: '',
         title: t('route.home.title'),
@@ -119,6 +135,11 @@ export const authRoutes = (t: (id: string) => string, user?: User | null): AppRo
             selected: IoCube,
         },
         children: [
+            {
+                path: 'authors/:id',
+                title: t('route.projects.authors.title'),
+                element: <AuthorDetail />,
+            },
             {
                 path: ':id',
                 title: t('route.projects.detail.title'),
@@ -177,6 +198,41 @@ export const authRoutes = (t: (id: string) => string, user?: User | null): AppRo
             selected: IoListCircle,
         },
         children: playlistChildRoutes(t),
+    },
+    {
+        path: 'organization',
+        title: t('route.organizations.title'),
+        element: <OrganizationsEdit />,
+        inMenu: (['append', 'write', 'all'] as Permission[]).some((perm) =>
+            currentOrganization?.userPermissions?.includes(perm),
+        ),
+        icon: {
+            default: IoPeopleOutline,
+            selected: IoPeople,
+        },
+        // children: [
+        //     {
+        //         path: 'create',
+        //         title: t('route.organizations.create.title'),
+        //         element: <OrganizationsCreate />,
+        //     },
+        //     {
+        //         path: ':id',
+        //         title: '',
+        //         element: (
+        //             <OutletOrChildren>
+        //                 <Navigate to="edit" replace />
+        //             </OutletOrChildren>
+        //         ),
+        //         children: [
+        //             {
+        //                 path: 'edit',
+        //                 title: t('route.organizations.edit.title'),
+        //                 element: <OrganizationsEdit />,
+        //             },
+        //         ],
+        //     },
+        // ],
     },
     {
         path: 'system',

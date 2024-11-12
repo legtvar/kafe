@@ -15,7 +15,7 @@ namespace Kafe.Api.Endpoints.Project;
 [ApiVersion("1")]
 [Route("projects")]
 public class ProjectListEndpoint : EndpointBaseAsync
-    .WithoutRequest
+    .WithRequest<ProjectListEndpoint.RequestData>
     .WithActionResult<ImmutableArray<ProjectListDto>>
 {
     private readonly ProjectService projectService;
@@ -33,11 +33,17 @@ public class ProjectListEndpoint : EndpointBaseAsync
     }
 
     [HttpGet]
-    [SwaggerOperation(Tags = new[] { EndpointArea.Project })]
+    [SwaggerOperation(Tags = [EndpointArea.Project])]
     public override async Task<ActionResult<ImmutableArray<ProjectListDto>>> HandleAsync(
+        RequestData requestData,
         CancellationToken cancellationToken = default)
     {
-        var projects =  await projectService.List(new(AccessingAccountId: userProvider.AccountId), cancellationToken);
+        var filter = new ProjectService.ProjectFilter(
+            AccessingAccountId: userProvider.AccountId,
+            OrganizationId: requestData.OrganizationId,
+            ProjectGroupId: requestData.ProjectGroupId
+        );
+        var projects = await projectService.List(filter, requestData.Sort, cancellationToken);
         var perms = await entityService.
             GetPermissions(projects.Select(p => (Hrib)p.Id),
             userProvider.AccountId,
@@ -45,5 +51,17 @@ public class ProjectListEndpoint : EndpointBaseAsync
         return Ok(projects.Zip(perms)
             .Select((p) => TransferMaps.ToProjectListDto(p.First, p.Second))
             .ToImmutableArray());
+    }
+
+    public record RequestData
+    {
+        [FromQuery(Name = "organization")]
+        public string? OrganizationId { get; set; }
+
+        [FromQuery(Name = "project-group")]
+        public string? ProjectGroupId { get; set; }
+
+        [FromQuery(Name = "sort")]
+        public string? Sort { get; set; } = "name.iv";
     }
 }

@@ -1,5 +1,6 @@
 import { Box, Button, Flex, Heading, SimpleGrid } from '@chakra-ui/react';
 import { t } from 'i18next';
+import { useCallback } from 'react';
 import { AiOutlineEdit } from 'react-icons/ai';
 import { Link, useParams } from 'react-router-dom';
 import { Project } from '../../../data/Project';
@@ -22,7 +23,12 @@ export function ProjectDetail(props: IProjectDetailProps) {
 
     return (
         <OutletOrChildren>
-            <AwaitAPI request={(api) => api.projects.getById(id)} error={<Status statusCode={404} embeded />}>
+            <AwaitAPI
+                request={useCallback((api) => api.projects.getById(id), [id])}
+                error={(resp) => {
+                    return <Status statusCode={resp.response.status} log={resp.response.detail} embeded />;
+                }}
+            >
                 {(project: Project) => (
                     <Box m={6} pb={12}>
                         <WithTitle title={t('title.project', { project: project.getName() })} />

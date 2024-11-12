@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import subsrt from 'subsrt-ts';
 import { Caption, ContentCaption } from 'subsrt-ts/dist/types/handler';
+import { useApi } from '../../../hooks/Caffeine';
 
 export interface ISubtitlesProps {
     path: string | null;
@@ -11,6 +12,7 @@ export interface ISubtitlesProps {
 
 export function Subtitles({ path, currentSeconds }: ISubtitlesProps) {
     const [subtitleData, setSubtitleData] = useState<Caption[] | null>(null);
+    const api = useApi();
 
     console.log(currentSeconds);
 
@@ -20,7 +22,9 @@ export function Subtitles({ path, currentSeconds }: ISubtitlesProps) {
         setSubtitleData(null);
 
         (async () => {
-            const response = await axios.get(path);
+            const response = await axios.get(path, {
+                withCredentials: true,
+            });
             const data = subsrt.parse(response.data);
             setSubtitleData(data);
             console.log(data);

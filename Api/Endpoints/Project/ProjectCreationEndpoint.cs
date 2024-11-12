@@ -2,6 +2,7 @@
 using Asp.Versioning;
 using Kafe.Api.Services;
 using Kafe.Api.Transfer;
+using Kafe.Data.Aggregates;
 using Kafe.Data.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -34,7 +35,7 @@ public class ProjectCreationEndpoint : EndpointBaseAsync
     }
 
     [HttpPost]
-    [SwaggerOperation(Tags = new[] { EndpointArea.Project })]
+    [SwaggerOperation(Tags = [EndpointArea.Project])]
     public override async Task<ActionResult<Hrib>> HandleAsync(
         ProjectCreationDto request,
         CancellationToken cancellationToken = default)
@@ -46,13 +47,20 @@ public class ProjectCreationEndpoint : EndpointBaseAsync
         }
 
         var project = await projectService.Create(
-            projectGroupId: request.ProjectGroupId.ToString(),
-            name: request.Name,
-            description: request.Description,
-            genre: request.Genre,
-            ownerId: userProvider.AccountId,
-            token: cancellationToken);
+        @new: ProjectInfo.Create(
+            projectGroupId: request.ProjectGroupId,
+            name: request.Name) with
+        {
+            Description = request.Description,
+            Genre = request.Genre
+        },
+        ownerId: userProvider.AccountId,
+        cancellationToken);
+        if (project.HasErrors)
+        {
+            return project.ToActionResult();
+        }
 
-        return Ok(project.Id);
+        return Ok((Hrib)project.Value.Id);
     }
 }

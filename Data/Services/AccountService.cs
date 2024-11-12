@@ -1,6 +1,7 @@
 ﻿using Kafe.Common;
 using Kafe.Data.Aggregates;
 using Kafe.Data.Events;
+using Kafe.Data.Metadata;
 using Marten;
 using Marten.Linq;
 using Marten.Linq.MatchesSql;
@@ -20,12 +21,15 @@ public class AccountService
 {
     public static readonly TimeSpan ConfirmationTokenExpiration = TimeSpan.FromHours(24);
     private readonly IDocumentSession db;
-
+    private readonly EntityMetadataProvider entityMetadataProvider;
     public const string PreferredUsernameClaim = "preferred_username";
 
-    public AccountService(IDocumentSession db)
+    public AccountService(
+        IDocumentSession db,
+        EntityMetadataProvider entityMetadataProvider)
     {
         this.db = db;
+        this.entityMetadataProvider = entityMetadataProvider;
     }
 
     public async Task<AccountInfo?> Load(
@@ -215,7 +219,11 @@ public class AccountService
         ImmutableDictionary<string, Permission>? Permissions = default
     );
 
-    public async Task<ImmutableArray<AccountInfo>> List(AccountFilter? filter = null, CancellationToken token = default)
+    public async Task<ImmutableArray<AccountInfo>> List(
+        AccountFilter? filter = null,
+        string? sort = null,
+        CancellationToken token = default
+    )
     {
         filter ??= new AccountFilter();
 
@@ -235,8 +243,12 @@ $@"TRUE = ALL(
 )"));
         }
 
-        var results = await query.ToListAsync();
-        return results.ToImmutableArray();
+        if (!string.IsNullOrEmpty(sort))
+        {
+            query = (IMartenQueryable<AccountInfo>)query.OrderBySortString(entityMetadataProvider, sort);
+        }
+
+        return (await query.ToListAsync(token: token)).ToImmutableArray();
     }
 
     public async Task<Err<AccountInfo>> CreateOrRefreshTemporaryAccount(

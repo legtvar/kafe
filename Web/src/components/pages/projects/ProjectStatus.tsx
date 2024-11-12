@@ -1,5 +1,7 @@
 import { Text } from '@chakra-ui/react';
 import { t } from 'i18next';
+import { useCallback } from 'react';
+import { API } from '../../../api/API';
 import { Project } from '../../../data/Project';
 import { useColorScheme } from '../../../hooks/useColorScheme';
 import { components } from '../../../schemas/api';
@@ -14,13 +16,16 @@ interface IProjectStatusProps {
 
 export function ProjectStatus(props: IProjectStatusProps) {
     const { lighten } = useColorScheme();
+
+    const getProject = useCallback((api: API) => api.projects.getById(props.projectId), [props.projectId]);
+
     return (
         <AwaitAPI
-            request={(api) => api.projects.validationById(props.projectId)}
+            request={useCallback((api) => api.projects.validationById(props.projectId), [props.projectId])}
             error={<Text color={lighten}>Automatizovaná kontrola nebyla spuštěna</Text>}
         >
             {(validation: components['schemas']['ProjectValidationDto']) => (
-                <AwaitAPI request={(api) => api.projects.getById(props.projectId)}>
+                <AwaitAPI request={getProject}>
                     {(project: Project) => (
                         <>
                             <StatusGroup stage="info" diagnostics={validation.diagnostics} />

@@ -1,6 +1,7 @@
 ﻿using Kafe.Common;
 using Kafe.Data.Aggregates;
 using Kafe.Data.Events;
+using Kafe.Data.Metadata;
 using Marten;
 using Marten.Linq;
 using Marten.Linq.MatchesSql;
@@ -19,50 +20,59 @@ public partial class ProjectService
     private readonly IDocumentSession db;
     private readonly AccountService accountService;
     private readonly ArtifactService artifactService;
+    private readonly EntityMetadataProvider entityMetadataProvider;
 
     public ProjectService(
         IDocumentSession db,
         AccountService accountService,
-        ArtifactService artifactService)
+        ArtifactService artifactService,
+        EntityMetadataProvider entityMetadataProvider)
     {
         this.db = db;
         this.accountService = accountService;
         this.artifactService = artifactService;
+        this.entityMetadataProvider = entityMetadataProvider;
     }
 
-    public async Task<ProjectInfo> Create(
-        string projectGroupId,
-        LocalizedString name,
-        LocalizedString? description,
-        LocalizedString? genre,
-        Hrib? ownerId,
-        Hrib? id = null,
+    public async Task<Err<ProjectInfo>> Create(
+        ProjectInfo @new,
+        Hrib? ownerId = null,
         CancellationToken token = default)
     {
-        var group = await db.LoadAsync<ProjectGroupInfo>(projectGroupId, token);
-        if (group is null)
+        var parseResult = Hrib.Parse(@new.Id);
+        if (parseResult.HasErrors)
         {
-            throw new ArgumentOutOfRangeException($"Project group '{projectGroupId}' does not exist.");
+            return parseResult.Errors;
         }
 
-        if (!group.IsOpen)
+        var group = await db.KafeLoadAsync<ProjectGroupInfo>(@new.ProjectGroupId, token);
+        if (group.HasErrors)
         {
-            throw new ArgumentException($"Project group '{projectGroupId}' is not open.");
+            return group.Errors;
         }
 
-        var projectId = (id ?? Hrib.Create()).ToString();
+        if (!group.Value.IsOpen)
+        {
+            return new Error($"Project group '{@new.ProjectGroupId}' is not open.");
+        }
+
+        var projectId = parseResult.Value;
+        if (projectId.IsEmpty)
+        {
+            projectId = Hrib.Create();
+        }
 
         var created = new ProjectCreated(
-            ProjectId: projectId,
+            ProjectId: projectId.ToString(),
             CreationMethod: CreationMethod.Api,
-            ProjectGroupId: projectGroupId,
-            Name: name);
+            ProjectGroupId: @new.ProjectGroupId,
+            Name: @new.Name);
 
         var infoChanged = new ProjectInfoChanged(
-            ProjectId: projectId,
-            Name: name,
-            Description: description,
-            Genre: genre);
+            ProjectId: projectId.ToString(),
+            Name: @new.Name,
+            Description: @new.Description,
+            Genre: @new.Genre);
 
         db.Events.KafeStartStream<ProjectInfo>(created.ProjectId, created, infoChanged);
         await db.SaveChangesAsync(token);
@@ -75,11 +85,8 @@ public partial class ProjectService
                 token);
         }
 
-        var project = await db.Events.AggregateStreamAsync<ProjectInfo>(created.ProjectId, token: token);
-        if (project is null)
-        {
-            throw new InvalidOperationException($"Could not persist a project with id '{created.ProjectId}'.");
-        }
+        var project = await db.Events.AggregateStreamAsync<ProjectInfo>(created.ProjectId, token: token)
+            ?? throw new InvalidOperationException($"Could not persist a project with id '{created.ProjectId}'.");
 
         return project;
     }
@@ -180,10 +187,14 @@ public partial class ProjectService
     /// </param>
     public record ProjectFilter(
         Hrib? ProjectGroupId = null,
+        Hrib? OrganizationId = null,
         Hrib? AccessingAccountId = null
     );
 
-    public async Task<ImmutableArray<ProjectInfo>> List(ProjectFilter? filter = null, CancellationToken token = default)
+    public async Task<ImmutableArray<ProjectInfo>> List(
+        ProjectFilter? filter = null,
+        string? sort = null,
+        CancellationToken token = default)
     {
         filter ??= new ProjectFilter();
 
@@ -203,6 +214,26 @@ public partial class ProjectService
             query = (IMartenQueryable<ProjectInfo>)query
                 .Where(e => e.ProjectGroupId == filter.ProjectGroupId.ToString());
         }
+
+        if (filter.OrganizationId is not null)
+        {
+            var sql =
+            $"""
+            (
+                SELECT g.data ->> 'OrganizationId'
+                FROM {db.DocumentStore.Options.Schema.For<ProjectGroupInfo>()} AS g
+                WHERE g.id = d.data ->> 'ProjectGroupId'
+            ) = ?
+            """;
+            query = (IMartenQueryable<ProjectInfo>)query
+                .Where(p => p.MatchesSql(sql, filter.OrganizationId.ToString()));
+        }
+
+        if (!string.IsNullOrEmpty(sort))
+        {
+            query = (IMartenQueryable<ProjectInfo>)query.OrderBySortString(entityMetadataProvider, sort);
+        }
+
         var results = (await query.ToListAsync(token)).ToImmutableArray();
         return results;
     }
@@ -297,7 +328,7 @@ public partial class ProjectService
         {
             return Error.NotFound(projectId, "A project");
         }
-        
+
         var existingArtifactIds = (await artifactService.LoadMany(artifacts.Select(a => a.id), token))
             .Select(a => a.Id)
             .ToImmutableHashSet();

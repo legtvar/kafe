@@ -41,11 +41,12 @@
     "edit": "Upravit",
     "save": "Uložit",
     "understood": "Chápu",
-    "send": "Odeslat"
+    "send": "Odeslat",
+    "invariant": "Mezinárodní"
   },
   "content": {
     "noFileSelected": "Žádný vybraný soubor",
-    "unknownType": "Neznámý typ souboru"
+    "unknownType": "Neznámý typ"
   },
   "countdown": {
     "days": "dní",
@@ -101,7 +102,9 @@
     "files": "souborů",
     "quitEdit": "Ukončit editaci",
     "construction": "Kde nic tu nic, tato stránka se připravuje...",
-    "allowMarkdown": "Toto pole umožňuje zadat text formátovaný, jako Markdown"
+    "allowMarkdown": "Toto pole umožňuje zadat text formátovaný, jako Markdown",
+    "download": "Stáhnout",
+    "file": "soubor"
   },
   "home": {
     "signin": "Přihlásit se",
@@ -109,7 +112,8 @@
     "openProjects": "Aktuálně otevřené projekty",
     "openGroups": "Otevřené skupiny projektů",
     "myProjects": "Moje projekty",
-    "subtitle": "Podívej se, co je nového!"
+    "subtitle": "Podívej se, co je nového!",
+    "noOpenGroups": "Aktuálně není otevřená žádná skupina projektů"
   },
   "homeFestival": {
     "title": "24. Filmový festival FI MU"
@@ -223,7 +227,7 @@
     "disclaimer": "Automatická kontrola je zatím ve stádiu vývoje. Výsledky prosím berte s rezervou."
   },
   "register": {
-    "button": "Zaregistrovat se",
+    "button": "Přihlásit se",
     "email": "Emailová adresa",
     "firstName": "Křestní jméno",
     "lastName": "Příjmení",
@@ -231,7 +235,8 @@
     "password": "Heslo",
     "passwordAgain": "Heslo znovu",
     "subtitle": "pro přístup k vaší denní dávce kofeinu",
-    "title": "Zaregistrujte se"
+    "title": "Zaregistrujte se",
+    "divider": "Nebo"
   },
   "role": {
     "admin": "Administrátor",
@@ -273,10 +278,22 @@
       "detail": {
         "title": "Upravit projekt"
       },
-      "title": "Projekty"
+      "title": "Projekty",
+      "authors": {
+        "title": "Autoři"
+      }
     },
     "system": {
       "title": "Systém"
+    },
+    "organizations": {
+      "title": "Organizace",
+      "create": {
+        "title": "Vytvořit organizaci"
+      },
+      "edit": {
+        "title": "Upravit organizaci"
+      }
     }
   },
   "title": {
@@ -292,16 +309,41 @@
     "projectCreate": "Nový projekt",
     "error": "{{error}} | Chyba",
     "login": "Přihlášení",
-    "system": "Systém"
+    "system": "Systém",
+    "organizations": "Organizace",
+    "organization": "{{group}} | Organizace",
+    "organizationsCreate": "Vytvořit organizaci",
+    "author": "{{author}} | Autor"
   },
   "sendApi": {
     "error": "Ve formuláři je chyba",
     "unknownError": "Došlo k chybě při odesílání formuláře"
   },
   "status": {
+    "400": {
+      "subtitle": "Odeslaný požadavek je chybný",
+      "title": "Chybný požadavek"
+    },
+    "401": {
+      "subtitle": "Nemáte dostatečná oprávnění",
+      "title": "Neautorizováno"
+    },
+    "403": {
+      "subtitle": "Nemáte dostatečná oprávnění",
+      "title": "Zakázáno"
+    },
     "404": {
       "subtitle": "Vypadá to, že stránka kterou hledáte neexistuje",
       "title": "Stránka nebyla nalezena"
+    },
+    "500": {
+      "subtitle": "Ale ne, něco se šíleně pokazilo!",
+      "title": "Při zpracování došlo k chybě"
+    },
+    "offline": {
+      "title": "Je nám líto, ale KAFE je momentálně offline",
+      "subtitle": "Zkuste to prosím za chvíli",
+      "code": "Offline"
     },
     "backlink": "Vrátit se zpět"
   },
@@ -334,7 +376,8 @@
   },
   "artifact": {
     "delete": "Odstranit artefakt",
-    "deleteWarn": "Opravdu chcete odstranit vybraný artefatk? Tato operace je nevratná!"
+    "deleteWarn": "Opravdu chcete odstranit vybraný artefatk? Tato operace je nevratná!",
+    "noContent": "Artefakt neobsahuje žádné soubory"
   },
   "projectList": {
     "search": "Hledat projekty"
@@ -442,7 +485,8 @@
     "loadingError": "Toto video bohužel nelze přehrát v této kvalitě"
   },
   "general": {
-    "copied": "Zkopírováno!"
+    "copied": "Zkopírováno!",
+    "autosave": "Změny provedené na této stránce se ukládají automaticky"
   },
   "reatePlaylist": {
     "fields": {
@@ -464,5 +508,49 @@
     "files": {
       "description": "Tahem můžete měnit pořadí souborů, či přidat nový soubor do playlistu"
     }
+  },
+  "organizations": {
+    "search": "Hledat organizace",
+    "create": "Vytvořit organizaci"
+  },
+  "createOrganization": {
+    "fields": {
+      "name": "Název organizace"
+    },
+    "button": {
+      "update": "Uložit organizaci",
+      "create": "Vytvořit organizaci"
+    }
+  },
+  "avatar": {
+    "clicks": {
+      "fullfilled": {
+        "title": "Vtělení je zahájeno",
+        "description": "Gratuluji, kliknul jsi 10x na avatar a díky tomu tě právě převtělíme do dané osoby! Držte si klobouky!"
+      },
+      "noPerson": {
+        "title": "Vtělení se nepovedlo!",
+        "description": "Tato osoba bohužel nemá uvedené ID."
+      }
+    }
+  },
+  "root": {
+    "offline": "Offline"
+  },
+  "cookies": {
+    "title": "KAFE a sušenky",
+    "description": "<1>Zkoušeli jste si někdy dávat kafe bez sušenek? Celkem nuda...</1><2>Cookies jsou důležité pro správnou funkci aplikace. Starají se o ukládání vašich preferencí a přihlašovacích údajů.</2><3>Chtěli bychom vás tímto poprosit o Váš souhlas se servírováním cookies společně s KAFE.</3>",
+    "reject": "Nemám rád cookies",
+    "accept": "Mňam, to beru!"
+  },
+  "organizationRedirect": {
+    "title": "Zvolte si organizaci",
+    "subtitle": "Na jinou organizaci můžete kdykoli přepnout v levém panelu"
+  },
+  "languageToggle": {
+    "system": "Jazyk aplikace",
+    "content": "Preferovaný jazyk obsahu",
+    "matching": "Stejný, jako aplikace",
+    "more": "Zobrazit další"
   }
 }

@@ -13,13 +13,14 @@ using Swashbuckle.AspNetCore.Annotations;
 using Kafe.Api.Services;
 using System.Collections.Immutable;
 using Kafe.Data.Services;
+using Microsoft.IdentityModel.Protocols;
 
 namespace Kafe.Api.Endpoints.ProjectGroup;
 
 [ApiVersion("1")]
 [Route("project-groups")]
 public class ProjectGroupListEndpoint : EndpointBaseAsync
-    .WithoutRequest
+    .WithRequest<ProjectGroupListEndpoint.RequestData>
     .WithActionResult<ImmutableArray<ProjectGroupListDto>>
 {
     private readonly ProjectGroupService projectGroupService;
@@ -36,13 +37,24 @@ public class ProjectGroupListEndpoint : EndpointBaseAsync
     [HttpGet]
     [SwaggerOperation(Tags = new[] { EndpointArea.ProjectGroup })]
     public override async Task<ActionResult<ImmutableArray<ProjectGroupListDto>>> HandleAsync(
+        RequestData request,
         CancellationToken cancellationToken = default)
     {
         var filter = new ProjectGroupService.ProjectGroupFilter(
-            AccessingAccountId: userProvider.AccountId
+            AccessingAccountId: userProvider.AccountId,
+            OrganizationId: request.OrganizationId
         );
-        
-        var groups = await projectGroupService.List(filter, cancellationToken);
+
+        var groups = await projectGroupService.List(filter, request.Sort, cancellationToken);
         return Ok(groups.Select(TransferMaps.ToProjectGroupListDto));
+    }
+
+    public record RequestData
+    {
+        [FromQuery(Name = "organization")]
+        public string? OrganizationId { get; set; }
+
+        [FromQuery(Name = "sort")]
+        public string? Sort { get; set; } = "name.iv";
     }
 }

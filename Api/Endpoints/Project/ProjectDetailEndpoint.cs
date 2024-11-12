@@ -83,10 +83,10 @@ public class ProjectDetailEndpoint : EndpointBaseAsync
         };
 
         var artifactDetails = await artifactService.LoadDetailMany(
-            project.Artifacts.Select(a => (Hrib)a.Id),
+            project.Artifacts.Select(a => (Hrib)a.Id).Distinct(),
             cancellationToken);
         var authors = await authorService.LoadMany(
-            project.Authors.Select(a => (Hrib)a.Id),
+            project.Authors.Select(a => (Hrib)a.Id).Distinct(),
             cancellationToken);
 
         dto = dto with

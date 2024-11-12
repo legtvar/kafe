@@ -11,20 +11,35 @@ namespace Kafe.Data.Aggregates;
 
 public record AccountInfo(
     [Hrib] string Id,
+
     CreationMethod CreationMethod,
+
     AccountKind Kind,
+
     string? IdentityProvider,
 
     [property: UniqueIndex(IndexType = UniqueIndexType.Computed)]
+    [property:Sortable]
     string EmailAddress,
 
+    [property:Sortable]
     string PreferredCulture,
+
+    [property:Sortable]
     string? Name,
+
+    [property:Sortable]
     string? Uco,
+
+    [property:Sortable]
     string? Phone,
+
     string? SecurityStamp,
+
     DateTimeOffset RefreshedOn,
+
     ImmutableDictionary<string, Permission> Permissions,
+
     ImmutableArray<string> RoleIds
 ) : IEntity
 {

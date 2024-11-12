@@ -3,6 +3,7 @@ import { Artifact } from '../data/Artifact';
 import { Author } from '../data/Author';
 import { EntityPermissions } from '../data/EntityPermissions';
 import { Group } from '../data/Group';
+import { Organization } from '../data/Organization';
 import { Playlist } from '../data/Playlist';
 import { Project } from '../data/Project';
 import { Shard } from '../data/Shard';
@@ -67,8 +68,8 @@ export class API {
         const api = this;
 
         return {
-            async getAll() {
-                return api.requestArray(`projects`, Project);
+            async getAll(organization?: string) {
+                return api.requestArray(`projects`, Project, { organization });
             },
             async getById(id: string) {
                 return api.requestSingle(`project/${id}`, Project);
@@ -89,8 +90,8 @@ export class API {
         const api = this;
 
         return {
-            async getAll() {
-                return api.requestArray(`project-groups`, Group);
+            async getAll(organization?: string) {
+                return api.requestArray(`project-groups`, Group, { organization });
             },
             async getById(id: string) {
                 return api.requestSingle(`project-group/${id}`, Group);
@@ -114,8 +115,8 @@ export class API {
         const api = this;
 
         return {
-            async getAll() {
-                return api.requestArray(`playlists`, Playlist);
+            async getAll(organization?: string) {
+                return api.requestArray(`playlists`, Playlist, { organization });
             },
             async getById(id: string) {
                 return api.requestSingle(`playlist/${id}`, Playlist);
@@ -213,6 +214,11 @@ export class API {
             getById(id: string) {
                 return api.requestSingle(`shard/${id}`, Shard);
             },
+            async getContent(id: string) {
+                return await api.client.get(`shard-download/${id}`, {
+                    withCredentials: true,
+                });
+            },
         };
     }
 
@@ -251,6 +257,9 @@ export class API {
             async logout() {
                 return api.getSimple(`account/logout`);
             },
+            async impersonate(id: string) {
+                return api.getSimple(`account/impersonate/${id}`);
+            },
         };
     }
 
@@ -272,6 +281,31 @@ export class API {
         };
     }
 
+    public get organizations() {
+        const api = this;
+
+        return {
+            async getAll() {
+                return api.requestArray(`organizations`, Organization);
+            },
+            async getById(id: string) {
+                return api.requestSingle(`organization/${id}`, Organization);
+            },
+            async create(organization: Organization) {
+                return api.post<components['schemas']['OrganizationCreationDto'], HRIB>(
+                    `organization`,
+                    organization.serialize(),
+                );
+            },
+            async update(organization: Organization) {
+                return api.patch<components['schemas']['OrganizationCreationDto'], HRIB>(
+                    `organization`,
+                    organization.serialize(true),
+                );
+            },
+        };
+    }
+
     public get system() {
         const api = this;
 
@@ -286,12 +320,12 @@ export class API {
 
     // Api utils
 
-    private async requestSingle<Class>(path: string, type: new (response: any) => Class) {
-        return this.get(path, type, false) as Promise<ApiResponse<Class>>;
+    private async requestSingle<Class>(path: string, type: new (response: any) => Class, params: any = {}) {
+        return this.get(path, type, false, true, params) as Promise<ApiResponse<Class>>;
     }
 
-    private async requestArray<Class>(path: string, type: new (response: any) => Class) {
-        return this.get(path, type, true) as Promise<ApiResponse<Class[]>>;
+    private async requestArray<Class>(path: string, type: new (response: any) => Class, params: any = {}) {
+        return this.get(path, type, true, true, params) as Promise<ApiResponse<Class[]>>;
     }
 
     private async get<Class>(
@@ -299,9 +333,11 @@ export class API {
         type: new (response: any) => Class,
         isArray: boolean,
         auth: boolean = true,
+        params: any = {},
     ): Promise<ApiResponse<Class | Class[]>> {
         const response = await this.client.get(path, {
             withCredentials: auth,
+            params,
         });
 
         const res = this.handleError<any>(response);
@@ -317,9 +353,10 @@ export class API {
         return res;
     }
 
-    private async getSimple<Res>(path: string, auth: boolean = true): Promise<ApiResponse<any>> {
+    private async getSimple<Res>(path: string, auth: boolean = true, params: any = {}): Promise<ApiResponse<any>> {
         const response = await this.client.get(path, {
             withCredentials: auth,
+            params,
         });
 
         return this.handleError<Res>(response);

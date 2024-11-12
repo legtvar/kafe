@@ -55,6 +55,6 @@ public class PlaylistCreationEndpoint : EndpointBaseAsync
             return ValidationProblem(title: playlist.Errors.FirstOrDefault().Message);
         }
 
-        return Ok(playlist.Value.Id);
+        return Ok((Hrib)playlist.Value.Id);
     }
 }

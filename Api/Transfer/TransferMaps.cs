@@ -173,6 +173,7 @@ public static class TransferMaps
     {
         return new PlaylistListDto(
             Id: data.Id,
+            OrganizationId: data.OrganizationId,
             Name: data.Name,
             Description: data.Description,
             GlobalPermissions: ToPermissionArray(data.GlobalPermissions));
@@ -182,16 +183,18 @@ public static class TransferMaps
     {
         return new PlaylistDetailDto(
             Id: data.Id,
+            OrganizationId: data.OrganizationId,
             Name: data.Name,
             Description: data.Description,
             GlobalPermissions: ToPermissionArray(data.GlobalPermissions),
-            Entries: ImmutableArray<PlaylistEntryDto>.Empty);
+            Entries: []);
     }
 
     public static ProjectGroupListDto ToProjectGroupListDto(ProjectGroupInfo data)
     {
         return new ProjectGroupListDto(
             Id: data.Id,
+            OrganizationId: data.OrganizationId,
             Name: data.Name,
             Description: data.Description,
             Deadline: data.Deadline,
@@ -202,6 +205,7 @@ public static class TransferMaps
     {
         return new ProjectGroupDetailDto(
             Id: data.Id,
+            OrganizationId: data.OrganizationId,
             Name: data.Name,
             Description: data.Description,
             Deadline: data.Deadline,

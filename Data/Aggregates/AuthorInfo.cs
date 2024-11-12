@@ -8,12 +8,23 @@ namespace Kafe.Data.Aggregates;
 
 public record AuthorInfo(
     [Hrib] string Id,
+
     CreationMethod CreationMethod,
+
+    [property:Sortable]
     string Name,
+
     Permission GlobalPermissions = Permission.None,
+
     [LocalizedString] ImmutableDictionary<string, string>? Bio = null,
+
+    [property:Sortable]
     string? Uco = null,
+
+    [property:Sortable]
     string? Email = null,
+
+    [property:Sortable]
     string? Phone = null) : IVisibleEntity
 {
     public static readonly AuthorInfo Invalid = new(

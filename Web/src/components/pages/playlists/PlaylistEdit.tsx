@@ -15,6 +15,7 @@ import {
     useDisclosure,
 } from '@chakra-ui/react';
 import { t } from 'i18next';
+import { useCallback } from 'react';
 import { BsArrowsVertical, BsX } from 'react-icons/bs';
 import { IoAdd, IoSaveOutline, IoTrashOutline } from 'react-icons/io5';
 import { Link, useNavigate, useParams } from 'react-router-dom';
@@ -45,11 +46,18 @@ export function PlaylistEdit(props: IPlaylistEditProps) {
         return <Status statusCode={404} embeded />;
     }
 
+    const getPerms = useCallback((api: API) => api.entities.perms.getById(id), [id]);
+
     return (
         <>
-            <AwaitAPI request={(api) => api.playlists.getById(id)} error={<Status statusCode={404} embeded />}>
+            <AwaitAPI
+                request={useCallback((api) => api.playlists.getById(id), [id])}
+                error={(resp) => {
+                    return <Status statusCode={resp.response.status} log={resp.response.detail} embeded />;
+                }}
+            >
                 {observeAbstactType((playlist: Playlist) => (
-                    <AwaitAPI request={(api) => api.entities.perms.getById(playlist.id)}>
+                    <AwaitAPI request={getPerms}>
                         {observeAbstactType((perms: EntityPermissions) => (
                             <Box m={6} pb={12}>
                                 <WithTitle title={t('title.playlist', { playlist: playlist.getName() })} />
@@ -59,7 +67,7 @@ export function PlaylistEdit(props: IPlaylistEditProps) {
                                     </Heading>
                                     <SendAPI
                                         value={playlist}
-                                        request={(api: API, value: Playlist) => api.playlists.create(value)}
+                                        request={(api: API, value: Playlist) => api.playlists.update(value)}
                                         onSubmited={() => navigate(0)}
                                         repeatable={true}
                                     >

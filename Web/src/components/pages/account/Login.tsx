@@ -3,7 +3,6 @@ import {
     Button,
     FormControl,
     FormLabel,
-    HStack,
     Heading,
     Input,
     Link,
@@ -14,25 +13,36 @@ import {
 import i18next, { t } from 'i18next';
 import { useState } from 'react';
 import { useApi } from '../../../hooks/Caffeine';
+import { useTitle } from '../../../utils/useTitle';
 import { Loading } from '../../utils/Loading';
 import { MuniIcon } from '../../utils/MuniIcon';
-import { useTitle } from '../../../utils/useTitle';
 
 export function Login() {
     const [state, setState] = useState<'ready' | 'submitting' | 'submited' | 'error'>('ready');
     const [email, setEmail] = useState<string>('');
     const api = useApi();
-    useTitle(t("title.login"));
+    useTitle(t('title.login'));
 
     const login = async () => {
         setState('submitting');
         try {
-            await api.accounts.temporary.create(email, i18next.language);
+            const response = await api.accounts.temporary.create(email, i18next.language);
+            if (response.status !== 200) {
+                throw new Error('Error');
+            }
             setState('submited');
         } catch (e) {
             setState('error');
         }
     };
+
+    const MUNI_bg = useColorModeValue('#0000dc', 'white');
+    const MUNI_color = useColorModeValue('white', '#0000dc');
+    const MUNI_hover_bg = useColorModeValue('black', 'gray.300');
+
+    const border = useColorModeValue('gray.200', 'gray.600');
+    const internalBg = useColorModeValue('white', 'gray.700');
+    const lowlight = useColorModeValue('gray.300', 'gray.500');
 
     return (
         <>
@@ -69,16 +79,35 @@ export function Login() {
                             >
                                 {t('register.button').toString()}
                             </Button>
+                            <Box
+                                borderStyle="solid"
+                                borderWidth={0}
+                                borderBottomWidth={1}
+                                borderColor={border}
+                                position="relative"
+                            >
+                                <Box
+                                    position="absolute"
+                                    top="0"
+                                    left="50%"
+                                    transform="translate(-50%, -50%)"
+                                    bg={internalBg}
+                                    p={4}
+                                    color={lowlight}
+                                >
+                                    {t('register.divider').toString()}
+                                </Box>
+                            </Box>
                             <Link href={api.accounts.external.loginUrl()}>
                                 <Button
                                     size="lg"
-                                    bg={'#0000dc'}
-                                    color={'white'}
+                                    bg={MUNI_bg}
+                                    color={MUNI_color}
                                     _hover={{
-                                        bg: 'black',
+                                        bg: MUNI_hover_bg,
                                     }}
                                     width="100%"
-                                    leftIcon={<MuniIcon fill="white" />}
+                                    leftIcon={<MuniIcon fill={MUNI_color} />}
                                 >
                                     {t('munilogin.button').toString()}
                                 </Button>

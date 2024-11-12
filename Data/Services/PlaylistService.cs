@@ -1,18 +1,12 @@
 ﻿using Kafe.Common;
 using Kafe.Data.Aggregates;
-using Kafe.Data.Documents;
 using Kafe.Data.Events;
+using Kafe.Data.Metadata;
 using Marten;
 using Marten.Linq;
-using Marten.Linq.MatchesSql;
-using Marten.Linq.SoftDeletes;
-using Serilog;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Data.Common;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,15 +18,18 @@ public class PlaylistService
     private readonly IDocumentSession db;
     private readonly OrganizationService organizationService;
     private readonly ArtifactService artifactService;
+    private readonly EntityMetadataProvider entityMetadataProvider;
 
     public PlaylistService(
         IDocumentSession db,
         OrganizationService organizationService,
-        ArtifactService artifactService)
+        ArtifactService artifactService,
+        EntityMetadataProvider entityMetadataProvider)
     {
         this.db = db;
         this.organizationService = organizationService;
         this.artifactService = artifactService;
+        this.entityMetadataProvider = entityMetadataProvider;
     }
 
     /// <summary>
@@ -49,11 +46,13 @@ public class PlaylistService
     /// </list>
     /// </param>
     public record PlaylistFilter(
-        Hrib? AccessingAccountId
+        Hrib? AccessingAccountId,
+        Hrib? OrganizationId
     );
 
     public async Task<ImmutableArray<PlaylistInfo>> List(
         PlaylistFilter? filter = null,
+        string? sort = null,
         CancellationToken token = default)
     {
         var query = db.Query<PlaylistInfo>();
@@ -65,6 +64,18 @@ public class PlaylistService
                     Permission.Read,
                     filter.AccessingAccountId);
         }
+
+        if (filter?.OrganizationId is not null)
+        {
+            query = (IMartenQueryable<PlaylistInfo>)query
+                .Where(p => p.OrganizationId == filter.OrganizationId.ToString());
+        }
+
+        if (!string.IsNullOrEmpty(sort))
+        {
+            query = (IMartenQueryable<PlaylistInfo>)query.OrderBySortString(entityMetadataProvider, sort);
+        }
+
         var result = (await query.ToListAsync(token)).ToImmutableArray();
         return result;
     }
@@ -131,13 +142,19 @@ public class PlaylistService
 
         if (!@new.EntryIds.IsDefaultOrEmpty)
         {
+            var existanceCheck = await CheckArtifactsExist(
+                @new.EntryIds.Select(i => (Hrib)i).ToImmutableArray(),
+                token);
+            if (existanceCheck.HasErrors)
+            {
+                return existanceCheck.Errors;
+            }
+
             var entriesSet = new PlaylistEntriesSet(
                 PlaylistId: id.ToString(),
                 EntryIds: @new.EntryIds);
             db.Events.Append(id.ToString(), entriesSet);
         }
-
-        // TODO: Check all entries exist before putting them in
 
         await db.SaveChangesAsync(token);
         var playlist = await db.Events.AggregateStreamAsync<PlaylistInfo>(id.ToString(), token: token)
@@ -178,13 +195,12 @@ public class PlaylistService
 
         if (!@new.EntryIds.SequenceEqual(old.EntryIds))
         {
-            var addedEntryIds = @new.EntryIds.Except(old.EntryIds).Select(i => (Hrib)i).ToImmutableArray();
-            var addedEntries = await artifactService.LoadMany(addedEntryIds, token);
-            var nonExistentEntryIds = addedEntryIds.ExceptBy(addedEntries.Select(e => e.Id), a => a.ToString())
-                .ToImmutableArray();
-            if (nonExistentEntryIds.Length > 0)
+            var existanceCheck = await CheckArtifactsExist(
+                @new.EntryIds.Select(i => (Hrib)i).ToImmutableArray(),
+                token);
+            if (existanceCheck.HasErrors)
             {
-                return Error.NotFound($"Could not found some entries: {string.Join(", ", nonExistentEntryIds)}.");
+                return existanceCheck.Errors;
             }
 
             eventStream.AppendOne(new PlaylistEntriesSet(
@@ -203,5 +219,19 @@ public class PlaylistService
 
         await db.SaveChangesAsync(token);
         return await db.Events.KafeAggregateRequiredStream<PlaylistInfo>(@old.Id, token: token);
+    }
+
+    private async Task<Err<bool>> CheckArtifactsExist(
+        ImmutableArray<Hrib> artifactIds,
+        CancellationToken token = default
+    )
+    {
+        var artifacts = await db.KafeLoadManyAsync<ArtifactInfo>(artifactIds, token);
+        if (artifacts.HasErrors)
+        {
+            return artifacts.Errors;
+        }
+
+        return true;
     }
 }

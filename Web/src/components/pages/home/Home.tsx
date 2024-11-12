@@ -16,13 +16,17 @@ import {
 } from '@chakra-ui/react';
 import ChakraUIRenderer from 'chakra-ui-markdown-renderer';
 import { t } from 'i18next';
+import moment from 'moment';
+import { useCallback } from 'react';
 import Countdown from 'react-countdown';
 import { IoCubeOutline } from 'react-icons/io5';
 import Markdown from 'react-markdown';
 import { Link } from 'react-router-dom';
+import { useOrganizations } from '../../../hooks/Caffeine';
+import { useAuthLink } from '../../../hooks/useAuthLink';
 import { useTitle } from '../../../utils/useTitle';
-import { Brand } from '../../brand/Brand';
 import { AwaitAPI } from '../../utils/AwaitAPI';
+import { OrganizationAvatar } from '../../utils/OrganizationAvatar/OrganizationAvatar';
 import { OutletOrChildren } from '../../utils/OutletOrChildren';
 
 interface IHomeProps {}
@@ -39,17 +43,18 @@ export function Home(props: IHomeProps) {
     );
 
     const DESCRIPTION_LENGTH = 200;
+    const { currentOrganization } = useOrganizations();
 
     return (
         <OutletOrChildren>
             <VStack w="full" px={6} py={4} alignItems="stretch">
                 <HStack spacing={6} alignItems="center" mb={6}>
                     <Center fontSize="6xl" h="auto">
-                        <Brand />
+                        <OrganizationAvatar organization={currentOrganization!} size="xl" noHighlight />
                     </Center>
                     <VStack alignItems="start">
                         <Heading size="2xl" mt={0}>
-                            {t('home.title')}
+                            {currentOrganization!.getName()}
                         </Heading>
                         <Text opacity={0.5}>{t('home.subtitle')}</Text>
                     </VStack>
@@ -61,10 +66,20 @@ export function Home(props: IHomeProps) {
                         <Text>{t('home.openGroups')}</Text>
                     </HStack>
                 </Heading>
-                <AwaitAPI request={(api) => api.groups.getAll()}>
+                <AwaitAPI
+                    request={useCallback(
+                        (api) => api.groups.getAll(useOrganizations().currentOrganization?.id),
+                        [useOrganizations().currentOrganization],
+                    )}
+                >
                     {(groups) => (
                         <Box w="full" overflowX="auto" py={4} scrollSnapType="x mandatory">
                             <HStack alignItems="start">
+                                {groups.filter((group) => group.isOpen).length === 0 && (
+                                    <Text w="full" textAlign="center" color="gray.500" fontStyle="italic">
+                                        {t('home.noOpenGroups')}
+                                    </Text>
+                                )}
                                 {groups
                                     .filter((group) => group.isOpen)
                                     .map((group, i) => (
@@ -84,7 +99,7 @@ export function Home(props: IHomeProps) {
                                                             </Markdown>
                                                         </Box>
                                                     )}
-                                                    {group.deadline && (
+                                                    {group.deadline && moment(group.deadline).isAfter() && (
                                                         <Box mb={-6}>
                                                             <Countdown
                                                                 date={new Date(group.deadline)}
@@ -125,12 +140,12 @@ export function Home(props: IHomeProps) {
                                             <Divider />
                                             <CardFooter>
                                                 <ButtonGroup spacing="2">
-                                                    <Link to={`/auth/groups/${group.id}/create`}>
+                                                    <Link to={useAuthLink(`/groups/${group.id}/create`)}>
                                                         <Button variant="solid" colorScheme="brand">
                                                             {t('createProject.signUp').toString()}
                                                         </Button>
                                                     </Link>
-                                                    <Link to={`/auth/groups/${group.id}`}>
+                                                    <Link to={useAuthLink(`/groups/${group.id}`)}>
                                                         <Button variant="outline" colorScheme="brand">
                                                             {t('createProject.details').toString()}
                                                         </Button>
@@ -143,58 +158,6 @@ export function Home(props: IHomeProps) {
                         </Box>
                     )}
                 </AwaitAPI>
-
-                {/* <Heading size="lg" mb={4} mt={6}>
-                    <HStack>
-                        <IoFolderOpenOutline />
-                        <Text>{t('home.myProjects')}</Text>
-                    </HStack>
-                </Heading>
-                <AwaitAPI request={(api) => api.projects.getAll()}>
-                    {(projects) => {
-                        return (
-                            <Box w="full" overflowX="auto" py={4} scrollSnapType="x mandatory">
-                                <HStack alignItems="start">
-                                    {projects
-                                        .filter((project) => project.userPermissions.includes('write'))
-                                        .map((project, i) => (
-                                            <Card w="sm" maxW="100%" key={i} flexShrink={0} scrollSnapAlign="start">
-                                                <CardBody>
-                                                    <Stack spacing="3">
-                                                        <Heading size="md">{project.getName()}</Heading>
-                                                        {project.description && (
-                                                            <Box mb={4}>
-                                                                {project
-                                                                    .getDescription()
-                                                                    .substring(0, DESCRIPTION_LENGTH)}
-                                                                {project.getDescription().length > DESCRIPTION_LENGTH &&
-                                                                    '...'}
-                                                            </Box>
-                                                        )}
-                                                    </Stack>
-                                                </CardBody>
-                                                <Divider />
-                                                <CardFooter>
-                                                    <ButtonGroup spacing="2">
-                                                        <Link to={`/auth/groups/${project.id}`}>
-                                                            <Button variant="solid" colorScheme="brand">
-                                                                {t('project.details').toString()}
-                                                            </Button>
-                                                        </Link>
-                                                        <Link to={`/auth/groups/${project.id}/edit`}>
-                                                            <Button variant="outline" colorScheme="brand">
-                                                                {t('project.edit').toString()}
-                                                            </Button>
-                                                        </Link>
-                                                    </ButtonGroup>
-                                                </CardFooter>
-                                            </Card>
-                                        ))}
-                                </HStack>
-                            </Box>
-                        );
-                    }}
-                </AwaitAPI> */}
             </VStack>
         </OutletOrChildren>
     );

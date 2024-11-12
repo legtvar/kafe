@@ -1,9 +1,10 @@
 import { Button, Flex, FormControl, Highlight, Icon, Input, Text, useColorModeValue } from '@chakra-ui/react';
 import { t } from 'i18next';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { IoAdd, IoListCircleOutline } from 'react-icons/io5';
 import { Link } from 'react-router-dom';
 import { Playlist } from '../../../data/Playlist';
+import { useOrganizations } from '../../../hooks/Caffeine';
 import { useColorScheme, useHighlightStyle } from '../../../hooks/useColorScheme';
 import { fulltextFilter } from '../../../utils/fulltextFilter';
 import { useTitle } from '../../../utils/useTitle';
@@ -24,7 +25,12 @@ export function PlaylistList(props: IPlaylistListProps) {
 
     return (
         <OutletOrChildren>
-            <AwaitAPI request={(api) => api.playlists.getAll()}>
+            <AwaitAPI
+                request={useCallback(
+                    (api) => api.playlists.getAll(useOrganizations().currentOrganization?.id),
+                    [useOrganizations().currentOrganization],
+                )}
+            >
                 {(data: Playlist[]) => (
                     <>
                         <Flex
@@ -71,13 +77,16 @@ export function PlaylistList(props: IPlaylistListProps) {
                                             px={8}
                                             borderBottomWidth="1px"
                                             borderBottomColor={borderColor}
-                                            align={'center'}
+                                            align={{
+                                                base: 'start',
+                                                md: 'center',
+                                            }}
                                             cursor="pointer"
                                             _hover={{
                                                 background: hoverColor,
                                             }}
                                         >
-                                            <Icon as={IoListCircleOutline} mb="auto" mr={3} mt={1} fontSize="xl" />
+                                            <Icon as={IoListCircleOutline} mb="auto" mr={3} my={1} fontSize="xl" />
                                             <Flex direction="column" flex="1">
                                                 <Text>
                                                     <Highlight styles={highlightStyle} query={filter}>

@@ -11,6 +11,8 @@ using System.Linq;
 using System.Collections.Immutable;
 using Kafe.Data.Aggregates;
 using Kafe.Data;
+using Microsoft.AspNetCore.Mvc.Formatters;
+using System.Net.Mime;
 
 namespace Kafe.Api.Endpoints.Playlist;
 
@@ -36,7 +38,7 @@ public class PlaylistEditEndpoint : EndpointBaseAsync
     }
 
     [HttpPatch]
-    [SwaggerOperation(Tags = new[] { EndpointArea.Playlist })]
+    [SwaggerOperation(Tags = [EndpointArea.Playlist])]
     public override async Task<ActionResult<Hrib>> HandleAsync(
         PlaylistEditDto dto,
         CancellationToken cancellationToken = default)
@@ -66,7 +68,7 @@ public class PlaylistEditEndpoint : EndpointBaseAsync
         var result = await playlistService.Edit(@new, cancellationToken);
         if (result.HasErrors)
         {
-            return ValidationProblem(title: result.Errors.FirstOrDefault().Message);
+            return result.ToActionResult();
         }
 
         return Ok(dto.Id);

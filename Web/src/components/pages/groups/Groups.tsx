@@ -1,9 +1,10 @@
 import { Button, Flex, FormControl, Highlight, Icon, Input, Text, useColorModeValue } from '@chakra-ui/react';
 import { t } from 'i18next';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { IoAdd, IoFolderOpenOutline } from 'react-icons/io5';
 import { Link } from 'react-router-dom';
 import { Group } from '../../../data/Group';
+import { useOrganizations } from '../../../hooks/Caffeine';
 import { useColorScheme, useHighlightStyle } from '../../../hooks/useColorScheme';
 import { fulltextFilter } from '../../../utils/fulltextFilter';
 import { useTitle } from '../../../utils/useTitle';
@@ -24,7 +25,12 @@ export function Groups(props: IGroupsProps) {
 
     return (
         <OutletOrChildren>
-            <AwaitAPI request={(api) => api.groups.getAll()}>
+            <AwaitAPI
+                request={useCallback(
+                    (api) => api.groups.getAll(useOrganizations().currentOrganization?.id),
+                    [useOrganizations().currentOrganization?.id],
+                )}
+            >
                 {(data: Group[]) => (
                     <>
                         <Flex
@@ -70,13 +76,16 @@ export function Groups(props: IGroupsProps) {
                                             px={8}
                                             borderBottomWidth="1px"
                                             borderBottomColor={borderColor}
-                                            align={'center'}
+                                            align={{
+                                                base: 'start',
+                                                md: 'center',
+                                            }}
                                             cursor="pointer"
                                             _hover={{
                                                 background: hoverColor,
                                             }}
                                         >
-                                            <Icon as={IoFolderOpenOutline} mb="auto" mr={3} mt={1} fontSize="xl" />
+                                            <Icon as={IoFolderOpenOutline} mb="auto" mr={3} my={1} fontSize="xl" />
                                             <Flex direction="column" flex="1">
                                                 <Text>
                                                     <Highlight styles={highlightStyle} query={filter}>

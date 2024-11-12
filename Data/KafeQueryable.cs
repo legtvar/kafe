@@ -1,11 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Data.Common;
 using System.Linq;
+using System.Net.Http.Headers;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Kafe.Data.Aggregates;
 using Kafe.Data.Documents;
+using Kafe.Data.Metadata;
 using Marten;
 using Marten.Linq;
 using Marten.Linq.MatchesSql;
@@ -39,8 +43,8 @@ public static class KafeQueryable
             WHERE
                 (
                     (
-                        (perms.data -> 'AccountEntries' -> ? -> 'EffectivePermission')::int
-                        | perms.data -> 'GlobalPermission'
+                        COALESCE((perms.data -> 'AccountEntries' -> ? -> 'EffectivePermission')::int, 0)
+                        | COALESCE((perms.data -> 'GlobalPermission')::int, 0)
                     )
                     & ?
                 ) = ?
@@ -83,8 +87,8 @@ public static class KafeQueryable
         var sql = $"""
         (
             SELECT
-                (perms.data -> 'AccountEntries' -> ? -> 'EffectivePermission')::int
-                    | (perms.data -> 'GlobalPermission')::int
+                COALESCE((perms.data -> 'AccountEntries' -> ? -> 'EffectivePermission')::int, 0)
+                    | COALESCE((perms.data -> 'GlobalPermission')::int, 0)
             FROM {schema.For<EntityPermissionInfo>()} AS perms
             WHERE perms.id = d.id
         )::int & ? = ?
@@ -108,6 +112,24 @@ public static class KafeQueryable
                 $"data -> {fieldName} @> (?)::jsonb",
                 dictName));
         return query;
+    }
+
+    public static IQueryable<T> OrderBySortString<T>(
+        this IQueryable<T> query,
+        EntityMetadataProvider metadataProvider,
+        string sortString,
+        bool isDescending = false
+    ) where T : IEntity
+    {
+        var sortableMetadata = metadataProvider.GetSortableMetadata(typeof(T));
+        if (!sortableMetadata.SortExpressions.TryGetValue(sortString, out var sortExpression))
+        {
+            throw new ArgumentException(
+                $"Sort string '{sortString}' is not a valid sort string for '{typeof(T).Name}'.",
+                nameof(sortString));
+        }
+
+        return query.OrderBySql(isDescending ? sortExpression + " DESC" : sortExpression);
     }
 
     private static void EnsureValidPermission(Permission requiredPermission)

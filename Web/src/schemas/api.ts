@@ -70,6 +70,21 @@ export interface paths {
       };
     };
   };
+  "/api/v1/account/impersonate/{id}": {
+    get: {
+      parameters: {
+        path: {
+          id: string;
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          content: never;
+        };
+      };
+    };
+  };
   "/api/v1/accounts": {
     get: {
       parameters: {
@@ -268,6 +283,87 @@ export interface paths {
         /** @description OK */
         200: {
           content: never;
+        };
+      };
+    };
+  };
+  "/api/v1/organization": {
+    post: {
+      requestBody?: {
+        content: {
+          "application/json": components["schemas"]["OrganizationCreationDto"];
+          "text/json": components["schemas"]["OrganizationCreationDto"];
+          "application/*+json": components["schemas"]["OrganizationCreationDto"];
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
+          };
+        };
+      };
+    };
+    patch: {
+      requestBody?: {
+        content: {
+          "application/json": components["schemas"]["OrganizationEditDto"];
+          "text/json": components["schemas"]["OrganizationEditDto"];
+          "application/*+json": components["schemas"]["OrganizationEditDto"];
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
+          };
+        };
+      };
+    };
+  };
+  "/api/v1/organization/{id}": {
+    get: {
+      parameters: {
+        path: {
+          id: string;
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          content: {
+            "text/plain": components["schemas"]["OrganizationDetailDto"];
+            "application/json": components["schemas"]["OrganizationDetailDto"];
+            "text/json": components["schemas"]["OrganizationDetailDto"];
+          };
+        };
+        /** @description Not Found */
+        404: {
+          content: {
+            "text/plain": components["schemas"]["ProblemDetails"];
+            "application/json": components["schemas"]["ProblemDetails"];
+            "text/json": components["schemas"]["ProblemDetails"];
+          };
+        };
+      };
+    };
+  };
+  "/api/v1/organizations": {
+    get: {
+      responses: {
+        /** @description OK */
+        200: {
+          content: {
+            "text/plain": components["schemas"]["OrganizationListDto"][];
+            "application/json": components["schemas"]["OrganizationListDto"][];
+            "text/json": components["schemas"]["OrganizationListDto"][];
+          };
         };
       };
     };
@@ -538,6 +634,87 @@ export interface paths {
             "text/plain": components["schemas"]["ProjectValidationDto"];
             "application/json": components["schemas"]["ProjectValidationDto"];
             "text/json": components["schemas"]["ProjectValidationDto"];
+          };
+        };
+      };
+    };
+  };
+  "/api/v1/role": {
+    post: {
+      requestBody?: {
+        content: {
+          "application/json": components["schemas"]["RoleCreationDto"];
+          "text/json": components["schemas"]["RoleCreationDto"];
+          "application/*+json": components["schemas"]["RoleCreationDto"];
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
+          };
+        };
+      };
+    };
+    patch: {
+      requestBody?: {
+        content: {
+          "application/json": components["schemas"]["RoleEditDto"];
+          "text/json": components["schemas"]["RoleEditDto"];
+          "application/*+json": components["schemas"]["RoleEditDto"];
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
+          };
+        };
+      };
+    };
+  };
+  "/api/v1/role/{id}": {
+    get: {
+      parameters: {
+        path: {
+          id: string;
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          content: {
+            "text/plain": components["schemas"]["RoleDetailDto"];
+            "application/json": components["schemas"]["RoleDetailDto"];
+            "text/json": components["schemas"]["RoleDetailDto"];
+          };
+        };
+        /** @description Not Found */
+        404: {
+          content: {
+            "text/plain": components["schemas"]["ProblemDetails"];
+            "application/json": components["schemas"]["ProblemDetails"];
+            "text/json": components["schemas"]["ProblemDetails"];
+          };
+        };
+      };
+    };
+  };
+  "/api/v1/roles": {
+    get: {
+      responses: {
+        /** @description OK */
+        200: {
+          content: {
+            "text/plain": components["schemas"]["RoleListDto"][];
+            "application/json": components["schemas"]["RoleListDto"][];
+            "text/json": components["schemas"]["RoleListDto"][];
           };
         };
       };
@@ -916,8 +1093,60 @@ export interface components {
       isCorrupted: boolean;
       error?: string | null;
     };
+    OrganizationCreationDto: {
+      /** LocalizedString */
+      name: {
+        iv: string;
+        cs?: string | null;
+        en?: string | null;
+      };
+    };
+    OrganizationDetailDto: {
+      /**
+       * Format: hrib
+       * @description Human-Readable Identifier Ballast
+       * @example AAAAbadf00d
+       */
+      id: string;
+      /** LocalizedString */
+      name: {
+        iv: string;
+        cs?: string | null;
+        en?: string | null;
+      };
+      /** Format: date-time */
+      createdOn: string;
+    };
+    OrganizationEditDto: {
+      /**
+       * Format: hrib
+       * @description Human-Readable Identifier Ballast
+       * @example AAAAbadf00d
+       */
+      id: string;
+      /** LocalizedString */
+      name: {
+        iv: string;
+        cs?: string | null;
+        en?: string | null;
+      };
+    };
+    OrganizationListDto: {
+      /**
+       * Format: hrib
+       * @description Human-Readable Identifier Ballast
+       * @example AAAAbadf00d
+       */
+      id: string;
+      /** LocalizedString */
+      name: {
+        iv: string;
+        cs?: string | null;
+        en?: string | null;
+      };
+    };
     /** @enum {string} */
-    Permission: "none" | "read" | "append" | "inspect" | "write" | "review" | "all";
+    Permission: "none" | "read" | "append" | "inspect" | "publishable" | "write" | "review" | "administer" | "inheritable" | "all";
     PlaylistCreationDto: {
       /** LocalizedString */
       name: {
@@ -925,6 +1154,12 @@ export interface components {
         cs?: string | null;
         en?: string | null;
       };
+      /**
+       * Format: hrib
+       * @description Human-Readable Identifier Ballast
+       * @example AAAAbadf00d
+       */
+      organizationId: string;
       /** LocalizedString */
       description?: ({
         iv: string;
@@ -1243,6 +1478,12 @@ export interface components {
         cs?: string | null;
         en?: string | null;
       };
+      /**
+       * Format: hrib
+       * @description Human-Readable Identifier Ballast
+       * @example AAAAbadf00d
+       */
+      organizationId: string;
       /** LocalizedString */
       description?: ({
         iv: string;
@@ -1251,6 +1492,7 @@ export interface components {
       }) | null;
       /** Format: date-time */
       deadline: string;
+      isOpen: boolean;
     };
     ProjectGroupDetailDto: {
       /**
@@ -1396,6 +1638,97 @@ export interface components {
     };
     /** @enum {string} */
     ReviewKind: "notReviewed" | "accepted" | "rejected";
+    RoleCreationDto: {
+      /**
+       * Format: hrib
+       * @description Human-Readable Identifier Ballast
+       * @example AAAAbadf00d
+       */
+      organizationId: string;
+      /** LocalizedString */
+      name: {
+        iv: string;
+        cs?: string | null;
+        en?: string | null;
+      };
+      /** LocalizedString */
+      description?: ({
+        iv: string;
+        cs?: string | null;
+        en?: string | null;
+      }) | null;
+    };
+    RoleDetailDto: {
+      /**
+       * Format: hrib
+       * @description Human-Readable Identifier Ballast
+       * @example AAAAbadf00d
+       */
+      id: string;
+      /**
+       * Format: hrib
+       * @description Human-Readable Identifier Ballast
+       * @example AAAAbadf00d
+       */
+      organizationId: string;
+      /** LocalizedString */
+      name: {
+        iv: string;
+        cs?: string | null;
+        en?: string | null;
+      };
+      /** LocalizedString */
+      description?: ({
+        iv: string;
+        cs?: string | null;
+        en?: string | null;
+      }) | null;
+      /** Format: date-time */
+      createdOn: string;
+      permissions: {
+        [key: string]: components["schemas"]["Permission"][];
+      };
+    };
+    RoleEditDto: {
+      /**
+       * Format: hrib
+       * @description Human-Readable Identifier Ballast
+       * @example AAAAbadf00d
+       */
+      id: string;
+      /** LocalizedString */
+      name: {
+        iv: string;
+        cs?: string | null;
+        en?: string | null;
+      };
+      /** LocalizedString */
+      description?: ({
+        iv: string;
+        cs?: string | null;
+        en?: string | null;
+      }) | null;
+    };
+    RoleListDto: {
+      /**
+       * Format: hrib
+       * @description Human-Readable Identifier Ballast
+       * @example AAAAbadf00d
+       */
+      id: string;
+      /**
+       * Format: hrib
+       * @description Human-Readable Identifier Ballast
+       * @example AAAAbadf00d
+       */
+      organizationId: string;
+      /** LocalizedString */
+      name: {
+        iv: string;
+        cs?: string | null;
+        en?: string | null;
+      };
+    };
     ShardDetailBaseDto: {
       kind: components["schemas"]["ShardKind"];
       /**

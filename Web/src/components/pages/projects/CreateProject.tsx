@@ -1,6 +1,7 @@
 import { Box, Stack } from '@chakra-ui/react';
 import ChakraUIRenderer from 'chakra-ui-markdown-renderer';
 import { t } from 'i18next';
+import { useCallback } from 'react';
 import Markdown from 'react-markdown';
 import { useParams } from 'react-router-dom';
 import { Group } from '../../../data/Group';
@@ -22,7 +23,12 @@ export function CreateProject(props: ICreateProjectProps) {
 
     return (
         <OutletOrChildren>
-            <AwaitAPI request={(api) => api.groups.getById(id)} error={<Status statusCode={404} embeded />}>
+            <AwaitAPI
+                request={useCallback((api) => api.groups.getById(id), [id])}
+                error={(resp) => {
+                    return <Status statusCode={resp.response.status} log={resp.response.detail} embeded />;
+                }}
+            >
                 {(group: Group) => (
                     <Stack spacing={4} m={6} direction="column">
                         <Box fontSize="xl" as="h2" lineHeight="tight" color="gray.500">

@@ -31,24 +31,30 @@ public class AccountListEndpoint : EndpointBaseAsync
     [HttpGet]
     [SwaggerOperation(Tags = new[] { EndpointArea.Account })]
     public override async Task<ActionResult<ImmutableArray<AccountListDto>>> HandleAsync(
-        [FromQuery] RequestData request,
+        RequestData request,
         CancellationToken cancellationToken = default)
     {
         var filter = new AccountService.AccountFilter();
         if (request.AccessedEntityId is not null)
         {
-            filter = filter with {
+            filter = filter with
+            {
                 Permissions = ImmutableDictionary.CreateRange(new[]{
                     new KeyValuePair<string, Permission>(request.AccessedEntityId, Permission.None)
                 })
             };
         }
 
-        var data = await accounts.List(filter, cancellationToken);
+        var data = await accounts.List(filter, request.Sort, cancellationToken);
         return Ok(data.Select(TransferMaps.ToAccountListDto).ToImmutableArray());
     }
-    
-    public record RequestData(
-        [FromQuery(Name = "entity")] string? AccessedEntityId
-    );
+
+    public record RequestData
+    {
+        [FromQuery(Name = "entity")]
+        public string? AccessedEntityId { get; set; }
+
+        [FromQuery(Name = "sort")]
+        public string? Sort { get; set; } = "emailAddress";
+    }
 }

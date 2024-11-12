@@ -10,16 +10,35 @@ namespace Kafe.Data.Aggregates;
 
 public record ProjectInfo(
     [Hrib] string Id,
+
     CreationMethod CreationMethod,
+
     [Hrib] string ProjectGroupId,
+
     ImmutableArray<ProjectAuthorInfo> Authors,
+
     ImmutableArray<ProjectArtifactInfo> Artifacts,
+
     ImmutableArray<ProjectReviewInfo> Reviews,
-    [LocalizedString] ImmutableDictionary<string, string> Name,
-    [LocalizedString] ImmutableDictionary<string, string>? Description = null,
-    [LocalizedString] ImmutableDictionary<string, string>? Genre = null,
+
+    [property:Sortable]
+    [property:LocalizedString]
+    ImmutableDictionary<string, string> Name,
+
+    [property:Sortable]
+    [property:LocalizedString]
+    ImmutableDictionary<string, string>? Description = null,
+
+    [property:Sortable]
+    [property:LocalizedString]
+    ImmutableDictionary<string, string>? Genre = null,
+
     Permission GlobalPermissions = Permission.None,
+
+    [property:Sortable]
     DateTimeOffset ReleasedOn = default,
+
+    [property:Sortable]
     bool IsLocked = false
 ) : IVisibleEntity
 {
@@ -178,7 +197,7 @@ public class ProjectInfoProjection : SingleStreamProjection<ProjectInfo>
         {
             p = p with
             {
-                Artifacts = ImmutableArray.Create(projectArtifact)
+                Artifacts = [projectArtifact]
             };
         }
 

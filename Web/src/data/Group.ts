@@ -1,9 +1,10 @@
 import { components } from '../schemas/api';
-import { localizedString } from '../schemas/generic';
+import { HRIB, localizedString } from '../schemas/generic';
 import { getPrefered } from '../utils/preferedLanguage';
 import { AbstractType } from './AbstractType';
 import { Project } from './Project';
 import { Serializer } from './serialize/Serializer';
+import { currentOrganizationIdMapper } from './serialize/currentOrganizationIdMapper';
 import { localizedMapper } from './serialize/localizedMapper';
 
 export class Group extends AbstractType {
@@ -14,6 +15,7 @@ export class Group extends AbstractType {
     public isOpen!: boolean;
     public projects!: Project[];
     public customFields: Record<string, any> = {};
+    public organizationId!: HRIB;
 
     public constructor(
         struct: components['schemas']['ProjectGroupListDto'] | components['schemas']['ProjectGroupDetailDto'],
@@ -33,6 +35,7 @@ export class Group extends AbstractType {
 
     serialize(update: boolean = false): components['schemas']['ProjectGroupCreationDto'] {
         return new Serializer(this, update)
+            .addConditionaly(!update, 'organizationId', currentOrganizationIdMapper)
             .add('name', localizedMapper)
             .add('description', localizedMapper)
             .add('isOpen')

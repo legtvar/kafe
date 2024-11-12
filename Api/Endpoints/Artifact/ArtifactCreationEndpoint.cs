@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using System.ComponentModel;
+using System.Net.Mime;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -72,6 +73,6 @@ public class ArtifactCreationEndpoint : EndpointBaseAsync
             }
         }
 
-        return Ok(createResult.Value.Id);
+        return Ok((Hrib)createResult.Value.Id);
     }
 }

@@ -15,7 +15,7 @@ namespace Kafe.Api.Endpoints.Organization;
 [ApiVersion("1")]
 [Route("organizations")]
 public class OrganizationListEndpoint : EndpointBaseAsync
-    .WithoutRequest
+    .WithRequest<OrganizationListEndpoint.RequestData>
     .WithActionResult<ImmutableArray<OrganizationListDto>>
 {
     private readonly OrganizationService organizationService;
@@ -32,14 +32,21 @@ public class OrganizationListEndpoint : EndpointBaseAsync
     [HttpGet]
     [SwaggerOperation(Tags = new[] { EndpointArea.Organization })]
     public override async Task<ActionResult<ImmutableArray<OrganizationListDto>>> HandleAsync(
+        RequestData requestData,
         CancellationToken cancellationToken = default)
     {
         var filter = new OrganizationService.OrganizationFilter(
             AccessingAccountId: userProvider.AccountId
         );
 
-        return Ok((await organizationService.List(filter, cancellationToken))
+        return Ok((await organizationService.List(filter, requestData.Sort, cancellationToken))
             .Select(TransferMaps.ToOrganizationListDto)
             .ToImmutableArray());
+    }
+
+    public record RequestData
+    {
+        [FromQuery(Name = "sort")]
+        public string? Sort { get; set; } = "name.iv";
     }
 }

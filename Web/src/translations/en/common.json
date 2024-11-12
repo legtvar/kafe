@@ -41,11 +41,12 @@
     "edit": "Edit",
     "save": "Save",
     "understood": "I understand",
-    "send": "Send"
+    "send": "Send",
+    "invariant": "International"
   },
   "content": {
     "noFileSelected": "No file selected",
-    "unknownType": "Unknown file type"
+    "unknownType": "Unknown type"
   },
   "countdown": {
     "days": "days",
@@ -100,7 +101,9 @@
     "save": "Save",
     "files": "files",
     "quitEdit": "Ukončit editaci",
-    "construction": "This section is under construction..."
+    "construction": "This section is under construction...",
+    "download": "Download",
+    "file": "file"
   },
   "home": {
     "signin": "Sign in",
@@ -108,7 +111,8 @@
     "openProjects": "Currently open projects",
     "openGroups": "Open project groups",
     "myProjects": "My projects",
-    "subtitle": "Check out, what is new!"
+    "subtitle": "Check out, what is new!",
+    "noOpenGroups": "There are currently no project groups open"
   },
   "homeFestival": {
     "title": "24th Film Festival FI MU"
@@ -225,7 +229,7 @@
     "disclaimer": "The automatic validation is still in development. Please take the results with a grain of salt."
   },
   "register": {
-    "button": "Sign up",
+    "button": "Log in",
     "email": "Email address",
     "firstName": "First name",
     "lastName": "Last name",
@@ -233,7 +237,8 @@
     "password": "Password",
     "passwordAgain": "Password again",
     "subtitle": "to access your daily dose of caffeine",
-    "title": "Sign up"
+    "title": "Sign up",
+    "divider": "Or"
   },
   "role": {
     "admin": "Administrator",
@@ -275,10 +280,22 @@
       "detail": {
         "title": "Edit project"
       },
-      "title": "Projects"
+      "title": "Projects",
+      "authors": {
+        "title": "Authors"
+      }
     },
     "system": {
       "title": "System"
+    },
+    "organizations": {
+      "title": "Organizations",
+      "create": {
+        "title": "Create an organization"
+      },
+      "edit": {
+        "title": "Edit organization"
+      }
     }
   },
   "title": {
@@ -294,16 +311,41 @@
     "projectCreate": "New project",
     "error": "{{error}} | Error",
     "login": "Login",
-    "system": "System"
+    "system": "System",
+    "organizations": "Organizations",
+    "organization": "{{group}} | \nOrganization",
+    "organizationsCreate": "Create an organization",
+    "author": "{{author}} | \nAuthor"
   },
   "sendApi": {
     "error": "There is a problem with the form",
     "unknownError": "An error occurred while submitting the form"
   },
   "status": {
+    "400": {
+      "subtitle": "The request was incorrect",
+      "title": "Bad request"
+    },
+    "401": {
+      "subtitle": "You are not authorized to view this page",
+      "title": "Unauthorized"
+    },
+    "403": {
+      "subtitle": "You do not have permission to view this page",
+      "title": "Forbidden"
+    },
     "404": {
       "subtitle": "The page you're looking for does not seem to exist",
       "title": "Page Not Found"
+    },
+    "500": {
+      "subtitle": "Oh no, something went terribly wrong!",
+      "title": "An error occurred while processing your request"
+    },
+    "offline": {
+      "title": "We are sorry, but KAFE is currently offline",
+      "subtitle": "Please try again later",
+      "code": "Offline"
     },
     "backlink": "Go to Home"
   },
@@ -336,7 +378,8 @@
   },
   "artifact": {
     "delete": "Delete the artifact",
-    "deleteWarn": "Are you sure you want to delete the selected artifact? \nThis operation is irreversible!"
+    "deleteWarn": "Are you sure you want to delete the selected artifact? \nThis operation is irreversible!",
+    "noContent": "The artifact does not contain any files"
   },
   "projectList": {
     "search": "Filter projects"
@@ -399,7 +442,8 @@
   },
   "groupsEdit": {
     "tabs": {
-      "rights": "Rights"
+      "rights": "Rights",
+      "info": "Basic information"
     }
   },
   "createGroup": {
@@ -439,7 +483,8 @@
     "loadingError": "Unfortunately, this video cannot be played in this quality"
   },
   "general": {
-    "copied": "Copied!"
+    "copied": "Copied!",
+    "autosave": "Changes made on this page are saved automatically"
   },
   "reatePlaylist": {
     "fields": {
@@ -461,5 +506,49 @@
     "files": {
       "description": "Drag to change the order of files or add a new file to the playlist"
     }
+  },
+  "organizations": {
+    "search": "Search for organizations",
+    "create": "Create an organization"
+  },
+  "createOrganization": {
+    "fields": {
+      "name": "Organization name"
+    },
+    "button": {
+      "update": "Save organization",
+      "create": "Create an organization"
+    }
+  },
+  "avatar": {
+    "clicks": {
+      "fullfilled": {
+        "title": "Impersonation has been initiated",
+        "description": "Congratulations, you've clicked 10 times on an avatar and thanks to that, we'll just turn you into that person! Hold on to your hats!"
+      },
+      "noPerson": {
+        "title": "Impersonation was not successfull",
+        "description": "Unfortunately, this person does not have the ID listed."
+      }
+    }
+  },
+  "root": {
+    "offline": "Offline"
+  },
+  "cookies": {
+    "description": "<1>Have you ever tried having coffee without cookies? \nQuite boring...</1><2>Cookies are important for the proper functioning of the application. \nThey take care of saving your preferences and login data.</2><3>We would like to ask you for your consent to serve cookies together with KAFE.</3>",
+    "reject": "I don't like cookies",
+    "accept": "Yum, I'll take it!",
+    "title": "KAFE and cookies"
+  },
+  "organizationRedirect": {
+    "title": "Choose your organization",
+    "subtitle": "You can switch to another organization at any time in the left panel"
+  },
+  "languageToggle": {
+    "system": "Application language",
+    "content": "Preferred content language",
+    "matching": "Same as app",
+    "more": "Show more"
   }
 }

@@ -1,5 +1,6 @@
 import { Box, Button, Flex, Icon, Stack, Text, useColorModeValue, VStack } from '@chakra-ui/react';
 import { t } from 'i18next';
+import { useCallback } from 'react';
 import { AiOutlineEdit } from 'react-icons/ai';
 import { IoPlayOutline } from 'react-icons/io5';
 import { Link, Navigate, useNavigate, useOutlet, useParams } from 'react-router-dom';
@@ -30,19 +31,28 @@ export function PlaylistDetail(props: IPlaylistDetailProps) {
     }
 
     if (itemId === undefined) {
-        return <Navigate to="1" />;
+        return <Navigate to="1" replace />;
     }
 
     const item = parseInt(itemId);
 
     if (!(item > 0)) {
-        return <Navigate to="./1" />;
+        return <Navigate to="../1" replace />;
     }
 
     return (
-        <AwaitAPI request={(api) => api.playlists.getById(id)} error={<Status statusCode={404} embeded />}>
+        <AwaitAPI
+            request={useCallback((api) => api.playlists.getById(id), [id])}
+            error={(resp) => {
+                return <Status statusCode={resp.response.status} log={resp.response.detail} embeded />;
+            }}
+        >
             {(playlist: Playlist) => {
                 const artifacts = playlist.entries;
+
+                if (item > artifacts.length && artifacts.length !== 0) {
+                    return <Navigate to="../1" replace />;
+                }
 
                 return (
                     <>
@@ -74,7 +84,7 @@ export function PlaylistDetail(props: IPlaylistDetailProps) {
                                                         {artifacts.length === 0 ? (
                                                             <Box></Box>
                                                         ) : artifacts.length < item ? (
-                                                            <Navigate to="./1" />
+                                                            <Navigate to="../1" />
                                                         ) : (
                                                             <ContentViewer
                                                                 key={0}
@@ -83,18 +93,18 @@ export function PlaylistDetail(props: IPlaylistDetailProps) {
                                                                 videoProps={{
                                                                     onEnded: () => {
                                                                         if (item < artifacts.length) {
-                                                                            navigate(`./${item + 1}`);
+                                                                            navigate(`../${item + 1}`);
                                                                         }
                                                                     },
                                                                 }}
                                                                 onNext={
                                                                     item < artifacts.length
-                                                                        ? () => navigate(`./${item + 1}`)
+                                                                        ? () => navigate(`../${item + 1}`)
                                                                         : undefined
                                                                 }
                                                                 onPrevious={
                                                                     item > 1
-                                                                        ? () => navigate(`./${item - 1}`)
+                                                                        ? () => navigate(`../${item - 1}`)
                                                                         : undefined
                                                                 }
                                                             />
@@ -190,7 +200,7 @@ export function PlaylistDetail(props: IPlaylistDetailProps) {
                                                                 </Flex>
                                                             ) : (
                                                                 artifacts.map((artifact, i) => (
-                                                                    <Link to={`./${i + 1}`} key={i}>
+                                                                    <Link to={`../${i + 1}`} key={i}>
                                                                         <Flex
                                                                             direction={{
                                                                                 base: 'column',

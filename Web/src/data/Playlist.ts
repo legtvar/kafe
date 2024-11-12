@@ -2,6 +2,7 @@ import { components } from '../schemas/api';
 import { HRIB, localizedString } from '../schemas/generic';
 import { getPrefered } from '../utils/preferedLanguage';
 import { AbstractType } from './AbstractType';
+import { currentOrganizationIdMapper } from './serialize/currentOrganizationIdMapper';
 import { entriesMapper } from './serialize/entriesMapper';
 import { localizedMapper } from './serialize/localizedMapper';
 import { Serializer } from './serialize/Serializer';
@@ -16,6 +17,7 @@ export class Playlist extends AbstractType {
     public name!: localizedString;
     public description?: localizedString;
     public entries!: PlaylistEntry[];
+    public organizationId!: HRIB;
 
     public constructor(struct: components['schemas']['PlaylistListDto'] | components['schemas']['PlaylistDetailDto']) {
         super();
@@ -32,9 +34,10 @@ export class Playlist extends AbstractType {
 
     serialize(update: boolean = false): components['schemas']['PlaylistCreationDto'] {
         return new Serializer(this, update)
+            .addConditionaly(!update, 'organizationId', currentOrganizationIdMapper)
             .add('name', localizedMapper)
             .add('description', localizedMapper)
-            .add('entries', entriesMapper)
+            .add('entries', entriesMapper, 'entryIds')
             .build();
     }
 }

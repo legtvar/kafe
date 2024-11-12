@@ -1,7 +1,6 @@
 import {
     Box,
     Button,
-    Flex,
     HStack,
     Heading,
     Stack,
@@ -14,11 +13,16 @@ import {
     VStack,
 } from '@chakra-ui/react';
 import { t } from 'i18next';
+import { useCallback } from 'react';
 import { AiOutlineUnlock } from 'react-icons/ai';
-import { BsX } from 'react-icons/bs';
+import { BsFillExclamationTriangleFill, BsX } from 'react-icons/bs';
+import { IoSaveOutline } from 'react-icons/io5';
 import { Link, useNavigate, useParams } from 'react-router-dom';
+import { API } from '../../../api/API';
+import { EntityPermissions } from '../../../data/EntityPermissions';
 import { Project } from '../../../data/Project';
 import { useAuth } from '../../../hooks/Caffeine';
+import { observeAbstactType } from '../../utils/AbstractTypeObserver';
 import { AwaitAPI } from '../../utils/AwaitAPI';
 import { RightsEditor } from '../../utils/RightsEditor';
 import { SendAPI } from '../../utils/SendAPI';
@@ -42,91 +46,108 @@ export function ProjectEdit(props: IProjectEditProps) {
         return <Status statusCode={404} embeded />;
     }
 
+    const getPerms = useCallback((api: API) => api.entities.perms.getById(id), [id]);
+
     return (
-        <AwaitAPI request={(api) => api.projects.getById(id)} error={<Status statusCode={404} embeded />}>
-            {(project: Project) => (
-                <Box m={6} pb={12}>
-                    <WithTitle title={t('title.project', { project: project.getName() })} />
-                    <Flex mb={2}>
-                        <Heading fontSize="4xl" fontWeight="semibold" as="h2" lineHeight="tight" mr="auto">
-                            {project.getName()}
-                        </Heading>
-                        <Link to="..">
-                            <Button leftIcon={<BsX />}>{t('projectEdit.quit').toString()}</Button>
-                        </Link>
-                    </Flex>
-                    <ProjectTags project={project} />
-                    <Tabs>
-                        <TabList>
-                            <Tab>{t('projectEdit.tabs.status').toString()}</Tab>
-                            <Tab>{t('projectEdit.tabs.info').toString()}</Tab>
-                            <Tab>{t('projectEdit.tabs.files').toString()}</Tab>
-                            <Tab>{t('projectEdit.tabs.rights').toString()}</Tab>
-                            {project.userPermissions.includes('review') && (
-                                <Tab>
-                                    <AiOutlineUnlock />
-                                    <Text pl={2}>{t('projectEdit.tabs.admin').toString()}</Text>
-                                </Tab>
-                            )}
-                        </TabList>
-
-                        <TabPanels pt={6}>
-                            <TabPanel mt={-4}>
-                                <ProjectStatus projectId={id} />
-
-                                <Heading as="h2" fontSize="lg" mb={4} pt={24}>
-                                    {t('project.admin.archive').toString()}
+        <AwaitAPI
+            request={useCallback((api) => api.projects.getById(id), [id])}
+            error={(resp) => {
+                return <Status statusCode={resp.response.status} log={resp.response.detail} embeded />;
+            }}
+        >
+            {observeAbstactType((project: Project) => (
+                <AwaitAPI request={getPerms}>
+                    {observeAbstactType((perms: EntityPermissions) => (
+                        <Box m={6} pb={12}>
+                            <WithTitle title={t('title.project', { project: project.getName() })} />
+                            <HStack mb={2}>
+                                <Heading fontSize="4xl" fontWeight="semibold" as="h2" lineHeight="tight" mr="auto">
+                                    {project.getName()}
                                 </Heading>
-                                <ReviewList project={project} />
-                            </TabPanel>
-                            <TabPanel>
-                                <ProjectBasicInfo project={project} />
-                            </TabPanel>
-                            <TabPanel>
-                                <Stack spacing={8} direction="column">
-                                    {Object.entries(project.blueprint.artifactBlueprints).map(
-                                        ([slotName, blueprint], i) => (
-                                            <ArtifactGroupUpload
-                                                key={i}
-                                                project={project}
-                                                artifactBlueprint={blueprint!}
-                                                slotName={slotName}
-                                            />
-                                        ),
+                                <SendAPI
+                                    value={project}
+                                    request={(api: API, value: Project) => api.projects.update(value)}
+                                    onSubmited={() => navigate(0)}
+                                    repeatable={true}
+                                >
+                                    {(saveProject, projectSaveStatus) => (
+                                        <SendAPI
+                                            value={perms}
+                                            request={(api, value) => api.entities.perms.update(value)}
+                                            onSubmited={() => navigate(0)}
+                                            repeatable={true}
+                                        >
+                                            {(savePerms, permsSaveStatus) => (
+                                                <Button
+                                                    leftIcon={<IoSaveOutline />}
+                                                    colorScheme="blue"
+                                                    isDisabled={project.changed.size === 0 && perms.changed.size === 0}
+                                                    onClick={() => {
+                                                        if (project.changed.size > 0) {
+                                                            saveProject();
+                                                        }
+                                                        if (perms.changed.size > 0) {
+                                                            savePerms();
+                                                        }
+                                                    }}
+                                                >
+                                                    {t('generic.save').toString()}
+                                                </Button>
+                                            )}
+                                        </SendAPI>
                                     )}
-                                </Stack>
-                            </TabPanel>
-                            <TabPanel>
-                                <AwaitAPI request={(api) => api.entities.perms.getById(project.id)}>
-                                    {(perms) => (
+                                </SendAPI>
+                                <Link to="..">
+                                    <Button leftIcon={<BsX />}>{t('projectEdit.quit').toString()}</Button>
+                                </Link>
+                            </HStack>
+                            <ProjectTags project={project} />
+                            <Tabs>
+                                <TabList>
+                                    <Tab>{t('projectEdit.tabs.status').toString()}</Tab>
+                                    <Tab>{t('projectEdit.tabs.info').toString()}</Tab>
+                                    <Tab>{t('projectEdit.tabs.files').toString()}</Tab>
+                                    <Tab>{t('projectEdit.tabs.rights').toString()}</Tab>
+                                    {project.userPermissions.includes('review') && (
+                                        <Tab>
+                                            <AiOutlineUnlock />
+                                            <Text pl={2}>{t('projectEdit.tabs.admin').toString()}</Text>
+                                        </Tab>
+                                    )}
+                                </TabList>
+
+                                <TabPanels pt={6}>
+                                    <TabPanel mt={-4}>
+                                        <ProjectStatus projectId={id} />
+
+                                        <Heading as="h2" fontSize="lg" mb={4} pt={24}>
+                                            {t('project.admin.archive').toString()}
+                                        </Heading>
+                                        <ReviewList project={project} />
+                                    </TabPanel>
+                                    <TabPanel>
+                                        <ProjectBasicInfo project={project} noSelfSubmit />
+                                    </TabPanel>
+                                    <TabPanel>
+                                        <HStack mb={6} color="yellow.500">
+                                            <BsFillExclamationTriangleFill />
+                                            <Text fontStyle="italic">{t('general.autosave').toString()}</Text>
+                                        </HStack>
+                                        <Stack spacing={8} direction="column">
+                                            {Object.entries(project.blueprint.artifactBlueprints).map(
+                                                ([slotName, blueprint], i) => (
+                                                    <ArtifactGroupUpload
+                                                        key={i}
+                                                        project={project}
+                                                        artifactBlueprint={blueprint!}
+                                                        slotName={slotName}
+                                                    />
+                                                ),
+                                            )}
+                                        </Stack>
+                                    </TabPanel>
+                                    <TabPanel>
                                         <VStack align="stretch">
-                                            <SendAPI
-                                                value={perms}
-                                                request={(api, value) => api.entities.perms.update(value)}
-                                                onSubmited={() => navigate(0) /* Refresh the page */}
-                                                repeatable={true}
-                                            >
-                                                {(onSubmit, status) => (
-                                                    <HStack align="stretch" justifyContent="flex-end">
-                                                        <Button
-                                                            colorScheme="blue"
-                                                            ml={{
-                                                                base: '0',
-                                                                xl: '4',
-                                                            }}
-                                                            mt={{
-                                                                base: '2',
-                                                                xl: '0',
-                                                            }}
-                                                            onClick={onSubmit}
-                                                            isLoading={status === 'sending'}
-                                                            isDisabled={status === 'sending'}
-                                                        >
-                                                            {t('generic.save').toString()}
-                                                        </Button>
-                                                    </HStack>
-                                                )}
-                                            </SendAPI>
                                             <RightsEditor
                                                 perms={perms}
                                                 options={['read', 'write', 'append']}
@@ -136,23 +157,23 @@ export function ProjectEdit(props: IProjectEditProps) {
                                                 }}
                                             />
                                         </VStack>
-                                    )}
-                                </AwaitAPI>
-                            </TabPanel>
-                            <TabPanel>
-                                <Heading as="h2" fontSize="lg" mb={4}>
-                                    {t('project.admin.new').toString()}
-                                </Heading>
-                                <AddReview project={project} />
-                                <Heading as="h2" fontSize="lg" mb={4} mt={8}>
-                                    {t('project.admin.archive').toString()}
-                                </Heading>
-                                <ReviewList project={project} />
-                            </TabPanel>
-                        </TabPanels>
-                    </Tabs>
-                </Box>
-            )}
+                                    </TabPanel>
+                                    <TabPanel>
+                                        <Heading as="h2" fontSize="lg" mb={4}>
+                                            {t('project.admin.new').toString()}
+                                        </Heading>
+                                        <AddReview project={project} />
+                                        <Heading as="h2" fontSize="lg" mb={4} mt={8}>
+                                            {t('project.admin.archive').toString()}
+                                        </Heading>
+                                        <ReviewList project={project} />
+                                    </TabPanel>
+                                </TabPanels>
+                            </Tabs>
+                        </Box>
+                    ))}
+                </AwaitAPI>
+            ))}
         </AwaitAPI>
     );
 }

@@ -5,12 +5,14 @@ namespace Kafe.Api.Transfer;
 
 public record PlaylistListDto(
     Hrib Id,
+    Hrib OrganizationId,
     LocalizedString Name,
     LocalizedString? Description,
     ImmutableArray<Permission> GlobalPermissions);
 
 public record PlaylistDetailDto(
     Hrib Id,
+    Hrib OrganizationId,
     LocalizedString Name,
     LocalizedString? Description,
     ImmutableArray<Permission> GlobalPermissions,
@@ -29,6 +31,8 @@ public record PlaylistCreationDto(
 
 public record PlaylistEditDto(
     Hrib Id,
+    // TODO: Uncomment once moving groups between organizations is implemented.
+    // Hrib? OrganizationId,
     LocalizedString? Name,
     LocalizedString? Description,
     ImmutableArray<Permission>? GlobalPermissions,

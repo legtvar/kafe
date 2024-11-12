@@ -15,7 +15,7 @@ namespace Kafe.Api.Endpoints.Author;
 [ApiVersion("1")]
 [Route("authors")]
 public class AuthorListEndpoint : EndpointBaseAsync
-    .WithoutRequest
+    .WithRequest<AuthorListEndpoint.RequestData>
     .WithActionResult<ImmutableArray<AuthorListDto>>
 {
     private readonly AuthorService authorService;
@@ -30,16 +30,23 @@ public class AuthorListEndpoint : EndpointBaseAsync
     }
 
     [HttpGet]
-    [SwaggerOperation(Tags = new[] { EndpointArea.Author })]
+    [SwaggerOperation(Tags = [EndpointArea.Author])]
     public override async Task<ActionResult<ImmutableArray<AuthorListDto>>> HandleAsync(
+        RequestData requestData,
         CancellationToken cancellationToken = default)
     {
         var filter = new AuthorService.AuthorFilter(
             AccessingAccountId: userProvider.AccountId
         );
-        
-        return Ok((await authorService.List(filter, cancellationToken))
+
+        return Ok((await authorService.List(filter, requestData.Sort, cancellationToken))
             .Select(TransferMaps.ToAuthorListDto)
             .ToImmutableArray());
+    }
+
+    public record RequestData
+    {
+        [FromQuery(Name = "sort")]
+        public string? Sort { get; set; } = "name";
     }
 }

@@ -39,7 +39,7 @@ export function RightsEditor({ perms, readonly, explanation, options, onChange }
                 </List>
             </Box>
             <Box>
-                {perms.globalPermissions && (
+                {perms.globalPermissions !== null && (
                     <RightsItem
                         user={0}
                         initialPerms={perms.globalPermissions}

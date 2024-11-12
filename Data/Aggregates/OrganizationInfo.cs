@@ -9,16 +9,25 @@ namespace Kafe.Data.Aggregates;
 
 public record OrganizationInfo(
     [Hrib] string Id,
+
     CreationMethod CreationMethod,
-    [LocalizedString] ImmutableDictionary<string, string> Name,
-    DateTimeOffset CreatedOn
-) : IEntity
+
+    [property:LocalizedString]
+    [property:Sortable]
+    ImmutableDictionary<string, string> Name,
+
+    [property:Sortable]
+    DateTimeOffset CreatedOn,
+
+    Permission GlobalPermissions = Permission.None
+) : IVisibleEntity
 {
     public static readonly OrganizationInfo Invalid = new(
         Id: Hrib.InvalidValue,
         CreationMethod: CreationMethod.Unknown,
         Name: LocalizedString.CreateInvariant(Const.InvalidName),
-        CreatedOn: default
+        CreatedOn: default,
+        GlobalPermissions: Permission.None
     );
 
     public OrganizationInfo() : this(Invalid)
@@ -59,6 +68,14 @@ public class OrganizationInfoProjection : SingleStreamProjection<OrganizationInf
         return o with
         {
             Name = e.Name ?? o.Name
+        };
+    }
+
+    public OrganizationInfo Apply(OrganizationGlobalPermissionsChanged e, OrganizationInfo o)
+    {
+        return o with
+        {
+            GlobalPermissions = e.GlobalPermissions
         };
     }
 }

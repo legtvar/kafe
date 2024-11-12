@@ -1,22 +1,18 @@
 import React, { useContext } from 'react';
+import { useLocation } from 'react-router-dom';
 import { API } from '../api/API';
+import { Organization } from '../data/Organization';
 import { User } from '../data/User';
 
 export class Caffeine {
     public api: API;
     public user: User | null = null;
+    public organizations: Organization[] = [];
 
     public constructor(api: API) {
         this.api = api;
-
-        // const user = new User();
-        // user.email = 'rosecky.jonas@gmail.com';
-        // user.id = '123456789';
-        // user.name = 'Jonáš Rosecký';
-        // user.role = 'admin';
-
         this.user = null;
-        // this.user = user;
+        this.organizations = [];
     }
 }
 
@@ -37,5 +33,20 @@ export function useAuth() {
         setUser: (user: User | null) => {
             caffeine.user = user;
         },
+    };
+}
+
+export function useOrganizations() {
+    const caffeine = useContext(caffeineContext);
+
+    const location = useLocation();
+    const orgId = location.pathname.split('/')[2];
+
+    return {
+        organizations: caffeine.organizations,
+        setOrganizations: (organizations: Organization[]) => {
+            caffeine.organizations = organizations;
+        },
+        currentOrganization: caffeine.organizations.find((org) => org.id === orgId),
     };
 }

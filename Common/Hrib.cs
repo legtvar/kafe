@@ -42,7 +42,7 @@ public record Hrib
     }
 
     /// <summary>
-    /// The raw identifier string. Use only if you know what you're doing. Prefer <see cref="ToString"/> instead.
+    /// The raw identifier string. Use only if you know what you're doing. Prefer <see cref="ToString()"/> instead.
     /// </summary>
     public string RawValue { get; init; }
 
@@ -140,21 +140,26 @@ public record Hrib
 
         return new Error(Error.BadHribId, error);
     }
-    public override string ToString()
+
+    public string ToString(bool throwOnInvalidAndEmpty)
     {
-        if (RawValue == InvalidValue)
+        if (throwOnInvalidAndEmpty && RawValue == InvalidValue)
         {
             throw new InvalidOperationException(
                 "This Hrib is invalid and cannot be stringified to prevent accidental use in a database.");
         }
 
-        if (RawValue == EmptyValue)
+        if (throwOnInvalidAndEmpty && RawValue == EmptyValue)
         {
             throw new InvalidOperationException(
                 "This Hrib is empty and cannot be stringified to prevent accidental use in a database."
                     + "This value is meant to be replaced with a proper HRIB by an entity service.");
         }
-
         return RawValue;
+    }
+    
+    public override string ToString()
+    {
+        return ToString(throwOnInvalidAndEmpty: true);
     }
 }

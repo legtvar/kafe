@@ -153,6 +153,28 @@
         }
       }
     },
+    "/api/v1/account/impersonate/{id}": {
+      "get": {
+        "tags": [
+          "Account"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/v1/accounts": {
       "get": {
         "tags": [
@@ -615,6 +637,215 @@
         "responses": {
           "200": {
             "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/organization": {
+      "post": {
+        "tags": [
+          "Organization"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrganizationCreationDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrganizationCreationDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrganizationCreationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "description": "Human-Readable Identifier Ballast",
+                  "format": "hrib",
+                  "example": "AAAAbadf00d"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "description": "Human-Readable Identifier Ballast",
+                  "format": "hrib",
+                  "example": "AAAAbadf00d"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "string",
+                  "description": "Human-Readable Identifier Ballast",
+                  "format": "hrib",
+                  "example": "AAAAbadf00d"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Organization"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrganizationEditDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrganizationEditDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrganizationEditDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "description": "Human-Readable Identifier Ballast",
+                  "format": "hrib",
+                  "example": "AAAAbadf00d"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "description": "Human-Readable Identifier Ballast",
+                  "format": "hrib",
+                  "example": "AAAAbadf00d"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "string",
+                  "description": "Human-Readable Identifier Ballast",
+                  "format": "hrib",
+                  "example": "AAAAbadf00d"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/organization/{id}": {
+      "get": {
+        "tags": [
+          "Organization"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationDetailDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationDetailDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationDetailDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/organizations": {
+      "get": {
+        "tags": [
+          "Organization"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OrganizationListDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OrganizationListDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OrganizationListDto"
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -1257,6 +1488,215 @@
               "text/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProjectValidationDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/role": {
+      "post": {
+        "tags": [
+          "Role"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleCreationDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleCreationDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleCreationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "description": "Human-Readable Identifier Ballast",
+                  "format": "hrib",
+                  "example": "AAAAbadf00d"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "description": "Human-Readable Identifier Ballast",
+                  "format": "hrib",
+                  "example": "AAAAbadf00d"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "string",
+                  "description": "Human-Readable Identifier Ballast",
+                  "format": "hrib",
+                  "example": "AAAAbadf00d"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Role"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleEditDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleEditDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleEditDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "description": "Human-Readable Identifier Ballast",
+                  "format": "hrib",
+                  "example": "AAAAbadf00d"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "description": "Human-Readable Identifier Ballast",
+                  "format": "hrib",
+                  "example": "AAAAbadf00d"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "string",
+                  "description": "Human-Readable Identifier Ballast",
+                  "format": "hrib",
+                  "example": "AAAAbadf00d"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/role/{id}": {
+      "get": {
+        "tags": [
+          "Role"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoleDetailDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoleDetailDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoleDetailDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/roles": {
+      "get": {
+        "tags": [
+          "Role"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RoleListDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RoleListDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RoleListDto"
+                  }
                 }
               }
             }
@@ -2218,19 +2658,7 @@
         },
         "additionalProperties": false
       },
-      "Permission": {
-        "enum": [
-          "none",
-          "read",
-          "append",
-          "inspect",
-          "write",
-          "review",
-          "all"
-        ],
-        "type": "string"
-      },
-      "PlaylistCreationDto": {
+      "OrganizationCreationDto": {
         "required": [
           "name"
         ],
@@ -2255,6 +2683,170 @@
                 "nullable": true
               }
             }
+          }
+        },
+        "additionalProperties": false
+      },
+      "OrganizationDetailDto": {
+        "required": [
+          "createdOn",
+          "id",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Human-Readable Identifier Ballast",
+            "format": "hrib",
+            "example": "AAAAbadf00d"
+          },
+          "name": {
+            "title": "LocalizedString",
+            "required": [
+              "iv"
+            ],
+            "type": "object",
+            "properties": {
+              "iv": {
+                "type": "string"
+              },
+              "cs": {
+                "type": "string",
+                "nullable": true
+              },
+              "en": {
+                "type": "string",
+                "nullable": true
+              }
+            }
+          },
+          "createdOn": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false
+      },
+      "OrganizationEditDto": {
+        "required": [
+          "id",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Human-Readable Identifier Ballast",
+            "format": "hrib",
+            "example": "AAAAbadf00d"
+          },
+          "name": {
+            "title": "LocalizedString",
+            "required": [
+              "iv"
+            ],
+            "type": "object",
+            "properties": {
+              "iv": {
+                "type": "string"
+              },
+              "cs": {
+                "type": "string",
+                "nullable": true
+              },
+              "en": {
+                "type": "string",
+                "nullable": true
+              }
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "OrganizationListDto": {
+        "required": [
+          "id",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Human-Readable Identifier Ballast",
+            "format": "hrib",
+            "example": "AAAAbadf00d"
+          },
+          "name": {
+            "title": "LocalizedString",
+            "required": [
+              "iv"
+            ],
+            "type": "object",
+            "properties": {
+              "iv": {
+                "type": "string"
+              },
+              "cs": {
+                "type": "string",
+                "nullable": true
+              },
+              "en": {
+                "type": "string",
+                "nullable": true
+              }
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "Permission": {
+        "enum": [
+          "none",
+          "read",
+          "append",
+          "inspect",
+          "publishable",
+          "write",
+          "review",
+          "administer",
+          "inheritable",
+          "all"
+        ],
+        "type": "string"
+      },
+      "PlaylistCreationDto": {
+        "required": [
+          "name",
+          "organizationId"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "title": "LocalizedString",
+            "required": [
+              "iv"
+            ],
+            "type": "object",
+            "properties": {
+              "iv": {
+                "type": "string"
+              },
+              "cs": {
+                "type": "string",
+                "nullable": true
+              },
+              "en": {
+                "type": "string",
+                "nullable": true
+              }
+            }
+          },
+          "organizationId": {
+            "type": "string",
+            "description": "Human-Readable Identifier Ballast",
+            "format": "hrib",
+            "example": "AAAAbadf00d"
           },
           "description": {
             "title": "LocalizedString",
@@ -3267,7 +3859,9 @@
       "ProjectGroupCreationDto": {
         "required": [
           "deadline",
-          "name"
+          "isOpen",
+          "name",
+          "organizationId"
         ],
         "type": "object",
         "properties": {
@@ -3290,6 +3884,12 @@
                 "nullable": true
               }
             }
+          },
+          "organizationId": {
+            "type": "string",
+            "description": "Human-Readable Identifier Ballast",
+            "format": "hrib",
+            "example": "AAAAbadf00d"
           },
           "description": {
             "title": "LocalizedString",
@@ -3315,6 +3915,9 @@
           "deadline": {
             "type": "string",
             "format": "date-time"
+          },
+          "isOpen": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -3730,6 +4333,242 @@
           "rejected"
         ],
         "type": "string"
+      },
+      "RoleCreationDto": {
+        "required": [
+          "name",
+          "organizationId"
+        ],
+        "type": "object",
+        "properties": {
+          "organizationId": {
+            "type": "string",
+            "description": "Human-Readable Identifier Ballast",
+            "format": "hrib",
+            "example": "AAAAbadf00d"
+          },
+          "name": {
+            "title": "LocalizedString",
+            "required": [
+              "iv"
+            ],
+            "type": "object",
+            "properties": {
+              "iv": {
+                "type": "string"
+              },
+              "cs": {
+                "type": "string",
+                "nullable": true
+              },
+              "en": {
+                "type": "string",
+                "nullable": true
+              }
+            }
+          },
+          "description": {
+            "title": "LocalizedString",
+            "required": [
+              "iv"
+            ],
+            "type": "object",
+            "properties": {
+              "iv": {
+                "type": "string"
+              },
+              "cs": {
+                "type": "string",
+                "nullable": true
+              },
+              "en": {
+                "type": "string",
+                "nullable": true
+              }
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "RoleDetailDto": {
+        "required": [
+          "createdOn",
+          "id",
+          "name",
+          "organizationId",
+          "permissions"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Human-Readable Identifier Ballast",
+            "format": "hrib",
+            "example": "AAAAbadf00d"
+          },
+          "organizationId": {
+            "type": "string",
+            "description": "Human-Readable Identifier Ballast",
+            "format": "hrib",
+            "example": "AAAAbadf00d"
+          },
+          "name": {
+            "title": "LocalizedString",
+            "required": [
+              "iv"
+            ],
+            "type": "object",
+            "properties": {
+              "iv": {
+                "type": "string"
+              },
+              "cs": {
+                "type": "string",
+                "nullable": true
+              },
+              "en": {
+                "type": "string",
+                "nullable": true
+              }
+            }
+          },
+          "description": {
+            "title": "LocalizedString",
+            "required": [
+              "iv"
+            ],
+            "type": "object",
+            "properties": {
+              "iv": {
+                "type": "string"
+              },
+              "cs": {
+                "type": "string",
+                "nullable": true
+              },
+              "en": {
+                "type": "string",
+                "nullable": true
+              }
+            },
+            "nullable": true
+          },
+          "createdOn": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "permissions": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Permission"
+              }
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "RoleEditDto": {
+        "required": [
+          "id",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Human-Readable Identifier Ballast",
+            "format": "hrib",
+            "example": "AAAAbadf00d"
+          },
+          "name": {
+            "title": "LocalizedString",
+            "required": [
+              "iv"
+            ],
+            "type": "object",
+            "properties": {
+              "iv": {
+                "type": "string"
+              },
+              "cs": {
+                "type": "string",
+                "nullable": true
+              },
+              "en": {
+                "type": "string",
+                "nullable": true
+              }
+            }
+          },
+          "description": {
+            "title": "LocalizedString",
+            "required": [
+              "iv"
+            ],
+            "type": "object",
+            "properties": {
+              "iv": {
+                "type": "string"
+              },
+              "cs": {
+                "type": "string",
+                "nullable": true
+              },
+              "en": {
+                "type": "string",
+                "nullable": true
+              }
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "RoleListDto": {
+        "required": [
+          "id",
+          "name",
+          "organizationId"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Human-Readable Identifier Ballast",
+            "format": "hrib",
+            "example": "AAAAbadf00d"
+          },
+          "organizationId": {
+            "type": "string",
+            "description": "Human-Readable Identifier Ballast",
+            "format": "hrib",
+            "example": "AAAAbadf00d"
+          },
+          "name": {
+            "title": "LocalizedString",
+            "required": [
+              "iv"
+            ],
+            "type": "object",
+            "properties": {
+              "iv": {
+                "type": "string"
+              },
+              "cs": {
+                "type": "string",
+                "nullable": true
+              },
+              "en": {
+                "type": "string",
+                "nullable": true
+              }
+            }
+          }
+        },
+        "additionalProperties": false
       },
       "ShardDetailBaseDto": {
         "required": [

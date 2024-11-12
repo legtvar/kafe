@@ -17,13 +17,16 @@ import {
     VStack,
 } from '@chakra-ui/react';
 import i18next, { t } from 'i18next';
-import { FiChevronDown, FiMenu, FiMoon, FiSun } from 'react-icons/fi';
+import { FiChevronDown, FiMenu } from 'react-icons/fi';
 import { Link, useNavigate } from 'react-router-dom';
 import { useApi, useAuth } from '../../../hooks/Caffeine';
+import { ColorModeToggle } from '../../utils/ColorModeToggle';
 import { KafeAvatar } from '../../utils/KafeAvatar';
 import { LanguageToggle } from '../../utils/LanguageToggle';
 import { Logo } from '../Logo';
 import { MessageButton } from '../MessageButton';
+
+export const NAVBAR_HEIGHT = 20;
 
 interface INavbarProps extends FlexProps {
     onOpen?: () => void;
@@ -31,7 +34,7 @@ interface INavbarProps extends FlexProps {
     signedIn: boolean;
 }
 export function Navbar({ onOpen, forceReload, signedIn, ...rest }: INavbarProps) {
-    const { colorMode, toggleColorMode } = useColorMode();
+    const { toggleColorMode } = useColorMode();
     const { user, setUser } = useAuth();
     const navigate = useNavigate();
     const api = useApi();
@@ -45,20 +48,21 @@ export function Navbar({ onOpen, forceReload, signedIn, ...rest }: INavbarProps)
     return (
         <Flex
             px={{ base: 4, md: 4 }}
-            height="20"
+            height={NAVBAR_HEIGHT}
             alignItems="center"
             bg={useColorModeValue('white', 'gray.900')}
             borderBottomWidth="1px"
             borderBottomColor={useColorModeValue('gray.200', 'gray.700')}
             justifyContent={{ base: 'space-between', md: 'flex-end' }}
-            position="fixed"
-            top={0}
-            right={0}
-            left={signedIn ? { base: 0, md: 64 } : 0}
             zIndex="sticky"
             {...rest}
         >
-            {signedIn && (
+            <Flex h="20" alignItems="center" ml={2} mr={8} justifyContent="space-between" key="heading">
+                <Link to="/">
+                    <Logo />
+                </Link>
+            </Flex>
+            {signedIn && onOpen && (
                 <IconButton
                     display={{ base: 'flex', md: 'none' }}
                     onClick={onOpen}
@@ -84,9 +88,6 @@ export function Navbar({ onOpen, forceReload, signedIn, ...rest }: INavbarProps)
             )}
 
             {signedIn && <Spacer />}
-            <Link to="/">
-                <Logo display={signedIn ? { base: 'flex', md: 'none' } : 'flex'} ml={6} />
-            </Link>
 
             <Spacer />
 
@@ -96,14 +97,7 @@ export function Navbar({ onOpen, forceReload, signedIn, ...rest }: INavbarProps)
                     onLanguageToggled={() => forceReload()}
                     display={{ base: 'none', md: 'flex' }}
                 />
-                <IconButton
-                    display={{ base: 'none', md: 'flex' }}
-                    size="lg"
-                    variant="ghost"
-                    aria-label="Toggle Color Mode"
-                    onClick={toggleColorMode}
-                    icon={colorMode === 'light' ? <FiMoon /> : <FiSun />}
-                />
+                <ColorModeToggle display={{ base: 'none', md: 'flex' }} aria-label="Toggle Color Mode" />
                 {!signedIn && (
                     <Link to="/account/login">
                         <Button ml={4}>{t('home.signin').toString()}</Button>

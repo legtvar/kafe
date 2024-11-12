@@ -66,7 +66,7 @@ export const LocalizedInput: ComponentWithAs<'input', ILocalizedInputProps> = ({
 
     return (
         <Tabs variant="enclosed">
-            <TabList borderBottom="none" px={2}>
+            <TabList borderBottom="none" px={0}>
                 {Object.keys(definedValue).map((key) => {
                     if (key === 'iv') {
                         return (
@@ -118,13 +118,14 @@ export const LocalizedInput: ComponentWithAs<'input', ILocalizedInputProps> = ({
                             CountryLanguage.getLanguage(lang.language).name[0];
                     }
 
-                    const inputProps = {
+                    const inputProps: InputProps = {
                         placeholder: placeholder ? `${placeholder} - ${langName}` : undefined,
                         defaultValue: getPrefered(value, key),
                         onChange: (event: ChangeEvent<HTMLInputElement>) => {
                             definedValue[key] = event.target.value;
                             onChange && onChange(definedValue);
                         },
+                        borderTopLeftRadius: 0,
                         type: type || 'text',
                         ...rest,
                     };

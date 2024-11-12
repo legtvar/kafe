@@ -236,9 +236,8 @@ public class EntityPermissionEventProjection : EventProjection
         };
         ops.Store(membersInfo);
 
-        var query = ops.Query<EntityPermissionInfo>()
-            .Where(p => p.RoleEntries.ContainsKey(e.RoleId));
-        var affectedEntities = query
+        var affectedEntities = ops.Query<EntityPermissionInfo>()
+            .Where(p => p.RoleEntries.ContainsKey(e.RoleId))
             .ToAsyncEnumerable();
         await foreach (var affected in affectedEntities)
         {
@@ -299,7 +298,11 @@ public class EntityPermissionEventProjection : EventProjection
         }
 
         var perms = await RequireEntityPermissionInfo(ops, e.ProjectGroupId);
-        perms = await RemoveDependency(ops, perms, entitySoFar.OrganizationId);
+        if (((Hrib)entitySoFar.OrganizationId).IsValidNonEmpty)
+        {
+            perms = await RemoveDependency(ops, perms, entitySoFar.OrganizationId);
+        }
+
         perms = await AddParent(ops, perms, e.OrganizationId);
         ops.Store(perms);
     }
@@ -315,7 +318,11 @@ public class EntityPermissionEventProjection : EventProjection
         }
 
         var perms = await RequireEntityPermissionInfo(ops, e.PlaylistId);
-        perms = await RemoveDependency(ops, perms, entitySoFar.OrganizationId);
+        if (((Hrib)entitySoFar.OrganizationId).IsValidNonEmpty)
+        {
+            perms = await RemoveDependency(ops, perms, entitySoFar.OrganizationId);
+        }
+
         perms = await AddParent(ops, perms, e.OrganizationId);
         ops.Store(perms);
     }
@@ -409,7 +416,7 @@ public class EntityPermissionEventProjection : EventProjection
 
         // NB: "Spread" the new dependency to all entities where `perms.Id` was already in the dependency graph
         var affectedEntities = ops.Query<EntityPermissionInfo>()
-            .Where(p => p.DependencyGraph.ContainsKey(perms.Id))
+            .Where(p => p.Id != changedPerms.Id && p.DependencyGraph.ContainsKey(changedPerms.Id))
             .ToAsyncEnumerable();
         await foreach (var affected in affectedEntities)
         {
@@ -433,12 +440,12 @@ public class EntityPermissionEventProjection : EventProjection
     private static async Task<EntityPermissionInfo> RemoveDependency(
         IDocumentOperations ops,
         EntityPermissionInfo perms,
-        Hrib parentId
+        Hrib dependencyId
     )
     {
         var changedGraph = RemoveFromDependencyGraph(
             perms.DependencyGraph,
-            parentId.ToString(),
+            dependencyId.ToString(),
             out var removedGrantors);
 
         var changedPerms = perms with
@@ -450,13 +457,13 @@ public class EntityPermissionEventProjection : EventProjection
 
         // NB: Recalculate perms of entities where `perms` is a grantor.
         var affectedEntities = ops.Query<EntityPermissionInfo>()
-            .Where(p => p.DependencyGraph.ContainsKey(changedPerms.Id))
+            .Where(p => p.Id != changedPerms.Id && p.DependencyGraph.ContainsKey(changedPerms.Id))
             .ToAsyncEnumerable();
         await foreach (var affected in affectedEntities)
         {
             var affectedGraph = RemoveFromDependencyGraph(
                 affected.DependencyGraph,
-                parentId.ToString(),
+                dependencyId.ToString(),
                 out var removedAffectedGrantors,
                 changedPerms.Id);
 

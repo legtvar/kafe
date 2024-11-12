@@ -1,5 +1,6 @@
 import { AspectRatio, Box, Button, Center, Image, SimpleGrid, Stack, Tag, useColorModeValue } from '@chakra-ui/react';
 import { t } from 'i18next';
+import { useCallback } from 'react';
 import { BsPlayFill } from 'react-icons/bs';
 import { Link } from 'react-router-dom';
 import { Playlist } from '../../../data/Playlist';
@@ -13,7 +14,7 @@ export function PlaylistGallery(props: IPlaylistGalleryProps) {
     const tagColor = useColorModeValue('grayAlpha.200', 'whiteAlpha.200');
 
     return (
-        <AwaitAPI request={(api) => api.playlists.getAll()}>
+        <AwaitAPI request={useCallback((api) => api.playlists.getAll(), [])}>
             {(data: Playlist[]) => {
                 if (data.length === 0) return <></>;
 

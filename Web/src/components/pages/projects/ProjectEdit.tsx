@@ -13,6 +13,7 @@ import {
     VStack,
 } from '@chakra-ui/react';
 import { t } from 'i18next';
+import { useCallback } from 'react';
 import { AiOutlineUnlock } from 'react-icons/ai';
 import { BsFillExclamationTriangleFill, BsX } from 'react-icons/bs';
 import { IoSaveOutline } from 'react-icons/io5';
@@ -45,15 +46,17 @@ export function ProjectEdit(props: IProjectEditProps) {
         return <Status statusCode={404} embeded />;
     }
 
+    const getPerms = useCallback((api: API) => api.entities.perms.getById(id), [id]);
+
     return (
         <AwaitAPI
-            request={(api) => api.projects.getById(id)}
+            request={useCallback((api) => api.projects.getById(id), [id])}
             error={(resp) => {
                 return <Status statusCode={resp.response.status} log={resp.response.detail} embeded />;
             }}
         >
             {observeAbstactType((project: Project) => (
-                <AwaitAPI request={(api) => api.entities.perms.getById(project.id)}>
+                <AwaitAPI request={getPerms}>
                     {observeAbstactType((perms: EntityPermissions) => (
                         <Box m={6} pb={12}>
                             <WithTitle title={t('title.project', { project: project.getName() })} />

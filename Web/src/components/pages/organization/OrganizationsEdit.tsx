@@ -1,5 +1,6 @@
 import { Box, Button, HStack, Heading, Tab, TabList, TabPanel, TabPanels, Tabs, VStack } from '@chakra-ui/react';
 import { t } from 'i18next';
+import { useCallback } from 'react';
 import { BsX } from 'react-icons/bs';
 import { IoSaveOutline } from 'react-icons/io5';
 import { Link, useNavigate } from 'react-router-dom';
@@ -26,15 +27,17 @@ export function OrganizationsEdit(props: IOrganizationsEditProps) {
         return <Status statusCode={404} embeded />;
     }
 
+    const getPerms = useCallback((api: API) => api.entities.perms.getById(id), [id]);
+
     return (
         <AwaitAPI
-            request={(api) => api.organizations.getById(id)}
+            request={useCallback((api) => api.organizations.getById(id), [id])}
             error={(resp) => {
                 return <Status statusCode={resp.response.status} log={resp.response.detail} embeded />;
             }}
         >
             {observeAbstactType((organization: Organization) => (
-                <AwaitAPI request={(api) => api.entities.perms.getById(organization.id)}>
+                <AwaitAPI request={getPerms}>
                     {observeAbstactType((perms: EntityPermissions) => (
                         <Box m={6} pb={12}>
                             <WithTitle title={t('title.organization', { group: organization.getName() })} />

@@ -6,7 +6,7 @@ import { Organization } from '../../../data/Organization';
 import { useAuthLinkFunction } from '../../../hooks/useAuthLink';
 import { useColorScheme } from '../../../hooks/useColorScheme';
 import { HRIB } from '../../../schemas/generic';
-import { getPrefered } from '../../../utils/preferedLanguage';
+import { LocalizedInput } from '../../utils/LocalizedInput';
 import { SendAPI } from '../../utils/SendAPI';
 
 interface IOrganizationBasicInfoProps {
@@ -50,47 +50,16 @@ export function OrganizationBasicInfo(props: IOrganizationBasicInfoProps) {
                 <Stack spacing={8} direction="column" mb={8}>
                     <FormControl>
                         <FormLabel>{t('createOrganization.fields.name').toString()}</FormLabel>
-                        <Stack direction={{ base: 'column', md: 'row' }}>
-                            <FormControl id="name.cs">
-                                <Input
-                                    type="text"
-                                    borderColor={border}
-                                    bg={bg}
-                                    placeholder={`${t('createOrganization.fields.name').toString()} ${t(
-                                        'createProject.language.cs',
-                                    )}`}
-                                    defaultValue={getPrefered(organization.name, 'cs')}
-                                    onChange={(event) =>
-                                        forceUpdate(
-                                            organization.set('name', {
-                                                ...organization.name,
-                                                cs: event.target.value,
-                                            }),
-                                        )
-                                    }
-                                />
-                            </FormControl>
-
-                            <FormControl id="name.en">
-                                <Input
-                                    type="text"
-                                    borderColor={border}
-                                    bg={bg}
-                                    placeholder={`${t('createOrganization.fields.name').toString()} ${t(
-                                        'createProject.language.en',
-                                    )}`}
-                                    defaultValue={getPrefered(organization.name, 'en')}
-                                    onChange={(event) =>
-                                        forceUpdate(
-                                            organization.set('name', {
-                                                ...organization.name,
-                                                en: event.target.value,
-                                            }),
-                                        )
-                                    }
-                                />
-                            </FormControl>
-                        </Stack>
+                        <LocalizedInput
+                            as={Input}
+                            type="text"
+                            borderColor={border}
+                            bg={bg}
+                            name="name"
+                            placeholder={t('createOrganization.fields.name').toString()}
+                            value={organization.name}
+                            onChange={(value) => forceUpdate(organization.set('name', value))}
+                        />
                     </FormControl>
 
                     {!props.noSelfSubmit && (

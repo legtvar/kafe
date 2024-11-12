@@ -18,7 +18,7 @@ import {
     useColorModeValue,
 } from '@chakra-ui/react';
 import { t } from 'i18next';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Group } from '../../../../data/Group';
 import { PlaylistEntry } from '../../../../data/Playlist';
 import { Project } from '../../../../data/Project';
@@ -148,7 +148,10 @@ export function PlaylistAddNewFileWrapper({ isOpen, onClose, groups, projects }:
                             ) : (
                                 <AwaitAPI
                                     key={selectedProject}
-                                    request={(api) => api.projects.getById(selectedProject)}
+                                    request={useCallback(
+                                        (api) => api.projects.getById(selectedProject),
+                                        [selectedProject],
+                                    )}
                                     error={(error) => <Text>{error.message}</Text>}
                                 >
                                     {(project: Project) => (

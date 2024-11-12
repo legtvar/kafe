@@ -6,8 +6,8 @@ import { Project } from '../../../../data/Project';
 import { useAuthLinkFunction } from '../../../../hooks/useAuthLink';
 import { useColorScheme } from '../../../../hooks/useColorScheme';
 import { HRIB } from '../../../../schemas/generic';
-import { getPrefered } from '../../../../utils/preferedLanguage';
 import { AuthorSelect } from '../../../utils/Authors/AuthorSelect';
+import { LocalizedInput } from '../../../utils/LocalizedInput';
 import { ProjectAuthorList } from '../../../utils/ProjectAuthorList';
 import { SendAPI } from '../../../utils/SendAPI';
 import { TextareaLimited } from '../../../utils/TextareaLimited';
@@ -59,139 +59,45 @@ export function ProjectBasicInfo(props: IProjectBasicInfoProps) {
                 <Stack spacing={8} direction="column" mb={8}>
                     <FormControl>
                         <FormLabel>{t('createProject.fields.name').toString()}</FormLabel>
-                        <Stack direction={{ base: 'column', md: 'row' }}>
-                            <FormControl id="name.cs">
-                                <Input
-                                    type="text"
-                                    borderColor={border}
-                                    bg={bg}
-                                    placeholder={`${t('createProject.fields.name').toString()} ${t(
-                                        'createProject.language.cs',
-                                    )}`}
-                                    defaultValue={getPrefered(project.name, 'cs')}
-                                    onChange={(event) =>
-                                        forceUpdate(
-                                            project.set('name', {
-                                                ...project.name,
-                                                cs: event.target.value,
-                                            }),
-                                        )
-                                    }
-                                />
-                            </FormControl>
-
-                            <FormControl id="name.en">
-                                <Input
-                                    type="text"
-                                    borderColor={border}
-                                    bg={bg}
-                                    placeholder={`${t('createProject.fields.name').toString()} ${t(
-                                        'createProject.language.en',
-                                    )}`}
-                                    defaultValue={getPrefered(project.name, 'en')}
-                                    onChange={(event) =>
-                                        forceUpdate(
-                                            project.set('name', {
-                                                ...project.name,
-                                                en: event.target.value,
-                                            }),
-                                        )
-                                    }
-                                />
-                            </FormControl>
-                        </Stack>
+                        <LocalizedInput
+                            as={Input}
+                            type="text"
+                            borderColor={border}
+                            bg={bg}
+                            name="name"
+                            placeholder={t('createProject.fields.name').toString()}
+                            value={project.name}
+                            onChange={(value) => forceUpdate(project.set('name', value))}
+                        />
                     </FormControl>
                     <FormControl>
                         <FormLabel>{t('createProject.fields.genre').toString()}</FormLabel>
-                        <Stack direction={{ base: 'column', md: 'row' }}>
-                            <FormControl id="genre.cs">
-                                <Input
-                                    type="text"
-                                    borderColor={border}
-                                    bg={bg}
-                                    placeholder={`${t('createProject.fields.genre').toString()} ${t(
-                                        'createProject.language.cs',
-                                    )}`}
-                                    defaultValue={getPrefered(project.genre, 'cs')}
-                                    onChange={(event) =>
-                                        forceUpdate(
-                                            project.set('genre', {
-                                                ...project.genre,
-                                                cs: event.target.value,
-                                            }),
-                                        )
-                                    }
-                                />
-                            </FormControl>
-
-                            <FormControl id="genre.en">
-                                <Input
-                                    type="text"
-                                    borderColor={border}
-                                    bg={bg}
-                                    placeholder={`${t('createProject.fields.genre').toString()} ${t(
-                                        'createProject.language.en',
-                                    )}`}
-                                    defaultValue={getPrefered(project.genre, 'en')}
-                                    onChange={(event) =>
-                                        forceUpdate(
-                                            project.set('genre', {
-                                                ...project.genre,
-                                                en: event.target.value,
-                                            }),
-                                        )
-                                    }
-                                />
-                            </FormControl>
-                        </Stack>
+                        <LocalizedInput
+                            as={Input}
+                            type="text"
+                            borderColor={border}
+                            bg={bg}
+                            name="genre"
+                            placeholder={t('createProject.fields.genre').toString()}
+                            value={project.genre}
+                            onChange={(value) => forceUpdate(project.set('genre', value))}
+                        />
                     </FormControl>
                     <FormControl>
                         <FormLabel>{t('createProject.fields.description').toString()}</FormLabel>
-                        <Stack direction={{ base: 'column', md: 'row' }}>
-                            <FormControl id="description.cs">
-                                <TextareaLimited
-                                    placeholder={`${t('createProject.fields.description').toString()} ${t(
-                                        'createProject.language.cs',
-                                    )}`}
-                                    min={50}
-                                    max={200}
-                                    borderColor={border}
-                                    bg={bg}
-                                    defaultValue={getPrefered(project.description, 'cs')}
-                                    onChange={(event) =>
-                                        forceUpdate(
-                                            project.set('description', {
-                                                ...project.description,
-                                                cs: event.target.value,
-                                            }),
-                                        )
-                                    }
-                                />
-                            </FormControl>
-
-                            <FormControl id="description.en">
-                                <TextareaLimited
-                                    placeholder={`${t('createProject.fields.description').toString()} ${t(
-                                        'createProject.language.en',
-                                    )}`}
-                                    min={50}
-                                    max={200}
-                                    borderColor={border}
-                                    bg={bg}
-                                    defaultValue={getPrefered(project.description, 'en')}
-                                    onChange={(event) =>
-                                        forceUpdate(
-                                            project.set('description', {
-                                                ...project.description,
-                                                en: event.target.value,
-                                            }),
-                                        )
-                                    }
-                                />
-                            </FormControl>
-                        </Stack>
+                        <LocalizedInput
+                            as={TextareaLimited}
+                            min={50}
+                            max={200}
+                            borderColor={border}
+                            bg={bg}
+                            name="genre"
+                            placeholder={t('createProject.fields.genre').toString()}
+                            value={project.genre}
+                            onChange={(value) => forceUpdate(project.set('genre', value))}
+                        />
                     </FormControl>
-                    <FormControl pb={12}>
+                    <FormControl py={12}>
                         <FormLabel>{t('createProject.fields.crew').toString()}</FormLabel>
                         <ProjectAuthorList
                             authors={project.crew || []}

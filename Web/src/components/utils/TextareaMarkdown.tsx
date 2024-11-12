@@ -19,7 +19,6 @@ export function TextareaMarkdown({ value, defaultValue, ...props }: TextareaProp
 
     return (
         <>
-            <FormHelperText opacity={0.5}>{t('textareaMarkdown.allowMarkdown').toString()}</FormHelperText>
             <Textarea
                 {...props}
                 value={textareaValue}
@@ -29,7 +28,11 @@ export function TextareaMarkdown({ value, defaultValue, ...props }: TextareaProp
                 }}
             />
 
-            <Accordion allowToggle>
+            <FormHelperText opacity={0.5} mb={2}>
+                {t('textareaMarkdown.allowMarkdown').toString()}
+            </FormHelperText>
+
+            <Accordion allowToggle w="full">
                 <AccordionItem>
                     <AccordionButton>
                         <Box as="span" flex="1" textAlign="left">

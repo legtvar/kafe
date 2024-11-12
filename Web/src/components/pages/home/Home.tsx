@@ -17,6 +17,7 @@ import {
 import ChakraUIRenderer from 'chakra-ui-markdown-renderer';
 import { t } from 'i18next';
 import moment from 'moment';
+import { useCallback } from 'react';
 import Countdown from 'react-countdown';
 import { IoCubeOutline } from 'react-icons/io5';
 import Markdown from 'react-markdown';
@@ -65,7 +66,12 @@ export function Home(props: IHomeProps) {
                         <Text>{t('home.openGroups')}</Text>
                     </HStack>
                 </Heading>
-                <AwaitAPI request={(api) => api.groups.getAll(useOrganizations().currentOrganization?.id)}>
+                <AwaitAPI
+                    request={useCallback(
+                        (api) => api.groups.getAll(useOrganizations().currentOrganization?.id),
+                        [useOrganizations().currentOrganization],
+                    )}
+                >
                     {(groups) => (
                         <Box w="full" overflowX="auto" py={4} scrollSnapType="x mandatory">
                             <HStack alignItems="start">
@@ -152,58 +158,6 @@ export function Home(props: IHomeProps) {
                         </Box>
                     )}
                 </AwaitAPI>
-
-                {/* <Heading size="lg" mb={4} mt={6}>
-                    <HStack>
-                        <IoFolderOpenOutline />
-                        <Text>{t('home.myProjects')}</Text>
-                    </HStack>
-                </Heading>
-                <AwaitAPI request={(api) => api.projects.getAll()}>
-                    {(projects) => {
-                        return (
-                            <Box w="full" overflowX="auto" py={4} scrollSnapType="x mandatory">
-                                <HStack alignItems="start">
-                                    {projects
-                                        .filter((project) => project.userPermissions.includes('write'))
-                                        .map((project, i) => (
-                                            <Card w="sm" maxW="100%" key={i} flexShrink={0} scrollSnapAlign="start">
-                                                <CardBody>
-                                                    <Stack spacing="3">
-                                                        <Heading size="md">{project.getName()}</Heading>
-                                                        {project.description && (
-                                                            <Box mb={4}>
-                                                                {project
-                                                                    .getDescription()
-                                                                    .substring(0, DESCRIPTION_LENGTH)}
-                                                                {project.getDescription().length > DESCRIPTION_LENGTH &&
-                                                                    '...'}
-                                                            </Box>
-                                                        )}
-                                                    </Stack>
-                                                </CardBody>
-                                                <Divider />
-                                                <CardFooter>
-                                                    <ButtonGroup spacing="2">
-                                                        <Link to={useAuthLink(`/groups/${project.id}`)}>
-                                                            <Button variant="solid" colorScheme="brand">
-                                                                {t('project.details').toString()}
-                                                            </Button>
-                                                        </Link>
-                                                        <Link to={useAuthLink(`/groups/${project.id}/edit`)}>
-                                                            <Button variant="outline" colorScheme="brand">
-                                                                {t('project.edit').toString()}
-                                                            </Button>
-                                                        </Link>
-                                                    </ButtonGroup>
-                                                </CardFooter>
-                                            </Card>
-                                        ))}
-                                </HStack>
-                            </Box>
-                        );
-                    }}
-                </AwaitAPI> */}
             </VStack>
         </OutletOrChildren>
     );

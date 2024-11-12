@@ -1,4 +1,5 @@
 import { CloseButton, HStack, SimpleGrid, Text, VStack } from '@chakra-ui/react';
+import { useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { Author } from '../../data/Author';
 import { useAuthLink } from '../../hooks/useAuthLink';
@@ -19,7 +20,7 @@ export function ProjectAuthorList(props: IProjectAuthorListProps) {
         <SimpleGrid alignItems="start" spacing={4} columns={{ base: 1, md: 2, lg: 3, xl: 4 }}>
             {props.authors.map((author, i) =>
                 props.requestDetails ? (
-                    <AwaitAPI key={author.id} request={(api) => api.authors.getById(author.id)}>
+                    <AwaitAPI key={author.id} request={useCallback((api) => api.authors.getById(author.id), [author])}>
                         {(data: Author) => (
                             <SimpleProjectAuthorList key={i} {...props} author={{ ...author, ...data }} />
                         )}

@@ -41,7 +41,8 @@
     "edit": "Upravit",
     "save": "Uložit",
     "understood": "Chápu",
-    "send": "Odeslat"
+    "send": "Odeslat",
+    "invariant": "Mezinárodní"
   },
   "content": {
     "noFileSelected": "Žádný vybraný soubor",

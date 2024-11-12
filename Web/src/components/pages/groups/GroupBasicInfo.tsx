@@ -18,7 +18,7 @@ import { Group } from '../../../data/Group';
 import { useAuthLinkFunction } from '../../../hooks/useAuthLink';
 import { useColorScheme } from '../../../hooks/useColorScheme';
 import { HRIB } from '../../../schemas/generic';
-import { getPrefered } from '../../../utils/preferedLanguage';
+import { LocalizedInput } from '../../utils/LocalizedInput';
 import { SendAPI } from '../../utils/SendAPI';
 import { TextareaMarkdown } from '../../utils/TextareaMarkdown';
 
@@ -63,90 +63,29 @@ export function GroupBasicInfo(props: IGroupBasicInfoProps) {
                 <Stack spacing={8} direction="column" mb={8}>
                     <FormControl>
                         <FormLabel>{t('createGroup.fields.name').toString()}</FormLabel>
-                        <Stack direction={{ base: 'column', md: 'row' }}>
-                            <FormControl id="name.cs">
-                                <Input
-                                    type="text"
-                                    borderColor={border}
-                                    bg={bg}
-                                    placeholder={`${t('createGroup.fields.name').toString()} ${t(
-                                        'createProject.language.cs',
-                                    )}`}
-                                    defaultValue={getPrefered(group.name, 'cs')}
-                                    onChange={(event) =>
-                                        forceUpdate(
-                                            group.set('name', {
-                                                ...group.name,
-                                                cs: event.target.value,
-                                            }),
-                                        )
-                                    }
-                                />
-                            </FormControl>
-
-                            <FormControl id="name.en">
-                                <Input
-                                    type="text"
-                                    borderColor={border}
-                                    bg={bg}
-                                    placeholder={`${t('createGroup.fields.name').toString()} ${t(
-                                        'createProject.language.en',
-                                    )}`}
-                                    defaultValue={getPrefered(group.name, 'en')}
-                                    onChange={(event) =>
-                                        forceUpdate(
-                                            group.set('name', {
-                                                ...group.name,
-                                                en: event.target.value,
-                                            }),
-                                        )
-                                    }
-                                />
-                            </FormControl>
-                        </Stack>
+                        <LocalizedInput
+                            as={Input}
+                            type="text"
+                            borderColor={border}
+                            bg={bg}
+                            name="name"
+                            placeholder={t('createGroup.fields.name').toString()}
+                            value={group.name}
+                            onChange={(value) => forceUpdate(group.set('name', value))}
+                        />
                     </FormControl>
 
                     <FormControl>
                         <FormLabel>{t('createGroup.fields.description').toString()}</FormLabel>
-                        <Stack direction={{ base: 'column', md: 'row' }}>
-                            <FormControl id="description.cs">
-                                <TextareaMarkdown
-                                    placeholder={`${t('createGroup.fields.description').toString()} ${t(
-                                        'createProject.language.cs',
-                                    )}`}
-                                    borderColor={border}
-                                    bg={bg}
-                                    defaultValue={getPrefered(group.description, 'cs')}
-                                    onChange={(event) =>
-                                        forceUpdate(
-                                            group.set('description', {
-                                                ...group.description,
-                                                cs: event.target.value,
-                                            }),
-                                        )
-                                    }
-                                />
-                            </FormControl>
-
-                            <FormControl id="description.en">
-                                <TextareaMarkdown
-                                    placeholder={`${t('createGroup.fields.description').toString()} ${t(
-                                        'createProject.language.en',
-                                    )}`}
-                                    borderColor={border}
-                                    bg={bg}
-                                    defaultValue={getPrefered(group.description, 'en')}
-                                    onChange={(event) =>
-                                        forceUpdate(
-                                            group.set('description', {
-                                                ...group.description,
-                                                en: event.target.value,
-                                            }),
-                                        )
-                                    }
-                                />
-                            </FormControl>
-                        </Stack>
+                        <LocalizedInput
+                            as={TextareaMarkdown}
+                            borderColor={border}
+                            bg={bg}
+                            name="description"
+                            placeholder={t('createGroup.fields.description').toString()}
+                            value={group.description}
+                            onChange={(value) => forceUpdate(group.set('description', value))}
+                        />
                     </FormControl>
 
                     <Heading as="h3" size="md" mt={8}>

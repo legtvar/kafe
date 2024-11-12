@@ -1,4 +1,5 @@
 import { t } from 'i18next';
+import { useCallback } from 'react';
 import { Navigate, useParams } from 'react-router-dom';
 import { AwaitAPI } from '../../utils/AwaitAPI';
 import { Error } from '../../utils/Error';
@@ -9,7 +10,7 @@ export function Token() {
 
     return (
         <AwaitAPI
-            request={(api) => api.accounts.temporary.confirm(token || '')}
+            request={useCallback((api) => api.accounts.temporary.confirm(token || ''), [token])}
             error={(response) =>
                 response.status === 403 ? (
                     <Status statusCode={t(`error.tokenInvalid`).toString()} />

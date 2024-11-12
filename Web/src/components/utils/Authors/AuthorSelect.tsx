@@ -20,7 +20,7 @@ import {
     VStack,
 } from '@chakra-ui/react';
 import { t } from 'i18next';
-import { useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { AiOutlinePlus, AiOutlineSearch } from 'react-icons/ai';
 import { Author } from '../../../data/Author';
 import { useColorScheme } from '../../../hooks/useColorScheme';
@@ -62,7 +62,7 @@ export function AuthorSelect(props: IAuthorSelectProps) {
     };
 
     return (
-        <AwaitAPI request={(api) => api.authors.getAll()}>
+        <AwaitAPI request={useCallback((api) => api.authors.getAll(), [])}>
             {(data: Author[]) => (
                 <>
                     <Button onClick={onOpen} mt={4}>

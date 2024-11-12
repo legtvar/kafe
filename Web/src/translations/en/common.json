@@ -41,7 +41,8 @@
     "edit": "Edit",
     "save": "Save",
     "understood": "I understand",
-    "send": "Send"
+    "send": "Send",
+    "invariant": "International"
   },
   "content": {
     "noFileSelected": "No file selected",

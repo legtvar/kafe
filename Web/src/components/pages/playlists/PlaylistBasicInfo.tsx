@@ -6,7 +6,7 @@ import { Playlist } from '../../../data/Playlist';
 import { useAuthLinkFunction } from '../../../hooks/useAuthLink';
 import { useColorScheme } from '../../../hooks/useColorScheme';
 import { HRIB } from '../../../schemas/generic';
-import { getPrefered } from '../../../utils/preferedLanguage';
+import { LocalizedInput } from '../../utils/LocalizedInput';
 import { SendAPI } from '../../utils/SendAPI';
 import { TextareaMarkdown } from '../../utils/TextareaMarkdown';
 
@@ -51,90 +51,29 @@ export function PlaylistBasicInfo(props: IGroupBasicInfoProps) {
                 <Stack spacing={8} direction="column" mb={8}>
                     <FormControl>
                         <FormLabel>{t('reatePlaylist.fields.name').toString()}</FormLabel>
-                        <Stack direction={{ base: 'column', md: 'row' }}>
-                            <FormControl id="name.cs">
-                                <Input
-                                    type="text"
-                                    borderColor={border}
-                                    bg={bg}
-                                    placeholder={`${t('reatePlaylist.fields.name').toString()} ${t(
-                                        'createProject.language.cs',
-                                    )}`}
-                                    defaultValue={getPrefered(playlist.name, 'cs')}
-                                    onChange={(event) =>
-                                        forceUpdate(
-                                            playlist.set('name', {
-                                                ...playlist.name,
-                                                cs: event.target.value,
-                                            }),
-                                        )
-                                    }
-                                />
-                            </FormControl>
-
-                            <FormControl id="name.en">
-                                <Input
-                                    type="text"
-                                    borderColor={border}
-                                    bg={bg}
-                                    placeholder={`${t('reatePlaylist.fields.name').toString()} ${t(
-                                        'createProject.language.en',
-                                    )}`}
-                                    defaultValue={getPrefered(playlist.name, 'en')}
-                                    onChange={(event) =>
-                                        forceUpdate(
-                                            playlist.set('name', {
-                                                ...playlist.name,
-                                                en: event.target.value,
-                                            }),
-                                        )
-                                    }
-                                />
-                            </FormControl>
-                        </Stack>
+                        <LocalizedInput
+                            as={Input}
+                            type="text"
+                            borderColor={border}
+                            bg={bg}
+                            name="name"
+                            placeholder={t('reatePlaylist.fields.name').toString()}
+                            value={playlist.name}
+                            onChange={(value) => forceUpdate(playlist.set('name', value))}
+                        />
                     </FormControl>
 
                     <FormControl>
                         <FormLabel>{t('reatePlaylist.fields.description').toString()}</FormLabel>
-                        <Stack direction={{ base: 'column', md: 'row' }}>
-                            <FormControl id="description.cs">
-                                <TextareaMarkdown
-                                    placeholder={`${t('reatePlaylist.fields.description').toString()} ${t(
-                                        'createProject.language.cs',
-                                    )}`}
-                                    borderColor={border}
-                                    bg={bg}
-                                    defaultValue={getPrefered(playlist.description, 'cs')}
-                                    onChange={(event) =>
-                                        forceUpdate(
-                                            playlist.set('description', {
-                                                ...playlist.description,
-                                                cs: event.target.value,
-                                            }),
-                                        )
-                                    }
-                                />
-                            </FormControl>
-
-                            <FormControl id="description.en">
-                                <TextareaMarkdown
-                                    placeholder={`${t('reatePlaylist.fields.description').toString()} ${t(
-                                        'createProject.language.en',
-                                    )}`}
-                                    borderColor={border}
-                                    bg={bg}
-                                    defaultValue={getPrefered(playlist.description, 'en')}
-                                    onChange={(event) =>
-                                        forceUpdate(
-                                            playlist.set('description', {
-                                                ...playlist.description,
-                                                en: event.target.value,
-                                            }),
-                                        )
-                                    }
-                                />
-                            </FormControl>
-                        </Stack>
+                        <LocalizedInput
+                            as={TextareaMarkdown}
+                            borderColor={border}
+                            bg={bg}
+                            name="description"
+                            placeholder={t('reatePlaylist.fields.description').toString()}
+                            value={playlist.description}
+                            onChange={(value) => forceUpdate(playlist.set('description', value))}
+                        />
                     </FormControl>
 
                     {!props.noSelfSubmit && (

@@ -1,4 +1,5 @@
 import { t } from 'i18next';
+import { useCallback } from 'react';
 import { Project } from '../../../data/Project';
 import { useOrganizations } from '../../../hooks/Caffeine';
 import { useTitle } from '../../../utils/useTitle';
@@ -12,7 +13,12 @@ export function Projects(props: IProjectsProps) {
     useTitle(t('title.projects'));
     return (
         <OutletOrChildren>
-            <AwaitAPI request={(api) => api.projects.getAll(useOrganizations().currentOrganization?.id)}>
+            <AwaitAPI
+                request={useCallback(
+                    (api) => api.projects.getAll(useOrganizations().currentOrganization?.id),
+                    [useOrganizations().currentOrganization],
+                )}
+            >
                 {(data: Project[]) => <ProjectListComponent projects={data} />}
             </AwaitAPI>
         </OutletOrChildren>

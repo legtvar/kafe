@@ -1,5 +1,6 @@
 import { Box, Flex, Heading } from '@chakra-ui/react';
 import { t } from 'i18next';
+import { useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { Author } from '../../../../data/Author';
 import { AwaitAPI } from '../../../utils/AwaitAPI';
@@ -20,7 +21,7 @@ export function AuthorDetail(props: IAuthorDetailProps) {
     return (
         <OutletOrChildren>
             <AwaitAPI
-                request={(api) => api.authors.getById(id)}
+                request={useCallback((api) => api.authors.getById(id), [id])}
                 error={(resp) => {
                     return <Status statusCode={resp.response.status} log={resp.response.detail} embeded />;
                 }}

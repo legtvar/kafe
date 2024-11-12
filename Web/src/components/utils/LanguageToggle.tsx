@@ -10,10 +10,12 @@ import {
     MenuList,
     MenuOptionGroup,
     Text,
+    useForceUpdate,
 } from '@chakra-ui/react';
 import CountryLanguage from '@ladjs/country-language';
 import * as Flags from 'country-flag-icons/react/3x2';
 import i18next, { t } from 'i18next';
+import { useMemo } from 'react';
 import { BsCopy } from 'react-icons/bs';
 import { LS_LANGUAGE_APP_KEY } from '../../languageConfig';
 import { getRawPrefered, LS_LANGUAGE_CONTENT_KEY, setPreferedLanguage } from '../../utils/preferedLanguage';
@@ -23,39 +25,52 @@ interface ILanguageToggleProps extends IconButtonProps {
 }
 
 export function LanguageToggle({ onLanguageToggled: onLanguageChange, ...rest }: ILanguageToggleProps) {
+    const forceReload = useForceUpdate();
+
     const changeLanguage = (lang: string) => {
         i18next.changeLanguage(lang);
         localStorage.setItem(LS_LANGUAGE_APP_KEY, lang);
         onLanguageChange && onLanguageChange(lang);
+        forceReload();
     };
 
     const changeContentLanguage = (lang: string) => {
         setPreferedLanguage(lang);
         localStorage.setItem(LS_LANGUAGE_CONTENT_KEY, lang);
         onLanguageChange && onLanguageChange(lang);
+        forceReload();
     };
 
-    const translated = Object.keys(i18next.options.resources!).map((lang) => new Intl.Locale(lang).maximize());
+    const translated = useMemo(
+        () => Object.keys(i18next.options.resources!).map((lang) => new Intl.Locale(lang).maximize()),
+        [],
+    );
 
-    const flags = Flags as any as Record<string, Flags.FlagComponent>;
+    const flags = useMemo(() => Flags as any as Record<string, Flags.FlagComponent>, []);
 
-    const all = CountryLanguage.getLanguages()
-        .map((lang) => lang.iso639_1)
-        .filter((lang) => lang.length > 0)
-        .map((lang) => new Intl.Locale(lang).maximize());
+    const all = useMemo(
+        () =>
+            CountryLanguage.getLanguages()
+                .map((lang) => lang.iso639_1)
+                .filter((lang) => lang.length > 0)
+                .map((lang) => new Intl.Locale(lang).maximize()),
+        [],
+    );
 
     const mapper = (onClick: (lang: Intl.Locale) => void) => (lang: Intl.Locale) => {
         const Flag: Flags.FlagComponent = flags[lang.region || ''];
         if (!Flag) {
             return null;
         }
+
+        const lng = CountryLanguage.getLanguage(lang.language);
+
         return (
             <MenuItemOption value={lang.language} onClick={() => onClick(lang)}>
                 <HStack>
                     <Flag width={18} />
                     <Text>
-                        {CountryLanguage.getLanguage(lang.language).nativeName[0] ||
-                            CountryLanguage.getLanguage(lang.language).name[0]}
+                        {lng.name[0]} {lng.nativeName[0] && `(${lng.nativeName[0]})`}
                     </Text>
                 </HStack>
             </MenuItemOption>

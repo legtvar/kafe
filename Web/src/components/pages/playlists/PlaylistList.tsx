@@ -1,6 +1,6 @@
 import { Button, Flex, FormControl, Highlight, Icon, Input, Text, useColorModeValue } from '@chakra-ui/react';
 import { t } from 'i18next';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { IoAdd, IoListCircleOutline } from 'react-icons/io5';
 import { Link } from 'react-router-dom';
 import { Playlist } from '../../../data/Playlist';
@@ -25,7 +25,12 @@ export function PlaylistList(props: IPlaylistListProps) {
 
     return (
         <OutletOrChildren>
-            <AwaitAPI request={(api) => api.playlists.getAll(useOrganizations().currentOrganization?.id)}>
+            <AwaitAPI
+                request={useCallback(
+                    (api) => api.playlists.getAll(useOrganizations().currentOrganization?.id),
+                    [useOrganizations().currentOrganization],
+                )}
+            >
                 {(data: Playlist[]) => (
                     <>
                         <Flex

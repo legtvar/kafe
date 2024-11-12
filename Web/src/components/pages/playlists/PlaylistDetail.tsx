@@ -1,5 +1,6 @@
 import { Box, Button, Flex, Icon, Stack, Text, useColorModeValue, VStack } from '@chakra-ui/react';
 import { t } from 'i18next';
+import { useCallback } from 'react';
 import { AiOutlineEdit } from 'react-icons/ai';
 import { IoPlayOutline } from 'react-icons/io5';
 import { Link, Navigate, useNavigate, useOutlet, useParams } from 'react-router-dom';
@@ -41,7 +42,7 @@ export function PlaylistDetail(props: IPlaylistDetailProps) {
 
     return (
         <AwaitAPI
-            request={(api) => api.playlists.getById(id)}
+            request={useCallback((api) => api.playlists.getById(id), [id])}
             error={(resp) => {
                 return <Status statusCode={resp.response.status} log={resp.response.detail} embeded />;
             }}

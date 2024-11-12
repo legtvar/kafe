@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 using Kafe.Common;
+using Kafe.Data.Aggregates;
 using Kafe.Data.Documents;
 using Kafe.Data.Events;
 using Marten;
@@ -272,6 +273,38 @@ public class EntityPermissionEventProjection : EventProjection
     {
         var perms = await RequireEntityPermissionInfo(ops, e.ArtifactId);
         perms = await RemoveParent(ops, perms, e.ProjectId);
+        ops.Store(perms);
+    }
+
+    public async Task Project(ProjectGroupMovedToOrganization e, IEvent metadata, IDocumentOperations ops)
+    {
+        var entitySoFar = await ops.Events.KafeAggregateStream<ProjectGroupInfo>(
+            id: e.ProjectGroupId,
+            version: metadata.Version - 1);
+        if (entitySoFar is null)
+        {
+            throw new InvalidOperationException("Project group could not be aggregated to a point before the event.");
+        }
+
+        var perms = await RequireEntityPermissionInfo(ops, e.ProjectGroupId);
+        perms = await RemoveParent(ops, perms, entitySoFar.OrganizationId);
+        perms = await AddParent(ops, perms, e.OrganizationId);
+        ops.Store(perms);
+    }
+
+    public async Task Project(PlaylistMovedToOrganization e, IEvent metadata, IDocumentOperations ops)
+    {
+        var entitySoFar = await ops.Events.KafeAggregateStream<ProjectGroupInfo>(
+            id: e.PlaylistId,
+            version: metadata.Version - 1);
+        if (entitySoFar is null)
+        {
+            throw new InvalidOperationException("Project group could not be aggregated to a point before the event.");
+        }
+        
+        var perms = await RequireEntityPermissionInfo(ops, e.PlaylistId);
+        perms = await RemoveParent(ops, perms, entitySoFar.OrganizationId);
+        perms = await AddParent(ops, perms, e.OrganizationId);
         ops.Store(perms);
     }
 

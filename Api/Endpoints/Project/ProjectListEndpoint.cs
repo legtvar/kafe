@@ -33,7 +33,7 @@ public class ProjectListEndpoint : EndpointBaseAsync
     }
 
     [HttpGet]
-    [SwaggerOperation(Tags = new[] { EndpointArea.Project })]
+    [SwaggerOperation(Tags = [EndpointArea.Project])]
     public override async Task<ActionResult<ImmutableArray<ProjectListDto>>> HandleAsync(
         RequestData requestData,
         CancellationToken cancellationToken = default)
@@ -60,8 +60,8 @@ public class ProjectListEndpoint : EndpointBaseAsync
 
         [FromQuery(Name = "project-group")]
         public string? ProjectGroupId { get; set; }
-        
+
         [FromQuery(Name = "sort")]
-        public string? Sort { get;set; } = "name.iv";
+        public string? Sort { get; set; } = "name.iv";
     }
 }

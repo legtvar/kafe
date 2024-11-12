@@ -12,3 +12,8 @@ public record OrganizationInfoChanged(
     [Hrib] string OrganizationId,
     [LocalizedString] ImmutableDictionary<string, string>? Name
 );
+
+public record OrganizationGlobalPermissionsChanged(
+    [Hrib] string OrganizationId,
+    Permission GlobalPermissions
+);

@@ -188,6 +188,11 @@ public class EntityPermissionEventProjection : EventProjection
         return SetGlobalPermission(ops, e.PlaylistId, e.GlobalPermissions);
     }
 
+    public Task Project(OrganizationGlobalPermissionsChanged e, IDocumentOperations ops)
+    {
+        return SetGlobalPermission(ops, e.OrganizationId, e.GlobalPermissions);
+    }
+
     public async Task Project(AccountRoleSet e, IEvent metadata, IDocumentOperations ops)
     {
         var membersInfo = await RequireRoleMembersInfo(ops, e.RoleId);

@@ -36,6 +36,14 @@ export function Login() {
         }
     };
 
+    const MUNI_bg = useColorModeValue('#0000dc', 'white');
+    const MUNI_color = useColorModeValue('white', '#0000dc');
+    const MUNI_hover_bg = useColorModeValue('black', 'gray.300');
+
+    const border = useColorModeValue('gray.200', 'gray.600');
+    const internalBg = useColorModeValue('white', 'gray.700');
+    const lowlight = useColorModeValue('gray.300', 'gray.500');
+
     return (
         <>
             <Stack align={'center'}>
@@ -71,16 +79,35 @@ export function Login() {
                             >
                                 {t('register.button').toString()}
                             </Button>
+                            <Box
+                                borderStyle="solid"
+                                borderWidth={0}
+                                borderBottomWidth={1}
+                                borderColor={border}
+                                position="relative"
+                            >
+                                <Box
+                                    position="absolute"
+                                    top="0"
+                                    left="50%"
+                                    transform="translate(-50%, -50%)"
+                                    bg={internalBg}
+                                    p={4}
+                                    color={lowlight}
+                                >
+                                    {t('register.divider').toString()}
+                                </Box>
+                            </Box>
                             <Link href={api.accounts.external.loginUrl()}>
                                 <Button
                                     size="lg"
-                                    bg={'#0000dc'}
-                                    color={'white'}
+                                    bg={MUNI_bg}
+                                    color={MUNI_color}
                                     _hover={{
-                                        bg: 'black',
+                                        bg: MUNI_hover_bg,
                                     }}
                                     width="100%"
-                                    leftIcon={<MuniIcon fill="white" />}
+                                    leftIcon={<MuniIcon fill={MUNI_color} />}
                                 >
                                     {t('munilogin.button').toString()}
                                 </Button>

@@ -229,7 +229,7 @@
     "disclaimer": "The automatic validation is still in development. Please take the results with a grain of salt."
   },
   "register": {
-    "button": "Sign up",
+    "button": "Log in",
     "email": "Email address",
     "firstName": "First name",
     "lastName": "Last name",
@@ -237,7 +237,8 @@
     "password": "Password",
     "passwordAgain": "Password again",
     "subtitle": "to access your daily dose of caffeine",
-    "title": "Sign up"
+    "title": "Sign up",
+    "divider": "Or"
   },
   "role": {
     "admin": "Administrator",

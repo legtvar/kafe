@@ -227,7 +227,7 @@
     "disclaimer": "Automatická kontrola je zatiaľ v štádiu vývoja. Výsledky prosím berte s rezervou."
   },
   "register": {
-    "button": "Zaregistrovať sa",
+    "button": "Prihlásiť sa",
     "email": "Emailová adresa",
     "firstName": "Krstné meno",
     "lastName": "Priezvisko",
@@ -235,7 +235,8 @@
     "password": "Heslo",
     "passwordAgain": "Heslo znova",
     "subtitle": "pre prístup k vašej dennej dávke kofeínu",
-    "title": "Zaregistrujte sa"
+    "title": "Zaregistrujte sa",
+    "divider": "Alebo"
   },
   "role": {
     "admin": "Administrátor",

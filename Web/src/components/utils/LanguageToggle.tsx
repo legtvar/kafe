@@ -86,14 +86,7 @@ export function LanguageToggle({ onLanguageToggled: onLanguageChange, ...rest }:
 
     return (
         <Menu closeOnSelect={false}>
-            <MenuButton
-                as={IconButton}
-                size="lg"
-                icon={<CurrentFlag />}
-                p={3}
-                variant="ghost"
-                aria-label="Change language"
-            />
+            <MenuButton as={IconButton} size="lg" icon={<CurrentFlag />} p={3} variant="ghost" {...rest} />
             <MenuList overflowY="auto" maxH="80vh" w={96}>
                 <MenuOptionGroup title={t('languageToggle.system')} value={i18next.language}>
                     {translated.map(

@@ -121,7 +121,13 @@ public class EntityPermissionEventProjection : EventProjection
         var inheritedPermission = InheritPermission(e.Permission);
         // NB: Since we don't know if we're adding or removing permissions we have to try to update all of the entity's
         //     descendants.
-        await SpreadAccountPermission(ops, [e.AccountId], e.EntityId, inheritedPermission, metadata.Timestamp);
+        await SpreadAccountPermission(
+            ops: ops,
+            accountIds: [e.AccountId],
+            sourceId: e.EntityId,
+            permission: inheritedPermission,
+            grantedAt: metadata.Timestamp,
+            ignoreSelf: true);
     }
 
     public async Task Project(RolePermissionSet e, IEvent metadata, IDocumentOperations ops)
@@ -158,7 +164,13 @@ public class EntityPermissionEventProjection : EventProjection
         ops.Store(entityPerms);
 
         var inheritedPermission = InheritPermission(e.Permission);
-        await SpreadRolePermission(ops, e.RoleId, e.EntityId, inheritedPermission, metadata.Timestamp);
+        await SpreadRolePermission(
+            ops: ops,
+            roleId: e.RoleId,
+            sourceId: e.EntityId,
+            permission: inheritedPermission,
+            grantedAt: metadata.Timestamp,
+            ignoreSelf: true);
     }
 
     public Task Project(ProjectGroupGlobalPermissionsChanged e, IDocumentOperations ops)
@@ -272,7 +284,7 @@ public class EntityPermissionEventProjection : EventProjection
     public async Task Project(ProjectArtifactRemoved e, IDocumentOperations ops)
     {
         var perms = await RequireEntityPermissionInfo(ops, e.ArtifactId);
-        perms = await RemoveParent(ops, perms, e.ProjectId);
+        perms = await RemoveDependency(ops, perms, e.ProjectId);
         ops.Store(perms);
     }
 
@@ -287,7 +299,7 @@ public class EntityPermissionEventProjection : EventProjection
         }
 
         var perms = await RequireEntityPermissionInfo(ops, e.ProjectGroupId);
-        perms = await RemoveParent(ops, perms, entitySoFar.OrganizationId);
+        perms = await RemoveDependency(ops, perms, entitySoFar.OrganizationId);
         perms = await AddParent(ops, perms, e.OrganizationId);
         ops.Store(perms);
     }
@@ -301,9 +313,9 @@ public class EntityPermissionEventProjection : EventProjection
         {
             throw new InvalidOperationException("Project group could not be aggregated to a point before the event.");
         }
-        
+
         var perms = await RequireEntityPermissionInfo(ops, e.PlaylistId);
-        perms = await RemoveParent(ops, perms, entitySoFar.OrganizationId);
+        perms = await RemoveDependency(ops, perms, entitySoFar.OrganizationId);
         perms = await AddParent(ops, perms, e.OrganizationId);
         ops.Store(perms);
     }
@@ -347,7 +359,7 @@ public class EntityPermissionEventProjection : EventProjection
     }
 
     /// <summary>
-    /// Add Hrib.System among <see cref="EntityPermissionInfo.GrantorIds"/> (NOT parents!).
+    /// Add Hrib.System to <see cref="EntityPermissionInfo.DependencyGraph"/>.
     /// Also, adds account entries for all accounts that have permissions for System with inherited permissions values.
     /// </summary>
     private static async Task<EntityPermissionInfo> AddSystem(
@@ -364,13 +376,14 @@ public class EntityPermissionEventProjection : EventProjection
 
         return perms with
         {
-            GrantorIds = perms.GrantorIds.Add(Hrib.SystemValue),
-            AccountEntries = MergeEntries(perms.AccountEntries, InheritEntries(systemPerms.Value.AccountEntries))
+            AccountEntries = MergeEntries(perms.AccountEntries, InheritEntries(systemPerms.Value.AccountEntries)),
+            DependencyGraph = perms.DependencyGraph.SetItem(Hrib.SystemValue, [Hrib.SystemValue])
         };
     }
 
     /// <summary>
-    /// Adds a parent to the perms object, along with its further ancestors and the `system` object as Grantors.
+    /// Adds a parent to the perms's <see cref="EntityPermissionInfo.DependencyGraph"/>,
+    /// along with its further ancestors and the `system` object.
     /// Also merges in inheritable permission entries from the parent (and thus further ancestors).
     /// </summary>
     private static async Task<EntityPermissionInfo> AddParent(
@@ -386,47 +399,78 @@ public class EntityPermissionEventProjection : EventProjection
                 + "Either the Id is wrong or the DB is in an invalid state.", ancestorPerms.AsException());
         }
 
-        return perms with
+        var changedPerms = perms with
         {
             AccountEntries = MergeEntries(perms.AccountEntries, InheritEntries(ancestorPerms.Value.AccountEntries)),
             RoleEntries = MergeEntries(perms.RoleEntries, InheritEntries(ancestorPerms.Value.RoleEntries)),
-            GrantorIds = perms.GrantorIds.Union([parentId.ToString(), .. ancestorPerms.Value.GrantorIds]),
-            ParentIds = perms.ParentIds.Add(parentId.ToString())
+            DependencyGraph = MergeDependencyGraphs(perms.DependencyGraph, ancestorPerms.Value.DependencyGraph)
+                .SetItem(ancestorPerms.Value.Id, [perms.Id])
         };
+
+        // NB: "Spread" the new dependency to all entities where `perms.Id` was already in the dependency graph
+        var affectedEntities = ops.Query<EntityPermissionInfo>()
+            .Where(p => p.DependencyGraph.ContainsKey(perms.Id))
+            .ToAsyncEnumerable();
+        await foreach (var affected in affectedEntities)
+        {
+            var changed = affected with
+            {
+                AccountEntries = MergeEntries(affected.AccountEntries, InheritEntries(changedPerms.AccountEntries)),
+                RoleEntries = MergeEntries(affected.RoleEntries, InheritEntries(changedPerms.RoleEntries)),
+                DependencyGraph = MergeDependencyGraphs(affected.DependencyGraph, changedPerms.DependencyGraph)
+            };
+            ops.Store(changed);
+        }
+
+        ops.Store(changedPerms);
+        return changedPerms;
     }
 
     /// <summary>
-    /// Removes a parent along with the grantors and entries it implies.
-    /// Keeps Hrib.System as a grantor.
+    /// Removes a dependency from an <see cref="EntityPermissionInfo.DependencyGraph"/> along with its transitive
+    /// dependencies (but only should the become orphans) and related account and role entries.
     /// </summary>
-    private static async Task<EntityPermissionInfo> RemoveParent(
+    private static async Task<EntityPermissionInfo> RemoveDependency(
         IDocumentOperations ops,
         EntityPermissionInfo perms,
         Hrib parentId
     )
     {
-        var ancestorsPerms = (await ops.KafeLoadManyAsync<EntityPermissionInfo>(
-            perms.ParentIds
-                .Where(i => i != parentId.ToString())
-                .Select(i => Hrib.Parse(i).Unwrap())
-                .ToImmutableArray()
-        )).Unwrap();
+        var changedGraph = RemoveFromDependencyGraph(
+            perms.DependencyGraph,
+            parentId.ToString(),
+            out var removedGrantors);
 
-        var grantors = ancestorsPerms.Aggregate(new HashSet<string>(), (s, p) =>
+        var changedPerms = perms with
         {
-            s.UnionWith(p.GrantorIds);
-            return s;
-        });
-        grantors.Add(Hrib.SystemValue);
-        var removedGrantors = perms.GrantorIds.Except(grantors);
-
-        return perms with
-        {
-            ParentIds = perms.ParentIds.Remove(parentId.ToString()),
-            GrantorIds = grantors.ToImmutableHashSet(),
             AccountEntries = RemoveEntrySources(perms.AccountEntries, removedGrantors),
-            RoleEntries = RemoveEntrySources(perms.RoleEntries, removedGrantors)
+            RoleEntries = RemoveEntrySources(perms.RoleEntries, removedGrantors),
+            DependencyGraph = changedGraph
         };
+
+        // NB: Recalculate perms of entities where `perms` is a grantor.
+        var affectedEntities = ops.Query<EntityPermissionInfo>()
+            .Where(p => p.DependencyGraph.ContainsKey(changedPerms.Id))
+            .ToAsyncEnumerable();
+        await foreach (var affected in affectedEntities)
+        {
+            var affectedGraph = RemoveFromDependencyGraph(
+                affected.DependencyGraph,
+                parentId.ToString(),
+                out var removedAffectedGrantors,
+                changedPerms.Id);
+
+            var changed = affected with
+            {
+                DependencyGraph = affectedGraph,
+                AccountEntries = RemoveEntrySources(affected.AccountEntries, removedAffectedGrantors),
+                RoleEntries = RemoveEntrySources(affected.RoleEntries, removedAffectedGrantors)
+            };
+            ops.Store(changed);
+        }
+
+        ops.Store(changedPerms);
+        return changedPerms;
     }
 
     /// <summary>
@@ -511,6 +555,11 @@ public class EntityPermissionEventProjection : EventProjection
         ImmutableHashSet<string> sources
     )
     {
+        if (sources.IsEmpty)
+        {
+            return entries;
+        }
+
         var result = entries.ToBuilder();
         foreach (var pair in entries)
         {
@@ -593,7 +642,8 @@ public class EntityPermissionEventProjection : EventProjection
         ImmutableHashSet<Hrib> accountIds,
         Hrib sourceId,
         Permission permission,
-        DateTimeOffset grantedAt
+        DateTimeOffset grantedAt,
+        bool ignoreSelf = false
     )
     {
         if (accountIds.IsEmpty)
@@ -602,11 +652,16 @@ public class EntityPermissionEventProjection : EventProjection
         }
 
         var affectedEntities = ops.Query<EntityPermissionInfo>()
-            .Where(p => p.GrantorIds.Contains(sourceId.ToString()))
+            .Where(p => p.DependencyGraph.ContainsKey(sourceId.ToString()))
             .ToAsyncEnumerable();
 
         await foreach (var affected in affectedEntities)
         {
+            if (affected.Id == sourceId && ignoreSelf)
+            {
+                continue;
+            }
+
             var changed = affected;
             foreach (var accountId in accountIds)
             {
@@ -629,17 +684,23 @@ public class EntityPermissionEventProjection : EventProjection
         Hrib roleId,
         Hrib sourceId,
         Permission permission,
-        DateTimeOffset grantedAt
+        DateTimeOffset grantedAt,
+        bool ignoreSelf = false
     )
     {
         var roleInfo = await RequireRoleMembersInfo(ops, roleId);
 
         var affectedEntities = ops.Query<EntityPermissionInfo>()
-            .Where(p => p.GrantorIds.Contains(sourceId.ToString()))
+            .Where(p => p.DependencyGraph.ContainsKey(sourceId.ToString()))
             .ToAsyncEnumerable();
 
         await foreach (var affected in affectedEntities)
         {
+            if (affected.Id == sourceId && ignoreSelf)
+            {
+                continue;
+            }
+
             var changed = affected with
             {
                 RoleEntries = SetPermission(
@@ -666,5 +727,67 @@ public class EntityPermissionEventProjection : EventProjection
             }
             ops.Store(changed);
         }
+    }
+
+    private static ImmutableDictionary<string, ImmutableHashSet<string>> MergeDependencyGraphs(
+        ImmutableDictionary<string, ImmutableHashSet<string>> one,
+        ImmutableDictionary<string, ImmutableHashSet<string>> two
+    )
+    {
+        var builder = one.ToBuilder();
+        foreach (var pair in two)
+        {
+            if (!builder.TryAdd(pair.Key, pair.Value))
+            {
+                builder[pair.Key] = pair.Value.Union(builder[pair.Key]);
+            }
+        }
+
+        return builder.ToImmutable();
+    }
+
+    private static ImmutableDictionary<string, ImmutableHashSet<string>> RemoveFromDependencyGraph(
+        ImmutableDictionary<string, ImmutableHashSet<string>> graph,
+        string removedId,
+        out ImmutableHashSet<string> removedKeys,
+        string? sourceId = null
+    )
+    {
+        var builder = graph.ToBuilder();
+
+        if (sourceId != null)
+        {
+            builder[removedId] = builder[removedId].Remove(sourceId);
+            // NB: special case: `sourceId` was not the only source of the `removedId` dependency
+            //                   thus we cannot remove `removedId`
+            if (builder[removedId].Count > 0)
+            {
+                removedKeys = [];
+                return builder.ToImmutable();
+            }
+        }
+
+        var removedBuilder = ImmutableHashSet.CreateBuilder<string>();
+        var queue = new Queue<string>();
+        queue.Enqueue(removedId);
+        while (queue.Count > 0)
+        {
+            var current = queue.Dequeue();
+            builder.Remove(current);
+            removedBuilder.Add(current);
+            var ancestors = builder.Where(p => p.Value.Contains(current))
+                .Select(p => p.Key)
+                .ToArray();
+            foreach (var ancestor in ancestors)
+            {
+                builder[ancestor] = builder[ancestor].Remove(current);
+                if (builder[ancestor].IsEmpty)
+                {
+                    queue.Enqueue(ancestor);
+                }
+            }
+        }
+        removedKeys = removedBuilder.ToImmutable();
+        return builder.ToImmutable();
     }
 }

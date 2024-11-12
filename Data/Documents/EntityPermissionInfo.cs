@@ -2,6 +2,7 @@ using System;
 using System.Collections.Immutable;
 using Marten.Events.CodeGeneration;
 using Kafe.Data.Aggregates;
+using System.Linq;
 
 namespace Kafe.Data.Documents;
 
@@ -34,26 +35,20 @@ public record EntityPermissionEntry(
 /// </summary>
 /// 
 /// <param name="Id">The Id of the entity---the object the permissions affect.</param>
-/// 
-/// <param name="GrantorIds">
-/// Ids of all transitive parent entities whose permission affect this entity.
-/// For example, if this entity is a project, <see cref="GrantorIds"/> will contain the Ids of the
-/// containing project group.
-/// In other words, contains all entities, whose change, may affect this <see cref="EntityPermissionInfo"/>.
-/// Please NOTE that Roles CANNOT be grantors.
-/// If they were, we woulnd't be able to correctly recalculate permissions when an entity moves or changes parent
-/// (e.g., <see cref="Events.ProjectArtifactRemoved"/>).
+/// <param name="DependencyGraph">
+/// Keys are all "grantors" -- entities whose permission influence permissionf of *this* entity.
+/// Values are sources of those grantors.
+/// Keys the value of which contains <paramref name="Id"/> are "parents.
+/// The sources are important when adding or removing parents of entities.
+/// Always contains [<paramref name="Id"/>] = {<paramref name="Id"/>} and [<see cref="Hrib.System"/>] = {<see cref="Hrib.System"/>}.
 /// </param>
-/// 
-/// <param name="ParentIds">Ids of all direct parent entities whose permission affect this entity.</param>
-/// 
+
 /// <param name="AccountEntries"> Accounts with permissions to this entity along with source metadata.</param>
 /// <param name="RoleEntries"> Roles with permissions to this entity along with source metadata.</param>
 public record EntityPermissionInfo(
     [Hrib] string Id,
     Permission GlobalPermission,
-    ImmutableHashSet<string> GrantorIds,
-    ImmutableHashSet<string> ParentIds,
+    ImmutableDictionary<string, ImmutableHashSet<string>> DependencyGraph,
     ImmutableDictionary<string, EntityPermissionEntry> RoleEntries,
     ImmutableDictionary<string, EntityPermissionEntry> AccountEntries
 ) : IEntity
@@ -61,8 +56,7 @@ public record EntityPermissionInfo(
     public static readonly EntityPermissionInfo Invalid = new(
         Id: Hrib.InvalidValue,
         GlobalPermission: Permission.None,
-        GrantorIds: [],
-        ParentIds: [],
+        DependencyGraph: ImmutableDictionary<string, ImmutableHashSet<string>>.Empty,
         RoleEntries: ImmutableDictionary<string, EntityPermissionEntry>.Empty,
         AccountEntries: ImmutableDictionary<string, EntityPermissionEntry>.Empty
     );
@@ -77,12 +71,30 @@ public record EntityPermissionInfo(
     [MartenIgnore]
     public static EntityPermissionInfo Create(Hrib id)
     {
-        return new EntityPermissionInfo() with { Id = id.ToString() };
+        var graph = ImmutableDictionary.CreateBuilder<string, ImmutableHashSet<string>>();
+        graph.Add(id.ToString(), [id.ToString()]);
+        return new EntityPermissionInfo() with
+        {
+            Id = id.ToString(),
+            DependencyGraph = graph.ToImmutable()
+        };
     }
 
     public Permission GetAccountPermission(Hrib accountId)
     {
         return (AccountEntries.GetValueOrDefault(accountId.ToString())?.EffectivePermission ?? Permission.None)
             | GlobalPermission;
+    }
+
+    public ImmutableHashSet<string> GetParents()
+    {
+        return DependencyGraph.Where(p => p.Key != Id && p.Value.Contains(Id))
+            .Select(p => p.Key)
+            .ToImmutableHashSet();
+    }
+
+    public ImmutableHashSet<string> GetGrantors()
+    {
+        return [.. DependencyGraph.Keys];
     }
 }

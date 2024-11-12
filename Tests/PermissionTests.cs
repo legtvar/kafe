@@ -313,20 +313,16 @@ public class PermissionTests(ApiFixture fixture, ITestOutputHelper testOutput) :
         await using var query = Store.QuerySession();
         var perms = (await query.KafeLoadAsync<EntityPermissionInfo>(TestSeedData.Artifact1Hrib)).Unwrap();
 
+        Assert.Equal([TestSeedData.Project1Hrib], perms.GetParents());
         Assert.Equal(
             [
-                TestSeedData.Project1Hrib
-            ],
-            perms.ParentIds
-        );
-        Assert.Equal(
-            [
+                TestSeedData.Artifact1Hrib,
                 TestSeedData.Project1Hrib,
                 TestSeedData.Group1Hrib,
                 TestSeedData.Org1Hrib,
                 Hrib.SystemValue
             ],
-            perms.GrantorIds);
+            perms.GetGrantors());
         AssertAccountPermission(
             perms: perms,
             accountHrib: TestSeedData.UserHrib,
@@ -356,8 +352,8 @@ public class PermissionTests(ApiFixture fixture, ITestOutputHelper testOutput) :
         await WaitForProjections();
         await using var query = Store.QuerySession();
         var perms = (await query.KafeLoadAsync<EntityPermissionInfo>(TestSeedData.Artifact1Hrib)).Unwrap();
-        Assert.Equal([], perms.ParentIds);
-        Assert.Equal([Hrib.SystemValue], perms.GrantorIds);
+        Assert.Equal([], perms.GetParents());
+        Assert.Equal([Hrib.SystemValue, TestSeedData.Artifact1Hrib], perms.GetGrantors());
         AssertAccountPermission(
             perms: perms,
             accountHrib: TestSeedData.UserHrib,
@@ -383,8 +379,8 @@ public class PermissionTests(ApiFixture fixture, ITestOutputHelper testOutput) :
         await WaitForProjections();
         await using var query = Store.QuerySession();
         var groupPerms = (await query.KafeLoadAsync<EntityPermissionInfo>(TestSeedData.Group1Hrib)).Unwrap();
-        Assert.Equal([TestSeedData.Org2Hrib], groupPerms.ParentIds);
-        Assert.Equal([TestSeedData.Org2Hrib, Hrib.SystemValue], groupPerms.GrantorIds);
+        Assert.Equal([TestSeedData.Org2Hrib], groupPerms.GetParents());
+        Assert.Equal([TestSeedData.Org2Hrib, Hrib.SystemValue, TestSeedData.Group1Hrib], groupPerms.GetGrantors());
 
         var projectPerms = (await query.KafeLoadAsync<EntityPermissionInfo>(TestSeedData.Project1Hrib)).Unwrap();
     }

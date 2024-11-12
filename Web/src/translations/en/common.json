@@ -441,7 +441,8 @@
   },
   "groupsEdit": {
     "tabs": {
-      "rights": "Rights"
+      "rights": "Rights",
+      "info": "Basic information"
     }
   },
   "createGroup": {

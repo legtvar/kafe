@@ -57,11 +57,6 @@ export function Navbar({ onOpen, forceReload, signedIn, ...rest }: INavbarProps)
             zIndex="sticky"
             {...rest}
         >
-            <Flex h="20" alignItems="center" ml={2} mr={8} justifyContent="space-between" key="heading">
-                <Link to="/">
-                    <Logo />
-                </Link>
-            </Flex>
             {signedIn && onOpen && (
                 <IconButton
                     display={{ base: 'flex', md: 'none' }}
@@ -71,7 +66,6 @@ export function Navbar({ onOpen, forceReload, signedIn, ...rest }: INavbarProps)
                     icon={<FiMenu />}
                 />
             )}
-
             {api.isStaging && (
                 <MessageButton
                     warningKey="staging.warning"
@@ -87,7 +81,13 @@ export function Navbar({ onOpen, forceReload, signedIn, ...rest }: INavbarProps)
                 />
             )}
 
-            {signedIn && <Spacer />}
+            {signedIn && <Spacer display={{ base: 'flex', md: 'none' }} />}
+
+            <Flex h="20" alignItems="center" ml={2} mr={8} justifyContent="space-between" key="heading">
+                <Link to="/">
+                    <Logo />
+                </Link>
+            </Flex>
 
             <Spacer />
 

@@ -130,6 +130,7 @@ export function ReportButton({ ...box }: IReportButtonProps) {
                             borderRadius="md"
                             bg={useColorModeValue('gray.100', 'gray.800')}
                             maxH="64"
+                            maxW="full"
                             overflow="auto"
                             whiteSpace="pre-wrap"
                             position="relative"

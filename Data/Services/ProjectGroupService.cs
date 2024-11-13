@@ -183,14 +183,18 @@ public class ProjectGroupService
                 : new ProjectGroupClosed(@new.Id));
         }
 
-        // TODO: Allow moving playlists between organizations.
-        // if (@old.OrganizationId != @new.OrganizationId)
-        // {
-        //     eventStream.AppendOne(new ProjectGroupMovedToOrganization(
-        //         @old.Id,
-        //         @new.OrganizationId
-        //     ));
-        // }
+        if (@old.OrganizationId != @new.OrganizationId)
+        {
+            if (!((Hrib)@new.OrganizationId).IsValidNonEmpty)
+            {
+                return Error.InvalidOrEmptyHrib(nameof(ProjectGroupInfo.OrganizationId));
+            }
+
+            eventStream.AppendOne(new ProjectGroupMovedToOrganization(
+                @old.Id,
+                @new.OrganizationId
+            ));
+        }
 
         await db.SaveChangesAsync(token);
         return await db.Events.AggregateStreamAsync<ProjectGroupInfo>(@old.Id, token: token)

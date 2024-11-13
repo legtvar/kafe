@@ -43,6 +43,9 @@ export const LocalizedInput: ComponentWithAs<'input', ILocalizedInputProps> = ({
 }: ILocalizedInputProps) => {
     const definedValue = value || { iv: '' };
 
+    // Make "iv" the first key
+    const keys = Object.keys(definedValue).sort((a, b) => (a === 'iv' ? -1 : b === 'iv' ? 1 : 0));
+
     const flags = useMemo(() => Flags as any as Record<string, Flags.FlagComponent>, []);
     const allFlags = useMemo(
         () =>
@@ -66,8 +69,8 @@ export const LocalizedInput: ComponentWithAs<'input', ILocalizedInputProps> = ({
 
     return (
         <Tabs variant="enclosed">
-            <TabList borderBottom="none" px={2}>
-                {Object.keys(definedValue).map((key) => {
+            <TabList borderBottom="none" px={0}>
+                {keys.map((key) => {
                     if (key === 'iv') {
                         return (
                             <Tab key={key} p={3}>
@@ -109,7 +112,7 @@ export const LocalizedInput: ComponentWithAs<'input', ILocalizedInputProps> = ({
                 </Menu>
             </TabList>
             <TabPanels>
-                {Object.keys(definedValue).map((key) => {
+                {keys.map((key) => {
                     let langName = t('common.invariant');
                     if (key !== 'iv') {
                         const lang = new Intl.Locale(key).maximize();
@@ -118,13 +121,14 @@ export const LocalizedInput: ComponentWithAs<'input', ILocalizedInputProps> = ({
                             CountryLanguage.getLanguage(lang.language).name[0];
                     }
 
-                    const inputProps = {
+                    const inputProps: InputProps = {
                         placeholder: placeholder ? `${placeholder} - ${langName}` : undefined,
                         defaultValue: getPrefered(value, key),
                         onChange: (event: ChangeEvent<HTMLInputElement>) => {
                             definedValue[key] = event.target.value;
                             onChange && onChange(definedValue);
                         },
+                        borderTopLeftRadius: 0,
                         type: type || 'text',
                         ...rest,
                     };

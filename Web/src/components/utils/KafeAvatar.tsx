@@ -1,7 +1,6 @@
 import { Avatar, AvatarProps, useToast } from '@chakra-ui/react';
 import { t } from 'i18next';
 import { useState } from 'react';
-import { redirect } from 'react-router-dom';
 import { forTime } from 'waitasecond';
 import { useApi, useAuth } from '../../hooks/Caffeine';
 import { avatarUrl } from '../../utils/avatarUrl';
@@ -47,15 +46,17 @@ export function KafeAvatar({ person, ...props }: IAvatarProps) {
         toast({
             title: t('avatar.clicks.fullfilled.title'),
             description: t('avatar.clicks.fullfilled.description'),
-            status: 'success',
+            status: 'loading',
             duration: 3000,
             isClosable: true,
         });
 
+        await api.accounts.impersonate(person.id!);
+
         await forTime(3000);
 
-        await api.accounts.impersonate(person.id!);
-        redirect('/auth');
+        // Reload the page
+        window.location.reload();
     };
 
     const onClick = () => {

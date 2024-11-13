@@ -23,11 +23,15 @@ export function OrganizationRedirect() {
                 <Flex direction="column" w="100vw" h="100vh" align="stretch">
                     <Navbar signedIn={true} forceReload={() => reload()} />
                     <Flex direction="row" flexGrow={1} align="stretch" minH={0} minW={0}>
-                        <Center px={4} pt={4} flexGrow={1} overflowY="auto">
-                            <VStack>
-                                <Heading as="h1">{t('organizationRedirect.title')}</Heading>
-                                <Text>{t('organizationRedirect.subtitle')}</Text>
-                                <HStack mt={8} spacing={6}>
+                        <Center px={6} flexGrow={1} overflowY="auto">
+                            <VStack maxW="full">
+                                <Heading as="h1" textAlign="center" maxW="full">
+                                    {t('organizationRedirect.title')}
+                                </Heading>
+                                <Text textAlign="center" maxW="full">
+                                    {t('organizationRedirect.subtitle')}
+                                </Text>
+                                <HStack mt={8} spacing={6} overflowX="auto" minW={0} maxW="full">
                                     {organizations.map((org, key) => (
                                         <Link
                                             to={useAuthLink(undefined, org.id)}

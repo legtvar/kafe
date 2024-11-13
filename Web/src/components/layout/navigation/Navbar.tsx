@@ -57,11 +57,6 @@ export function Navbar({ onOpen, forceReload, signedIn, ...rest }: INavbarProps)
             zIndex="sticky"
             {...rest}
         >
-            <Flex h="20" alignItems="center" ml={2} mr={8} justifyContent="space-between" key="heading">
-                <Link to="/">
-                    <Logo />
-                </Link>
-            </Flex>
             {signedIn && onOpen && (
                 <IconButton
                     display={{ base: 'flex', md: 'none' }}
@@ -71,7 +66,6 @@ export function Navbar({ onOpen, forceReload, signedIn, ...rest }: INavbarProps)
                     icon={<FiMenu />}
                 />
             )}
-
             {api.isStaging && (
                 <MessageButton
                     warningKey="staging.warning"
@@ -87,7 +81,13 @@ export function Navbar({ onOpen, forceReload, signedIn, ...rest }: INavbarProps)
                 />
             )}
 
-            {signedIn && <Spacer />}
+            {signedIn && <Spacer display={{ base: 'flex', md: 'none' }} />}
+
+            <Flex h="20" alignItems="center" ml={2} mr={8} justifyContent="space-between" key="heading">
+                <Link to="/">
+                    <Logo />
+                </Link>
+            </Flex>
 
             <Spacer />
 
@@ -138,12 +138,15 @@ export function Navbar({ onOpen, forceReload, signedIn, ...rest }: INavbarProps)
                                     </HStack>
                                 </MenuButton>
                                 <MenuList>
-                                    <MenuItem display={{ base: 'flex', md: 'none' }} onClick={() => toggleLanguage()}>
-                                        {t('navbar.language').toString()}
-                                    </MenuItem>
-                                    <MenuItem display={{ base: 'flex', md: 'none' }} onClick={toggleColorMode}>
-                                        {t('navbar.colorMode').toString()}
-                                    </MenuItem>
+                                    <HStack display={{ base: 'flex', md: 'none' }} px={2}>
+                                        <LanguageToggle aria-label="Language" onLanguageToggled={() => forceReload()} />
+                                        <ColorModeToggle aria-label="Toggle Color Mode" />
+                                        {!signedIn && (
+                                            <Link to="/account/login">
+                                                <Button ml={4}>{t('home.signin').toString()}</Button>
+                                            </Link>
+                                        )}
+                                    </HStack>
                                     <MenuDivider display={{ base: 'block', md: 'none' }} />
                                     <MenuItem
                                         onClick={() => {

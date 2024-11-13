@@ -238,9 +238,6 @@ export const authRoutes = (
         path: 'system',
         title: t('route.system.title'),
         element: <SystemComponent />,
-        inMenu: (['read', 'append', 'inspect', 'write', 'all'] as Permission[]).some((perm) =>
-            user?.permissions['system']?.includes(perm),
-        ),
         icon: {
             default: IoSettingsOutline,
             selected: IoSettingsSharp,

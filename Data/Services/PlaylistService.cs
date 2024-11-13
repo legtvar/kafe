@@ -208,14 +208,18 @@ public class PlaylistService
                 EntryIds: @new.EntryIds));
         }
 
-        // TODO: Allow moving playlists between organizations.
-        // if (@new.OrganizationId != old.OrganizationId)
-        // {
-        //     eventStream.AppendOne(new PlaylistMovedToOrganization(
-        //         PlaylistId: @new.Id,
-        //         OrganizationId: @new.OrganizationId
-        //     ));
-        // }
+        if (@new.OrganizationId != old.OrganizationId)
+        {
+            if (!((Hrib)@new.OrganizationId).IsValidNonEmpty)
+            {
+                return Error.InvalidOrEmptyHrib(nameof(PlaylistInfo.OrganizationId));
+            }
+
+            eventStream.AppendOne(new PlaylistMovedToOrganization(
+                PlaylistId: @new.Id,
+                OrganizationId: @new.OrganizationId
+            ));
+        }
 
         await db.SaveChangesAsync(token);
         return await db.Events.KafeAggregateRequiredStream<PlaylistInfo>(@old.Id, token: token);

@@ -47,6 +47,10 @@ const theme = extendTheme({
             body: {
                 color: mode('gray.800', 'whiteAlpha.900')(props),
                 bg: mode('gray.100', 'gray.800')(props),
+                overflow: 'hidden',
+            },
+            html: {
+                overflow: 'hidden',
             },
         }),
     },

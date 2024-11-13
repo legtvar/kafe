@@ -1,12 +1,13 @@
-import { BoxProps, CloseButton, Flex, useColorModeValue, VStack } from '@chakra-ui/react';
+import { BoxProps, CloseButton, Flex, IconButton, Spacer, useColorModeValue, VStack } from '@chakra-ui/react';
 import { Fragment } from 'react';
 import { useTranslation } from 'react-i18next';
-import { IoReader, IoReaderOutline } from 'react-icons/io5';
+import { IoReader, IoReaderOutline, IoSettingsOutline } from 'react-icons/io5';
 import { Link, useMatches } from 'react-router-dom';
 import { useAuth, useOrganizations } from '../../../hooks/Caffeine';
 import { useAuthLink } from '../../../hooks/useAuthLink';
 import { useColorScheme } from '../../../hooks/useColorScheme';
 import { AppRoute, authRoutes } from '../../../routes';
+import { Permission } from '../../../schemas/generic';
 import { LS_LATEST_ORG_KEY } from '../../pages/root/OrganizationRedirect';
 import { OrganizationAvatar } from '../../utils/OrganizationAvatar/OrganizationAvatar';
 import { Footer } from '../Footer';
@@ -25,8 +26,9 @@ export function Sidebar({ onClose, forceReload, ...rest }: ISidebarProps) {
     const i18next = useTranslation();
     const fgColor = useColorModeValue('gray.900', 'white');
     const { border, bg, bgDarker, color } = useColorScheme();
+    const { user } = useAuth();
 
-    const routeValues = authRoutes(i18next.t, useAuth().user, useOrganizations().currentOrganization);
+    const routeValues = authRoutes(i18next.t, user, useOrganizations().currentOrganization);
 
     const match = matches[matches.length - 1].id
         .split('-')
@@ -107,7 +109,7 @@ export function Sidebar({ onClose, forceReload, ...rest }: ISidebarProps) {
             w={{ base: 'full', md: SIDEBAR_WIDTH }}
             flexShrink={0}
             flexGrow={{ base: 1, md: 0 }}
-            overflowY="auto"
+            h="full"
             {...rest}
         >
             <VStack
@@ -116,11 +118,14 @@ export function Sidebar({ onClose, forceReload, ...rest }: ISidebarProps) {
                 flexShrink={0}
                 align="center"
                 justify="start"
-                py={6}
+                pt={6}
+                pb={4}
                 spacing={6}
                 bg={useColorModeValue('gray.100', 'gray.800')}
                 borderRight="1px"
                 borderRightColor={border}
+                overflowY="auto"
+                h="full"
             >
                 {organizations.map((org, key) => (
                     <Link
@@ -134,10 +139,25 @@ export function Sidebar({ onClose, forceReload, ...rest }: ISidebarProps) {
                         <OrganizationAvatar organization={org} size="sm" cursor="pointer" />
                     </Link>
                 ))}
+                <Spacer />
+                {(['read', 'append', 'inspect', 'write', 'all'] as Permission[]).some((perm) =>
+                    user?.permissions['system']?.includes(perm),
+                ) && (
+                    <Link to={useAuthLink('/system')}>
+                        <IconButton aria-label="Settings" icon={<IoSettingsOutline />} borderRadius="full" />
+                    </Link>
+                )}
             </VStack>
-            <Flex direction="column" minH="100%" flexGrow={1} flexShrink={1} justifyContent="space-between">
+            <Flex
+                direction="column"
+                h="100%"
+                flexGrow={1}
+                flexShrink={1}
+                justifyContent="space-between"
+                overflowY="auto"
+            >
                 <CloseButton display={{ base: 'flex', md: 'none' }} alignSelf="end" m={4} mb={-2} onClick={onClose} />
-                <Flex direction="column" grow={1} mt={4}>
+                <Flex direction="column" grow={1} my={4}>
                     {items}
                 </Flex>
                 <ReportButton

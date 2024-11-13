@@ -34,7 +34,7 @@ public class ProjectGroupEditEndpoint : EndpointBaseAsync
     }
 
     [HttpPatch]
-    [SwaggerOperation(Tags = new[] { EndpointArea.ProjectGroup })]
+    [SwaggerOperation(Tags = [EndpointArea.ProjectGroup])]
     public override async Task<ActionResult<Hrib>> HandleAsync(
         ProjectGroupEditDto request,
         CancellationToken cancellationToken = default)
@@ -58,8 +58,25 @@ public class ProjectGroupEditEndpoint : EndpointBaseAsync
             Name = request.Name ?? @old.Name,
             Description = request.Description ?? @old.Description,
             IsOpen = request.IsOpen ?? @old.IsOpen,
-            Deadline = request.Deadline ?? @old.Deadline
+            Deadline = request.Deadline ?? @old.Deadline,
+            OrganizationId = request.OrganizationId?.ToString() ?? @old.OrganizationId
         };
+
+        if (@new.OrganizationId != old.OrganizationId)
+        {
+            var oldOrgAuth = await authorizationService.AuthorizeAsync(User, old.OrganizationId, EndpointPolicy.Write);
+            if (!oldOrgAuth.Succeeded)
+            {
+                return Unauthorized($"You don't have write permissions to organization '{old.OrganizationId}'.");
+            }
+
+            var newOrgAuth = await authorizationService.AuthorizeAsync(User, @new.OrganizationId, EndpointPolicy.Write);
+            if (!newOrgAuth.Succeeded)
+            {
+                return Unauthorized($"You don't have write permissions to organization '{@new.OrganizationId}'.");
+            }
+        }
+
         var result = await projectGroupService.Edit(@new, cancellationToken);
         if (result.HasErrors)
         {

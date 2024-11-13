@@ -33,8 +33,7 @@ public record ProjectGroupCreationDto(
 
 public record ProjectGroupEditDto(
     Hrib Id,
-    // TODO: Uncomment once moving groups between organizations is implemented.
-    // Hrib? OrganizationId,
+    Hrib? OrganizationId,
     LocalizedString? Name,
     LocalizedString? Description,
     DateTimeOffset? Deadline,

@@ -31,8 +31,7 @@ public record PlaylistCreationDto(
 
 public record PlaylistEditDto(
     Hrib Id,
-    // TODO: Uncomment once moving groups between organizations is implemented.
-    // Hrib? OrganizationId,
+    Hrib? OrganizationId,
     LocalizedString? Name,
     LocalizedString? Description,
     ImmutableArray<Permission>? GlobalPermissions,

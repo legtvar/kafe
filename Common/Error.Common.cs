@@ -23,6 +23,13 @@ public readonly partial record struct Error
         return new Error(BadHribId, $"String {value} is not a valid identifier.");
     }
 
+    public static Error InvalidOrEmptyHrib(string? description = null)
+    {
+        return new Error(BadHribId, description is null
+            ? $"Encounterd an invalid or empty identifier."
+            : $"{description} must be a valid and non-empty identifier.");
+    }
+
     public static Error MissingValue(string what)
     {
         return new Error(MissingValueId, $"Value for '{what}' is missing.");

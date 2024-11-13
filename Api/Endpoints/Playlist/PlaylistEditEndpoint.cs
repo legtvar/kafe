@@ -62,8 +62,24 @@ public class PlaylistEditEndpoint : EndpointBaseAsync
             GlobalPermissions = dto.GlobalPermissions is not null
                 ? TransferMaps.FromPermissionArray(dto.GlobalPermissions)
                 : old.GlobalPermissions,
-            EntryIds = dto.EntryIds ?? old.EntryIds
+            EntryIds = dto.EntryIds ?? old.EntryIds,
+            OrganizationId = dto.OrganizationId?.ToString() ?? old.OrganizationId
         };
+
+        if (@new.OrganizationId != old.OrganizationId)
+        {
+            var oldOrgAuth = await authorizationService.AuthorizeAsync(User, old.OrganizationId, EndpointPolicy.Write);
+            if (!oldOrgAuth.Succeeded)
+            {
+                return Unauthorized($"You don't have write permissions to organization '{old.OrganizationId}'.");
+            }
+
+            var newOrgAuth = await authorizationService.AuthorizeAsync(User, @new.OrganizationId, EndpointPolicy.Write);
+            if (!newOrgAuth.Succeeded)
+            {
+                return Unauthorized($"You don't have write permissions to organization '{@new.OrganizationId}'.");
+            }
+        }
 
         var result = await playlistService.Edit(@new, cancellationToken);
         if (result.HasErrors)

@@ -8,6 +8,7 @@ import {
     InputProps,
     Menu,
     MenuButton,
+    MenuDivider,
     MenuItem,
     MenuList,
     Tab,
@@ -20,8 +21,8 @@ import {
 } from '@chakra-ui/react';
 import CountryLanguage from '@ladjs/country-language';
 import * as Flags from 'country-flag-icons/react/3x2';
-import { t } from 'i18next';
-import { ChangeEvent, useMemo } from 'react';
+import i18next, { t } from 'i18next';
+import { ChangeEvent, useMemo, useState } from 'react';
 import { IoAdd, IoEarth, IoTrash } from 'react-icons/io5';
 import { localizedString } from '../../schemas/generic';
 import { getPrefered } from '../../utils/preferedLanguage';
@@ -42,6 +43,7 @@ export const LocalizedInput: ComponentWithAs<'input', ILocalizedInputProps> = ({
     ...rest
 }: ILocalizedInputProps) => {
     const definedValue = value || { iv: '' };
+    const [tabIndex, setTabIndex] = useState(0);
 
     // Make "iv" the first key
     const keys = Object.keys(definedValue).sort((a, b) => (a === 'iv' ? -1 : b === 'iv' ? 1 : 0));
@@ -53,7 +55,6 @@ export const LocalizedInput: ComponentWithAs<'input', ILocalizedInputProps> = ({
                 .map((lang) => lang.iso639_1)
                 .filter((lang) => lang.length > 0)
                 .map((lang) => new Intl.Locale(lang).maximize())
-                .filter((lang) => !Object.keys(definedValue).includes(lang.toString()))
                 .map((lang) => {
                     const lng = CountryLanguage.getLanguage(lang.language);
 
@@ -67,8 +68,24 @@ export const LocalizedInput: ComponentWithAs<'input', ILocalizedInputProps> = ({
         [],
     );
 
+    const translated = useMemo(
+        () =>
+            Object.keys(i18next.options.resources!)
+                .map((lang) => new Intl.Locale(lang).maximize())
+                .map((lang) => {
+                    const lng = CountryLanguage.getLanguage(lang.language);
+
+                    return {
+                        id: lang.language,
+                        name: `${lng.name[0]} ${lng.nativeName[0] ? `(${lng.nativeName[0]})` : ''}`,
+                        flag: flags[lang.region || ''],
+                    };
+                }),
+        [],
+    );
+
     return (
-        <Tabs variant="enclosed">
+        <Tabs variant="enclosed" onChange={(index) => setTabIndex(index)} index={tabIndex}>
             <TabList borderBottom="none" px={0}>
                 {keys.map((key) => {
                     if (key === 'iv') {
@@ -92,22 +109,45 @@ export const LocalizedInput: ComponentWithAs<'input', ILocalizedInputProps> = ({
                 <Menu isLazy>
                     <MenuButton as={IconButton} icon={<IoAdd />} variant="link" aria-label="Add" />
                     <MenuList overflowY="auto" maxH="20vh">
-                        {allFlags.map((lang, key) => (
-                            <MenuItem
-                                onClick={() => {
-                                    definedValue[lang.id] = '';
-                                    onChange && onChange(definedValue);
-                                }}
-                                key={key}
-                            >
-                                <HStack>
-                                    <Center w="18px">
-                                        <lang.flag />
-                                    </Center>
-                                    <Text>{lang.name}</Text>
-                                </HStack>
-                            </MenuItem>
-                        ))}
+                        {translated
+                            .filter((lang) => !Object.keys(definedValue).includes(lang.id))
+                            .map((lang, key) => (
+                                <MenuItem
+                                    onClick={() => {
+                                        definedValue[lang.id] = '';
+                                        onChange && onChange(definedValue);
+                                        setTabIndex(Object.keys(definedValue).length - 1);
+                                    }}
+                                    key={key}
+                                >
+                                    <HStack>
+                                        <Center w="18px">
+                                            <lang.flag />
+                                        </Center>
+                                        <Text>{lang.name}</Text>
+                                    </HStack>
+                                </MenuItem>
+                            ))}
+                        <MenuDivider />
+                        {allFlags
+                            .filter((lang) => !Object.keys(definedValue).includes(lang.id))
+                            .map((lang, key) => (
+                                <MenuItem
+                                    onClick={() => {
+                                        definedValue[lang.id] = '';
+                                        onChange && onChange(definedValue);
+                                        setTabIndex(Object.keys(definedValue).length - 1);
+                                    }}
+                                    key={key}
+                                >
+                                    <HStack>
+                                        <Center w="18px">
+                                            <lang.flag />
+                                        </Center>
+                                        <Text>{lang.name}</Text>
+                                    </HStack>
+                                </MenuItem>
+                            ))}
                     </MenuList>
                 </Menu>
             </TabList>
@@ -148,6 +188,7 @@ export const LocalizedInput: ComponentWithAs<'input', ILocalizedInputProps> = ({
                                         icon={<IoTrash />}
                                         isDisabled={key === 'iv'}
                                         onClick={() => {
+                                            setTabIndex(tabIndex - 1);
                                             delete definedValue[key];
                                             onChange && onChange(definedValue);
                                         }}

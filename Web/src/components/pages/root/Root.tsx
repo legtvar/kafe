@@ -50,8 +50,6 @@ export function Root(props: IRootProps) {
         })();
     });
 
-    console.log(status);
-
     if (status === 'request' || status === 'requesting') {
         return (
             <Center h="100vh">

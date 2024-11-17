@@ -91,10 +91,10 @@ export function ProjectBasicInfo(props: IProjectBasicInfoProps) {
                             max={200}
                             borderColor={border}
                             bg={bg}
-                            name="genre"
-                            placeholder={t('createProject.fields.genre').toString()}
-                            value={project.genre}
-                            onChange={(value) => forceUpdate(project.set('genre', value))}
+                            name="description"
+                            placeholder={t('createProject.fields.description').toString()}
+                            value={project.description}
+                            onChange={(value) => forceUpdate(project.set('description', value))}
                         />
                     </FormControl>
                     <FormControl py={12}>

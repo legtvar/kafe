@@ -26,8 +26,7 @@ services:
 
 volumes:
   kafe_postgres:
-    name: kafe_postgres
-    driver: local
+    external: true
   kafe_archive:
     external: true
   kafe_generated:
@@ -35,5 +34,4 @@ volumes:
   kafe_temp:
     external: true
   kafe_secrets:
-    name: kafe_secrets
-    driver: local
+    external: true

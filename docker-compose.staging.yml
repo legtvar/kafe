@@ -37,5 +37,5 @@ volumes:
     name: kafe_staging_temp
     external: true
   kafe_secrets:
-    name: kafe_secrets
+    name: kafe_staging_secrets
     driver: local

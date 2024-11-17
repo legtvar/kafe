@@ -19,6 +19,7 @@ import {
 } from '@chakra-ui/react';
 import { t } from 'i18next';
 import { useCallback, useState } from 'react';
+import { API } from '../../../../api/API';
 import { Group } from '../../../../data/Group';
 import { PlaylistEntry } from '../../../../data/Playlist';
 import { Project } from '../../../../data/Project';
@@ -44,6 +45,8 @@ export function PlaylistAddNewFileWrapper({ isOpen, onClose, groups, projects }:
     const odd = useColorModeValue('gray.200', 'gray.650');
     const evenSelected = useColorModeValue('blue.300', 'blue.600');
     const oddSelected = useColorModeValue('blue.400', 'blue.500');
+
+    const getProject = useCallback((api: API) => api.projects.getById(selectedProject), [selectedProject]);
 
     return (
         <Modal isOpen={isOpen} onClose={() => onClose(files)} size="full" scrollBehavior={'inside'}>
@@ -148,10 +151,7 @@ export function PlaylistAddNewFileWrapper({ isOpen, onClose, groups, projects }:
                             ) : (
                                 <AwaitAPI
                                     key={selectedProject}
-                                    request={useCallback(
-                                        (api) => api.projects.getById(selectedProject),
-                                        [selectedProject],
-                                    )}
+                                    request={getProject}
                                     error={(error) => <Text>{error.message}</Text>}
                                 >
                                     {(project: Project) => (

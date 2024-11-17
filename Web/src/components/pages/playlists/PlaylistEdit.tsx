@@ -1,6 +1,7 @@
 import {
     Box,
     Button,
+    Flex,
     HStack,
     Heading,
     Icon,
@@ -61,7 +62,15 @@ export function PlaylistEdit(props: IPlaylistEditProps) {
                         {observeAbstactType((perms: EntityPermissions) => (
                             <Box m={6} pb={12}>
                                 <WithTitle title={t('title.playlist', { playlist: playlist.getName() })} />
-                                <HStack mb={2}>
+                                <Flex
+                                    direction={{
+                                        base: 'column',
+                                        md: 'row',
+                                    }}
+                                    gap={4}
+                                    mb={6}
+                                    alignItems="start"
+                                >
                                     <Heading fontSize="4xl" fontWeight="semibold" as="h2" lineHeight="tight" mr="auto">
                                         {playlist.getName()}
                                     </Heading>
@@ -103,7 +112,7 @@ export function PlaylistEdit(props: IPlaylistEditProps) {
                                     <Link to="..">
                                         <Button leftIcon={<BsX />}>{t('generic.quitEdit').toString()}</Button>
                                     </Link>
-                                </HStack>
+                                </Flex>
                                 <Tabs>
                                     <TabList>
                                         <Tab>{t('playlistsEdit.tabs.info').toString()}</Tab>

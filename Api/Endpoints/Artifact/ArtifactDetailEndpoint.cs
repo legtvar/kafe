@@ -37,7 +37,7 @@ public class ArtifactDetailEndpoint : EndpointBaseAsync
         string id,
         CancellationToken cancellationToken = default)
     {
-        var auth = await authorization.AuthorizeAsync(User, EndpointPolicy.Read);
+        var auth = await authorization.AuthorizeAsync(User, id, EndpointPolicy.Read);
         if (!auth.Succeeded)
         {
             return Unauthorized();

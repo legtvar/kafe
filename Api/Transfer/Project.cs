@@ -18,7 +18,8 @@ public record ProjectListDto(
     LocalizedString? Description,
     ImmutableArray<Permission> GlobalPermissions,
     ImmutableArray<Permission> UserPermissions,
-    DateTimeOffset ReleasedOn
+    DateTimeOffset ReleasedOn,
+    bool IsLocked
     // TODO: Thumbnail
 );
 
@@ -36,7 +37,8 @@ public record ProjectDetailDto(
     ImmutableArray<ProjectAuthorDto> Cast,
     ImmutableArray<ProjectArtifactDto> Artifacts,
     ImmutableArray<ProjectReviewDto> Reviews,
-    ProjectBlueprintDto Blueprint
+    ProjectBlueprintDto Blueprint,
+    bool IsLocked
 );
 
 public record ProjectAuthorDto(
@@ -93,7 +95,8 @@ public record ProjectCreationDto(
     LocalizedString? Description,
     LocalizedString? Genre,
     ImmutableArray<ProjectCreationAuthorDto> Crew,
-    ImmutableArray<ProjectCreationAuthorDto> Cast
+    ImmutableArray<ProjectCreationAuthorDto> Cast,
+    bool IsLocked
 );
 
 public record ProjectEditDto(
@@ -103,7 +106,8 @@ public record ProjectEditDto(
     LocalizedString? Genre,
     ImmutableArray<ProjectCreationAuthorDto>? Crew,
     ImmutableArray<ProjectCreationAuthorDto>? Cast,
-    ImmutableArray<ProjectArtifactAdditionDto>? Artifacts
+    ImmutableArray<ProjectArtifactAdditionDto>? Artifacts,
+    bool? IsLocked
 );
 
 public record ProjectCreationAuthorDto(

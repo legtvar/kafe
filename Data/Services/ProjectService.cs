@@ -77,6 +77,12 @@ public partial class ProjectService
         db.Events.KafeStartStream<ProjectInfo>(created.ProjectId, created, infoChanged);
         await db.SaveChangesAsync(token);
 
+        if (@new.IsLocked)
+        {
+            db.Events.KafeAppend(projectId, new ProjectLocked(projectId.ToString()));
+            await db.SaveChangesAsync(token);
+        }
+
         if (ownerId is not null)
         {
             await accountService.AddPermissions(
@@ -119,53 +125,58 @@ public partial class ProjectService
         await db.SaveChangesAsync();
     }
 
-    public async Task<Err<bool>> Edit(ProjectInfo modified, CancellationToken token = default)
+    public async Task<Err<bool>> Edit(ProjectInfo @new, CancellationToken token = default)
     {
-        var @old = await Load(modified.Id, token);
+        var @old = await Load(@new.Id, token);
         if (@old is null)
         {
-            return Error.NotFound(modified.Id);
+            return Error.NotFound(@new.Id);
         }
 
-        if (LocalizedString.IsTooLong(modified.Name, NameMaxLength))
+        if (LocalizedString.IsTooLong(@new.Name, NameMaxLength))
         {
             return new Error("Name is too long.");
         }
 
-        if (LocalizedString.IsTooLong(modified.Genre, GenreMaxLength))
+        if (LocalizedString.IsTooLong(@new.Genre, GenreMaxLength))
         {
             return new Error("Genre is too long.");
         }
 
-        if (LocalizedString.IsTooLong(modified.Description, DescriptionMaxLength))
+        if (LocalizedString.IsTooLong(@new.Description, DescriptionMaxLength))
         {
             return new Error("Description is too long.");
         }
 
-        var eventStream = await db.Events.FetchForExclusiveWriting<ProjectInfo>(modified.Id, token);
+        var eventStream = await db.Events.FetchForExclusiveWriting<ProjectInfo>(@new.Id, token);
 
         var infoChanged = new ProjectInfoChanged(
-            ProjectId: modified.Id,
-            Name: (LocalizedString)@old.Name != modified.Name ? modified.Name : null,
-            Description: (LocalizedString?)@old.Description != modified.Description ? modified.Description : null,
-            Genre: (LocalizedString?)@old.Genre != modified.Genre ? modified.Genre : null);
+            ProjectId: @new.Id,
+            Name: (LocalizedString)@old.Name != @new.Name ? @new.Name : null,
+            Description: (LocalizedString?)@old.Description != @new.Description ? @new.Description : null,
+            Genre: (LocalizedString?)@old.Genre != @new.Genre ? @new.Genre : null);
         if (infoChanged.Name is not null || infoChanged.Description is not null || infoChanged.Genre is not null)
         {
             eventStream.AppendOne(infoChanged);
         }
 
-        var authorsRemoved = @old.Authors.Except(modified.Authors)
-            .Select(a => new ProjectAuthorRemoved(modified.Id, a.Id, a.Kind, a.Roles));
+        if (@new.IsLocked != old.IsLocked)
+        {
+            eventStream.AppendOne(@new.IsLocked ? new ProjectLocked(old.Id) : new ProjectUnlocked(old.Id));
+        }
+
+        var authorsRemoved = @old.Authors.Except(@new.Authors)
+            .Select(a => new ProjectAuthorRemoved(@new.Id, a.Id, a.Kind, a.Roles));
         eventStream.AppendMany(authorsRemoved);
-        var authorsAdded = modified.Authors.Except(@old.Authors)
-            .Select(a => new ProjectAuthorAdded(modified.Id, a.Id, a.Kind, a.Roles));
+        var authorsAdded = @new.Authors.Except(@old.Authors)
+            .Select(a => new ProjectAuthorAdded(@new.Id, a.Id, a.Kind, a.Roles));
         eventStream.AppendMany(authorsAdded);
 
-        var artifactsRemoved = @old.Artifacts.Except(modified.Artifacts)
-            .Select(a => new ProjectArtifactRemoved(modified.Id, a.Id));
+        var artifactsRemoved = @old.Artifacts.Except(@new.Artifacts)
+            .Select(a => new ProjectArtifactRemoved(@new.Id, a.Id));
         eventStream.AppendMany(artifactsRemoved);
-        var artifactsAdded = modified.Artifacts.Except(@old.Artifacts)
-            .Select(a => new ProjectArtifactAdded(modified.Id, a.Id, a.BlueprintSlot));
+        var artifactsAdded = @new.Artifacts.Except(@old.Artifacts)
+            .Select(a => new ProjectArtifactAdded(@new.Id, a.Id, a.BlueprintSlot));
         eventStream.AppendMany(artifactsAdded);
 
         await db.SaveChangesAsync(token);

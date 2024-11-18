@@ -114,7 +114,8 @@ public static class TransferMaps
             Description: data.Description,
             GlobalPermissions: ToPermissionArray(data.GlobalPermissions),
             UserPermissions: ToPermissionArray(data.GlobalPermissions | userPermission),
-            ReleasedOn: data.ReleasedOn);
+            ReleasedOn: data.ReleasedOn,
+            IsLocked: data.IsLocked);
     }
 
     public static ProjectDetailDto ToProjectDetailDto(ProjectInfo data, Permission userPermission = Permission.None)
@@ -129,13 +130,14 @@ public static class TransferMaps
             GlobalPermissions: ToPermissionArray(data.GlobalPermissions),
             UserPermissions: ToPermissionArray(data.GlobalPermissions | userPermission),
             ReleasedOn: data.ReleasedOn,
-            Crew: ImmutableArray<ProjectAuthorDto>.Empty,
-            Cast: ImmutableArray<ProjectAuthorDto>.Empty,
-            Artifacts: ImmutableArray<ProjectArtifactDto>.Empty,
+            Crew: [],
+            Cast: [],
+            Artifacts: [],
             Reviews: data.Reviews.IsDefaultOrEmpty
-                ? ImmutableArray<ProjectReviewDto>.Empty
+                ? []
                 : data.Reviews.Select(ToProjectReviewDto).ToImmutableArray(),
-            Blueprint: TemporaryProjectBlueprintMockup
+            Blueprint: TemporaryProjectBlueprintMockup,
+            IsLocked: data.IsLocked
         );
     }
 
@@ -210,7 +212,7 @@ public static class TransferMaps
             Description: data.Description,
             Deadline: data.Deadline,
             IsOpen: data.IsOpen,
-            Projects: ImmutableArray<ProjectListDto>.Empty);
+            Projects: []);
     }
 
     public static ArtifactDetailDto ToArtifactDetailDto(ArtifactDetail data)
@@ -410,7 +412,7 @@ public static class TransferMaps
     {
         if (value == Permission.None)
         {
-            return ImmutableArray<Permission>.Empty;
+            return [];
         }
 
         return Enum.GetValues<Permission>()

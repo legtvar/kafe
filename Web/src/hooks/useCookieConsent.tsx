@@ -1,8 +1,7 @@
-import { Button, Heading, HStack, Text, ToastId, useToast, VStack } from '@chakra-ui/react';
+import { Button, Heading, HStack, Text, ToastId, useColorModeValue, useToast, VStack } from '@chakra-ui/react';
 import { t } from 'i18next';
 import { useEffect, useRef } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 
 const LS_COOKIE_CONSENT = 'kafe_cookie_consent';
 
@@ -10,12 +9,19 @@ export function useCookieConsent() {
     const toast = useToast();
     const toastRef = useRef<ToastId>();
     const { i18n } = useTranslation();
-    const navigate = useNavigate();
+    const bg = useColorModeValue('gray.100', 'gray.800');
+    console.log(bg);
+
+    const id = 'cookies';
 
     // Show the cookie consent toast once, only if the user has not already accepted it
     useEffect(() => {
         if (!localStorage.getItem(LS_COOKIE_CONSENT)) {
-            toastRef.current = toast({});
+            if (!toast.isActive(id)) {
+                toastRef.current = toast({
+                    id,
+                });
+            }
             // localStorage.setItem(LS_COOKIE_CONSENT, 'true');
         }
     }, [toast]);
@@ -65,6 +71,9 @@ export function useCookieConsent() {
             duration: null,
             isClosable: false,
             variant: 'left-accent',
+            containerStyle: {
+                bg,
+            },
         });
-    }, [i18n.language]);
+    }, [i18n.language, bg]);
 }

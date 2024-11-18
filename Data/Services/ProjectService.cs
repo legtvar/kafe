@@ -124,12 +124,20 @@ public partial class ProjectService
         await db.SaveChangesAsync();
     }
 
-    public async Task<Err<bool>> Edit(ProjectInfo @new, CancellationToken token = default)
+    public async Task<Err<bool>> Edit(
+        ProjectInfo @new,
+        bool overrideLock = false,
+        CancellationToken token = default)
     {
         var @old = await Load(@new.Id, token);
         if (@old is null)
         {
             return Error.NotFound(@new.Id);
+        }
+
+        if (@old.IsLocked && !overrideLock)
+        {
+            return Error.Locked(@old.Id, "The project");
         }
 
         if (LocalizedString.IsTooLong(@new.Name, NameMaxLength))

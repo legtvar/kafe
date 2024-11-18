@@ -99,7 +99,7 @@ public class ProjectEditEndpoint : EndpointBaseAsync
                 : @old.Artifacts,
             IsLocked = request.IsLocked ?? old.IsLocked
         };
-        var result = await projectService.Edit(@new, cancellationToken);
+        var result = await projectService.Edit(@new: @new, token: cancellationToken);
         if (result.HasErrors)
         {
             return result.ToActionResult();

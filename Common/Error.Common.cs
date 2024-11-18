@@ -6,6 +6,7 @@ public readonly partial record struct Error
     public const string BadHribId = nameof(BadHrib);
     public const string MissingValueId = nameof(MissingValue);
     public const string UnmodifiedId = nameof(Unmodified);
+    public const string LockedId = nameof(Locked);
 
     public static Error NotFound(string? message = null)
     {
@@ -43,5 +44,10 @@ public readonly partial record struct Error
     public static Error Unmodified(Hrib id, string description = "An entity")
     {
         return new Error(UnmodifiedId, $"No changed were made to {description} with identifier '{id}'.");
+    }
+
+    public static Error Locked(Hrib id, string description = "The entity")
+    {
+        return new Error(LockedId, $"{description} is locked.");
     }
 }

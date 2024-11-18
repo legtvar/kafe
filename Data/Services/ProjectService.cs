@@ -75,13 +75,12 @@ public partial class ProjectService
             Genre: @new.Genre);
 
         db.Events.KafeStartStream<ProjectInfo>(created.ProjectId, created, infoChanged);
-        await db.SaveChangesAsync(token);
 
         if (@new.IsLocked)
         {
             db.Events.KafeAppend(projectId, new ProjectLocked(projectId.ToString()));
-            await db.SaveChangesAsync(token);
         }
+        await db.SaveChangesAsync(token);
 
         if (ownerId is not null)
         {
@@ -286,6 +285,8 @@ public partial class ProjectService
         // return dto;
     }
 
+
+
     public async Task<ImmutableArray<ProjectInfo>> LoadMany(IEnumerable<Hrib> ids, CancellationToken token = default)
     {
         return (await db.KafeLoadManyAsync<ProjectInfo>(ids.ToImmutableArray(), token)).Unwrap();
@@ -361,5 +362,35 @@ public partial class ProjectService
         }
         await db.SaveChangesAsync(token);
         return await db.Events.KafeAggregateRequiredStream<ProjectInfo>(projectId, token: token);
+    }
+
+    public Task<Err<bool>> Lock(Hrib projectId, CancellationToken token = default)
+    {
+        return LockUnlock(projectId: projectId, shouldLock: true, token: token);
+    }
+
+    public Task<Err<bool>> Unlock(Hrib projectId, CancellationToken token = default)
+    {
+        return LockUnlock(projectId: projectId, shouldLock: false, token: token);
+    }
+
+    private async Task<Err<bool>> LockUnlock(Hrib projectId, bool shouldLock, CancellationToken token = default)
+    {
+        var stream = await db.Events.FetchForExclusiveWriting<ProjectInfo>(projectId.ToString(), token);
+        if (stream is null)
+        {
+            return Error.NotFound(projectId, "A project");
+        }
+
+        if (shouldLock && !stream.Aggregate.IsLocked)
+        {
+            stream.AppendOne(new ProjectLocked(projectId.ToString()));
+        }
+        else if (!shouldLock && stream.Aggregate.IsLocked)
+        {
+            stream.AppendOne(new ProjectUnlocked(projectId.ToString()));
+        }
+        await db.SaveChangesAsync(token);
+        return true;
     }
 }

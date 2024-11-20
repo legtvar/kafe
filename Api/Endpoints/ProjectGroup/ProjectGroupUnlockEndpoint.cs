@@ -15,7 +15,7 @@ namespace Kafe.Api.Endpoints.ProjectGroup;
 [ApiVersion("1")]
 [Route("project-group/unlock")]
 public class ProjectGroupUnlockEndpoint : EndpointBaseAsync
-    .WithRequest<ProjectGroupUnlockEndpoint.RequestData>
+    .WithRequest<ProjectGroupUnlockEndpoint.UnlockRequestData>
     .WithActionResult
 {
     private readonly ProjectGroupService projectGroupService;
@@ -35,7 +35,7 @@ public class ProjectGroupUnlockEndpoint : EndpointBaseAsync
     [HttpPost]
     [SwaggerOperation(Tags = [EndpointArea.ProjectGroup])]
     public override async Task<ActionResult> HandleAsync(
-        RequestData requestData,
+        [FromBody] UnlockRequestData requestData,
         CancellationToken cancellationToken = default)
     {
         var auth = await authorizationService.AuthorizeAsync(User, requestData.Id, EndpointPolicy.Administer);
@@ -64,8 +64,8 @@ public class ProjectGroupUnlockEndpoint : EndpointBaseAsync
         }
         return Ok();
     }
-    
-    public record RequestData
+
+    public record UnlockRequestData
     {
         public Hrib Id { get; set; } = Hrib.Empty;
     }

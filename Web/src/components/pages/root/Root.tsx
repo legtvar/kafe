@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { Navigate, useMatches, useOutlet } from 'react-router-dom';
 import { useApi, useAuth, useOrganizations } from '../../../hooks/Caffeine';
 import { useCookieConsent } from '../../../hooks/useCookieConsent';
+import { NavigateStoreBacklink } from '../../utils/Backlink/Backlink';
 import { Loading } from '../../utils/Loading';
 import { Status } from '../../utils/Status';
 
@@ -75,7 +76,7 @@ export function Root(props: IRootProps) {
 
     if (authRequested && !user) {
         // User requested auth section, but is not authenticated
-        return <Navigate to="/home" />;
+        return <NavigateStoreBacklink to="/account/login" />;
     }
     if (!authRequested && user) {
         // User requested unauthorized section, but is authenticated

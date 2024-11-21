@@ -1,7 +1,8 @@
 import { t } from 'i18next';
 import { useCallback } from 'react';
-import { Navigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { AwaitAPI } from '../../utils/AwaitAPI';
+import { NavigateRestoreBacklink } from '../../utils/Backlink/Backlink';
 import { Error } from '../../utils/Error';
 import { Status } from '../../utils/Status';
 
@@ -20,7 +21,7 @@ export function Token() {
             }
         >
             {(data) => {
-                return <Navigate to="/auth" />;
+                return <NavigateRestoreBacklink to="/auth" />;
             }}
         </AwaitAPI>
     );

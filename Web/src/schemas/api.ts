@@ -89,7 +89,8 @@ export interface paths {
     get: {
       parameters: {
         query?: {
-          AccessedEntityId?: string;
+          entity?: string;
+          sort?: string;
         };
       };
       responses: {
@@ -220,6 +221,11 @@ export interface paths {
   };
   "/api/v1/authors": {
     get: {
+      parameters: {
+        query?: {
+          sort?: string;
+        };
+      };
       responses: {
         /** @description OK */
         200: {
@@ -276,7 +282,7 @@ export interface paths {
     get: {
       parameters: {
         query?: {
-          Redirect?: string;
+          redirect?: string;
         };
       };
       responses: {
@@ -356,6 +362,11 @@ export interface paths {
   };
   "/api/v1/organizations": {
     get: {
+      parameters: {
+        query?: {
+          sort?: string;
+        };
+      };
       responses: {
         /** @description OK */
         200: {
@@ -437,6 +448,12 @@ export interface paths {
   };
   "/api/v1/playlists": {
     get: {
+      parameters: {
+        query?: {
+          organization?: string;
+          sort?: string;
+        };
+      };
       responses: {
         /** @description OK */
         200: {
@@ -480,7 +497,11 @@ export interface paths {
       responses: {
         /** @description OK */
         200: {
-          content: never;
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
+          };
         };
       };
     };
@@ -543,7 +564,11 @@ export interface paths {
       responses: {
         /** @description OK */
         200: {
-          content: never;
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
+          };
         };
       };
     };
@@ -577,6 +602,12 @@ export interface paths {
   };
   "/api/v1/project-groups": {
     get: {
+      parameters: {
+        query?: {
+          organization?: string;
+          sort?: string;
+        };
+      };
       responses: {
         /** @description OK */
         200: {
@@ -589,8 +620,49 @@ export interface paths {
       };
     };
   };
+  "/api/v1/project-group/lock": {
+    post: {
+      requestBody?: {
+        content: {
+          "application/json": components["schemas"]["LockRequestData"];
+          "text/json": components["schemas"]["LockRequestData"];
+          "application/*+json": components["schemas"]["LockRequestData"];
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          content: never;
+        };
+      };
+    };
+  };
+  "/api/v1/project-group/unlock": {
+    post: {
+      requestBody?: {
+        content: {
+          "application/json": components["schemas"]["UnlockRequestData"];
+          "text/json": components["schemas"]["UnlockRequestData"];
+          "application/*+json": components["schemas"]["UnlockRequestData"];
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          content: never;
+        };
+      };
+    };
+  };
   "/api/v1/projects": {
     get: {
+      parameters: {
+        query?: {
+          organization?: string;
+          "project-group"?: string;
+          sort?: string;
+        };
+      };
       responses: {
         /** @description OK */
         200: {
@@ -708,6 +780,11 @@ export interface paths {
   };
   "/api/v1/roles": {
     get: {
+      parameters: {
+        query?: {
+          sort?: string;
+        };
+      };
       responses: {
         /** @description OK */
         200: {
@@ -792,6 +869,7 @@ export interface paths {
       parameters: {
         path: {
           Id: string;
+          Variant: string;
         };
       };
       responses: {
@@ -953,8 +1031,9 @@ export interface components {
       /** LocalizedString */
       name: {
         iv: string;
-        cs?: string | null;
         en?: string | null;
+        cs?: string | null;
+        sk?: string | null;
       };
       /** Format: date-time */
       addedOn?: string | null;
@@ -981,8 +1060,9 @@ export interface components {
       /** LocalizedString */
       bio?: ({
         iv: string;
-        cs?: string | null;
         en?: string | null;
+        cs?: string | null;
+        sk?: string | null;
       }) | null;
       uco?: string | null;
       email?: string | null;
@@ -1000,8 +1080,9 @@ export interface components {
       /** LocalizedString */
       bio?: ({
         iv: string;
-        cs?: string | null;
         en?: string | null;
+        cs?: string | null;
+        sk?: string | null;
       }) | null;
       uco?: string | null;
       email?: string | null;
@@ -1077,6 +1158,14 @@ export interface components {
         [key: string]: components["schemas"]["ImageDto"];
       };
     };
+    LockRequestData: {
+      /**
+       * Format: hrib
+       * @description Human-Readable Identifier Ballast
+       * @example AAAAbadf00d
+       */
+      id: string;
+    };
     MediaDto: {
       fileExtension: string;
       mimeType: string;
@@ -1097,8 +1186,9 @@ export interface components {
       /** LocalizedString */
       name: {
         iv: string;
-        cs?: string | null;
         en?: string | null;
+        cs?: string | null;
+        sk?: string | null;
       };
     };
     OrganizationDetailDto: {
@@ -1111,8 +1201,9 @@ export interface components {
       /** LocalizedString */
       name: {
         iv: string;
-        cs?: string | null;
         en?: string | null;
+        cs?: string | null;
+        sk?: string | null;
       };
       /** Format: date-time */
       createdOn: string;
@@ -1127,8 +1218,9 @@ export interface components {
       /** LocalizedString */
       name: {
         iv: string;
-        cs?: string | null;
         en?: string | null;
+        cs?: string | null;
+        sk?: string | null;
       };
     };
     OrganizationListDto: {
@@ -1141,8 +1233,9 @@ export interface components {
       /** LocalizedString */
       name: {
         iv: string;
-        cs?: string | null;
         en?: string | null;
+        cs?: string | null;
+        sk?: string | null;
       };
     };
     /** @enum {string} */
@@ -1151,8 +1244,9 @@ export interface components {
       /** LocalizedString */
       name: {
         iv: string;
-        cs?: string | null;
         en?: string | null;
+        cs?: string | null;
+        sk?: string | null;
       };
       /**
        * Format: hrib
@@ -1163,8 +1257,9 @@ export interface components {
       /** LocalizedString */
       description?: ({
         iv: string;
-        cs?: string | null;
         en?: string | null;
+        cs?: string | null;
+        sk?: string | null;
       }) | null;
       globalPermissions?: components["schemas"]["Permission"][] | null;
       entryIds?: string[] | null;
@@ -1176,17 +1271,25 @@ export interface components {
        * @example AAAAbadf00d
        */
       id: string;
+      /**
+       * Format: hrib
+       * @description Human-Readable Identifier Ballast
+       * @example AAAAbadf00d
+       */
+      organizationId: string;
       /** LocalizedString */
       name: {
         iv: string;
-        cs?: string | null;
         en?: string | null;
+        cs?: string | null;
+        sk?: string | null;
       };
       /** LocalizedString */
       description?: ({
         iv: string;
-        cs?: string | null;
         en?: string | null;
+        cs?: string | null;
+        sk?: string | null;
       }) | null;
       globalPermissions: components["schemas"]["Permission"][];
       entries: components["schemas"]["PlaylistEntryDto"][];
@@ -1198,17 +1301,25 @@ export interface components {
        * @example AAAAbadf00d
        */
       id: string;
+      /**
+       * Format: hrib
+       * @description Human-Readable Identifier Ballast
+       * @example AAAAbadf00d
+       */
+      organizationId?: string | null;
       /** LocalizedString */
       name?: ({
         iv: string;
-        cs?: string | null;
         en?: string | null;
+        cs?: string | null;
+        sk?: string | null;
       }) | null;
       /** LocalizedString */
       description?: ({
         iv: string;
-        cs?: string | null;
         en?: string | null;
+        cs?: string | null;
+        sk?: string | null;
       }) | null;
       globalPermissions?: components["schemas"]["Permission"][] | null;
       entryIds?: string[] | null;
@@ -1223,8 +1334,9 @@ export interface components {
       /** LocalizedString */
       name: {
         iv: string;
-        cs?: string | null;
         en?: string | null;
+        cs?: string | null;
+        sk?: string | null;
       };
     };
     PlaylistListDto: {
@@ -1234,17 +1346,25 @@ export interface components {
        * @example AAAAbadf00d
        */
       id: string;
+      /**
+       * Format: hrib
+       * @description Human-Readable Identifier Ballast
+       * @example AAAAbadf00d
+       */
+      organizationId: string;
       /** LocalizedString */
       name: {
         iv: string;
-        cs?: string | null;
         en?: string | null;
+        cs?: string | null;
+        sk?: string | null;
       };
       /** LocalizedString */
       description?: ({
         iv: string;
-        cs?: string | null;
         en?: string | null;
+        cs?: string | null;
+        sk?: string | null;
       }) | null;
       globalPermissions: components["schemas"]["Permission"][];
     };
@@ -1270,14 +1390,16 @@ export interface components {
       /** LocalizedString */
       name: {
         iv: string;
-        cs?: string | null;
         en?: string | null;
+        cs?: string | null;
+        sk?: string | null;
       };
       /** LocalizedString */
       description?: ({
         iv: string;
-        cs?: string | null;
         en?: string | null;
+        cs?: string | null;
+        sk?: string | null;
       }) | null;
       arity: components["schemas"]["ArgumentArity"];
       shardBlueprints: {
@@ -1297,8 +1419,9 @@ export interface components {
       /** LocalizedString */
       name: {
         iv: string;
-        cs?: string | null;
         en?: string | null;
+        cs?: string | null;
+        sk?: string | null;
       };
       /** Format: date-time */
       addedOn: string;
@@ -1309,14 +1432,16 @@ export interface components {
       /** LocalizedString */
       name: {
         iv: string;
-        cs?: string | null;
         en?: string | null;
+        cs?: string | null;
+        sk?: string | null;
       };
       /** LocalizedString */
       description?: ({
         iv: string;
-        cs?: string | null;
         en?: string | null;
+        cs?: string | null;
+        sk?: string | null;
       }) | null;
       arity: components["schemas"]["ArgumentArity"];
     };
@@ -1334,14 +1459,16 @@ export interface components {
       /** LocalizedString */
       name: {
         iv: string;
-        cs?: string | null;
         en?: string | null;
+        cs?: string | null;
+        sk?: string | null;
       };
       /** LocalizedString */
       description?: ({
         iv: string;
-        cs?: string | null;
         en?: string | null;
+        cs?: string | null;
+        sk?: string | null;
       }) | null;
       requiredReviewers: string[];
       artifactBlueprints: {
@@ -1367,23 +1494,27 @@ export interface components {
       /** LocalizedString */
       name: {
         iv: string;
-        cs?: string | null;
         en?: string | null;
+        cs?: string | null;
+        sk?: string | null;
       };
       /** LocalizedString */
       description?: ({
         iv: string;
-        cs?: string | null;
         en?: string | null;
+        cs?: string | null;
+        sk?: string | null;
       }) | null;
       /** LocalizedString */
       genre?: ({
         iv: string;
-        cs?: string | null;
         en?: string | null;
+        cs?: string | null;
+        sk?: string | null;
       }) | null;
       crew: components["schemas"]["ProjectCreationAuthorDto"][];
       cast: components["schemas"]["ProjectCreationAuthorDto"][];
+      isLocked: boolean;
     };
     ProjectDetailDto: {
       /**
@@ -1401,26 +1532,30 @@ export interface components {
       /** LocalizedString */
       projectGroupName?: ({
         iv: string;
-        cs?: string | null;
         en?: string | null;
+        cs?: string | null;
+        sk?: string | null;
       }) | null;
       /** LocalizedString */
       genre?: ({
         iv: string;
-        cs?: string | null;
         en?: string | null;
+        cs?: string | null;
+        sk?: string | null;
       }) | null;
       /** LocalizedString */
       name: {
         iv: string;
-        cs?: string | null;
         en?: string | null;
+        cs?: string | null;
+        sk?: string | null;
       };
       /** LocalizedString */
       description?: ({
         iv: string;
-        cs?: string | null;
         en?: string | null;
+        cs?: string | null;
+        sk?: string | null;
       }) | null;
       globalPermissions: components["schemas"]["Permission"][];
       userPermissions: components["schemas"]["Permission"][];
@@ -1431,14 +1566,16 @@ export interface components {
       artifacts: components["schemas"]["ProjectArtifactDto"][];
       reviews: components["schemas"]["ProjectReviewDto"][];
       blueprint: components["schemas"]["ProjectBlueprintDto"];
+      isLocked: boolean;
     };
     ProjectDiagnosticDto: {
       kind: components["schemas"]["DiagnosticKind"];
       /** LocalizedString */
       message: {
         iv: string;
-        cs?: string | null;
         en?: string | null;
+        cs?: string | null;
+        sk?: string | null;
       };
       validationStage: string;
     };
@@ -1452,32 +1589,30 @@ export interface components {
       /** LocalizedString */
       name?: ({
         iv: string;
-        cs?: string | null;
         en?: string | null;
+        cs?: string | null;
+        sk?: string | null;
       }) | null;
       /** LocalizedString */
       description?: ({
         iv: string;
-        cs?: string | null;
         en?: string | null;
+        cs?: string | null;
+        sk?: string | null;
       }) | null;
       /** LocalizedString */
       genre?: ({
         iv: string;
-        cs?: string | null;
         en?: string | null;
+        cs?: string | null;
+        sk?: string | null;
       }) | null;
       crew?: components["schemas"]["ProjectCreationAuthorDto"][] | null;
       cast?: components["schemas"]["ProjectCreationAuthorDto"][] | null;
       artifacts?: components["schemas"]["ProjectArtifactAdditionDto"][] | null;
+      isLocked?: boolean | null;
     };
     ProjectGroupCreationDto: {
-      /** LocalizedString */
-      name: {
-        iv: string;
-        cs?: string | null;
-        en?: string | null;
-      };
       /**
        * Format: hrib
        * @description Human-Readable Identifier Ballast
@@ -1485,10 +1620,18 @@ export interface components {
        */
       organizationId: string;
       /** LocalizedString */
+      name: {
+        iv: string;
+        en?: string | null;
+        cs?: string | null;
+        sk?: string | null;
+      };
+      /** LocalizedString */
       description?: ({
         iv: string;
-        cs?: string | null;
         en?: string | null;
+        cs?: string | null;
+        sk?: string | null;
       }) | null;
       /** Format: date-time */
       deadline: string;
@@ -1501,17 +1644,25 @@ export interface components {
        * @example AAAAbadf00d
        */
       id: string;
+      /**
+       * Format: hrib
+       * @description Human-Readable Identifier Ballast
+       * @example AAAAbadf00d
+       */
+      organizationId: string;
       /** LocalizedString */
       name: {
         iv: string;
-        cs?: string | null;
         en?: string | null;
+        cs?: string | null;
+        sk?: string | null;
       };
       /** LocalizedString */
       description?: ({
         iv: string;
-        cs?: string | null;
         en?: string | null;
+        cs?: string | null;
+        sk?: string | null;
       }) | null;
       /** Format: date-time */
       deadline: string;
@@ -1525,17 +1676,25 @@ export interface components {
        * @example AAAAbadf00d
        */
       id: string;
+      /**
+       * Format: hrib
+       * @description Human-Readable Identifier Ballast
+       * @example AAAAbadf00d
+       */
+      organizationId?: string | null;
       /** LocalizedString */
       name?: ({
         iv: string;
-        cs?: string | null;
         en?: string | null;
+        cs?: string | null;
+        sk?: string | null;
       }) | null;
       /** LocalizedString */
       description?: ({
         iv: string;
-        cs?: string | null;
         en?: string | null;
+        cs?: string | null;
+        sk?: string | null;
       }) | null;
       /** Format: date-time */
       deadline?: string | null;
@@ -1548,17 +1707,25 @@ export interface components {
        * @example AAAAbadf00d
        */
       id: string;
+      /**
+       * Format: hrib
+       * @description Human-Readable Identifier Ballast
+       * @example AAAAbadf00d
+       */
+      organizationId: string;
       /** LocalizedString */
       name: {
         iv: string;
-        cs?: string | null;
         en?: string | null;
+        cs?: string | null;
+        sk?: string | null;
       };
       /** LocalizedString */
       description?: ({
         iv: string;
-        cs?: string | null;
         en?: string | null;
+        cs?: string | null;
+        sk?: string | null;
       }) | null;
       /** Format: date-time */
       deadline: string;
@@ -1581,14 +1748,16 @@ export interface components {
       /** LocalizedString */
       name: {
         iv: string;
-        cs?: string | null;
         en?: string | null;
+        cs?: string | null;
+        sk?: string | null;
       };
       /** LocalizedString */
       description?: ({
         iv: string;
-        cs?: string | null;
         en?: string | null;
+        cs?: string | null;
+        sk?: string | null;
       }) | null;
       /** @description Permissions that apply to all users, even the anonymous ones. */
       globalPermissions: components["schemas"]["Permission"][];
@@ -1596,6 +1765,7 @@ export interface components {
       userPermissions: components["schemas"]["Permission"][];
       /** Format: date-time */
       releasedOn: string;
+      isLocked: boolean;
     };
     ProjectReviewCreationDto: {
       /**
@@ -1609,8 +1779,9 @@ export interface components {
       /** LocalizedString */
       comment?: ({
         iv: string;
-        cs?: string | null;
         en?: string | null;
+        cs?: string | null;
+        sk?: string | null;
       }) | null;
     };
     ProjectReviewDto: {
@@ -1619,8 +1790,9 @@ export interface components {
       /** LocalizedString */
       comment?: ({
         iv: string;
-        cs?: string | null;
         en?: string | null;
+        cs?: string | null;
+        sk?: string | null;
       }) | null;
       /** Format: date-time */
       addedOn: string;
@@ -1648,14 +1820,16 @@ export interface components {
       /** LocalizedString */
       name: {
         iv: string;
-        cs?: string | null;
         en?: string | null;
+        cs?: string | null;
+        sk?: string | null;
       };
       /** LocalizedString */
       description?: ({
         iv: string;
-        cs?: string | null;
         en?: string | null;
+        cs?: string | null;
+        sk?: string | null;
       }) | null;
     };
     RoleDetailDto: {
@@ -1674,14 +1848,16 @@ export interface components {
       /** LocalizedString */
       name: {
         iv: string;
-        cs?: string | null;
         en?: string | null;
+        cs?: string | null;
+        sk?: string | null;
       };
       /** LocalizedString */
       description?: ({
         iv: string;
-        cs?: string | null;
         en?: string | null;
+        cs?: string | null;
+        sk?: string | null;
       }) | null;
       /** Format: date-time */
       createdOn: string;
@@ -1699,14 +1875,16 @@ export interface components {
       /** LocalizedString */
       name: {
         iv: string;
-        cs?: string | null;
         en?: string | null;
+        cs?: string | null;
+        sk?: string | null;
       };
       /** LocalizedString */
       description?: ({
         iv: string;
-        cs?: string | null;
         en?: string | null;
+        cs?: string | null;
+        sk?: string | null;
       }) | null;
     };
     RoleListDto: {
@@ -1725,8 +1903,9 @@ export interface components {
       /** LocalizedString */
       name: {
         iv: string;
-        cs?: string | null;
         en?: string | null;
+        cs?: string | null;
+        sk?: string | null;
       };
     };
     ShardDetailBaseDto: {
@@ -1774,6 +1953,14 @@ export interface components {
     TemporaryAccountCreationDto: {
       emailAddress: string;
       preferredCulture?: string | null;
+    };
+    UnlockRequestData: {
+      /**
+       * Format: hrib
+       * @description Human-Readable Identifier Ballast
+       * @example AAAAbadf00d
+       */
+      id: string;
     };
     VideoShardDetailDto: {
       kind: "Video";

@@ -48,7 +48,7 @@ public class SystemDetailEndpoint : EndpointBaseAsync
             Name: hostEnvironment.ApplicationName,
             BaseUrls: (server.Features.Get<IServerAddressesFeature>()?.Addresses ?? Enumerable.Empty<string>())
                 .ToImmutableArray(),
-            Version: $"{ThisAssembly.Git.SemVer.Major}.{ThisAssembly.Git.SemVer.Minor}.{ThisAssembly.Git.SemVer.Patch}",
+            Version: ThisAssembly.Git.Tag,
             Commit: ThisAssembly.Git.Commit,
             CommitDate: DateTimeOffset.Parse(ThisAssembly.Git.CommitDate),
             RunningSince: System.Diagnostics.Process.GetCurrentProcess().StartTime

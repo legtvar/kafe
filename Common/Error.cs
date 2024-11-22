@@ -10,7 +10,7 @@ public readonly partial record struct Error
 
     public Error(
         string id,
-        LocalizedString message,
+        string message,
         ImmutableDictionary<string, object> arguments,
         string? stackTrace = null,
         int skipFrames = 1)
@@ -24,7 +24,7 @@ public readonly partial record struct Error
     public Error(string message)
         : this(
             GenericErrorId,
-            LocalizedString.CreateInvariant(message),
+            message,
             ImmutableDictionary<string, object>.Empty,
             null,
             skipFrames: 2) // to skip this frame and `this()`
@@ -34,7 +34,7 @@ public readonly partial record struct Error
     public Error(string id, string message)
         : this(
             id,
-            LocalizedString.CreateInvariant(message),
+            message,
             ImmutableDictionary<string, object>.Empty,
             null,
             skipFrames: 2) // to skip this frame and `this()`
@@ -44,7 +44,7 @@ public readonly partial record struct Error
     public Error(Exception inner, string? stackTrace = null, int skipFrames = 1)
         : this(
             inner.GetType().FullName ?? inner.GetType().Name,
-            LocalizedString.CreateInvariant(inner.Message),
+            inner.Message,
             ImmutableDictionary<string, object>.Empty,
             stackTrace,
             skipFrames: skipFrames + 1)
@@ -56,7 +56,7 @@ public readonly partial record struct Error
 
     public string Id { get; }
 
-    public LocalizedString Message { get; }
+    public string Message { get; }
 
     public ImmutableDictionary<string, object> Arguments { get; }
         = ImmutableDictionary<string, object>.Empty;

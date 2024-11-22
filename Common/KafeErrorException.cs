@@ -6,7 +6,7 @@ namespace Kafe.Common;
 
 public class KafeErrorException : Exception
 {
-    public KafeErrorException(Error error) : base(error.Message, error.InnerException)
+    public KafeErrorException(Error error) : base(error.Message.ToString(), error.InnerException)
     {
         InnerErrors = [error];
         StackTrace = error.StackTrace;

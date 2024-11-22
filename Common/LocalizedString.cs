@@ -196,9 +196,9 @@ public sealed partial class LocalizedString : IEquatable<LocalizedString>
         return data.GetHashCode();
     }
 
-    public override string? ToString()
+    public override string ToString()
     {
-        return this[CultureInfo.CurrentCulture];
+        return this[CultureInfo.CurrentCulture] ?? Invariant;
     }
 
     public static LocalizedString Override(LocalizedString? old, LocalizedString? @new)

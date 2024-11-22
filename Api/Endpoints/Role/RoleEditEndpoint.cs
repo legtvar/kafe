@@ -56,7 +56,7 @@ public class RoleEditEndpoint : EndpointBaseAsync
         var result = await roleService.Edit(@new, cancellationToken);
         if (result.HasErrors)
         {
-            return ValidationProblem(title: result.Errors.FirstOrDefault().Message);
+            return result.ToActionResult();
         }
 
         return Ok((Hrib)result.Value.Id);

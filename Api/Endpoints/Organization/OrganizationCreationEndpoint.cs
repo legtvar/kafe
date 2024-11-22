@@ -42,7 +42,7 @@ public class OrganizationCreationEndpoint : EndpointBaseAsync
 
         if (organization.HasErrors)
         {
-            return ValidationProblem(title: organization.Errors.First().Message);
+            return organization.ToActionResult();
         }
 
         return Ok(organization.Value.Id);

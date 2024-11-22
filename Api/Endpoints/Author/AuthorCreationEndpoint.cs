@@ -51,7 +51,7 @@ public class AuthorCreationEndpoint : EndpointBaseAsync
 
         if (author.HasErrors)
         {
-            return ValidationProblem(title: author.Errors.First().Message);
+            return author.ToActionResult();
         }
 
         return Ok(author.Value.Id);

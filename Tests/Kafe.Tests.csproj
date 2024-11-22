@@ -17,6 +17,7 @@
   <ItemGroup>
     <PackageReference Include="Alba" Version="8.0.0" />
     <PackageReference Include="JunitXml.TestLogger" Version="4.1.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="9.0.0" />
     <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="9.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
     <PackageReference Include="Serilog.Sinks.XUnit.Injectable" Version="3.0.58" />

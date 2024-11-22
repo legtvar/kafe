@@ -16,7 +16,7 @@ priority: 010
 
 **Back end (API)**
 
-* [.NET SDK 8.0 or later](https://dotnet.microsoft.com/en-us/download).
+* [.NET SDK 9.0 or later](https://dotnet.microsoft.com/en-us/download).
 * [PostgreSQL](https://www.postgresql.org/)
 * [FFmpeg](https://ffmpeg.org/) in your [PATH](https://en.wikipedia.org/wiki/PATH_(variable))
 

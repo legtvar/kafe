@@ -4,7 +4,7 @@ stages:
   - test
 
 build-api:
-  image: mcr.microsoft.com/dotnet/sdk:8.0-alpine
+  image: mcr.microsoft.com/dotnet/sdk:9.0-alpine
   stage: build
   variables:
     NUGET_PACKAGES: $CI_PROJECT_DIR/.nuget
@@ -19,7 +19,7 @@ build-api:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
 
 test-api:
-  image: mcr.microsoft.com/dotnet/sdk:8.0-alpine
+  image: mcr.microsoft.com/dotnet/sdk:9.0-alpine
   stage: test
   variables:
     POSTGRES_DB: kafe

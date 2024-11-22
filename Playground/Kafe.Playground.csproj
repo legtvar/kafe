@@ -8,6 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="RestSharp" Version="112.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <!--<ProjectReference Include="..\Api\Kafe.Api.csproj" />-->
     <ProjectReference Include="..\Media\Kafe.Media.csproj" />
     <ProjectReference Include="..\Ruv\Kafe.Ruv.csproj" />

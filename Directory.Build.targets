@@ -1,0 +1,6 @@
+<Project>
+  <!-- https://www.strathweb.com/2018/07/solution-wide-nuget-package-version-handling-with-msbuild-15/ -->
+  <ItemGroup>
+    <PackageReference Update="System.Text.Json" Version="9.0.0" />
+  </ItemGroup>
+</Project>

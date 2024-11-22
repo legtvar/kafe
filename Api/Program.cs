@@ -41,6 +41,7 @@ public class Program
                 {
                     // set request limit to 4 GiB
                     k.Limits.MaxRequestBodySize = Const.ShardSizeLimit;
+                    k.AddServerHeader = false;
                 });
                 builder.ConfigureAppConfiguration(c =>
                 {

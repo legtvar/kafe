@@ -32,7 +32,15 @@ export function ProjectDetail(props: IProjectDetailProps) {
                 {(project: Project) => (
                     <Box m={6} pb={12}>
                         <WithTitle title={t('title.project', { project: project.getName() })} />
-                        <Flex mb={2}>
+                        <Flex
+                            direction={{
+                                base: 'column',
+                                md: 'row',
+                            }}
+                            gap={4}
+                            mb={6}
+                            alignItems="start"
+                        >
                             <Heading fontSize="4xl" fontWeight="semibold" as="h2" lineHeight="tight" mr="auto">
                                 {project.getName()}
                             </Heading>

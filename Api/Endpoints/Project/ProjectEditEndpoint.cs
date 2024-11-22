@@ -34,7 +34,7 @@ public class ProjectEditEndpoint : EndpointBaseAsync
     }
 
     [HttpPatch]
-    [SwaggerOperation(Tags = new[] { EndpointArea.Project })]
+    [SwaggerOperation(Tags = [EndpointArea.Project])]
     public override async Task<ActionResult<Hrib>> HandleAsync(
         ProjectEditDto request,
         CancellationToken cancellationToken = default)
@@ -76,6 +76,15 @@ public class ProjectEditEndpoint : EndpointBaseAsync
             );
         }
 
+        if (request.IsLocked != null)
+        {
+            var lockedAuth = await authorizationService.AuthorizeAsync(User, request.Id, EndpointPolicy.Administer);
+            if (!lockedAuth.Succeeded)
+            {
+                return Unauthorized();
+            }
+        }
+
         var @new = @old with
         {
             Name = LocalizedString.Override(@old.Name, request.Name),
@@ -87,9 +96,10 @@ public class ProjectEditEndpoint : EndpointBaseAsync
                     Id: a.Id.ToString(),
                     BlueprintSlot: a.BlueprintSlot
                 )).ToImmutableArray()
-                : @old.Artifacts
+                : @old.Artifacts,
+            IsLocked = request.IsLocked ?? old.IsLocked
         };
-        var result = await projectService.Edit(@new, cancellationToken);
+        var result = await projectService.Edit(@new: @new, token: cancellationToken);
         if (result.HasErrors)
         {
             return result.ToActionResult();

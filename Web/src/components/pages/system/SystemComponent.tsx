@@ -1,8 +1,10 @@
 import {
     Box,
     Button,
+    Flex,
     Heading,
     HStack,
+    Icon,
     ListItem,
     Tab,
     TabList,
@@ -54,7 +56,15 @@ export function SystemComponent(props: ISystemComponentProps) {
                         >
                             {(onSubmit, status) => (
                                 <>
-                                    <HStack>
+                                    <Flex
+                                        direction={{
+                                            base: 'column',
+                                            md: 'row',
+                                        }}
+                                        gap={4}
+                                        mb={6}
+                                        alignItems="start"
+                                    >
                                         <Heading
                                             fontSize="4xl"
                                             fontWeight="semibold"
@@ -84,10 +94,10 @@ export function SystemComponent(props: ISystemComponentProps) {
                                                 {t('generic.save').toString()}
                                             </Button>
                                         )}
-                                    </HStack>
+                                    </Flex>
 
                                     <HStack color="red.500" mb={8}>
-                                        <IoWarning />
+                                        <Icon as={IoWarning} flexShrink={0} />
                                         <Text>{t('system.warning').toString()}</Text>
                                     </HStack>
                                 </>

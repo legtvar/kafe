@@ -1,4 +1,4 @@
-import { Box, Button, HStack, Heading, Tab, TabList, TabPanel, TabPanels, Tabs, VStack } from '@chakra-ui/react';
+import { Box, Button, Flex, Heading, Tab, TabList, TabPanel, TabPanels, Tabs, VStack } from '@chakra-ui/react';
 import { t } from 'i18next';
 import { useCallback } from 'react';
 import { BsX } from 'react-icons/bs';
@@ -41,7 +41,15 @@ export function OrganizationsEdit(props: IOrganizationsEditProps) {
                     {observeAbstactType((perms: EntityPermissions) => (
                         <Box m={6} pb={12}>
                             <WithTitle title={t('title.organization', { group: organization.getName() })} />
-                            <HStack mb={2}>
+                            <Flex
+                                direction={{
+                                    base: 'column',
+                                    md: 'row',
+                                }}
+                                gap={4}
+                                mb={6}
+                                alignItems="start"
+                            >
                                 <Heading fontSize="4xl" fontWeight="semibold" as="h2" lineHeight="tight" mr="auto">
                                     {organization.getName()}
                                 </Heading>
@@ -83,7 +91,7 @@ export function OrganizationsEdit(props: IOrganizationsEditProps) {
                                 <Link to="..">
                                     <Button leftIcon={<BsX />}>{t('generic.quitEdit').toString()}</Button>
                                 </Link>
-                            </HStack>
+                            </Flex>
                             <Tabs>
                                 <TabList>
                                     <Tab>{t('groupsEdit.tabs.info').toString()}</Tab>

@@ -1,8 +1,8 @@
-import { Box, Button, Flex, Heading, Spacer, Stack } from '@chakra-ui/react';
+import { Box, Button, Flex, Heading, Stack } from '@chakra-ui/react';
 import ChakraUIRenderer from 'chakra-ui-markdown-renderer';
 import { t } from 'i18next';
 import { useCallback } from 'react';
-import { AiOutlineEdit } from 'react-icons/ai';
+import { AiOutlineEdit, AiOutlinePlus } from 'react-icons/ai';
 import Markdown from 'react-markdown';
 import { Link, useParams } from 'react-router-dom';
 import { Group } from '../../../data/Group';
@@ -30,10 +30,25 @@ export function GroupsDetail(props: IGroupsDetailProps) {
                 {(group: Group) => (
                     <Stack spacing={4} m={6} direction="column" pb={16}>
                         <WithTitle title={t('title.group', { group: group.getName() })} />
-                        <Flex mb={2}>
+                        <Flex
+                            direction={{
+                                base: 'column',
+                                md: 'row',
+                            }}
+                            gap={4}
+                            mb={6}
+                            alignItems="start"
+                        >
                             <Heading fontSize="4xl" fontWeight="semibold" as="h2" lineHeight="tight" mr="auto">
                                 {group.getName()}
                             </Heading>
+                            {group.isOpen && (
+                                <Link to="create">
+                                    <Button leftIcon={<AiOutlinePlus />} colorScheme="brand">
+                                        {t('createProject.signUp').toString()}
+                                    </Button>
+                                </Link>
+                            )}
                             <Link to="edit">
                                 <Button leftIcon={<AiOutlineEdit />}>{t('generic.edit').toString()}</Button>
                             </Link>
@@ -43,17 +58,6 @@ export function GroupsDetail(props: IGroupsDetailProps) {
                                 {group.getDescription()}
                             </Markdown>
                         </Box>
-
-                        {group.isOpen && (
-                            <>
-                                <Flex direction="row" pb={12}>
-                                    <Link to="create">
-                                        <Button colorScheme="brand">{t('createProject.signUp').toString()}</Button>
-                                    </Link>
-                                    <Spacer />
-                                </Flex>
-                            </>
-                        )}
                         <ProjectListComponent projects={group.projects} />
                     </Stack>
                 )}

@@ -1,6 +1,7 @@
 import {
     Box,
     Button,
+    Flex,
     HStack,
     Heading,
     Stack,
@@ -60,7 +61,15 @@ export function ProjectEdit(props: IProjectEditProps) {
                     {observeAbstactType((perms: EntityPermissions) => (
                         <Box m={6} pb={12}>
                             <WithTitle title={t('title.project', { project: project.getName() })} />
-                            <HStack mb={2}>
+                            <Flex
+                                direction={{
+                                    base: 'column',
+                                    md: 'row',
+                                }}
+                                gap={4}
+                                mb={6}
+                                alignItems="start"
+                            >
                                 <Heading fontSize="4xl" fontWeight="semibold" as="h2" lineHeight="tight" mr="auto">
                                     {project.getName()}
                                 </Heading>
@@ -100,7 +109,7 @@ export function ProjectEdit(props: IProjectEditProps) {
                                 <Link to="..">
                                     <Button leftIcon={<BsX />}>{t('projectEdit.quit').toString()}</Button>
                                 </Link>
-                            </HStack>
+                            </Flex>
                             <ProjectTags project={project} />
                             <Tabs>
                                 <TabList>

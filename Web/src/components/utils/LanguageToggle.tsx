@@ -62,7 +62,7 @@ export function LanguageToggle({ onLanguageToggled: onLanguageChange, ...rest }:
         [],
     );
 
-    const mapper = (onClick: (lang: Intl.Locale) => void) => (lang: Intl.Locale) => {
+    const mapper = (onClick: (lang: Intl.Locale) => void) => (lang: Intl.Locale, key: number) => {
         const Flag: Flags.FlagComponent = flags[lang.region || ''];
         if (!Flag) {
             return null;
@@ -71,7 +71,7 @@ export function LanguageToggle({ onLanguageToggled: onLanguageChange, ...rest }:
         const lng = CountryLanguage.getLanguage(lang.language);
 
         return (
-            <MenuItemOption value={lang.language} onClick={() => onClick(lang)}>
+            <MenuItemOption key={key} value={lang.language} onClick={() => onClick(lang)}>
                 <HStack>
                     <Flag width={18} />
                     <Text>

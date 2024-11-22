@@ -151,6 +151,7 @@ public class Startup
             o.AddPolicy(EndpointPolicy.Inspect, b => b.AddRequirements(new PermissionRequirement(Permission.Inspect)));
             o.AddPolicy(EndpointPolicy.ReadInspect, b => b.AddRequirements(new PermissionRequirement(Permission.Read | Permission.Inspect)));
             o.AddPolicy(EndpointPolicy.Review, b => b.AddRequirements(new PermissionRequirement(Permission.Review)));
+            o.AddPolicy(EndpointPolicy.Administer, b => b.AddRequirements(new PermissionRequirement(Permission.Administer)));
         });
 
         ConfigureDataProtection(services);

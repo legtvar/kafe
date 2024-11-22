@@ -182,7 +182,14 @@
         ],
         "parameters": [
           {
-            "name": "AccessedEntityId",
+            "name": "entity",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
             "in": "query",
             "schema": {
               "type": "string"
@@ -500,6 +507,15 @@
         "tags": [
           "Author"
         ],
+        "parameters": [
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -627,7 +643,7 @@
         ],
         "parameters": [
           {
-            "name": "Redirect",
+            "name": "redirect",
             "in": "query",
             "schema": {
               "type": "string"
@@ -816,6 +832,15 @@
       "get": {
         "tags": [
           "Organization"
+        ],
+        "parameters": [
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
         ],
         "responses": {
           "200": {
@@ -1026,6 +1051,22 @@
         "tags": [
           "Playlist"
         ],
+        "parameters": [
+          {
+            "name": "organization",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -1140,7 +1181,33 @@
         },
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "description": "Human-Readable Identifier Ballast",
+                  "format": "hrib",
+                  "example": "AAAAbadf00d"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "description": "Human-Readable Identifier Ballast",
+                  "format": "hrib",
+                  "example": "AAAAbadf00d"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "string",
+                  "description": "Human-Readable Identifier Ballast",
+                  "format": "hrib",
+                  "example": "AAAAbadf00d"
+                }
+              }
+            }
           }
         }
       }
@@ -1285,7 +1352,33 @@
         },
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "description": "Human-Readable Identifier Ballast",
+                  "format": "hrib",
+                  "example": "AAAAbadf00d"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "description": "Human-Readable Identifier Ballast",
+                  "format": "hrib",
+                  "example": "AAAAbadf00d"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "string",
+                  "description": "Human-Readable Identifier Ballast",
+                  "format": "hrib",
+                  "example": "AAAAbadf00d"
+                }
+              }
+            }
           }
         }
       }
@@ -1354,6 +1447,22 @@
         "tags": [
           "ProjectGroup"
         ],
+        "parameters": [
+          {
+            "name": "organization",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -1387,10 +1496,95 @@
         }
       }
     },
+    "/api/v1/project-group/lock": {
+      "post": {
+        "tags": [
+          "ProjectGroup"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LockRequestData"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LockRequestData"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/LockRequestData"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/project-group/unlock": {
+      "post": {
+        "tags": [
+          "ProjectGroup"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UnlockRequestData"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UnlockRequestData"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UnlockRequestData"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/v1/projects": {
       "get": {
         "tags": [
           "Project"
+        ],
+        "parameters": [
+          {
+            "name": "organization",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "project-group",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
         ],
         "responses": {
           "200": {
@@ -1671,6 +1865,15 @@
         "tags": [
           "Role"
         ],
+        "parameters": [
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -1893,6 +2096,14 @@
         "parameters": [
           {
             "name": "Id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Variant",
             "in": "path",
             "required": true,
             "schema": {
@@ -2239,11 +2450,15 @@
               "iv": {
                 "type": "string"
               },
+              "en": {
+                "type": "string",
+                "nullable": true
+              },
               "cs": {
                 "type": "string",
                 "nullable": true
               },
-              "en": {
+              "sk": {
                 "type": "string",
                 "nullable": true
               }
@@ -2318,11 +2533,15 @@
               "iv": {
                 "type": "string"
               },
+              "en": {
+                "type": "string",
+                "nullable": true
+              },
               "cs": {
                 "type": "string",
                 "nullable": true
               },
-              "en": {
+              "sk": {
                 "type": "string",
                 "nullable": true
               }
@@ -2374,11 +2593,15 @@
               "iv": {
                 "type": "string"
               },
+              "en": {
+                "type": "string",
+                "nullable": true
+              },
               "cs": {
                 "type": "string",
                 "nullable": true
               },
-              "en": {
+              "sk": {
                 "type": "string",
                 "nullable": true
               }
@@ -2602,6 +2825,21 @@
           }
         ]
       },
+      "LockRequestData": {
+        "required": [
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Human-Readable Identifier Ballast",
+            "format": "hrib",
+            "example": "AAAAbadf00d"
+          }
+        },
+        "additionalProperties": false
+      },
       "MediaDto": {
         "required": [
           "audioStreams",
@@ -2674,11 +2912,15 @@
               "iv": {
                 "type": "string"
               },
+              "en": {
+                "type": "string",
+                "nullable": true
+              },
               "cs": {
                 "type": "string",
                 "nullable": true
               },
-              "en": {
+              "sk": {
                 "type": "string",
                 "nullable": true
               }
@@ -2711,11 +2953,15 @@
               "iv": {
                 "type": "string"
               },
+              "en": {
+                "type": "string",
+                "nullable": true
+              },
               "cs": {
                 "type": "string",
                 "nullable": true
               },
-              "en": {
+              "sk": {
                 "type": "string",
                 "nullable": true
               }
@@ -2751,11 +2997,15 @@
               "iv": {
                 "type": "string"
               },
+              "en": {
+                "type": "string",
+                "nullable": true
+              },
               "cs": {
                 "type": "string",
                 "nullable": true
               },
-              "en": {
+              "sk": {
                 "type": "string",
                 "nullable": true
               }
@@ -2787,11 +3037,15 @@
               "iv": {
                 "type": "string"
               },
+              "en": {
+                "type": "string",
+                "nullable": true
+              },
               "cs": {
                 "type": "string",
                 "nullable": true
               },
-              "en": {
+              "sk": {
                 "type": "string",
                 "nullable": true
               }
@@ -2832,11 +3086,15 @@
               "iv": {
                 "type": "string"
               },
+              "en": {
+                "type": "string",
+                "nullable": true
+              },
               "cs": {
                 "type": "string",
                 "nullable": true
               },
-              "en": {
+              "sk": {
                 "type": "string",
                 "nullable": true
               }
@@ -2858,11 +3116,15 @@
               "iv": {
                 "type": "string"
               },
+              "en": {
+                "type": "string",
+                "nullable": true
+              },
               "cs": {
                 "type": "string",
                 "nullable": true
               },
-              "en": {
+              "sk": {
                 "type": "string",
                 "nullable": true
               }
@@ -2891,11 +3153,18 @@
           "entries",
           "globalPermissions",
           "id",
-          "name"
+          "name",
+          "organizationId"
         ],
         "type": "object",
         "properties": {
           "id": {
+            "type": "string",
+            "description": "Human-Readable Identifier Ballast",
+            "format": "hrib",
+            "example": "AAAAbadf00d"
+          },
+          "organizationId": {
             "type": "string",
             "description": "Human-Readable Identifier Ballast",
             "format": "hrib",
@@ -2911,11 +3180,15 @@
               "iv": {
                 "type": "string"
               },
+              "en": {
+                "type": "string",
+                "nullable": true
+              },
               "cs": {
                 "type": "string",
                 "nullable": true
               },
-              "en": {
+              "sk": {
                 "type": "string",
                 "nullable": true
               }
@@ -2931,11 +3204,15 @@
               "iv": {
                 "type": "string"
               },
+              "en": {
+                "type": "string",
+                "nullable": true
+              },
               "cs": {
                 "type": "string",
                 "nullable": true
               },
-              "en": {
+              "sk": {
                 "type": "string",
                 "nullable": true
               }
@@ -2969,6 +3246,13 @@
             "format": "hrib",
             "example": "AAAAbadf00d"
           },
+          "organizationId": {
+            "type": "string",
+            "description": "Human-Readable Identifier Ballast",
+            "format": "hrib",
+            "nullable": true,
+            "example": "AAAAbadf00d"
+          },
           "name": {
             "title": "LocalizedString",
             "required": [
@@ -2979,11 +3263,15 @@
               "iv": {
                 "type": "string"
               },
+              "en": {
+                "type": "string",
+                "nullable": true
+              },
               "cs": {
                 "type": "string",
                 "nullable": true
               },
-              "en": {
+              "sk": {
                 "type": "string",
                 "nullable": true
               }
@@ -3000,11 +3288,15 @@
               "iv": {
                 "type": "string"
               },
+              "en": {
+                "type": "string",
+                "nullable": true
+              },
               "cs": {
                 "type": "string",
                 "nullable": true
               },
-              "en": {
+              "sk": {
                 "type": "string",
                 "nullable": true
               }
@@ -3051,11 +3343,15 @@
               "iv": {
                 "type": "string"
               },
+              "en": {
+                "type": "string",
+                "nullable": true
+              },
               "cs": {
                 "type": "string",
                 "nullable": true
               },
-              "en": {
+              "sk": {
                 "type": "string",
                 "nullable": true
               }
@@ -3068,11 +3364,18 @@
         "required": [
           "globalPermissions",
           "id",
-          "name"
+          "name",
+          "organizationId"
         ],
         "type": "object",
         "properties": {
           "id": {
+            "type": "string",
+            "description": "Human-Readable Identifier Ballast",
+            "format": "hrib",
+            "example": "AAAAbadf00d"
+          },
+          "organizationId": {
             "type": "string",
             "description": "Human-Readable Identifier Ballast",
             "format": "hrib",
@@ -3088,11 +3391,15 @@
               "iv": {
                 "type": "string"
               },
+              "en": {
+                "type": "string",
+                "nullable": true
+              },
               "cs": {
                 "type": "string",
                 "nullable": true
               },
-              "en": {
+              "sk": {
                 "type": "string",
                 "nullable": true
               }
@@ -3108,11 +3415,15 @@
               "iv": {
                 "type": "string"
               },
+              "en": {
+                "type": "string",
+                "nullable": true
+              },
               "cs": {
                 "type": "string",
                 "nullable": true
               },
-              "en": {
+              "sk": {
                 "type": "string",
                 "nullable": true
               }
@@ -3192,11 +3503,15 @@
               "iv": {
                 "type": "string"
               },
+              "en": {
+                "type": "string",
+                "nullable": true
+              },
               "cs": {
                 "type": "string",
                 "nullable": true
               },
-              "en": {
+              "sk": {
                 "type": "string",
                 "nullable": true
               }
@@ -3212,11 +3527,15 @@
               "iv": {
                 "type": "string"
               },
+              "en": {
+                "type": "string",
+                "nullable": true
+              },
               "cs": {
                 "type": "string",
                 "nullable": true
               },
-              "en": {
+              "sk": {
                 "type": "string",
                 "nullable": true
               }
@@ -3278,11 +3597,15 @@
               "iv": {
                 "type": "string"
               },
+              "en": {
+                "type": "string",
+                "nullable": true
+              },
               "cs": {
                 "type": "string",
                 "nullable": true
               },
-              "en": {
+              "sk": {
                 "type": "string",
                 "nullable": true
               }
@@ -3322,11 +3645,15 @@
               "iv": {
                 "type": "string"
               },
+              "en": {
+                "type": "string",
+                "nullable": true
+              },
               "cs": {
                 "type": "string",
                 "nullable": true
               },
-              "en": {
+              "sk": {
                 "type": "string",
                 "nullable": true
               }
@@ -3342,11 +3669,15 @@
               "iv": {
                 "type": "string"
               },
+              "en": {
+                "type": "string",
+                "nullable": true
+              },
               "cs": {
                 "type": "string",
                 "nullable": true
               },
-              "en": {
+              "sk": {
                 "type": "string",
                 "nullable": true
               }
@@ -3403,11 +3734,15 @@
               "iv": {
                 "type": "string"
               },
+              "en": {
+                "type": "string",
+                "nullable": true
+              },
               "cs": {
                 "type": "string",
                 "nullable": true
               },
-              "en": {
+              "sk": {
                 "type": "string",
                 "nullable": true
               }
@@ -3423,11 +3758,15 @@
               "iv": {
                 "type": "string"
               },
+              "en": {
+                "type": "string",
+                "nullable": true
+              },
               "cs": {
                 "type": "string",
                 "nullable": true
               },
-              "en": {
+              "sk": {
                 "type": "string",
                 "nullable": true
               }
@@ -3475,6 +3814,7 @@
         "required": [
           "cast",
           "crew",
+          "isLocked",
           "name",
           "projectGroupId"
         ],
@@ -3496,11 +3836,15 @@
               "iv": {
                 "type": "string"
               },
+              "en": {
+                "type": "string",
+                "nullable": true
+              },
               "cs": {
                 "type": "string",
                 "nullable": true
               },
-              "en": {
+              "sk": {
                 "type": "string",
                 "nullable": true
               }
@@ -3516,11 +3860,15 @@
               "iv": {
                 "type": "string"
               },
+              "en": {
+                "type": "string",
+                "nullable": true
+              },
               "cs": {
                 "type": "string",
                 "nullable": true
               },
-              "en": {
+              "sk": {
                 "type": "string",
                 "nullable": true
               }
@@ -3537,11 +3885,15 @@
               "iv": {
                 "type": "string"
               },
+              "en": {
+                "type": "string",
+                "nullable": true
+              },
               "cs": {
                 "type": "string",
                 "nullable": true
               },
-              "en": {
+              "sk": {
                 "type": "string",
                 "nullable": true
               }
@@ -3559,6 +3911,9 @@
             "items": {
               "$ref": "#/components/schemas/ProjectCreationAuthorDto"
             }
+          },
+          "isLocked": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -3571,6 +3926,7 @@
           "crew",
           "globalPermissions",
           "id",
+          "isLocked",
           "name",
           "projectGroupId",
           "releasedOn",
@@ -3601,11 +3957,15 @@
               "iv": {
                 "type": "string"
               },
+              "en": {
+                "type": "string",
+                "nullable": true
+              },
               "cs": {
                 "type": "string",
                 "nullable": true
               },
-              "en": {
+              "sk": {
                 "type": "string",
                 "nullable": true
               }
@@ -3622,11 +3982,15 @@
               "iv": {
                 "type": "string"
               },
+              "en": {
+                "type": "string",
+                "nullable": true
+              },
               "cs": {
                 "type": "string",
                 "nullable": true
               },
-              "en": {
+              "sk": {
                 "type": "string",
                 "nullable": true
               }
@@ -3643,11 +4007,15 @@
               "iv": {
                 "type": "string"
               },
+              "en": {
+                "type": "string",
+                "nullable": true
+              },
               "cs": {
                 "type": "string",
                 "nullable": true
               },
-              "en": {
+              "sk": {
                 "type": "string",
                 "nullable": true
               }
@@ -3663,11 +4031,15 @@
               "iv": {
                 "type": "string"
               },
+              "en": {
+                "type": "string",
+                "nullable": true
+              },
               "cs": {
                 "type": "string",
                 "nullable": true
               },
-              "en": {
+              "sk": {
                 "type": "string",
                 "nullable": true
               }
@@ -3716,6 +4088,9 @@
           },
           "blueprint": {
             "$ref": "#/components/schemas/ProjectBlueprintDto"
+          },
+          "isLocked": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -3741,11 +4116,15 @@
               "iv": {
                 "type": "string"
               },
+              "en": {
+                "type": "string",
+                "nullable": true
+              },
               "cs": {
                 "type": "string",
                 "nullable": true
               },
-              "en": {
+              "sk": {
                 "type": "string",
                 "nullable": true
               }
@@ -3779,11 +4158,15 @@
               "iv": {
                 "type": "string"
               },
+              "en": {
+                "type": "string",
+                "nullable": true
+              },
               "cs": {
                 "type": "string",
                 "nullable": true
               },
-              "en": {
+              "sk": {
                 "type": "string",
                 "nullable": true
               }
@@ -3800,11 +4183,15 @@
               "iv": {
                 "type": "string"
               },
+              "en": {
+                "type": "string",
+                "nullable": true
+              },
               "cs": {
                 "type": "string",
                 "nullable": true
               },
-              "en": {
+              "sk": {
                 "type": "string",
                 "nullable": true
               }
@@ -3821,11 +4208,15 @@
               "iv": {
                 "type": "string"
               },
+              "en": {
+                "type": "string",
+                "nullable": true
+              },
               "cs": {
                 "type": "string",
                 "nullable": true
               },
-              "en": {
+              "sk": {
                 "type": "string",
                 "nullable": true
               }
@@ -3852,6 +4243,10 @@
               "$ref": "#/components/schemas/ProjectArtifactAdditionDto"
             },
             "nullable": true
+          },
+          "isLocked": {
+            "type": "boolean",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -3865,6 +4260,12 @@
         ],
         "type": "object",
         "properties": {
+          "organizationId": {
+            "type": "string",
+            "description": "Human-Readable Identifier Ballast",
+            "format": "hrib",
+            "example": "AAAAbadf00d"
+          },
           "name": {
             "title": "LocalizedString",
             "required": [
@@ -3875,21 +4276,19 @@
               "iv": {
                 "type": "string"
               },
+              "en": {
+                "type": "string",
+                "nullable": true
+              },
               "cs": {
                 "type": "string",
                 "nullable": true
               },
-              "en": {
+              "sk": {
                 "type": "string",
                 "nullable": true
               }
             }
-          },
-          "organizationId": {
-            "type": "string",
-            "description": "Human-Readable Identifier Ballast",
-            "format": "hrib",
-            "example": "AAAAbadf00d"
           },
           "description": {
             "title": "LocalizedString",
@@ -3901,11 +4300,15 @@
               "iv": {
                 "type": "string"
               },
+              "en": {
+                "type": "string",
+                "nullable": true
+              },
               "cs": {
                 "type": "string",
                 "nullable": true
               },
-              "en": {
+              "sk": {
                 "type": "string",
                 "nullable": true
               }
@@ -3928,11 +4331,18 @@
           "id",
           "isOpen",
           "name",
+          "organizationId",
           "projects"
         ],
         "type": "object",
         "properties": {
           "id": {
+            "type": "string",
+            "description": "Human-Readable Identifier Ballast",
+            "format": "hrib",
+            "example": "AAAAbadf00d"
+          },
+          "organizationId": {
             "type": "string",
             "description": "Human-Readable Identifier Ballast",
             "format": "hrib",
@@ -3948,11 +4358,15 @@
               "iv": {
                 "type": "string"
               },
+              "en": {
+                "type": "string",
+                "nullable": true
+              },
               "cs": {
                 "type": "string",
                 "nullable": true
               },
-              "en": {
+              "sk": {
                 "type": "string",
                 "nullable": true
               }
@@ -3968,11 +4382,15 @@
               "iv": {
                 "type": "string"
               },
+              "en": {
+                "type": "string",
+                "nullable": true
+              },
               "cs": {
                 "type": "string",
                 "nullable": true
               },
-              "en": {
+              "sk": {
                 "type": "string",
                 "nullable": true
               }
@@ -4007,6 +4425,13 @@
             "format": "hrib",
             "example": "AAAAbadf00d"
           },
+          "organizationId": {
+            "type": "string",
+            "description": "Human-Readable Identifier Ballast",
+            "format": "hrib",
+            "nullable": true,
+            "example": "AAAAbadf00d"
+          },
           "name": {
             "title": "LocalizedString",
             "required": [
@@ -4017,11 +4442,15 @@
               "iv": {
                 "type": "string"
               },
+              "en": {
+                "type": "string",
+                "nullable": true
+              },
               "cs": {
                 "type": "string",
                 "nullable": true
               },
-              "en": {
+              "sk": {
                 "type": "string",
                 "nullable": true
               }
@@ -4038,11 +4467,15 @@
               "iv": {
                 "type": "string"
               },
+              "en": {
+                "type": "string",
+                "nullable": true
+              },
               "cs": {
                 "type": "string",
                 "nullable": true
               },
-              "en": {
+              "sk": {
                 "type": "string",
                 "nullable": true
               }
@@ -4066,11 +4499,18 @@
           "deadline",
           "id",
           "isOpen",
-          "name"
+          "name",
+          "organizationId"
         ],
         "type": "object",
         "properties": {
           "id": {
+            "type": "string",
+            "description": "Human-Readable Identifier Ballast",
+            "format": "hrib",
+            "example": "AAAAbadf00d"
+          },
+          "organizationId": {
             "type": "string",
             "description": "Human-Readable Identifier Ballast",
             "format": "hrib",
@@ -4086,11 +4526,15 @@
               "iv": {
                 "type": "string"
               },
+              "en": {
+                "type": "string",
+                "nullable": true
+              },
               "cs": {
                 "type": "string",
                 "nullable": true
               },
-              "en": {
+              "sk": {
                 "type": "string",
                 "nullable": true
               }
@@ -4106,11 +4550,15 @@
               "iv": {
                 "type": "string"
               },
+              "en": {
+                "type": "string",
+                "nullable": true
+              },
               "cs": {
                 "type": "string",
                 "nullable": true
               },
-              "en": {
+              "sk": {
                 "type": "string",
                 "nullable": true
               }
@@ -4131,6 +4579,7 @@
         "required": [
           "globalPermissions",
           "id",
+          "isLocked",
           "name",
           "projectGroupId",
           "releasedOn",
@@ -4160,11 +4609,15 @@
               "iv": {
                 "type": "string"
               },
+              "en": {
+                "type": "string",
+                "nullable": true
+              },
               "cs": {
                 "type": "string",
                 "nullable": true
               },
-              "en": {
+              "sk": {
                 "type": "string",
                 "nullable": true
               }
@@ -4180,11 +4633,15 @@
               "iv": {
                 "type": "string"
               },
+              "en": {
+                "type": "string",
+                "nullable": true
+              },
               "cs": {
                 "type": "string",
                 "nullable": true
               },
-              "en": {
+              "sk": {
                 "type": "string",
                 "nullable": true
               }
@@ -4208,6 +4665,9 @@
           "releasedOn": {
             "type": "string",
             "format": "date-time"
+          },
+          "isLocked": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false,
@@ -4243,11 +4703,15 @@
               "iv": {
                 "type": "string"
               },
+              "en": {
+                "type": "string",
+                "nullable": true
+              },
               "cs": {
                 "type": "string",
                 "nullable": true
               },
-              "en": {
+              "sk": {
                 "type": "string",
                 "nullable": true
               }
@@ -4281,11 +4745,15 @@
               "iv": {
                 "type": "string"
               },
+              "en": {
+                "type": "string",
+                "nullable": true
+              },
               "cs": {
                 "type": "string",
                 "nullable": true
               },
-              "en": {
+              "sk": {
                 "type": "string",
                 "nullable": true
               }
@@ -4357,11 +4825,15 @@
               "iv": {
                 "type": "string"
               },
+              "en": {
+                "type": "string",
+                "nullable": true
+              },
               "cs": {
                 "type": "string",
                 "nullable": true
               },
-              "en": {
+              "sk": {
                 "type": "string",
                 "nullable": true
               }
@@ -4377,11 +4849,15 @@
               "iv": {
                 "type": "string"
               },
+              "en": {
+                "type": "string",
+                "nullable": true
+              },
               "cs": {
                 "type": "string",
                 "nullable": true
               },
-              "en": {
+              "sk": {
                 "type": "string",
                 "nullable": true
               }
@@ -4423,11 +4899,15 @@
               "iv": {
                 "type": "string"
               },
+              "en": {
+                "type": "string",
+                "nullable": true
+              },
               "cs": {
                 "type": "string",
                 "nullable": true
               },
-              "en": {
+              "sk": {
                 "type": "string",
                 "nullable": true
               }
@@ -4443,11 +4923,15 @@
               "iv": {
                 "type": "string"
               },
+              "en": {
+                "type": "string",
+                "nullable": true
+              },
               "cs": {
                 "type": "string",
                 "nullable": true
               },
-              "en": {
+              "sk": {
                 "type": "string",
                 "nullable": true
               }
@@ -4493,11 +4977,15 @@
               "iv": {
                 "type": "string"
               },
+              "en": {
+                "type": "string",
+                "nullable": true
+              },
               "cs": {
                 "type": "string",
                 "nullable": true
               },
-              "en": {
+              "sk": {
                 "type": "string",
                 "nullable": true
               }
@@ -4513,11 +5001,15 @@
               "iv": {
                 "type": "string"
               },
+              "en": {
+                "type": "string",
+                "nullable": true
+              },
               "cs": {
                 "type": "string",
                 "nullable": true
               },
-              "en": {
+              "sk": {
                 "type": "string",
                 "nullable": true
               }
@@ -4557,11 +5049,15 @@
               "iv": {
                 "type": "string"
               },
+              "en": {
+                "type": "string",
+                "nullable": true
+              },
               "cs": {
                 "type": "string",
                 "nullable": true
               },
-              "en": {
+              "sk": {
                 "type": "string",
                 "nullable": true
               }
@@ -4704,6 +5200,21 @@
           "preferredCulture": {
             "type": "string",
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "UnlockRequestData": {
+        "required": [
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Human-Readable Identifier Ballast",
+            "format": "hrib",
+            "example": "AAAAbadf00d"
           }
         },
         "additionalProperties": false

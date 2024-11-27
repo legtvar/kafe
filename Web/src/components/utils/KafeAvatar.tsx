@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { forTime } from 'waitasecond';
 import { useApi, useAuth } from '../../hooks/Caffeine';
 import { avatarUrl } from '../../utils/avatarUrl';
+import { Await } from './Await';
 
 export type Person = {
     emailAddress?: string | null;
@@ -72,5 +73,9 @@ export function KafeAvatar({ person, ...props }: IAvatarProps) {
         }
     };
 
-    return <Avatar src={avatarUrl(person.emailAddress, person.id)} onClick={onClick} {...props} />;
+    return (
+        <Await for={avatarUrl(person.emailAddress, person.id)}>
+            {(url) => <Avatar src={url} onClick={onClick} {...props} />}
+        </Await>
+    );
 }

@@ -1,19 +1,26 @@
 import axios from 'axios';
 import { SHA256 } from 'crypto-js';
 
+let sha256Invalid: string | null = null;
+
 export async function avatarUrl(email?: string | null, id?: string | null) {
     if (email) {
         if (email.endsWith('@mail.muni.cz')) {
             const isImage = await axios.get(`https://cdn.muni.cz/w3mu-media/person/${email.split('@')[0]}`, {
                 responseType: 'stream',
             });
-            const invalidIsImage = await axios.get(`https://cdn.muni.cz/w3mu-media/person/1`, {
-                responseType: 'stream',
-            });
+            if (sha256Invalid === null) {
+                sha256Invalid = SHA256(
+                    (
+                        await axios.get(`https://cdn.muni.cz/w3mu-media/person/1`, {
+                            responseType: 'stream',
+                        })
+                    ).data,
+                ).toString();
+            }
 
             // Compare SHA256(email) with SHA256('1') to check if the image is invalid
             const sha256Email = SHA256(isImage.data).toString();
-            const sha256Invalid = SHA256(invalidIsImage.data).toString();
 
             if (isImage.status === 200 && sha256Email !== sha256Invalid) {
                 return `https://cdn.muni.cz/w3mu-media/person/${email.split('@')[0]}`;

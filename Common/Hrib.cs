@@ -11,7 +11,7 @@ namespace Kafe;
 /// Human-Readable Identifier Ballast
 /// </summary>
 [JsonConverter(typeof(HribJsonConverter))]
-public record Hrib
+public record Hrib : IParsable<Hrib>
 {
     public const string Alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
     public const int Length = 11;
@@ -140,6 +140,27 @@ public record Hrib
         return new Error(Error.BadHribId, error);
     }
 
+    static Hrib IParsable<Hrib>.Parse(string value, IFormatProvider? provider)
+    {
+        return Parse(value).Unwrap();
+    }
+
+    static bool IParsable<Hrib>.TryParse(
+        [NotNullWhen(true)] string? value,
+        IFormatProvider? provider,
+        [MaybeNullWhen(false)] out Hrib hrib)
+    {
+        var result = Parse(value);
+        if (result.HasErrors)
+        {
+            hrib = null;
+            return false;
+        }
+
+        hrib = result.Value;
+        return true;
+    }
+
     public string ToString(bool throwOnInvalidAndEmpty)
     {
         if (throwOnInvalidAndEmpty && RawValue == InvalidValue)
@@ -156,7 +177,7 @@ public record Hrib
         }
         return RawValue;
     }
-    
+
     public override string ToString()
     {
         return ToString(throwOnInvalidAndEmpty: true);

@@ -1,4 +1,4 @@
-using Kafe.Common;
+using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Kafe.Api;
@@ -12,6 +12,12 @@ public static class ErrorExtensions
             return new OkObjectResult(err.Value);
         }
         
-        return new BadRequestObjectResult(err.Errors);
+        return new BadRequestObjectResult(new KafeProblemDetails
+        {
+            Errors = err.Errors,
+            Title = "Bad Request",
+            Type = "https://tools.ietf.org/html/rfc9110#section-15.5.1",
+            Status = 400
+        });
     }
 }

@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Collections.Immutable;
 using Kafe.Data.Services;
-using Kafe.Common;
 
 namespace Kafe.Api.Endpoints.ProjectGroup;
 

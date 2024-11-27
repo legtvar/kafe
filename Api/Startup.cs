@@ -177,6 +177,11 @@ public class Startup
             o.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
             o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
             o.JsonSerializerOptions.Converters.Add(new LocalizedStringJsonConverter());
+            o.JsonSerializerOptions.Converters.Add(new HribJsonConverter());
+            o.JsonSerializerOptions.Converters.Add(new ErrorJsonConverter()
+            {
+                ShouldWriteStackTraces = Environment.IsDevelopment() || Environment.IsStaging()
+            });
         });
 
         services.AddCors(o =>

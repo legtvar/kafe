@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Immutable;
 using System.Diagnostics;
+using System.Text.Json.Serialization;
 
-namespace Kafe.Common;
+namespace Kafe;
 
+[JsonConverter(typeof(HribJsonConverter))]
 public readonly partial record struct Error
 {
     public const string GenericErrorId = "GenericError";
@@ -52,16 +54,19 @@ public readonly partial record struct Error
         InnerException = inner;
     }
 
-    public Exception? InnerException { get; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public Exception? InnerException { get; init; }
 
-    public string Id { get; }
+    public string Id { get; init; }
 
-    public string Message { get; }
+    public string Message { get; init; }
 
-    public ImmutableDictionary<string, object> Arguments { get; }
+    public ImmutableDictionary<string, object> Arguments { get; init; }
         = ImmutableDictionary<string, object>.Empty;
 
-    public string StackTrace { get; }
+    // NB: We do actually set it to null in ErrorJsonConverter.
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string StackTrace { get; init; }
 
     // NB: This operator is "explicit" so that it is not so easy to create multiply nested error-exception-errors
     //     by accident.

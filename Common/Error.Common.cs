@@ -1,4 +1,4 @@
-namespace Kafe.Common;
+namespace Kafe;
 
 public readonly partial record struct Error
 {

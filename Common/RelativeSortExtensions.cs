@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 
-namespace Kafe.Common;
+namespace Kafe;
 
 public static class RelativeSortExtensions
 {

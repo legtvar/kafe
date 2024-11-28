@@ -166,23 +166,9 @@ public class Startup
         services.AddSwaggerGen();
         services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
 
-        services.AddControllers(o =>
-        {
-            o.Conventions.Add(new RoutePrefixConvention(new RouteAttribute("/api/v{version:apiVersion}")));
-            o.Filters.Add(typeof(SemanticExceptionFilter));
-            o.OutputFormatters.Insert(0, new HribOutputFormatter());
-        })
-        .AddJsonOptions(o =>
-        {
-            o.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-            o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
-            o.JsonSerializerOptions.Converters.Add(new LocalizedStringJsonConverter());
-            o.JsonSerializerOptions.Converters.Add(new HribJsonConverter());
-            o.JsonSerializerOptions.Converters.Add(new ErrorJsonConverter()
-            {
-                ShouldWriteStackTraces = Environment.IsDevelopment() || Environment.IsStaging()
-            });
-        });
+        services.AddControllers();
+        services.AddTransient<IConfigureOptions<MvcOptions>, ConfigureMvcOptions>();
+        services.AddTransient<IConfigureOptions<JsonOptions>, ConfigureJsonOptions>();
 
         services.AddCors(o =>
         {

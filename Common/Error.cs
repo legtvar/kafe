@@ -79,4 +79,12 @@ public readonly partial record struct Error
     {
         return new Error(exception, skipFrames: 2);
     }
+
+    public Error WithArgument(string key, object value)
+    {
+        return this with
+        {
+            Arguments = Arguments.Add(key, value)
+        };
+    }
 }

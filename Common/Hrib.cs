@@ -101,9 +101,15 @@ public record Hrib : IParsable<Hrib>
         hrib = null;
         error = null;
 
+        if (value is null)
+        {
+            error = "Value is null.";
+            return false;
+        }
+
         if (string.IsNullOrWhiteSpace(value))
         {
-            error = "Value is null, empty, or white-space.";
+            error = "Value is an empty string, or made up of white-space.";
             return false;
         }
 

@@ -11,7 +11,18 @@ public class HribJsonConverter : JsonConverter<Hrib>
         Type typeToConvert,
         JsonSerializerOptions options)
     {
-        return (Hrib?)reader.GetString();
+        var value = reader.GetString();
+        if (value is null)
+        {
+            return null;
+        }
+
+        if (!Hrib.TryParse(value, out var result, out var error))
+        {
+            throw new JsonException(error);
+        }
+
+        return result;
     }
 
     public override void Write(
@@ -27,13 +38,9 @@ public class HribJsonConverter : JsonConverter<Hrib>
         Type typeToConvert,
         JsonSerializerOptions options)
     {
-        var result = Read(ref reader, typeToConvert, options);
-        if (result is null)
-        {
-            throw new JsonException("Could not parse as Hrib.");
-        }
-
-        return result;
+        var value = Read(ref reader, typeToConvert, options)
+            ?? throw new JsonException("Could not parse as Hrib.");
+        return value;
     }
 
     public override void WriteAsPropertyName(

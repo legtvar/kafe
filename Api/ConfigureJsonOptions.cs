@@ -30,7 +30,7 @@ public class ConfigureJsonOptions : IConfigureOptions<JsonOptions>
         {
             ShouldWriteStackTraces = environment.IsDevelopment() || environment.IsStaging()
         });
-        o.JsonSerializerOptions.Converters.Add(new ImmutableArrayJsonConverter());
+        // o.JsonSerializerOptions.Converters.Add(new ImmutableArrayJsonConverter());
         o.JsonSerializerOptions.TypeInfoResolver =
             (o.JsonSerializerOptions.TypeInfoResolver ?? new DefaultJsonTypeInfoResolver())
             .WithAddedModifier(InitializeImmutableArrayProperties);

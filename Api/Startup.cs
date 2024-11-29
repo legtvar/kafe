@@ -49,6 +49,7 @@ using OpenTelemetry.Trace;
 using Npgsql;
 using Kafe.Api.Transfer;
 using System.Globalization;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 
 namespace Kafe.Api;
 
@@ -293,6 +294,9 @@ public class Startup
         services.AddScoped<UserProvider>();
 
         services.AddScoped<IAuthorizationHandler, PermissionHandler>();
+
+        services.AddSingleton<ProblemDetailsFactory, ProblemDetailsWithStackTraceFactory>();
+        services.AddSingleton<IProblemDetailsWriter, KafeProblemDetailsWriter>();
 
         services.AddOptions<ApiOptions>()
             .Bind(Configuration)

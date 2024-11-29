@@ -1,7 +1,3 @@
----
-title: Kafpocalypse
----
-
 # Kafpocalypse
 
 I accidentally dropped the production DB.

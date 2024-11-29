@@ -1,7 +1,3 @@
----
-title: Fake Aggregates Removed
----
-
 # Fake Aggregates Removed
 
 Turns out two Marten aggregate types cannot share an event type.

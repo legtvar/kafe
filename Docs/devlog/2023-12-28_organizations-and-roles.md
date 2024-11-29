@@ -1,7 +1,3 @@
----
-title: Organizations and Roles
----
-
 # Organizations and Roles
 
 To migrate accounts from WMA we need a concept of _organizations_.

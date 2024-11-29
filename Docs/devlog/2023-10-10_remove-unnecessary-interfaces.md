@@ -1,7 +1,3 @@
----
-title: Remove unnecessary interfaces
----
-
 # Remove unnecessary interfaces
 
 Some services will never have another implementation, so I removed the interfaces and the `Default*` prefix.

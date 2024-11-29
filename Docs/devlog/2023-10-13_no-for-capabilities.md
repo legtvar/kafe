@@ -1,7 +1,3 @@
----
-title: Stop putting capabilities into the session cookie
----
-
 # Stop putting capabilities into the session cookie
 
 That was a dumb idea.

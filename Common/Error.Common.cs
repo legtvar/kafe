@@ -63,4 +63,9 @@ public readonly partial record struct Error
 
         return error;
     }
+
+    public static Error InvalidValue(string message)
+    {
+        return new Error(InvalidValueId, message);
+    }
 }

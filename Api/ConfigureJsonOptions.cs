@@ -26,13 +26,15 @@ public class ConfigureJsonOptions : IConfigureOptions<JsonOptions>
         o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
         o.JsonSerializerOptions.Converters.Add(new LocalizedStringJsonConverter());
         o.JsonSerializerOptions.Converters.Add(new HribJsonConverter());
-        o.JsonSerializerOptions.Converters.Add(new ErrorJsonConverter()
-        {
-            ShouldWriteStackTraces = environment.IsDevelopment() || environment.IsStaging()
-        });
-        o.JsonSerializerOptions.TypeInfoResolver =
-            (o.JsonSerializerOptions.TypeInfoResolver ?? new DefaultJsonTypeInfoResolver())
+
+        var typeInfoResolver = (o.JsonSerializerOptions.TypeInfoResolver ?? new DefaultJsonTypeInfoResolver())
             .WithAddedModifier(InitializeImmutableArrayProperties);
+        if (environment.IsProduction())
+        {
+            typeInfoResolver = typeInfoResolver.WithAddedModifier(RemoveErrorStackTraces);
+        }
+
+        o.JsonSerializerOptions.TypeInfoResolver = typeInfoResolver;
     }
 
     private static void InitializeImmutableArrayProperties(JsonTypeInfo type)
@@ -96,5 +98,16 @@ public class ConfigureJsonOptions : IConfigureOptions<JsonOptions>
                 }
             }
         };
+    }
+
+    private static void RemoveErrorStackTraces(JsonTypeInfo type)
+    {
+        if (type.Type != typeof(Error))
+        {
+            return;
+        }
+
+        var stackTraceProp = type.Properties.Single(p => p.Name == nameof(Error.StackTrace));
+        type.Properties.Remove(stackTraceProp);
     }
 }

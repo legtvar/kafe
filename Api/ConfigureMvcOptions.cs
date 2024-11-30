@@ -1,9 +1,6 @@
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using Kafe.Api.Endpoints;
 using Kafe.Api.Transfer;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 
 namespace Kafe.Api;

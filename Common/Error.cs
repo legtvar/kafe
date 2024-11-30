@@ -5,7 +5,6 @@ using System.Text.Json.Serialization;
 
 namespace Kafe;
 
-[JsonConverter(typeof(HribJsonConverter))]
 public readonly partial record struct Error
 {
     public const string GenericErrorId = "GenericError";

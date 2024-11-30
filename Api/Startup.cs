@@ -167,10 +167,6 @@ public class Startup
         services.AddSwaggerGen();
         services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
 
-        services.AddControllers();
-        services.AddTransient<IConfigureOptions<MvcOptions>, ConfigureMvcOptions>();
-        services.AddTransient<IConfigureOptions<JsonOptions>, ConfigureJsonOptions>();
-
         services.AddCors(o =>
         {
             o.AddDefaultPolicy(p =>
@@ -223,6 +219,11 @@ public class Startup
             {
                 o.Endpoint = new Uri(otlpEndpoint);
             }));
+
+        services.AddControllers();
+        services.AddTransient<IConfigureOptions<MvcOptions>, ConfigureMvcOptions>();
+        services.AddTransient<IConfigureOptions<JsonOptions>, ConfigureJsonOptions>();
+        services.AddTransient<IConfigureOptions<ApiBehaviorOptions>, ConfigureApiBehaviorOptions>();
     }
 
     public void Configure(IApplicationBuilder app)

@@ -27,6 +27,7 @@ public class ConfigureSwaggerOptions : IConfigureOptions<SwaggerGenOptions>
         o.SwaggerDoc("v1", new OpenApiInfo { Title = "KAFE API", Version = "v1" });
         o.SupportNonNullableReferenceTypes();
         o.SchemaFilter<RequireNonNullablePropertiesSchemaFilter>();
+        o.SchemaFilter<OptionalErrorStackTraceSchemaFilter>();
         o.MapType<Hrib>(() => new OpenApiSchema
         {
             Type = "string",

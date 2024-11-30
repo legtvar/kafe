@@ -88,7 +88,6 @@ public class KafeProblemDetails : ProblemDetails
             StatusCode = Status
         };
         objectResult.ContentTypes.Add("application/problem+json");
-        objectResult.ContentTypes.Add("application/problem+xml");
 
         return objectResult;
     }

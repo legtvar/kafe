@@ -296,7 +296,7 @@ public class Startup
 
         services.AddScoped<IAuthorizationHandler, PermissionHandler>();
 
-        services.AddSingleton<ProblemDetailsFactory, ProblemDetailsWithStackTraceFactory>();
+        services.AddSingleton<ProblemDetailsFactory, UnsupportedProblemDetailsFactory>();
         services.AddSingleton<IProblemDetailsWriter, KafeProblemDetailsWriter>();
 
         services.AddOptions<ApiOptions>()

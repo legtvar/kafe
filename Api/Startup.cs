@@ -237,11 +237,19 @@ public class Startup
             .AddRewrite($"^{apiOptions.Value.AccountConfirmPath.Trim('/')}/(.*)$", "api/v1/tmp-account/$1", true));
 
         app.UseSerilogRequestLogging();
-        app.UseStatusCodePages();
+
+        app.UseExceptionHandler();
+
+        // NB: Default files, static files, and Swagger UI are "preferred" over endpoints.
         app.UseDefaultFiles();
         app.UseStaticFiles();
 
+        app.UseSwaggerUI();
+
         app.UseRouting();
+
+        // NB: Status code pages have to *after* routing so that an endpoint can opt out of them
+        app.UseStatusCodePages();
 
         app.UseCors();
 
@@ -274,17 +282,13 @@ public class Startup
             await ctx.RequestServices.GetRequiredService<UserProvider>().RefreshAccount();
             await next();
         });
+
         app.UseAuthorization();
-
-        app.UseExceptionHandler();
-
-        app.UseSwagger();
-        app.UseSwaggerUI();
-
 
         app.UseEndpoints(e =>
         {
             e.MapControllers();
+            e.MapSwagger();
         });
     }
 
@@ -298,6 +302,7 @@ public class Startup
         services.AddScoped<IAuthorizationHandler, PermissionHandler>();
 
         services.AddSingleton<ProblemDetailsFactory, UnsupportedProblemDetailsFactory>();
+        services.AddSingleton<IClientErrorFactory, KafeProblemDetailsClientErrorFactory>();
 
         services.AddOptions<ApiOptions>()
             .Bind(Configuration)

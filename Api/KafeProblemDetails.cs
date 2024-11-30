@@ -42,7 +42,7 @@ public class KafeProblemDetails : ProblemDetails
             Instance = instance,
             TraceId = Activity.Current?.Id ?? httpContext?.TraceIdentifier
         };
-        
+
         if (httpContext is not null)
         {
             var apiBehaviorOptions = httpContext.RequestServices
@@ -79,5 +79,17 @@ public class KafeProblemDetails : ProblemDetails
 
         pd.Errors = errors.ToImmutable();
         return pd;
+    }
+
+    public IActionResult ToActionResult()
+    {
+        var objectResult = new ObjectResult(this)
+        {
+            StatusCode = Status
+        };
+        objectResult.ContentTypes.Add("application/problem+json");
+        objectResult.ContentTypes.Add("application/problem+xml");
+
+        return objectResult;
     }
 }

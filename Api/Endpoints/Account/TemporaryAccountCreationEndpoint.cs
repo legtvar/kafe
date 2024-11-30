@@ -67,7 +67,7 @@ public class TemporaryAccountCreationEndpoint : EndpointBaseAsync
             token);
         if (createRes.HasErrors)
         {
-            return createRes.ToActionResult();
+            return this.KafeErrResult(createRes);
         }
 
         var account = createRes.Value;

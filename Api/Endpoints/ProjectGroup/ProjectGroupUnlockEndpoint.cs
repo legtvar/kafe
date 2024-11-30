@@ -45,7 +45,7 @@ public class ProjectGroupUnlockEndpoint : EndpointBaseAsync
 
         var projects = await projectService.List(new(ProjectGroupId: requestData.Id), token: cancellationToken);
         var errors = ImmutableArray.CreateBuilder<string>();
-        foreach(var project in projects)
+        foreach (var project in projects)
         {
             if (project.IsLocked)
             {
@@ -58,9 +58,9 @@ public class ProjectGroupUnlockEndpoint : EndpointBaseAsync
         }
         if (errors.Any())
         {
-            return new Err<bool>(new Error($"Some projects could not be unlocked: {string.Join(", ", errors)}"))
-                .ToActionResult();
+            return this.KafeErrorResult(new Error($"Some projects could not be unlocked: {string.Join(", ", errors)}"));
         }
+
         return Ok();
     }
 

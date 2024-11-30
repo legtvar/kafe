@@ -42,7 +42,7 @@ public class OrganizationCreationEndpoint : EndpointBaseAsync
 
         if (organization.HasErrors)
         {
-            return organization.ToActionResult();
+            return this.KafeErrResult(organization);
         }
 
         return Ok(organization.Value.Id);

@@ -51,7 +51,7 @@ public class AuthorCreationEndpoint : EndpointBaseAsync
 
         if (author.HasErrors)
         {
-            return author.ToActionResult();
+            return this.KafeErrResult(author);
         }
 
         return Ok(author.Value.Id);

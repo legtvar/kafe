@@ -58,7 +58,7 @@ public class ProjectCreationEndpoint : EndpointBaseAsync
         cancellationToken);
         if (project.HasErrors)
         {
-            return project.ToActionResult();
+            return this.KafeErrResult(project);
         }
 
         return Ok((Hrib)project.Value.Id);

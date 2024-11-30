@@ -67,7 +67,7 @@ public class ProjectReviewEndpoint : EndpointBaseAsync
             token: cancellationToken);
         if (result.HasErrors)
         {
-            return result.ToActionResult();
+            return this.KafeErrResult(result);
         }
 
         var owners = await accountService.List(

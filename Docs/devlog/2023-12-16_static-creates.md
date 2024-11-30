@@ -1,7 +1,3 @@
----
-title: Static Creates
----
-
 # Static `Create`s
 
 Made the `Create` methods on all projections `static`.

@@ -1,7 +1,3 @@
----
-title: Historical Decisions
----
-
 # Historical Decisions
 
 These decisions were made before we started writing this devlog.

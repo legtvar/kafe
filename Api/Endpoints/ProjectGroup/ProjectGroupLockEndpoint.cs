@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Collections.Immutable;
 using Kafe.Data.Services;
-using Kafe.Common;
 
 namespace Kafe.Api.Endpoints.ProjectGroup;
 
@@ -59,9 +58,9 @@ public class ProjectGroupLockEndpoint : EndpointBaseAsync
         }
         if (errors.Any())
         {
-            return new Err<bool>(new Error($"Some projects could not be locked: {string.Join(", ", errors)}"))
-                .ToActionResult();
+            return this.KafeErrorResult(new Error($"Some projects could not be locked: {string.Join(", ", errors)}"));
         }
+
         return Ok();
     }
 

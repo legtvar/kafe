@@ -1,7 +1,3 @@
----
-tags: devlog
----
-
 # Filtering by Permissions
 
 Marten (at least as I am writing this) doesn't support the `Join()` LINQ operator.

@@ -5,7 +5,6 @@ using System.Data;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Kafe.Common;
 using Kafe.Data.Aggregates;
 using Kafe.Data.Documents;
 using Kafe.Data.Events;

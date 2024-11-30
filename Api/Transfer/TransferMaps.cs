@@ -5,7 +5,6 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Security.Claims;
-using Kafe.Common;
 using Kafe.Data;
 using Kafe.Data.Aggregates;
 using Kafe.Data.Capabilities;

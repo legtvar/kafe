@@ -49,7 +49,7 @@ public class ProjectGroupCreationEndpoint : EndpointBaseAsync
         }, cancellationToken);
         if (group.HasErrors)
         {
-            return group.ToActionResult();
+            return this.KafeErrResult(group);
         }
 
         return Ok((Hrib)group.Value.Id);

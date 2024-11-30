@@ -52,7 +52,7 @@ public class PlaylistCreationEndpoint : EndpointBaseAsync
 
         if (playlist.HasErrors)
         {
-            return ValidationProblem(title: playlist.Errors.FirstOrDefault().Message);
+            return this.KafeErrResult(playlist);
         }
 
         return Ok((Hrib)playlist.Value.Id);

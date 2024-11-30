@@ -1,7 +1,3 @@
----
-tags: devlog
----
-
 # Sorting Lists
 
 I added sorting to all list endpoints:

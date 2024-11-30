@@ -2,7 +2,7 @@ using System;
 using System.Collections.Immutable;
 using System.Diagnostics;
 
-namespace Kafe.Common;
+namespace Kafe;
 
 /// <summary>
 /// An error union type. Can be used to return exceptions instead of throwing them.

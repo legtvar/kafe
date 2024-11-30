@@ -4,7 +4,6 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Kafe.Common;
 using Kafe.Data.Aggregates;
 using Marten;
 using Marten.Events;

@@ -54,7 +54,7 @@ public class RoleCreationEndpoint : EndpointBaseAsync
 
         if (role.HasErrors)
         {
-            return ValidationProblem(title: role.Errors.First().Message);
+            return this.KafeErrResult(role);
         }
 
         return Ok(role.Value.Id);

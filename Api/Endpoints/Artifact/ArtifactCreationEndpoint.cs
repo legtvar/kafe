@@ -59,7 +59,7 @@ public class ArtifactCreationEndpoint : EndpointBaseAsync
 
         if (createResult.HasErrors)
         {
-            return createResult.ToActionResult();
+            return this.KafeErrResult(createResult);
         }
 
         if (request.ContainingProject is not null)
@@ -69,7 +69,7 @@ public class ArtifactCreationEndpoint : EndpointBaseAsync
                 [(createResult.Value.Id, request.BlueprintSlot)]);
             if (addArtifactsResult.HasErrors)
             {
-                return addArtifactsResult.ToActionResult();
+                return this.KafeErrResult(addArtifactsResult);
             }
         }
 

@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Logging;
 
 namespace Kafe.Api;
@@ -31,20 +32,17 @@ public class KafeProblemDetailsExceptionHandler : IExceptionHandler
         );
         pd.Errors = [exception];
         
-        var endpoint = httpContext.GetEndpoint();
+        var feature = httpContext.Features.GetRequiredFeature<IExceptionHandlerFeature>();
         
         await problemDetailsService.WriteAsync(new()
         {
             HttpContext = httpContext,
             Exception = exception,
             ProblemDetails = pd,
-            AdditionalMetadata = endpoint?.Metadata
+            AdditionalMetadata = feature.Endpoint?.Metadata
         });
         
-        logger.LogError(
-            exception,
-            "An exception occured while processing '{EndpointDisplayName}'.",
-            endpoint?.DisplayName ?? "Unknown endpoint");
+        // No need to do logging, since the ExceptionHandlerMiddleware and RequestLoggingMiddleware already doe it.
         
         return true;
     }

@@ -1,5 +1,4 @@
 using System.Security.Claims;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Kafe.Data;
 using Kafe.Api.Endpoints;
@@ -9,14 +8,11 @@ using Microsoft.AspNetCore.Rewrite;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.OpenApi.Models;
-using Kafe.Api.Swagger;
 using Kafe.Api.Services;
 using Asp.Versioning;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Linq;
 using System;
-using Microsoft.OpenApi.Any;
 using System.IO;
 using System.Collections.Immutable;
 using System.Collections.Generic;
@@ -30,26 +26,21 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Authentication;
-using Kafe.Media.Services;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
-using System.Security.Cryptography;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.IdentityModel.Logging;
-using System.Text.Json;
 using Kafe.Data.Services;
 using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.Extensions.Logging;
 using System.Net;
-using Microsoft.Extensions.Logging.Abstractions;
 using Serilog;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 using Npgsql;
-using Kafe.Api.Transfer;
 using System.Globalization;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Kafe.Api;
 
@@ -226,6 +217,9 @@ public class Startup
         services.AddTransient<IConfigureOptions<ApiBehaviorOptions>, ConfigureApiBehaviorOptions>();
 
         services.AddExceptionHandler<KafeProblemDetailsExceptionHandler>();
+        services.RemoveAll<IProblemDetailsWriter>();
+        services.AddSingleton<IProblemDetailsWriter, KafeProblemDetailsWriter>();
+        services.AddSingleton<IProblemDetailsService, KafeProblemDetailsService>();
     }
 
     public void Configure(IApplicationBuilder app)
@@ -238,20 +232,20 @@ public class Startup
         app.UseRewriter(new RewriteOptions()
             .AddRewrite($"^{apiOptions.Value.AccountConfirmPath.Trim('/')}/(.*)$", "api/v1/tmp-account/$1", true));
 
-        app.UseSerilogRequestLogging();
+        app.UseRouting();
 
         app.UseExceptionHandler();
+
+        // NB: Status code pages have to *after* routing so that an endpoints can opt out of them
+        app.UseStatusCodePages();
+
+        app.UseSerilogRequestLogging();
 
         // NB: Default files, static files, and Swagger UI are "preferred" over endpoints.
         app.UseDefaultFiles();
         app.UseStaticFiles();
 
         app.UseSwaggerUI();
-
-        app.UseRouting();
-
-        // NB: Status code pages have to *after* routing so that an endpoint can opt out of them
-        app.UseStatusCodePages();
 
         app.UseCors();
 

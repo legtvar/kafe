@@ -237,6 +237,7 @@ public class Startup
             .AddRewrite($"^{apiOptions.Value.AccountConfirmPath.Trim('/')}/(.*)$", "api/v1/tmp-account/$1", true));
 
         app.UseSerilogRequestLogging();
+        app.UseStatusCodePages();
         app.UseDefaultFiles();
         app.UseStaticFiles();
 
@@ -297,7 +298,6 @@ public class Startup
         services.AddScoped<IAuthorizationHandler, PermissionHandler>();
 
         services.AddSingleton<ProblemDetailsFactory, UnsupportedProblemDetailsFactory>();
-        services.AddSingleton<IProblemDetailsWriter, KafeProblemDetailsWriter>();
 
         services.AddOptions<ApiOptions>()
             .Bind(Configuration)

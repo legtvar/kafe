@@ -47,23 +47,23 @@ public readonly partial record struct Error
             inner.GetType().FullName ?? inner.GetType().Name,
             inner.Message,
             ImmutableDictionary<string, object>.Empty,
-            stackTrace,
+            stackTrace ?? inner.StackTrace,
             skipFrames: skipFrames + 1)
     {
         InnerException = inner;
     }
 
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonIgnore]
     public Exception? InnerException { get; init; }
 
     public string Id { get; init; }
 
     public string Message { get; init; }
 
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public ImmutableDictionary<string, object> Arguments { get; init; }
         = ImmutableDictionary<string, object>.Empty;
 
-    // NB: We do actually set it to null in ErrorJsonConverter.
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string StackTrace { get; init; }
 
@@ -76,7 +76,7 @@ public readonly partial record struct Error
 
     public static implicit operator Error(Exception exception)
     {
-        return new Error(exception, skipFrames: 2);
+        return new Error(exception);
     }
 
     public Error WithArgument(string key, object value)

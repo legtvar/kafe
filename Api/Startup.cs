@@ -224,6 +224,8 @@ public class Startup
         services.AddTransient<IConfigureOptions<MvcOptions>, ConfigureMvcOptions>();
         services.AddTransient<IConfigureOptions<JsonOptions>, ConfigureJsonOptions>();
         services.AddTransient<IConfigureOptions<ApiBehaviorOptions>, ConfigureApiBehaviorOptions>();
+
+        services.AddExceptionHandler<KafeProblemDetailsExceptionHandler>();
     }
 
     public void Configure(IApplicationBuilder app)

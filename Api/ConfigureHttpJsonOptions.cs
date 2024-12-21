@@ -5,36 +5,57 @@ using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
-using Microsoft.AspNetCore.Mvc;
+using JasperFx.Core;
+using Microsoft.AspNetCore.Http.Json;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 
 namespace Kafe.Api;
 
-public class ConfigureJsonOptions : IConfigureOptions<JsonOptions>
+public class ConfigureHttpJsonOptions : IConfigureOptions<JsonOptions>
 {
     private readonly IHostEnvironment environment;
 
-    public ConfigureJsonOptions(IHostEnvironment environment)
+    public ConfigureHttpJsonOptions(IHostEnvironment environment)
     {
         this.environment = environment;
     }
 
     public void Configure(JsonOptions o)
     {
-        o.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-        o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
-        o.JsonSerializerOptions.Converters.Add(new LocalizedStringJsonConverter());
-        o.JsonSerializerOptions.Converters.Add(new HribJsonConverter());
+        ConfigureSerializerOptions(o.SerializerOptions, environment);
+    }
 
-        var typeInfoResolver = (o.JsonSerializerOptions.TypeInfoResolver ?? new DefaultJsonTypeInfoResolver())
-            .WithAddedModifier(InitializeImmutableArrayProperties);
+    public static void ConfigureSerializerOptions(
+        JsonSerializerOptions serializerOptions,
+        IHostEnvironment environment
+    )
+    {
+        serializerOptions.RespectNullableAnnotations = true;
+        serializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+        serializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
+        serializerOptions.Converters.Add(new LocalizedStringJsonConverter());
+        serializerOptions.Converters.Add(new HribJsonConverter());
+
+        int typeResolverIndex = -1;
+        if (serializerOptions.TypeInfoResolverChain.Count != 0) {
+            typeResolverIndex = serializerOptions.TypeInfoResolverChain
+                .GetFirstIndex(r => r.GetType() == typeof(DefaultJsonTypeInfoResolver));
+        }
+        else if (typeResolverIndex == -1)
+        {
+            serializerOptions.TypeInfoResolverChain.Add(new DefaultJsonTypeInfoResolver());
+            typeResolverIndex = 0;
+        }
+
+        var typeInfoResolver = serializerOptions.TypeInfoResolverChain[typeResolverIndex];
+        typeInfoResolver = typeInfoResolver.WithAddedModifier(InitializeImmutableArrayProperties);
         if (environment.IsProduction())
         {
             typeInfoResolver = typeInfoResolver.WithAddedModifier(RemoveErrorStackTraces);
         }
 
-        o.JsonSerializerOptions.TypeInfoResolver = typeInfoResolver;
+        serializerOptions.TypeInfoResolverChain[typeResolverIndex] = typeInfoResolver;
     }
 
     private static void InitializeImmutableArrayProperties(JsonTypeInfo type)

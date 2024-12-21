@@ -20,7 +20,13 @@ public class KafeProblemDetailsWriter : IProblemDetailsWriter
 
     public bool CanWrite(ProblemDetailsContext context)
     {
-        var acceptHeader = context.HttpContext.Request.Headers.Accept;
+        if (!MediaTypeHeaderValue.TryParseList(
+            context.HttpContext.Request.Headers.Accept,
+            out var acceptHeader))
+        {
+            return false;
+        }
+
         if (acceptHeader.Count == 0)
         {
             // No accept header => send anything
@@ -28,7 +34,7 @@ public class KafeProblemDetailsWriter : IProblemDetailsWriter
         }
         for (var i = 0; i < acceptHeader.Count; ++i)
         {
-            var current = new MediaTypeHeaderValue(acceptHeader[i]!);
+            var current = acceptHeader[i];
             if (current.IsSubsetOf(JsonMediaType)
                 || current.IsSubsetOf(ProblemDetailsJsonMediaType)
                 || JsonMediaType.IsSubsetOf(current))

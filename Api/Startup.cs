@@ -158,7 +158,7 @@ public class Startup
         });
         services.AddSwaggerGen();
         services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
-        services.AddOpenApi("vnext");
+        services.AddOpenApi("v1");
         services.AddTransient<IConfigureOptions<OpenApiOptions>, ConfigureOpenApiOptions>();
 
         services.AddCors(o =>
@@ -216,7 +216,12 @@ public class Startup
 
         services.AddControllers();
         services.AddTransient<IConfigureOptions<MvcOptions>, ConfigureMvcOptions>();
-        services.AddTransient<IConfigureOptions<JsonOptions>, ConfigureJsonOptions>();
+        services.AddTransient<
+            IConfigureOptions<Microsoft.AspNetCore.Http.Json.JsonOptions>,
+            ConfigureHttpJsonOptions>();
+        services.AddTransient<
+            IConfigureOptions<Microsoft.AspNetCore.Mvc.JsonOptions>,
+            ConfigureMvcJsonOptions>();
         services.AddTransient<IConfigureOptions<ApiBehaviorOptions>, ConfigureApiBehaviorOptions>();
 
         services.AddExceptionHandler<KafeProblemDetailsExceptionHandler>();
@@ -249,8 +254,8 @@ public class Startup
         app.UseStaticFiles();
 
         app.UseSwaggerUI(o => {
-            o.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
-            o.SwaggerEndpoint("/openapi/vnext.json", "vnext");
+            o.SwaggerEndpoint("/swagger/v1/swagger.json", "v1 (SwaggerGen)");
+            o.SwaggerEndpoint("/openapi/v1.json", "v1 (Microsoft.AspNetCore.OpenApi)");
         });
 
         app.UseCors();

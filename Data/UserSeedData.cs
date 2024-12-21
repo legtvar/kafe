@@ -152,7 +152,7 @@ public class UserSeedData : IInitialData
             }
 
             logger.LogInformation("Seed project group '{ProjectGroupId}' created.", group.Id);
-            logger.LogInformation("User seed data populated.");
         }
+        logger.LogInformation("User seed data populated.");
     }
 }

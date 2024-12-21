@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Swashbuckle.AspNetCore.Annotations;
 using Kafe.Data.Services;
 using System.Linq;
+using Microsoft.AspNetCore.Http;
 
 namespace Kafe.Api.Endpoints.Organization;
 
@@ -31,6 +32,7 @@ public class OrganizationEditEndpoint : EndpointBaseAsync
 
     [HttpPatch]
     [SwaggerOperation(Tags = new[] { EndpointArea.Organization })]
+    [Tags(EndpointArea.Organization)]
     public override async Task<ActionResult<Hrib>> HandleAsync(
         OrganizationEditDto dto,
         CancellationToken cancellationToken = default)

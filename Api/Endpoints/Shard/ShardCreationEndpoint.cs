@@ -37,6 +37,7 @@ public class ShardCreationEndpoint : EndpointBaseAsync
 
     [HttpPost]
     [SwaggerOperation(Tags = new[] { EndpointArea.Shard })]
+    [Tags(EndpointArea.Shard)]
     [RequestSizeLimit(Const.ShardSizeLimit)]
     [RequestFormLimits(MultipartBodyLengthLimit = Const.ShardSizeLimit)]
     [ProducesResponseType(403)]

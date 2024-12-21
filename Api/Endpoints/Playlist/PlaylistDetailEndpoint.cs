@@ -11,6 +11,7 @@ using Kafe.Data.Services;
 using System.Linq;
 using JasperFx.Core;
 using System.Collections.Immutable;
+using Microsoft.AspNetCore.Http;
 
 namespace Kafe.Api.Endpoints.Playlist;
 
@@ -36,6 +37,7 @@ public class PlaylistDetailEndpoint : EndpointBaseAsync
 
     [HttpGet]
     [SwaggerOperation(Tags = new[] { EndpointArea.Playlist })]
+    [Tags(EndpointArea.Playlist)]
     [ProducesResponseType(typeof(PlaylistDetailDto), 200)]
     [ProducesResponseType(404)]
     public override async Task<ActionResult<PlaylistDetailDto>> HandleAsync(

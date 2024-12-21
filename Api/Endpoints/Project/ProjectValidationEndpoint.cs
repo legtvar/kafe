@@ -4,6 +4,7 @@ using Kafe.Api.Services;
 using Kafe.Api.Transfer;
 using Kafe.Data.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Collections.Immutable;
@@ -33,6 +34,7 @@ public class ProjectValidationEndpoint : EndpointBaseAsync
 
     [HttpGet]
     [SwaggerOperation(Tags = new[] { EndpointArea.Project })]
+    [Tags(EndpointArea.Project)]
     public override async Task<ActionResult<ProjectValidationDto>> HandleAsync(
         string id,
         CancellationToken cancellationToken = default)

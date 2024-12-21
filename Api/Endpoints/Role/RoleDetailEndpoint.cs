@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Swashbuckle.AspNetCore.Annotations;
 using Kafe.Data.Services;
+using Microsoft.AspNetCore.Http;
 
 namespace Kafe.Api.Endpoints.Role;
 
@@ -29,6 +30,7 @@ public class RoleDetailEndpoint : EndpointBaseAsync
 
     [HttpGet]
     [SwaggerOperation(Tags = new[] { EndpointArea.Role })]
+    [Tags(EndpointArea.Role)]
     [ProducesResponseType(typeof(RoleDetailDto), 200)]
     [ProducesResponseType(404)]
     public override async Task<ActionResult<RoleDetailDto?>> HandleAsync(

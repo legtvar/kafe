@@ -5,6 +5,7 @@ using Kafe.Api.Transfer;
 using Kafe.Data.Services;
 using Marten;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Threading;
@@ -31,6 +32,7 @@ public class ArtifactDetailEndpoint : EndpointBaseAsync
 
     [HttpGet]
     [SwaggerOperation(Tags = new[] { EndpointArea.Artifact })]
+    [Tags(EndpointArea.Artifact)]
     [ProducesResponseType(typeof(Hrib), 200)]
     [ProducesResponseType(400)]
     public override async Task<ActionResult<ArtifactDetailDto>> HandleAsync(

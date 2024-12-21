@@ -12,6 +12,7 @@ using Kafe.Data;
 using Kafe.Data.Aggregates;
 using Kafe.Data.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -43,6 +44,7 @@ public class EntityPermissionsEditEndpoint : EndpointBaseAsync
 
     [HttpPatch]
     [SwaggerOperation(Tags = new[] { EndpointArea.Entity })]
+    [Tags(EndpointArea.Entity)]
     public override async Task<ActionResult<string>> HandleAsync(
         EntityPermissionsEditDto dto,
         CancellationToken cancellationToken = default)

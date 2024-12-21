@@ -4,6 +4,7 @@ using Kafe.Api.Services;
 using Kafe.Api.Transfer;
 using Kafe.Data.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Threading;
@@ -31,6 +32,7 @@ public class ShardDetailEndpoint : EndpointBaseAsync
 
     [HttpGet]
     [SwaggerOperation(Tags = new[] { EndpointArea.Shard })]
+    [Tags(EndpointArea.Shard)]
     [ProducesResponseType(typeof(ShardDetailBaseDto), 200)]
     [ProducesResponseType(403)]
     [ProducesResponseType(404)]

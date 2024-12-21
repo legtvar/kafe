@@ -6,6 +6,7 @@ using Kafe.Data;
 using Kafe.Data.Aggregates;
 using Kafe.Data.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Linq;
@@ -33,7 +34,8 @@ public class OrganizationCreationEndpoint : EndpointBaseAsync
     }
 
     [HttpPost]
-    [SwaggerOperation(Tags = [EndpointArea.Organization])]
+    [SwaggerOperation(Tags = new[] { EndpointArea.Organization })]
+    [Tags(EndpointArea.Organization)]
     public override async Task<ActionResult<Hrib?>> HandleAsync(
         OrganizationCreationDto dto,
         CancellationToken cancellationToken = default)

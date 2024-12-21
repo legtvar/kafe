@@ -6,6 +6,7 @@ using Kafe.Data.Aggregates;
 using Kafe.Data.Services;
 using Marten.Linq.SoftDeletes;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using System.ComponentModel;
@@ -38,6 +39,7 @@ public class ArtifactCreationEndpoint : EndpointBaseAsync
 
     [HttpPost]
     [SwaggerOperation(Tags = new[] { EndpointArea.Artifact })]
+    [Tags(EndpointArea.Artifact)]
     [ProducesResponseType(typeof(Hrib), 200)]
     [ProducesResponseType(400)]
     public override async Task<ActionResult<Hrib>> HandleAsync(

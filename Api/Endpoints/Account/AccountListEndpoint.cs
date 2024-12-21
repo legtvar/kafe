@@ -4,6 +4,7 @@ using Kafe.Api.Transfer;
 using Kafe.Data;
 using Kafe.Data.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Collections.Generic;
@@ -30,6 +31,7 @@ public class AccountListEndpoint : EndpointBaseAsync
 
     [HttpGet]
     [SwaggerOperation(Tags = new[] { EndpointArea.Account })]
+    [Tags(EndpointArea.Account)]
     public override async Task<ActionResult<ImmutableArray<AccountListDto>>> HandleAsync(
         RequestData request,
         CancellationToken cancellationToken = default)

@@ -5,6 +5,7 @@ using Kafe.Api.Transfer;
 using Kafe.Data.Aggregates;
 using Kafe.Data.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Swashbuckle.AspNetCore.Annotations;
@@ -35,7 +36,8 @@ public class ProjectCreationEndpoint : EndpointBaseAsync
     }
 
     [HttpPost]
-    [SwaggerOperation(Tags = [EndpointArea.Project])]
+    [SwaggerOperation(Tags = new[] { EndpointArea.Project })]
+    [Tags(EndpointArea.Project)]
     public override async Task<ActionResult<Hrib>> HandleAsync(
         ProjectCreationDto request,
         CancellationToken cancellationToken = default)

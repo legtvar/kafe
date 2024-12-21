@@ -4,6 +4,7 @@ using Kafe.Api.Services;
 using Kafe.Api.Transfer;
 using Kafe.Data.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Threading;
@@ -35,6 +36,7 @@ public class AccountDetailEndpoint : EndpointBaseAsync
 
     [HttpGet]
     [SwaggerOperation(Tags = new[] { EndpointArea.Account })]
+    [Tags(EndpointArea.Account)]
     [ProducesResponseType(200)]
     [ProducesResponseType(400)]
     [ProducesResponseType(404)]

@@ -11,6 +11,7 @@ using Kafe.Api.Services;
 using Kafe.Data.Services;
 using System.Linq;
 using System.Collections.Immutable;
+using Microsoft.AspNetCore.Http;
 
 namespace Kafe.Api.Endpoints.ProjectGroup;
 
@@ -42,6 +43,7 @@ public class ProjectGroupDetailEndpoint : EndpointBaseAsync
 
     [HttpGet]
     [SwaggerOperation(Tags = new[] { EndpointArea.ProjectGroup })]
+    [Tags(EndpointArea.ProjectGroup)]
     [ProducesResponseType(typeof(ProjectGroupDetailDto), 200)]
     [ProducesResponseType(404)]
     public override async Task<ActionResult<ProjectGroupDetailDto>> HandleAsync(

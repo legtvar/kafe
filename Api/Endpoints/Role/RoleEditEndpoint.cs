@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Swashbuckle.AspNetCore.Annotations;
 using Kafe.Data.Services;
 using System.Linq;
+using Microsoft.AspNetCore.Http;
 
 namespace Kafe.Api.Endpoints.Role;
 
@@ -31,6 +32,7 @@ public class RoleEditEndpoint : EndpointBaseAsync
 
     [HttpPatch]
     [SwaggerOperation(Tags = new[] { EndpointArea.Role })]
+    [Tags(EndpointArea.Role)]
     public override async Task<ActionResult<Hrib>> HandleAsync(
         RoleEditDto dto,
         CancellationToken cancellationToken = default)

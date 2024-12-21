@@ -4,6 +4,7 @@ using Ardalis.ApiEndpoints;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -19,6 +20,7 @@ public class ExternalAccountLoginEndpoint : EndpointBaseSync
 
     [HttpGet]
     [SwaggerOperation(Tags = new[] { EndpointArea.Account })]
+    [Tags(EndpointArea.Account)]
     public override ActionResult Handle([FromQuery] RequestData request)
     {
         return Challenge(

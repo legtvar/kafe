@@ -9,6 +9,7 @@ using Swashbuckle.AspNetCore.Annotations;
 using Kafe.Api.Services;
 using System.Collections.Immutable;
 using Kafe.Data.Services;
+using Microsoft.AspNetCore.Http;
 
 namespace Kafe.Api.Endpoints.Role;
 
@@ -31,6 +32,7 @@ public class RoleListEndpoint : EndpointBaseAsync
 
     [HttpGet]
     [SwaggerOperation(Tags = new[] { EndpointArea.Role })]
+    [Tags(EndpointArea.Role)]
     public override async Task<ActionResult<ImmutableArray<RoleListDto>>> HandleAsync(
         RequestData requestData,
         CancellationToken cancellationToken = default)

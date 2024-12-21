@@ -1,6 +1,7 @@
 ﻿using Ardalis.ApiEndpoints;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -14,6 +15,7 @@ public class AccountLogoutEndpoint : EndpointBaseSync
 {
     [HttpGet]
     [SwaggerOperation(Tags = new[] { EndpointArea.Account })]
+    [Tags(EndpointArea.Account)]
     public override ActionResult Handle()
     {
         return SignOut(CookieAuthenticationDefaults.AuthenticationScheme);

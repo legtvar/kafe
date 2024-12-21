@@ -9,6 +9,7 @@ using Swashbuckle.AspNetCore.Annotations;
 using System.Collections.Immutable;
 using Kafe.Api.Services;
 using Kafe.Data.Services;
+using Microsoft.AspNetCore.Http;
 
 namespace Kafe.Api.Endpoints.Project;
 
@@ -33,7 +34,8 @@ public class ProjectListEndpoint : EndpointBaseAsync
     }
 
     [HttpGet]
-    [SwaggerOperation(Tags = [EndpointArea.Project])]
+    [SwaggerOperation(Tags = new[] { EndpointArea.Project })]
+    [Tags(EndpointArea.Project)]
     public override async Task<ActionResult<ImmutableArray<ProjectListDto>>> HandleAsync(
         RequestData requestData,
         CancellationToken cancellationToken = default)

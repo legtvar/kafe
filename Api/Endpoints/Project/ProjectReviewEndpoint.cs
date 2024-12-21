@@ -5,6 +5,7 @@ using Kafe.Api.Transfer;
 using Kafe.Data;
 using Kafe.Data.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Collections.Generic;
@@ -43,6 +44,7 @@ public class ProjectReviewEndpoint : EndpointBaseAsync
 
     [HttpPost]
     [SwaggerOperation(Tags = new[] { EndpointArea.Project })]
+    [Tags(EndpointArea.Project)]
     public override async Task<ActionResult> HandleAsync(
         ProjectReviewCreationDto dto,
         CancellationToken cancellationToken = default)

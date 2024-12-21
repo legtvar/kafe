@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using Swashbuckle.AspNetCore.Annotations;
 using Kafe.Api.Services;
 using Kafe.Data.Services;
+using Microsoft.AspNetCore.Http;
 
 namespace Kafe.Api.Endpoints.Project;
 
@@ -51,6 +52,7 @@ public class ProjectDetailEndpoint : EndpointBaseAsync
 
     [HttpGet]
     [SwaggerOperation(Tags = new[] { EndpointArea.Project })]
+    [Tags(EndpointArea.Project)]
     [ProducesResponseType(typeof(ProjectDetailDto), 200)]
     [ProducesResponseType(404)]
     public override async Task<ActionResult<ProjectDetailDto>> HandleAsync(

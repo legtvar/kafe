@@ -11,6 +11,7 @@ using System.Linq;
 using System.Collections.Immutable;
 using Kafe.Data.Aggregates;
 using Kafe.Data;
+using Microsoft.AspNetCore.Http;
 
 namespace Kafe.Api.Endpoints.Playlist;
 
@@ -37,6 +38,7 @@ public class PlaylistCreationEndpoint : EndpointBaseAsync
 
     [HttpPost]
     [SwaggerOperation(Tags = new[] { EndpointArea.Playlist })]
+    [Tags(EndpointArea.Playlist)]
     public override async Task<ActionResult<Hrib>> HandleAsync(
         PlaylistCreationDto dto,
         CancellationToken cancellationToken = default)

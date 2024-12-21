@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Swashbuckle.AspNetCore.Annotations;
 using Kafe.Data.Services;
+using Microsoft.AspNetCore.Http;
 
 namespace Kafe.Api.Endpoints.Organization;
 
@@ -29,6 +30,7 @@ public class OrganizationDetailEndpoint : EndpointBaseAsync
 
     [HttpGet]
     [SwaggerOperation(Tags = new[] { EndpointArea.Organization })]
+    [Tags(EndpointArea.Organization)]
     [ProducesResponseType(typeof(OrganizationDetailDto), 200)]
     [ProducesResponseType(404)]
     public override async Task<ActionResult<OrganizationDetailDto?>> HandleAsync(

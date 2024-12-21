@@ -6,6 +6,7 @@ using Kafe.Data;
 using Kafe.Data.Aggregates;
 using Kafe.Data.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Collections.Immutable;
@@ -34,7 +35,8 @@ public class ProjectEditEndpoint : EndpointBaseAsync
     }
 
     [HttpPatch]
-    [SwaggerOperation(Tags = [EndpointArea.Project])]
+    [SwaggerOperation(Tags = new[] { EndpointArea.Project })]
+    [Tags(EndpointArea.Project)]
     public override async Task<ActionResult<Hrib>> HandleAsync(
         ProjectEditDto request,
         CancellationToken cancellationToken = default)

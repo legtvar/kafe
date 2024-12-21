@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Swashbuckle.AspNetCore.Annotations;
 using Kafe.Data.Services;
+using Microsoft.AspNetCore.Http;
 
 namespace Kafe.Api.Endpoints.Author;
 
@@ -29,6 +30,7 @@ public class AuthorDetailEndpoint : EndpointBaseAsync
 
     [HttpGet]
     [SwaggerOperation(Tags = new[] { EndpointArea.Author })]
+    [Tags(EndpointArea.Author)]
     [ProducesResponseType(typeof(AuthorDetailDto), 200)]
     [ProducesResponseType(404)]
     public override async Task<ActionResult<AuthorDetailDto?>> HandleAsync(

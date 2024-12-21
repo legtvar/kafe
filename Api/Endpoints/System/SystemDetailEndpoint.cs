@@ -18,6 +18,7 @@ using System.Reflection;
 using JasperFx.Core;
 using System;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Http;
 
 namespace Kafe.Api.Endpoints.ProjectGroup;
 
@@ -41,6 +42,7 @@ public class SystemDetailEndpoint : EndpointBaseAsync
 
     [HttpGet]
     [SwaggerOperation(Tags = new[] { EndpointArea.System })]
+    [Tags(EndpointArea.System)]
     public override Task<ActionResult<SystemDetailDto>> HandleAsync(
         CancellationToken cancellationToken = default)
     {

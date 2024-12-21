@@ -9,6 +9,7 @@ using Swashbuckle.AspNetCore.Annotations;
 using Kafe.Api.Services;
 using System.Collections.Immutable;
 using Kafe.Data.Services;
+using Microsoft.AspNetCore.Http;
 
 namespace Kafe.Api.Endpoints.Organization;
 
@@ -31,6 +32,7 @@ public class OrganizationListEndpoint : EndpointBaseAsync
 
     [HttpGet]
     [SwaggerOperation(Tags = new[] { EndpointArea.Organization })]
+    [Tags(EndpointArea.Organization)]
     public override async Task<ActionResult<ImmutableArray<OrganizationListDto>>> HandleAsync(
         RequestData requestData,
         CancellationToken cancellationToken = default)

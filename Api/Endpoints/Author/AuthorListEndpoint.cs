@@ -9,6 +9,7 @@ using Swashbuckle.AspNetCore.Annotations;
 using Kafe.Api.Services;
 using System.Collections.Immutable;
 using Kafe.Data.Services;
+using Microsoft.AspNetCore.Http;
 
 namespace Kafe.Api.Endpoints.Author;
 
@@ -30,7 +31,8 @@ public class AuthorListEndpoint : EndpointBaseAsync
     }
 
     [HttpGet]
-    [SwaggerOperation(Tags = [EndpointArea.Author])]
+    [SwaggerOperation(Tags = new[] { EndpointArea.Author })]
+    [Tags(EndpointArea.Author)]
     public override async Task<ActionResult<ImmutableArray<AuthorListDto>>> HandleAsync(
         RequestData requestData,
         CancellationToken cancellationToken = default)

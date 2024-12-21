@@ -6,6 +6,7 @@ using Kafe.Data;
 using Kafe.Data.Aggregates;
 using Kafe.Data.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Linq;
@@ -37,7 +38,8 @@ public class RoleCreationEndpoint : EndpointBaseAsync
     }
 
     [HttpPost]
-    [SwaggerOperation(Tags = [EndpointArea.Role])]
+    [SwaggerOperation(Tags = new[] { EndpointArea.Role })]
+    [Tags(EndpointArea.Role)]
     public override async Task<ActionResult<Hrib?>> HandleAsync(
         RoleCreationDto dto,
         CancellationToken cancellationToken = default)

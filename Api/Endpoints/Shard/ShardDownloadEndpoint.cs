@@ -3,6 +3,7 @@ using Asp.Versioning;
 using Kafe.Api.Services;
 using Kafe.Data.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Threading;
@@ -30,6 +31,7 @@ public class ShardDownloadEndpoint : EndpointBaseAsync
 
     [HttpGet]
     [SwaggerOperation(Tags = new[] { EndpointArea.Shard })]
+    [Tags(EndpointArea.Shard)]
     [Produces(typeof(FileStreamResult))]
     public override async Task<ActionResult> HandleAsync(
         RequestData data,

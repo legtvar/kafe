@@ -6,6 +6,7 @@ using Kafe.Data;
 using Kafe.Data.Aggregates;
 using Kafe.Data.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Linq;
@@ -36,7 +37,8 @@ public class AuthorCreationEndpoint : EndpointBaseAsync
     }
 
     [HttpPost]
-    [SwaggerOperation(Tags = [EndpointArea.Author])]
+    [SwaggerOperation(Tags = new[] { EndpointArea.Author })]
+    [Tags(EndpointArea.Author)]
     public override async Task<ActionResult<Hrib?>> HandleAsync(
         AuthorCreationDto dto,
         CancellationToken cancellationToken = default)

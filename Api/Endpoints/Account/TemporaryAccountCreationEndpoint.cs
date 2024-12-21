@@ -47,6 +47,7 @@ public class TemporaryAccountCreationEndpoint : EndpointBaseAsync
 
     [HttpPost]
     [SwaggerOperation(Tags = new[] { EndpointArea.Account })]
+    [Tags(EndpointArea.Account)]
     [ProducesResponseType(200)]
     [ProducesResponseType(400)]
     public override async Task<ActionResult> HandleAsync(

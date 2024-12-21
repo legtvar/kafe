@@ -14,6 +14,7 @@ using Kafe.Api.Services;
 using System.Collections.Immutable;
 using Kafe.Data.Services;
 using Microsoft.IdentityModel.Protocols;
+using Microsoft.AspNetCore.Http;
 
 namespace Kafe.Api.Endpoints.ProjectGroup;
 
@@ -36,6 +37,7 @@ public class ProjectGroupListEndpoint : EndpointBaseAsync
 
     [HttpGet]
     [SwaggerOperation(Tags = new[] { EndpointArea.ProjectGroup })]
+    [Tags(EndpointArea.ProjectGroup)]
     public override async Task<ActionResult<ImmutableArray<ProjectGroupListDto>>> HandleAsync(
         RequestData request,
         CancellationToken cancellationToken = default)

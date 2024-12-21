@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Collections.Immutable;
 using Kafe.Data.Services;
+using Microsoft.AspNetCore.Http;
 
 namespace Kafe.Api.Endpoints.ProjectGroup;
 
@@ -32,7 +33,8 @@ public class ProjectGroupUnlockEndpoint : EndpointBaseAsync
     }
 
     [HttpPost]
-    [SwaggerOperation(Tags = [EndpointArea.ProjectGroup])]
+    [SwaggerOperation(Tags = new[] { EndpointArea.ProjectGroup })]
+    [Tags(EndpointArea.ProjectGroup)]
     public override async Task<ActionResult> HandleAsync(
         [FromBody] UnlockRequestData requestData,
         CancellationToken cancellationToken = default)

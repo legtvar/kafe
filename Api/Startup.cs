@@ -41,6 +41,7 @@ using Npgsql;
 using System.Globalization;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.AspNetCore.OpenApi;
 
 namespace Kafe.Api;
 
@@ -157,6 +158,8 @@ public class Startup
         });
         services.AddSwaggerGen();
         services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
+        services.AddOpenApi("vnext");
+        services.AddTransient<IConfigureOptions<OpenApiOptions>, ConfigureOpenApiOptions>();
 
         services.AddCors(o =>
         {
@@ -245,7 +248,10 @@ public class Startup
         app.UseDefaultFiles();
         app.UseStaticFiles();
 
-        app.UseSwaggerUI();
+        app.UseSwaggerUI(o => {
+            o.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
+            o.SwaggerEndpoint("/openapi/vnext.json", "vnext");
+        });
 
         app.UseCors();
 
@@ -284,6 +290,7 @@ public class Startup
         app.UseEndpoints(e =>
         {
             e.MapControllers();
+            e.MapOpenApi();
             e.MapSwagger();
         });
     }

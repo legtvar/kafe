@@ -62,11 +62,11 @@ public class ProjectGroupDetailEndpoint : EndpointBaseAsync
 
         var dto = TransferMaps.ToProjectGroupDetailDto(projectGroup);
 
-        auth = await authorizationService.AuthorizeAsync(User, id, EndpointPolicy.ReadInspect);
-
         if (auth.Succeeded)
         {
-            var projects = await projectService.List(new(ProjectGroupId: projectGroup.Id), token: cancellationToken);
+            var projects = await projectService.List(
+                new(ProjectGroupId: projectGroup.Id, AccessingAccountId: userProvider.AccountId),
+                token: cancellationToken);
             var projectPerms = await entityService.GetPermissions(
                 projects.Select(p => (Hrib)p.Id),
                 userProvider.AccountId,

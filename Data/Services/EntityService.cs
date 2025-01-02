@@ -51,7 +51,7 @@ public class EntityService
     {
         return await db.KafeLoadAsync<EntityPermissionInfo>(entityId, token);
     }
-    
+
     public async Task<Err<ImmutableArray<EntityPermissionInfo>>> LoadPermissionInfoMany(
         IEnumerable<Hrib> entityIds,
         CancellationToken token = default
@@ -66,10 +66,23 @@ public class EntityService
         CancellationToken token = default
     )
     {
-        var perms = (await LoadPermissionInfo(entityId, token)).Unwrap();
+        var perms = await LoadPermissionInfo(entityId, token);
+        // NB: Special case: The async deamon might still be processing EntityPermissionEventProjection, so we look into
+        //     the account itself.
+        if (perms.HasErrors)
+        {
+            if (perms.Errors.All(e => e.Id == Error.NotFoundId) && !accessingAccountId.IsEmpty)
+            {
+                var accessingAccount = (await db.KafeLoadAsync<AccountInfo>(accessingAccountId, token)).Unwrap();
+                return accessingAccount.Permissions.GetValueOrDefault(entityId.ToString());
+            }
+
+            perms.Unwrap();
+        }
+
         return accessingAccountId.IsEmpty
-            ? perms.GlobalPermission
-            : perms.GetAccountPermission(accessingAccountId) | perms.GlobalPermission;
+            ? perms.Value.GlobalPermission
+            : perms.Value.GetAccountPermission(accessingAccountId) | perms.Value.GlobalPermission;
     }
 
     public async Task<ImmutableArray<Permission>> GetPermissions(
@@ -82,7 +95,7 @@ public class EntityService
         {
             return ImmutableArray<Permission>.Empty;
         }
-        
+
         var manyPerms = (await LoadPermissionInfoMany(entityIds, token)).Unwrap();
         return manyPerms.Select(p => accessingAccountId.IsEmpty
                 ? p.GlobalPermission

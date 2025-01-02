@@ -19,17 +19,17 @@ export interface paths {
         /** @description Bad Request */
         400: {
           content: {
-            "text/plain": components["schemas"]["ProblemDetails"];
-            "application/json": components["schemas"]["ProblemDetails"];
-            "text/json": components["schemas"]["ProblemDetails"];
+            "text/plain": components["schemas"]["KafeProblemDetails"];
+            "application/json": components["schemas"]["KafeProblemDetails"];
+            "text/json": components["schemas"]["KafeProblemDetails"];
           };
         };
         /** @description Not Found */
         404: {
           content: {
-            "text/plain": components["schemas"]["ProblemDetails"];
-            "application/json": components["schemas"]["ProblemDetails"];
-            "text/json": components["schemas"]["ProblemDetails"];
+            "text/plain": components["schemas"]["KafeProblemDetails"];
+            "application/json": components["schemas"]["KafeProblemDetails"];
+            "text/json": components["schemas"]["KafeProblemDetails"];
           };
         };
       };
@@ -54,17 +54,17 @@ export interface paths {
         /** @description Bad Request */
         400: {
           content: {
-            "text/plain": components["schemas"]["ProblemDetails"];
-            "application/json": components["schemas"]["ProblemDetails"];
-            "text/json": components["schemas"]["ProblemDetails"];
+            "text/plain": components["schemas"]["KafeProblemDetails"];
+            "application/json": components["schemas"]["KafeProblemDetails"];
+            "text/json": components["schemas"]["KafeProblemDetails"];
           };
         };
         /** @description Not Found */
         404: {
           content: {
-            "text/plain": components["schemas"]["ProblemDetails"];
-            "application/json": components["schemas"]["ProblemDetails"];
-            "text/json": components["schemas"]["ProblemDetails"];
+            "text/plain": components["schemas"]["KafeProblemDetails"];
+            "application/json": components["schemas"]["KafeProblemDetails"];
+            "text/json": components["schemas"]["KafeProblemDetails"];
           };
         };
       };
@@ -136,9 +136,9 @@ export interface paths {
         /** @description Bad Request */
         400: {
           content: {
-            "text/plain": components["schemas"]["ProblemDetails"];
-            "application/json": components["schemas"]["ProblemDetails"];
-            "text/json": components["schemas"]["ProblemDetails"];
+            "text/plain": components["schemas"]["KafeProblemDetails"];
+            "application/json": components["schemas"]["KafeProblemDetails"];
+            "text/json": components["schemas"]["KafeProblemDetails"];
           };
         };
       };
@@ -163,9 +163,9 @@ export interface paths {
         /** @description Bad Request */
         400: {
           content: {
-            "text/plain": components["schemas"]["ProblemDetails"];
-            "application/json": components["schemas"]["ProblemDetails"];
-            "text/json": components["schemas"]["ProblemDetails"];
+            "text/plain": components["schemas"]["KafeProblemDetails"];
+            "application/json": components["schemas"]["KafeProblemDetails"];
+            "text/json": components["schemas"]["KafeProblemDetails"];
           };
         };
       };
@@ -211,9 +211,9 @@ export interface paths {
         /** @description Not Found */
         404: {
           content: {
-            "text/plain": components["schemas"]["ProblemDetails"];
-            "application/json": components["schemas"]["ProblemDetails"];
-            "text/json": components["schemas"]["ProblemDetails"];
+            "text/plain": components["schemas"]["KafeProblemDetails"];
+            "application/json": components["schemas"]["KafeProblemDetails"];
+            "text/json": components["schemas"]["KafeProblemDetails"];
           };
         };
       };
@@ -352,9 +352,9 @@ export interface paths {
         /** @description Not Found */
         404: {
           content: {
-            "text/plain": components["schemas"]["ProblemDetails"];
-            "application/json": components["schemas"]["ProblemDetails"];
-            "text/json": components["schemas"]["ProblemDetails"];
+            "text/plain": components["schemas"]["KafeProblemDetails"];
+            "application/json": components["schemas"]["KafeProblemDetails"];
+            "text/json": components["schemas"]["KafeProblemDetails"];
           };
         };
       };
@@ -438,9 +438,9 @@ export interface paths {
         /** @description Not Found */
         404: {
           content: {
-            "text/plain": components["schemas"]["ProblemDetails"];
-            "application/json": components["schemas"]["ProblemDetails"];
-            "text/json": components["schemas"]["ProblemDetails"];
+            "text/plain": components["schemas"]["KafeProblemDetails"];
+            "application/json": components["schemas"]["KafeProblemDetails"];
+            "text/json": components["schemas"]["KafeProblemDetails"];
           };
         };
       };
@@ -525,9 +525,9 @@ export interface paths {
         /** @description Not Found */
         404: {
           content: {
-            "text/plain": components["schemas"]["ProblemDetails"];
-            "application/json": components["schemas"]["ProblemDetails"];
-            "text/json": components["schemas"]["ProblemDetails"];
+            "text/plain": components["schemas"]["KafeProblemDetails"];
+            "application/json": components["schemas"]["KafeProblemDetails"];
+            "text/json": components["schemas"]["KafeProblemDetails"];
           };
         };
       };
@@ -592,9 +592,9 @@ export interface paths {
         /** @description Not Found */
         404: {
           content: {
-            "text/plain": components["schemas"]["ProblemDetails"];
-            "application/json": components["schemas"]["ProblemDetails"];
-            "text/json": components["schemas"]["ProblemDetails"];
+            "text/plain": components["schemas"]["KafeProblemDetails"];
+            "application/json": components["schemas"]["KafeProblemDetails"];
+            "text/json": components["schemas"]["KafeProblemDetails"];
           };
         };
       };
@@ -770,9 +770,9 @@ export interface paths {
         /** @description Not Found */
         404: {
           content: {
-            "text/plain": components["schemas"]["ProblemDetails"];
-            "application/json": components["schemas"]["ProblemDetails"];
-            "text/json": components["schemas"]["ProblemDetails"];
+            "text/plain": components["schemas"]["KafeProblemDetails"];
+            "application/json": components["schemas"]["KafeProblemDetails"];
+            "text/json": components["schemas"]["KafeProblemDetails"];
           };
         };
       };
@@ -801,8 +801,7 @@ export interface paths {
     post: {
       requestBody?: {
         content: {
-          "multipart/form-data": {
-            Kind?: components["schemas"]["ShardKind"];
+          "multipart/form-data": components["schemas"]["ShardKind"] & {
             ArtifactId?: string;
             /** Format: binary */
             File?: string;
@@ -813,17 +812,17 @@ export interface paths {
         /** @description Forbidden */
         403: {
           content: {
-            "text/plain": components["schemas"]["ProblemDetails"];
-            "application/json": components["schemas"]["ProblemDetails"];
-            "text/json": components["schemas"]["ProblemDetails"];
+            "text/plain": components["schemas"]["KafeProblemDetails"];
+            "application/json": components["schemas"]["KafeProblemDetails"];
+            "text/json": components["schemas"]["KafeProblemDetails"];
           };
         };
         /** @description Not Found */
         404: {
           content: {
-            "text/plain": components["schemas"]["ProblemDetails"];
-            "application/json": components["schemas"]["ProblemDetails"];
-            "text/json": components["schemas"]["ProblemDetails"];
+            "text/plain": components["schemas"]["KafeProblemDetails"];
+            "application/json": components["schemas"]["KafeProblemDetails"];
+            "text/json": components["schemas"]["KafeProblemDetails"];
           };
         };
       };
@@ -848,17 +847,17 @@ export interface paths {
         /** @description Forbidden */
         403: {
           content: {
-            "text/plain": components["schemas"]["ProblemDetails"];
-            "application/json": components["schemas"]["ProblemDetails"];
-            "text/json": components["schemas"]["ProblemDetails"];
+            "text/plain": components["schemas"]["KafeProblemDetails"];
+            "application/json": components["schemas"]["KafeProblemDetails"];
+            "text/json": components["schemas"]["KafeProblemDetails"];
           };
         };
         /** @description Not Found */
         404: {
           content: {
-            "text/plain": components["schemas"]["ProblemDetails"];
-            "application/json": components["schemas"]["ProblemDetails"];
-            "text/json": components["schemas"]["ProblemDetails"];
+            "text/plain": components["schemas"]["KafeProblemDetails"];
+            "application/json": components["schemas"]["KafeProblemDetails"];
+            "text/json": components["schemas"]["KafeProblemDetails"];
           };
         };
       };
@@ -933,17 +932,17 @@ export interface paths {
         /** @description Bad Request */
         400: {
           content: {
-            "text/plain": components["schemas"]["ProblemDetails"];
-            "application/json": components["schemas"]["ProblemDetails"];
-            "text/json": components["schemas"]["ProblemDetails"];
+            "text/plain": components["schemas"]["KafeProblemDetails"];
+            "application/json": components["schemas"]["KafeProblemDetails"];
+            "text/json": components["schemas"]["KafeProblemDetails"];
           };
         };
         /** @description Not Found */
         404: {
           content: {
-            "text/plain": components["schemas"]["ProblemDetails"];
-            "application/json": components["schemas"]["ProblemDetails"];
-            "text/json": components["schemas"]["ProblemDetails"];
+            "text/plain": components["schemas"]["KafeProblemDetails"];
+            "application/json": components["schemas"]["KafeProblemDetails"];
+            "text/json": components["schemas"]["KafeProblemDetails"];
           };
         };
       };
@@ -966,9 +965,9 @@ export interface paths {
         /** @description Bad Request */
         400: {
           content: {
-            "text/plain": components["schemas"]["ProblemDetails"];
-            "application/json": components["schemas"]["ProblemDetails"];
-            "text/json": components["schemas"]["ProblemDetails"];
+            "text/plain": components["schemas"]["KafeProblemDetails"];
+            "application/json": components["schemas"]["KafeProblemDetails"];
+            "text/json": components["schemas"]["KafeProblemDetails"];
           };
         };
       };
@@ -1142,6 +1141,14 @@ export interface components {
       globalPermissions?: components["schemas"]["Permission"][] | null;
       accountPermissions?: components["schemas"]["EntityPermissionsAccountEditDto"][] | null;
     };
+    Error: {
+      id: string;
+      message: string;
+      arguments: {
+        [key: string]: unknown;
+      };
+      stackTrace?: string;
+    };
     ImageDto: {
       fileExtension: string;
       mimeType: string;
@@ -1157,6 +1164,17 @@ export interface components {
       variants?: {
         [key: string]: components["schemas"]["ImageDto"];
       };
+    };
+    KafeProblemDetails: {
+      type?: string | null;
+      title?: string | null;
+      /** Format: int32 */
+      status?: number | null;
+      detail?: string | null;
+      instance?: string | null;
+      errors: components["schemas"]["Error"][];
+      traceId?: string | null;
+      [key: string]: unknown;
     };
     LockRequestData: {
       /**
@@ -1367,15 +1385,6 @@ export interface components {
         sk?: string | null;
       }) | null;
       globalPermissions: components["schemas"]["Permission"][];
-    };
-    ProblemDetails: {
-      type?: string | null;
-      title?: string | null;
-      /** Format: int32 */
-      status?: number | null;
-      detail?: string | null;
-      instance?: string | null;
-      [key: string]: unknown;
     };
     ProjectArtifactAdditionDto: {
       /**

@@ -60,10 +60,7 @@ export function ProjectListComponent({ projects }: IProjectListComponentProps) {
                                 px={8}
                                 borderBottomWidth="1px"
                                 borderBottomColor={borderColor}
-                                align={{
-                                    base: 'start',
-                                    md: 'center',
-                                }}
+                                align={'start'}
                                 cursor="pointer"
                                 _hover={{
                                     background: hoverColor,

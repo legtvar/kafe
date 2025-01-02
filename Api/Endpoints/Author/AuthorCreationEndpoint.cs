@@ -41,17 +41,20 @@ public class AuthorCreationEndpoint : EndpointBaseAsync
         AuthorCreationDto dto,
         CancellationToken cancellationToken = default)
     {
-        var author = await authorService.Create(AuthorInfo.Create(dto.Name) with
-        {
-            Bio = dto.Bio,
-            Uco = dto.Uco,
-            Email = dto.Email,
-            Phone = dto.Phone
-        }, cancellationToken);
+        var author = await authorService.Create(
+            @new: AuthorInfo.Create(dto.Name) with
+            {
+                Bio = dto.Bio,
+                Uco = dto.Uco,
+                Email = dto.Email,
+                Phone = dto.Phone
+            },
+            ownerId: userProvider.AccountId,
+            token: cancellationToken);
 
         if (author.HasErrors)
         {
-            return ValidationProblem(title: author.Errors.First().Message);
+            return this.KafeErrResult(author);
         }
 
         return Ok(author.Value.Id);

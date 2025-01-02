@@ -1,5 +1,4 @@
-﻿using Kafe.Common;
-using Kafe.Data.Aggregates;
+﻿using Kafe.Data.Aggregates;
 using Kafe.Data.Events;
 using Kafe.Data.Metadata;
 using Marten;
@@ -86,7 +85,7 @@ public partial class ProjectService
         {
             await accountService.AddPermissions(
                 ownerId,
-                [((Hrib)created.ProjectId, Permission.Read | Permission.Write | Permission.Append)],
+                [((Hrib)created.ProjectId, Permission.Read | Permission.Write | Permission.Append | Permission.Inspect)],
                 token);
         }
 

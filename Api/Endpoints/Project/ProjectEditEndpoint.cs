@@ -102,7 +102,7 @@ public class ProjectEditEndpoint : EndpointBaseAsync
         var result = await projectService.Edit(@new: @new, token: cancellationToken);
         if (result.HasErrors)
         {
-            return result.ToActionResult();
+            return this.KafeErrResult(result);
         }
 
         return Ok((Hrib)@new.Id);

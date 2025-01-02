@@ -1,14 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Security.Claims;
-using Kafe.Common;
 using Kafe.Data;
 using Kafe.Data.Aggregates;
-using Kafe.Data.Capabilities;
 using Kafe.Media;
 
 namespace Kafe.Api.Transfer;
@@ -47,10 +42,27 @@ public static class TransferMaps
                             Arity: ArgumentArity.ExactlyOne),
                         [ShardKind.Subtitles] = new ProjectArtifactShardBlueprintDto(
                             Name: LocalizedString.Create(
-                                (Const.InvariantCulture, "English subtitles"),
-                                (Const.CzechCulture, "Anglické titulky")
+                                (
+                                    Const.InvariantCulture,
+                                    "Subtitles"
+                                ),
+                                (
+                                    Const.CzechCulture,
+                                    "Titulky"
+                                )
                             ),
-                            Description: null,
+                            Description: LocalizedString.Create(
+                                (
+                                    Const.InvariantCulture,
+                                    "English subtitles if the film is in Czech, "
+                                    + "or Czech subtitles if the film is in English."
+                                ),
+                                (
+                                    Const.CzechCulture,
+                                    "Anglické titulky, pokud je film v češtině, "
+                                    + "nebo české titulky, pokud je film v angličtině)"
+                                )
+                            ),
                             Arity: ArgumentArity.ExactlyOne)
                     }
                     .ToImmutableDictionary()
@@ -73,10 +85,21 @@ public static class TransferMaps
                             Arity: ArgumentArity.ExactlyOne),
                         [ShardKind.Subtitles] = new ProjectArtifactShardBlueprintDto(
                             Name: LocalizedString.Create(
-                                (Const.InvariantCulture, "English subtitles"),
-                                (Const.CzechCulture, "Anglické titulky")
+                                (Const.InvariantCulture,"Subtitles"),
+                                (Const.CzechCulture, "Titulky")
                             ),
-                            Description: null,
+                            Description: LocalizedString.Create(
+                                (
+                                    Const.InvariantCulture,
+                                    "English subtitles if the film is in Czech, "
+                                    + "or Czech subtitles if the film is in English."
+                                ),
+                                (
+                                    Const.CzechCulture,
+                                    "Anglické titulky, pokud je film v češtině, "
+                                    + "nebo české titulky, pokud je film v angličtině)"
+                                )
+                            ),
                             Arity: ArgumentArity.ExactlyOne)
                     }
                     .ToImmutableDictionary()

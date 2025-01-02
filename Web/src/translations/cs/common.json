@@ -425,7 +425,8 @@
       },
       "project": {
         "append": "Přidávat nové soubory do projektu",
-        "read": "Zobrazit projekt, jeho metadata a soubory",
+        "read": "Zobrazit projekt a jeho metadata",
+        "inspect": "Zobrazit soubory projektu",
         "write": "Upravovat metadata projektu"
       },
       "group": {
@@ -545,7 +546,8 @@
   },
   "organizationRedirect": {
     "title": "Zvolte si organizaci",
-    "subtitle": "Na jinou organizaci můžete kdykoli přepnout v levém panelu"
+    "subtitle": "Na jinou organizaci můžete kdykoli přepnout v levém panelu",
+    "noOrgs": "Není dostupná žádná organizace, prosím kontaktujte administrátory... Tohle by se nemělo stát!"
   },
   "languageToggle": {
     "system": "Jazyk aplikace (Language)",

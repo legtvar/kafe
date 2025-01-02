@@ -1,7 +1,3 @@
----
-title: Observability
----
-
 # Observability
 
 This year's film festival has shown me how difficult it is for me to replicate bugs users report to me.

@@ -1,5 +1,4 @@
-﻿using Kafe.Common;
-using Kafe.Data.Aggregates;
+﻿using Kafe.Data.Aggregates;
 using Kafe.Data.Events;
 using Kafe.Data.Metadata;
 using Marten;
@@ -262,9 +261,8 @@ $@"TRUE = ALL(
 
         if (!IsValidEmailAddress(emailAddress))
         {
-            throw new ArgumentException(
-                "The provided email address does not have a valid format.",
-                nameof(emailAddress));
+            return Error.InvalidValue("The provided email address does not have a valid format.")
+                .WithArgument(Error.ParameterArgument, nameof(emailAddress));
         }
 
         var account = await FindByEmail(emailAddress, token);

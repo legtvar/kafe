@@ -47,18 +47,19 @@ public class ProjectCreationEndpoint : EndpointBaseAsync
         }
 
         var project = await projectService.Create(
-        @new: ProjectInfo.Create(
-            projectGroupId: request.ProjectGroupId,
-            name: request.Name) with
-        {
-            Description = request.Description,
-            Genre = request.Genre
-        },
-        ownerId: userProvider.AccountId,
-        cancellationToken);
+            @new: ProjectInfo.Create(
+                projectGroupId: request.ProjectGroupId,
+                name: request.Name) with
+            {
+                Description = request.Description,
+                Genre = request.Genre
+            },
+            ownerId: userProvider.AccountId,
+            cancellationToken
+        );
         if (project.HasErrors)
         {
-            return project.ToActionResult();
+            return this.KafeErrResult(project);
         }
 
         return Ok((Hrib)project.Value.Id);

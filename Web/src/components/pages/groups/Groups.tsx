@@ -9,6 +9,7 @@ import { useColorScheme, useHighlightStyle } from '../../../hooks/useColorScheme
 import { fulltextFilter } from '../../../utils/fulltextFilter';
 import { useTitle } from '../../../utils/useTitle';
 import { AwaitAPI } from '../../utils/AwaitAPI';
+import { ChakraMarkdown } from '../../utils/ChakraMarkdown';
 import { OutletOrChildren } from '../../utils/OutletOrChildren';
 import { Pagination } from '../../utils/Pagination';
 
@@ -76,10 +77,7 @@ export function Groups(props: IGroupsProps) {
                                             px={8}
                                             borderBottomWidth="1px"
                                             borderBottomColor={borderColor}
-                                            align={{
-                                                base: 'start',
-                                                md: 'center',
-                                            }}
+                                            align={'start'}
                                             cursor="pointer"
                                             _hover={{
                                                 background: hoverColor,
@@ -92,10 +90,8 @@ export function Groups(props: IGroupsProps) {
                                                         {project.getName()}
                                                     </Highlight>
                                                 </Text>
-                                                <Text fontSize="smaller" color="gray.500">
-                                                    <Highlight styles={highlightStyle} query={filter}>
-                                                        {project.getDescription()}
-                                                    </Highlight>
+                                                <Text fontSize="smaller" color="gray.500" mb={-2}>
+                                                    <ChakraMarkdown>{project.getDescription()}</ChakraMarkdown>
                                                 </Text>
                                             </Flex>
                                         </Flex>

@@ -1,4 +1,4 @@
-namespace Kafe.Common;
+namespace Kafe;
 
 public readonly partial record struct Error
 {
@@ -7,6 +7,8 @@ public readonly partial record struct Error
     public const string MissingValueId = nameof(MissingValue);
     public const string UnmodifiedId = nameof(Unmodified);
     public const string LockedId = nameof(Locked);
+    public const string InvalidValueId = nameof(InvalidValueId);
+    public const string ParameterArgument = "parameter";
 
     public static Error NotFound(string? message = null)
     {
@@ -49,5 +51,21 @@ public readonly partial record struct Error
     public static Error Locked(Hrib id, string description = "The entity")
     {
         return new Error(LockedId, $"{description} is locked.");
+    }
+
+    public static Error InvalidValue(string what, string? parameterArg)
+    {
+        var error = new Error(InvalidValueId, $"{what} has an invalid value.");
+        if (!string.IsNullOrEmpty(parameterArg))
+        {
+            error = error.WithArgument(ParameterArgument, parameterArg);
+        }
+
+        return error;
+    }
+
+    public static Error InvalidValue(string message)
+    {
+        return new Error(InvalidValueId, message);
     }
 }

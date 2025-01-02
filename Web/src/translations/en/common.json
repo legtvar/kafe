@@ -63,7 +63,7 @@
       "cast": "Cast",
       "crew": "Crew",
       "description": "Description",
-      "genre": "genre",
+      "genre": "Genre",
       "movie": "Movie",
       "name": "Name of the movie",
       "videoannotation": "Video annotation"
@@ -543,7 +543,8 @@
   },
   "organizationRedirect": {
     "title": "Choose your organization",
-    "subtitle": "You can switch to another organization at any time in the left panel"
+    "subtitle": "You can switch to another organization at any time in the left panel",
+    "noOrgs": "No organization available, please contact the admins... This shouldn't happen!"
   },
   "languageToggle": {
     "system": "Application language",

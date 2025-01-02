@@ -55,7 +55,7 @@ public class OrganizationEditEndpoint : EndpointBaseAsync
         var result = await organizationService.Edit(@new, cancellationToken);
         if (result.HasErrors)
         {
-            return ValidationProblem(title: result.Errors.FirstOrDefault().Message);
+            return this.KafeErrResult(result);
         }
 
         return Ok((Hrib)result.Value.Id);

@@ -14,18 +14,17 @@ import {
     Text,
     VStack,
 } from '@chakra-ui/react';
-import ChakraUIRenderer from 'chakra-ui-markdown-renderer';
 import { t } from 'i18next';
 import moment from 'moment';
 import { useCallback } from 'react';
 import Countdown from 'react-countdown';
 import { IoCubeOutline } from 'react-icons/io5';
-import Markdown from 'react-markdown';
 import { Link } from 'react-router-dom';
 import { useOrganizations } from '../../../hooks/Caffeine';
 import { useAuthLink } from '../../../hooks/useAuthLink';
 import { useTitle } from '../../../utils/useTitle';
 import { AwaitAPI } from '../../utils/AwaitAPI';
+import { ChakraMarkdown } from '../../utils/ChakraMarkdown';
 import { OrganizationAvatar } from '../../utils/OrganizationAvatar/OrganizationAvatar';
 import { OutletOrChildren } from '../../utils/OutletOrChildren';
 
@@ -34,7 +33,7 @@ interface IHomeProps {}
 export function Home(props: IHomeProps) {
     useTitle(t('home.title'));
     const CountdownItem = (props: { children: number; title: string }) => (
-        <Box textAlign="center" py={8} px={4} wordBreak="keep-all">
+        <Box textAlign="center" py={8} px={4} wordBreak="keep-all" whiteSpace="nowrap">
             <Text fontSize="2em" fontWeight="bold">
                 {props.children}
             </Text>
@@ -89,14 +88,14 @@ export function Home(props: IHomeProps) {
                                                     <Heading size="md">{group.getName()}</Heading>
                                                     {group.description && (
                                                         <Box mb={4}>
-                                                            <Markdown components={ChakraUIRenderer()} skipHtml>
+                                                            <ChakraMarkdown>
                                                                 {group
                                                                     .getDescription()
                                                                     .substring(0, DESCRIPTION_LENGTH) +
                                                                     (group.getDescription().length > DESCRIPTION_LENGTH
                                                                         ? '...'
                                                                         : '')}
-                                                            </Markdown>
+                                                            </ChakraMarkdown>
                                                         </Box>
                                                     )}
                                                     {group.deadline && moment(group.deadline).isAfter() && (

@@ -14,7 +14,7 @@ export interface ISendAPIProps<T> {
     children: (
         onSubmit: () => void,
         status: SendAPIStatus,
-        error: components['schemas']['ProblemDetails'] | null,
+        error: components['schemas']['KafeProblemDetails'] | null,
     ) => JSX.Element;
     onSubmited: (id: HRIB) => void;
     repeatable?: boolean;
@@ -23,7 +23,7 @@ export interface ISendAPIProps<T> {
 export function SendAPI<T>({ request, value, children, onSubmited, repeatable }: ISendAPIProps<T>) {
     const api = useApi();
     const [status, setStatus] = useState<SendAPIStatus>('ready');
-    const [error, setError] = useState<components['schemas']['ProblemDetails'] | null>(null);
+    const [error, setError] = useState<components['schemas']['KafeProblemDetails'] | null>(null);
     const border = useColorModeValue('orange.300', 'orange.800');
     const bg = useColorModeValue('orange.200', 'orange.900');
     const toast = useToast();
@@ -48,19 +48,14 @@ export function SendAPI<T>({ request, value, children, onSubmited, repeatable }:
                 title: t('sendApi.error').toString(),
                 description: (
                     <>
-                        {typeof result.error === 'string' && (
-                            <Text>
-                                {(result.error as string)
-                                    .split('\n')[0]
-                                    .replace('System.ArgumentException: ', '')
-                                    .replace(" (Parameter 'dto')", '')}
-                            </Text>
-                        )}
                         {result.error?.errors ? (
-                            Object.entries(result.error.errors).map(([field, problem]: any, i) => (
+                            result.error.errors.length > 0 &&
+                            result.error.errors.map((e, i) => (
                                 <Text key={i}>
-                                    <strong>{field}: </strong>
-                                    {problem}
+                                    {(e.arguments['parameter'] as string) && (
+                                        <strong>{e.arguments['parameter'] as string}: </strong>
+                                    )}
+                                    {e.message}
                                 </Text>
                             ))
                         ) : (

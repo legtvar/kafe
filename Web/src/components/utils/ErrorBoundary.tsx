@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Error } from './Error';
+import { Error as ErrorComponent } from './Error';
 
 interface IErrorBoundaryProps {
     children: React.ReactNode;
@@ -14,13 +14,13 @@ export class ErrorBoundary extends React.Component<IErrorBoundaryProps, IErrorBo
         error: null,
     };
 
-    static getDerivedStateFromError(error: any) {
+    static getDerivedStateFromError(error: Error) {
         return { error };
     }
 
     render() {
         if (this.state.error) {
-            return <Error error={this.state.error} />;
+            return <ErrorComponent error={this.state.error} />;
         }
         return this.props.children;
     }

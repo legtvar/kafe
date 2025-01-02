@@ -1,10 +1,11 @@
 import { Box, Center, Heading, Text } from '@chakra-ui/react';
 import { t } from 'i18next';
+import { components } from '../../schemas/api';
 import { Brand } from '../brand/Brand';
 import { ErrorContent } from './ErrorContent';
 
 interface IErrorProps {
-    error: any;
+    error: Error | components['schemas']['KafeProblemDetails'];
 }
 
 export function Error(props: IErrorProps) {

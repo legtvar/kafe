@@ -2,16 +2,31 @@ import { Box, useColorModeValue } from '@chakra-ui/react';
 import { components } from '../../schemas/api';
 
 interface IErrorContentProps {
-    error: any;
+    error: Error | components['schemas']['KafeProblemDetails'];
 }
 
 export function ErrorContent(props: IErrorContentProps) {
-    let title = 'API error';
+    let title = 'An error occurred';
     let description: string | null = null;
+    let suberrors: components['schemas']['Error'][] = [];
 
-    const kpd = props.error as components['schemas']['KafeProblemDetails'];
-    title = kpd?.title ?? title;
-    description = kpd?.detail ?? description;
+    if ((props.error as unknown as any).title) {
+        const kpd = props.error as components['schemas']['KafeProblemDetails'];
+        title = kpd?.title ?? title;
+        description = kpd?.detail ?? description;
+        suberrors = kpd?.errors ?? [];
+    } else {
+        const jsError = props.error as Error;
+        title = 'A client error occurred';
+        suberrors = [
+            {
+                id: jsError.name,
+                message: jsError.message,
+                arguments: {},
+                stackTrace: jsError.stack,
+            },
+        ];
+    }
 
     return (
         <>
@@ -32,7 +47,7 @@ export function ErrorContent(props: IErrorContentProps) {
                 {description}
             </Box>
 
-            {kpd?.errors.map((e) => (
+            {suberrors.map((e) => (
                 <Box
                     borderRadius={'lg'}
                     border="1px"

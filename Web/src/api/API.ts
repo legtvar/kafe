@@ -27,7 +27,7 @@ export type ApiResponse<T> =
     | {
           status: IntRange<400, 500>;
           response: AxiosResponse<any>;
-          error: components['schemas']['ProblemDetails'];
+          error: components['schemas']['KafeProblemDetails'];
       };
 
 export class API {

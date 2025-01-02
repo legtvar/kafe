@@ -39,7 +39,8 @@ function SimpleProjectAuthorList({
     editable,
 }: { author: components['schemas']['ProjectAuthorDto'] } & IProjectAuthorListProps) {
     return (
-        <Link to={useAuthLink('/projects/authors/' + author.id)}>
+        // TODO: Uncomment when back-end is ready
+        // <Link to={useAuthLink('/projects/authors/' + author.id)}>
             <HStack alignItems="start">
                 <KafeAvatar size={'md'} person={author} />
                 <VStack alignItems="start" pl={2} spacing={0}>
@@ -48,6 +49,6 @@ function SimpleProjectAuthorList({
                 </VStack>
                 {editable && <CloseButton onClick={() => onRemove && onRemove(author.id)} />}
             </HStack>
-        </Link>
+        // </Link>
     );
 }

@@ -63,7 +63,7 @@
       "cast": "Cast",
       "crew": "Crew",
       "description": "Description",
-      "genre": "genre",
+      "genre": "Genre",
       "movie": "Movie",
       "name": "Name of the movie",
       "videoannotation": "Video annotation"

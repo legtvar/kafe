@@ -425,7 +425,8 @@
       },
       "project": {
         "append": "Přidávat nové soubory do projektu",
-        "read": "Zobrazit projekt, jeho metadata a soubory",
+        "read": "Zobrazit projekt a jeho metadata",
+        "inspect": "Zobrazit soubory projektu",
         "write": "Upravovat metadata projektu"
       },
       "group": {

@@ -159,10 +159,12 @@ export function ProjectEdit(props: IProjectEditProps) {
                                         <VStack align="stretch">
                                             <RightsEditor
                                                 perms={perms}
-                                                options={['read', 'write', 'append']}
+                                                options={['read', 'inspect', 'write', 'append']}
                                                 explanation={{
                                                     read: t('rights.groups.project.read').toString(),
+                                                    inspect: t('rights.groups.project.inspect').toString(),
                                                     write: t('rights.groups.project.write').toString(),
+                                                    append: t('rights.groups.project.append').toString(),
                                                 }}
                                             />
                                         </VStack>

@@ -30,6 +30,7 @@ public class AuthorService
 
     public async Task<Err<AuthorInfo>> Create(
         AuthorInfo @new,
+        Hrib? ownerId = null,
         CancellationToken token = default)
     {
         if (!Hrib.TryParse(@new.Id, out var id, out var error))
@@ -66,6 +67,14 @@ public class AuthorService
                 Email: @new.Email,
                 Phone: @new.Phone);
             db.Events.Append(created.AuthorId, infoChanged);
+        }
+
+        if (ownerId is not null)
+        {
+            await accountService.AddPermissions(
+                ownerId,
+                [((Hrib)created.AuthorId, Permission.Read | Permission.Write | Permission.Append | Permission.Inspect)],
+                token);
         }
 
         await db.SaveChangesAsync(token);
@@ -168,7 +177,7 @@ public class AuthorService
             query = (IMartenQueryable<AuthorInfo>)query
                 .Where(a => a.Name == filter.Phone);
         }
-        
+
         if (!string.IsNullOrEmpty(sort))
         {
             query = (IMartenQueryable<AuthorInfo>)query.OrderBySortString(entityMetadataProvider, sort);

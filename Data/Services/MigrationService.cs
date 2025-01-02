@@ -359,13 +359,15 @@ public class MigrationService
 
         if (entity is null)
         {
-            var createResult = await authorService.Create(AuthorInfo.Create(order.Name) with
-            {
-                Id = (order.AuthorId ?? Hrib.Empty).RawValue,
-                Email = order.Email,
-                Uco = order.Uco,
-                Phone = order.Phone
-            }, token);
+            var createResult = await authorService.Create(
+                @new: AuthorInfo.Create(order.Name) with
+                {
+                    Id = (order.AuthorId ?? Hrib.Empty).RawValue,
+                    Email = order.Email,
+                    Uco = order.Uco,
+                    Phone = order.Phone
+                },
+                token: token);
             if (createResult.HasErrors)
             {
                 throw createResult.AsException();

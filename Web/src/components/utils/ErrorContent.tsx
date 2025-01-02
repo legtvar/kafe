@@ -10,8 +10,8 @@ export function ErrorContent(props: IErrorContentProps) {
     let description: string | null = null;
 
     const kpd = props.error as components['schemas']['KafeProblemDetails'];
-    title = kpd.title ?? title;
-    description = kpd.detail ?? description;
+    title = kpd?.title ?? title;
+    description = kpd?.detail ?? description;
 
     return (
         <>
@@ -32,7 +32,7 @@ export function ErrorContent(props: IErrorContentProps) {
                 {description}
             </Box>
 
-            {kpd.errors.map((e) => (
+            {kpd?.errors.map((e) => (
                 <Box
                     borderRadius={'lg'}
                     border="1px"

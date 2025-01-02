@@ -1,12 +1,11 @@
 import { Box, Stack } from '@chakra-ui/react';
-import ChakraUIRenderer from 'chakra-ui-markdown-renderer';
 import { t } from 'i18next';
 import { useCallback } from 'react';
-import Markdown from 'react-markdown';
 import { useParams } from 'react-router-dom';
 import { Group } from '../../../data/Group';
 import { useTitle } from '../../../utils/useTitle';
 import { AwaitAPI } from '../../utils/AwaitAPI';
+import { ChakraMarkdown } from '../../utils/ChakraMarkdown';
 import { OutletOrChildren } from '../../utils/OutletOrChildren';
 import { Status } from '../../utils/Status';
 import { ProjectBasicInfo } from './create/ProjectBasicInfo';
@@ -37,10 +36,8 @@ export function CreateProject(props: ICreateProjectProps) {
                         <Box fontSize="4xl" fontWeight="semibold" as="h2" lineHeight="tight">
                             {group.getName()}
                         </Box>
-                        <Box fontSize="4xl" fontWeight="semibold" as="h2" lineHeight="tight">
-                            <Markdown components={ChakraUIRenderer()} skipHtml>
-                                {group.getDescription()}
-                            </Markdown>
+                        <Box>
+                            <ChakraMarkdown>{group.getDescription()}</ChakraMarkdown>
                         </Box>
                         <hr />
                         <Box fontSize="xl" fontWeight="semibold" as="h3" lineHeight="tight">

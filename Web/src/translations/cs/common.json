@@ -545,7 +545,8 @@
   },
   "organizationRedirect": {
     "title": "Zvolte si organizaci",
-    "subtitle": "Na jinou organizaci můžete kdykoli přepnout v levém panelu"
+    "subtitle": "Na jinou organizaci můžete kdykoli přepnout v levém panelu",
+    "noOrgs": "Není dostupná žádná organizace, prosím kontaktujte administrátory... Tohle by se nemělo stát!"
   },
   "languageToggle": {
     "system": "Jazyk aplikace (Language)",

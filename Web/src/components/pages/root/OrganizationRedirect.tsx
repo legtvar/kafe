@@ -1,4 +1,4 @@
-import { Center, Flex, Heading, HStack, Text, VStack } from '@chakra-ui/layout';
+import { Box, Center, Flex, Heading, HStack, Text, VStack } from '@chakra-ui/layout';
 import { useForceUpdate } from '@chakra-ui/react';
 import { t } from 'i18next';
 import { Link, Navigate } from 'react-router-dom';
@@ -15,10 +15,19 @@ export function OrganizationRedirect() {
     const { organizations } = useOrganizations();
     const reload = useForceUpdate();
 
-    // if (organizations.length === 1) {
-    //     localStorage.setItem(LS_LATEST_ORG_KEY, organizations[0].id);
-    //     return <Navigate to={useAuthLink(undefined, organizations[0].id)} />;
-    // }
+    if (organizations.length === 0) {
+        return <Box>{t('organizationRedirect.noOrgs')}</Box>;
+    }
+
+    if (organizations.length === 1) {
+        localStorage.setItem(LS_LATEST_ORG_KEY, organizations[0].id);
+        console.log('Redirecting to', useAuthLink(undefined, organizations[0].id));
+        return (
+            <OutletOrChildren>
+                <Navigate to={useAuthLink(undefined, organizations[0].id)} />
+            </OutletOrChildren>
+        );
+    }
 
     return (
         <OutletOrChildren>

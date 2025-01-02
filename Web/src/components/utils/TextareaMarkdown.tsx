@@ -9,10 +9,9 @@ import {
     Textarea,
     TextareaProps,
 } from '@chakra-ui/react';
-import ChakraUIRenderer from 'chakra-ui-markdown-renderer';
 import { t } from 'i18next';
 import { useState } from 'react';
-import Markdown from 'react-markdown';
+import { ChakraMarkdown } from './ChakraMarkdown';
 
 export function TextareaMarkdown({ value, defaultValue, ...props }: TextareaProps) {
     const [textareaValue, setTextareaValue] = useState<string>(value?.toString() || defaultValue?.toString() || '');
@@ -41,9 +40,7 @@ export function TextareaMarkdown({ value, defaultValue, ...props }: TextareaProp
                         <AccordionIcon />
                     </AccordionButton>
                     <AccordionPanel pb={4}>
-                        <Markdown components={ChakraUIRenderer()} skipHtml>
-                            {textareaValue}
-                        </Markdown>
+                        <ChakraMarkdown>{textareaValue}</ChakraMarkdown>
                     </AccordionPanel>
                 </AccordionItem>
             </Accordion>

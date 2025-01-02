@@ -1,4 +1,4 @@
-import { Center, Flex, Heading, HStack, Text, VStack } from '@chakra-ui/layout';
+import { Box, Center, Flex, Heading, HStack, Text, VStack } from '@chakra-ui/layout';
 import { useForceUpdate } from '@chakra-ui/react';
 import { t } from 'i18next';
 import { Link, Navigate } from 'react-router-dom';
@@ -14,6 +14,10 @@ export function OrganizationRedirect() {
     const org = localStorage.getItem(LS_LATEST_ORG_KEY);
     const { organizations } = useOrganizations();
     const reload = useForceUpdate();
+
+    if (organizations.length === 0) {
+        return <Box>{t('organizationRedirect.noOrgs')}</Box>;
+    }
 
     if (organizations.length === 1) {
         localStorage.setItem(LS_LATEST_ORG_KEY, organizations[0].id);

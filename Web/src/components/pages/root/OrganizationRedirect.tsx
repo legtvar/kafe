@@ -15,10 +15,15 @@ export function OrganizationRedirect() {
     const { organizations } = useOrganizations();
     const reload = useForceUpdate();
 
-    // if (organizations.length === 1) {
-    //     localStorage.setItem(LS_LATEST_ORG_KEY, organizations[0].id);
-    //     return <Navigate to={useAuthLink(undefined, organizations[0].id)} />;
-    // }
+    if (organizations.length === 1) {
+        localStorage.setItem(LS_LATEST_ORG_KEY, organizations[0].id);
+        console.log('Redirecting to', useAuthLink(undefined, organizations[0].id));
+        return (
+            <OutletOrChildren>
+                <Navigate to={useAuthLink(undefined, organizations[0].id)} />
+            </OutletOrChildren>
+        );
+    }
 
     return (
         <OutletOrChildren>

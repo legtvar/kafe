@@ -1,4 +1,4 @@
-import { Button, Flex, FormControl, Highlight, Icon, Input, Text, useColorModeValue } from '@chakra-ui/react';
+import { Box, Button, Flex, FormControl, Highlight, Icon, Input, Text, useColorModeValue } from '@chakra-ui/react';
 import { t } from 'i18next';
 import { useCallback, useState } from 'react';
 import { IoAdd, IoFolderOpenOutline } from 'react-icons/io5';
@@ -24,13 +24,12 @@ export function Groups(props: IGroupsProps) {
     const highlightStyle = useHighlightStyle();
     const [filter, setFilter] = useState('');
 
+    const { currentOrganization } = useOrganizations();
+
     return (
         <OutletOrChildren>
             <AwaitAPI
-                request={useCallback(
-                    (api) => api.groups.getAll(useOrganizations().currentOrganization?.id),
-                    [useOrganizations().currentOrganization?.id],
-                )}
+                request={useCallback((api) => api.groups.getAll(currentOrganization?.id), [currentOrganization?.id])}
             >
                 {(data: Group[]) => (
                     <>
@@ -90,9 +89,9 @@ export function Groups(props: IGroupsProps) {
                                                         {project.getName()}
                                                     </Highlight>
                                                 </Text>
-                                                <Text fontSize="smaller" color="gray.500" mb={-2}>
+                                                <Box fontSize="smaller" color="gray.500" mb={-2}>
                                                     <ChakraMarkdown>{project.getDescription()}</ChakraMarkdown>
-                                                </Text>
+                                                </Box>
                                             </Flex>
                                         </Flex>
                                     </Link>

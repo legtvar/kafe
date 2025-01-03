@@ -21,7 +21,7 @@ import Countdown from 'react-countdown';
 import { IoCubeOutline } from 'react-icons/io5';
 import { Link } from 'react-router-dom';
 import { useOrganizations } from '../../../hooks/Caffeine';
-import { useAuthLink } from '../../../hooks/useAuthLink';
+import { useAuthLinkFunction } from '../../../hooks/useAuthLink';
 import { useTitle } from '../../../utils/useTitle';
 import { AwaitAPI } from '../../utils/AwaitAPI';
 import { ChakraMarkdown } from '../../utils/ChakraMarkdown';
@@ -40,6 +40,7 @@ export function Home(props: IHomeProps) {
             <Text>{props.title}</Text>
         </Box>
     );
+    const useAuthLink = useAuthLinkFunction();
 
     const DESCRIPTION_LENGTH = 200;
     const { currentOrganization } = useOrganizations();
@@ -66,10 +67,7 @@ export function Home(props: IHomeProps) {
                     </HStack>
                 </Heading>
                 <AwaitAPI
-                    request={useCallback(
-                        (api) => api.groups.getAll(useOrganizations().currentOrganization?.id),
-                        [useOrganizations().currentOrganization],
-                    )}
+                    request={useCallback((api) => api.groups.getAll(currentOrganization?.id), [currentOrganization])}
                 >
                     {(groups) => (
                         <Box w="full" overflowX="auto" py={4} scrollSnapType="x mandatory">

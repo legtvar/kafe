@@ -24,6 +24,7 @@ import { Artifact } from '../../../data/Artifact';
 import { Project } from '../../../data/Project';
 import { useColorScheme } from '../../../hooks/useColorScheme';
 import { components } from '../../../schemas/api';
+import { ContentThumbnail } from '../../media/ContentThumbnail';
 import { SendAPI } from '../SendAPI';
 import { ShardGroupUpload } from './ShardGroup';
 
@@ -66,13 +67,30 @@ export function ArtifactUpload(props: IArtifactUploadProps) {
                             <AccordionButton>
                                 <Box as="span" flex="1" textAlign="left">
                                     {artifact.getName()}{' '}
-                                    <Text as="span" pl={4} color={'gray.500'}>
+                                    {/* <Text as="span" pl={4} color={'gray.500'}>
                                         ({artifact.shards.length} {t('generic.files').toString()})
-                                    </Text>
+                                    </Text> */}
                                 </Box>
                                 <AccordionIcon />
                             </AccordionButton>
                             <AccordionPanel pb={4}>
+                                <Text mb={2} opacity={0.5}>
+                                    {t('artifact.section.preview.title')}
+                                </Text>
+                                <ContentThumbnail
+                                    artifact={artifact}
+                                    w={{
+                                        base: '100%',
+                                        lg: 'calc(50% - var(--kafe-space-4) / 2)',
+                                        xl: 'calc(33.33% - var(--kafe-space-4) / 2)',
+                                    }}
+                                />
+                                <Text mt={6} opacity={0.5}>
+                                    {t('artifact.section.shards.title')}
+                                </Text>
+                                <Text mb={3} opacity={0.5} fontSize="sm">
+                                    {t('artifact.section.shards.subtitle')}
+                                </Text>
                                 <SimpleGrid columns={{ base: 1, lg: 2, xl: 3 }} spacing={4} w="100%">
                                     {Object.entries(shardBlueprints).map(([kind, shard], i) => (
                                         <ShardGroupUpload
@@ -83,7 +101,10 @@ export function ArtifactUpload(props: IArtifactUploadProps) {
                                         />
                                     ))}
                                 </SimpleGrid>
-                                <Button mt={4} colorScheme="red" leftIcon={<IoTrashOutline />} onClick={onOpen}>
+                                <Text mt={6} mb={2} opacity={0.5}>
+                                    Správa
+                                </Text>
+                                <Button colorScheme="red" leftIcon={<IoTrashOutline />} onClick={onOpen}>
                                     {t('artifact.delete').toString()}
                                 </Button>
 

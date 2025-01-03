@@ -390,9 +390,18 @@
     "note": "Role oddělujte čárkou, nebo novým řádkem"
   },
   "artifact": {
-    "delete": "Odstranit artefakt",
+    "delete": "Odstranit celý artefakt",
     "deleteWarn": "Opravdu chcete odstranit vybraný artefatk? Tato operace je nevratná!",
-    "noContent": "Artefakt neobsahuje žádné soubory"
+    "noContent": "Artefakt neobsahuje žádné soubory",
+    "section": {
+      "preview": {
+        "title": "Náhled"
+      },
+      "shards": {
+        "title": "Části artefaktu",
+        "subtitle": "Každý artefakt pod sebou může obsahovat několik souborů - střípků. Typickým příkladem může být film a jeho titulky. Tyto soubory se zobrazují společně v rámci jednoho artefaktu."
+      }
+    }
   },
   "projectList": {
     "search": "Hledat projekty"

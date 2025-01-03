@@ -392,9 +392,18 @@
     "note": "Separate the roles with a comma or a new line"
   },
   "artifact": {
-    "delete": "Delete the artifact",
+    "delete": "Delete the entire artifact",
     "deleteWarn": "Are you sure you want to delete the selected artifact? \nThis operation is irreversible!",
-    "noContent": "The artifact does not contain any files"
+    "noContent": "The artifact does not contain any files",
+    "section": {
+      "preview": {
+        "title": "Preview"
+      },
+      "shards": {
+        "title": "Artifact parts",
+        "subtitle": "Each artifact can contain several files - shards. \nA typical example can be a movie and its subtitles. These files are displayed together within a single artifact."
+      }
+    }
   },
   "projectList": {
     "search": "Filter projects"

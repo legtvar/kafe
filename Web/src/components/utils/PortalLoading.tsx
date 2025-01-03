@@ -1,7 +1,7 @@
 import { Box, Center, Portal, Spinner } from '@chakra-ui/react';
 
 export function PortalLoading() {
-    console.log('hello');
+    // console.log('hello');
     return (
         <Portal>
             <Box

@@ -11,13 +11,12 @@ interface IProjectsProps {}
 
 export function Projects(props: IProjectsProps) {
     useTitle(t('title.projects'));
+    const { currentOrganization } = useOrganizations();
+
     return (
         <OutletOrChildren>
             <AwaitAPI
-                request={useCallback(
-                    (api) => api.projects.getAll(useOrganizations().currentOrganization?.id),
-                    [useOrganizations().currentOrganization],
-                )}
+                request={useCallback((api) => api.projects.getAll(currentOrganization?.id), [currentOrganization])}
             >
                 {(data: Project[]) => <ProjectListComponent projects={data} />}
             </AwaitAPI>

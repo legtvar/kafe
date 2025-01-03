@@ -75,7 +75,7 @@ export function PlaylistDetail(props: IPlaylistDetailProps) {
                                     }
                                 >
                                     {(shards) => {
-                                        console.log(shards);
+                                        // console.log(shards);
 
                                         return (
                                             <Stack direction={{ base: 'column', lg: 'row' }} spacing={4}>

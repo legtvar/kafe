@@ -28,7 +28,9 @@ public record RoleInfo(
     ImmutableDictionary<string, Permission> Permissions
 ) : IEntity
 {
-    public static readonly RoleInfo Invalid = new(
+    public static readonly RoleInfo Invalid = new();
+
+    public RoleInfo() : this(
         Id: Hrib.InvalidValue,
         CreationMethod: CreationMethod.Unknown,
         OrganizationId: Hrib.InvalidValue,
@@ -36,9 +38,7 @@ public record RoleInfo(
         Description: null,
         CreatedOn: default,
         Permissions: ImmutableDictionary<string, Permission>.Empty
-    );
-
-    public RoleInfo() : this(Invalid)
+    )
     {
     }
 

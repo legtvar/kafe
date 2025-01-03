@@ -30,15 +30,15 @@ public record ProjectGroupInfo(
     Permission GlobalPermissions = Permission.None
 ) : IVisibleEntity
 {
-    public static readonly ProjectGroupInfo Invalid = new(
+    public static readonly ProjectGroupInfo Invalid = new();
+
+    public ProjectGroupInfo() : this(
         Id: Hrib.InvalidValue,
         CreationMethod: CreationMethod.Unknown,
         OrganizationId: Hrib.InvalidValue,
         Name: LocalizedString.CreateInvariant(Const.InvalidName),
         Description: null
-    );
-
-    public ProjectGroupInfo() : this(Invalid)
+    )
     {
     }
 

@@ -13,14 +13,14 @@ public record ArtifactInfo(
     DateTimeOffset AddedOn
 ) : IEntity
 {
-    public static readonly ArtifactInfo Invalid = new(
+    public static readonly ArtifactInfo Invalid = new();
+
+    public ArtifactInfo() : this(
         Id: Hrib.InvalidValue,
         CreationMethod: CreationMethod.Unknown,
         Name: LocalizedString.CreateInvariant(Const.InvalidName),
         AddedOn: default
-    );
-
-    public ArtifactInfo() : this(Invalid)
+    )
     {
     }
 

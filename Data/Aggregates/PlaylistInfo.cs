@@ -26,7 +26,9 @@ public record PlaylistInfo(
     Permission GlobalPermissions = Permission.None
 ) : IVisibleEntity
 {
-    public static readonly PlaylistInfo Invalid = new(
+    public static readonly PlaylistInfo Invalid = new();
+
+    public PlaylistInfo() : this(
         Id: Hrib.InvalidValue,
         CreationMethod: CreationMethod.Unknown,
         OrganizationId: Hrib.InvalidValue,
@@ -34,9 +36,7 @@ public record PlaylistInfo(
         Name: LocalizedString.CreateInvariant(Const.InvalidName),
         Description: null,
         GlobalPermissions: Permission.None
-    );
-
-    public PlaylistInfo() : this(Invalid)
+    )
     {
     }
 

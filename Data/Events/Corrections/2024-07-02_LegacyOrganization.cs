@@ -32,6 +32,12 @@ internal class LegacyOrganizationCorrection : IEventCorrection
 
     public async Task Apply(IDocumentSession db, CancellationToken ct = default)
     {
+        db.Events.KafeStartStream<OrganizationInfo>(LegacyOrganizationId, new OrganizationCreated(
+            OrganizationId: LegacyOrganizationId.ToString(),
+            CreationMethod: CreationMethod.Correction,
+            Name: LegacyOrganizationName
+        ));
+
         var events = await db.Events.QueryAllRawEvents()
             .Where(e =>
                 e.EventTypeName == EventMappingExtensions.GetEventTypeName<PlaylistCreated>()
@@ -54,12 +60,6 @@ internal class LegacyOrganizationCorrection : IEventCorrection
                 ));
             }
         }
-
-        db.Events.KafeStartStream<OrganizationInfo>(LegacyOrganizationId, new OrganizationCreated(
-            OrganizationId: LegacyOrganizationId.ToString(),
-            CreationMethod: CreationMethod.Correction,
-            Name: LegacyOrganizationName
-        ));
     }
 }
 

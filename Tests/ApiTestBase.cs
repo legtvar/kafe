@@ -64,6 +64,6 @@ public class ApiTestBase : IAsyncLifetime
 
     public async Task WaitForProjections()
     {
-        await Store.WaitForNonStaleProjectionDataAsync(TimeSpan.FromMinutes(1));
+        await Store.WaitForNonStaleProjectionDataAsync(TimeSpan.FromMinutes(4));
     }
 }

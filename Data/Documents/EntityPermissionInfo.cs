@@ -47,7 +47,7 @@ public record EntityPermissionEntry(
 /// <param name="RoleEntries"> Roles with permissions to this entity along with source metadata.</param>
 public record EntityPermissionInfo(
     [Hrib] string Id,
-    Permission GlobalPermission,
+    EntityPermissionEntry GlobalPermission,
     ImmutableDictionary<string, ImmutableHashSet<string>> DependencyGraph,
     ImmutableDictionary<string, EntityPermissionEntry> RoleEntries,
     ImmutableDictionary<string, EntityPermissionEntry> AccountEntries
@@ -55,7 +55,7 @@ public record EntityPermissionInfo(
 {
     public static readonly EntityPermissionInfo Invalid = new(
         Id: Hrib.InvalidValue,
-        GlobalPermission: Permission.None,
+        GlobalPermission: new(Permission.None, ImmutableDictionary<string, EntityPermissionSource>.Empty),
         DependencyGraph: ImmutableDictionary<string, ImmutableHashSet<string>>.Empty,
         RoleEntries: ImmutableDictionary<string, EntityPermissionEntry>.Empty,
         AccountEntries: ImmutableDictionary<string, EntityPermissionEntry>.Empty
@@ -83,7 +83,7 @@ public record EntityPermissionInfo(
     public Permission GetAccountPermission(Hrib accountId)
     {
         return (AccountEntries.GetValueOrDefault(accountId.ToString())?.EffectivePermission ?? Permission.None)
-            | GlobalPermission;
+            | GlobalPermission.EffectivePermission;
     }
 
     public ImmutableHashSet<string> GetParents()

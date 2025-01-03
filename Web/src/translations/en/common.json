@@ -221,12 +221,27 @@
     "title": "My projects"
   },
   "projectStatus": {
-    "dramaturgy": "Project has been accepted",
-    "file": "Files are uploaded and have passed the automated check",
-    "info": "Basic information is sufficiently filled in",
-    "tech": "Project has been reviewed by a technician",
-    "visual": "The project has been reviewed by the graphic designer",
-    "disclaimer": "The automatic validation is still in development. Please take the results with a grain of salt."
+    "dramaturgy": {
+      "ok": "The project has been accepted to the festival",
+      "nok": "The project has not been accepted to the festival"
+    },
+    "file": {
+      "ok": "Files are uploaded and passed the automated check",
+      "nok": "Files are not uploaded or did not pass the automated check"
+    },
+    "info": {
+      "ok": "Basic information is sufficiently filled out",
+      "nok": "Basic information is not sufficiently filled out"
+    },
+    "tech": {
+      "ok": "The project passed the technician's check",
+      "nok": "The project did not pass the technician's check"
+    },
+    "visual": {
+      "ok": "The project passed the graphic designer's check",
+      "nok": "The project did not pass the graphic designer's check"
+    },
+    "disclaimer": "The automated check is still in development. Please take the results with caution."
   },
   "register": {
     "button": "Log in",

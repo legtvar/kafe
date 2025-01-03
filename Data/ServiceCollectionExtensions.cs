@@ -1,5 +1,6 @@
 ﻿using Kafe.Data;
 using Kafe.Data.Aggregates;
+using Kafe.Data.Documents;
 using Kafe.Data.Events.Upcasts;
 using Kafe.Data.Metadata;
 using Kafe.Data.Options;
@@ -85,6 +86,8 @@ public static class ServiceCollectionExtensions
                     // NB: Since some of the projections query other perm infos, the events need to be processed
                     //     one by one.
                     ao.BatchSize = 1;
+                    ao.DeleteViewTypeOnTeardown<EntityPermissionInfo>();
+                    ao.DeleteViewTypeOnTeardown<RoleMembersInfo>();
                 });
             mo.Events.Upcast<AccountCapabilityAddedUpcaster>();
             mo.Events.Upcast<AccountCapabilityRemovedUpcaster>();

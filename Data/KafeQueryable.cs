@@ -44,7 +44,7 @@ public static class KafeQueryable
                 (
                     (
                         COALESCE((perms.data -> 'AccountEntries' -> ? -> 'EffectivePermission')::int, 0)
-                        | COALESCE((perms.data -> 'GlobalPermission')::int, 0)
+                        | COALESCE((perms.data -> 'GlobalPermission' -> 'EffectivePermission')::int, 0)
                     )
                     & ?
                 ) = ?
@@ -72,7 +72,7 @@ public static class KafeQueryable
             var anonSql =
             $"""
             (
-                SELECT (perms.data -> 'GlobalPermission')::int
+                SELECT (perms.data -> 'GlobalPermission' -> 'EffectivePermission')::int
                 FROM {schema.For<EntityPermissionInfo>()} AS perms
                 WHERE perms.id = d.id
             )::int & ? = ?
@@ -88,7 +88,7 @@ public static class KafeQueryable
         (
             SELECT
                 COALESCE((perms.data -> 'AccountEntries' -> ? -> 'EffectivePermission')::int, 0)
-                    | COALESCE((perms.data -> 'GlobalPermission')::int, 0)
+                    | COALESCE((perms.data -> 'GlobalPermission' -> 'EffectivePermission')::int, 0)
             FROM {schema.For<EntityPermissionInfo>()} AS perms
             WHERE perms.id = d.id
         )::int & ? = ?

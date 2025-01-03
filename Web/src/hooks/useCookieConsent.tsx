@@ -10,7 +10,6 @@ export function useCookieConsent() {
     const toastRef = useRef<ToastId>();
     const { i18n } = useTranslation();
     const bg = useColorModeValue('gray.100', 'gray.800');
-    console.log(bg);
 
     const id = 'cookies';
 

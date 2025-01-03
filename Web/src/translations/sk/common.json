@@ -219,12 +219,27 @@
     "title": "Moje projekty"
   },
   "projectStatus": {
-    "dramaturgy": "Projekt bol prijatý na festival",
-    "file": "Súbory sú nahrané a prešli automatizovanou kontrolou",
-    "info": "Základné informácie sú dostatočne vyplnené",
-    "tech": "Projekt prešiel kontrolou technikom",
-    "visual": "Projekt prešiel kontrolou grafikom",
-    "disclaimer": "Automatická kontrola je zatiaľ v štádiu vývoja. Výsledky prosím berte s rezervou."
+    "dramaturgy": {
+      "ok": "Projekt bol prijatý na festival",
+      "nok": "Projekt nebol prijatý na festival"
+    },
+    "file": {
+      "ok": "Súbory sú nahrané a prešli automatizovanou kontrolou",
+      "nok": "Súbory nie sú nahrané, alebo neprešli automatizovanou kontrolou"
+    },
+    "info": {
+      "ok": "Základné informácie sú dostatočne vyplnené",
+      "nok": "Základné informácie nie sú dostatočne vyplnené"
+    },
+    "tech": {
+      "ok": "Projekt prešiel kontrolou technikom",
+      "nok": "Projekt neprešiel kontrolou technikom"
+    },
+    "visual": {
+      "ok": "Projekt prešiel kontrolou grafikom",
+      "nok": "Projekt neprešiel kontrolou grafikom"
+    },
+    "disclaimer": "Automatická kontrola je zatiaľ vo fáze vývoja. Výsledky prosím berte s rezervou."
   },
   "register": {
     "button": "Prihlásiť sa",

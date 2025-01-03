@@ -19,12 +19,12 @@ public record RoleMembersInfo
     ImmutableHashSet<string> MemberIds
 ) : IEntity
 {
-    public static readonly RoleMembersInfo Invalid = new(
+    public static readonly RoleMembersInfo Invalid = new();
+
+    public RoleMembersInfo() : this(
         Id: Hrib.InvalidValue,
         MemberIds: []
-    );
-
-    public RoleMembersInfo() : this(Invalid)
+    )
     {
     }
 

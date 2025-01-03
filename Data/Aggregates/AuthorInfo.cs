@@ -27,7 +27,9 @@ public record AuthorInfo(
     [property:Sortable]
     string? Phone = null) : IVisibleEntity
 {
-    public static readonly AuthorInfo Invalid = new(
+    public static readonly AuthorInfo Invalid = new();
+
+    public AuthorInfo() : this(
         Id: Hrib.InvalidValue,
         CreationMethod: CreationMethod.Unknown,
         Name: Const.InvalidName,
@@ -36,9 +38,7 @@ public record AuthorInfo(
         Uco: null,
         Email: null,
         Phone: null
-    );
-
-    public AuthorInfo() : this(Invalid)
+    )
     {
     }
 

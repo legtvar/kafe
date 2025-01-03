@@ -42,7 +42,9 @@ public record ProjectInfo(
     bool IsLocked = false
 ) : IVisibleEntity
 {
-    public static readonly ProjectInfo Invalid = new(
+    public static readonly ProjectInfo Invalid = new();
+
+    public ProjectInfo() : this(
         Id: Hrib.InvalidValue,
         CreationMethod: CreationMethod.Unknown,
         ProjectGroupId: Hrib.InvalidValue,
@@ -55,9 +57,7 @@ public record ProjectInfo(
         GlobalPermissions: Permission.None,
         ReleasedOn: default,
         IsLocked: false
-    );
-
-    public ProjectInfo() : this(Invalid)
+    )
     {
     }
 

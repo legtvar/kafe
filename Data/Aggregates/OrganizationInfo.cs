@@ -22,15 +22,15 @@ public record OrganizationInfo(
     Permission GlobalPermissions = Permission.None
 ) : IVisibleEntity
 {
-    public static readonly OrganizationInfo Invalid = new(
+    public static readonly OrganizationInfo Invalid = new();
+
+    public OrganizationInfo() : this(
         Id: Hrib.InvalidValue,
         CreationMethod: CreationMethod.Unknown,
         Name: LocalizedString.CreateInvariant(Const.InvalidName),
         CreatedOn: default,
         GlobalPermissions: Permission.None
-    );
-
-    public OrganizationInfo() : this(Invalid)
+    )
     {
     }
 

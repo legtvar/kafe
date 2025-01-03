@@ -53,17 +53,16 @@ public record EntityPermissionInfo(
     ImmutableDictionary<string, EntityPermissionEntry> AccountEntries
 ) : IEntity
 {
-    public static readonly EntityPermissionInfo Invalid = new(
+    public static readonly EntityPermissionInfo Invalid = new();
+
+    public EntityPermissionInfo() : this(
         Id: Hrib.InvalidValue,
         GlobalPermission: new(Permission.None, ImmutableDictionary<string, EntityPermissionSource>.Empty),
         DependencyGraph: ImmutableDictionary<string, ImmutableHashSet<string>>.Empty,
         RoleEntries: ImmutableDictionary<string, EntityPermissionEntry>.Empty,
         AccountEntries: ImmutableDictionary<string, EntityPermissionEntry>.Empty
-    );
-
-    public EntityPermissionInfo() : this(Invalid)
-    {
-    }
+    )
+    {}
 
     /// <summary>
     /// Creates a bare-bones but valid <see cref="EntityPermissionInfo"/> with nothing but the entity's HRIB.

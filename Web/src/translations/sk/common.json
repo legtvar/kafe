@@ -390,9 +390,18 @@
     "note": "Role oddeľujte čiarkou, alebo novým riadkom"
   },
   "artifact": {
-    "delete": "Odstrániť artefakt",
+    "delete": "Odstrániť celý artefakt",
     "deleteWarn": "Naozaj chcete odstrániť vybraný artefakt? Táto operácia je nevratná!",
-    "noContent": "Artefakt neobsahuje žiadne súbory"
+    "noContent": "Artefakt neobsahuje žiadne súbory",
+    "section": {
+      "preview": {
+        "title": "Náhľad"
+      },
+      "shards": {
+        "title": "Časti artefaktu",
+        "subtitle": "Každý artefakt pod sebou môže obsahovať niekoľko súborov – čriepkov. \nTypickým príkladom môže byť film a jeho titulky. Tieto súbory sa zobrazujú spoločne v rámci jedného artefaktu."
+      }
+    }
   },
   "projectList": {
     "search": "Hľadať projekty"

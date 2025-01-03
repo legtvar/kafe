@@ -6,7 +6,7 @@ import { Project } from '../../../data/Project';
 import { useColorScheme } from '../../../hooks/useColorScheme';
 import { useReload } from '../../../hooks/useReload';
 import { components } from '../../../schemas/api';
-import { concat, toLocalizedString } from '../../../schemas/generic';
+import { toLocalizedString } from '../../../schemas/generic';
 import { getPrefered } from '../../../utils/preferedLanguage';
 import { SendAPI } from '../SendAPI';
 import { ArtifactUpload } from './Artifact';
@@ -28,7 +28,7 @@ export function ArtifactGroupUpload(props: IArtifactGroupUploadProps) {
 
     const artifactsInSlot = project.artifacts.filter((artifact) => artifact.blueprintSlot === slotName);
 
-    const newArtname = concat(project.name, ' (', toLocalizedString(name), ')');
+    const newArtname = toLocalizedString(name);
 
     return (
         <SendAPI

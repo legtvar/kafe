@@ -691,7 +691,11 @@ public class EntityPermissionEventProjection : EventProjection
         foreach (var pair in entries)
         {
             var newEntry = RemoveEntrySources(pair.Value, sources);
-            if (newEntry.EffectivePermission != Permission.None)
+            if (newEntry.EffectivePermission == Permission.None)
+            {
+                result.Remove(pair.Key);
+            }
+            else
             {
                 result[pair.Key] = newEntry;
             }

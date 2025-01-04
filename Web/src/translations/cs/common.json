@@ -219,11 +219,26 @@
     "title": "Moje projekty"
   },
   "projectStatus": {
-    "dramaturgy": "Projekt byl přijat na festival",
-    "file": "Soubory jsou nahrány a prošly automatizovanou kontrolou",
-    "info": "Základní informace jsou dostatečně vyplněny",
-    "tech": "Projekt prošel kontrolou technikem",
-    "visual": "Projekt prošel kontrolou grafikem",
+    "dramaturgy": {
+      "ok": "Projekt byl přijat na festival",
+      "nok": "Projekt nebyl přijat na festival"
+    },
+    "file": {
+      "ok": "Soubory jsou nahrány a prošly automatizovanou kontrolou",
+      "nok": "Soubory nejsou nahrány, nebo neprošly automatizovanou kontrolou"
+    },
+    "info": {
+      "ok": "Základní informace jsou dostatečně vyplněny",
+      "nok": "Základní informace nejsou dostatečně vyplněny"
+    },
+    "tech": {
+      "ok": "Projekt prošel kontrolou technikem",
+      "nok": "Projekt neprošel kontrolou technikem"
+    },
+    "visual": {
+      "ok": "Projekt prošel kontrolou grafikem",
+      "nok": "Projekt neprošel kontrolou grafikem"
+    },
     "disclaimer": "Automatická kontrola je zatím ve stádiu vývoje. Výsledky prosím berte s rezervou."
   },
   "register": {
@@ -375,9 +390,18 @@
     "note": "Role oddělujte čárkou, nebo novým řádkem"
   },
   "artifact": {
-    "delete": "Odstranit artefakt",
+    "delete": "Odstranit celý artefakt",
     "deleteWarn": "Opravdu chcete odstranit vybraný artefatk? Tato operace je nevratná!",
-    "noContent": "Artefakt neobsahuje žádné soubory"
+    "noContent": "Artefakt neobsahuje žádné soubory",
+    "section": {
+      "preview": {
+        "title": "Náhled"
+      },
+      "shards": {
+        "title": "Části artefaktu",
+        "subtitle": "Každý artefakt pod sebou může obsahovat několik souborů - střípků. Typickým příkladem může být film a jeho titulky. Tyto soubory se zobrazují společně v rámci jednoho artefaktu."
+      }
+    }
   },
   "projectList": {
     "search": "Hledat projekty"

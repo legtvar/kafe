@@ -7,7 +7,7 @@ import {
     FormHelperText,
     FormLabel,
     Icon,
-    Text
+    Text,
 } from '@chakra-ui/react';
 import { AiOutlinePlus } from 'react-icons/ai';
 import { Artifact } from '../../../data/Artifact';
@@ -67,38 +67,40 @@ export function ShardGroupUpload(props: IShardGroupUploadProps) {
                     </Text>
                 </Box>
             ))}
-            {(filesInGroup.length < arity.max) && <Box w="100%" borderColor={border} bg={bg} borderWidth={1} borderRadius="md" py={4} px={4}>
-                <Accordion allowToggle m={-4}>
-                    <AccordionItem borderWidth="0 !important">
-                        <AccordionButton color={'gray.500'}>
-                            <Box as="span" flex="1" textAlign="left">
-                                <Icon fontSize="1.2em">
-                                    <AiOutlinePlus />
-                                </Icon>{' '}
-                                Přidat nový soubor
-                            </Box>
-                        </AccordionButton>
-                        <AccordionPanel pb={4}>
-                            <Upload
-                                title={getPrefered(toLocalizedString(name)).toLowerCase()}
-                                projectId={project.id}
-                                shardKind={kind as any}
-                                artifactId={artifact.id}
-                                onUploaded={(id) => {
-                                    artifact.shards.push(
-                                        new Shard({
-                                            id,
-                                            kind,
-                                        }),
-                                    );
-                                    reload();
-                                }}
-                                repeatable
-                            />
-                        </AccordionPanel>
-                    </AccordionItem>
-                </Accordion>
-            </Box>}
+            {filesInGroup.length < arity.max && (
+                <Box w="100%" borderColor={border} bg={bg} borderWidth={1} borderRadius="md" py={4} px={4}>
+                    <Accordion allowToggle m={-4}>
+                        <AccordionItem borderWidth="0 !important">
+                            <AccordionButton color={'gray.500'}>
+                                <Box as="span" flex="1" textAlign="left">
+                                    <Icon fontSize="1.2em">
+                                        <AiOutlinePlus />
+                                    </Icon>{' '}
+                                    Přidat nový soubor
+                                </Box>
+                            </AccordionButton>
+                            <AccordionPanel pb={4}>
+                                <Upload
+                                    title={getPrefered(toLocalizedString(name)).toLowerCase()}
+                                    projectId={project.id}
+                                    shardKind={kind as any}
+                                    artifactId={artifact.id}
+                                    onUploaded={(id) => {
+                                        artifact.shards.push(
+                                            new Shard({
+                                                id,
+                                                kind,
+                                            }),
+                                        );
+                                        reload();
+                                    }}
+                                    repeatable
+                                />
+                            </AccordionPanel>
+                        </AccordionItem>
+                    </Accordion>
+                </Box>
+            )}
         </Box>
     );
 }

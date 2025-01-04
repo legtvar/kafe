@@ -81,8 +81,8 @@ public class EntityService
         }
 
         return accessingAccountId.IsEmpty
-            ? perms.Value.GlobalPermission
-            : perms.Value.GetAccountPermission(accessingAccountId) | perms.Value.GlobalPermission;
+            ? perms.Value.GlobalPermission.EffectivePermission
+            : perms.Value.GetAccountPermission(accessingAccountId) | perms.Value.GlobalPermission.EffectivePermission;
     }
 
     public async Task<ImmutableArray<Permission>> GetPermissions(
@@ -98,8 +98,8 @@ public class EntityService
 
         var manyPerms = (await LoadPermissionInfoMany(entityIds, token)).Unwrap();
         return manyPerms.Select(p => accessingAccountId.IsEmpty
-                ? p.GlobalPermission
-                : p.GetAccountPermission(accessingAccountId) | p.GlobalPermission)
+                ? p.GlobalPermission.EffectivePermission
+                : p.GetAccountPermission(accessingAccountId) | p.GlobalPermission.EffectivePermission)
             .ToImmutableArray();
     }
 

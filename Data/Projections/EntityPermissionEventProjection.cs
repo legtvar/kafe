@@ -172,24 +172,24 @@ public class EntityPermissionEventProjection : EventProjection
             ignoreSelf: true);
     }
 
-    public Task Project(ProjectGroupGlobalPermissionsChanged e, IDocumentOperations ops)
+    public Task Project(ProjectGroupGlobalPermissionsChanged e, IEvent metadata, IDocumentOperations ops)
     {
-        return SetGlobalPermission(ops, e.ProjectGroupId, e.GlobalPermissions);
+        return OnGlobalPermissionChanged(ops, e.ProjectGroupId, e.GlobalPermissions, metadata.Timestamp);
     }
 
-    public Task Project(ProjectGlobalPermissionsChanged e, IDocumentOperations ops)
+    public Task Project(ProjectGlobalPermissionsChanged e, IEvent metadata, IDocumentOperations ops)
     {
-        return SetGlobalPermission(ops, e.ProjectId, e.GlobalPermissions);
+        return OnGlobalPermissionChanged(ops, e.ProjectId, e.GlobalPermissions, metadata.Timestamp);
     }
 
-    public Task Project(PlaylistGlobalPermissionsChanged e, IDocumentOperations ops)
+    public Task Project(PlaylistGlobalPermissionsChanged e, IEvent metadata, IDocumentOperations ops)
     {
-        return SetGlobalPermission(ops, e.PlaylistId, e.GlobalPermissions);
+        return OnGlobalPermissionChanged(ops, e.PlaylistId, e.GlobalPermissions, metadata.Timestamp);
     }
 
-    public Task Project(OrganizationGlobalPermissionsChanged e, IDocumentOperations ops)
+    public Task Project(OrganizationGlobalPermissionsChanged e, IEvent metadata, IDocumentOperations ops)
     {
-        return SetGlobalPermission(ops, e.OrganizationId, e.GlobalPermissions);
+        return OnGlobalPermissionChanged(ops, e.OrganizationId, e.GlobalPermissions, metadata.Timestamp);
     }
 
     public async Task Project(AccountRoleSet e, IEvent metadata, IDocumentOperations ops)
@@ -331,14 +331,48 @@ public class EntityPermissionEventProjection : EventProjection
         ops.Store(perms);
     }
 
-    private static async Task SetGlobalPermission(IDocumentOperations ops, Hrib entityId, Permission globalPermission)
+    private static async Task OnGlobalPermissionChanged(
+        IDocumentOperations ops,
+        Hrib entityId,
+        Permission globalPermission,
+        DateTimeOffset grantedAt
+    )
     {
         var entityPerms = await RequireEntityPermissionInfo(ops, entityId);
-        entityPerms = entityPerms with
-        {
-            GlobalPermission = globalPermission & Permission.Publishable
-        };
+        entityPerms = SetGlobalPermission(entityPerms, entityId, globalPermission, grantedAt);
         ops.Store(entityPerms);
+
+        await SpreadGlobalPermission(
+            ops: ops,
+            sourceId: entityId,
+            permission: InheritPermission(globalPermission),
+            grantedAt: grantedAt,
+            ignoreSelf: true
+        );
+    }
+
+    private static EntityPermissionInfo SetGlobalPermission(
+        EntityPermissionInfo entityPerms,
+        Hrib sourceId,
+        Permission globalPermission,
+        DateTimeOffset grantedAt)
+    {
+        globalPermission &= Permission.Publishable;
+
+        var entry = entityPerms.GlobalPermission;
+        entry = entry with
+        {
+            Sources = globalPermission == Permission.None
+                ? entry.Sources.Remove(sourceId.ToString())
+                : entry.Sources.SetItem(sourceId.ToString(), new EntityPermissionSource(
+                    Permission: globalPermission,
+                    GrantedAt: grantedAt,
+                    RoleId: null
+                ))
+        };
+        entry = RecalculateEffectivePermission(entry);
+        entityPerms = entityPerms with { GlobalPermission = entry };
+        return entityPerms;
     }
 
     private static async Task<EntityPermissionInfo> RequireEntityPermissionInfo(
@@ -348,6 +382,35 @@ public class EntityPermissionEventProjection : EventProjection
         var entityPerms = await ops.KafeLoadAsync<EntityPermissionInfo>(entityId);
         if (entityPerms.HasErrors)
         {
+            // NB: Once upon a time, there were Capabilities instead of Permissions.
+            //     They were terribly designed and served the only the first year KAFE was used in production.
+            //     When they were deprecated, a heroic upcaster was posted betweeen KAFE and the DB so that we'd never
+            //     have to think about them again... or so we though...
+            //
+            //     Unfortunately, the FFFIMU23 project group came to exist AFTER some of the AccountCapabilityAdded
+            //     events were already issued. More specifily events 10909, 10911, 10912, 10916, and 10917 are the band
+            //     of misfits that somehow got created before 10918, when the group itself came to be.
+            //    
+            //     So now here we are... and those five events are bombs that destroy this projection every time they
+            //     are encountered because they reference a group that will not have existed for another less than a
+            //     second. Thus we have a new hero, this `if` below that will hopefully save us from the mistake
+            //     which calls itself Capabilities.
+            if (entityId == Kafe.Data.Events.Upcasts.AccountCapabilityAddedUpcaster.Fffimu23Id)
+            {
+                // It doesn't matter what we return. It will get ovewritten a few events later, when the project group
+                // actually gets created.
+                return EntityPermissionInfo.Create(entityId);
+            }
+
+            // NB: Twice upon a time... I was dumb... and made a mistake. This time in the LegacyOrganizationCorrection,
+            //     where I first appended the ProjectGroupMovedToOrganization and PlaylistMovedToOrganization events
+            //     and only THEN created the legacy--org organization. Thus, we have another of prescience to deal with,
+            //     because those few events KNOW that an organization shall exist and indeed it does.
+            if (entityId == Kafe.Data.Events.Corrections.LegacyOrganizationCorrection.LegacyOrganizationId)
+            {
+                return EntityPermissionInfo.Create(entityId);
+            }
+
             throw new InvalidOperationException($"No permission info exists for '{entityId}'. "
                 + "Either the events are out of order or the permission info projection is broken.",
                 entityPerms.AsException());
@@ -387,7 +450,10 @@ public class EntityPermissionEventProjection : EventProjection
 
         return perms with
         {
-            AccountEntries = MergeEntries(perms.AccountEntries, InheritEntries(systemPerms.Value.AccountEntries)),
+            AccountEntries = MergeManyEntries(
+                perms.AccountEntries,
+                InheritEntries(systemPerms.Value.AccountEntries)),
+            // NB: We ignore RoleEntries and GlobalPermission, since `system` can have neither.
             DependencyGraph = perms.DependencyGraph.SetItem(Hrib.SystemValue, [Hrib.SystemValue])
         };
     }
@@ -403,19 +469,22 @@ public class EntityPermissionEventProjection : EventProjection
         Hrib parentId
     )
     {
-        var ancestorPerms = await ops.KafeLoadAsync<EntityPermissionInfo>(parentId);
-        if (ancestorPerms.HasErrors)
-        {
-            throw new InvalidOperationException($"The parent entity with the '{parentId}' Id does not exist."
-                + "Either the Id is wrong or the DB is in an invalid state.", ancestorPerms.AsException());
-        }
+        var ancestorPerms = await RequireEntityPermissionInfo(ops, parentId);
 
         var changedPerms = perms with
         {
-            AccountEntries = MergeEntries(perms.AccountEntries, InheritEntries(ancestorPerms.Value.AccountEntries)),
-            RoleEntries = MergeEntries(perms.RoleEntries, InheritEntries(ancestorPerms.Value.RoleEntries)),
-            DependencyGraph = MergeDependencyGraphs(perms.DependencyGraph, ancestorPerms.Value.DependencyGraph)
-                .SetItem(ancestorPerms.Value.Id, [perms.Id])
+            AccountEntries = MergeManyEntries(
+                perms.AccountEntries,
+                InheritEntries(ancestorPerms.AccountEntries)),
+            RoleEntries = MergeManyEntries(
+                perms.RoleEntries,
+                InheritEntries(ancestorPerms.RoleEntries)),
+            GlobalPermission = MergeTwoEntries(
+                perms.GlobalPermission,
+                InheritEntry(ancestorPerms.GlobalPermission)
+            ),
+            DependencyGraph = MergeDependencyGraphs(perms.DependencyGraph, ancestorPerms.DependencyGraph)
+                .SetItem(ancestorPerms.Id, [perms.Id])
         };
 
         // NB: "Spread" the new dependency to all entities where `perms.Id` was already in the dependency graph
@@ -426,8 +495,16 @@ public class EntityPermissionEventProjection : EventProjection
         {
             var changed = affected with
             {
-                AccountEntries = MergeEntries(affected.AccountEntries, InheritEntries(changedPerms.AccountEntries)),
-                RoleEntries = MergeEntries(affected.RoleEntries, InheritEntries(changedPerms.RoleEntries)),
+                AccountEntries = MergeManyEntries(
+                    affected.AccountEntries,
+                    InheritEntries(changedPerms.AccountEntries)),
+                RoleEntries = MergeManyEntries(
+                    affected.RoleEntries,
+                    InheritEntries(changedPerms.RoleEntries)),
+                GlobalPermission = MergeTwoEntries(
+                    affected.GlobalPermission,
+                    InheritEntry(changedPerms.GlobalPermission)
+                ),
                 DependencyGraph = MergeDependencyGraphs(affected.DependencyGraph, changedPerms.DependencyGraph)
             };
             ops.Store(changed);
@@ -439,7 +516,7 @@ public class EntityPermissionEventProjection : EventProjection
 
     /// <summary>
     /// Removes a dependency from an <see cref="EntityPermissionInfo.DependencyGraph"/> along with its transitive
-    /// dependencies (but only should the become orphans) and related account and role entries.
+    /// dependencies (but only should they become orphans) and related account and role entries.
     /// </summary>
     private static async Task<EntityPermissionInfo> RemoveDependency(
         IDocumentOperations ops,
@@ -456,6 +533,7 @@ public class EntityPermissionEventProjection : EventProjection
         {
             AccountEntries = RemoveEntrySources(perms.AccountEntries, removedGrantors),
             RoleEntries = RemoveEntrySources(perms.RoleEntries, removedGrantors),
+            GlobalPermission = RemoveEntrySources(perms.GlobalPermission, removedGrantors),
             DependencyGraph = changedGraph
         };
 
@@ -475,13 +553,27 @@ public class EntityPermissionEventProjection : EventProjection
             {
                 DependencyGraph = affectedGraph,
                 AccountEntries = RemoveEntrySources(affected.AccountEntries, removedAffectedGrantors),
-                RoleEntries = RemoveEntrySources(affected.RoleEntries, removedAffectedGrantors)
+                RoleEntries = RemoveEntrySources(affected.RoleEntries, removedAffectedGrantors),
+                GlobalPermission = RemoveEntrySources(affected.GlobalPermission, removedAffectedGrantors)
             };
             ops.Store(changed);
         }
 
         ops.Store(changedPerms);
         return changedPerms;
+    }
+
+    private static EntityPermissionEntry InheritEntry(EntityPermissionEntry entry)
+    {
+        return new EntityPermissionEntry(
+            EffectivePermission: InheritPermission(entry.EffectivePermission),
+            Sources: entry.Sources
+                .Where(s => (s.Value.Permission & Permission.Inheritable) != 0)
+                .ToImmutableDictionary(s => s.Key, s => s.Value with
+                {
+                    Permission = InheritPermission(s.Value.Permission)
+                })
+        );
     }
 
     /// <summary>
@@ -495,15 +587,7 @@ public class EntityPermissionEventProjection : EventProjection
             .Where(p => (p.Value.EffectivePermission & Permission.Inheritable) != 0)
             .ToImmutableDictionary(
                 p => p.Key,
-                p => new EntityPermissionEntry(
-                    EffectivePermission: InheritPermission(p.Value.EffectivePermission),
-                    Sources: p.Value.Sources
-                        .Where(s => (s.Value.Permission & Permission.Inheritable) != 0)
-                        .ToImmutableDictionary(s => s.Key, s => s.Value with
-                        {
-                            Permission = InheritPermission(s.Value.Permission)
-                        })
-                )
+                p => InheritEntry(p.Value)
             );
     }
 
@@ -526,7 +610,19 @@ public class EntityPermissionEventProjection : EventProjection
         };
     }
 
-    private static ImmutableDictionary<string, EntityPermissionEntry> MergeEntries(
+    private static EntityPermissionEntry MergeTwoEntries(
+        EntityPermissionEntry one,
+        EntityPermissionEntry two
+    )
+    {
+        return one with
+        {
+            EffectivePermission = one.EffectivePermission | two.EffectivePermission,
+            Sources = one.Sources.AddRange(two.Sources)
+        };
+    }
+
+    private static ImmutableDictionary<string, EntityPermissionEntry> MergeManyEntries(
         ImmutableDictionary<string, EntityPermissionEntry> one,
         ImmutableDictionary<string, EntityPermissionEntry> two
     )
@@ -546,11 +642,7 @@ public class EntityPermissionEventProjection : EventProjection
         {
             if (result.TryGetValue(pair.Key, out EntityPermissionEntry? existing))
             {
-                result[pair.Key] = existing with
-                {
-                    EffectivePermission = existing.EffectivePermission | pair.Value.EffectivePermission,
-                    Sources = existing.Sources.AddRange(pair.Value.Sources)
-                };
+                result[pair.Key] = MergeTwoEntries(existing, pair.Value);
             }
             else
             {
@@ -559,6 +651,30 @@ public class EntityPermissionEventProjection : EventProjection
         }
 
         return result.ToImmutable();
+    }
+
+    private static EntityPermissionEntry RemoveEntrySources(
+        EntityPermissionEntry entry,
+        ImmutableHashSet<string> sources
+    )
+    {
+        if (sources.IsEmpty)
+        {
+            return entry;
+        }
+
+        var newSources = entry.Sources.ExceptBy(sources, s => s.Key).ToImmutableDictionary();
+        if (newSources.Count >= entry.Sources.Count)
+        {
+            return entry;
+        }
+
+        var newEntry = RecalculateEffectivePermission(entry with
+        {
+            Sources = newSources
+        });
+
+        return newEntry;
     }
 
     private static ImmutableDictionary<string, EntityPermissionEntry> RemoveEntrySources(
@@ -574,18 +690,14 @@ public class EntityPermissionEventProjection : EventProjection
         var result = entries.ToBuilder();
         foreach (var pair in entries)
         {
-            var newSources = pair.Value.Sources.ExceptBy(sources, s => s.Key).ToImmutableDictionary();
-            if (newSources.Count < pair.Value.Sources.Count)
+            var newEntry = RemoveEntrySources(pair.Value, sources);
+            if (newEntry.EffectivePermission == Permission.None)
             {
-                result[pair.Key] = RecalculateEffectivePermission(pair.Value with
-                {
-                    Sources = newSources
-                });
-
-                if (result[pair.Key].EffectivePermission == Permission.None)
-                {
-                    result.Remove(pair.Key);
-                }
+                result.Remove(pair.Key);
+            }
+            else
+            {
+                result[pair.Key] = newEntry;
             }
         }
 
@@ -603,25 +715,25 @@ public class EntityPermissionEventProjection : EventProjection
         DateTimeOffset grantedAt,
         string? intermediaryRoleId = null)
     {
-        if (entries.TryGetValue(accountOrRoleId.ToString(), out var accountEntry))
+        if (entries.TryGetValue(accountOrRoleId.ToString(), out var entry))
         {
             // NB: The Sources and EffectivePermission need to be updated separately
             //     so that the event has any effect.
-            accountEntry = accountEntry with
+            entry = entry with
             {
                 Sources = permission == Permission.None
-                    ? accountEntry.Sources.Remove(sourceId.ToString())
-                    : accountEntry.Sources.SetItem(sourceId.ToString(), new EntityPermissionSource(
+                    ? entry.Sources.Remove(sourceId.ToString())
+                    : entry.Sources.SetItem(sourceId.ToString(), new EntityPermissionSource(
                         Permission: permission,
                         GrantedAt: grantedAt,
                         RoleId: intermediaryRoleId
                     ))
             };
-            accountEntry = RecalculateEffectivePermission(accountEntry);
+            entry = RecalculateEffectivePermission(entry);
         }
         else if (permission != Permission.None)
         {
-            accountEntry = new EntityPermissionEntry(
+            entry = new EntityPermissionEntry(
                 EffectivePermission: permission,
                 Sources: ImmutableDictionary.CreateRange([new KeyValuePair<string, EntityPermissionSource>(
                     sourceId.ToString(),
@@ -634,14 +746,14 @@ public class EntityPermissionEventProjection : EventProjection
             );
         }
 
-        if (accountEntry is null)
+        if (entry is null)
         {
             return entries;
         }
 
-        return accountEntry.EffectivePermission == Permission.None
+        return entry.EffectivePermission == Permission.None
                 ? entries.Remove(accountOrRoleId.ToString())
-                : entries.SetItem(accountOrRoleId.ToString(), accountEntry);
+                : entries.SetItem(accountOrRoleId.ToString(), entry);
     }
 
     /// <summary>
@@ -736,6 +848,30 @@ public class EntityPermissionEventProjection : EventProjection
                     )
                 };
             }
+            ops.Store(changed);
+        }
+    }
+
+    private static async Task SpreadGlobalPermission(
+        IDocumentOperations ops,
+        Hrib sourceId,
+        Permission permission,
+        DateTimeOffset grantedAt,
+        bool ignoreSelf = false
+    )
+    {
+        var affectedEntities = ops.Query<EntityPermissionInfo>()
+            .Where(p => p.DependencyGraph.ContainsKey(sourceId.ToString()))
+            .ToAsyncEnumerable();
+
+        await foreach (var affected in affectedEntities)
+        {
+            if (affected.Id == sourceId && ignoreSelf)
+            {
+                continue;
+            }
+
+            var changed = SetGlobalPermission(affected, sourceId, permission, grantedAt);
             ops.Store(changed);
         }
     }

@@ -1,10 +1,10 @@
-import { Box, Center, HStack, Icon, useColorModeValue, useDisclosure, VStack } from '@chakra-ui/react';
+import { Box, BoxProps, Center, HStack, Icon, useColorModeValue, useDisclosure, VStack } from '@chakra-ui/react';
 import { IoVideocam, IoWarning } from 'react-icons/io5';
 import { Artifact } from '../../data/Artifact';
 import { useApi } from '../../hooks/Caffeine';
 import { ContentPopup } from './ContentPopup';
 
-interface IContentThumbnailProps {
+interface IContentThumbnailProps extends BoxProps {
     artifact: Artifact;
     passive?: boolean;
     onClick?: () => void;
@@ -12,7 +12,7 @@ interface IContentThumbnailProps {
 
 type ContentType = 'Video' | 'Image' | 'Unknown';
 
-export function ContentThumbnail({ artifact, passive, onClick }: IContentThumbnailProps) {
+export function ContentThumbnail({ artifact, passive, onClick, ...props }: IContentThumbnailProps) {
     const api = useApi();
     const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -53,6 +53,7 @@ export function ContentThumbnail({ artifact, passive, onClick }: IContentThumbna
                 p={4}
                 cursor="pointer"
                 onClick={onClickHandler}
+                {...props}
             >
                 {(() => {
                     if (type) {

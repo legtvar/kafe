@@ -385,6 +385,37 @@ public class PermissionTests(ApiFixture fixture, ITestOutputHelper testOutput) :
         var projectPerms = (await query.KafeLoadAsync<EntityPermissionInfo>(TestSeedData.Project1Hrib)).Unwrap();
     }
 
+    [Fact]
+    public async Task EntityPermissionInfo_GlobalPermission_ShouldBeInherited()
+    {
+        await using (var session = Store.LightweightSession())
+        {
+            session.Events.Append(
+                TestSeedData.Group1Hrib,
+                new ProjectGroupGlobalPermissionsChanged(
+                    TestSeedData.Group1Hrib,
+                    GlobalPermissions: Permission.Inspect
+                )
+            );
+            await session.SaveChangesAsync();
+        }
+
+        await WaitForProjections();
+        await using var query = Store.QuerySession();
+        var groupPerms = (await query.KafeLoadAsync<EntityPermissionInfo>(TestSeedData.Group1Hrib)).Unwrap();
+        Assert.Equal(Permission.Inspect, groupPerms.GlobalPermission.EffectivePermission);
+        Assert.Single(groupPerms.GlobalPermission.Sources);
+        Assert.True(groupPerms.GlobalPermission.Sources.ContainsKey(TestSeedData.Group1Hrib));
+        Assert.Equal(Permission.Inspect, groupPerms.GlobalPermission.Sources[TestSeedData.Group1Hrib].Permission);
+
+        var projPerms = (await query.KafeLoadAsync<EntityPermissionInfo>(TestSeedData.Project1Hrib)).Unwrap();
+        Assert.Equal(Permission.Inspect | Permission.Read, projPerms.GlobalPermission.EffectivePermission);
+        Assert.True(projPerms.GlobalPermission.Sources.ContainsKey(TestSeedData.Group1Hrib));
+        Assert.Equal(
+            Permission.Inspect | Permission.Read,
+            projPerms.GlobalPermission.Sources[TestSeedData.Group1Hrib].Permission);
+    }
+
 
     // TODO: Test case: Role has Inspect on a group and Review on an org.
     //       Role must have two sources on the group: the org and the group.

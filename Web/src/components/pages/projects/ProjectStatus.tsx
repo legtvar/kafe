@@ -54,7 +54,7 @@ function StatusGroup(props: IStatusGroupProps) {
         // const worst = inStage.reduce((prev, curr) => [curr.kind, prev].includes("Error") ? "Error" : [curr.kind, prev].includes("Warn") ? "Warn" : [curr.kind, prev].includes("Info") ? "Info" : "Unknown", "Unknown");
 
         if (inStage.length === 0) {
-            return <StatusCheck status="ok">{t(`projectStatus.${props.stage}`).toString()}</StatusCheck>;
+            return <StatusCheck status="ok">{t(`projectStatus.${props.stage}.ok`).toString()}</StatusCheck>;
         } else {
             return (
                 <StatusCheck
@@ -74,7 +74,7 @@ function StatusGroup(props: IStatusGroupProps) {
                         )
                     }
                 >
-                    {t(`projectStatus.${props.stage}`).toString()}
+                    {t(`projectStatus.${props.stage}.nok`).toString()}
                 </StatusCheck>
             );
         }
@@ -86,14 +86,14 @@ function StatusGroup(props: IStatusGroupProps) {
             .sort((a, b) => new Date(b.addedOn).getTime() - new Date(a.addedOn).getTime());
 
         if (inStage.length === 0) {
-            return <StatusCheck status="unknown">{t(`projectStatus.${props.stage}`).toString()}</StatusCheck>;
+            return <StatusCheck status="unknown">{t(`projectStatus.${props.stage}.nok`).toString()}</StatusCheck>;
         } else {
             return (
                 <StatusCheck
                     status={inStage[0].kind === 'accepted' ? 'ok' : 'nok'}
                     details={<Text>{getPrefered(inStage[0].comment as any as localizedString)}</Text>}
                 >
-                    {t(`projectStatus.${props.stage}`).toString()}
+                    {t(`projectStatus.${props.stage}.` + (inStage[0].kind === 'accepted' ? 'ok' : 'nok')).toString()}
                 </StatusCheck>
             );
         }

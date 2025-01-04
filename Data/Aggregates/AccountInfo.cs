@@ -43,7 +43,9 @@ public record AccountInfo(
     ImmutableArray<string> RoleIds
 ) : IEntity
 {
-    public static readonly AccountInfo Invalid = new(
+    public static readonly AccountInfo Invalid = new();
+
+    public AccountInfo() : this(
         Id: Hrib.InvalidValue,
         CreationMethod: CreationMethod.Unknown,
         Kind: AccountKind.Unknown,
@@ -57,9 +59,7 @@ public record AccountInfo(
         RefreshedOn: default,
         Permissions: ImmutableDictionary<string, Permission>.Empty,
         RoleIds: []
-    );
-
-    public AccountInfo() : this(Invalid)
+    )
     {
     }
 

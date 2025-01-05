@@ -1,11 +1,12 @@
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 
 namespace Kafe;
 
+[JsonConverter(typeof(KafeTypeJsonConverter))]
 public partial record struct KafeType : IParsable<KafeType>
 {
     public const char ModPrimarySeparator = ':';
@@ -83,7 +84,7 @@ public partial record struct KafeType : IParsable<KafeType>
         );
         return true;
     }
-    
+
     public static Err<KafeType> Parse(string? s)
     {
         if (!TryParse(s, out var kafeType))

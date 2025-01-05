@@ -10,6 +10,7 @@ public readonly partial record struct Error
     public const string InvalidValueId = nameof(InvalidValue);
     public const string AlreadyExistsId = nameof(AlreadyExists);
     public const string ParameterArgument = "parameter";
+    public const string BadKafeTypeId = nameof(BadKafeType);
 
     public static Error NotFound(string? message = null)
     {
@@ -78,5 +79,12 @@ public readonly partial record struct Error
     public static Error AlreadyExists(Hrib id, string description = "An entity")
     {
         return new Error(AlreadyExistsId, $"{description} with identifier '{id}' already exists.");
+    }
+
+    public static Error BadKafeType(string? value)
+    {
+        return new Error(BadKafeTypeId, string.IsNullOrEmpty(value)
+            ? "Encountered an invalid or empty KAFE type."
+            : $"String '{value}' could not be parsed as a KAFE type.");
     }
 }

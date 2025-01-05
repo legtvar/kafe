@@ -14,6 +14,7 @@ public readonly partial record struct Error
     public const string AnalysisFailedId = nameof(AnalysisFailed);
     public const string ValidationErrorId = nameof(ValidationError);
     public const string ParameterArgument = "parameter";
+    public const string BadKafeTypeId = nameof(BadKafeType);
 
     public static Error NotFound(string? message = null)
     {
@@ -118,5 +119,12 @@ public readonly partial record struct Error
         }
 
         return error;
+    }
+
+    public static Error BadKafeType(string? value)
+    {
+        return new Error(BadKafeTypeId, string.IsNullOrEmpty(value)
+            ? "Encountered an invalid or empty KAFE type."
+            : $"String '{value}' could not be parsed as a KAFE type.");
     }
 }

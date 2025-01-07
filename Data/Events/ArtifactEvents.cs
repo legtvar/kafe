@@ -15,3 +15,21 @@ public record ArtifactInfoChanged(
     [LocalizedString] ImmutableDictionary<string, string>? Name,
     DateTimeOffset? AddedOn
 );
+
+public enum ArtifactExistingPropertyValueHandling
+{
+    OverwriteExisting,
+    KeepExisting,
+    Append
+}
+
+public record ArtifactPropertiesSet(
+    [Hrib] string ArtifactId,
+    ImmutableDictionary<string, ArtifactPropertySetter> Properties
+);
+
+public record ArtifactPropertySetter(
+    KafeType? Type,
+    object? Value,
+    ArtifactExistingPropertyValueHandling ExistingValueHandling
+);

@@ -38,6 +38,16 @@ public partial record struct KafeType : IParsable<KafeType>
     public string? Secondary { get; }
     public bool IsArray { get; }
 
+    public KafeType GetElementType()
+    {
+        if (!IsArray)
+        {
+            throw new NotSupportedException("Only array KAFE types may have element type.");
+        }
+
+        return new(Mod, Primary, Secondary, false);
+    }
+
     public override readonly string ToString()
     {
         var sb = new StringBuilder(Mod.Length + 1 + Primary.Length + 1 + Secondary?.Length ?? 0 + 2);

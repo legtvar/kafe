@@ -84,20 +84,20 @@ public class TestSeedData : IInitialData
         );
 
         var projectService = scope.ServiceProvider.GetRequiredService<ProjectService>();
-        await projectService.Create(
-            ProjectInfo.Create(Group1Hrib, (LocalizedString)"Test Project 1") with
+        await projectService.Upsert(
+            project: ProjectInfo.Create(Group1Hrib, (LocalizedString)"Test Project 1") with
             {
                 Id = Project1Hrib
             },
-            null,
-            ct);
-        await projectService.Create(
-            ProjectInfo.Create(Group2Hrib, (LocalizedString)"Test Project 2") with
+            existingEntityHandling: ExistingEntityHandling.Insert,
+            token: ct);
+        await projectService.Upsert(
+            project: ProjectInfo.Create(Group2Hrib, (LocalizedString)"Test Project 2") with
             {
                 Id = Project2Hrib
             },
-            null,
-            ct);
+            existingEntityHandling: ExistingEntityHandling.Insert,
+            token: ct);
 
         var artifactService = scope.ServiceProvider.GetRequiredService<ArtifactService>();
         await artifactService.Create(

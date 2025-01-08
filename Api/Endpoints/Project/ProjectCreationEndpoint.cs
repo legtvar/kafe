@@ -2,12 +2,15 @@
 using Asp.Versioning;
 using Kafe.Api.Services;
 using Kafe.Api.Transfer;
+using Kafe.Data;
 using Kafe.Data.Aggregates;
 using Kafe.Data.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Swashbuckle.AspNetCore.Annotations;
+using System.Collections.Immutable;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -46,16 +49,22 @@ public class ProjectCreationEndpoint : EndpointBaseAsync
             return Unauthorized();
         }
 
-        var project = await projectService.Create(
-            @new: ProjectInfo.Create(
+        var project = await projectService.Upsert(
+            project: ProjectInfo.Create(
                 projectGroupId: request.ProjectGroupId,
                 name: request.Name) with
             {
                 Description = request.Description,
-                Genre = request.Genre
+                Genre = request.Genre,
+                Authors = request.Cast
+                    .Select(c => new ProjectAuthorInfo(c.Id.ToString(), ProjectAuthorKind.Cast, c.Roles))
+                    .Concat(request.Crew
+                        .Select(c => new ProjectAuthorInfo(c.Id.ToString(), ProjectAuthorKind.Crew, c.Roles)))
+                    .ToImmutableArray()
             },
             ownerId: userProvider.AccountId,
-            cancellationToken
+            existingEntityHandling: ExistingEntityHandling.Insert,
+            token: cancellationToken
         );
         if (project.HasErrors)
         {

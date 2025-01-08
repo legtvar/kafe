@@ -32,7 +32,7 @@ services:
       - kafe_temp:/mnt/kafe_temp
     depends_on:
       - db
-    command: ["bash", "-c", "/app/Kafe.Api projections --rebuild && /app/Kafe.Api"]
+    command: ["bash", "-c", "/app/Kafe.Api projections --rebuild --shard-timeout 30m && /app/Kafe.Api"]
     networks:
       default:
         aliases:

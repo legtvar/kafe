@@ -69,6 +69,8 @@ public class AuthorService
             db.Events.Append(created.AuthorId, infoChanged);
         }
 
+        await db.SaveChangesAsync(token);
+
         if (ownerId is not null)
         {
             await accountService.AddPermissions(
@@ -76,8 +78,6 @@ public class AuthorService
                 [((Hrib)created.AuthorId, Permission.Read | Permission.Write | Permission.Append | Permission.Inspect)],
                 token);
         }
-
-        await db.SaveChangesAsync(token);
 
         // NB: perform a live aggregation because the DB might still have outdated data
         return await db.Events.AggregateStreamAsync<AuthorInfo>(created.AuthorId, token: token)

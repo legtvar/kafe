@@ -7,7 +7,8 @@ public readonly partial record struct Error
     public const string MissingValueId = nameof(MissingValue);
     public const string UnmodifiedId = nameof(Unmodified);
     public const string LockedId = nameof(Locked);
-    public const string InvalidValueId = nameof(InvalidValueId);
+    public const string InvalidValueId = nameof(InvalidValue);
+    public const string AlreadyExistsId = nameof(AlreadyExists);
     public const string ParameterArgument = "parameter";
 
     public static Error NotFound(string? message = null)
@@ -67,5 +68,15 @@ public readonly partial record struct Error
     public static Error InvalidValue(string message)
     {
         return new Error(InvalidValueId, message);
+    }
+    
+    public static Error AlreadyExists(string? message = null)
+    {
+        return new Error(AlreadyExistsId, message ?? "Value already exists.");
+    }
+
+    public static Error AlreadyExists(Hrib id, string description = "An entity")
+    {
+        return new Error(AlreadyExistsId, $"{description} with identifier '{id}' already exists.");
     }
 }

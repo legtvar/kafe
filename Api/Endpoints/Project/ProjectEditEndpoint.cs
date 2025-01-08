@@ -99,7 +99,10 @@ public class ProjectEditEndpoint : EndpointBaseAsync
                 : @old.Artifacts,
             IsLocked = request.IsLocked ?? old.IsLocked
         };
-        var result = await projectService.Edit(@new: @new, token: cancellationToken);
+        var result = await projectService.Upsert(
+            project: @new,
+            existingEntityHandling: ExistingEntityHandling.Update,
+            token: cancellationToken);
         if (result.HasErrors)
         {
             return this.KafeErrResult(result);

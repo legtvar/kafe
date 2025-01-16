@@ -41,6 +41,7 @@ using Npgsql;
 using System.Globalization;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Kafe.Api.Middleware;
 
 namespace Kafe.Api;
 
@@ -220,10 +221,13 @@ public class Startup
         services.RemoveAll<IProblemDetailsWriter>();
         services.AddSingleton<IProblemDetailsWriter, KafeProblemDetailsWriter>();
         services.AddSingleton<IProblemDetailsService, KafeProblemDetailsService>();
+        services.AddSingleton<ClacksMiddleware>();
     }
 
     public void Configure(IApplicationBuilder app)
     {
+        app.UseMiddleware<ClacksMiddleware>();
+
         app.UseForwardedHeaders();
 
         app.UseHttpsRedirection();

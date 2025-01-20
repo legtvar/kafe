@@ -16,8 +16,8 @@ priority: 010
 
 **Back end (API)**
 
-* [.NET SDK 9.0 or later](https://dotnet.microsoft.com/en-us/download).
-* [PostgreSQL](https://www.postgresql.org/)
+* [.NET SDK 9.0 or newer](https://dotnet.microsoft.com/en-us/download).
+* [PostgreSQL 17 or newer](https://www.postgresql.org/)
 * [FFmpeg](https://ffmpeg.org/) in your [PATH](https://en.wikipedia.org/wiki/PATH_(variable))
 
 **Front end (Web)**

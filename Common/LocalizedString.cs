@@ -201,12 +201,39 @@ public sealed partial class LocalizedString : IEquatable<LocalizedString>
         return this[CultureInfo.CurrentCulture] ?? Invariant;
     }
 
-    public static LocalizedString Override(LocalizedString? old, LocalizedString? @new)
+    public static LocalizedString Merge(LocalizedString? old, LocalizedString? @new)
     {
-        return old is not null && @new is null ? old
-            : old is null && @new is not null ? @new
-            : old is not null && @new is not null ? old.data.SetItems(@new)
+        var isOldEmpty = IsNullOrEmpty(old);
+        var isNewEmpty = IsNullOrEmpty(@new);
+
+        return !isOldEmpty && isNewEmpty ? old!
+            : isOldEmpty && !isNewEmpty ? @new!
+            : !isOldEmpty && !isNewEmpty ? old!.data.SetItems(@new!)
             : LocalizedString.Empty;
+    }
+
+    /// <summary>
+    /// Generates value that can be used in <c>*InfoChanged</c> events.
+    /// </summary>
+    /// 
+    /// <remarks>
+    /// Returns <c>null</c> if no change should be made or <paramref name="new"/>
+    /// if it should override <paramref name="old"/>.
+    /// </remarks>
+    public static LocalizedString? MakeOverride(LocalizedString? old, LocalizedString? @new)
+    {
+        var isOldEmpty = IsNullOrEmpty(old);
+        var isNewEmpty = IsNullOrEmpty(@new);
+
+        if (old == @new)
+        {
+            return null;
+        }
+
+        return !isOldEmpty && isNewEmpty ? null
+            : isOldEmpty && !isNewEmpty ? @new
+            : !isOldEmpty && !isNewEmpty ? @new
+            : null;
     }
 }
 

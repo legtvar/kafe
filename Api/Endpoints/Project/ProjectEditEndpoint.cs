@@ -87,9 +87,9 @@ public class ProjectEditEndpoint : EndpointBaseAsync
 
         var @new = @old with
         {
-            Name = LocalizedString.Override(@old.Name, request.Name),
-            Genre = LocalizedString.Override(@old.Genre, request.Genre),
-            Description = LocalizedString.Override(@old.Description, request.Description),
+            Name = LocalizedString.Merge(@old.Name, request.Name),
+            Genre = LocalizedString.Merge(@old.Genre, request.Genre),
+            Description = LocalizedString.Merge(@old.Description, request.Description),
             Authors = authors,
             Artifacts = request.Artifacts.HasValue
                 ? request.Artifacts.Value.Select(a => new ProjectArtifactInfo(

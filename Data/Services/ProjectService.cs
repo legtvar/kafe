@@ -108,9 +108,9 @@ public partial class ProjectService
 
         var infoChanged = new ProjectInfoChanged(
             ProjectId: id.ToString(),
-            Name: (LocalizedString)existing.Name != project.Name ? project.Name : null,
-            Description: (LocalizedString?)existing.Description != project.Description ? project.Description : null,
-            Genre: (LocalizedString?)existing.Genre != project.Genre ? existing.Genre : null
+            Name: LocalizedString.MakeOverride(existing.Name, project.Name),
+            Description: LocalizedString.MakeOverride(existing.Description, project.Description),
+            Genre: LocalizedString.MakeOverride(existing.Genre, project.Genre)
         );
         if (infoChanged.Name is not null || infoChanged.Description is not null || infoChanged.Genre is not null)
         {

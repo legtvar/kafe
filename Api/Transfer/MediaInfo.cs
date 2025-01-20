@@ -49,3 +49,9 @@ public record SubtitlesDto(
     string Codec,
     long Bitrate
 );
+
+public record BlendDto(
+    string FileExtension,
+    string MimeType,
+    string? Error
+);

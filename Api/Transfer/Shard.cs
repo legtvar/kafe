@@ -38,6 +38,13 @@ public record SubtitlesShardDetailDto(
     ImmutableDictionary<string, SubtitlesDto> Variants
 ) : ShardDetailBaseDto(Id, Kind, ArtifactId);
 
+public record BlendShardDetailDto(
+    Hrib Id,
+    ShardKind Kind,
+    Hrib ArtifactId,
+    ImmutableDictionary<string, BlendDto> Variants
+) : ShardDetailBaseDto(Id, Kind, ArtifactId);
+
 public record ShardCreationDto(
     ShardKind Kind,
     Hrib ArtifactId);

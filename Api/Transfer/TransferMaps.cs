@@ -343,6 +343,7 @@ public static class TransferMaps
             VideoShardInfo v => ToVideoShardDetailDto(v),
             ImageShardInfo i => ToImageShardDetailDto(i),
             SubtitlesShardInfo s => ToSubtitlesShardDetailDto(s),
+            BlendShardInfo b => ToBlendShardDetailDto(b),
             _ => throw new NotSupportedException($"Shards of '{data.GetType()}' are not supported.")
         };
     }
@@ -364,6 +365,23 @@ public static class TransferMaps
             Language: data.Language,
             Codec: data.Codec,
             Bitrate: data.Bitrate);
+    }
+
+    public static BlendShardDetailDto ToBlendShardDetailDto(BlendShardInfo data)
+    {
+        return new BlendShardDetailDto(
+            Id: data.Id,
+            Kind: data.Kind,
+            ArtifactId: data.ArtifactId,
+            Variants: data.Variants.ToImmutableDictionary(p => p.Key, p => ToBlendDto(p.Value)));
+    }
+
+    public static BlendDto ToBlendDto(BlendInfo data)
+    {
+        return new BlendDto(
+            FileExtension: data.FileExtension,
+            MimeType: data.MimeType,  
+            Error: data.Error);
     }
 
     public static TemporaryAccountInfoDto ToTemporaryAccountInfoDto(AccountInfo data)

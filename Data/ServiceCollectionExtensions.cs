@@ -10,17 +10,13 @@ using Marten;
 using Marten.Events;
 using Marten.Events.Daemon.Resiliency;
 using Marten.Events.Projections;
-using Marten.Services.Json;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using Weasel.Core;
 using Weasel.Postgresql;
 using Weasel.Postgresql.Functions;
@@ -51,6 +47,7 @@ public static class ServiceCollectionExtensions
             if (environment.IsDevelopment())
             {
                 mo.AutoCreateSchemaObjects = AutoCreate.All;
+                mo.CommandTimeout = 1_000_000;
             }
 
             mo.CreateDatabasesForTenants(c =>

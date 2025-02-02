@@ -10,6 +10,7 @@ export interface IOrganizationAvatarProps extends AvatarProps {
 const organizationAvatars: Record<string, string> = {
     lemmafimuni: '/avatars/lemmafimuni.jpg',
     gamesfimuni: '/avatars/gamesfimuni.png',
+    'mate-fimuni': '/avatars/mate-fimuni.png',
     'legacy--org': '/avatars/legacy--org.png',
 };
 

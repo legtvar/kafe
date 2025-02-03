@@ -66,7 +66,8 @@
       "genre": "Žáner",
       "movie": "Film",
       "name": "Názov filmu",
-      "videoannotation": "Videoanotácia"
+      "videoannotation": "Videoanotácia",
+      "nameMate": "Názov projektu"
     },
     "language": {
       "cs": "česky",

@@ -58,7 +58,7 @@ build-web:
   script:
     - apk update
     - apk add nodejs-current npm
-    - corepack enable && corepack prepare pnpm@latest --activate
+    - npm install -g corepack@latest --force && npx corepack enable && npx corepack prepare pnpm@latest --activate
 
     - cd Web
     - pnpm config set store-dir .pnpm-store/

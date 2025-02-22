@@ -104,7 +104,9 @@
     "quitEdit": "Stop editing",
     "construction": "This section is under construction...",
     "download": "Download",
-    "file": "file"
+    "file": "file",
+    "lastUpdate": "Last update",
+    "addedOn": "Added on"
   },
   "home": {
     "signin": "Sign in",

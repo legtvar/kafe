@@ -63,6 +63,7 @@ export function ProjectDetail(props: IProjectDetailProps) {
                                     )}
                                 </AwaitAPI>
                             )}
+
                             <ProjectTags project={project} />
                             <Box>{project.getDescription()}</Box>
 
@@ -104,8 +105,22 @@ export function ProjectDetail(props: IProjectDetailProps) {
                                     </SimpleGrid>
                                 </>
                             )}
+
+                            {project.getLastUpdate() &&
+                                <Box mt={4} color="gray.500" fontStyle="italic">
+                                    {t('generic.lastUpdate') + ": " + project.getLastUpdate()?.toLocaleString(undefined, {
+                                        year: 'numeric',
+                                        month: 'short',
+                                        day: 'numeric',
+                                        hour: '2-digit',
+                                        minute: '2-digit',
+                                    })}
+                                </Box>
+                            }
                         </Box>
+                        
                     );
+                    
                 }}
             </AwaitAPI>
         </OutletOrChildren>

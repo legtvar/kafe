@@ -72,6 +72,13 @@ export class Project extends AbstractType {
         return getPrefered(this.genre);
     }
 
+    public getLastUpdate(): Date | null {
+        const lastUpdate = this.artifacts
+            .filter((artifact) => artifact.addedOn !== null)
+            .sort((a, b) => b.addedOn!.getTime() - a.addedOn!.getTime())[0]?.addedOn;
+        return lastUpdate ? lastUpdate : null;
+    }
+
     serialize(update: boolean = false): components['schemas']['ProjectCreationDto'] {
         return new Serializer(this, update)
             .addConditionaly(!update, 'projectGroupId')

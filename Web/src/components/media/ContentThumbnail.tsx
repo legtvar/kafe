@@ -1,9 +1,11 @@
-import { Box, BoxProps, Center, HStack, Icon, useColorModeValue, useDisclosure, VStack } from '@chakra-ui/react';
-import { IoVideocam, IoWarning } from 'react-icons/io5';
+import { Box, BoxProps, Center, Flex, HStack, Icon, Spacer, useColorModeValue, useDisclosure, VStack } from '@chakra-ui/react';
+import { IoVideocam, IoWarning, IoInformationCircleOutline } from 'react-icons/io5';
 import { SiBlender } from "react-icons/si";
 import { Artifact } from '../../data/Artifact';
 import { useApi } from '../../hooks/Caffeine';
 import { ContentPopup } from './ContentPopup';
+import { t } from 'i18next';
+import { ContentInfo } from './ContentInfo';
 
 interface IContentThumbnailProps extends BoxProps {
     artifact: Artifact;
@@ -165,9 +167,13 @@ export function ContentThumbnail({ artifact, passive, onClick, ...props }: ICont
                         </Box>
                     );
                 })()}
-                <Box overflow="hidden" whiteSpace="nowrap" textOverflow="ellipsis" w="full" textAlign="center">
-                    {artifact.getName()}
-                </Box>
+                <Flex w="full">
+                    <Box overflow="hidden" whiteSpace="nowrap" textOverflow="ellipsis" w="full" textAlign="left">
+                        {artifact.getName()}
+                    </Box>
+                    <Spacer/>
+                    <ContentInfo artifact={artifact} />
+                </Flex>
             </VStack>
             <ContentPopup artifact={artifact} isOpen={isOpen} onClose={onClose} />
         </>

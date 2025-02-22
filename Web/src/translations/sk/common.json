@@ -138,10 +138,13 @@
     "projectDoesNotExist": "Projekt s daným ID neexistuje",
     "subtitle": "Ospravedlňujeme sa za problémy. Ak máte pocit, že sa to nemalo stať (čo pravdepodobne nemalo), pošlite nám prosím tento report",
     "title": "Jejda, tak to nešlo podľa plánu",
-    "tokenInvalid": "Token nie je platný"
+    "tokenInvalid": "Token nie je platný",
+    "leavePageTitle": "Neuložené zmeny",
+    "leavePageWarn": "Môžete mať neuložené zmeny, chcete naozaj opustiť túto stránku?"
   },
   "generic": {
     "cancel": "Zrušiť",
+    "ok": "OK",
     "edit": "Upraviť",
     "empty": "Kde nič, tu nič...",
     "for": "pre",

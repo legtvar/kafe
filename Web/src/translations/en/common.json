@@ -138,10 +138,13 @@
     "projectDoesNotExist": "Project with the given ID does not exist",
     "subtitle": "We are terribly sorry for the inconvenience. If you feel like this was not supposed to happen (which it probably wasn't), please send us the report bellow",
     "title": "Whops, something went wrong",
-    "tokenInvalid": "Token is invalid"
+    "tokenInvalid": "Token is invalid",
+    "leavePageTitle": "Unsaved changes",
+    "leavePageWarn": "You may have unsaved changes on this page. Are you sure you want to leave?"
   },
   "generic": {
     "cancel": "Cancel",
+    "ok": "OK",
     "edit": "Edit",
     "empty": "It's empty in here...",
     "for": "for",

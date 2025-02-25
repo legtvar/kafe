@@ -98,7 +98,12 @@ export function ContentViewer({
         <VStack spacing={6}>
             <Text color="gray.500">{t('content.unknownType').toString()}</Text>
             {artifact.shards.map((shard) => (
-                <Button key={shard.id} leftIcon={<AiOutlineDownload />}>
+                <Button
+                    key={shard.id}
+                    as={'a'}
+                    href={api.shards.defaultStreamUrl(shard.id)}
+                    leftIcon={<AiOutlineDownload />}
+                >
                     {t('generic.download')} {t('generic.file')} {shard.id}
                 </Button>
             ))}

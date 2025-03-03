@@ -4,7 +4,7 @@ namespace Kafe;
 
 public record ModMetadata
 {
-    public required string Slug { get; init; }
+    public required string Name { get; init; }
 
     public required ImmutableHashSet<KafeType> Types { get; init; }
 }

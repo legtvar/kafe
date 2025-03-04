@@ -1,13 +1,10 @@
-using System.Diagnostics.CodeAnalysis;
-
 namespace Kafe;
 
 public interface IMergeable
 {
-    bool TryMergeWith(object other, [NotNullWhen(true)] out object? merged);
-}
-
-public interface IMergable<T> : IMergeable
-{
-    bool TryMergeWith(T other, [NotNullWhen(true)] out object? merged);
+    /// <summary>
+    /// Merge an object of this mergeable type wrapped in an <see cref="KafeObject"/> as <paramref name="self"/> with
+    /// another object of potentitally completely different type.
+    /// </summary>
+    static abstract KafeObject? Merge(KafeObject self, KafeObject @new);
 }

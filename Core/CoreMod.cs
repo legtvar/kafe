@@ -1,53 +1,59 @@
-﻿using System;
-
-namespace Kafe.Core;
+﻿namespace Kafe.Core;
 
 [Mod(Name)]
 public sealed class CoreMod : IMod
 {
     public const string Name = "core";
-    
+
     public void Configure(ModContext context)
     {
-        context
-            .AddType<LocalizedString>(new() {
-                Name = "localized-string",
-                Converter = new LocalizedStringJsonConverter(),
-                Usage = KafeTypeUsage.ArtifactProperty
-            })
-            .AddType<KafeDateTime>(new() {
-                Name = "date-time",
-                Converter = new KafeDateTimeJsonConverter(),
-                Usage = KafeTypeUsage.ArtifactProperty
-            })
-            .AddType<KafeString>(new() {
-                Name = "string",
-                Converter = new KafeStringJsonConverter(),
-                Usage = KafeTypeUsage.ArtifactProperty
-            })
-            .AddType<KafeNumber>(new() {
-                Name = "number",
-                Converter = new KafeNumberJsonConverter(),
-                Usage = KafeTypeUsage.ArtifactProperty
-            })
-            .AddType<ShardReference>(new() {
-                Name = "shard-ref",
-                Converter = new ShardReferenceJsonConverter(),
-                Usage = KafeTypeUsage.ArtifactProperty
-            })
-            .AddType<AuthorReference>(new() {
-                Name = "author-ref",
-                Usage = KafeTypeUsage.ArtifactProperty,
-                DefaultRequirements = [
-                    new AuthorReferenceNameOrIdRequirement()
-                ]
-            })
-            .AddRequirement<AuthorReferenceNameOrIdRequirement>(new() {
-                Name = "author-ref-name-or-id",
-                Accessibility = KafeTypeAccessibility.Internal,
-                HandlerTypes = [
-                    typeof(AuthorReferenceNameOrIdRequirementHandler)
-                ]
-            });
+        context.AddArtifactProperty<LocalizedString>(new()
+        {
+            Name = "localized-string",
+            Converter = new LocalizedStringJsonConverter(),
+        });
+        context.AddArtifactProperty<DateTimeProperty>(new()
+        {
+            Name = "date-time",
+            Converter = new DateTimePropertyJsonConverter(),
+        });
+        context.AddArtifactProperty<KafeString>(new()
+        {
+            Name = "string",
+            Converter = new KafeStringJsonConverter(),
+        });
+        context.AddArtifactProperty<NumberProperty>(new()
+        {
+            Name = "number",
+            Converter = new NumberPropertyJsonConverter(),
+        });
+        context.AddArtifactProperty<ShardReferenceProperty>(new()
+        {
+            Name = "shard-ref",
+            Converter = new ShardReferencePropertyJsonConverter(),
+        });
+        context.AddArtifactProperty<AuthorReferenceProperty>(new()
+        {
+            Name = "author-ref",
+            DefaultRequirements = [
+                new AuthorReferenceNameOrIdRequirement()
+            ]
+        });
+        context.AddRequirement<AuthorReferenceNameOrIdRequirement>(new()
+        {
+            Name = "author-ref-name-or-id",
+            Accessibility = KafeTypeAccessibility.Internal,
+            HandlerTypes = [
+                typeof(AuthorReferenceNameOrIdRequirementHandler)
+            ]
+        });
+        context.AddShard<BlobShard>(new()
+        {
+            Name = "blob"
+        });
+        context.AddShard<ArchiveShard>(new()
+        {
+            Name = "archive"
+        });
     }
 }

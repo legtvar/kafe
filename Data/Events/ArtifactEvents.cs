@@ -29,7 +29,6 @@ public record ArtifactPropertiesSet(
 );
 
 public record ArtifactPropertySetter(
-    KafeType? Type,
-    object? Value,
+    KafeObject? Object,
     ArtifactExistingPropertyValueHandling ExistingValueHandling
 );

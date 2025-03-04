@@ -16,13 +16,6 @@ public record ArtifactInfoChanged(
     DateTimeOffset? AddedOn
 );
 
-public enum ArtifactExistingPropertyValueHandling
-{
-    OverwriteExisting,
-    KeepExisting,
-    Append
-}
-
 public record ArtifactPropertiesSet(
     [Hrib] string ArtifactId,
     ImmutableDictionary<string, ArtifactPropertySetter> Properties
@@ -30,5 +23,5 @@ public record ArtifactPropertiesSet(
 
 public record ArtifactPropertySetter(
     KafeObject? Object,
-    ArtifactExistingPropertyValueHandling ExistingValueHandling
+    ExistingKafeObjectHandling ExistingValueHandling
 );

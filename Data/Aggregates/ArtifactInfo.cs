@@ -67,40 +67,44 @@ public class ArtifactInfoProjection : SingleStreamProjection<ArtifactInfo>
         var builder = a.Properties.ToBuilder();
         foreach (var (key, setter) in e.Properties)
         {
+            
+            
             if (setter.Object is null)
             {
                 builder.Remove(key);
                 continue;
             }
+            
+            var @object = setter.Object.Value;
 
-            if (setter.Object.Type == KafeType.Invalid)
+            if (@object.Type == KafeType.Invalid)
             {
                 throw new InvalidOperationException("An artifact property cannot be set without a valid KAFE type.");
             }
 
             switch (setter.ExistingValueHandling)
             {
-                case ArtifactExistingPropertyValueHandling.OverwriteExisting:
-                    builder[key] = setter.Object;
+                case ExistingKafeObjectHandling.OverwriteExisting:
+                    builder[key] = @object;
                     break;
 
-                case ArtifactExistingPropertyValueHandling.KeepExisting:
+                case ExistingKafeObjectHandling.KeepExisting:
                     if (builder.ContainsKey(key))
                     {
                         continue;
                     }
 
-                    builder[key] = setter.Object;
+                    builder[key] = @object;
                     break;
 
-                case ArtifactExistingPropertyValueHandling.Append:
+                case ExistingKafeObjectHandling.Merge:
                     if (!builder.TryGetValue(key, out var property))
                     {
-                        builder[key] = setter.Object;
+                        builder[key] = @object;
                         continue;
                     }
 
-                    if (property.Type.IsArray && (property.Type.GetElementType() == setter.Object.Type))
+                    if (property.Type.IsArray && (property.Type.GetElementType() == @object.Type))
                     {
                         // builder[key] = property with
                         // {
@@ -113,7 +117,7 @@ public class ArtifactInfoProjection : SingleStreamProjection<ArtifactInfo>
 
                 default:
                     throw new NotSupportedException($"{setter.ExistingValueHandling} is not a supported "
-                        + $"{nameof(ArtifactExistingPropertyValueHandling)} value.");
+                        + $"{nameof(ExistingKafeObjectHandling)} value.");
             }
         }
 

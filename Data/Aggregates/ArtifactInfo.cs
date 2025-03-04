@@ -11,7 +11,7 @@ public record ArtifactInfo(
     CreationMethod CreationMethod,
     [LocalizedString] ImmutableDictionary<string, string> Name,
     DateTimeOffset AddedOn,
-    ImmutableDictionary<string, ArtifactProperty> Properties
+    ImmutableDictionary<string, KafeObject> Properties
 ) : IEntity
 {
     public static readonly ArtifactInfo Invalid = new();
@@ -21,7 +21,7 @@ public record ArtifactInfo(
         CreationMethod: CreationMethod.Unknown,
         Name: LocalizedString.CreateInvariant(Const.InvalidName),
         AddedOn: default,
-        Properties: ImmutableDictionary<string, ArtifactProperty>.Empty
+        Properties: ImmutableDictionary<string, KafeObject>.Empty
     )
     {
     }
@@ -40,11 +40,6 @@ public record ArtifactInfo(
     }
 }
 
-public record ArtifactProperty(
-    KafeType Type,
-    object Value
-);
-
 public class ArtifactInfoProjection : SingleStreamProjection<ArtifactInfo, string>
 {
     public static ArtifactInfo Create(ArtifactCreated e)
@@ -54,7 +49,7 @@ public class ArtifactInfoProjection : SingleStreamProjection<ArtifactInfo, strin
             CreationMethod: e.CreationMethod,
             Name: e.Name,
             AddedOn: e.AddedOn,
-            Properties: ImmutableDictionary<string, ArtifactProperty>.Empty
+            Properties: ImmutableDictionary<string, KafeObject>.Empty
         );
     }
 
@@ -72,13 +67,13 @@ public class ArtifactInfoProjection : SingleStreamProjection<ArtifactInfo, strin
         var builder = a.Properties.ToBuilder();
         foreach (var (key, setter) in e.Properties)
         {
-            if (setter.Value is null)
+            if (setter.Object is null)
             {
                 builder.Remove(key);
                 continue;
             }
 
-            if (setter.Type is null || setter.Type.Value == KafeType.Invalid)
+            if (setter.Object.Type == KafeType.Invalid)
             {
                 throw new InvalidOperationException("An artifact property cannot be set without a valid KAFE type.");
             }
@@ -86,10 +81,7 @@ public class ArtifactInfoProjection : SingleStreamProjection<ArtifactInfo, strin
             switch (setter.ExistingValueHandling)
             {
                 case ArtifactExistingPropertyValueHandling.OverwriteExisting:
-                    builder[key] = new(
-                        Type: setter.Type.Value,
-                        Value: setter.Value
-                    );
+                    builder[key] = setter.Object;
                     break;
 
                 case ArtifactExistingPropertyValueHandling.KeepExisting:
@@ -98,23 +90,17 @@ public class ArtifactInfoProjection : SingleStreamProjection<ArtifactInfo, strin
                         continue;
                     }
 
-                    builder[key] = new(
-                        Type: setter.Type.Value,
-                        Value: setter.Value
-                    );
+                    builder[key] = setter.Object;
                     break;
 
                 case ArtifactExistingPropertyValueHandling.Append:
                     if (!builder.TryGetValue(key, out var property))
                     {
-                        builder[key] = new(
-                            Type: setter.Type.Value,
-                            Value: setter.Value
-                        );
+                        builder[key] = setter.Object;
                         continue;
                     }
 
-                    if (property.Type.IsArray && (property.Type.GetElementType() == setter.Type.Value))
+                    if (property.Type.IsArray && (property.Type.GetElementType() == setter.Object.Type))
                     {
                         // builder[key] = property with
                         // {

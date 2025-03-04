@@ -38,6 +38,10 @@ public partial record struct KafeType : IParsable<KafeType>
     public string? Secondary { get; }
     public bool IsArray { get; }
 
+    public readonly bool IsDefault => Mod == null && Primary == null && Secondary == null && IsArray == false;
+
+    public readonly bool IsInvalid => this == Invalid;
+
     public KafeType GetElementType()
     {
         if (!IsArray)

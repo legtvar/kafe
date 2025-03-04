@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace Kafe;
@@ -22,5 +23,15 @@ public static class Naming
             }
         }
         return sb.ToString();
+    }
+
+    public static string WithoutSuffix(string name, string suffix)
+    {
+        if (name.EndsWith(suffix))
+        {
+            return name[0..(name.Length - suffix.Length)];
+        }
+
+        return name;
     }
 }

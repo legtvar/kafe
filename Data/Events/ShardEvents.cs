@@ -1,12 +1,4 @@
-﻿using Marten.Events.CodeGeneration;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
-
-namespace Kafe.Data.Events;
+﻿namespace Kafe.Data.Events;
 
 public interface IShardEvent
 {
@@ -31,3 +23,23 @@ public interface IShardVariantRemoved : IShardEvent
 {
     string Name { get; }
 }
+
+public record ShardCreated(
+    [Hrib] string ShardId,
+    CreationMethod CreationMethod,
+    [Hrib] string ArtifactId,
+    long Size,
+    string Filename,
+    KafeObject Metadata
+);
+
+public record ShardMetadataSet(
+    [Hrib] string ShardId,
+    KafeObject Metadata,
+    ExistingKafeObjectHandling ExistingValueHandling
+);
+
+public record ShardInfoChanged(
+    long Size,
+    string Filename
+);

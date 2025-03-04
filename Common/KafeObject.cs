@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Immutable;
-using System.Diagnostics.CodeAnalysis;
-using System.Runtime.InteropServices;
+using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -19,116 +18,113 @@ public readonly record struct KafeObject(
 
     public bool IsInvalid => Type == KafeType.Invalid || Value is null;
 
-    public static bool TrySet(
+    public static KafeObject? Set(
         KafeObject? existing,
         KafeObject? @new,
         ExistingKafeObjectHandling existingValueHandling,
-        out KafeObject? result,
-        [NotNullWhen(false)] out LocalizedString? error
+        out LocalizedString? error
     )
     {
-        result = null;
         error = null;
 
         switch (existingValueHandling)
         {
             case ExistingKafeObjectHandling.OverwriteExisting:
-                result = @new;
-                return true;
+                return @new;
 
             case ExistingKafeObjectHandling.KeepExisting:
-                result = existing is null || existing.Value.IsInvalid ? @new : existing;
-                return true;
+                return existing is null || existing.Value.IsInvalid ? @new : existing;
 
-            case ExistingKafeObjectHandling.Merge:
+            case ExistingKafeObjectHandling.MergeOrOverwrite:
+            case ExistingKafeObjectHandling.MergeOrKeep:
                 if (existing is null)
                 {
-                    result = @new;
-                    return true;
+                    return @new;
                 }
 
                 if (@new is null)
                 {
-                    result = existing;
-                    return true;
+                    return existing;
                 }
 
                 if (existing.Value.Type.IsArray || @new.Value.Type.IsArray)
                 {
-                    return TryMergeArrays(existing.Value, @new.Value, out result, out error);
-                }
-                
-                if (existing.Value.Type != @new.Value.Type) {
-                    result = existing;
-                    error = LocalizedString.CreateInvariant(
-                        $"Cannot merge a '{existing.Value.Type}' with a '{@new.Value.Type}' due to a type mismatch.");
-                    return false;
+                    var result = MergeArrays(existing.Value, @new.Value, out error);
+                    if (result is null)
+                    {
+                        // error happened, fallback to either Keep or Overwrite
+                        return existingValueHandling == ExistingKafeObjectHandling.MergeOrOverwrite ? @new : existing;
+                    }
+                    return result;
                 }
 
                 if (existing.Value.Value is IMergeable mergeable)
                 {
-                    if (mergeable.TryMergeWith(@new.Value, out var merged))
+                    var merged = mergeable.GetType().InvokeMember(
+                        nameof(IMergeable.Merge),
+                        BindingFlags.Static,
+                        null,
+                        null,
+                        [existing.Value, @new.Value]
+                    ) as KafeObject?;
+                    if (merged is not null)
                     {
                         return new KafeObject(
                             Type: existing.Value.Type,
-                            Value: merged
+                            Value: merged.Value
                         );
                     }
-                    else
-                    {
-                        result = existing;
-                        error = LocalizedString.CreateInvariant(
-                            ""
-                        )
-                    }
                 }
+
+                error = LocalizedString.CreateInvariant(
+                    $"Cannot merge '{existing.Value.Type}' with '{@new.Value.Type}'."
+                );
+                return existingValueHandling == ExistingKafeObjectHandling.MergeOrOverwrite ? @new : existing;
+            default:
+                throw new NotImplementedException(
+                    $"{nameof(ExistingKafeObjectHandling)} '{existingValueHandling}' is not implemented.");
         }
     }
 
-    private static bool TryMergeArrays(
+    private static KafeObject? MergeArrays(
         KafeObject existing,
         KafeObject @new,
-        out KafeObject? result,
-        [NotNullWhen(false)] out LocalizedString? error
+        out LocalizedString? error
     )
     {
-        result = existing;
         error = null;
 
         if (existing.Type.IsArray && !@new.Type.IsArray
             && existing.Type.GetElementType() == @new.Type)
         {
-            result = new KafeObject(
+            return new KafeObject(
                 Type: existing.Type,
                 Value: ((ImmutableArray<object>)existing.Value).Add(@new.Value)
             );
-            return true;
         }
 
         if (!existing.Type.IsArray && @new.Type.IsArray
             && @new.Type.GetElementType() == existing.Type)
         {
-            result = new KafeObject(
+            return new KafeObject(
                 Type: existing.Type,
                 Value: ImmutableArray.Create(existing.Value).AddRange((ImmutableArray<object>)@new.Value)
             );
-            return true;
         }
 
         if (existing.Type.IsArray && @new.Type.IsArray
             && existing.Type.GetElementType() == @new.Type.GetElementType())
         {
-            result = new KafeObject(
+            return new KafeObject(
                 Type: existing.Type.GetElementType(),
                 Value: ((ImmutableArray<object>)existing.Value)
                     .AddRange((ImmutableArray<object>)@new.Value)
             );
-            return true;
         }
 
         error = LocalizedString.CreateInvariant($"Cannot merge a '{existing.Type}' with a '{@new.Type}' into an array. "
             + "The array's element type would not match.");
-        return false;
+        return null;
     }
 }
 

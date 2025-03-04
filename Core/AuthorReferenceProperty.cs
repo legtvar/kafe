@@ -2,7 +2,7 @@ using System.Threading.Tasks;
 
 namespace Kafe.Core;
 
-public record AuthorReference(
+public record AuthorReferenceProperty(
     Hrib? AuthorId,
     string? Name,
     string[] Roles
@@ -19,7 +19,7 @@ public sealed class AuthorReferenceNameOrIdRequirementHandler
 
     public override ValueTask Handle(RequirementContext context)
     {
-        if (context.Object.Value is not AuthorReference authorRef)
+        if (context.Object.Value is not AuthorReferenceProperty authorRef)
         {
             context.ReportError(NotAuthorReference, LocalizedString.CreateInvariant(
                 "This requirement is not valid on objects of types other than author reference."));

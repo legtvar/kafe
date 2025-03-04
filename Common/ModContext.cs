@@ -33,14 +33,49 @@ public sealed record class ModContext
 
     public RequirementRegistry RequirementRegistry { get; }
 
-    public ModContext AddType(Type type, KafeTypeRegistrationOptions? options = null)
+    internal KafeType AddType(Type type, KafeTypeRegistrationOptions? options = null)
     {
         options ??= KafeTypeRegistrationOptions.Default;
 
+        var name = options.Name;
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            name = type.Name;
+            switch (options.Usage)
+            {
+                case KafeTypeUsage.ArtifactProperty:
+                    name = Naming.WithoutSuffix(name, "Shard");
+                    name = Naming.WithoutSuffix(name, "ShardMetadata");
+                    break;
+                case KafeTypeUsage.ShardMetadata:
+                    name = Naming.WithoutSuffix(name, "Shard");
+                    name = Naming.WithoutSuffix(name, "ShardMetadata");
+                    break;
+                case KafeTypeUsage.Requirement:
+                    name = Naming.WithoutSuffix(name, "Requirement");
+                    break;
+            }
+            name = Naming.ToDashCase(name);
+        }
+
+        string primary = name;
+        string? secondary = null;
+        switch (options.Usage)
+        {
+            case KafeTypeUsage.ShardMetadata:
+                secondary = primary;
+                primary = "shard";
+                break;
+            case KafeTypeUsage.Requirement:
+                secondary = primary;
+                primary = "requirement";
+                break;
+        }
+
         var kafeType = new KafeType(
             mod: Name,
-            primary: options.Name ?? Naming.ToDashCase(type.Name),
-            secondary: null,
+            primary: primary,
+            secondary: secondary,
             isArray: false);
         TypeRegistry.Register(
             new(
@@ -53,42 +88,63 @@ public sealed record class ModContext
             )
         );
         types.Add(kafeType);
-        return this;
+        return kafeType;
     }
 
-    public ModContext AddRequirement(Type requirementType, RequirementRegistrationOptions? options = null)
+    public KafeType AddArtifactProperty(Type propertyType, ArtifactPropertyRegistrationOptions? options = null)
+    {
+        options ??= ArtifactPropertyRegistrationOptions.Default;
+        var kafeType = AddType(propertyType, new()
+        {
+            Accessibility = options.Accessibility,
+            Converter = options.Converter,
+            Name = options.Name,
+            Usage = KafeTypeUsage.ArtifactProperty,
+            DefaultRequirements = options.DefaultRequirements
+        });
+        return kafeType;
+    }
+
+    public KafeType AddRequirement(Type requirementType, RequirementRegistrationOptions? options = null)
     {
         options ??= RequirementRegistrationOptions.Default;
 
-        var kafeType = new KafeType(
-            mod: Name,
-            primary: "requirement",
-            secondary: options.Name ?? Naming.ToDashCase(Naming.WithoutSuffix(requirementType.Name, "Requirement")),
-            isArray: false
-        );
-        TypeRegistry.Register(new(
-            KafeType: kafeType,
-            DotnetType: requirementType,
-            Usage: KafeTypeUsage.Requirement,
-            Accessibility: options.Accessibility,
-            DefaultRequirements: [],
-            Converter: options.Converter
-        ));
+        var kafeType = AddType(requirementType, new()
+        {
+            Accessibility = options.Accessibility,
+            Converter = options.Converter,
+            Name = options.Name,
+            Usage = KafeTypeUsage.Requirement
+        });
+
         RequirementRegistry.Register(new(
             KafeType: kafeType,
             HandlerTypes: [.. options.HandlerTypes]
         ));
-        types.Add(kafeType);
-        return this;
+        return kafeType;
+    }
+
+    public KafeType AddShard(Type shardType, ShardRegistrationOptions? options = null)
+    {
+        options ??= ShardRegistrationOptions.Default;
+
+        var kafeType = AddType(shardType, new()
+        {
+            Accessibility = options.Accessibility,
+            Converter = options.Converter,
+            Name = options.Name,
+            Usage = KafeTypeUsage.ShardMetadata
+        });
+
+        return kafeType;
     }
 
     public ModMetadata BuildMetadata()
     {
-        return new ModMetadata
-        {
-            Name = Name,
-            Types = types.ToImmutable()
-        };
+        return new(
+            Name: Name,
+            Types: types.ToImmutable()
+        );
     }
 
     public record KafeTypeRegistrationOptions
@@ -106,6 +162,18 @@ public sealed record class ModContext
         public List<IRequirement> DefaultRequirements { get; set; } = [];
     }
 
+    public record ArtifactPropertyRegistrationOptions
+    {
+        public static readonly ArtifactPropertyRegistrationOptions Default = new();
+
+        public KafeTypeAccessibility Accessibility { get; set; } = KafeTypeAccessibility.Public;
+
+        public string? Name { get; set; }
+
+        public JsonConverter? Converter { get; set; }
+        public List<IRequirement> DefaultRequirements { get; set; } = [];
+    }
+
     public record RequirementRegistrationOptions
     {
         public static readonly RequirementRegistrationOptions Default = new();
@@ -117,5 +185,16 @@ public sealed record class ModContext
         public JsonConverter? Converter { get; set; }
 
         public List<Type> HandlerTypes { get; set; } = [];
+    }
+
+    public record ShardRegistrationOptions
+    {
+        public static readonly ShardRegistrationOptions Default = new();
+
+        public KafeTypeAccessibility Accessibility { get; set; } = KafeTypeAccessibility.Public;
+
+        public string? Name { get; set; }
+
+        public JsonConverter? Converter { get; set; }
     }
 }

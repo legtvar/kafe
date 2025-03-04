@@ -22,12 +22,12 @@ public class KafeTypeRegistry : IFreezable
         IsFrozen = true;
     }
 
-    public KafeTypeRegistry Register(KafeType type, KafeTypeMetadata metadata)
+    public KafeTypeRegistry Register(KafeTypeMetadata metadata)
     {
         AssertUnfrozen();
-        if (!types.TryAdd(type, metadata))
+        if (!types.TryAdd(metadata.KafeType, metadata))
         {
-            throw new ArgumentException($"KafeType '{type}' has been already registered.", nameof(type));
+            throw new ArgumentException($"KafeType '{metadata.KafeType}' has been already registered.", nameof(metadata));
         }
         return this;
     }

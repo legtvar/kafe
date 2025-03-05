@@ -1,6 +1,6 @@
-FROM alpine:latest as builder
+FROM alpine:latest AS builder
 RUN apk update && apk add nodejs-current npm
-RUN corepack enable && corepack prepare pnpm@latest --activate
+RUN corepack enable && npm install -g pnpm
 WORKDIR /app
 COPY ./Web ./
 RUN pnpm i

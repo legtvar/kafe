@@ -1,4 +1,5 @@
-﻿using Kafe.Data;
+﻿using Kafe;
+using Kafe.Data;
 using Kafe.Data.Aggregates;
 using Kafe.Data.Documents;
 using Kafe.Data.Events.Upcasts;
@@ -101,6 +102,10 @@ public static class ServiceCollectionExtensions
             mo.Events.Upcast<TemporaryAccountCreatedUpcaster>();
             mo.Events.Upcast<TemporaryAccountClosedUpcaster>();
             mo.Events.Upcast<AccountPermissionUnsetUpcaster>();
+            mo.Events.Upcast(ActivatorUtilities.CreateInstance<VideoShardCreatedUpcaster>(services));
+            mo.Events.Upcast(ActivatorUtilities.CreateInstance<VideoShardVariantAddedUpcaster>(services));
+            mo.Events.Upcast(ActivatorUtilities.CreateInstance<ImageShardCreatedUpcaster>(services));
+            mo.Events.Upcast(ActivatorUtilities.CreateInstance<SubtitlesShardCreatedUpcaster>(services));
             mo.UseNewtonsoftForSerialization();
 
             RegisterEmbeddedSql(mo);
@@ -118,6 +123,8 @@ public static class ServiceCollectionExtensions
 
         services.AddSingleton<StorageService>();
         services.AddSingleton<EntityMetadataProvider>();
+        services.AddSingleton<KafeTypeRegistry>();
+        services.AddSingleton<KafeObjectFactory>();
 
         services.AddScoped<AccountService>();
         services.AddScoped<ProjectGroupService>();

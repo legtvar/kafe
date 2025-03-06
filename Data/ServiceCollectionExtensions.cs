@@ -62,7 +62,6 @@ public static class ServiceCollectionExtensions
             });
 
             mo.Projections.Add<AuthorInfoProjection>(ProjectionLifecycle.Inline);
-            mo.Projections.Add<ArtifactInfoProjection>(ProjectionLifecycle.Inline);
             mo.Projections.Add<VideoShardInfoProjection>(ProjectionLifecycle.Inline);
             mo.Projections.Add<ImageShardInfoProjection>(ProjectionLifecycle.Inline);
             mo.Projections.Add<SubtitlesShardInfoProjection>(ProjectionLifecycle.Inline);
@@ -76,6 +75,9 @@ public static class ServiceCollectionExtensions
             mo.Projections.Add<AccountInfoProjection>(ProjectionLifecycle.Inline);
             mo.Projections.Add<OrganizationInfoProjection>(ProjectionLifecycle.Inline);
             mo.Projections.Add<RoleInfoProjection>(ProjectionLifecycle.Inline);
+            mo.Projections.Add(
+                ActivatorUtilities.CreateInstance<ArtifactInfoProjection>(services),
+                ProjectionLifecycle.Inline);
             mo.Projections.Add<EntityPermissionEventProjection>(
                 ProjectionLifecycle.Async,
                 ao =>

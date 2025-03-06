@@ -5,17 +5,23 @@ public sealed class MediaMod : IMod
 {
     public const string Name = "media";
 
+    public KafeType VideoShardType { get; private set; }
+
+    public KafeType ImageShardType { get; private set; }
+
+    public KafeType SubtitlesShardType { get; private set; }
+
     public void Configure(ModContext context)
     {
-        context.AddShard<VideoShard>(new()
+        VideoShardType = context.AddShard<VideoShard>(new()
         {
             Name = "video",
         });
-        context.AddShard<ImageShard>(new()
+        ImageShardType = context.AddShard<ImageShard>(new()
         {
             Name = "image"
         });
-        context.AddShard<SubtitlesShard>(new()
+        SubtitlesShardType = context.AddShard<SubtitlesShard>(new()
         {
             Name = "subtitles"
         });

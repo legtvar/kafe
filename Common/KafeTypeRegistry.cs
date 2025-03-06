@@ -7,14 +7,18 @@ namespace Kafe;
 public class KafeTypeRegistry : IFreezable
 {
     private readonly ConcurrentDictionary<KafeType, KafeTypeMetadata> types = new();
+    private readonly ConcurrentDictionary<Type, KafeType> dotnetTypeMap = new();
 
     public bool IsFrozen { get; private set; }
 
     public IReadOnlyDictionary<KafeType, KafeTypeMetadata> Types { get; }
 
+    public IReadOnlyDictionary<Type, KafeType> DotnetTypeMap { get; }
+
     public KafeTypeRegistry()
     {
         Types = types.AsReadOnly();
+        DotnetTypeMap = dotnetTypeMap.AsReadOnly();
     }
 
     public void Freeze()
@@ -29,6 +33,7 @@ public class KafeTypeRegistry : IFreezable
         {
             throw new ArgumentException($"KafeType '{metadata.KafeType}' has been already registered.", nameof(metadata));
         }
+        dotnetTypeMap.AddOrUpdate(metadata.DotnetType, metadata.KafeType, (_, _) => metadata.KafeType);
         return this;
     }
 

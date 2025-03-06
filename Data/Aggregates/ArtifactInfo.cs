@@ -42,6 +42,13 @@ public record ArtifactInfo(
 
 public class ArtifactInfoProjection : SingleStreamProjection<ArtifactInfo, string>
 {
+    private readonly KafeObjectFactory kafeObjectFactory;
+
+    public ArtifactInfoProjection(KafeObjectFactory kafeObjectFactory)
+    {
+        this.kafeObjectFactory = kafeObjectFactory;
+    }
+
     public static ArtifactInfo Create(ArtifactCreated e)
     {
         return new ArtifactInfo(
@@ -83,7 +90,7 @@ public class ArtifactInfoProjection : SingleStreamProjection<ArtifactInfo, strin
             var oldObject = builder.GetValueOrDefault(key);
 
             // TODO: Report the error... somewhere.
-            var setValue = KafeObject.Set(oldObject, newObject, setter.ExistingValueHandling, out var _);
+            var setValue = kafeObjectFactory.Set(oldObject, newObject, setter.ExistingValueHandling, out var _);
             if (setValue is null)
             {
                 builder.Remove(key);

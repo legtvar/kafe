@@ -2,7 +2,6 @@
 using Kafe.Data.Events;
 using Marten.Events;
 using Marten.Events.Aggregation;
-using Marten.Linq.CreatedAt;
 
 namespace Kafe.Data.Aggregates;
 
@@ -11,8 +10,8 @@ public record ShardInfo(
     CreationMethod CreationMethod,
     [Hrib] string ArtifactId,
     DateTimeOffset CreatedAt,
-    long Size,
-    string Filename,
+    long? Size,
+    string? Filename,
     KafeObject Metadata
 )
 {

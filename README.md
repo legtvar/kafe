@@ -6,7 +6,7 @@ KAFE is an archival system initially built for the Film festival of FI MU.
 However, its abstractions were designed to be used for a variety of data.
 KAFE can be thus extended for, for example, games, 3D models, photographs, generative design experiments, or whatever your heart desires.
 
-> KAFE was developed with financial help from the Faculty of Informatics of MU as projects [`MUNI/33/0776/2021`](https://www.muni.cz/en/research/projects/67938) and [`MUNI/33/0026/2024 `](https://www.muni.cz/en/research/projects/71853).
+> KAFE was developed with financial help from the Faculty of Informatics of MU as projects [`MUNI/33/0776/2021`](https://www.muni.cz/en/research/projects/67938) and [`MUNI/33/0026/2024`](https://www.muni.cz/en/research/projects/71853).
 
 ## Attribution / External Dependencies
 

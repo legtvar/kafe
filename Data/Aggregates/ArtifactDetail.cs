@@ -25,7 +25,7 @@ public record ArtifactDetail(
 
 public record ArtifactShardInfo(
     [Hrib] string ShardId,
-    ShardKind Kind,
+    KafeType Type,
     ImmutableHashSet<string> Variants
 );
 
@@ -34,10 +34,12 @@ public class ArtifactDetailProjection : MultiStreamProjection<ArtifactDetail, st
     public ArtifactDetailProjection()
     {
         Identity<ArtifactCreated>(a => a.ArtifactId);
-        Identity<IShardCreated>(c => c.ArtifactId);
+        Identity<ShardCreated>(c => c.ArtifactId);
         Identity<ProjectArtifactAdded>(c => c.ArtifactId);
         Identity<ProjectArtifactRemoved>(c => c.ArtifactId);
-        IncludeType<IShardEvent>();
+        IncludeType<ShardMetadataSet>();
+        IncludeType<ShardVariantAdded>();
+        IncludeType<ShardVariantRemoved>();
         CustomGrouping(new Grouper());
     }
 
@@ -53,18 +55,31 @@ public class ArtifactDetailProjection : MultiStreamProjection<ArtifactDetail, st
         );
     }
 
-    public ArtifactDetail Apply(IShardCreated e, ArtifactDetail a)
+    public ArtifactDetail Apply(ShardCreated e, ArtifactDetail a)
     {
         return a with
         {
             Shards = a.Shards.Add(new ArtifactShardInfo(
                 ShardId: e.ShardId,
-                Kind: e.GetShardKind(),
-                Variants: ImmutableHashSet.Create(Const.OriginalShardVariant)))
+                Type: e.Metadata.Type,
+                Variants: [Const.OriginalShardVariant]))
+        };
+    }
+    
+    public ArtifactDetail Apply(ShardMetadataSet e, ArtifactDetail a)
+    {
+        // if (a.Shards.)
+        
+        return a with
+        {
+            Shards = a.Shards.Add(new ArtifactShardInfo(
+                ShardId: e.ShardId,
+                Type: e.Metadata.Type,
+                Variants: [Const.OriginalShardVariant]))
         };
     }
 
-    public ArtifactDetail Apply(IShardVariantAdded e, ArtifactDetail a)
+    public ArtifactDetail Apply(ShardVariantAdded e, ArtifactDetail a)
     {
         var oldShard = a.Shards.Single(s => s.ShardId == e.ShardId);
         return a with
@@ -76,7 +91,7 @@ public class ArtifactDetailProjection : MultiStreamProjection<ArtifactDetail, st
         };
     }
 
-    public ArtifactDetail Apply(IShardVariantRemoved e, ArtifactDetail a)
+    public ArtifactDetail Apply(ShardVariantRemoved e, ArtifactDetail a)
     {
         var oldShard = a.Shards.Single(s => s.ShardId == e.ShardId);
         return a with

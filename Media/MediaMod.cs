@@ -15,7 +15,7 @@ public sealed class MediaMod : IMod
     {
         AudiovisualShardType = context.AddShard<MediaInfo>(new()
         {
-            Name = "audiovisual",
+            Name = "video",
         });
         ImageShardType = context.AddShard<ImageInfo>(new()
         {

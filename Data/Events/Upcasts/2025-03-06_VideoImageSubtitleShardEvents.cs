@@ -1,8 +1,6 @@
 #pragma warning disable 0618
 
 using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
 using Kafe.Media;
 using Marten.Services.Json.Transformations;
 
@@ -134,22 +132,12 @@ namespace Kafe.Data.Events.Upcasts
                 ArtifactId: oldEvent.ArtifactId,
                 Size: oldEvent.OriginalVariantInfo.FileLength,
                 Filename: null,
-                Metadata: factory.Wrap(new VideoShard
-                {
-                    Variants = ImmutableDictionary.CreateRange(
-                        [
-                            new KeyValuePair<string, MediaInfo>(
-                                Const.OriginalShardVariant,
-                                oldEvent.OriginalVariantInfo
-                            )
-                        ]
-                    )
-                })
+                Metadata: factory.Wrap(oldEvent.OriginalVariantInfo)
             );
         }
     }
 
-    internal class VideoShardVariantAddedUpcaster : EventUpcaster<VideoShardVariantAdded, ShardMetadataSet>
+    internal class VideoShardVariantAddedUpcaster : EventUpcaster<VideoShardVariantAdded, ShardVariantAdded>
     {
         private readonly KafeObjectFactory factory;
 
@@ -158,22 +146,24 @@ namespace Kafe.Data.Events.Upcasts
             this.factory = factory;
         }
 
-        protected override ShardMetadataSet Upcast(VideoShardVariantAdded oldEvent)
+        protected override ShardVariantAdded Upcast(VideoShardVariantAdded oldEvent)
         {
-            return new ShardMetadataSet(
+            return new ShardVariantAdded(
                 ShardId: oldEvent.ShardId,
+                Name: oldEvent.Name,
                 ExistingValueHandling: ExistingKafeObjectHandling.MergeOrKeep,
-                Metadata: factory.Wrap(new VideoShard
-                {
-                    Variants = ImmutableDictionary.CreateRange(
-                        [
-                            new KeyValuePair<string, MediaInfo>(
-                                oldEvent.Name,
-                                oldEvent.Info
-                            )
-                        ]
-                    )
-                })
+                Metadata: factory.Wrap(oldEvent.Info)
+            );
+        }
+    }
+
+    internal class VideoShardVariantRemovedUpcaster : EventUpcaster<VideoShardVariantRemoved, ShardVariantRemoved>
+    {
+        protected override ShardVariantRemoved Upcast(VideoShardVariantRemoved oldEvent)
+        {
+            return new ShardVariantRemoved(
+                ShardId: oldEvent.ShardId,
+                Name: oldEvent.Name
             );
         }
     }
@@ -195,17 +185,38 @@ namespace Kafe.Data.Events.Upcasts
                 ArtifactId: oldEvent.ArtifactId,
                 Size: null,
                 Filename: null,
-                Metadata: factory.Wrap(new ImageShard
-                {
-                    Variants = ImmutableDictionary.CreateRange(
-                        [
-                            new KeyValuePair<string, ImageInfo>(
-                                Const.OriginalShardVariant,
-                                oldEvent.OriginalVariantInfo
-                            )
-                        ]
-                    )
-                })
+                Metadata: factory.Wrap(oldEvent.OriginalVariantInfo)
+            );
+        }
+    }
+
+    internal class ImageShardVariantsAddedUpcaster : EventUpcaster<ImageShardVariantsAdded, ShardVariantAdded>
+    {
+        private readonly KafeObjectFactory factory;
+
+        public ImageShardVariantsAddedUpcaster(KafeObjectFactory factory)
+        {
+            this.factory = factory;
+        }
+
+        protected override ShardVariantAdded Upcast(ImageShardVariantsAdded oldEvent)
+        {
+            return new ShardVariantAdded(
+                ShardId: oldEvent.ShardId,
+                Name: oldEvent.Name,
+                ExistingValueHandling: ExistingKafeObjectHandling.MergeOrKeep,
+                Metadata: factory.Wrap(oldEvent.Info)
+            );
+        }
+    }
+
+    internal class ImageShardVariantsRemovedUpcaster : EventUpcaster<ImageShardVariantsRemoved, ShardVariantRemoved>
+    {
+        protected override ShardVariantRemoved Upcast(ImageShardVariantsRemoved oldEvent)
+        {
+            return new ShardVariantRemoved(
+                ShardId: oldEvent.ShardId,
+                Name: oldEvent.Name
             );
         }
     }
@@ -227,17 +238,39 @@ namespace Kafe.Data.Events.Upcasts
                 ArtifactId: oldEvent.ArtifactId,
                 Size: null,
                 Filename: null,
-                Metadata: factory.Wrap(new SubtitlesShard
-                {
-                    Variants = ImmutableDictionary.CreateRange(
-                        [
-                            new KeyValuePair<string, SubtitlesInfo>(
-                                Const.OriginalShardVariant,
-                                oldEvent.OriginalVariantInfo
-                            )
-                        ]
-                    )
-                })
+                Metadata: factory.Wrap(oldEvent.OriginalVariantInfo)
+            );
+        }
+    }
+
+    internal class SubtitlesShardVariantsAddedUpcaster : EventUpcaster<SubtitlesShardVariantsAdded, ShardVariantAdded>
+    {
+        private readonly KafeObjectFactory factory;
+
+        public SubtitlesShardVariantsAddedUpcaster(KafeObjectFactory factory)
+        {
+            this.factory = factory;
+        }
+
+        protected override ShardVariantAdded Upcast(SubtitlesShardVariantsAdded oldEvent)
+        {
+            return new ShardVariantAdded(
+                ShardId: oldEvent.ShardId,
+                Name: oldEvent.Name,
+                ExistingValueHandling: ExistingKafeObjectHandling.MergeOrKeep,
+                Metadata: factory.Wrap(oldEvent.Info)
+            );
+        }
+    }
+
+    internal class SubtitlesShardVariantsRemovedUpcaster
+        : EventUpcaster<SubtitlesShardVariantsRemoved, ShardVariantRemoved>
+    {
+        protected override ShardVariantRemoved Upcast(SubtitlesShardVariantsRemoved oldEvent)
+        {
+            return new ShardVariantRemoved(
+                ShardId: oldEvent.ShardId,
+                Name: oldEvent.Name
             );
         }
     }

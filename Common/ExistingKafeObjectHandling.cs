@@ -23,7 +23,7 @@ public enum ExistingKafeObjectHandling
     ///     <list type="bullet">
     ///         <item>Items to be appended or prepended to arrays.</item>
     ///         <item>Arrays to be concatened, with existing items first, new items later.</item>
-    ///         <item>Invokation of <see cref="IMergeable.Merge(KafeObject, KafeObject)"/>.</item>
+    ///         <item>Invokation of <see cref="IMergeable{T}.MergeWith(T)"/>.</item>
     ///     </list>
     /// </remarks>
     MergeOrOverwrite,

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Immutable;
 using Kafe.Data.Events;
 using Marten.Events;
 using Marten.Events.Aggregation;
@@ -12,7 +13,8 @@ public record ShardInfo(
     DateTimeOffset CreatedAt,
     long? Size,
     string? Filename,
-    KafeObject Metadata
+    KafeObject Metadata,
+    ImmutableDictionary<string, KafeObject> Variants
 )
 {
     public static readonly ShardInfo Invalid = new();
@@ -24,7 +26,8 @@ public record ShardInfo(
         CreatedAt: default,
         Size: 0,
         Filename: Const.InvalidName,
-        Metadata: KafeObject.Invalid
+        Metadata: KafeObject.Invalid,
+        Variants: ImmutableDictionary<string, KafeObject>.Empty
     )
     {
     }
@@ -32,8 +35,11 @@ public record ShardInfo(
 
 public class ShardInfoProjection : SingleStreamProjection<ShardInfo>
 {
-    public ShardInfoProjection()
+    private readonly KafeObjectFactory factory;
+
+    public ShardInfoProjection(KafeObjectFactory factory)
     {
+        this.factory = factory;
     }
 
     public static ShardInfo Create(IEvent<ShardCreated> e)
@@ -45,7 +51,34 @@ public class ShardInfoProjection : SingleStreamProjection<ShardInfo>
             CreatedAt: e.Timestamp,
             Size: e.Data.Size,
             Filename: e.Data.Filename,
-            Metadata: e.Data.Metadata
+            Metadata: e.Data.Metadata,
+            Variants: ImmutableDictionary<string, KafeObject>.Empty
         );
     }
+
+    public ShardInfo Apply(ShardVariantAdded e, ShardInfo s)
+    {
+        var existing = s.Variants.GetValueOrDefault(e.Name);
+        // TODO: Report the error somewhere
+        var newValue = factory.Set(existing, e.Metadata, e.ExistingValueHandling, out _);
+
+        if (newValue is null)
+        {
+            return s;
+        }
+
+        return s with
+        {
+            Variants = s.Variants.SetItem(e.Name, newValue.Value)
+        };
+    }
+
+    public ShardInfo Apply(ShardVariantRemoved e, ShardInfo s)
+    {
+        return s with
+        {
+            Variants = s.Variants.Remove(e.Name)
+        };
+    }
+
 }

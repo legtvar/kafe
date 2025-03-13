@@ -99,8 +99,13 @@ public static class ServiceCollectionExtensions
             mo.Events.Upcast<AccountPermissionUnsetUpcaster>();
             mo.Events.Upcast(ActivatorUtilities.CreateInstance<VideoShardCreatedUpcaster>(services));
             mo.Events.Upcast(ActivatorUtilities.CreateInstance<VideoShardVariantAddedUpcaster>(services));
+            mo.Events.Upcast<VideoShardVariantRemovedUpcaster>();
+            mo.Events.Upcast(ActivatorUtilities.CreateInstance<ImageShardVariantsAddedUpcaster>(services));
             mo.Events.Upcast(ActivatorUtilities.CreateInstance<ImageShardCreatedUpcaster>(services));
+            mo.Events.Upcast<ImageShardVariantsRemovedUpcaster>();
+            mo.Events.Upcast(ActivatorUtilities.CreateInstance<SubtitlesShardVariantsAddedUpcaster>(services));
             mo.Events.Upcast(ActivatorUtilities.CreateInstance<SubtitlesShardCreatedUpcaster>(services));
+            mo.Events.Upcast<SubtitlesShardVariantsRemovedUpcaster>();
             mo.UseNewtonsoftForSerialization();
 
             RegisterEmbeddedSql(mo);

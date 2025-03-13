@@ -19,3 +19,15 @@ public record ShardInfoChanged(
     long Size,
     string Filename
 );
+
+public record ShardVariantAdded(
+    [Hrib] string ShardId,
+    string Name,
+    KafeObject Metadata,
+    ExistingKafeObjectHandling ExistingValueHandling
+);
+
+public record ShardVariantRemoved(
+    [Hrib] string ShardId,
+    string Name
+);

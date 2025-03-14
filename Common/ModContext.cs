@@ -1,13 +1,13 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Text.Json.Serialization;
+using System.Collections.ObjectModel;
 
 namespace Kafe;
 
 public sealed record class ModContext
 {
-    private ImmutableHashSet<KafeType>.Builder types = ImmutableHashSet.CreateBuilder<KafeType>();
+    private HashSet<KafeType> types = [];
 
     public ModContext(
         string name,
@@ -15,6 +15,7 @@ public sealed record class ModContext
         RequirementRegistry requirementRegistry
     )
     {
+        Types = new ReadOnlySet<KafeType>(types);
         Name = name;
         TypeRegistry = typeRegistry;
         RequirementRegistry = requirementRegistry;
@@ -32,6 +33,8 @@ public sealed record class ModContext
     public KafeTypeRegistry TypeRegistry { get; }
 
     public RequirementRegistry RequirementRegistry { get; }
+
+    public IReadOnlySet<KafeType> Types { get; }
 
     internal KafeType AddType(Type type, KafeTypeRegistrationOptions? options = null)
     {
@@ -137,14 +140,6 @@ public sealed record class ModContext
         });
 
         return kafeType;
-    }
-
-    public ModMetadata BuildMetadata()
-    {
-        return new(
-            Name: Name,
-            Types: types.ToImmutable()
-        );
     }
 
     public record KafeTypeRegistrationOptions

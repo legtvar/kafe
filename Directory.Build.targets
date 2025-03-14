@@ -3,6 +3,7 @@
   <ItemGroup>
     <PackageReference Update="System.Text.Json" Version="9.0.3" />
     <PackageReference Update="Microsoft.Extensions.Options.DataAnnotations" Version="9.0.3" />
+    <PackageReference Update="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.3" />
     <PackageReference Update="Serilog.AspNetCore" Version="9.0.0" />
   </ItemGroup>
 </Project>

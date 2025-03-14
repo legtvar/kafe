@@ -101,15 +101,18 @@ public static class ServiceCollectionExtensions
             mo.Events.Upcast<TemporaryAccountCreatedUpcaster>();
             mo.Events.Upcast<TemporaryAccountClosedUpcaster>();
             mo.Events.Upcast<AccountPermissionUnsetUpcaster>();
-            mo.Events.Upcast(ActivatorUtilities.CreateInstance<VideoShardCreatedUpcaster>(services));
-            mo.Events.Upcast(ActivatorUtilities.CreateInstance<VideoShardVariantAddedUpcaster>(services));
+            mo.Events.Upcast<VideoShardCreatedUpcaster>();
+            mo.Events.Upcast<VideoShardVariantAddedUpcaster>();
             mo.Events.Upcast<VideoShardVariantRemovedUpcaster>();
-            mo.Events.Upcast(ActivatorUtilities.CreateInstance<ImageShardVariantsAddedUpcaster>(services));
-            mo.Events.Upcast(ActivatorUtilities.CreateInstance<ImageShardCreatedUpcaster>(services));
+            mo.Events.Upcast<ImageShardVariantsAddedUpcaster>();
+            mo.Events.Upcast<ImageShardCreatedUpcaster>();
             mo.Events.Upcast<ImageShardVariantsRemovedUpcaster>();
-            mo.Events.Upcast(ActivatorUtilities.CreateInstance<SubtitlesShardVariantsAddedUpcaster>(services));
-            mo.Events.Upcast(ActivatorUtilities.CreateInstance<SubtitlesShardCreatedUpcaster>(services));
+            mo.Events.Upcast<SubtitlesShardVariantsAddedUpcaster>();
+            mo.Events.Upcast<SubtitlesShardCreatedUpcaster>();
             mo.Events.Upcast<SubtitlesShardVariantsRemovedUpcaster>();
+            mo.Events.Upcast<BlendShardCreatedUpcaster>();
+            mo.Events.Upcast<BlendShardVariantAddedUpcaster>();
+            mo.Events.Upcast<BlendShardVariantRemovedUpcaster>();
             mo.UseNewtonsoftForSerialization();
 
             RegisterEmbeddedSql(mo);

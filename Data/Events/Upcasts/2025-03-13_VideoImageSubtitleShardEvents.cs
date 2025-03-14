@@ -2,6 +2,7 @@
 
 using System;
 using Kafe.Media;
+using Kafe.Media.Deprecated;
 using Marten.Services.Json.Transformations;
 
 namespace Kafe.Data.Events
@@ -111,19 +112,35 @@ namespace Kafe.Data.Events
         [Hrib] string ShardId,
         string Name
     ) : IImageShardEvent, IShardVariantRemoved;
+
+    public interface IBlendShardEvent : IShardEvent
+    {
+    }
+
+    public record BlendShardCreated(
+        [Hrib] string ShardId,
+        CreationMethod CreationMethod,
+        [Hrib] string ArtifactId,
+        BlendInfo OriginalVariantInfo
+    ) : IBlendShardEvent, IShardCreated;
+
+    public record BlendShardVariantAdded(
+        [Hrib] string ShardId,
+        string Name,
+        BlendInfo Info
+    ) : IBlendShardEvent, IShardVariantAdded;
+
+    public record BlendShardVariantRemoved(
+        [Hrib] string ShardId,
+        string Name
+    ) : IBlendShardEvent, IShardVariantRemoved;
+
 }
 
 namespace Kafe.Data.Events.Upcasts
 {
     internal class VideoShardCreatedUpcaster : EventUpcaster<VideoShardCreated, ShardCreated>
     {
-        private readonly KafeObjectFactory factory;
-
-        public VideoShardCreatedUpcaster(KafeObjectFactory factory)
-        {
-            this.factory = factory;
-        }
-
         protected override ShardCreated Upcast(VideoShardCreated oldEvent)
         {
             return new ShardCreated(
@@ -132,27 +149,26 @@ namespace Kafe.Data.Events.Upcasts
                 ArtifactId: oldEvent.ArtifactId,
                 Size: oldEvent.OriginalVariantInfo.FileLength,
                 Filename: null,
-                Metadata: factory.Wrap(oldEvent.OriginalVariantInfo)
+                Metadata: new KafeObject(
+                    Type: new KafeType("media", "shard", "video", false),
+                    oldEvent.OriginalVariantInfo
+                )
             );
         }
     }
 
     internal class VideoShardVariantAddedUpcaster : EventUpcaster<VideoShardVariantAdded, ShardVariantAdded>
     {
-        private readonly KafeObjectFactory factory;
-
-        public VideoShardVariantAddedUpcaster(KafeObjectFactory factory)
-        {
-            this.factory = factory;
-        }
-
         protected override ShardVariantAdded Upcast(VideoShardVariantAdded oldEvent)
         {
             return new ShardVariantAdded(
                 ShardId: oldEvent.ShardId,
                 Name: oldEvent.Name,
                 ExistingValueHandling: ExistingKafeObjectHandling.MergeOrKeep,
-                Metadata: factory.Wrap(oldEvent.Info)
+                Metadata: new KafeObject(
+                    Type: new KafeType("media", "shard", "video", false),
+                    oldEvent.Info
+                )
             );
         }
     }
@@ -170,13 +186,6 @@ namespace Kafe.Data.Events.Upcasts
 
     internal class ImageShardCreatedUpcaster : EventUpcaster<ImageShardCreated, ShardCreated>
     {
-        private readonly KafeObjectFactory factory;
-
-        public ImageShardCreatedUpcaster(KafeObjectFactory factory)
-        {
-            this.factory = factory;
-        }
-
         protected override ShardCreated Upcast(ImageShardCreated oldEvent)
         {
             return new ShardCreated(
@@ -185,27 +194,26 @@ namespace Kafe.Data.Events.Upcasts
                 ArtifactId: oldEvent.ArtifactId,
                 Size: null,
                 Filename: null,
-                Metadata: factory.Wrap(oldEvent.OriginalVariantInfo)
+                Metadata: new KafeObject(
+                    Type: new KafeType("media", "shard", "image", false),
+                    oldEvent.OriginalVariantInfo
+                )
             );
         }
     }
 
     internal class ImageShardVariantsAddedUpcaster : EventUpcaster<ImageShardVariantsAdded, ShardVariantAdded>
     {
-        private readonly KafeObjectFactory factory;
-
-        public ImageShardVariantsAddedUpcaster(KafeObjectFactory factory)
-        {
-            this.factory = factory;
-        }
-
         protected override ShardVariantAdded Upcast(ImageShardVariantsAdded oldEvent)
         {
             return new ShardVariantAdded(
                 ShardId: oldEvent.ShardId,
                 Name: oldEvent.Name,
                 ExistingValueHandling: ExistingKafeObjectHandling.MergeOrKeep,
-                Metadata: factory.Wrap(oldEvent.Info)
+                Metadata: new KafeObject(
+                    Type: new KafeType("media", "shard", "image", false),
+                    oldEvent.Info
+                )
             );
         }
     }
@@ -223,13 +231,6 @@ namespace Kafe.Data.Events.Upcasts
 
     internal class SubtitlesShardCreatedUpcaster : EventUpcaster<SubtitlesShardCreated, ShardCreated>
     {
-        private readonly KafeObjectFactory factory;
-
-        public SubtitlesShardCreatedUpcaster(KafeObjectFactory factory)
-        {
-            this.factory = factory;
-        }
-
         protected override ShardCreated Upcast(SubtitlesShardCreated oldEvent)
         {
             return new ShardCreated(
@@ -238,27 +239,26 @@ namespace Kafe.Data.Events.Upcasts
                 ArtifactId: oldEvent.ArtifactId,
                 Size: null,
                 Filename: null,
-                Metadata: factory.Wrap(oldEvent.OriginalVariantInfo)
+                Metadata: new KafeObject(
+                    Type: new KafeType("media", "shard", "subtitles", false),
+                    oldEvent.OriginalVariantInfo
+                )
             );
         }
     }
 
     internal class SubtitlesShardVariantsAddedUpcaster : EventUpcaster<SubtitlesShardVariantsAdded, ShardVariantAdded>
     {
-        private readonly KafeObjectFactory factory;
-
-        public SubtitlesShardVariantsAddedUpcaster(KafeObjectFactory factory)
-        {
-            this.factory = factory;
-        }
-
         protected override ShardVariantAdded Upcast(SubtitlesShardVariantsAdded oldEvent)
         {
             return new ShardVariantAdded(
                 ShardId: oldEvent.ShardId,
                 Name: oldEvent.Name,
                 ExistingValueHandling: ExistingKafeObjectHandling.MergeOrKeep,
-                Metadata: factory.Wrap(oldEvent.Info)
+                Metadata: new KafeObject(
+                    Type: new KafeType("media", "shard", "subtitles", false),
+                    oldEvent.Info
+                )
             );
         }
     }
@@ -267,6 +267,52 @@ namespace Kafe.Data.Events.Upcasts
         : EventUpcaster<SubtitlesShardVariantsRemoved, ShardVariantRemoved>
     {
         protected override ShardVariantRemoved Upcast(SubtitlesShardVariantsRemoved oldEvent)
+        {
+            return new ShardVariantRemoved(
+                ShardId: oldEvent.ShardId,
+                Name: oldEvent.Name
+            );
+        }
+    }
+
+    internal class BlendShardCreatedUpcaster : EventUpcaster<BlendShardCreated, ShardCreated>
+    {
+        protected override ShardCreated Upcast(BlendShardCreated oldEvent)
+        {
+            return new ShardCreated(
+                ShardId: oldEvent.ShardId,
+                CreationMethod: oldEvent.CreationMethod,
+                ArtifactId: oldEvent.ArtifactId,
+                Size: null,
+                Filename: null,
+                Metadata: new KafeObject(
+                    Type: new KafeType("media", "shard", "blend", false),
+                    oldEvent.OriginalVariantInfo
+                )
+            );
+        }
+    }
+
+    internal class BlendShardVariantAddedUpcaster : EventUpcaster<BlendShardVariantAdded, ShardVariantAdded>
+    {
+        protected override ShardVariantAdded Upcast(BlendShardVariantAdded oldEvent)
+        {
+            return new ShardVariantAdded(
+                ShardId: oldEvent.ShardId,
+                Name: oldEvent.Name,
+                ExistingValueHandling: ExistingKafeObjectHandling.MergeOrKeep,
+                Metadata: new KafeObject(
+                    Type: new KafeType("media", "shard", "Blend", false),
+                    oldEvent.Info
+                )
+            );
+        }
+    }
+
+    internal class BlendShardVariantRemovedUpcaster
+        : EventUpcaster<BlendShardVariantRemoved, ShardVariantRemoved>
+    {
+        protected override ShardVariantRemoved Upcast(BlendShardVariantRemoved oldEvent)
         {
             return new ShardVariantRemoved(
                 ShardId: oldEvent.ShardId,

@@ -9,7 +9,6 @@ namespace Kafe.Data.Aggregates;
 public record ShardInfo(
     [Hrib] string Id,
     CreationMethod CreationMethod,
-    [Hrib] string ArtifactId,
     DateTimeOffset CreatedAt,
     long? Size,
     string? Filename,
@@ -22,7 +21,6 @@ public record ShardInfo(
     public ShardInfo() : this(
         Id: Hrib.InvalidValue,
         CreationMethod: CreationMethod.Unknown,
-        ArtifactId: Hrib.InvalidValue,
         CreatedAt: default,
         Size: 0,
         Filename: Const.InvalidName,
@@ -47,7 +45,6 @@ public class ShardInfoProjection : SingleStreamProjection<ShardInfo>
         return new(
             Id: e.Data.ShardId,
             CreationMethod: e.Data.CreationMethod,
-            ArtifactId: e.Data.ArtifactId,
             CreatedAt: e.Timestamp,
             Size: e.Data.Size,
             Filename: e.Data.Filename,

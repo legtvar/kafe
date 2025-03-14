@@ -1,6 +1,9 @@
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Kafe.Data;
+using Kafe.Media;
+using Kafe.Core;
+using Kafe.Polygons;
 using Kafe.Api.Endpoints;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
@@ -226,6 +229,8 @@ public class Startup
 
     public void Configure(IApplicationBuilder app)
     {
+        app.ApplicationServices.ConfigureKafeMods();
+
         app.UseMiddleware<ClacksMiddleware>();
 
         app.UseForwardedHeaders();
@@ -294,7 +299,10 @@ public class Startup
 
     private void RegisterKafe(IServiceCollection services)
     {
+        services.AddKafeCommon();
+        services.AddKafeCore();
         services.AddKafeMedia();
+        services.AddKafePolygons();
         services.AddKafeData();
 
         services.AddScoped<UserProvider>();

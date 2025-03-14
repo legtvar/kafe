@@ -1,11 +1,7 @@
 ﻿using Kafe.Media.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace Microsoft.Extensions.DependencyInjection;
+namespace Kafe.Media;
 
 public static class ServiceCollectionExtensions
 {
@@ -13,6 +9,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddSingleton<IMediaService, FFmpegCoreService>();
         services.AddSingleton<IImageService, ImageSharpService>();
+        services.AddSingleton<IMod, MediaMod>();
         return services;
     }
 }

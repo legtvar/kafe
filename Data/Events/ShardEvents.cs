@@ -3,7 +3,6 @@
 public record ShardCreated(
     [Hrib] string ShardId,
     CreationMethod CreationMethod,
-    [Hrib] string ArtifactId,
     long? Size,
     string? Filename,
     KafeObject Metadata

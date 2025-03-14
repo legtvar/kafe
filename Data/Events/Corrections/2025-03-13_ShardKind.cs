@@ -2,7 +2,7 @@
 
 using System;
 using System.Collections.Immutable;
-using Kafe.Media;
+using Kafe.Media.Deprecated;
 
 namespace Kafe.Data
 {
@@ -15,6 +15,71 @@ namespace Kafe.Data
         Subtitles = 3,
         Blend = 4
     }
+}
+
+namespace Kafe.Media.Deprecated
+{
+    [Obsolete("Use `Kafe.Polygons.BlendInfo` instead.")]
+    public record BlendInfo(
+        string FileExtension,
+        string MimeType,
+        string? Error = null
+    );
+
+    [Obsolete("Use `Kafe.Media.VideoStreamInfo` instead.")]
+    public record VideoStreamInfo(
+        string Codec,
+        long Bitrate,
+        int Width,
+        int Height,
+        double Framerate);
+
+    [Obsolete("Use `Kafe.Media.AudioStreamInfo` instead.")]
+    public record AudioStreamInfo(
+        string Codec,
+        long Bitrate,
+        int Channels,
+        int SampleRate);
+
+    [Obsolete("Use `Kafe.Media.SubtitleStreamInfo` instead.")]
+    public record SubtitleStreamInfo(
+        string? Language,
+        string Codec,
+        long Bitrate);
+
+    [Obsolete("Use `Kafe.Media.MediaInfo` instead.")]
+    public record MediaInfo(
+        string FileExtension,
+        string FormatName,
+        string MimeType,
+        long FileLength,
+        TimeSpan Duration,
+        double Bitrate,
+        ImmutableArray<VideoStreamInfo> VideoStreams,
+        ImmutableArray<AudioStreamInfo> AudioStreams,
+        ImmutableArray<SubtitleStreamInfo> SubtitleStreams,
+        bool IsCorrupted = false,
+        string? Error = null
+    );
+
+    [Obsolete("Use `Kafe.Media.ImageInfo` instead.")]
+    public record ImageInfo(
+        string FileExtension,
+        string MimeType,
+        string FormatName,
+        int Width,
+        int Height,
+        bool IsCorrupted = false
+    );
+
+    [Obsolete("Use `Kafe.Media.SubtitlesInfo` instead.")]
+    public record SubtitlesInfo(
+        string FileExtension,
+        string MimeType,
+        string? Language,
+        string Codec,
+        long Bitrate,
+        bool IsCorrupted);
 }
 
 namespace Kafe.Data.Aggregates
@@ -53,6 +118,7 @@ namespace Kafe.Data.Aggregates
         public override ShardKind Kind => ShardKind.Image;
     }
 
+    [Obsolete("Use the new universal ShardInfo projection instead.")]
     public record SubtitlesShardInfo(
         [Hrib] string Id,
         CreationMethod CreationMethod,
@@ -64,6 +130,7 @@ namespace Kafe.Data.Aggregates
         public override ShardKind Kind => ShardKind.Subtitles;
     }
 
+    [Obsolete("Use the new universal ShardInfo projection instead.")]
     public record BlendShardInfo(
         [Hrib] string Id,
         string? FileName,

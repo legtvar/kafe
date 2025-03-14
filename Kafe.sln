@@ -47,6 +47,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kafe.Pigeons", "Pigeons\Kafe.Pigeons.csproj", "{0471CCDE-174B-4396-A2C8-93F041044C2B}"
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kafe.Core", "Core\Kafe.Core.csproj", "{C836E570-A4B6-4CD5-B95C-B84442425D19}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kafe.Polygons", "Polygons\Kafe.Polygons.csproj", "{6AE2DBF2-A9B9-4105-85C7-C4BC5FE22C0A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -101,6 +103,10 @@ Global
 		{C836E570-A4B6-4CD5-B95C-B84442425D19}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C836E570-A4B6-4CD5-B95C-B84442425D19}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C836E570-A4B6-4CD5-B95C-B84442425D19}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6AE2DBF2-A9B9-4105-85C7-C4BC5FE22C0A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6AE2DBF2-A9B9-4105-85C7-C4BC5FE22C0A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6AE2DBF2-A9B9-4105-85C7-C4BC5FE22C0A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6AE2DBF2-A9B9-4105-85C7-C4BC5FE22C0A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

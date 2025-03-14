@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 
-namespace Kafe.Media;
+namespace Kafe.Polygons;
 
 public record BlendInfo(
     string FileExtension = Const.BlendFileExtension,

@@ -2,20 +2,12 @@ namespace Kafe;
 
 public static class ModContextExtensions
 {
-    internal static KafeType AddType<T>(
-        this ModContext c,
-        ModContext.KafeTypeRegistrationOptions? options = null
-    )
-    {
-        return c.AddType(typeof(T), options);
-    }
-
     public static KafeType AddArtifactProperty<T>(
         this ModContext c,
-        ModContext.ArtifactPropertyRegistrationOptions? options = null
+        ModContext.PropertyRegistrationOptions? options = null
     )
     {
-        return c.AddArtifactProperty(typeof(T), options);
+        return c.AddProperty(typeof(T), options);
     }
 
     public static KafeType AddRequirement<T>(

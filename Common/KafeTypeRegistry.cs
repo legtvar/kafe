@@ -8,25 +8,18 @@ namespace Kafe;
 public class KafeTypeRegistry : IFreezable
 {
     private readonly ConcurrentDictionary<KafeType, KafeTypeMetadata> types = new();
-    private readonly ConcurrentDictionary<KafeType, RequirementTypeMetadata> requirements = new();
-    private readonly ConcurrentDictionary<KafeType, ShardTypeMetadata> shards = new();
+
     private readonly ConcurrentDictionary<Type, KafeType> dotnetTypeMap = new();
 
     public bool IsFrozen { get; private set; }
 
     public IReadOnlyDictionary<KafeType, KafeTypeMetadata> Types { get; }
 
-    public IReadOnlyDictionary<KafeType, RequirementTypeMetadata> Requirements { get; }
-
-    public IReadOnlyDictionary<KafeType, ShardTypeMetadata> Shards { get; }
-
     public IReadOnlyDictionary<Type, KafeType> DotnetTypeMap { get; }
 
     public KafeTypeRegistry()
     {
         Types = types.AsReadOnly();
-        Requirements = requirements.AsReadOnly();
-        Shards = shards.AsReadOnly();
         DotnetTypeMap = dotnetTypeMap.AsReadOnly();
     }
 
@@ -35,7 +28,7 @@ public class KafeTypeRegistry : IFreezable
         IsFrozen = true;
     }
 
-    public KafeTypeRegistry Register(KafeType kafeType, Type dotnetNet)
+    public KafeTypeRegistry Register(KafeTypeMetadata metadata)
     {
         AssertUnfrozen();
         if (!types.TryAdd(metadata.KafeType, metadata))
@@ -56,16 +49,10 @@ public class KafeTypeRegistry : IFreezable
 
     public sealed record KafeTypeRegistrationOptions
     {
-        public KafeTypeUsage Usage { get; set; } = KafeTypeUsage.ArtifactProperty;
-
         public KafeTypeAccessibility Accessibility { get; set; } = KafeTypeAccessibility.Public;
 
         public List<IRequirement> DefaultRequirements { get; set; } = [];
 
         public JsonConverter? Converter { get; set; }
-
-        public List<Type> RequirementHandlerTypes { get; set; } = [];
-
-        public List<Type> ShardAnalyzerTypes { get; set; } = [];
     }
 }

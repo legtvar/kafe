@@ -6,11 +6,11 @@ namespace Kafe;
 
 public class ShardTypeRegistry : IFreezable
 {
-    private readonly ConcurrentDictionary<KafeType, RequirementTypeMetadata> shards = new();
+    private readonly ConcurrentDictionary<KafeType, ShardTypeMetadata> shards = new();
 
     public bool IsFrozen { get; private set; }
 
-    public IReadOnlyDictionary<KafeType, RequirementTypeMetadata> Shards { get; }
+    public IReadOnlyDictionary<KafeType, ShardTypeMetadata> Shards { get; }
 
     public ShardTypeRegistry()
     {
@@ -22,7 +22,7 @@ public class ShardTypeRegistry : IFreezable
         IsFrozen = true;
     }
 
-    public ShardTypeRegistry Register(RequirementTypeMetadata metadata)
+    public ShardTypeRegistry Register(ShardTypeMetadata metadata)
     {
         AssertUnfrozen();
         if (!shards.TryAdd(metadata.KafeType, metadata))

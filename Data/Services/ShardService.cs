@@ -1,7 +1,5 @@
 ﻿using Kafe.Data.Aggregates;
 using Kafe.Data.Events;
-using Kafe.Media;
-using Kafe.Media.Services;
 using Marten;
 using System;
 using System.IO;
@@ -15,38 +13,19 @@ public class ShardService
 {
     private readonly IDocumentSession db;
     private readonly StorageService storageService;
-    private readonly IMediaService mediaService;
-    private readonly IImageService imageService;
 
     public ShardService(
         IDocumentSession db,
-        StorageService storageService,
-        IMediaService mediaService,
-        IImageService imageService)
+        StorageService storageService
+    )
     {
         this.db = db;
         this.storageService = storageService;
-        this.mediaService = mediaService;
-        this.imageService = imageService;
     }
 
-    public async Task<IShardEntity?> Load(Hrib id, CancellationToken token = default)
+    public async Task<ShardInfo?> Load(Hrib id, CancellationToken token = default)
     {
-        var shardKind = await GetShardKind(id, token);
-        if (shardKind == ShardKind.Unknown)
-        {
-            return null;
-        }
-
-        IShardEntity? shard = shardKind switch
-        {
-            ShardKind.Video => await db.LoadAsync<VideoShardInfo>(id.ToString(), token),
-            ShardKind.Image => await db.LoadAsync<ImageShardInfo>(id.ToString(), token),
-            ShardKind.Subtitles => await db.LoadAsync<SubtitlesShardInfo>(id.ToString(), token),
-            ShardKind.Blend => await db.LoadAsync<BlendShardInfo>(id.ToString(), token),
-            _ => throw new NotSupportedException($"ShardKind '{shardKind}' is not supported.")
-        };
-        return shard;
+        return await db.LoadAsync<ShardInfo>(id.ToString(), token);
     }
 
     public async Task<Hrib?> Create(
@@ -248,17 +227,6 @@ public class ShardService
         }
 
         return stream;
-    }
-
-    public async Task<ShardKind> GetShardKind(Hrib id, CancellationToken token = default)
-    {
-        var firstEvent = (await db.Events.FetchStreamAsync(id.ToString(), 1, token: token)).SingleOrDefault();
-        if (firstEvent is null)
-        {
-            return ShardKind.Unknown;
-        }
-
-        return ((IShardCreated)firstEvent.Data).GetShardKind();
     }
     
     public record VariantInfo(

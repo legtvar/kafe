@@ -14,7 +14,7 @@ public record ShardInfo(
     string? Filename,
     KafeObject Metadata,
     ImmutableDictionary<string, KafeObject> Variants
-)
+) : IEntity
 {
     public static readonly ShardInfo Invalid = new();
 

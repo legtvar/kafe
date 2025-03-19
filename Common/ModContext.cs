@@ -12,13 +12,15 @@ public sealed record class ModContext
     public ModContext(
         string name,
         KafeTypeRegistry typeRegistry,
-        RequirementRegistry requirementRegistry
+        RequirementRegistry requirementRegistry,
+        IServiceProvider services
     )
     {
         Types = new ReadOnlySet<KafeType>(types);
         Name = name;
         TypeRegistry = typeRegistry;
         RequirementRegistry = requirementRegistry;
+        Services = services;
     }
 
     /// <summary>
@@ -33,6 +35,8 @@ public sealed record class ModContext
     public KafeTypeRegistry TypeRegistry { get; }
 
     public RequirementRegistry RequirementRegistry { get; }
+    
+    public IServiceProvider Services { get; }
 
     public IReadOnlySet<KafeType> Types { get; }
 

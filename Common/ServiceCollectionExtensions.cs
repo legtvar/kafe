@@ -7,7 +7,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddKafeCommon(this IServiceCollection services)
     {
         services.AddSingleton<KafeTypeRegistry>();
-        services.AddSingleton<RequirementRegistry>();
+        services.AddSingleton<RequirementTypeRegistry>();
         services.AddSingleton<ModRegistry>();
         return services;
     }

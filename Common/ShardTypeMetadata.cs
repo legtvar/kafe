@@ -3,7 +3,7 @@ using System.Collections.Immutable;
 
 namespace Kafe;
 
-public record RequirementMetadata(
+public record ShardTypeMetadata(
     KafeType KafeType,
-    ImmutableArray<Type> HandlerTypes
+    ImmutableArray<Type> AnalyzerTypes
 );

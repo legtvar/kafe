@@ -4,15 +4,15 @@ using System.Collections.Generic;
 
 namespace Kafe;
 
-public class RequirementRegistry : IFreezable
+public class RequirementTypeRegistry : IFreezable
 {
-    private readonly ConcurrentDictionary<KafeType, RequirementMetadata> requirements = new();
+    private readonly ConcurrentDictionary<KafeType, RequirementTypeMetadata> requirements = new();
 
     public bool IsFrozen { get; private set; }
 
-    public IReadOnlyDictionary<KafeType, RequirementMetadata> Requirements { get; }
+    public IReadOnlyDictionary<KafeType, RequirementTypeMetadata> Requirements { get; }
 
-    public RequirementRegistry()
+    public RequirementTypeRegistry()
     {
         Requirements = requirements.AsReadOnly();
     }
@@ -22,13 +22,13 @@ public class RequirementRegistry : IFreezable
         IsFrozen = true;
     }
 
-    public RequirementRegistry Register(RequirementMetadata metadata)
+    public RequirementTypeRegistry Register(RequirementTypeMetadata metadata)
     {
         AssertUnfrozen();
         if (!requirements.TryAdd(metadata.KafeType, metadata))
         {
             throw new ArgumentException(
-                $"Requirement '{metadata.KafeType}' has been already registered.",
+                $"Requirement type '{metadata.KafeType}' has been already registered.",
                 nameof(metadata)
             );
         }
@@ -39,7 +39,8 @@ public class RequirementRegistry : IFreezable
     {
         if (IsFrozen)
         {
-            throw new InvalidOperationException("This IRequirement registry is frozen and can no longer be modified.");
+            throw new InvalidOperationException("This requirement type registry is frozen "
+                + "and can no longer be modified.");
         }
     }
 }

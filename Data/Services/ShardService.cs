@@ -1,7 +1,5 @@
 ﻿using Kafe.Data.Aggregates;
 using Kafe.Data.Events;
-using Kafe.Media;
-using Kafe.Media.Services;
 using Marten;
 using System;
 using System.Collections.Generic;
@@ -41,23 +39,9 @@ public class ShardService
         this.httpClientFactory = httpClientFactory;
     }
 
-    public async Task<IShardEntity?> Load(Hrib id, CancellationToken token = default)
+    public async Task<ShardInfo?> Load(Hrib id, CancellationToken token = default)
     {
-        var shardKind = await GetShardKind(id, token);
-        if (shardKind == ShardKind.Unknown)
-        {
-            return null;
-        }
-
-        IShardEntity? shard = shardKind switch
-        {
-            ShardKind.Video => await db.LoadAsync<VideoShardInfo>(id.ToString(), token),
-            ShardKind.Image => await db.LoadAsync<ImageShardInfo>(id.ToString(), token),
-            ShardKind.Subtitles => await db.LoadAsync<SubtitlesShardInfo>(id.ToString(), token),
-            ShardKind.Blend => await db.LoadAsync<BlendShardInfo>(id.ToString(), token),
-            _ => throw new NotSupportedException($"ShardKind '{shardKind}' is not supported.")
-        };
-        return shard;
+        return await db.LoadAsync<ShardInfo>(id.ToString(), token);
     }
 
     public async Task<ImmutableArray<T>> LoadMany<T>(IEnumerable<Hrib> ids, CancellationToken ct = default)
@@ -276,7 +260,7 @@ public class ShardService
         {
             throw new InvalidOperationException($"A blend shard must belong to exactly one project group. Found {projectGroupNames.Length}.");
         }
-        
+
         var blendInfo = new BlendInfo(
             FileExtension: Const.BlendFileExtension,
             MimeType: Const.BlendMimeType,
@@ -295,7 +279,7 @@ public class ShardService
         await db.SaveChangesAsync(token);
 
         await pigeonsQueue.EnqueueAsync(shardId);
-        
+
         return created.ShardId;
     }
 
@@ -321,7 +305,7 @@ public class ShardService
         // Fetch all shard IDs that were queued for testing but have not yet been tested
         var blendShards = await db.Query<BlendShardInfo>().ToListAsync();
         var missingTestShards = blendShards
-            .Where(s => s.Variants.ContainsKey(Const.OriginalShardVariant) 
+            .Where(s => s.Variants.ContainsKey(Const.OriginalShardVariant)
                 && s.Variants[Const.OriginalShardVariant].Tests == null
                 && s.Variants[Const.OriginalShardVariant].Error == null)
             .Select(s => (Hrib)s.Id);

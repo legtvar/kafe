@@ -12,14 +12,16 @@ public sealed record class ModContext
     public ModContext(
         string name,
         KafeTypeRegistry typeRegistry,
-        RequirementRegistry requirementRegistry,
+        RequirementTypeRegistry requirementTypeRegistry,
+        ShardTypeRegistry shardTypeRegistry,
         IServiceProvider services
     )
     {
         Types = new ReadOnlySet<KafeType>(types);
         Name = name;
         TypeRegistry = typeRegistry;
-        RequirementRegistry = requirementRegistry;
+        RequirementTypeRegistry = requirementTypeRegistry;
+        ShardTypeRegistry = shardTypeRegistry;
         Services = services;
     }
 
@@ -34,8 +36,10 @@ public sealed record class ModContext
 
     public KafeTypeRegistry TypeRegistry { get; }
 
-    public RequirementRegistry RequirementRegistry { get; }
-    
+    public RequirementTypeRegistry RequirementTypeRegistry { get; }
+
+    public ShardTypeRegistry ShardTypeRegistry { get; }
+
     public IServiceProvider Services { get; }
 
     public IReadOnlySet<KafeType> Types { get; }
@@ -124,7 +128,7 @@ public sealed record class ModContext
             Usage = KafeTypeUsage.Requirement
         });
 
-        RequirementRegistry.Register(new(
+        RequirementTypeRegistry.Register(new(
             KafeType: kafeType,
             HandlerTypes: [.. options.HandlerTypes]
         ));

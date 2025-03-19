@@ -9,7 +9,7 @@ public class ModRegistry : IFreezable
 {
     private readonly ConcurrentDictionary<string, ModMetadata> mods = new();
     private readonly KafeTypeRegistry typeRegistry;
-    private readonly RequirementRegistry requirementRegistry;
+    private readonly RequirementTypeRegistry requirementRegistry;
 
     public bool IsFrozen { get; private set; }
 
@@ -17,7 +17,7 @@ public class ModRegistry : IFreezable
 
     public ModRegistry(
         KafeTypeRegistry typeRegistry,
-        RequirementRegistry requirementRegistry
+        RequirementTypeRegistry requirementRegistry
     )
     {
         Mods = mods.AsReadOnly();

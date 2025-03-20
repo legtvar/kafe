@@ -46,56 +46,6 @@ public class ShardService
         };
     }
 
-    private async Task<Hrib?> CreateVideo(
-        Hrib artifactId,
-        Stream videoStream,
-        string mimeType,
-        Hrib? shardId = null,
-        CancellationToken token = default)
-    {
-        if (mimeType != Const.MatroskaMimeType && mimeType != Const.Mp4MimeType)
-        {
-            throw new ArgumentException($"Only '{Const.MatroskaMimeType}' and '{Const.Mp4MimeType}' video container " +
-                $"formats are supported.");
-        }
-
-        shardId ??= Hrib.Create();
-        var originalFileExtension = mimeType == Const.MatroskaMimeType
-            ? Const.MatroskaFileExtension
-            : Const.Mp4FileExtension;
-        if (!await storageService.TryStoreShard(
-            ShardKind.Video,
-            shardId,
-            videoStream,
-            Const.OriginalShardVariant,
-            originalFileExtension,
-            token))
-        {
-            throw new InvalidOperationException($"Failed to store shard '{shardId}'.");
-        }
-
-        if (!storageService.TryGetFilePath(
-            ShardKind.Video,
-            shardId,
-            Const.OriginalShardVariant,
-            out var shardFilePath))
-        {
-            throw new ArgumentException("The shard stream could not be opened just after being saved.");
-        }
-
-        var mediaInfo = await mediaService.GetInfo(shardFilePath, token);
-
-        var created = new VideoShardCreated(
-            ShardId: shardId.ToString(),
-            CreationMethod: CreationMethod.Api,
-            ArtifactId: artifactId.ToString(),
-            OriginalVariantInfo: mediaInfo);
-        db.Events.KafeStartStream<VideoShardInfo>(created.ShardId, created);
-        await db.SaveChangesAsync(token);
-
-        return created.ShardId;
-    }
-
     private async Task<Hrib?> CreateImage(
         Hrib artifactId,
         Stream imageStream,
@@ -126,60 +76,6 @@ public class ShardService
         }
 
         db.Events.KafeStartStream<VideoShardInfo>(created.ShardId, created);
-
-        await db.SaveChangesAsync(token);
-        return created.ShardId;
-    }
-
-    private async Task<Hrib?> CreateSubtitles(
-        Hrib artifactId,
-        Stream subtitlesStream,
-        Hrib? shardId = null,
-        CancellationToken token = default)
-    {
-        var mediaInfo = await mediaService.GetInfo(subtitlesStream, token);
-
-        subtitlesStream.Seek(0, SeekOrigin.Begin);
-
-        if (mediaInfo.SubtitleStreams.IsDefaultOrEmpty)
-        {
-            throw new ArgumentException("The file contains no subtitle streams.");
-        }
-
-        if (mediaInfo.SubtitleStreams.Length > 1)
-        {
-            throw new ArgumentException("The file contains more than one subtitle stream.");
-        }
-
-        var ssInfo = mediaInfo.SubtitleStreams.Single();
-        var info = new SubtitlesInfo(
-            FileExtension: FFmpegFormat.GetFileExtension(mediaInfo.FormatName) ?? Const.InvalidFileExtension,
-            MimeType: FFmpegFormat.GetMimeType(mediaInfo.FormatName) ?? Const.InvalidMimeType,
-            Language: ssInfo.Language,
-            Codec: ssInfo.Codec,
-            Bitrate: ssInfo.Bitrate,
-            IsCorrupted: mediaInfo.IsCorrupted);
-
-        shardId ??= Hrib.Create();
-
-        var created = new SubtitlesShardCreated(
-            ShardId: shardId.ToString(),
-            CreationMethod: CreationMethod.Api,
-            ArtifactId: artifactId.ToString(),
-            OriginalVariantInfo: info);
-
-        if (!await storageService.TryStoreShard(
-            ShardKind.Subtitles,
-            shardId,
-            subtitlesStream,
-            Const.OriginalShardVariant,
-            info.FileExtension,
-            token))
-        {
-            throw new InvalidOperationException("The subtitles could not be stored.");
-        }
-
-        db.Events.KafeStartStream<SubtitlesShardInfo>(created.ShardId, created);
 
         await db.SaveChangesAsync(token);
         return created.ShardId;

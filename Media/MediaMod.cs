@@ -1,3 +1,6 @@
+using Kafe.Media.Services;
+using Microsoft.Extensions.DependencyInjection;
+
 namespace Kafe.Media;
 
 [Mod(Name)]
@@ -10,6 +13,16 @@ public sealed class MediaMod : IMod
     public KafeType ImageShardType { get; private set; }
 
     public KafeType SubtitlesShardType { get; private set; }
+
+    public void ConfigureServices(IServiceCollection services)
+    {
+        services.AddSingleton<IMediaService, FFmpegCoreService>();
+        services.AddSingleton<IImageService, ImageSharpService>();
+        services.AddSingleton<IMod, MediaMod>();
+        services.AddSingleton<VideoShardAnalyzer>();
+        services.AddSingleton<SubtitlesShardAnalyzer>();
+        services.AddSingleton<ImageShardAnalyzer>();
+    }
 
     public void Configure(ModContext context)
     {

@@ -1,9 +1,9 @@
-using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Kafe;
 
 public interface IShardAnalyzer
 {
-    ValueTask<object> Analyze(Stream stream, string? mimeType);
+    ValueTask<ShardAnalysis> Analyze(string tempPath, string? mimeType, CancellationToken token = default);
 }

@@ -58,10 +58,11 @@ public class EntityPermissionEventProjection : EventProjection
         return perms;
     }
 
-    public async Task<EntityPermissionInfo> Create(AuthorCreated e, IDocumentOperations ops)
+    public async Task<EntityPermissionInfo> Create(AuthorCreated e, IEvent metadata, IDocumentOperations ops)
     {
         var perms = EntityPermissionInfo.Create(e.AuthorId);
         perms = await AddSystem(ops, perms);
+        perms = SetGlobalPermission(perms, e.AuthorId, Permission.Read, metadata.Timestamp);
         return perms;
     }
 

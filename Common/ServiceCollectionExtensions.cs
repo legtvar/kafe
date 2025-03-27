@@ -11,6 +11,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<RequirementTypeRegistry>();
         services.AddSingleton<ShardTypeRegistry>();
         services.AddSingleton<ModRegistry>();
+        services.AddSingleton<ShardFactory>();
         return services;
     }
 

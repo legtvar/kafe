@@ -21,6 +21,7 @@ public class ShardService
     private readonly IImageService imageService;
     private readonly IPigeonsTestQueue pigeonsQueue;
     private readonly IHttpClientFactory httpClientFactory;
+    private readonly ShardFactory shardFactory;
 
     public ShardService(
         IDocumentSession db,
@@ -28,7 +29,8 @@ public class ShardService
         IMediaService mediaService,
         IImageService imageService,
         IPigeonsTestQueue pigeonsQueue,
-        IHttpClientFactory httpClientFactory
+        IHttpClientFactory httpClientFactory,
+        ShardFactory shardFactory
     )
     {
         this.db = db;
@@ -37,6 +39,7 @@ public class ShardService
         this.imageService = imageService;
         this.pigeonsQueue = pigeonsQueue;
         this.httpClientFactory = httpClientFactory;
+        this.shardFactory = shardFactory;
     }
 
     public async Task<ShardInfo?> Load(Hrib id, CancellationToken token = default)
@@ -51,7 +54,7 @@ public class ShardService
     }
 
     public async Task<Hrib?> Create(
-        ShardKind kind,
+        KafeType shardType,
         Hrib artifactId,
         string? fileName,
         Stream stream,
@@ -60,6 +63,20 @@ public class ShardService
         CancellationToken token = default
     )
     {
+        shardId ??= Hrib.Create();
+        stream.Seek(0, SeekOrigin.Begin);
+
+        var tmpPath = await storageService.TryStoreTemporaryShard(shardId, stream, token);
+        if (tmpPath is null)
+        {
+            return null;
+        }
+
+        await shardFactory.Create(shardType, tmpPath, )
+
+        var shardTypeMetadata = shardTypes.Shards.GetValueOrDefault(shardType)
+            ?? throw new ArgumentException($"Shard type '{shardType}' could not be recognized.");
+        shardTypeMetadata.
         return kind switch
         {
             ShardKind.Video => await CreateVideo(artifactId, stream, mimeType, shardId, token),

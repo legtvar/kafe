@@ -45,6 +45,7 @@ using System.Globalization;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Kafe.Api.Middleware;
+using Microsoft.AspNetCore.StaticFiles;
 
 namespace Kafe.Api;
 
@@ -299,6 +300,7 @@ public class Startup
 
     private void RegisterKafe(IServiceCollection services)
     {
+        FileExtensionContentTypeProvider
         services.AddKafeCommon();
         services.AddKafeData();
         services.AddKafeMod<CoreMod>();

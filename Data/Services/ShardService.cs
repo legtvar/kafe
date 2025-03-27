@@ -2,6 +2,7 @@
 using Kafe.Data.Events;
 using Marten;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -13,14 +14,17 @@ public class ShardService
 {
     private readonly IDocumentSession db;
     private readonly StorageService storageService;
+    private readonly ShardFactory shardFactory;
 
     public ShardService(
         IDocumentSession db,
-        StorageService storageService
+        StorageService storageService,
+        ShardFactory shardFactory
     )
     {
         this.db = db;
         this.storageService = storageService;
+        this.shardFactory = shardFactory;
     }
 
     public async Task<ShardInfo?> Load(Hrib id, CancellationToken token = default)
@@ -29,13 +33,27 @@ public class ShardService
     }
 
     public async Task<Hrib?> Create(
-        ShardKind kind,
+        KafeType shardType,
         Hrib artifactId,
         Stream stream,
         string mimeType,
         Hrib? shardId = null,
         CancellationToken token = default)
     {
+        shardId ??= Hrib.Create();
+        stream.Seek(0, SeekOrigin.Begin);
+
+        var tmpPath = await storageService.TryStoreTemporaryShard(shardId, stream, token);
+        if (tmpPath is null)
+        {
+            return null;
+        }
+
+        await shardFactory.Create(shardType, tmpPath, )
+
+        var shardTypeMetadata = shardTypes.Shards.GetValueOrDefault(shardType)
+            ?? throw new ArgumentException($"Shard type '{shardType}' could not be recognized.");
+        shardTypeMetadata.
         return kind switch
         {
             ShardKind.Video => await CreateVideo(artifactId, stream, mimeType, shardId, token),
@@ -107,7 +125,7 @@ public class ShardService
         {
             throw new InvalidOperationException("The .blend file could not be stored.");
         }
-        
+
         db.Events.KafeStartStream<BlendShardInfo>(created.ShardId, created);
         await db.SaveChangesAsync(token);
         return created.ShardId;
@@ -124,7 +142,7 @@ public class ShardService
 
         return stream;
     }
-    
+
     public record VariantInfo(
         Hrib ShardId,
         string Variant,

@@ -18,8 +18,8 @@ public class ImageShardAnalyzer : IShardAnalyzer
         var imageInfo = await imageService.GetInfo(tempPath, token);
 
         return new(
-            FileExtension: imageInfo.FileExtension,
-            ShardMetadata: imageInfo
+            shardMetadata: imageInfo,
+            fileExtension: imageInfo.FileExtension
         );
     }
 }

@@ -30,12 +30,12 @@ public record StorageOptions
 
     public bool AllowSeedData { get; set; } = true;
 
-    public Dictionary<ShardKind, string> ShardDirectories { get; init; } = new()
+    // TODO: Deprecate ShardDirectories, just store it one big pile instead (see issue #273).
+    public Dictionary<KafeType, string> ShardDirectories { get; init; } = new()
     {
-        [ShardKind.Image] = "images",
-        [ShardKind.Video] = "videos",
-        [ShardKind.Subtitles] = "subtitles",
-        [ShardKind.Blend] = "blends",
-        [ShardKind.Unknown] = "unknown"
+        [new KafeType("media", "shard", "image")] = "images",
+        [new KafeType("media", "shard", "video")] = "videos",
+        [new KafeType("media", "shard", "subtitles")] = "subtitles",
+        [new KafeType("polygons", "shard", "blend")] = "blends"
     };
 }

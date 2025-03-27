@@ -9,7 +9,10 @@ public class ModRegistry : IFreezable
 {
     private readonly ConcurrentDictionary<string, ModMetadata> mods = new();
     private readonly KafeTypeRegistry typeRegistry;
-    private readonly RequirementTypeRegistry requirementRegistry;
+    private readonly PropertyTypeRegistry propertyTypeRegistry;
+    private readonly RequirementTypeRegistry requirementTypeRegistry;
+    private readonly ShardTypeRegistry shardTypeRegistry;
+    private readonly IServiceProvider services;
 
     public bool IsFrozen { get; private set; }
 
@@ -17,12 +20,18 @@ public class ModRegistry : IFreezable
 
     public ModRegistry(
         KafeTypeRegistry typeRegistry,
-        RequirementTypeRegistry requirementRegistry
+        PropertyTypeRegistry propertyTypeRegistry,
+        RequirementTypeRegistry requirementRegistry,
+        ShardTypeRegistry shardTypeRegistry,
+        IServiceProvider services
     )
     {
         Mods = mods.AsReadOnly();
         this.typeRegistry = typeRegistry;
-        this.requirementRegistry = requirementRegistry;
+        this.propertyTypeRegistry = propertyTypeRegistry;
+        this.requirementTypeRegistry = requirementRegistry;
+        this.shardTypeRegistry = shardTypeRegistry;
+        this.services = services;
     }
 
     public void Freeze()
@@ -40,7 +49,10 @@ public class ModRegistry : IFreezable
         var modContext = new ModContext(
             name: modName,
             typeRegistry: typeRegistry,
-            requirementRegistry: requirementRegistry
+            propertyTypeRegistry: propertyTypeRegistry,
+            requirementTypeRegistry: requirementTypeRegistry,
+            shardTypeRegistry: shardTypeRegistry,
+            services: services
         );
         mod.Configure(modContext);
         var metadata = new ModMetadata(

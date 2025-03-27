@@ -141,7 +141,6 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ShardService>();
         services.AddScoped<PlaylistService>();
         services.AddScoped<EntityService>();
-        services.AddScoped<MigrationService>();
         services.AddScoped<OrganizationService>();
         services.AddScoped<RoleService>();
         services.AddScoped<VideoConversionService>();

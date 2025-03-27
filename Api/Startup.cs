@@ -300,10 +300,10 @@ public class Startup
     private void RegisterKafe(IServiceCollection services)
     {
         services.AddKafeCommon();
-        services.AddKafeCore();
-        services.AddKafeMedia();
-        services.AddKafePolygons();
         services.AddKafeData();
+        services.AddKafeMod<CoreMod>();
+        services.AddKafeMod<MediaMod>();
+        services.AddKafeMod<PolygonsMod>();
 
         services.AddScoped<UserProvider>();
 

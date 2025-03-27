@@ -18,7 +18,6 @@ public sealed class MediaMod : IMod
     {
         services.AddSingleton<IMediaService, FFmpegCoreService>();
         services.AddSingleton<IImageService, ImageSharpService>();
-        services.AddSingleton<IMod, MediaMod>();
         services.AddSingleton<VideoShardAnalyzer>();
         services.AddSingleton<SubtitlesShardAnalyzer>();
         services.AddSingleton<ImageShardAnalyzer>();

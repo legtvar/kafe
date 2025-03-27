@@ -23,8 +23,8 @@ public partial record struct KafeType : IParsable<KafeType>
     public KafeType(
         string mod,
         string primary,
-        string? secondary,
-        bool isArray
+        string? secondary = null,
+        bool isArray = false
     )
     {
         Mod = mod;

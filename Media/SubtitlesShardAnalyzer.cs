@@ -39,8 +39,8 @@ public class SubtitlesShardAnalyzer : IShardAnalyzer
             IsCorrupted: mediaInfo.IsCorrupted);
 
         return new(
-            FileExtension: mediaInfo.FileExtension,
-            ShardMetadata: mediaInfo
+            shardMetadata: info,
+            fileExtension: mediaInfo.FileExtension
         );
     }
 }

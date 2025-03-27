@@ -47,6 +47,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Kafe.Api.Middleware;
 using Microsoft.AspNetCore.Localization;
 using Kafe.Media.Services;
+using Microsoft.AspNetCore.StaticFiles;
 
 namespace Kafe.Api;
 

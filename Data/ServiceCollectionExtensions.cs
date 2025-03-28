@@ -68,7 +68,6 @@ public static class ServiceCollectionExtensions
             mo.Projections.Add<ProjectInfoProjection>(ProjectionLifecycle.Inline);
             mo.Projections.Add<ProjectGroupInfoProjection>(ProjectionLifecycle.Inline);
             mo.Projections.Add<VideoConversionInfoProjection>(ProjectionLifecycle.Inline);
-            mo.Projections.Add<ArtifactDetailProjection>(ProjectionLifecycle.Inline);
             mo.Projections.Add<AccountInfoProjection>(ProjectionLifecycle.Inline);
             mo.Projections.Add<OrganizationInfoProjection>(ProjectionLifecycle.Inline);
             mo.Projections.Add<RoleInfoProjection>(ProjectionLifecycle.Inline);

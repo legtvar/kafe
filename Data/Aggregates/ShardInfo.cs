@@ -11,7 +11,8 @@ public record ShardInfo(
     CreationMethod CreationMethod,
     DateTimeOffset CreatedAt,
     long? Size,
-    string? Filename,
+    string? UploadFilename,
+    string? MimeType,
     KafeObject Metadata,
     ImmutableDictionary<string, KafeObject> Variants
 ) : IEntity
@@ -22,8 +23,9 @@ public record ShardInfo(
         Id: Hrib.InvalidValue,
         CreationMethod: CreationMethod.Unknown,
         CreatedAt: default,
-        Size: 0,
-        Filename: Const.InvalidName,
+        Size: null,
+        UploadFilename: null,
+        MimeType: null,
         Metadata: KafeObject.Invalid,
         Variants: ImmutableDictionary<string, KafeObject>.Empty
     )
@@ -47,10 +49,21 @@ public class ShardInfoProjection : SingleStreamProjection<ShardInfo>
             CreationMethod: e.Data.CreationMethod,
             CreatedAt: e.Timestamp,
             Size: e.Data.Size,
-            Filename: e.Data.Filename,
+            UploadFilename: e.Data.UploadFilename,
+            MimeType: e.Data.MimeType,
             Metadata: e.Data.Metadata,
             Variants: ImmutableDictionary<string, KafeObject>.Empty
         );
+    }
+    
+    public ShardInfo Apply(ShardInfoChanged e, ShardInfo s)
+    {
+        return s with
+        {
+            Size = e.Size ?? s.Size,
+            UploadFilename = e.UploadFilename ?? s.UploadFilename,
+            MimeType = e.MimeType ?? s.MimeType
+        };
     }
 
     public ShardInfo Apply(ShardVariantAdded e, ShardInfo s)

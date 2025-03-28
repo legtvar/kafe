@@ -31,20 +31,6 @@ public class ArtifactService
         return (await db.KafeLoadManyAsync<ArtifactInfo>(ids.ToImmutableArray(), token)).Unwrap();
     }
 
-    public async Task<ArtifactDetail?> LoadDetail(Hrib id, CancellationToken token = default)
-    {
-        return await db.LoadAsync<ArtifactDetail>(id.ToString(), token);
-    }
-
-    public async Task<ImmutableArray<ArtifactDetail>> LoadDetailMany(
-        IEnumerable<Hrib> ids,
-        CancellationToken token = default)
-    {
-        return (await db.LoadManyAsync<ArtifactDetail>(token, ids.Select(i => (string)i)))
-            .Where(a => a is not null)
-            .ToImmutableArray();
-    }
-
     public async Task<Err<ArtifactInfo>> Create(ArtifactInfo @new, CancellationToken token = default)
     {
         var parseResult = Hrib.Parse(@new.Id);

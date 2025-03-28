@@ -8,9 +8,13 @@ public readonly partial record struct Error
     public const string UnmodifiedId = nameof(Unmodified);
     public const string LockedId = nameof(Locked);
     public const string InvalidValueId = nameof(InvalidValue);
+    public const string InvalidParameterValueId = nameof(InvalidParameterValue);
     public const string AlreadyExistsId = nameof(AlreadyExists);
     public const string ParameterArgument = "parameter";
     public const string BadKafeTypeId = nameof(BadKafeType);
+    public const string InvalidMimeTypeId = nameof(InvalidMimeType);
+    public const string ValueArgument = "value";
+    public const string ShardAnalysisFailureId = nameof(ShardAnalysisFailure);
 
     public static Error NotFound(string? message = null)
     {
@@ -55,9 +59,9 @@ public readonly partial record struct Error
         return new Error(LockedId, $"{description} is locked.");
     }
 
-    public static Error InvalidValue(string what, string? parameterArg)
+    public static Error InvalidParameterValue(string what, string? parameterArg)
     {
-        var error = new Error(InvalidValueId, $"{what} has an invalid value.");
+        var error = new Error(InvalidParameterValueId, $"{what} has an invalid value.");
         if (!string.IsNullOrEmpty(parameterArg))
         {
             error = error.WithArgument(ParameterArgument, parameterArg);
@@ -70,7 +74,7 @@ public readonly partial record struct Error
     {
         return new Error(InvalidValueId, message);
     }
-    
+
     public static Error AlreadyExists(string? message = null)
     {
         return new Error(AlreadyExistsId, message ?? "Value already exists.");
@@ -86,5 +90,21 @@ public readonly partial record struct Error
         return new Error(BadKafeTypeId, string.IsNullOrEmpty(value)
             ? "Encountered an invalid or empty KAFE type."
             : $"String '{value}' could not be parsed as a KAFE type.");
+    }
+
+    public static Error InvalidMimeType(string value)
+    {
+        return new Error(
+            id: InvalidMimeTypeId,
+            message: $"String '{value}' is not recognized as any known MIME type."
+        ).WithArgument(ValueArgument, value);
+    }
+
+    public static Error ShardAnalysisFailure(KafeType shardType)
+    {
+        return new Error(
+            id: ShardAnalysisFailureId,
+            message: $"The provided data cannot be analyzed as a shard of type '{shardType}'."
+        ).WithArgument(nameof(shardType), shardType);
     }
 }

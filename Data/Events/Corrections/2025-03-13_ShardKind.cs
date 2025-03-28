@@ -85,6 +85,15 @@ namespace Kafe.Media.Deprecated
 namespace Kafe.Data.Aggregates
 {
     [Obsolete("Use the new universal ShardInfo projection instead.")]
+    public interface IShardEntity : IEntity
+    {
+        ShardKind Kind { get; }
+
+        [Hrib]
+        string ArtifactId { get; }
+    }
+
+    [Obsolete("Use the new universal ShardInfo projection instead.")]
     public abstract record ShardInfoBase(
         [Hrib] string Id,
         CreationMethod CreationMethod,

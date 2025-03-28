@@ -124,7 +124,7 @@ public class StorageService
         return true;
     }
 
-    public async Task<string?> TryStoreTemporaryShard(
+    public async Task<string> StoreTemporaryShard(
         Hrib id,
         Stream stream,
         string fileExtension,
@@ -161,7 +161,7 @@ public class StorageService
                 File.Delete(tmpPath);
             }
 
-            return null;
+            throw;
         }
 
         return tmpPath;
@@ -210,7 +210,7 @@ public class StorageService
         return Task.CompletedTask;
     }
 
-    public Task<bool> TryMoveTemporaryShard(
+    public Task MoveTemporaryShard(
         Hrib id,
         KafeType shardType,
         string fileExtension,
@@ -226,7 +226,7 @@ public class StorageService
         var tmpPath = GetTemporaryShardFilePath(id, true);
         if (tmpPath is null)
         {
-            return Task.FromResult(false);
+            throw new ArgumentException($"Temporary shard '{id}' could not be found in the file system.");
         }
 
         variant ??= Const.OriginalShardVariant;
@@ -238,7 +238,7 @@ public class StorageService
             destFileName: originalPath
         );
 
-        return Task.FromResult(true);
+        return Task.CompletedTask;
     }
 
     public DirectoryInfo GetShardTypeDirectory(

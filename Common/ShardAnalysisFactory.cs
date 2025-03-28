@@ -6,12 +6,12 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Kafe;
 
-public class ShardFactory
+public class ShardAnalysisFactory
 {
     private readonly ShardTypeRegistry shardTypes;
     private readonly IServiceProvider services;
 
-    public ShardFactory(
+    public ShardAnalysisFactory(
         ShardTypeRegistry shardTypes,
         IServiceProvider services
     )
@@ -43,6 +43,11 @@ public class ShardFactory
             var analysis = await shardAnalyzer.Analyze(filePath, mimeType, ct);
             if (analysis.IsSuccessful)
             {
+                if (string.IsNullOrWhiteSpace(analysis.ShardAnalyzerName))
+                {
+                    analysis.ShardAnalyzerName = analyzerType.FullName;
+                }
+
                 return analysis;
             }
         }

@@ -146,9 +146,9 @@ namespace Kafe.Data.Events.Upcasts
             return new ShardCreated(
                 ShardId: oldEvent.ShardId,
                 CreationMethod: oldEvent.CreationMethod,
-                ArtifactId: oldEvent.ArtifactId,
                 Size: oldEvent.OriginalVariantInfo.FileLength,
-                Filename: null,
+                UploadFilename: $"{oldEvent.ShardId}{oldEvent.OriginalVariantInfo.FileExtension}",
+                MimeType: oldEvent.OriginalVariantInfo.MimeType,
                 Metadata: new KafeObject(
                     Type: new KafeType("media", "shard", "video", false),
                     oldEvent.OriginalVariantInfo
@@ -191,9 +191,9 @@ namespace Kafe.Data.Events.Upcasts
             return new ShardCreated(
                 ShardId: oldEvent.ShardId,
                 CreationMethod: oldEvent.CreationMethod,
-                ArtifactId: oldEvent.ArtifactId,
                 Size: null,
-                Filename: null,
+                UploadFilename: $"{oldEvent.ShardId}{oldEvent.OriginalVariantInfo.FileExtension}",
+                MimeType: oldEvent.OriginalVariantInfo.MimeType,
                 Metadata: new KafeObject(
                     Type: new KafeType("media", "shard", "image", false),
                     oldEvent.OriginalVariantInfo
@@ -236,9 +236,9 @@ namespace Kafe.Data.Events.Upcasts
             return new ShardCreated(
                 ShardId: oldEvent.ShardId,
                 CreationMethod: oldEvent.CreationMethod,
-                ArtifactId: oldEvent.ArtifactId,
                 Size: null,
-                Filename: null,
+                UploadFilename: $"{oldEvent.ShardId}{oldEvent.OriginalVariantInfo.FileExtension}",
+                MimeType: oldEvent.OriginalVariantInfo.MimeType,
                 Metadata: new KafeObject(
                     Type: new KafeType("media", "shard", "subtitles", false),
                     oldEvent.OriginalVariantInfo
@@ -282,9 +282,9 @@ namespace Kafe.Data.Events.Upcasts
             return new ShardCreated(
                 ShardId: oldEvent.ShardId,
                 CreationMethod: oldEvent.CreationMethod,
-                ArtifactId: oldEvent.ArtifactId,
                 Size: null,
-                Filename: null,
+                UploadFilename: $"{oldEvent.ShardId}{oldEvent.OriginalVariantInfo.FileExtension}",
+                MimeType: oldEvent.OriginalVariantInfo.MimeType,
                 Metadata: new KafeObject(
                     Type: new KafeType("media", "shard", "blend", false),
                     oldEvent.OriginalVariantInfo

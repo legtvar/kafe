@@ -271,6 +271,10 @@ public partial class Startup
     public void Configure(IApplicationBuilder app)
     {
         app.ApplicationServices.ConfigureKafeMods();
+        PopulateMimeTypes(
+            app.ApplicationServices.GetRequiredService<FileExtensionMimeMap>(),
+            app.ApplicationServices.GetRequiredService<FileExtensionContentTypeProvider>()
+        );
 
         app.UseMiddleware<ClacksMiddleware>();
 
@@ -451,6 +455,15 @@ public partial class Startup
             .PersistKeysToFileSystem(new DirectoryInfo(secretsFullPath));
     }
 
+    private void PopulateMimeTypes(FileExtensionMimeMap map, FileExtensionContentTypeProvider provider)
+    {
+        foreach(var entry in provider.Mappings)
+        {
+            map.Add(entry.Key, entry.Value);
+        }
+    }
+
     [GeneratedRegex(@"^https?:\/\/localhost(?::\d+)?$")]
     private static partial Regex GetLocalhostRegex();
+
 }

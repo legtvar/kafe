@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Kafe;
 
@@ -42,5 +43,25 @@ public class FileExtensionMimeMap
         }
 
         return this;
+    }
+
+    public string? GetFirstFileExtensionFor(string mimeType)
+    {
+        if (MimeToFileExtension.TryGetValue(mimeType, out var fileExtensions) && fileExtensions.Count > 0)
+        {
+            return fileExtensions.First();
+        }
+
+        return null;
+    }
+
+    public string? GetFirstMimeTypeFor(string fileExtension)
+    {
+        if (FileExtensionToMime.TryGetValue(fileExtension, out var mimeTypes) && mimeTypes.Count > 0)
+        {
+            return mimeTypes.First();
+        }
+
+        return null;
     }
 }

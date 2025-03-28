@@ -231,6 +231,10 @@ public class Startup
     public void Configure(IApplicationBuilder app)
     {
         app.ApplicationServices.ConfigureKafeMods();
+        PopulateMimeTypes(
+            app.ApplicationServices.GetRequiredService<FileExtensionMimeMap>(),
+            app.ApplicationServices.GetRequiredService<FileExtensionContentTypeProvider>()
+        );
 
         app.UseMiddleware<ClacksMiddleware>();
 
@@ -300,7 +304,6 @@ public class Startup
 
     private void RegisterKafe(IServiceCollection services)
     {
-        FileExtensionContentTypeProvider
         services.AddKafeCommon();
         services.AddKafeData();
         services.AddKafeMod<CoreMod>();
@@ -367,7 +370,6 @@ public class Startup
                 services.AddSingleton<IEmailService, DefaultEmailService>();
                 break;
         }
-
     }
 
     private void ConfigureDataProtection(IServiceCollection services)
@@ -388,5 +390,13 @@ public class Startup
 
         services.AddDataProtection()
             .PersistKeysToFileSystem(new DirectoryInfo(secretsFullPath));
+    }
+    
+    private void PopulateMimeTypes(FileExtensionMimeMap map, FileExtensionContentTypeProvider provider)
+    {
+        foreach(var entry in provider.Mappings)
+        {
+            map.Add(entry.Key, entry.Value);
+        }
     }
 }

@@ -69,7 +69,7 @@ public class OrganizationService
         var @old = await Load(modified.Id, token);
         if (@old is null)
         {
-            return Error.NotFound(modified.Id);
+            return Kafe.Diagnostic.NotFound(modified.Id);
         }
 
         if ((LocalizedString)@old.Name != modified.Name)
@@ -84,7 +84,7 @@ public class OrganizationService
                     + "This should never happen.");
         }
 
-        return Error.Unmodified($"organization {modified.Id}");
+        return Kafe.Diagnostic.Unmodified($"organization {modified.Id}");
     }
     
     /// <summary>

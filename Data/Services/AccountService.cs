@@ -105,7 +105,7 @@ public class AccountService(
             case AccountKind.External:
                 if (string.IsNullOrEmpty(@new.IdentityProvider))
                 {
-                    return Error.MissingValue(nameof(@new.IdentityProvider));
+                    return Kafe.Diagnostic.MissingValue(nameof(@new.IdentityProvider));
                 }
 
                 var associated = new ExternalAccountAssociated(
@@ -164,7 +164,7 @@ public class AccountService(
         var old = await Load(modified.Id, token);
         if (old is null)
         {
-            return Error.NotFound(modified.Id, "An account");
+            return Kafe.Diagnostic.NotFound(modified.Id, "An account");
         }
 
         var infoChanged = new AccountInfoChanged(
@@ -249,7 +249,7 @@ public class AccountService(
 
         if (!hasChanged)
         {
-            return Error.Unmodified(old.Id, "An account");
+            return Kafe.Diagnostic.Unmodified(old.Id, "An account");
         }
 
         await db.SaveChangesAsync(token);
@@ -346,7 +346,7 @@ public class AccountService(
         var account = await Load(accountId, token);
         if (account is null)
         {
-            return Error.NotFound(accountId, "An account");
+            return Kafe.Diagnostic.NotFound(accountId, "An account");
         }
 
         foreach (var permissionPair in permissions)
@@ -387,7 +387,7 @@ public class AccountService(
         var account = await Load(accountId, token);
         if (account is null)
         {
-            return Error.NotFound(accountId, "An account");
+            return Kafe.Diagnostic.NotFound(accountId, "An account");
         }
 
         foreach (var roleId in roleIds)
@@ -425,7 +425,7 @@ public class AccountService(
         var emailClaim = principal.FindFirst(ClaimTypes.Email);
         if (emailClaim is null || string.IsNullOrEmpty(emailClaim.Value))
         {
-            return Error.MissingValue("email address");
+            return Kafe.Diagnostic.MissingValue("email address");
         }
 
         var name = principal.FindFirst(ClaimTypes.Name)?.Value ?? principal.FindFirst(NameClaim)?.Value;

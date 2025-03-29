@@ -1184,12 +1184,12 @@ public partial class ProjectService
         var project = await Load(projectId, token);
         if (project is null)
         {
-            return new Error($"Project {projectId} could not be found.");
+            return new Kafe.Diagnostic($"Project {projectId} could not be found.");
         }
 
         if (kind == ReviewKind.NotReviewed)
         {
-            return new Error($"Review cannot be '{kind}'. It must be either accepting or rejecting.");
+            return new Kafe.Diagnostic($"Review cannot be '{kind}'. It must be either accepting or rejecting.");
         }
 
         var eventStream = await db.Events.FetchForExclusiveWriting<ProjectInfo>(projectId.ToString(), token);

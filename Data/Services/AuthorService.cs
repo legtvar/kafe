@@ -35,7 +35,7 @@ public class AuthorService
     {
         if (!Hrib.TryParse(@new.Id, out var id, out var error))
         {
-            return new Error(error);
+            return new Kafe.Diagnostic(error);
         }
 
         if (id == Hrib.Empty)
@@ -89,7 +89,7 @@ public class AuthorService
         var @old = await Load(modified.Id, token);
         if (@old is null)
         {
-            return Error.NotFound(modified.Id);
+            return Kafe.Diagnostic.NotFound(modified.Id);
         }
 
         if (@old.Uco != modified.Uco
@@ -115,7 +115,7 @@ public class AuthorService
                     + "This should never happen.");
         }
 
-        return Error.Unmodified($"author {modified.Id}");
+        return Kafe.Diagnostic.Unmodified($"author {modified.Id}");
     }
 
     /// <summary>

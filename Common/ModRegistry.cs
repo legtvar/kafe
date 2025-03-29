@@ -2,35 +2,22 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Reflection;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Kafe;
 
 public class ModRegistry : IFreezable
 {
     private readonly ConcurrentDictionary<string, ModMetadata> mods = new();
-    private readonly KafeTypeRegistry typeRegistry;
-    private readonly PropertyTypeRegistry propertyTypeRegistry;
-    private readonly RequirementTypeRegistry requirementTypeRegistry;
-    private readonly ShardTypeRegistry shardTypeRegistry;
     private readonly IServiceProvider services;
 
     public bool IsFrozen { get; private set; }
 
     public IReadOnlyDictionary<string, ModMetadata> Mods { get; }
 
-    public ModRegistry(
-        KafeTypeRegistry typeRegistry,
-        PropertyTypeRegistry propertyTypeRegistry,
-        RequirementTypeRegistry requirementRegistry,
-        ShardTypeRegistry shardTypeRegistry,
-        IServiceProvider services
-    )
+    public ModRegistry(IServiceProvider services)
     {
         Mods = mods.AsReadOnly();
-        this.typeRegistry = typeRegistry;
-        this.propertyTypeRegistry = propertyTypeRegistry;
-        this.requirementTypeRegistry = requirementRegistry;
-        this.shardTypeRegistry = shardTypeRegistry;
         this.services = services;
     }
 
@@ -46,14 +33,7 @@ public class ModRegistry : IFreezable
         var modType = mod.GetType();
         var modAttribute = modType.GetCustomAttribute<ModAttribute>();
         var modName = modAttribute?.Name ?? Naming.ToDashCase(Naming.WithoutSuffix(modType.Name, "Mod"));
-        var modContext = new ModContext(
-            name: modName,
-            typeRegistry: typeRegistry,
-            propertyTypeRegistry: propertyTypeRegistry,
-            requirementTypeRegistry: requirementTypeRegistry,
-            shardTypeRegistry: shardTypeRegistry,
-            services: services
-        );
+        var modContext = ActivatorUtilities.CreateInstance<ModContext>(services, modName);
         mod.Configure(modContext);
         var metadata = new ModMetadata(
             Instance: mod,

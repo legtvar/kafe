@@ -62,16 +62,16 @@ public partial class ProjectService
         var existing = await Load(id, token);
         if (existing is null && existingEntityHandling == ExistingEntityHandling.Update)
         {
-            return Error.NotFound(id, "A project");
+            return Kafe.Diagnostic.NotFound(id, "A project");
         }
         else if (existing is not null && existingEntityHandling == ExistingEntityHandling.Insert)
         {
-            return Error.AlreadyExists(id, "A project");
+            return Kafe.Diagnostic.AlreadyExists(id, "A project");
         }
 
         if (existing?.IsLocked == true && !shouldOverrideLock)
         {
-            return Error.Locked(id, "The project");
+            return Kafe.Diagnostic.Locked(id, "The project");
         }
 
         var group = await db.KafeLoadAsync<ProjectGroupInfo>(project.ProjectGroupId, token);
@@ -295,7 +295,7 @@ public partial class ProjectService
         var project = await Load(projectId, token);
         if (project is null)
         {
-            return Error.NotFound(projectId, "A project");
+            return Kafe.Diagnostic.NotFound(projectId, "A project");
         }
 
         var existingArtifactIds = (await artifactService.LoadMany(artifacts.Select(a => a.id), token))
@@ -304,7 +304,7 @@ public partial class ProjectService
         if (existingArtifactIds.Count != artifacts.Length)
         {
             return artifacts.Where(a => !existingArtifactIds.Contains(a.id.ToString()))
-                .Select(a => Error.NotFound(a.id, "An artifact"))
+                .Select(a => Diagnostic.NotFound(a.id, "An artifact"))
                 .ToImmutableArray();
         }
 
@@ -336,7 +336,7 @@ public partial class ProjectService
         var stream = await db.Events.FetchForExclusiveWriting<ProjectInfo>(projectId.ToString(), token);
         if (stream is null || stream.Aggregate is null)
         {
-            return Error.NotFound(projectId, "A project");
+            return Kafe.Diagnostic.NotFound(projectId, "A project");
         }
 
         if (shouldLock && !stream.Aggregate.IsLocked)

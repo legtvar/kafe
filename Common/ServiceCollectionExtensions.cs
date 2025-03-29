@@ -13,6 +13,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<ModRegistry>();
         services.AddSingleton<ShardAnalysisFactory>();
         services.AddSingleton<FileExtensionMimeMap>();
+        services.AddSingleton<DiagnosticDescriptorRegistry>();
         return services;
     }
 

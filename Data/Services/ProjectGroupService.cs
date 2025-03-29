@@ -44,7 +44,7 @@ public class ProjectGroupService
         var organization = await organizationService.Load(@new.OrganizationId, token);
         if (organization is null)
         {
-            return Error.NotFound(@new.OrganizationId, "An organization");
+            return Kafe.Diagnostic.NotFound(@new.OrganizationId, "An organization");
         }
 
         var id = parseResult.Value;
@@ -176,7 +176,7 @@ public class ProjectGroupService
         var @old = await Load(@new.Id, token);
         if (@old is null)
         {
-            return Error.NotFound(@new.Id);
+            return Kafe.Diagnostic.NotFound(@new.Id);
         }
 
         var eventStream = await db.Events.FetchForExclusiveWriting<ProjectGroupInfo>(@new.Id, token);
@@ -204,7 +204,7 @@ public class ProjectGroupService
         {
             if (!((Hrib)@new.OrganizationId).IsValidNonEmpty)
             {
-                return Error.InvalidOrEmptyHrib(nameof(ProjectGroupInfo.OrganizationId));
+                return Kafe.Diagnostic.InvalidOrEmptyHrib(nameof(ProjectGroupInfo.OrganizationId));
             }
 
             eventStream.AppendOne(new ProjectGroupMovedToOrganization(

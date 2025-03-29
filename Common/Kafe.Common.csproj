@@ -4,6 +4,7 @@
     <TargetFrameworks>$(DefaultTargetFrameworks)</TargetFrameworks>
     <Nullable>enable</Nullable>
     <RootNamespace>Kafe</RootNamespace>
+    <NoWarn>$(NoWarn);IDE0130</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

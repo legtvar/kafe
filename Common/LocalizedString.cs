@@ -10,7 +10,7 @@ using System.Text.Json.Serialization;
 namespace Kafe;
 
 [JsonConverter(typeof(LocalizedStringJsonConverter))]
-public sealed partial class LocalizedString : IEquatable<LocalizedString>
+public sealed partial class LocalizedString : IEquatable<LocalizedString>, IFormattable
 {
     /// <summary>
     /// All available ISO 639 Set 1 language codes (and "iv" for the special invariant culture).
@@ -236,7 +236,7 @@ public sealed partial class LocalizedString : IEquatable<LocalizedString>
 
     public override string? ToString()
     {
-        return ToString(CultureInfo.CurrentCulture.TwoLetterISOLanguageName);
+        return ((IFormattable)this).ToString(null, CultureInfo.CurrentCulture);
     }
 
     public string? ToString(CultureInfo culture)
@@ -304,6 +304,17 @@ public sealed partial class LocalizedString : IEquatable<LocalizedString>
             : isOldEmpty && !isNewEmpty ? @new
             : !isOldEmpty && !isNewEmpty ? @new
             : null;
+    }
+
+    string IFormattable.ToString(string? _, IFormatProvider? formatProvider)
+    {
+        formatProvider ??= CultureInfo.InvariantCulture;
+        if (formatProvider is not CultureInfo culture)
+        {
+            throw new ArgumentException("Format provider must be a CultureInfo.", nameof(formatProvider));
+        }
+
+        return this[culture];
     }
 }
 

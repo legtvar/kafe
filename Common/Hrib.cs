@@ -145,7 +145,7 @@ public record Hrib : IParsable<Hrib>
             return hrib;
         }
 
-        return new Error(Error.BadHribId, error);
+        return new Diagnostic(Diagnostic.BadHribId, error);
     }
 
     static Hrib IParsable<Hrib>.Parse(string value, IFormatProvider? provider)

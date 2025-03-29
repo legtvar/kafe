@@ -13,43 +13,46 @@ public readonly record struct Err<T>
     // Inspired in part by: https://stackoverflow.com/questions/3151702/discriminated-union-in-c-sharp
     // And: https://ziglang.org/documentation/master/#while-with-Error-Unions
 
+    private readonly T value;
+    private readonly ImmutableArray<Diagnostic> errors;
+
     public Err()
     {
-        Value = default!;
-        Errors = ImmutableArray<Error>.Empty;
+        value = default!;
+        errors = ImmutableArray<Diagnostic>.Empty;
     }
 
     public Err(T value) : this(value, [])
     {
     }
 
-    public Err(ImmutableArray<Error> errors) : this(default!, errors)
+    public Err(ImmutableArray<Diagnostic> errors) : this(default!, errors)
     {
     }
 
-    public Err(Error error) : this([error])
+    public Err(Diagnostic error) : this([error])
     {
     }
 
     public Err(Exception exception) : this()
     {
         var stackTrace = new StackTrace(skipFrames: 1, fNeedFileInfo: true);
-        Errors = [new Error(exception, stackTrace.ToString())];
+        errors = [new Diagnostic(exception, stackTrace.ToString())];
     }
 
-    public Err(T value, ImmutableArray<Error> errors) : this()
+    public Err(T value, ImmutableArray<Diagnostic> errors) : this()
     {
         Value = value;
         Errors = errors;
     }
 
-    public Err(T value, Error error) : this(value, [error])
+    public Err(T value, Diagnostic error) : this(value, [error])
     {
     }
 
-    public T Value { get; init; }
+    public T Value => value;
 
-    public ImmutableArray<Error> Errors { get; init; }
+    public ImmutableArray<Diagnostic> Errors => errors;
 
     public bool HasErrors => !Errors.IsEmpty;
 
@@ -59,12 +62,12 @@ public readonly record struct Err<T>
         return new Err<T>(value);
     }
 
-    public static implicit operator Err<T>(Error error)
+    public static implicit operator Err<T>(Diagnostic error)
     {
         return new Err<T>(error);
     }
 
-    public static implicit operator Err<T>(ImmutableArray<Error> errors)
+    public static implicit operator Err<T>(ImmutableArray<Diagnostic> errors)
     {
         return new Err<T>(errors);
     }
@@ -74,12 +77,12 @@ public readonly record struct Err<T>
         return new Err<T>(exception);
     }
 
-    public static implicit operator Err<T>((T value, ImmutableArray<Error> errors) pair)
+    public static implicit operator Err<T>((T value, ImmutableArray<Diagnostic> errors) pair)
     {
         return new Err<T>(pair.value, pair.errors);
     }
 
-    public static implicit operator Err<T>((T value, Error error) pair)
+    public static implicit operator Err<T>((T value, Diagnostic error) pair)
     {
         return new Err<T>(pair.value, pair.error);
     }

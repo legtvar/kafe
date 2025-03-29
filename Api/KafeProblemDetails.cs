@@ -14,7 +14,7 @@ public class KafeProblemDetails : ProblemDetails
 {
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     [JsonPropertyName("errors")]
-    public ImmutableArray<Error> Errors { get; set; } = [];
+    public ImmutableArray<Diagnostic> Errors { get; set; } = [];
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("traceId")]
@@ -55,20 +55,20 @@ public class KafeProblemDetails : ProblemDetails
             }
         }
 
-        var errors = ImmutableArray.CreateBuilder<Error>();
+        var errors = ImmutableArray.CreateBuilder<Diagnostic>();
         if (modelState is not null)
         {
             foreach (var (parameter, entry) in modelState)
             {
                 foreach (var validationError in entry.Errors)
                 {
-                    errors.Add(new Error(
-                        id: Error.InvalidValueId,
+                    errors.Add(new Diagnostic(
+                        id: Diagnostic.InvalidValueId,
                         message: validationError.ErrorMessage,
                         arguments: ImmutableDictionary.CreateRange(
                             [
                                 new KeyValuePair<string, object>(
-                                    Error.ParameterArgument,
+                                    Diagnostic.ParameterArgument,
                                     parameter)
                             ]),
                         skipFrames: skipFrames + 1 // NB: The plus one account for the ctor itself.

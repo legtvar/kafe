@@ -58,7 +58,7 @@ public class ProjectGroupLockEndpoint : EndpointBaseAsync
         }
         if (errors.Any())
         {
-            return this.KafeErrorResult(new Error($"Some projects could not be locked: {string.Join(", ", errors)}"));
+            return this.KafeErrorResult(new Diagnostic($"Some projects could not be locked: {string.Join(", ", errors)}"));
         }
 
         return Ok();

@@ -108,7 +108,7 @@ public class PlaylistService
         var organization = await organizationService.Load(@new.OrganizationId, token);
         if (organization is null)
         {
-            return Error.NotFound(@new.OrganizationId, "An organization");
+            return Kafe.Diagnostic.NotFound(@new.OrganizationId, "An organization");
         }
 
         var id = parseResult.Value;
@@ -181,7 +181,7 @@ public class PlaylistService
         var old = await Load(@new.Id, token);
         if (old is null)
         {
-            return Error.NotFound(@new.Id, "A playlist");
+            return Kafe.Diagnostic.NotFound(@new.Id, "A playlist");
         }
 
         var eventStream = await db.Events.FetchForExclusiveWriting<PlaylistInfo>(@new.Id, token);
@@ -224,7 +224,7 @@ public class PlaylistService
         {
             if (!((Hrib)@new.OrganizationId).IsValidNonEmpty)
             {
-                return Error.InvalidOrEmptyHrib(nameof(PlaylistInfo.OrganizationId));
+                return Kafe.Diagnostic.InvalidOrEmptyHrib(nameof(PlaylistInfo.OrganizationId));
             }
 
             eventStream.AppendOne(new PlaylistMovedToOrganization(

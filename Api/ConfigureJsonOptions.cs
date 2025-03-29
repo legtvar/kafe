@@ -102,12 +102,12 @@ public class ConfigureJsonOptions : IConfigureOptions<JsonOptions>
 
     private static void RemoveErrorStackTraces(JsonTypeInfo type)
     {
-        if (type.Type != typeof(Error))
+        if (type.Type != typeof(Diagnostic))
         {
             return;
         }
 
-        var stackTraceProp = type.Properties.Single(p => p.Name == nameof(Error.StackTrace));
+        var stackTraceProp = type.Properties.Single(p => p.Name == nameof(Diagnostic.StackTrace));
         type.Properties.Remove(stackTraceProp);
     }
 }

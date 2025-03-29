@@ -71,7 +71,7 @@ public class EntityService
         //     the account itself.
         if (perms.HasErrors)
         {
-            if (perms.Errors.All(e => e.Id == Error.NotFoundId) && !accessingAccountId.IsEmpty)
+            if (perms.Errors.All(e => e.Id == Kafe.Diagnostic.NotFoundId) && !accessingAccountId.IsEmpty)
             {
                 var accessingAccount = (await db.KafeLoadAsync<AccountInfo>(accessingAccountId, token)).Unwrap();
                 return accessingAccount.Permissions.GetValueOrDefault(entityId.ToString());

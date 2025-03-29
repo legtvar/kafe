@@ -73,7 +73,7 @@ public class ShardService
         var fileExtension = extMimeMap.GetFirstFileExtensionFor(mimeType);
         if (fileExtension is null)
         {
-            return Error.InvalidMimeType(mimeType);
+            return Kafe.Diagnostic.InvalidMimeType(mimeType);
         }
 
         var tmpPath = await storageService.StoreTemporaryShard(shardId, stream, fileExtension, token);
@@ -81,7 +81,7 @@ public class ShardService
         if (!analysis.IsSuccessful)
         {
             await storageService.DeleteTemporaryShard(shardId, token);
-            return Error.ShardAnalysisFailure(shardType);
+            return Kafe.Diagnostic.ShardAnalysisFailure(shardType);
         }
 
         var created = new ShardCreated(

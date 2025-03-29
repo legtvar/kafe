@@ -1,9 +1,9 @@
 namespace Kafe;
 
-public enum RequirementMessageSeverity
+public enum DiagnosticSeverity
 {
     Debug,
-    Information,
+    Info,
     Warning,
     Error,
 }

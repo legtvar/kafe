@@ -26,14 +26,17 @@ public static class ControllerBaseExtensions
         };
     }
 
-    public static ActionResult KafeErrorResult(this ControllerBase controller, params IEnumerable<Error> errors)
+    public static ActionResult KafeErrorResult(
+        this ControllerBase controller,
+        params IEnumerable<Diagnostic> diagnostics
+    )
     {
         var pd = KafeProblemDetails.Create(
             httpContext: controller.HttpContext,
             modelState: controller.ModelState,
             skipFrames: 2
         );
-        pd.Errors = pd.Errors.AddRange(errors);
+        pd.Errors = pd.Errors.AddRange(diagnostics);
 
         return new ObjectResult(pd)
         {

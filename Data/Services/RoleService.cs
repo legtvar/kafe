@@ -51,7 +51,7 @@ public class RoleService
         var organization = await organizationService.Load(@new.OrganizationId, token);
         if (organization is null)
         {
-            return Error.NotFound(@new.OrganizationId, "An organization");
+            return Kafe.Diagnostic.NotFound(@new.OrganizationId, "An organization");
         }
 
         var id = parseResult.Value;
@@ -90,7 +90,7 @@ public class RoleService
         var @old = await Load(modified.Id, token);
         if (@old is null)
         {
-            return Error.NotFound(modified.Id);
+            return Kafe.Diagnostic.NotFound(modified.Id);
         }
 
         var hasChanged = false;
@@ -129,7 +129,7 @@ public class RoleService
 
         if (!hasChanged)
         {
-            return Error.Unmodified($"role {modified.Id}");
+            return Kafe.Diagnostic.Unmodified($"role {modified.Id}");
         }
 
         await db.SaveChangesAsync(token);
@@ -148,7 +148,7 @@ public class RoleService
         var role = await Load(roleId, token);
         if (role is null)
         {
-            return Error.NotFound(roleId, "A role");
+            return Kafe.Diagnostic.NotFound(roleId, "A role");
         }
 
         foreach (var permissionPair in permissions)

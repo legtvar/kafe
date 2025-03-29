@@ -15,6 +15,7 @@ public sealed record class ModContext
         PropertyTypeRegistry propertyTypeRegistry,
         RequirementTypeRegistry requirementTypeRegistry,
         ShardTypeRegistry shardTypeRegistry,
+        DiagnosticDescriptorRegistry diagnosticDescriptorRegistry,
         IServiceProvider services
     )
     {

@@ -103,7 +103,7 @@ public partial record struct KafeType : IParsable<KafeType>
     {
         if (!TryParse(s, out var kafeType))
         {
-            return Error.BadKafeType(s);
+            return Diagnostic.BadKafeType(s);
         }
 
         return kafeType;

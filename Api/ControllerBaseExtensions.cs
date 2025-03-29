@@ -25,7 +25,7 @@ public static class ControllerBaseExtensions
         };
     }
     
-    public static ActionResult KafeErrorResult(this ControllerBase controller, params Error[] errors)
+    public static ActionResult KafeErrorResult(this ControllerBase controller, params Diagnostic[] errors)
     {
         var pd = KafeProblemDetails.Create(
             httpContext: controller.HttpContext,

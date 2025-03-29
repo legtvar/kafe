@@ -7,7 +7,7 @@ public class OptionalErrorStackTraceSchemaFilter : ISchemaFilter
 {
     public void Apply(OpenApiSchema schema, SchemaFilterContext context)
     {
-        if (context.Type != typeof(Error))
+        if (context.Type != typeof(Diagnostic))
         {
             return;
         }

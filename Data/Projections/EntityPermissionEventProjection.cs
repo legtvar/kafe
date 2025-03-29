@@ -443,7 +443,7 @@ public class EntityPermissionEventProjection : EventProjection
     )
     {
         var systemPerms = await ops.KafeLoadAsync<EntityPermissionInfo>(Hrib.System);
-        if (systemPerms.HasErrors && systemPerms.Errors.Length == 1 && systemPerms.Errors[0].Id == Error.NotFoundId)
+        if (systemPerms.HasErrors && systemPerms.Errors.Length == 1 && systemPerms.Errors[0].Id == Kafe.Diagnostic.NotFoundId)
         {
             systemPerms = EntityPermissionInfo.Create(Hrib.SystemValue);
             ops.Store(systemPerms.Value);

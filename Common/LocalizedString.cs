@@ -10,7 +10,7 @@ using System.Text.Json.Serialization;
 namespace Kafe;
 
 [JsonConverter(typeof(LocalizedStringJsonConverter))]
-public sealed partial class LocalizedString : IEquatable<LocalizedString>
+public sealed partial class LocalizedString : IEquatable<LocalizedString>, IFormattable
 {
     public static readonly LocalizedString Empty = new LocalizedString(ImmutableDictionary.CreateRange(new[] {
         new KeyValuePair<string, string>(Const.InvariantCultureCode, string.Empty)
@@ -198,7 +198,7 @@ public sealed partial class LocalizedString : IEquatable<LocalizedString>
 
     public override string ToString()
     {
-        return this[CultureInfo.CurrentCulture] ?? Invariant;
+        return ((IFormattable)this).ToString(null, CultureInfo.InvariantCulture);
     }
 
     public static LocalizedString Merge(LocalizedString? old, LocalizedString? @new)
@@ -234,6 +234,17 @@ public sealed partial class LocalizedString : IEquatable<LocalizedString>
             : isOldEmpty && !isNewEmpty ? @new
             : !isOldEmpty && !isNewEmpty ? @new
             : null;
+    }
+
+    string IFormattable.ToString(string? _, IFormatProvider? formatProvider)
+    {
+        formatProvider ??= CultureInfo.InvariantCulture;
+        if (formatProvider is not CultureInfo culture)
+        {
+            throw new ArgumentException("Format provider must be a CultureInfo.", nameof(formatProvider));
+        }
+
+        return this[culture];
     }
 }
 

@@ -82,7 +82,7 @@ public class AccountService
             case AccountKind.External:
                 if (string.IsNullOrEmpty(@new.IdentityProvider))
                 {
-                    return Error.MissingValue(nameof(@new.IdentityProvider));
+                    return Kafe.Diagnostic.MissingValue(nameof(@new.IdentityProvider));
                 }
 
                 var associated = new ExternalAccountAssociated(
@@ -133,7 +133,7 @@ public class AccountService
         var old = await Load(modified.Id, token);
         if (old is null)
         {
-            return Error.NotFound(modified.Id, "An account");
+            return Kafe.Diagnostic.NotFound(modified.Id, "An account");
         }
 
         var infoChanged = new AccountInfoChanged(
@@ -206,7 +206,7 @@ public class AccountService
 
         if (!hasChanged)
         {
-            return Error.Unmodified(old.Id, "An account");
+            return Kafe.Diagnostic.Unmodified(old.Id, "An account");
         }
 
         await db.SaveChangesAsync(token);
@@ -261,8 +261,8 @@ $@"TRUE = ALL(
 
         if (!IsValidEmailAddress(emailAddress))
         {
-            return Error.InvalidValue("The provided email address does not have a valid format.")
-                .WithArgument(Error.ParameterArgument, nameof(emailAddress));
+            return Kafe.Diagnostic.InvalidValue("The provided email address does not have a valid format.")
+                .WithArgument(Kafe.Diagnostic.ParameterArgument, nameof(emailAddress));
         }
 
         var account = await FindByEmail(emailAddress, token);
@@ -336,7 +336,7 @@ $@"TRUE = ALL(
         var account = await Load(accountId, token);
         if (account is null)
         {
-            return Error.NotFound(accountId, "An account");
+            return Kafe.Diagnostic.NotFound(accountId, "An account");
         }
 
         foreach (var permissionPair in permissions)
@@ -371,7 +371,7 @@ $@"TRUE = ALL(
         var account = await Load(accountId, token);
         if (account is null)
         {
-            return Error.NotFound(accountId, "An account");
+            return Kafe.Diagnostic.NotFound(accountId, "An account");
         }
 
         foreach (var roleId in roleIds)
@@ -403,7 +403,7 @@ $@"TRUE = ALL(
         var emailClaim = principal.FindFirst(ClaimTypes.Email);
         if (emailClaim is null || string.IsNullOrEmpty(emailClaim.Value))
         {
-            return Error.MissingValue("email address");
+            return Kafe.Diagnostic.MissingValue("email address");
         }
 
         var name = principal.FindFirst(ClaimTypes.Name)?.Value;

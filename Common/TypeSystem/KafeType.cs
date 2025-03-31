@@ -1,6 +1,5 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Text;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 
@@ -12,6 +11,10 @@ public partial record struct KafeType : IParsable<KafeType>
     public const char ModPrimarySeparator = ':';
     public const char PrimarySecondarySeparator = '/';
     public const string ArraySuffix = "[]";
+    public const string ShardPrimary = "shard";
+    public const string RequirementPrimary = "req";
+    public const string DiagnosticPrimary = "diag";
+
     public static readonly Regex Regex = GetRegex();
 
     [GeneratedRegex($@"^(?<{nameof(Mod)}>[\w-]+):(?<{nameof(Primary)}>[\w-]+)"
@@ -24,13 +27,15 @@ public partial record struct KafeType : IParsable<KafeType>
         string mod,
         string primary,
         string? secondary = null,
-        bool isArray = false
+        bool isArray = false,
+        LocalizedString? name = null
     )
     {
         Mod = mod;
         Primary = primary;
         Secondary = secondary;
         IsArray = isArray;
+        Name = name;
     }
 
     public string Mod { get; }
@@ -38,11 +43,17 @@ public partial record struct KafeType : IParsable<KafeType>
     public string? Secondary { get; }
     public bool IsArray { get; }
 
+    /// <summary>
+    /// A human-readable name.
+    /// Used in <see cref="ToString(string?, IFormatProvider?)"/> with <see cref="ShortHumanReadableFormat"/>.
+    /// </summary>
+    public LocalizedString? Name { get; init; }
+
     public readonly bool IsDefault => Mod == null && Primary == null && Secondary == null && IsArray == false;
 
     public readonly bool IsInvalid => this == Invalid;
 
-    public KafeType GetElementType()
+    public readonly KafeType GetElementType()
     {
         if (!IsArray)
         {
@@ -50,26 +61,6 @@ public partial record struct KafeType : IParsable<KafeType>
         }
 
         return new(Mod, Primary, Secondary, false);
-    }
-
-    public override readonly string ToString()
-    {
-        var sb = new StringBuilder(Mod.Length + 1 + Primary.Length + 1 + Secondary?.Length ?? 0 + 2);
-        sb.Append(Mod);
-        sb.Append(ModPrimarySeparator);
-
-        if (Secondary != null)
-        {
-            sb.Append(ModPrimarySeparator);
-            sb.Append(Primary);
-        }
-
-        if (IsArray)
-        {
-            sb.Append(ArraySuffix);
-        }
-
-        return sb.ToString();
     }
 
     public static bool TryParse(
@@ -99,22 +90,16 @@ public partial record struct KafeType : IParsable<KafeType>
         return true;
     }
 
-    public static Err<KafeType> Parse(string? s)
-    {
-        if (!TryParse(s, out var kafeType))
-        {
-            return Diagnostic.BadKafeType(s);
-        }
-
-        return kafeType;
-    }
-
     public static KafeType Parse(
         string s,
         IFormatProvider? provider
     )
     {
-        return Parse(s).Unwrap();
+        if (!TryParse(s, out var kafeType))
+        {
+            throw new ArgumentException($"Could not parse '{s}' as a KafeType.", nameof(s));
+        }
+        return kafeType;
     }
 
     public static bool TryParse(

@@ -1,11 +1,9 @@
 using System;
-using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Globalization;
 using System.Text.Json.Serialization;
 
 namespace Kafe;
-
 
 /// <summary>
 /// A user-facing structure representing an error, a warning, or a less severe note.
@@ -36,10 +34,6 @@ public record struct Diagnostic : IFormattable
 
     public DiagnosticSeverity Severity { get; init; }
 
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public ImmutableDictionary<string, object> Arguments { get; init; }
-        = ImmutableDictionary<string, object>.Empty;
-
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string StackTrace { get; init; }
 
@@ -52,29 +46,9 @@ public record struct Diagnostic : IFormattable
         }
     }
 
-    // NB: This operator is "explicit" so that it is not so easy to create multiply nested error-exception-errors
-    //     by accident.
-    public static explicit operator Exception(Diagnostic error)
-    {
-        return new KafeErrorException(error);
-    }
-
-    public static implicit operator Diagnostic(Exception exception)
-    {
-        return new Diagnostic(exception);
-    }
-
-    public Diagnostic WithArgument(string key, object value)
-    {
-        return this with
-        {
-            Arguments = Arguments.Add(key, value)
-        };
-    }
-
     public DiagnosticMessage ToMessage(CultureInfo culture)
     {
-
+        throw new NotImplementedException();
     }
 
     string IFormattable.ToString(string? _, IFormatProvider? formatProvider)

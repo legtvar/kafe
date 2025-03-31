@@ -287,6 +287,13 @@ public sealed partial class LocalizedString : IEquatable<LocalizedString>, IForm
             : null;
     }
 
+    public static LocalizedString Format(LocalizedString format, params object?[] args)
+    {
+        var formatted = format.data.Select(p => new KeyValuePair<string, string>(p.Key, string.Format(p.Value, args)))
+            .ToImmutableDictionary();
+        return new LocalizedString(formatted);
+    }
+
     string IFormattable.ToString(string? _, IFormatProvider? formatProvider)
     {
         formatProvider ??= CultureInfo.InvariantCulture;

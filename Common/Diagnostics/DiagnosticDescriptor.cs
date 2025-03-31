@@ -7,6 +7,11 @@ public sealed record DiagnosticDescriptor
 {
     public static readonly DiagnosticDescriptor Invalid = new();
 
+    public static readonly LocalizedString FallbackMessageFormat = LocalizedString.Create(
+        (Const.InvariantCulture, "A diagnostic of type '{0}' has been reported."),
+        (Const.CzechCulture, "Vyskytlo se hlášení typu '{0}'.")
+    );
+
     /// <summary>
     /// A short name/ID that is unique within the mod.
     /// </summary>

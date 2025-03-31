@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -14,13 +13,12 @@ public class KafeTypeJsonConverter : JsonConverter<KafeType>
     {
         var value = reader.GetString()
             ?? throw new JsonException("A KAFE type may never be null.");
-        var result = KafeType.Parse(value);
-        if (result.HasErrors)
+        if (!KafeType.TryParse(value, out var kafeType))
         {
-            throw new JsonException(result.Errors.First().Message);
+            throw new JsonException("Could not parse into a KafeType.");
         }
 
-        return result.Value;
+        return kafeType;
     }
 
     public override void Write(

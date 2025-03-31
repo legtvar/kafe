@@ -25,6 +25,7 @@ public sealed record class ModContext
         PropertyTypeRegistry = propertyTypeRegistry;
         RequirementTypeRegistry = requirementTypeRegistry;
         ShardTypeRegistry = shardTypeRegistry;
+        DiagnosticDescriptorRegistry = diagnosticDescriptorRegistry;
         Services = services;
     }
 
@@ -44,7 +45,7 @@ public sealed record class ModContext
     public RequirementTypeRegistry RequirementTypeRegistry { get; }
 
     public ShardTypeRegistry ShardTypeRegistry { get; }
-
+    public DiagnosticDescriptorRegistry DiagnosticDescriptorRegistry { get; }
     public IServiceProvider Services { get; }
 
     public IReadOnlySet<KafeType> Types { get; }
@@ -53,18 +54,18 @@ public sealed record class ModContext
     {
         options ??= PropertyRegistrationOptions.Default;
 
-        var name = options.Name;
-        if (string.IsNullOrWhiteSpace(name))
+        var typeName = options.Name;
+        if (string.IsNullOrWhiteSpace(typeName))
         {
-            name = propertyType.Name;
-            name = Naming.WithoutSuffix(name, "Property");
-            name = Naming.WithoutSuffix(name, "PropertyMetadata");
-            name = Naming.ToDashCase(name);
+            typeName = propertyType.Name;
+            typeName = Naming.WithoutSuffix(typeName, "Property");
+            typeName = Naming.WithoutSuffix(typeName, "PropertyMetadata");
+            typeName = Naming.ToDashCase(typeName);
         }
 
         var kafeType = new KafeType(
             mod: Name,
-            primary: name,
+            primary: typeName,
             secondary: null,
             isArray: false
         );
@@ -85,18 +86,18 @@ public sealed record class ModContext
     {
         options ??= RequirementRegistrationOptions.Default;
 
-        var name = options.Name;
-        if (string.IsNullOrWhiteSpace(name))
+        var typeName = options.Name;
+        if (string.IsNullOrWhiteSpace(typeName))
         {
-            name = requirementType.Name;
-            name = Naming.WithoutSuffix(name, "Requirement");
-            name = Naming.ToDashCase(name);
+            typeName = requirementType.Name;
+            typeName = Naming.WithoutSuffix(typeName, "Requirement");
+            typeName = Naming.ToDashCase(typeName);
         }
 
         var kafeType = new KafeType(
             mod: Name,
-            primary: "requirement",
-            secondary: name,
+            primary: KafeType.RequirementPrimary,
+            secondary: typeName,
             isArray: false
         );
         TypeRegistry.Register(new(
@@ -116,19 +117,19 @@ public sealed record class ModContext
     {
         options ??= ShardRegistrationOptions.Default;
 
-        var name = options.Name;
-        if (string.IsNullOrWhiteSpace(name))
+        var typeName = options.Name;
+        if (string.IsNullOrWhiteSpace(typeName))
         {
-            name = shardType.Name;
-            name = Naming.WithoutSuffix(name, "Shard");
-            name = Naming.WithoutSuffix(name, "ShardMetadata");
-            name = Naming.ToDashCase(name);
+            typeName = shardType.Name;
+            typeName = Naming.WithoutSuffix(typeName, "Shard");
+            typeName = Naming.WithoutSuffix(typeName, "ShardMetadata");
+            typeName = Naming.ToDashCase(typeName);
         }
 
         var kafeType = new KafeType(
             mod: Name,
-            primary: "shard",
-            secondary: name,
+            primary: KafeType.ShardPrimary,
+            secondary: typeName,
             isArray: false
         );
         TypeRegistry.Register(new(
@@ -142,6 +143,50 @@ public sealed record class ModContext
             AnalyzerTypes: [.. options.AnalyzerTypes]
         ));
         return kafeType;
+    }
+
+    public DiagnosticDescriptor AddDiagnostic(
+        Type diagnosticPayloadType,
+        DiagnosticDescriptorRegistrationOptions? options = null
+    )
+    {
+        options ??= DiagnosticDescriptorRegistrationOptions.Default;
+
+        var typeName = options.Name;
+        if (string.IsNullOrWhiteSpace(typeName))
+        {
+            typeName = diagnosticPayloadType.Name;
+            typeName = Naming.WithoutSuffix(typeName, "DiagnosticDescriptor");
+            typeName = Naming.WithoutSuffix(typeName, "Diagnostic");
+            typeName = Naming.ToDashCase(typeName);
+        }
+
+        var kafeType = new KafeType(
+            mod: Name,
+            primary: KafeType.DiagnosticPrimary,
+            secondary: typeName,
+            isArray: false
+        );
+        TypeRegistry.Register(new(
+            KafeType: kafeType,
+            DotnetType: diagnosticPayloadType,
+            Accessibility: options.Accessibility,
+            Converter: options.Converter
+        ));
+        var descriptor = new DiagnosticDescriptor()
+        {
+            Id = typeName,
+            KafeType = kafeType,
+            DotnetType = diagnosticPayloadType,
+            Title = options.Title ?? LocalizedString.CreateInvariant(kafeType.ToString()),
+            Description = options.Description,
+            HelpLinkUri = options.HelpLinkUri,
+            MessageFormat = options.MessageFormat
+                ?? LocalizedString.Format(DiagnosticDescriptor.FallbackMessageFormat, kafeType),
+            DefaultSeverity = options.DefaultSeverity
+        };
+        DiagnosticDescriptorRegistry.Register(descriptor);
+        return descriptor;
     }
 
     public abstract record KafeTypeRegistrationOptions
@@ -172,6 +217,20 @@ public sealed record class ModContext
         public static readonly ShardRegistrationOptions Default = new();
 
         public List<Type> AnalyzerTypes { get; set; } = [];
+    }
 
+    public record DiagnosticDescriptorRegistrationOptions : KafeTypeRegistrationOptions
+    {
+        public static readonly DiagnosticDescriptorRegistrationOptions Default = new();
+
+        public LocalizedString? Title { get; init; }
+
+        public LocalizedString? Description { get; init; }
+
+        public string? HelpLinkUri { get; init; }
+
+        public LocalizedString? MessageFormat { get; init; }
+
+        public DiagnosticSeverity DefaultSeverity { get; init; } = DiagnosticSeverity.Error;
     }
 }

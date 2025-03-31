@@ -25,4 +25,12 @@ public static class ModContextExtensions
     {
         return c.AddShard(typeof(T), options);
     }
+
+    public static DiagnosticDescriptor AddDiagnostic<T>(
+        this ModContext c,
+        ModContext.DiagnosticDescriptorRegistrationOptions? options = null
+    )
+    {
+        return c.AddDiagnostic(typeof(T), options);
+    }
 }

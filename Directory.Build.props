@@ -6,7 +6,16 @@
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <NoWarn>$(NoWarn);CS1591;CS1573</NoWarn>
+    <NoWarn>$(NoWarn);CS1591;CS1573;NU1608</NoWarn>
+    <PackageOutputPath>$(MSBuildThisFileDirectory)artifacts</PackageOutputPath>
+    <DebugType>embedded</DebugType>
+    <EmbedAllSources>true</EmbedAllSources>
+    <Version>0.0.0-local</Version>
+    <SourceRoot>$(MSBuildThisFileDirectory)</SourceRoot>
+    <RepositoryUrl>https://gitlab.fi.muni.cz/legtvar/kafe</RepositoryUrl>
+    <PackageLicenseExpression>BSD-3-Clause</PackageLicenseExpression>
+    <PackageProjectUrl>https://kafe.fi.muni.cz</PackageProjectUrl>
+    <Authors>LeGTVaR</Authors>
   </PropertyGroup>
   
   <ItemGroup>

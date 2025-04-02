@@ -2,8 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>$(DefaultExecutableFramework)</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>disable</ImplicitUsings>
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>

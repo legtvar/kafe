@@ -33,9 +33,21 @@ public class KafeTypeRegistry : IFreezable
         AssertUnfrozen();
         if (!types.TryAdd(metadata.KafeType, metadata))
         {
-            throw new ArgumentException($"KafeType '{metadata.KafeType}' has been already registered.", nameof(metadata));
+            throw new ArgumentException(
+                $"KafeType '{metadata.KafeType}' has been already registered.",
+                nameof(metadata)
+            );
         }
-        dotnetTypeMap.AddOrUpdate(metadata.DotnetType, metadata.KafeType, (_, _) => metadata.KafeType);
+
+        if (!dotnetTypeMap.TryAdd(metadata.DotnetType, metadata.KafeType))
+        {
+            var existing = dotnetTypeMap[metadata.DotnetType];
+            throw new ArgumentException(
+                $"KafeType '{metadata.KafeType}' cannot be mapped to .NET type '{metadata.DotnetType.FullName}' "
+                    + $"because that .NET type has already been registered by '{existing}'.",
+                nameof(metadata)
+            );
+        }
         return this;
     }
 

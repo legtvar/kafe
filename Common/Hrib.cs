@@ -136,19 +136,13 @@ public record Hrib : IParsable<Hrib>
         return true;
     }
 
-    public static Err<Hrib> Parse(string? value)
-    {
-        if (TryParse(value, out var hrib, out var error))
-        {
-            return hrib;
-        }
-
-        return new Diagnostic(Diagnostic.BadHribId, error);
-    }
-
     static Hrib IParsable<Hrib>.Parse(string value, IFormatProvider? provider)
     {
-        return Parse(value).Unwrap();
+        if (!TryParse(value, out var hrib, out var error))
+        {
+            throw new ArgumentException($"Could not parse '{value}' as HRIB: {error}");
+        }
+        return hrib;
     }
 
     static bool IParsable<Hrib>.TryParse(
@@ -156,15 +150,7 @@ public record Hrib : IParsable<Hrib>
         IFormatProvider? provider,
         [MaybeNullWhen(false)] out Hrib hrib)
     {
-        var result = Parse(value);
-        if (result.HasErrors)
-        {
-            hrib = null;
-            return false;
-        }
-
-        hrib = result.Value;
-        return true;
+        return TryParse(value, out hrib, out _);
     }
 
     public string ToString(bool throwOnInvalidAndEmpty)

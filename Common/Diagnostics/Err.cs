@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Immutable;
-using System.Diagnostics;
 
 namespace Kafe;
 
@@ -13,47 +11,33 @@ public readonly record struct Err<T>
     // And: https://ziglang.org/documentation/master/#while-with-Error-Unions
 
     private readonly T value;
-    private readonly ImmutableArray<Diagnostic> errors;
+    private readonly Diagnostic? diagnostic;
 
     public Err()
     {
         value = default!;
-        errors = ImmutableArray<Diagnostic>.Empty;
+        diagnostic = null;
     }
 
-    public Err(T value) : this(value, [])
-    {
-    }
-
-    public Err(ImmutableArray<Diagnostic> errors) : this(default!, errors)
-    {
-    }
-
-    public Err(Diagnostic error) : this([error])
-    {
-    }
-
-    public Err(Exception exception) : this()
-    {
-        var stackTrace = new StackTrace(skipFrames: 1, fNeedFileInfo: true);
-        errors = [new Diagnostic(exception, stackTrace.ToString())];
-    }
-
-    public Err(T value, ImmutableArray<Diagnostic> errors) : this()
+    public Err(T value, Diagnostic? diagnostic)
     {
         this.value = value;
-        this.errors = errors;
+        this.diagnostic = diagnostic;
     }
 
-    public Err(T value, Diagnostic error) : this(value, [error])
+    public Err(T value) : this(value, null)
+    {
+    }
+
+    public Err(Diagnostic diagnostic) : this(default!, diagnostic)
     {
     }
 
     public T Value => value;
 
-    public ImmutableArray<Diagnostic> Errors => errors;
+    public Diagnostic? Diagnostic => diagnostic;
 
-    public bool HasErrors => !errors.IsEmpty;
+    public bool HasErrors => diagnostic is not null;
 
 
     public static implicit operator Err<T>(T value)
@@ -66,29 +50,9 @@ public readonly record struct Err<T>
         return new Err<T>(error);
     }
 
-    public static implicit operator Err<T>(ImmutableArray<Diagnostic> errors)
+    public static implicit operator Err<T>((T value, Diagnostic? diagnostic) pair)
     {
-        return new Err<T>(errors);
-    }
-
-    public static implicit operator Err<T>(Exception exception)
-    {
-        return new Err<T>(exception);
-    }
-
-    public static implicit operator Err<T>((T value, ImmutableArray<Diagnostic> errors) pair)
-    {
-        return new Err<T>(pair.value, pair.errors);
-    }
-
-    public static implicit operator Err<T>((T value, Diagnostic error) pair)
-    {
-        return new Err<T>(pair.value, pair.error);
-    }
-    
-    public static implicit operator Err<T>((T value, Exception exception) pair)
-    {
-        return new Err<T>(pair.value, pair.exception);
+        return new Err<T>(pair.value, pair.diagnostic);
     }
 
     // NB: This is explicit to force people to unwrap their errors properly.
@@ -97,16 +61,22 @@ public readonly record struct Err<T>
         return err.HasErrors ? default : err.value;
     }
 
-    public KafeErrorException AsException()
+    public KafeErrorException? AsException()
     {
-        return new KafeErrorException(Errors);
+        if (Diagnostic.HasValue && Diagnostic.Value.Severity == DiagnosticSeverity.Error)
+        {
+            return new KafeErrorException(Diagnostic.Value);
+        }
+
+        return null;
     }
 
     public static T Unwrap(Err<T> err)
     {
-        if (err.HasErrors)
+        var ex = err.AsException();
+        if (ex is not null)
         {
-            throw err.AsException();
+            throw ex;
         }
 
         return err.Value;

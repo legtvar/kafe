@@ -1,14 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
-	<PropertyGroup>
-		<TargetFrameworks>$(DefaultTargetFrameworks)</TargetFrameworks>
-		<ImplicitUsings>enable</ImplicitUsings>
+  <PropertyGroup>
+    <TargetFrameworks>$(DefaultTargetFrameworks)</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>disable</Nullable>
-	</PropertyGroup>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
 
-	<ItemGroup>
-		<PackageReference Include="Duende.IdentityServer" Version="7.0.8" />
+  <ItemGroup>
+    <PackageReference Include="Duende.IdentityServer" Version="7.0.8" />
 
-		<PackageReference Include="Serilog.AspNetCore" Version="8.0.3" />
-	</ItemGroup>
+    <PackageReference Include="Serilog.AspNetCore" Version="8.0.3" />
+  </ItemGroup>
 </Project>

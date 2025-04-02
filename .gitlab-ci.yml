@@ -118,3 +118,16 @@ deploy-docs:
     name: docs
     url: https://kafe.fi.muni.cz/docs
   when: manual
+  
+deploy-nuget:
+  stage: deploy
+  script:
+    - dotnet pack .\Kafe.sln -c Release -o artifacts -p ContinuousIntegrationBuild=true
+    - dotnet nuget enable source KAFE
+    - dotnet nuget update source KAFE
+      --source "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/nuget/index.json"
+      --username gitlab-ci-token
+      --password $CI_JOB_TOKEN
+      --store-password-in-clear-text
+    - dotnet nuget push "artifacts/*.nupkg" --source KAFE
+  when: manual

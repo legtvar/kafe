@@ -1,25 +1,17 @@
 using System;
-using System.Collections.Immutable;
-using System.Linq;
 
 namespace Kafe;
 
 public class KafeErrorException : Exception
 {
-    public KafeErrorException(Diagnostic error) : base(error.Message.ToString(), error.InnerException)
+    public KafeErrorException(Diagnostic diagnostic)
+        : base($"A '{diagnostic.Descriptor.KafeType}' has been thrown as exception.")
     {
-        InnerErrors = [error];
-        StackTrace = error.StackTrace;
+        Diagnostic = diagnostic;
+        StackTrace = diagnostic.StackTrace;
     }
 
-    public KafeErrorException(ImmutableArray<Diagnostic> errors)
-        : base($"One or more KAFE errors occurred:{string.Join("\n- ", errors.Select(e => e.Message))}")
-    {
-        InnerErrors = errors;
-        StackTrace = errors.FirstOrDefault().StackTrace;
-    }
-
-    public ImmutableArray<Diagnostic> InnerErrors { get; }
+    public Diagnostic Diagnostic { get; }
 
     public override string? StackTrace { get; }
 }

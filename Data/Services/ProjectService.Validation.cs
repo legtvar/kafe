@@ -53,8 +53,7 @@ public partial class ProjectService
     };
     public static readonly string[] AllowedSubtitleCodecs = new[]
     {
-        "subrip",
-        "ass"
+        "subrip"
     };
     public static readonly string[] AllowedImageMimeTypes = new[]
     {
@@ -63,8 +62,9 @@ public partial class ProjectService
     };
     public const long Mp3MinBitrate = 192000;
     public const string Mp3MinBitrateDescription = "192 kbps";
-    public const double RequiredFramerate = 24.0;
-    public const string RequiredFramerateDescription = "24 fps";
+    public static readonly double[] RequiredFramerate = [24.0, 25.0];
+    public const string RequiredFramerateDescriptionEnglish = "24 or 25 fps";
+    public const string RequiredFramerateDescriptionCzech = "24 nebo 25 fps";
 
     public static long VideoAnnotationMaxFileLength = 512 << 20; // 512 MiB
     public static string VideoAnnotationMaxFileLengthDescription = "512 GiB";
@@ -435,8 +435,8 @@ public partial class ProjectService
         Kind: DiagnosticKind.Error,
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
-            (Const.InvariantCulture, $"The film file has an unsupported framerate. The required framerate is {RequiredFramerateDescription}."),
-            (Const.CzechCulture, $"Soubor s filmem má nepodporovaný framerate. Vyžadovaný framerate je {RequiredFramerateDescription}.")
+            (Const.InvariantCulture, $"The film file has an unsupported framerate. The required framerate is {RequiredFramerateDescriptionEnglish}."),
+            (Const.CzechCulture, $"Soubor s filmem má nepodporovaný framerate. Vyžadovaný framerate je {RequiredFramerateDescriptionCzech}.")
         )
     );
 
@@ -444,8 +444,8 @@ public partial class ProjectService
         Kind: DiagnosticKind.Error,
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
-            (Const.InvariantCulture, $"The video-annotation file has an unsupported framerate. The required framerate is {RequiredFramerateDescription}."),
-            (Const.CzechCulture, $"Soubor s videoanotací má nepodporovaný framerate. Vyžadovaný framerate je {RequiredFramerateDescription}.")
+            (Const.InvariantCulture, $"The video-annotation file has an unsupported framerate. The required framerate is {RequiredFramerateDescriptionEnglish}."),
+            (Const.CzechCulture, $"Soubor s videoanotací má nepodporovaný framerate. Vyžadovaný framerate je {RequiredFramerateDescriptionCzech}.")
         )
     );
 
@@ -947,7 +947,7 @@ public partial class ProjectService
             yield return mp3BitrateTooLowError;
         }
 
-        if (videoStream.Framerate != RequiredFramerate)
+        if (!RequiredFramerate.Contains(videoStream.Framerate))
         {
             yield return unsupportedFramerateError;
         }

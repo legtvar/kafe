@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using System.Collections.ObjectModel;
+using System.Reflection;
+using Kafe.Diagnostics;
 
 namespace Kafe;
 
@@ -152,7 +154,9 @@ public sealed record class ModContext
     {
         options ??= DiagnosticDescriptorRegistrationOptions.Default;
 
-        var typeName = options.Name;
+        var payloadAttribute = diagnosticPayloadType.GetCustomAttribute<DiagnosticPayloadAttribute>();
+
+        var typeName = options.Name ?? payloadAttribute?.Name;
         if (string.IsNullOrWhiteSpace(typeName))
         {
             typeName = diagnosticPayloadType.Name;

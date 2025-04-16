@@ -1,12 +1,13 @@
+using Kafe.Diagnostics;
+
 namespace Kafe.Core.Diagnostics;
 
+[DiagnosticPayload(Name = "locked")]
 public record LockedDiagnostic(
     KafeType EntityType,
     Hrib Id
 )
 {
-    public const string DiagnosticId = "locked";
-    
     public const DiagnosticSeverity DefaultSeverity = DiagnosticSeverity.Error;
 
     public static readonly LocalizedString Title = LocalizedString.Create(

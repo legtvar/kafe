@@ -1,12 +1,13 @@
+using Kafe.Diagnostics;
+
 namespace Kafe.Core.Diagnostics;
 
+[DiagnosticPayload(Name = "parameter")]
 public record ParameterDiagnostic(
     string Parameter,
     Diagnostic Inner
 )
 {
-    public const string DiagnosticId = "parameter";
-
     public const DiagnosticSeverity DefaultSeverity = DiagnosticSeverity.Error;
 
     public static readonly LocalizedString Title = LocalizedString.Create(

@@ -1,12 +1,13 @@
+using Kafe.Diagnostics;
+
 namespace Kafe.Core.Diagnostics;
 
+[DiagnosticPayload(Name = "already-exists")]
 public record AlreadyExistsDiagnostic(
     KafeType EntityType,
     Hrib Id
 )
 {
-    public const string DiagnosticId = "already-exists";
-
     public const DiagnosticSeverity DefaultSeverity = DiagnosticSeverity.Error;
 
     public static readonly LocalizedString Title = LocalizedString.Create(

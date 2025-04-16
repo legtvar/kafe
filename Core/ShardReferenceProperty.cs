@@ -4,6 +4,8 @@ using System.Text.Json.Serialization;
 
 namespace Kafe.Core;
 
+
+[JsonConverter(typeof(ShardReferencePropertyJsonConverter))]
 public record ShardReferenceProperty(
     Hrib ShardId
 );

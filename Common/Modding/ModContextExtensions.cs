@@ -1,3 +1,7 @@
+using System;
+using System.Configuration.Assemblies;
+using System.Reflection;
+
 namespace Kafe;
 
 public static class ModContextExtensions
@@ -32,5 +36,13 @@ public static class ModContextExtensions
     )
     {
         return c.AddDiagnostic(typeof(T), options);
+    }
+
+    public static DiagnosticDescriptor AddDiagnosticFromAssembly(
+        this ModContext c,
+        Assembly assembly
+    )
+    {
+        throw new NotImplementedException();
     }
 }

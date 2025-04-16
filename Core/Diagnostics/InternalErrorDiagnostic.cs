@@ -1,13 +1,13 @@
 using System;
+using Kafe.Diagnostics;
 
 namespace Kafe.Core.Diagnostics;
 
+[DiagnosticPayload(Name = "internal-error")]
 public record InternalErrorDiagnostic(
     Exception? Exception
 )
 {
-    public const string DiagnosticId = "internal-error";
-
     public const DiagnosticSeverity DefaultSeverity = DiagnosticSeverity.Error;
 
     public static readonly LocalizedString Title = LocalizedString.Create(

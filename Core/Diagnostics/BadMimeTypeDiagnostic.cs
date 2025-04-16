@@ -1,11 +1,12 @@
+using Kafe.Diagnostics;
+
 namespace Kafe.Core.Diagnostics;
 
+[DiagnosticPayload(Name = "bad-mime-type")]
 public record BadMimeTypeDiagnostic(
     string Value
 )
 {
-    public const string Id = "bad-mime-type";
-
     public const DiagnosticSeverity DefaultSeverity = DiagnosticSeverity.Error;
 
     public static readonly LocalizedString Title = LocalizedString.Create(

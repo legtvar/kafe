@@ -1,12 +1,13 @@
+using Kafe.Diagnostics;
+
 namespace Kafe.Core.Diagnostics;
 
+[DiagnosticPayload(Name = "unmodified")]
 public record UnmodifiedDiagnostic(
     KafeType EntityType,
     Hrib Id
 )
 {
-    public const string DiagnosticId = "unmodified";
-
     public const DiagnosticSeverity DefaultSeverity = DiagnosticSeverity.Warning;
 
     public static readonly LocalizedString Title = LocalizedString.Create(

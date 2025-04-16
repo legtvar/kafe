@@ -1,45 +1,71 @@
-﻿namespace Kafe.Core;
+﻿using Kafe.Core.Diagnostics;
+
+namespace Kafe.Core;
 
 [Mod(Name)]
 public sealed class CoreMod : IMod
 {
     public const string Name = "core";
 
-    public void Configure(ModContext context)
+    public void Configure(ModContext c)
     {
-        context.AddArtifactProperty<LocalizedString>(new()
+        AddArtifactProperties(c);
+        AddShards(c);
+        AddRequirements(c);
+        AddDiagnostics(c);
+    }
+
+    private static void AddArtifactProperties(ModContext c)
+    {
+        c.AddArtifactProperty<LocalizedString>(new()
         {
             Name = "localized-string",
             Converter = new LocalizedStringJsonConverter(),
         });
-        context.AddArtifactProperty<DateTimeProperty>(new()
+        c.AddArtifactProperty<DateTimeProperty>(new()
         {
             Name = "date-time",
             Converter = new DateTimePropertyJsonConverter(),
         });
-        context.AddArtifactProperty<KafeString>(new()
+        c.AddArtifactProperty<KafeString>(new()
         {
             Name = "string",
             Converter = new KafeStringJsonConverter(),
         });
-        context.AddArtifactProperty<NumberProperty>(new()
+        c.AddArtifactProperty<NumberProperty>(new()
         {
             Name = "number",
             Converter = new NumberPropertyJsonConverter(),
         });
-        context.AddArtifactProperty<ShardReferenceProperty>(new()
+        c.AddArtifactProperty<ShardReferenceProperty>(new()
         {
             Name = "shard-ref",
             Converter = new ShardReferencePropertyJsonConverter(),
         });
-        context.AddArtifactProperty<AuthorReferenceProperty>(new()
+        c.AddArtifactProperty<AuthorReferenceProperty>(new()
         {
             Name = "author-ref",
             DefaultRequirements = [
                 new AuthorReferenceNameOrIdRequirement()
             ]
         });
-        context.AddRequirement<AuthorReferenceNameOrIdRequirement>(new()
+    }
+
+    private static void AddShards(ModContext c)
+    {
+        c.AddShard<BlobShard>(new()
+        {
+            Name = "blob"
+        });
+        c.AddShard<ArchiveShard>(new()
+        {
+            Name = "archive"
+        });
+    }
+    
+    private static void AddRequirements(ModContext c)
+    {
+        c.AddRequirement<AuthorReferenceNameOrIdRequirement>(new()
         {
             Name = "author-ref-name-or-id",
             Accessibility = KafeTypeAccessibility.Internal,
@@ -47,13 +73,10 @@ public sealed class CoreMod : IMod
                 typeof(AuthorReferenceNameOrIdRequirementHandler)
             ]
         });
-        context.AddShard<BlobShard>(new()
-        {
-            Name = "blob"
-        });
-        context.AddShard<ArchiveShard>(new()
-        {
-            Name = "archive"
-        });
+    }
+    
+    private static void AddDiagnostics(ModContext c)
+    {
+        c.AddDiagnosticFromAssembly(typeof(CoreMod).Assembly);
     }
 }

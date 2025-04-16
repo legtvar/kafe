@@ -1,9 +1,10 @@
+using Kafe.Diagnostics;
+
 namespace Kafe.Core.Diagnostics;
 
+[DiagnosticPayload(Name = "empty-hrib")]
 public record EmptyHribDiagnostic
 {
-    public const string DiagnosticId = "empty-hrib";
-    
     public const DiagnosticSeverity DefaultSeverity = DiagnosticSeverity.Error;
 
     public static readonly LocalizedString Title = LocalizedString.Create(

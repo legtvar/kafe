@@ -1,11 +1,12 @@
+using Kafe.Diagnostics;
+
 namespace Kafe.Core.Diagnostics;
 
+[DiagnosticPayload(Name = "shard-analysis-failure")]
 public record ShardAnalysisFailureDiagnostic(
     KafeType ShardType
 )
 {
-    public const string Id = "shard-analysis-failure";
-
     public const DiagnosticSeverity DefaultSeverity = DiagnosticSeverity.Error;
 
     public static readonly LocalizedString Title = LocalizedString.Create(

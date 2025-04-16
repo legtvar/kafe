@@ -1,12 +1,13 @@
+using Kafe.Diagnostics;
+
 namespace Kafe.Core.Diagnostics;
 
+[DiagnosticPayload(Name = "not-found")]
 public record NotFoundDiagnostic(
     KafeType EntityType,
     Hrib Id
 )
 {
-    public const string DiagnosticId = "not-found";
-
     public const DiagnosticSeverity DefaultSeverity = DiagnosticSeverity.Error;
 
     public static readonly LocalizedString Title = LocalizedString.Create(

@@ -11,5 +11,5 @@ public interface IDiagnosticPayload
     public static virtual LocalizedString? Description { get; }
     public static virtual LocalizedString? MessageFormat { get; }
     public static virtual string? HelpLinkUri { get; }
-    public static virtual DiagnosticSeverity DefaultSeverity { get; } = DiagnosticSeverity.Error;
+    public static virtual DiagnosticSeverity? DefaultSeverity { get; }
 }

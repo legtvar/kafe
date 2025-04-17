@@ -3,13 +3,14 @@ using Kafe.Diagnostics;
 
 namespace Kafe.Core.Diagnostics;
 
-[DiagnosticPayload(Name = "aggregate")]
 public record AggregateDiagnostic(
     ImmutableArray<Diagnostic> Inner,
     long Count
 ) : IDiagnosticPayload
 {
-    public const DiagnosticSeverity DefaultSeverity = DiagnosticSeverity.Error;
+    public static string Name { get; } = "aggregate";
+
+    public static DiagnosticSeverity DefaultSeverity { get; } = DiagnosticSeverity.Error;
 
     public static LocalizedString Title { get; } = LocalizedString.Create(
         (Const.InvariantCulture, "Aggregate Diagnostic"),

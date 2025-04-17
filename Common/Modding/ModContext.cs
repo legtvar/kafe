@@ -10,6 +10,8 @@ namespace Kafe;
 public sealed record class ModContext
 {
     private HashSet<KafeType> types = [];
+    
+    public const DiagnosticSeverity DefaultDiagnosticSeverity = DiagnosticSeverity.Error;
 
     public ModContext(
         string name,
@@ -154,9 +156,42 @@ public sealed record class ModContext
     {
         options ??= DiagnosticDescriptorRegistrationOptions.Default;
 
-        var payloadAttribute = diagnosticPayloadType.GetCustomAttribute<DiagnosticPayloadAttribute>();
+        if (diagnosticPayloadType.IsAssignableTo(typeof(IDiagnosticPayload)))
+        {
+            options.Name ??= diagnosticPayloadType.GetStaticPropertyValue<string>(
+                propertyName: nameof(IDiagnosticPayload.Name),
+                isRequired: false,
+                allowNull: true
+            );
+            options.Title ??= diagnosticPayloadType.GetStaticPropertyValue<LocalizedString>(
+                propertyName: nameof(IDiagnosticPayload.Title),
+                isRequired: false,
+                allowNull: true
+            );
+            options.Description ??= diagnosticPayloadType.GetStaticPropertyValue<LocalizedString>(
+                propertyName: nameof(IDiagnosticPayload.Description),
+                isRequired: false,
+                allowNull: true
+            );
+            options.MessageFormat ??= diagnosticPayloadType.GetStaticPropertyValue<LocalizedString>(
+                propertyName: nameof(IDiagnosticPayload.MessageFormat),
+                isRequired: false,
+                allowNull: true
+            );
+            options.HelpLinkUri ??= diagnosticPayloadType.GetStaticPropertyValue<string>(
+                propertyName: nameof(IDiagnosticPayload.HelpLinkUri),
+                isRequired: false,
+                allowNull: true
+            );
+            options.DefaultSeverity ??= diagnosticPayloadType.GetStaticPropertyValue<DiagnosticSeverity>(
+                propertyName: nameof(IDiagnosticPayload.DefaultSeverity),
+                isRequired: false,
+                allowNull: true
+            );
+        }
 
-        var typeName = options.Name ?? payloadAttribute?.Name;
+
+        var typeName = options.Name ?? diagnosticPayloadType.Name;
         if (string.IsNullOrWhiteSpace(typeName))
         {
             typeName = diagnosticPayloadType.Name;
@@ -187,7 +222,7 @@ public sealed record class ModContext
             HelpLinkUri = options.HelpLinkUri,
             MessageFormat = options.MessageFormat
                 ?? LocalizedString.Format(DiagnosticDescriptor.FallbackMessageFormat, kafeType),
-            DefaultSeverity = options.DefaultSeverity
+            DefaultSeverity = options.DefaultSeverity ?? DefaultDiagnosticSeverity
         };
         DiagnosticDescriptorRegistry.Register(descriptor);
         return descriptor;
@@ -227,14 +262,14 @@ public sealed record class ModContext
     {
         public static readonly DiagnosticDescriptorRegistrationOptions Default = new();
 
-        public LocalizedString? Title { get; init; }
+        public LocalizedString? Title { get; set; }
 
-        public LocalizedString? Description { get; init; }
+        public LocalizedString? Description { get; set; }
 
-        public string? HelpLinkUri { get; init; }
+        public string? HelpLinkUri { get; set; }
 
-        public LocalizedString? MessageFormat { get; init; }
+        public LocalizedString? MessageFormat { get; set; }
 
-        public DiagnosticSeverity DefaultSeverity { get; init; } = DiagnosticSeverity.Error;
+        public DiagnosticSeverity? DefaultSeverity { get; set; }
     }
 }

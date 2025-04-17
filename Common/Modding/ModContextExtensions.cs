@@ -1,6 +1,9 @@
 using System;
+using System.Collections.Immutable;
 using System.Configuration.Assemblies;
+using System.Linq;
 using System.Reflection;
+using Kafe.Diagnostics;
 
 namespace Kafe;
 
@@ -38,11 +41,19 @@ public static class ModContextExtensions
         return c.AddDiagnostic(typeof(T), options);
     }
 
-    public static DiagnosticDescriptor AddDiagnosticFromAssembly(
+    public static ImmutableArray<DiagnosticDescriptor> AddDiagnosticFromAssembly(
         this ModContext c,
         Assembly assembly
     )
     {
-        throw new NotImplementedException();
+        var payloadTypes = assembly.GetTypes()
+            .Where(t => t.IsAssignableTo(typeof(IDiagnosticPayload)))
+            .ToImmutableArray();
+        var builder = ImmutableArray.CreateBuilder<DiagnosticDescriptor>();
+        foreach (var payloadType in payloadTypes)
+        {
+            builder.Add(c.AddDiagnostic(payloadType));
+        }
+        return builder.ToImmutable();
     }
 }

@@ -2,12 +2,13 @@ using Kafe.Diagnostics;
 
 namespace Kafe.Core.Diagnostics;
 
-[DiagnosticPayload(Name = "bad-type")]
 public record BadKafeTypeDiagnostic(
     string Value
-)
+) : IDiagnosticPayload
 {
-    public const DiagnosticSeverity DefaultSeverity = DiagnosticSeverity.Error;
+    public static string Name { get; } = "bad-type";
+
+    public static DiagnosticSeverity DefaultSeverity { get; } = DiagnosticSeverity.Error;
 
     public static readonly LocalizedString Title = LocalizedString.Create(
         (Const.InvariantCulture, "Bad Type"),

@@ -62,7 +62,7 @@ public sealed class CoreMod : IMod
             Name = "archive"
         });
     }
-    
+
     private static void AddRequirements(ModContext c)
     {
         c.AddRequirement<AuthorReferenceNameOrIdRequirement>(new()
@@ -74,7 +74,7 @@ public sealed class CoreMod : IMod
             ]
         });
     }
-    
+
     private static void AddDiagnostics(ModContext c)
     {
         c.AddDiagnosticFromAssembly(typeof(CoreMod).Assembly);

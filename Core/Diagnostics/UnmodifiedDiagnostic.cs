@@ -1,14 +1,16 @@
+using System;
 using Kafe.Diagnostics;
 
 namespace Kafe.Core.Diagnostics;
 
-[DiagnosticPayload(Name = "unmodified")]
 public record UnmodifiedDiagnostic(
     KafeType EntityType,
     Hrib Id
-)
+) : IDiagnosticPayload
 {
-    public const DiagnosticSeverity DefaultSeverity = DiagnosticSeverity.Warning;
+    public static string Name { get; } = "unmodified";
+
+    public static DiagnosticSeverity DefaultSeverity { get; } = DiagnosticSeverity.Warning;
 
     public static readonly LocalizedString Title = LocalizedString.Create(
         (Const.InvariantCulture, "Unmodified"),

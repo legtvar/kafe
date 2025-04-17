@@ -2,10 +2,11 @@ using Kafe.Diagnostics;
 
 namespace Kafe.Core.Diagnostics;
 
-[DiagnosticPayload(Name = "empty-hrib")]
-public record EmptyHribDiagnostic
+public record EmptyHribDiagnostic : IDiagnosticPayload
 {
-    public const DiagnosticSeverity DefaultSeverity = DiagnosticSeverity.Error;
+    public static string Name { get; } = "empty-hrib";
+
+    public static DiagnosticSeverity DefaultSeverity { get; } = DiagnosticSeverity.Error;
 
     public static readonly LocalizedString Title = LocalizedString.Create(
         (Const.InvariantCulture, "Empty HRIB"),

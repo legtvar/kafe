@@ -2,12 +2,13 @@ using Kafe.Diagnostics;
 
 namespace Kafe.Core.Diagnostics;
 
-[DiagnosticPayload(Name = "shard-analysis-failure")]
 public record ShardAnalysisFailureDiagnostic(
     KafeType ShardType
-)
+) : IDiagnosticPayload
 {
-    public const DiagnosticSeverity DefaultSeverity = DiagnosticSeverity.Error;
+    public static string Name { get; } = "shard-analysis-failure";
+
+    public static DiagnosticSeverity DefaultSeverity { get; } = DiagnosticSeverity.Error;
 
     public static readonly LocalizedString Title = LocalizedString.Create(
         (Const.InvariantCulture, "Shard Analysis Failure"),

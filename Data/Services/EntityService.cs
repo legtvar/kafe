@@ -49,7 +49,7 @@ public class EntityService
         CancellationToken token = default
     )
     {
-        return await db.KafeLoadAsync<EntityPermissionInfo>(entityId, token);
+        return await MartenExtensions.LoadAsync<EntityPermissionInfo>(db, entityId, token);
     }
 
     public async Task<Err<ImmutableArray<EntityPermissionInfo>>> LoadPermissionInfoMany(
@@ -73,7 +73,7 @@ public class EntityService
         {
             if (perms.Errors.All(e => e.Id == Kafe.Diagnostic.NotFoundId) && !accessingAccountId.IsEmpty)
             {
-                var accessingAccount = (await db.KafeLoadAsync<AccountInfo>(accessingAccountId, token)).Unwrap();
+                var accessingAccount = (await MartenExtensions.LoadAsync<AccountInfo>(db, accessingAccountId, token)).Unwrap();
                 return accessingAccount.Permissions.GetValueOrDefault(entityId.ToString());
             }
 

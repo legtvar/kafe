@@ -125,8 +125,9 @@ public class DataMod : IMod
 
         services.AddSingleton<StorageService>();
         services.AddSingleton<EntityMetadataProvider>();
-        services.AddSingleton<KafeTypeRegistry>();
-        services.AddSingleton<KafeObjectFactory>();
+        
+        services.AddScoped<IKafeQuerySession, KafeDocumentSession>();
+        services.AddScoped<IKafeDocumentSession, KafeDocumentSession>();
 
         services.AddScoped<AccountService>();
         services.AddScoped<ProjectGroupService>();

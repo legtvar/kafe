@@ -5,12 +5,16 @@ namespace Kafe;
 
 public class RequirementTypeRegistry : SubtypeRegistryBase<RequirementTypeMetadata>
 {
+    public const string SubtypePrimary = "req";
+
+    public static readonly LocalizedString FallbackName = LocalizedString.Create(
+        (Const.InvariantCulture, "requirement of type '{0}'"),
+        (Const.CzechCulture, "požadavek typu '{0}'")
+    );
 }
 
 public static class RequirementTypeModContextExtensions
 {
-    public const string SubtypePrimary = "req";
-
     public static KafeType AddRequirement(
         this ModContext c,
         Type requirementType,
@@ -19,7 +23,7 @@ public static class RequirementTypeModContextExtensions
     {
         var requirementTypeRegistry = c.RequireSubtypeRegistry<RequirementTypeMetadata>();
         options ??= RequirementRegistrationOptions.Default;
-        options.Subtype ??= SubtypePrimary;
+        options.Subtype ??= RequirementTypeRegistry.SubtypePrimary;
 
         if (string.IsNullOrWhiteSpace(options.Name))
         {
@@ -28,6 +32,11 @@ public static class RequirementTypeModContextExtensions
             typeName = Naming.ToDashCase(typeName);
             options.Name = typeName;
         }
+
+        options.HumanReadableName ??= LocalizedString.Format(
+            RequirementTypeRegistry.FallbackName,
+            options.Name
+        );
 
         var kafeType = c.AddType(requirementType, options);
         requirementTypeRegistry.Register(new(

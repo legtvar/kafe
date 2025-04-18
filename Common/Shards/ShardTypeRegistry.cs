@@ -5,11 +5,16 @@ namespace Kafe;
 
 public class ShardTypeRegistry : SubtypeRegistryBase<ShardTypeMetadata>
 {
+    public const string SubtypePrimary = "shard";
+
+    public static readonly LocalizedString FallbackName = LocalizedString.Create(
+        (Const.InvariantCulture, "shard of type '{0}'"),
+        (Const.CzechCulture, "střípek typu '{0}'")
+    );
 }
 
 public static class ShardTypeModContextExtensions
 {
-    public const string SubtypePrimary = "shard";
 
     public static KafeType AddShard(
         this ModContext c,
@@ -19,7 +24,7 @@ public static class ShardTypeModContextExtensions
     {
         var shardTypeRegistry = c.RequireSubtypeRegistry<ShardTypeMetadata>();
         options ??= ShardRegistrationOptions.Default;
-        options.Subtype ??= SubtypePrimary;
+        options.Subtype ??= ShardTypeRegistry.SubtypePrimary;
 
         if (string.IsNullOrWhiteSpace(options.Name))
         {
@@ -29,6 +34,11 @@ public static class ShardTypeModContextExtensions
             typeName = Naming.ToDashCase(typeName);
             options.Name = typeName;
         }
+
+        options.HumanReadableName ??= LocalizedString.Format(
+            ShardTypeRegistry.FallbackName,
+            options.Name
+        );
 
         var kafeType = c.AddType(shardType, options);
         shardTypeRegistry.Register(new(

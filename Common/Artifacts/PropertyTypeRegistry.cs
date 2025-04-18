@@ -5,12 +5,16 @@ namespace Kafe;
 
 public class PropertyTypeRegistry : SubtypeRegistryBase<PropertyTypeMetadata>
 {
+    public const string SubtypePrimary = "";
+
+    public static readonly LocalizedString FallbackName = LocalizedString.Create(
+        (Const.InvariantCulture, "artifact property of type '{0}'"),
+        (Const.CzechCulture, "vlastnost artefaktu typu '{0}'")
+    );
 }
 
 public static class PropertyTypeModContextExtensions
 {
-    public const string SubtypePrimary = "";
-
     public static KafeType AddArtifactProperty(
         this ModContext c,
         Type propertyType,
@@ -19,7 +23,7 @@ public static class PropertyTypeModContextExtensions
     {
         var propertyTypeRegistry = c.RequireSubtypeRegistry<PropertyTypeMetadata>();
         options ??= PropertyRegistrationOptions.Default;
-        options.Subtype ??= SubtypePrimary;
+        options.Subtype ??= PropertyTypeRegistry.SubtypePrimary;
 
         if (string.IsNullOrWhiteSpace(options.Name))
         {
@@ -29,6 +33,11 @@ public static class PropertyTypeModContextExtensions
             typeName = Naming.ToDashCase(typeName);
             options.Name = typeName;
         }
+
+        options.HumanReadableName ??= LocalizedString.Format(
+            PropertyTypeRegistry.FallbackName,
+            options.Name
+        );
 
         var kafeType = c.AddType(propertyType, options);
         propertyTypeRegistry.Register(new(

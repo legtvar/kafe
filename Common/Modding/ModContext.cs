@@ -4,7 +4,6 @@ using System.Text.Json.Serialization;
 using System.Collections.ObjectModel;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Kafe;
 
@@ -41,8 +40,6 @@ public sealed record class ModContext
 
     public IReadOnlyDictionary<Type, ISubtypeRegistry> SubtypeRegistries { get; }
 
-    public IServiceCollection Services { get; }
-
     /// <summary>
     /// Types that were registered by this mod through the <see cref="AddType"/> subtype registration methods.
     /// </summary>
@@ -61,12 +58,14 @@ public sealed record class ModContext
             ? new KafeType(
                 mod: Name,
                 primary: typeName,
-                secondary: null
+                secondary: null,
+                name: options.HumanReadableName
             )
             : new KafeType(
                 mod: Name,
                 primary: options.Subtype,
-                secondary: typeName
+                secondary: typeName,
+                name: options.HumanReadableName
             );
 
         TypeRegistry.Register(new(
@@ -84,9 +83,19 @@ public sealed record class ModContext
 
         public KafeTypeAccessibility Accessibility { get; set; } = KafeTypeAccessibility.Public;
 
+        /// <summary>
+        /// Short, dash-case name. Will be used for <see cref="KafeType.Primary"/> if <see cref="Subtype"/> is null or 
+        /// empty, or for <see cref="KafeType.Secondary"/> if <see cref="Subtype"/> is defined.
+        /// </summary>
         public string? Name { get; set; }
 
+        /// <summary>
+        /// The "subtype" or category of this type. Used for <see cref="KafeType.Primary"/>.
+        /// This property is typically set automatically through <see cref="ModContext"/> extension methods.
+        /// </summary>
         public string? Subtype { get; set; }
+
+        public LocalizedString? HumanReadableName { get; set; }
 
         public JsonConverter? Converter { get; set; }
     }

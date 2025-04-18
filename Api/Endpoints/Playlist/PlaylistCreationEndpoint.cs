@@ -63,7 +63,7 @@ public class PlaylistCreationEndpoint : EndpointBaseAsync
             ownerId: userProvider.AccountId,
             token: cancellationToken);
 
-        if (playlist.HasErrors)
+        if (playlist.Diagnostic is not null)
         {
             return this.KafeErrResult(playlist);
         }

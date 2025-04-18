@@ -40,8 +40,6 @@ public readonly record struct Err<T>
 
     public Diagnostic? Diagnostic => diagnostic;
 
-    public bool HasErrors => diagnostic is not null;
-
 
     public static implicit operator Err<T>(T value)
     {
@@ -97,7 +95,7 @@ public readonly record struct Err<T>
 
     public T? GetValueOrDefault()
     {
-        return HasErrors ? default : Value;
+        return Diagnostic is not null ? default : Value;
     }
 
     public Err<T> WithErrors(params IEnumerable<Error> newErrors)

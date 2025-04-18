@@ -50,7 +50,7 @@ public class ProjectGroupLockEndpoint : EndpointBaseAsync
             if (!project.IsLocked)
             {
                 var result = await projectService.Lock(project.Id, cancellationToken);
-                if (result.HasErrors)
+                if (result.Diagnostic is not null)
                 {
                     errors.Add(project.Id);
                 }

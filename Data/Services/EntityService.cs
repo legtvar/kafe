@@ -5,6 +5,7 @@ using System.Data;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Kafe.Core.Diagnostics;
 using Kafe.Data.Aggregates;
 using Kafe.Data.Documents;
 using Kafe.Data.Events;
@@ -14,9 +15,9 @@ namespace Kafe.Data.Services;
 
 public class EntityService
 {
-    private readonly IDocumentSession db;
+    private readonly IKafeDocumentSession db;
 
-    public EntityService(IDocumentSession db)
+    public EntityService(IKafeDocumentSession db)
     {
         this.db = db;
     }
@@ -49,7 +50,7 @@ public class EntityService
         CancellationToken token = default
     )
     {
-        return await MartenExtensions.LoadAsync<EntityPermissionInfo>(db, entityId, token);
+        return await db.LoadAsync<EntityPermissionInfo>(entityId, token);
     }
 
     public async Task<Err<ImmutableArray<EntityPermissionInfo>>> LoadPermissionInfoMany(
@@ -57,7 +58,7 @@ public class EntityService
         CancellationToken token = default
     )
     {
-        return await db.KafeLoadManyAsync<EntityPermissionInfo>(entityIds.ToImmutableArray(), token);
+        return await db.LoadManyAsync<EntityPermissionInfo>([.. entityIds], token);
     }
 
     public async Task<Permission> GetPermission(
@@ -69,11 +70,11 @@ public class EntityService
         var perms = await LoadPermissionInfo(entityId, token);
         // NB: Special case: The async deamon might still be processing EntityPermissionEventProjection, so we look into
         //     the account itself.
-        if (perms.HasErrors)
+        if (perms.Diagnostic is not null)
         {
-            if (perms.Errors.All(e => e.Id == Kafe.Diagnostic.NotFoundId) && !accessingAccountId.IsEmpty)
+            if (perms.Diagnostic.Value.Payload.Value is NotFoundDiagnostic)
             {
-                var accessingAccount = (await MartenExtensions.LoadAsync<AccountInfo>(db, accessingAccountId, token)).Unwrap();
+                var accessingAccount = (await db.LoadAsync<AccountInfo>(accessingAccountId, token)).Unwrap();
                 return accessingAccount.Permissions.GetValueOrDefault(entityId.ToString());
             }
 
@@ -143,8 +144,7 @@ public class EntityService
         }
         else
         {
-            var account = await db.LoadAsync<AccountInfo>(accessingAccountId.ToString(), token)
-                ?? throw new NullReferenceException("Account could not be found.");
+            var account = (await db.LoadAsync<AccountInfo>(accessingAccountId, token)).Unwrap();
 
             if (entityId != Hrib.System)
             {

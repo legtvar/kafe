@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Kafe.Core.Diagnostics;
 using Kafe.Data.Aggregates;
 using Kafe.Data.Events;
 using Kafe.Data.Metadata;
@@ -17,15 +18,19 @@ public class RoleService
     private readonly IDocumentSession db;
     private readonly OrganizationService organizationService;
     private readonly EntityMetadataProvider entityMetadataProvider;
+    private readonly DiagnosticFactory diagnosticFactory;
 
     public RoleService(
         IDocumentSession db,
         OrganizationService organizationService,
-        EntityMetadataProvider entityMetadataProvider)
+        EntityMetadataProvider entityMetadataProvider,
+        DiagnosticFactory diagnosticFactory
+    )
     {
         this.db = db;
         this.organizationService = organizationService;
         this.entityMetadataProvider = entityMetadataProvider;
+        this.diagnosticFactory = diagnosticFactory;
     }
 
     public async Task<RoleInfo?> Load(Hrib id, CancellationToken token = default)
@@ -42,10 +47,9 @@ public class RoleService
 
     public async Task<Err<RoleInfo>> Create(RoleInfo @new, CancellationToken token = default)
     {
-        var parseResult = Hrib.Parse(@new.Id);
-        if (parseResult.HasErrors)
+        if (!Hrib.TryParse(@new.Id, out var id, out _))
         {
-            return parseResult.Errors;
+            return diagnosticFactory.FromPayload(new BadHribDiagnostic(@new.Id));
         }
 
         var organization = await organizationService.Load(@new.OrganizationId, token);
@@ -54,7 +58,7 @@ public class RoleService
             return Kafe.Diagnostic.NotFound(@new.OrganizationId, "An organization");
         }
 
-        var id = parseResult.Value;
+
         if (id == Hrib.Empty)
         {
             id = Hrib.Create();
@@ -220,7 +224,7 @@ public class RoleService
             query = (IMartenQueryable<RoleInfo>)query
                 .WhereContainsLocalized(nameof(RoleInfo.Name), filter.Name);
         }
-        
+
         if (!string.IsNullOrEmpty(sort))
         {
             query = (IMartenQueryable<RoleInfo>)query.OrderBySortString(entityMetadataProvider, sort);

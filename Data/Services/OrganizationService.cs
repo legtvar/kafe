@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Kafe.Core.Diagnostics;
 using Kafe.Data.Aggregates;
 using Kafe.Data.Events;
 using Kafe.Data.Metadata;
@@ -16,13 +17,17 @@ public class OrganizationService
 {
     private readonly IDocumentSession db;
     private readonly EntityMetadataProvider entityMetadataProvider;
+    private readonly DiagnosticFactory diagnosticFactory;
 
     public OrganizationService(
         IDocumentSession db,
-        EntityMetadataProvider entityMetadataProvider)
+        EntityMetadataProvider entityMetadataProvider,
+        DiagnosticFactory diagnosticFactory
+    )
     {
         this.db = db;
         this.entityMetadataProvider = entityMetadataProvider;
+        this.diagnosticFactory = diagnosticFactory;
     }
 
     public async Task<OrganizationInfo?> Load(Hrib id, CancellationToken token = default)
@@ -39,13 +44,11 @@ public class OrganizationService
 
     public async Task<Err<OrganizationInfo>> Create(OrganizationInfo @new, CancellationToken token = default)
     {
-        var parseResult = Hrib.Parse(@new.Id);
-        if (parseResult.HasErrors)
+        if (!Hrib.TryParse(@new.Id, out var id, out _))
         {
-            return parseResult.Errors;
+            return diagnosticFactory.FromPayload(new BadHribDiagnostic(@new.Id));
         }
 
-        var id = parseResult.Value;
         if (id == Hrib.Empty)
         {
             id = Hrib.Create();
@@ -86,7 +89,7 @@ public class OrganizationService
 
         return Kafe.Diagnostic.Unmodified($"organization {modified.Id}");
     }
-    
+
     /// <summary>
     /// Filter of organizations.
     /// </summary>
@@ -125,7 +128,7 @@ public class OrganizationService
             query = (IMartenQueryable<OrganizationInfo>)query
                 .WhereContainsLocalized(nameof(OrganizationInfo.Name), filter.Name);
         }
-        
+
         if (!string.IsNullOrEmpty(sort))
         {
             query = (IMartenQueryable<OrganizationInfo>)query.OrderBySortString(entityMetadataProvider, sort);

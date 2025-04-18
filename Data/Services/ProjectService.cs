@@ -1,4 +1,5 @@
-﻿using Kafe.Data.Aggregates;
+﻿using Kafe.Core.Diagnostics;
+using Kafe.Data.Aggregates;
 using Kafe.Data.Events;
 using Kafe.Data.Metadata;
 using Marten;
@@ -21,13 +22,15 @@ public partial class ProjectService
     private readonly ArtifactService artifactService;
     private readonly AuthorService authorService;
     private readonly EntityMetadataProvider entityMetadataProvider;
+    private readonly DiagnosticFactory diagnosticFactory;
 
     public ProjectService(
         IDocumentSession db,
         AccountService accountService,
         ArtifactService artifactService,
         AuthorService authorService,
-        EntityMetadataProvider entityMetadataProvider
+        EntityMetadataProvider entityMetadataProvider,
+        DiagnosticFactory diagnosticFactory
     )
     {
         this.db = db;
@@ -35,6 +38,7 @@ public partial class ProjectService
         this.artifactService = artifactService;
         this.authorService = authorService;
         this.entityMetadataProvider = entityMetadataProvider;
+        this.diagnosticFactory = diagnosticFactory;
     }
 
     public async Task<Err<ProjectInfo>> Upsert(
@@ -47,13 +51,11 @@ public partial class ProjectService
         CancellationToken token = default
     )
     {
-        var parseResult = Hrib.Parse(project.Id);
-        if (parseResult.HasErrors)
+        if (!Hrib.TryParse(@new.Id, out var id, out _))
         {
-            return parseResult.Errors;
+            return diagnosticFactory.FromPayload(new BadHribDiagnostic(@new.Id));
         }
 
-        var id = parseResult.Value;
         if (id.IsEmpty)
         {
             id = Hrib.Create();

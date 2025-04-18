@@ -3,8 +3,7 @@ using System.Collections.Immutable;
 namespace Kafe.Core.Diagnostics;
 
 public record AggregateDiagnostic(
-    ImmutableArray<Diagnostic> Inner,
-    long Count
+    ImmutableArray<Diagnostic> Inner
 ) : IDiagnosticPayload
 {
     public static string Name { get; } = "aggregate";
@@ -13,11 +12,13 @@ public record AggregateDiagnostic(
 
     public static LocalizedString Title { get; } = LocalizedString.Create(
         (Const.InvariantCulture, "Aggregate Diagnostic"),
-        (Const.CzechCulture, "Několik hlášení")
+        (Const.CzechCulture, "Hromadné hlášení")
     );
 
     public static LocalizedString MessageFormat { get; } = LocalizedString.Create(
         (Const.InvariantCulture, "Several ({Count}) diagnostics were reported."),
         (Const.CzechCulture, "Je k dispozici {Count} hlášení.")
     );
+
+    public int Count => Inner.Length;
 }

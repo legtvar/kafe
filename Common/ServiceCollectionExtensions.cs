@@ -39,6 +39,7 @@ public static class ServiceCollectionExtensions
         );
         services.AddSingleton(typeRegistry);
         services.AddSingleton(modRegistry);
+        services.AddSingleton<KafeObjectFactory>();
 
         foreach (var mod in options.Mods)
         {

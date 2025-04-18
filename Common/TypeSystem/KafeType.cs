@@ -11,9 +11,6 @@ public partial record struct KafeType : IParsable<KafeType>
     public const char ModPrimarySeparator = ':';
     public const char PrimarySecondarySeparator = '/';
     public const string ArraySuffix = "[]";
-    public const string ShardPrimary = "shard";
-    public const string RequirementPrimary = "req";
-    public const string DiagnosticPrimary = "diag";
 
     public static readonly Regex Regex = GetRegex();
 
@@ -45,7 +42,7 @@ public partial record struct KafeType : IParsable<KafeType>
 
     /// <summary>
     /// A human-readable name.
-    /// Used in <see cref="ToString(string?, IFormatProvider?)"/> with <see cref="ShortHumanReadableFormat"/>.
+    /// Used in <see cref="ToString(string?, IFormatProvider?)"/> with <see cref="HumanReadableFormat"/>.
     /// </summary>
     public LocalizedString? Name { get; init; }
 

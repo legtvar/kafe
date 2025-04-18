@@ -1,5 +1,4 @@
 using System;
-using Kafe.Diagnostics;
 
 namespace Kafe.Core.Diagnostics;
 

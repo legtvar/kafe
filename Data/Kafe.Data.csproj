@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Common\Kafe.Common.csproj" />
+    <ProjectReference Include="..\Core\Kafe.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>

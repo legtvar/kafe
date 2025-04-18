@@ -1,45 +1,55 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 
 namespace Kafe;
 
-public class PropertyTypeRegistry
+public class PropertyTypeRegistry : SubtypeRegistryBase<PropertyTypeMetadata>
 {
-    private readonly ConcurrentDictionary<KafeType, PropertyTypeMetadata> requirements = new();
+}
 
-    public bool IsFrozen { get; private set; }
+public static class PropertyTypeModContextExtensions
+{
+    public const string SubtypePrimary = "";
 
-    public IReadOnlyDictionary<KafeType, PropertyTypeMetadata> Requirements { get; }
-
-    public PropertyTypeRegistry()
+    public static KafeType AddArtifactProperty(
+        this ModContext c,
+        Type propertyType,
+        PropertyRegistrationOptions? options = null
+    )
     {
-        Requirements = requirements.AsReadOnly();
-    }
+        var propertyTypeRegistry = c.RequireSubtypeRegistry<PropertyTypeMetadata>();
+        options ??= PropertyRegistrationOptions.Default;
+        options.Subtype ??= SubtypePrimary;
 
-    public void Freeze()
-    {
-        IsFrozen = true;
-    }
-
-    public PropertyTypeRegistry Register(PropertyTypeMetadata metadata)
-    {
-        AssertUnfrozen();
-        if (!requirements.TryAdd(metadata.KafeType, metadata))
+        if (string.IsNullOrWhiteSpace(options.Name))
         {
-            throw new ArgumentException(
-                $"Property type '{metadata.KafeType}' has been already registered.",
-                nameof(metadata)
-            );
+            var typeName = propertyType.Name;
+            typeName = Naming.WithoutSuffix(typeName, "Property");
+            typeName = Naming.WithoutSuffix(typeName, "PropertyMetadata");
+            typeName = Naming.ToDashCase(typeName);
+            options.Name = typeName;
         }
-        return this;
+
+        var kafeType = c.AddType(propertyType, options);
+        propertyTypeRegistry.Register(new(
+            KafeType: kafeType,
+            DefaultRequirements: [.. options.DefaultRequirements]
+        ));
+        return kafeType;
     }
 
-    private void AssertUnfrozen()
+    public static KafeType AddArtifactProperty<TProperty>(
+        this ModContext c,
+        PropertyRegistrationOptions? options = null
+    )
     {
-        if (IsFrozen)
-        {
-            throw new InvalidOperationException("This property type registry is frozen and can no longer be modified.");
-        }
+        return c.AddArtifactProperty(typeof(TProperty), options);
+    }
+
+    public record PropertyRegistrationOptions : ModContext.KafeTypeRegistrationOptions
+    {
+        public static new readonly PropertyRegistrationOptions Default = new();
+
+        public List<IRequirement> DefaultRequirements { get; set; } = [];
     }
 }

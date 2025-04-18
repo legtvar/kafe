@@ -1,5 +1,3 @@
-using Kafe.Diagnostics;
-
 namespace Kafe.Core.Diagnostics;
 
 public record EmptyHribDiagnostic : IDiagnosticPayload

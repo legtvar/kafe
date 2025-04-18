@@ -1,11 +1,8 @@
-﻿using Kafe.Core.Diagnostics;
+﻿namespace Kafe.Core;
 
-namespace Kafe.Core;
-
-[Mod(Name)]
 public sealed class CoreMod : IMod
 {
-    public const string Name = "core";
+    public static string Name { get; } = "core";
 
     public void Configure(ModContext c)
     {

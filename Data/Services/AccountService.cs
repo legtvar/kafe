@@ -102,7 +102,12 @@ public class AccountService(
             case AccountKind.External:
                 if (string.IsNullOrEmpty(@new.IdentityProvider))
                 {
-                    return Kafe.Diagnostic.MissingValue(nameof(@new.IdentityProvider));
+                    return diagnosticFactory.FromPayload(
+                        payload: new ParameterDiagnostic(
+                            nameof(@new.IdentityProvider),
+                            diagnosticFactory.FromPayload(new RequiredDiagnostic())),
+                        severityOverride: DiagnosticSeverity.Error
+                    );
                 }
 
                 var associated = new ExternalAccountAssociated(

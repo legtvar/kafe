@@ -11,7 +11,6 @@ namespace Kafe.Data;
 public partial class KafeDocumentSession : IKafeQuerySession
 {
     private readonly KafeTypeRegistry typeRegistry;
-    private readonly EntityTypeRegistry entityRegistry;
     private readonly DiagnosticFactory diagnosticFactory;
 
     public async Task<Err<T>> LoadAsync<T>(

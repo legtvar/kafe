@@ -1,4 +1,5 @@
-﻿using Kafe.Data.Aggregates;
+﻿using Kafe.Core.Diagnostics;
+using Kafe.Data.Aggregates;
 using Kafe.Data.Events;
 using Kafe.Data.Metadata;
 using Marten;
@@ -18,17 +19,21 @@ public class PlaylistService
     private readonly OrganizationService organizationService;
     private readonly ArtifactService artifactService;
     private readonly EntityMetadataProvider entityMetadataProvider;
+    private readonly DiagnosticFactory diagnosticFactory;
 
     public PlaylistService(
         IDocumentSession db,
         OrganizationService organizationService,
         ArtifactService artifactService,
-        EntityMetadataProvider entityMetadataProvider)
+        EntityMetadataProvider entityMetadataProvider,
+        DiagnosticFactory diagnosticFactory
+    )
     {
         this.db = db;
         this.organizationService = organizationService;
         this.artifactService = artifactService;
         this.entityMetadataProvider = entityMetadataProvider;
+        this.diagnosticFactory = diagnosticFactory;
     }
 
     /// <summary>
@@ -95,10 +100,9 @@ public class PlaylistService
         PlaylistInfo @new,
         CancellationToken token = default)
     {
-        var parseResult = Hrib.Parse(@new.Id);
-        if (parseResult.HasErrors)
+        if (!Hrib.TryParse(@new.Id, out var id, out _))
         {
-            return parseResult.Errors;
+            return diagnosticFactory.FromPayload(new BadHribDiagnostic(@new.Id));
         }
 
         var organization = await organizationService.Load(@new.OrganizationId, token);
@@ -107,7 +111,6 @@ public class PlaylistService
             return Kafe.Diagnostic.NotFound(@new.OrganizationId, "An organization");
         }
 
-        var id = parseResult.Value;
         if (id == Hrib.Empty)
         {
             id = Hrib.Create();

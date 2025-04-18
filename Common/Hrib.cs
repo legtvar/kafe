@@ -138,13 +138,18 @@ public record Hrib : IParsable<Hrib>
         return true;
     }
 
-    static Hrib IParsable<Hrib>.Parse(string value, IFormatProvider? provider)
+    public static Hrib Parse(string value)
     {
         if (!TryParse(value, out var hrib, out var error))
         {
             throw new ArgumentException($"Could not parse '{value}' as HRIB: {error}");
         }
         return hrib;
+    }
+
+    static Hrib IParsable<Hrib>.Parse(string value, IFormatProvider? _)
+    {
+        return Parse(value);
     }
 
     static bool IParsable<Hrib>.TryParse(

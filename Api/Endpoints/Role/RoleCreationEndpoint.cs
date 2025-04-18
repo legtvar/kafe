@@ -52,7 +52,7 @@ public class RoleCreationEndpoint : EndpointBaseAsync
             Description = dto.Description
         }, cancellationToken);
 
-        if (role.HasErrors)
+        if (role.Diagnostic is not null)
         {
             return this.KafeErrResult(role);
         }

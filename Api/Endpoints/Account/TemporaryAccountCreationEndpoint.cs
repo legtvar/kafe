@@ -65,7 +65,7 @@ public class TemporaryAccountCreationEndpoint : EndpointBaseAsync
             dto.PreferredCulture,
             null,
             token);
-        if (createRes.HasErrors)
+        if (createRes.Diagnostic is not null)
         {
             return this.KafeErrResult(createRes);
         }

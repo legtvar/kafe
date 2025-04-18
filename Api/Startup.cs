@@ -279,7 +279,7 @@ public class Startup
             {
                 var result = await ctx.RequestServices.GetRequiredService<AccountService>()
                     .AssociateExternalAccount(ctx.User);
-                if (result.HasErrors)
+                if (result.Diagnostic is not null)
                 {
                     await ctx.ForbidAsync();
                     return;

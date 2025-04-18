@@ -50,7 +50,7 @@ public class PlaylistCreationEndpoint : EndpointBaseAsync
                     : Permission.None
         }, cancellationToken);
 
-        if (playlist.HasErrors)
+        if (playlist.Diagnostic is not null)
         {
             return this.KafeErrResult(playlist);
         }

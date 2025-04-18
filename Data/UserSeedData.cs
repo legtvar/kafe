@@ -57,7 +57,7 @@ public class UserSeedData : IInitialData
                     account.EmailAddress,
                     account.PreferredCulture,
                     token: token);
-                if (res.HasErrors)
+                if (res.Diagnostic is not null)
                 {
                     throw res.AsException();
                 }
@@ -111,7 +111,7 @@ public class UserSeedData : IInitialData
                     CreationMethod = CreationMethod.Seed
                 },
                 token);
-            if (createResult.HasErrors)
+            if (createResult.Diagnostic is not null)
             {
                 throw createResult.AsException();
             }
@@ -146,7 +146,7 @@ public class UserSeedData : IInitialData
                 Description: null,
                 Deadline: deadline
             ));
-            if (createResult.HasErrors)
+            if (createResult.Diagnostic is not null)
             {
                 throw createResult.AsException();
             }

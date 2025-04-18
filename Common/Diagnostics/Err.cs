@@ -37,8 +37,6 @@ public readonly record struct Err<T>
 
     public Diagnostic? Diagnostic => diagnostic;
 
-    public bool HasErrors => diagnostic is not null;
-
 
     public static implicit operator Err<T>(T value)
     {
@@ -56,9 +54,9 @@ public readonly record struct Err<T>
     }
 
     // NB: This is explicit to force people to unwrap their errors properly.
-    public static explicit operator T?(Err<T> err)
+    public static explicit operator T(Err<T> err)
     {
-        return err.HasErrors ? default : err.value;
+        return err.Unwrap();
     }
 
     public KafeErrorException? AsException()
@@ -89,6 +87,6 @@ public readonly record struct Err<T>
 
     public T? GetValueOrDefault()
     {
-        return HasErrors ? default : Value;
+        return Diagnostic is not null ? default : Value;
     }
 }

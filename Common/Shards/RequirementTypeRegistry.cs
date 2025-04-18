@@ -1,7 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 
 namespace Kafe;
+
+public record RequirementTypeMetadata(
+    KafeType KafeType,
+    Type DotnetType,
+    ImmutableArray<Type> HandlerTypes
+) : ISubtypeMetadata;
 
 public class RequirementTypeRegistry : SubtypeRegistryBase<RequirementTypeMetadata>
 {
@@ -41,6 +48,7 @@ public static class RequirementTypeModContextExtensions
         var kafeType = c.AddType(requirementType, options);
         requirementTypeRegistry.Register(new(
             KafeType: kafeType,
+            DotnetType: requirementType,
             HandlerTypes: [.. options.HandlerTypes]
         ));
         return kafeType;

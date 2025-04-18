@@ -1,24 +1,35 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Reflection;
-using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 
 namespace Kafe;
 
 public class ModRegistry : IFreezable
 {
     private readonly ConcurrentDictionary<string, ModMetadata> mods = new();
-    private readonly IServiceProvider services;
+    private readonly KafeTypeRegistry typeRegistry;
+    private readonly IConfiguration configuration;
+    private readonly IHostEnvironment hostEnvironment;
+    private readonly IReadOnlyDictionary<Type, ISubtypeRegistry> subtypeRegistries;
 
     public bool IsFrozen { get; private set; }
 
     public IReadOnlyDictionary<string, ModMetadata> Mods { get; }
 
-    public ModRegistry(IServiceProvider services)
+    public ModRegistry(
+        KafeTypeRegistry typeRegistry,
+        IConfiguration configuration,
+        IHostEnvironment hostEnvironment,
+        IReadOnlyDictionary<Type, ISubtypeRegistry> subtypeRegistries
+    )
     {
         Mods = mods.AsReadOnly();
-        this.services = services;
+        this.typeRegistry = typeRegistry;
+        this.configuration = configuration;
+        this.hostEnvironment = hostEnvironment;
+        this.subtypeRegistries = subtypeRegistries;
     }
 
     public void Freeze()
@@ -26,14 +37,32 @@ public class ModRegistry : IFreezable
         IsFrozen = true;
     }
 
-    public ModRegistry Register(IMod mod)
+    public ModRegistry Register(
+        IMod mod
+    )
     {
         AssertUnfrozen();
 
         var modType = mod.GetType();
-        var modAttribute = modType.GetCustomAttribute<ModAttribute>();
-        var modName = modAttribute?.Name ?? Naming.ToDashCase(Naming.WithoutSuffix(modType.Name, "Mod"));
-        var modContext = ActivatorUtilities.CreateInstance<ModContext>(services, modName);
+        var modName = (string?)modType.GetProperty(nameof(IMod.Name))?.GetValue(null);
+        if (string.IsNullOrWhiteSpace(modName))
+        {
+            modName = modType.Name;
+        }
+
+        modName = Naming.WithoutSuffix(modName, "Mod");
+        modName = Naming.ToDashCase(modName);
+
+        // TODO: assert modName is in dash-case
+
+        var modContext = new ModContext(
+            name: modName,
+            typeRegistry: typeRegistry,
+            configuration: configuration,
+            hostEnvironment: hostEnvironment,
+            subtypeRegistries: subtypeRegistries
+        );
+
         mod.Configure(modContext);
         var metadata = new ModMetadata(
             Instance: mod,
@@ -44,6 +73,7 @@ public class ModRegistry : IFreezable
         {
             throw new ArgumentException($"A mod named '{modName}' is already registered.");
         }
+
         return this;
     }
 

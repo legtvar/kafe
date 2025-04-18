@@ -3,7 +3,7 @@ using System;
 
 namespace Kafe;
 
-public sealed record DiagnosticDescriptor
+public sealed record DiagnosticDescriptor : ISubtypeMetadata
 {
     public static readonly DiagnosticDescriptor Invalid = new();
 

@@ -1,5 +1,4 @@
 using System.Collections.Immutable;
-using Kafe.Diagnostics;
 
 namespace Kafe.Core.Diagnostics;
 

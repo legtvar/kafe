@@ -6,4 +6,4 @@ namespace Kafe;
 public record RequirementTypeMetadata(
     KafeType KafeType,
     ImmutableArray<Type> HandlerTypes
-);
+) : ISubtypeMetadata;

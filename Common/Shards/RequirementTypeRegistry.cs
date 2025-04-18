@@ -1,46 +1,54 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 
 namespace Kafe;
 
-public class RequirementTypeRegistry : IFreezable
+public class RequirementTypeRegistry : SubtypeRegistryBase<RequirementTypeMetadata>
 {
-    private readonly ConcurrentDictionary<KafeType, RequirementTypeMetadata> requirements = new();
+}
 
-    public bool IsFrozen { get; private set; }
+public static class RequirementTypeModContextExtensions
+{
+    public const string SubtypePrimary = "req";
 
-    public IReadOnlyDictionary<KafeType, RequirementTypeMetadata> Requirements { get; }
-
-    public RequirementTypeRegistry()
+    public static KafeType AddRequirement(
+        this ModContext c,
+        Type requirementType,
+        RequirementRegistrationOptions? options = null
+    )
     {
-        Requirements = requirements.AsReadOnly();
-    }
+        var requirementTypeRegistry = c.RequireSubtypeRegistry<RequirementTypeMetadata>();
+        options ??= RequirementRegistrationOptions.Default;
+        options.Subtype ??= SubtypePrimary;
 
-    public void Freeze()
-    {
-        IsFrozen = true;
-    }
-
-    public RequirementTypeRegistry Register(RequirementTypeMetadata metadata)
-    {
-        AssertUnfrozen();
-        if (!requirements.TryAdd(metadata.KafeType, metadata))
+        if (string.IsNullOrWhiteSpace(options.Name))
         {
-            throw new ArgumentException(
-                $"Requirement type '{metadata.KafeType}' has been already registered.",
-                nameof(metadata)
-            );
+            var typeName = requirementType.Name;
+            typeName = Naming.WithoutSuffix(typeName, "Requirement");
+            typeName = Naming.ToDashCase(typeName);
+            options.Name = typeName;
         }
-        return this;
+
+        var kafeType = c.AddType(requirementType, options);
+        requirementTypeRegistry.Register(new(
+            KafeType: kafeType,
+            HandlerTypes: [.. options.HandlerTypes]
+        ));
+        return kafeType;
     }
 
-    private void AssertUnfrozen()
+    public static KafeType AddRequirement<TRequirement>(
+        this ModContext c,
+        RequirementRegistrationOptions? options = null
+    ) where TRequirement : IRequirement
     {
-        if (IsFrozen)
-        {
-            throw new InvalidOperationException("This requirement type registry is frozen "
-                + "and can no longer be modified.");
-        }
+        return c.AddRequirement(typeof(TRequirement), options);
+    }
+
+    public record RequirementRegistrationOptions : ModContext.KafeTypeRegistrationOptions
+    {
+        public static new readonly RequirementRegistrationOptions Default = new();
+
+        public List<Type> HandlerTypes { get; set; } = [];
     }
 }

@@ -1,9 +1,12 @@
 <Project>
   <!-- https://www.strathweb.com/2018/07/solution-wide-nuget-package-version-handling-with-msbuild-15/ -->
   <ItemGroup>
-    <PackageReference Update="System.Text.Json" Version="9.0.3" />
-    <PackageReference Update="Microsoft.Extensions.Options.DataAnnotations" Version="9.0.3" />
-    <PackageReference Update="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.3" />
+    <PackageReference Update="System.Text.Json" Version="9.0.4" />
+    <PackageReference Update="Microsoft.Extensions.Options.DataAnnotations" Version="9.0.4" />
+    <PackageReference Update="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.4" />
+    <PackageReference Update="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.4" />
+    <PackageReference Update="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.4" />
+    <PackageReference Update="Microsoft.Extensions.Logging.Abstractions" Version="9.0.4" />
     <PackageReference Update="Serilog.AspNetCore" Version="9.0.0" />
   </ItemGroup>
 </Project>

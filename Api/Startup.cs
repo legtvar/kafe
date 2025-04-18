@@ -230,7 +230,6 @@ public class Startup
 
     public void Configure(IApplicationBuilder app)
     {
-        app.ApplicationServices.ConfigureKafeMods();
         PopulateMimeTypes(
             app.ApplicationServices.GetRequiredService<FileExtensionMimeMap>(),
             app.ApplicationServices.GetRequiredService<FileExtensionContentTypeProvider>()
@@ -304,11 +303,17 @@ public class Startup
 
     private void RegisterKafe(IServiceCollection services)
     {
-        services.AddKafeCommon();
-        services.AddKafeData();
-        services.AddKafeMod<CoreMod>();
-        services.AddKafeMod<MediaMod>();
-        services.AddKafeMod<PolygonsMod>();
+        services.AddKafe(
+            Configuration,
+            Environment,
+            o =>
+            {
+                o.AddMod<CoreMod>();
+                o.AddMod<DataMod>();
+                o.AddMod<MediaMod>();
+                o.AddMod<PolygonsMod>();
+            }
+        );
 
         services.AddScoped<UserProvider>();
 
@@ -391,10 +396,10 @@ public class Startup
         services.AddDataProtection()
             .PersistKeysToFileSystem(new DirectoryInfo(secretsFullPath));
     }
-    
+
     private void PopulateMimeTypes(FileExtensionMimeMap map, FileExtensionContentTypeProvider provider)
     {
-        foreach(var entry in provider.Mappings)
+        foreach (var entry in provider.Mappings)
         {
             map.Add(entry.Key, entry.Value);
         }

@@ -3,10 +3,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Kafe.Media;
 
-[Mod(Name)]
 public sealed class MediaMod : IMod
 {
-    public const string Name = "media";
+    public static string Name { get; } = "media";
 
     public KafeType AudiovisualShardType { get; private set; }
 

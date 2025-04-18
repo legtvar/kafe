@@ -1,45 +1,55 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 
 namespace Kafe;
 
-public class ShardTypeRegistry : IFreezable
+public class ShardTypeRegistry : SubtypeRegistryBase<ShardTypeMetadata>
 {
-    private readonly ConcurrentDictionary<KafeType, ShardTypeMetadata> shards = new();
+}
 
-    public bool IsFrozen { get; private set; }
+public static class ShardTypeModContextExtensions
+{
+    public const string SubtypePrimary = "shard";
 
-    public IReadOnlyDictionary<KafeType, ShardTypeMetadata> Shards { get; }
-
-    public ShardTypeRegistry()
+    public static KafeType AddShard(
+        this ModContext c,
+        Type shardType,
+        ShardRegistrationOptions? options = null
+    )
     {
-        Shards = shards.AsReadOnly();
-    }
+        var shardTypeRegistry = c.RequireSubtypeRegistry<ShardTypeMetadata>();
+        options ??= ShardRegistrationOptions.Default;
+        options.Subtype ??= SubtypePrimary;
 
-    public void Freeze()
-    {
-        IsFrozen = true;
-    }
-
-    public ShardTypeRegistry Register(ShardTypeMetadata metadata)
-    {
-        AssertUnfrozen();
-        if (!shards.TryAdd(metadata.KafeType, metadata))
+        if (string.IsNullOrWhiteSpace(options.Name))
         {
-            throw new ArgumentException(
-                $"Shard type '{metadata.KafeType}' has been already registered.",
-                nameof(metadata)
-            );
+            var typeName = shardType.Name;
+            typeName = Naming.WithoutSuffix(typeName, "Shard");
+            typeName = Naming.WithoutSuffix(typeName, "ShardMetadata");
+            typeName = Naming.ToDashCase(typeName);
+            options.Name = typeName;
         }
-        return this;
+
+        var kafeType = c.AddType(shardType, options);
+        shardTypeRegistry.Register(new(
+            KafeType: kafeType,
+            AnalyzerTypes: [.. options.AnalyzerTypes]
+        ));
+        return kafeType;
     }
 
-    private void AssertUnfrozen()
+    public static KafeType AddShard<T>(
+        this ModContext c,
+        ShardRegistrationOptions? options = null
+    )
     {
-        if (IsFrozen)
-        {
-            throw new InvalidOperationException("This shard type registry is frozen and can no longer be modified.");
-        }
+        return c.AddShard(typeof(T), options);
+    }
+
+    public record ShardRegistrationOptions : ModContext.KafeTypeRegistrationOptions
+    {
+        public static new readonly ShardRegistrationOptions Default = new();
+
+        public List<Type> AnalyzerTypes { get; set; } = [];
     }
 }

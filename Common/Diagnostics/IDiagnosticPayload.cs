@@ -1,4 +1,4 @@
-namespace Kafe.Diagnostics;
+namespace Kafe;
 
 public interface IDiagnosticPayload
 {

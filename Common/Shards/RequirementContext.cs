@@ -11,7 +11,8 @@ public sealed class RequirementContext
         IServiceProvider serviceProvider,
         KafeTypeRegistry typeRegistry,
         KafeObjectFactory kafeObjectFactory,
-        DiagnosticDescriptorRegistry descriptorRegistry
+        DiagnosticDescriptorRegistry descriptorRegistry,
+        DiagnosticFactory diagnosticFactory
     )
     {
         Requirement = requirement;
@@ -20,6 +21,7 @@ public sealed class RequirementContext
         TypeRegistry = typeRegistry;
         KafeObjectFactory = kafeObjectFactory;
         DiagnosticDescriptorRegistry = descriptorRegistry;
+        DiagnosticFactory = diagnosticFactory;
     }
 
     public List<Diagnostic> Diagnostics { get; } = [];
@@ -29,6 +31,7 @@ public sealed class RequirementContext
     public KafeTypeRegistry TypeRegistry { get; }
     public KafeObjectFactory KafeObjectFactory { get; }
     public DiagnosticDescriptorRegistry DiagnosticDescriptorRegistry { get; }
+    public DiagnosticFactory DiagnosticFactory { get; }
 
     public RequirementContext Report(Diagnostic diagnostic)
     {
@@ -39,29 +42,7 @@ public sealed class RequirementContext
     public RequirementContext Report<TPayload>(TPayload payload, DiagnosticSeverity? severityOverride = null)
         where TPayload : notnull
     {
-        if (!TypeRegistry.DotnetTypeMap.TryGetValue(typeof(TPayload), out var kafeType))
-        {
-            throw new ArgumentException(
-                $"No diagnostic type has a payload with .NET type '{typeof(TPayload)}'.",
-                nameof(payload)
-            );
-        }
-
-        if (!DiagnosticDescriptorRegistry.Descriptors.TryGetValue(kafeType, out var descriptor))
-        {
-            throw new ArgumentException(
-                $".NET type '{typeof(TPayload)}' is registered as KAFE type '{kafeType}'. "
-                    + $"However, '{kafeType}' is not a registered diagnostic descriptor."
-            );
-        }
-
-        var payloadObject = KafeObjectFactory.Wrap(payload);
-        var diagnostic = new Diagnostic(
-            descriptor: descriptor,
-            payload: payloadObject,
-            severity: severityOverride,
-            skipFrames: 2
-        );
+        var diagnostic = DiagnosticFactory.FromPayload(payload, severityOverride);
         return Report(diagnostic);
     }
 }

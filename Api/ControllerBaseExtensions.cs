@@ -8,7 +8,7 @@ public static class ControllerBaseExtensions
 {
     public static ActionResult KafeErrResult<T>(this ControllerBase controller, Err<T> err)
     {
-        if (!err.HasErrors)
+        if (err.Diagnostic is not null)
         {
             return new OkObjectResult(err.Value);
         }

@@ -1,4 +1,5 @@
-﻿using Kafe.Data.Aggregates;
+﻿using Kafe.Core.Diagnostics;
+using Kafe.Data.Aggregates;
 using Kafe.Data.Events;
 using Kafe.Data.Metadata;
 using Marten;
@@ -17,15 +18,19 @@ public class AuthorService
     private readonly IDocumentSession db;
     private readonly AccountService accountService;
     private readonly EntityMetadataProvider entityMetadataProvider;
+    private readonly DiagnosticFactory diagnosticFactory;
 
     public AuthorService(
         IDocumentSession db,
         AccountService accountService,
-        EntityMetadataProvider entityMetadataProvider)
+        EntityMetadataProvider entityMetadataProvider,
+        DiagnosticFactory diagnosticFactory
+    )
     {
         this.db = db;
         this.accountService = accountService;
         this.entityMetadataProvider = entityMetadataProvider;
+        this.diagnosticFactory = diagnosticFactory;
     }
 
     public async Task<Err<AuthorInfo>> Create(
@@ -33,9 +38,9 @@ public class AuthorService
         Hrib? ownerId = null,
         CancellationToken token = default)
     {
-        if (!Hrib.TryParse(@new.Id, out var id, out var error))
+        if (!Hrib.TryParse(@new.Id, out var id, out _))
         {
-            return new Kafe.Diagnostic(error);
+            return diagnosticFactory.FromPayload(new BadHribDiagnostic(@new.Id));
         }
 
         if (id == Hrib.Empty)

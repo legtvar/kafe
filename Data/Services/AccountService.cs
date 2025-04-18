@@ -1,4 +1,5 @@
-﻿using Kafe.Data.Aggregates;
+﻿using Kafe.Core.Diagnostics;
+using Kafe.Data.Aggregates;
 using Kafe.Data.Events;
 using Kafe.Data.Metadata;
 using Marten;
@@ -24,11 +25,11 @@ public class AccountService(
     IDocumentSession db,
     EntityMetadataProvider entityMetadataProvider,
     IDataProtectionProvider dataProtectionProvider,
+    DiagnosticFactory diagnosticFactory,
     ILogger<AccountService> logger
 )
 {
     public static readonly TimeSpan ConfirmationTokenExpiration = TimeSpan.FromHours(24);
-
     private readonly IDataProtector dataProtector = dataProtectionProvider.CreateProtector(nameof(AccountService));
     public const string NameClaim = "name";
     public const string PreferredUsernameClaim = "preferred_username";
@@ -75,13 +76,11 @@ public class AccountService(
 
     public async Task<Err<AccountInfo>> Create(AccountInfo @new, CancellationToken token = default)
     {
-        var parseResult = Hrib.Parse(@new.Id);
-        if (parseResult.HasErrors)
+        if (!Hrib.TryParse(@new.Id, out var id, out _))
         {
-            return parseResult.Errors;
+            return diagnosticFactory.FromPayload(new BadHribDiagnostic(@new.Id));
         }
 
-        var id = parseResult.Value;
         if (id == Hrib.Empty)
         {
             id = Hrib.Create();

@@ -1,4 +1,5 @@
-﻿using Kafe.Data.Aggregates;
+﻿using Kafe.Core.Diagnostics;
+using Kafe.Data.Aggregates;
 using Kafe.Data.Events;
 using Marten;
 using System;
@@ -23,6 +24,7 @@ public class ShardService
     private readonly ShardAnalysisFactory analysisFactory;
     private readonly FileExtensionMimeMap extMimeMap;
     private readonly KafeObjectFactory kafeObjectFactory;
+    private readonly DiagnosticFactory diagnosticFactory;
 
     public ShardService(
         IDocumentSession db,
@@ -33,7 +35,8 @@ public class ShardService
         IHttpClientFactory httpClientFactory,
         ShardAnalysisFactory analysisFactory,
         FileExtensionMimeMap extMimeMap,
-        KafeObjectFactory kafeObjectFactory
+        KafeObjectFactory kafeObjectFactory,
+        DiagnosticFactory diagnosticFactory
     )
     {
         this.db = db;
@@ -45,6 +48,7 @@ public class ShardService
         this.analysisFactory = analysisFactory;
         this.extMimeMap = extMimeMap;
         this.kafeObjectFactory = kafeObjectFactory;
+        this.diagnosticFactory = diagnosticFactory;
     }
 
     public async Task<ShardInfo?> Load(Hrib id, CancellationToken token = default)
@@ -73,7 +77,7 @@ public class ShardService
         var fileExtension = extMimeMap.GetFirstFileExtensionFor(mimeType);
         if (fileExtension is null)
         {
-            return Kafe.Diagnostic.InvalidMimeType(mimeType);
+            return diagnosticFactory.FromPayload(new BadMimeTypeDiagnostic(mimeType));
         }
 
         var tmpPath = await storageService.StoreTemporaryShard(shardId, stream, fileExtension, token);
@@ -81,7 +85,7 @@ public class ShardService
         if (!analysis.IsSuccessful)
         {
             await storageService.DeleteTemporaryShard(shardId, token);
-            return Kafe.Diagnostic.ShardAnalysisFailure(shardType);
+            return diagnosticFactory.FromPayload(new ShardAnalysisFailureDiagnostic(shardType));
         }
 
         var created = new ShardCreated(

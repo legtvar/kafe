@@ -1,6 +1,6 @@
-﻿using Kafe.Data.Aggregates;
+﻿using Kafe.Core.Diagnostics;
+using Kafe.Data.Aggregates;
 using Kafe.Data.Events;
-using Marten;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -12,14 +12,19 @@ namespace Kafe.Data.Services;
 
 public class ArtifactService
 {
-    private readonly IDocumentSession db;
+    private readonly IKafeDocumentSession db;
+    private readonly DiagnosticFactory diagnosticFactory;
 
-    public ArtifactService(IDocumentSession db)
+    public ArtifactService(
+        IKafeDocumentSession db,
+        DiagnosticFactory diagnosticFactory
+    )
     {
         this.db = db;
+        this.diagnosticFactory = diagnosticFactory;
     }
 
-    public async Task<ArtifactInfo?> Load(Hrib id, CancellationToken token = default)
+    public async Task<Err<ArtifactInfo>> Load(Hrib id, CancellationToken token = default)
     {
         return await db.LoadAsync<ArtifactInfo>(id.ToString(), token);
     }
@@ -28,18 +33,16 @@ public class ArtifactService
         IEnumerable<Hrib> ids,
         CancellationToken token = default)
     {
-        return (await db.KafeLoadManyAsync<ArtifactInfo>(ids.ToImmutableArray(), token)).Unwrap();
+        return (await db.LoadManyAsync<ArtifactInfo>(ids.ToImmutableArray(), token)).Unwrap();
     }
 
     public async Task<Err<ArtifactInfo>> Create(ArtifactInfo @new, CancellationToken token = default)
     {
-        var parseResult = Hrib.Parse(@new.Id);
-        if (parseResult.HasErrors)
+        if (!Hrib.TryParse(@new.Id, out var id, out _))
         {
-            return parseResult.Errors;
+            return diagnosticFactory.FromPayload(new BadHribDiagnostic(@new.Id));
         }
 
-        var id = parseResult.Value;
         if (id == Hrib.Empty)
         {
             id = Hrib.Create();

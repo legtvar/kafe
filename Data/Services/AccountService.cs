@@ -14,7 +14,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Kafe.Data.Documents;
 using Marten.Events;
-using Marten.Linq.SoftDeletes;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
@@ -30,17 +29,16 @@ public class AccountService(
 {
     public static readonly TimeSpan ConfirmationTokenExpiration = TimeSpan.FromHours(24);
 
+    private readonly IDataProtector dataProtector = dataProtectionProvider.CreateProtector(nameof(AccountService));
     public const string NameClaim = "name";
     public const string PreferredUsernameClaim = "preferred_username";
-
-    private readonly IDataProtector dataProtector = dataProtectionProvider.CreateProtector(nameof(AccountService));
 
     public async Task<AccountInfo?> Load(
         Hrib id,
         CancellationToken token = default
     )
     {
-        return (await db.KafeLoadAsync<AccountInfo>(id, token: token)).GetValueOrDefault();
+        return (await db.LoadAsync<AccountInfo>(id, token: token)).GetValueOrDefault();
     }
 
     public async Task<AccountInfo?> FindByEmail(string emailAddress, CancellationToken token = default)

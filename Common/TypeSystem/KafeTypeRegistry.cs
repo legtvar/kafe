@@ -58,13 +58,4 @@ public class KafeTypeRegistry : IFreezable
             throw new InvalidOperationException("This KafeType registry is frozen and can no longer be modified.");
         }
     }
-
-    public sealed record KafeTypeRegistrationOptions
-    {
-        public KafeTypeAccessibility Accessibility { get; set; } = KafeTypeAccessibility.Public;
-
-        public List<IRequirement> DefaultRequirements { get; set; } = [];
-
-        public JsonConverter? Converter { get; set; }
-    }
 }

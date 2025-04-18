@@ -7,11 +7,16 @@ namespace Kafe;
 
 public class DiagnosticDescriptorRegistry : SubtypeRegistryBase<DiagnosticDescriptor>
 {
+    public const string SubtypePrimary = "diag";
+
+    public static readonly LocalizedString FallbackName = LocalizedString.Create(
+        (Const.InvariantCulture, "diagnostic of type '{0}'"),
+        (Const.CzechCulture, "hlášení typu '{0}'")
+    );
 }
 
 public static class DiagnosticDescriptorModContextExtensions
 {
-    public const string SubtypePrimary = "diag";
     public const DiagnosticSeverity DefaultDiagnosticSeverity = DiagnosticSeverity.Error;
 
     public static DiagnosticDescriptor AddDiagnostic(
@@ -22,7 +27,7 @@ public static class DiagnosticDescriptorModContextExtensions
     {
         var diagnosticDescriptorRegistry = c.RequireSubtypeRegistry<DiagnosticDescriptor>();
         options ??= DiagnosticDescriptorRegistrationOptions.Default;
-        options.Subtype ??= SubtypePrimary;
+        options.Subtype ??= DiagnosticDescriptorRegistry.SubtypePrimary;
 
         if (diagnosticPayloadType.IsAssignableTo(typeof(IDiagnosticPayload)))
         {
@@ -66,6 +71,11 @@ public static class DiagnosticDescriptorModContextExtensions
             typeName = Naming.ToDashCase(typeName);
             options.Name = typeName;
         }
+
+        options.HumanReadableName ??= LocalizedString.Format(
+            DiagnosticDescriptorRegistry.FallbackName,
+            options.Name
+        );
 
         var kafeType = c.AddType(diagnosticPayloadType, options);
         var descriptor = new DiagnosticDescriptor()

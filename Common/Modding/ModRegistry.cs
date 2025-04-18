@@ -2,6 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 namespace Kafe;
@@ -38,7 +39,8 @@ public class ModRegistry : IFreezable
     }
 
     public ModRegistry Register(
-        IMod mod
+        IMod mod,
+        IServiceCollection services
     )
     {
         AssertUnfrozen();
@@ -60,7 +62,8 @@ public class ModRegistry : IFreezable
             typeRegistry: typeRegistry,
             configuration: configuration,
             hostEnvironment: hostEnvironment,
-            subtypeRegistries: subtypeRegistries
+            subtypeRegistries: subtypeRegistries,
+            services: services
         );
 
         mod.Configure(modContext);

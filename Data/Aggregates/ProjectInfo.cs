@@ -44,6 +44,11 @@ public record ProjectInfo(
 {
     public static readonly ProjectInfo Invalid = new();
 
+    static LocalizedString IEntity.Name { get; } = LocalizedString.Create(
+        (Const.InvariantCulture, "project"),
+        (Const.CzechCulture, "projekt")
+    );
+
     public ProjectInfo() : this(
         Id: Hrib.InvalidValue,
         CreationMethod: CreationMethod.Unknown,

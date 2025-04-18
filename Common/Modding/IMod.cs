@@ -16,5 +16,9 @@ public interface IMod
         => throw new InvalidOperationException("The IMod interface is not an instance "
             + "of a mod and thus does not have a name. Use a concrete mod type instead.");
 
+    public void ConfigureOptions(KafeBrewingOptions options) { }
+
     public void Configure(ModContext context);
+
+    public void PostConfigure() { }
 }

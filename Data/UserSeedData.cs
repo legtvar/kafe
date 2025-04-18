@@ -116,7 +116,7 @@ public class UserSeedData : IInitialData
                 },
                 token
             );
-            if (createResult.HasErrors)
+            if (createResult.Diagnostic is not null)
             {
                 throw createResult.AsException();
             }

@@ -52,7 +52,7 @@ public class AuthorCreationEndpoint : EndpointBaseAsync
             ownerId: userProvider.AccountId,
             token: cancellationToken);
 
-        if (author.HasErrors)
+        if (author.Diagnostic is not null)
         {
             return this.KafeErrResult(author);
         }

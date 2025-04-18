@@ -103,7 +103,7 @@ public class ProjectEditEndpoint : EndpointBaseAsync
             project: @new,
             existingEntityHandling: ExistingEntityHandling.Update,
             token: cancellationToken);
-        if (result.HasErrors)
+        if (result.Diagnostic is not null)
         {
             return this.KafeErrResult(result);
         }

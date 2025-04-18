@@ -40,7 +40,7 @@ public class OrganizationCreationEndpoint : EndpointBaseAsync
     {
         var organization = await organizationService.Create(OrganizationInfo.Create(dto.Name), cancellationToken);
 
-        if (organization.HasErrors)
+        if (organization.Diagnostic is not null)
         {
             return this.KafeErrResult(organization);
         }

@@ -27,7 +27,7 @@ public class ShardAnalysisFactory
         CancellationToken ct = default
     )
     {
-        var shardTypeMetadata = shardTypes.Shards.GetValueOrDefault(shardType)
+        var shardTypeMetadata = shardTypes.Metadata.GetValueOrDefault(shardType)
             ?? throw new ArgumentException($"Shard type '{shardType}' could not be recognized.");
 
         foreach (var analyzerType in shardTypeMetadata.AnalyzerTypes)

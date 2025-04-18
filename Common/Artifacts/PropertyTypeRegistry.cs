@@ -1,7 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 
 namespace Kafe;
+
+public record PropertyTypeMetadata(
+    KafeType KafeType,
+    Type DotnetType,
+    ImmutableArray<IRequirement> DefaultRequirements
+) : ISubtypeMetadata;
 
 public class PropertyTypeRegistry : SubtypeRegistryBase<PropertyTypeMetadata>
 {
@@ -42,6 +49,7 @@ public static class PropertyTypeModContextExtensions
         var kafeType = c.AddType(propertyType, options);
         propertyTypeRegistry.Register(new(
             KafeType: kafeType,
+            DotnetType: propertyType,
             DefaultRequirements: [.. options.DefaultRequirements]
         ));
         return kafeType;

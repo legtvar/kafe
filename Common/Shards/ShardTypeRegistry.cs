@@ -1,7 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 
 namespace Kafe;
+
+public record ShardTypeMetadata(
+    KafeType KafeType,
+    Type DotnetType,
+    ImmutableArray<Type> AnalyzerTypes
+) : ISubtypeMetadata;
 
 public class ShardTypeRegistry : SubtypeRegistryBase<ShardTypeMetadata>
 {
@@ -15,7 +22,6 @@ public class ShardTypeRegistry : SubtypeRegistryBase<ShardTypeMetadata>
 
 public static class ShardTypeModContextExtensions
 {
-
     public static KafeType AddShard(
         this ModContext c,
         Type shardType,
@@ -43,6 +49,7 @@ public static class ShardTypeModContextExtensions
         var kafeType = c.AddType(shardType, options);
         shardTypeRegistry.Register(new(
             KafeType: kafeType,
+            DotnetType: shardType,
             AnalyzerTypes: [.. options.AnalyzerTypes]
         ));
         return kafeType;

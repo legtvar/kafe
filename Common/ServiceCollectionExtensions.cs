@@ -25,6 +25,11 @@ public static class ServiceCollectionExtensions
 
         configureOptions(options);
 
+        foreach (var mod in options.Mods)
+        {
+            mod.ConfigureOptions(options);
+        }
+
         var typeRegistry = new KafeTypeRegistry();
         var modRegistry = new ModRegistry(
             typeRegistry: typeRegistry,
@@ -43,7 +48,7 @@ public static class ServiceCollectionExtensions
                 throw new InvalidOperationException($"Mod '{mod.GetType()}' declares an empty name.");
             }
 
-            modRegistry.Register(mod);
+            modRegistry.Register(mod, services);
         }
 
         foreach (var subtypeRegistry in options.SubtypeRegistries.Values)
@@ -52,6 +57,11 @@ public static class ServiceCollectionExtensions
         }
         modRegistry.Freeze();
         typeRegistry.Freeze();
+
+        foreach (var mod in options.Mods)
+        {
+            mod.PostConfigure();
+        }
 
         return services;
     }

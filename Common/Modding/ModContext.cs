@@ -4,6 +4,7 @@ using System.Text.Json.Serialization;
 using System.Collections.ObjectModel;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Kafe;
 
@@ -16,7 +17,8 @@ public sealed record class ModContext
         KafeTypeRegistry typeRegistry,
         IConfiguration configuration,
         IHostEnvironment hostEnvironment,
-        IReadOnlyDictionary<Type, ISubtypeRegistry> subtypeRegistries
+        IReadOnlyDictionary<Type, ISubtypeRegistry> subtypeRegistries,
+        IServiceCollection services
     )
     {
         Types = new ReadOnlySet<KafeType>(types);
@@ -25,6 +27,7 @@ public sealed record class ModContext
         Configuration = configuration;
         HostEnvironment = hostEnvironment;
         SubtypeRegistries = subtypeRegistries;
+        Services = services;
     }
 
     /// <summary>
@@ -39,6 +42,8 @@ public sealed record class ModContext
     public IHostEnvironment HostEnvironment { get; }
 
     public IReadOnlyDictionary<Type, ISubtypeRegistry> SubtypeRegistries { get; }
+
+    public IServiceCollection Services { get; }
 
     /// <summary>
     /// Types that were registered by this mod through the <see cref="AddType"/> subtype registration methods.

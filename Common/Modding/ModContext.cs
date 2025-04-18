@@ -17,7 +17,6 @@ public sealed record class ModContext
         KafeTypeRegistry typeRegistry,
         IConfiguration configuration,
         IHostEnvironment hostEnvironment,
-        IReadOnlyDictionary<Type, ISubtypeRegistry> subtypeRegistries,
         IServiceCollection services
     )
     {
@@ -26,7 +25,6 @@ public sealed record class ModContext
         TypeRegistry = typeRegistry;
         Configuration = configuration;
         HostEnvironment = hostEnvironment;
-        SubtypeRegistries = subtypeRegistries;
         Services = services;
     }
 
@@ -40,8 +38,6 @@ public sealed record class ModContext
     public IConfiguration Configuration { get; }
 
     public IHostEnvironment HostEnvironment { get; }
-
-    public IReadOnlyDictionary<Type, ISubtypeRegistry> SubtypeRegistries { get; }
 
     public IServiceCollection Services { get; }
 

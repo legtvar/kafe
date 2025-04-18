@@ -13,7 +13,6 @@ public class ModRegistry : IFreezable
     private readonly KafeTypeRegistry typeRegistry;
     private readonly IConfiguration configuration;
     private readonly IHostEnvironment hostEnvironment;
-    private readonly IReadOnlyDictionary<Type, ISubtypeRegistry> subtypeRegistries;
 
     public bool IsFrozen { get; private set; }
 
@@ -22,15 +21,13 @@ public class ModRegistry : IFreezable
     public ModRegistry(
         KafeTypeRegistry typeRegistry,
         IConfiguration configuration,
-        IHostEnvironment hostEnvironment,
-        IReadOnlyDictionary<Type, ISubtypeRegistry> subtypeRegistries
+        IHostEnvironment hostEnvironment
     )
     {
         Mods = mods.AsReadOnly();
         this.typeRegistry = typeRegistry;
         this.configuration = configuration;
         this.hostEnvironment = hostEnvironment;
-        this.subtypeRegistries = subtypeRegistries;
     }
 
     public void Freeze()
@@ -62,7 +59,6 @@ public class ModRegistry : IFreezable
             typeRegistry: typeRegistry,
             configuration: configuration,
             hostEnvironment: hostEnvironment,
-            subtypeRegistries: subtypeRegistries,
             services: services
         );
 

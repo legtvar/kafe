@@ -1,13 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Kafe.Data.Aggregates;
-using Marten;
 using Marten.Events;
-using Marten.Linq.SoftDeletes;
 
 namespace Kafe.Data;
 
@@ -16,53 +13,6 @@ namespace Kafe.Data;
 /// </summary>
 public static class MartenExtensions
 {
-    public static async Task<Err<T>> KafeLoadAsync<T>(
-        this IQuerySession db,
-        Hrib id,
-        CancellationToken token = default)
-        where T : notnull, IEntity
-    {
-        var entity = await db.LoadAsync<T>(id.ToString(), token: token);
-        if (entity is not null)
-        {
-            return entity;
-        }
-
-        return Kafe.Diagnostic.NotFound(id, DataConst.GetLocalizedName(typeof(T)).Invariant);
-    }
-
-    /// <summary>
-    /// Asynchronously loads entities of type <typeparamref name="T"/> specified by <paramref name="ids"/>.
-    /// </summary>
-    /// <remarks>
-    /// Returns entities in the same order as in <paramref name="ids"/> and respects duplicates.
-    /// Returns an <see cref="Kafe.Diagnostic"/>, if any of the ids cannot be found.
-    /// Even in case of error, returns the entities that were found.
-    /// </remarks>
-    public static async Task<Err<ImmutableArray<T>>> KafeLoadManyAsync<T>(
-        this IQuerySession db,
-        ImmutableArray<Hrib> ids,
-        CancellationToken token = default
-    ) where T : notnull, IEntity
-    {
-        var stringIds = ids.Select(i => (string)i).ToImmutableArray();
-        var entities = (await db.LoadManyAsync<T>(
-                token: token,
-                ids: stringIds
-            ))
-            .ToImmutableArray()
-            .SortEntitiesBy(ids);
-        if (entities.Length != ids.Length)
-        {
-            var missingIds = stringIds.Except(entities.Select(e => e.Id)).ToImmutableArray();
-            var notFoundError = Kafe.Diagnostic.NotFound("Some of the sought entities could not be found: "
-                + $"{string.Join(", ", missingIds)}.");
-            return (entities, notFoundError);
-        }
-
-        return entities;
-    }
-
     public static StreamAction KafeStartStream<TAggregate>(
         this IEventOperations ops,
         Hrib id,

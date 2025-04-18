@@ -88,7 +88,7 @@ public partial class ProjectService
 
         if (existing is null)
         {
-            var group = await db.KafeLoadAsync<ProjectGroupInfo>(project.ProjectGroupId, token);
+            var group = await MartenExtensions.LoadAsync<ProjectGroupInfo>(db, project.ProjectGroupId, token);
             if (group.HasErrors)
             {
                 return group.Errors;

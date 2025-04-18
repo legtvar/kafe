@@ -19,12 +19,12 @@ namespace Kafe.Data.Services;
 public class AccountService
 {
     public static readonly TimeSpan ConfirmationTokenExpiration = TimeSpan.FromHours(24);
-    private readonly IDocumentSession db;
+    private readonly IKafeDocumentSession db;
     private readonly EntityMetadataProvider entityMetadataProvider;
     public const string PreferredUsernameClaim = "preferred_username";
 
     public AccountService(
-        IDocumentSession db,
+        IKafeDocumentSession db,
         EntityMetadataProvider entityMetadataProvider)
     {
         this.db = db;
@@ -35,7 +35,7 @@ public class AccountService
         Hrib id,
         CancellationToken token = default)
     {
-        return (await db.KafeLoadAsync<AccountInfo>(id, token: token)).GetValueOrDefault();
+        return (await db.LoadAsync<AccountInfo>(id, token: token)).GetValueOrDefault();
     }
 
     public async Task<AccountInfo?> FindByEmail(string emailAddress, CancellationToken token = default)

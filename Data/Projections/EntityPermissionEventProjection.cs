@@ -380,8 +380,8 @@ public class EntityPermissionEventProjection : EventProjection
         IDocumentOperations ops,
         Hrib entityId)
     {
-        var entityPerms = await ops.KafeLoadAsync<EntityPermissionInfo>(entityId);
-        if (entityPerms.HasErrors)
+        var entityPerms = await ops.LoadAsync<EntityPermissionInfo>(entityId.ToString());
+        if (entityPerms is null)
         {
             // NB: Once upon a time, there were Capabilities instead of Permissions.
             //     They were terribly designed and served the only the first year KAFE was used in production.
@@ -413,24 +413,22 @@ public class EntityPermissionEventProjection : EventProjection
             }
 
             throw new InvalidOperationException($"No permission info exists for '{entityId}'. "
-                + "Either the events are out of order or the permission info projection is broken.",
-                entityPerms.AsException());
+                + "Either the events are out of order or the permission info projection is broken.");
         }
-        return entityPerms.Value;
+        return entityPerms;
     }
 
     private static async Task<RoleMembersInfo> RequireRoleMembersInfo(
         IDocumentOperations ops,
         Hrib roleId)
     {
-        var roleInfo = await ops.KafeLoadAsync<RoleMembersInfo>(roleId);
-        if (roleInfo.HasErrors)
+        var roleInfo = await ops.LoadAsync<RoleMembersInfo>(roleId.ToString());
+        if (roleInfo is null)
         {
             throw new InvalidOperationException($"No role members info exists for '{roleId}'. "
-                + "Either the events are out of order or the permission info projection is broken.",
-                roleInfo.AsException());
+                + "Either the events are out of order or the permission info projection is broken.");
         }
-        return roleInfo.Value;
+        return roleInfo;
     }
 
     /// <summary>
@@ -442,18 +440,18 @@ public class EntityPermissionEventProjection : EventProjection
         EntityPermissionInfo perms
     )
     {
-        var systemPerms = await ops.KafeLoadAsync<EntityPermissionInfo>(Hrib.System);
-        if (systemPerms.HasErrors && systemPerms.Errors.Length == 1 && systemPerms.Errors[0].Id == Kafe.Diagnostic.NotFoundId)
+        var systemPerms = await ops.LoadAsync<EntityPermissionInfo>(Hrib.System.ToString());
+        if (systemPerms is null)
         {
             systemPerms = EntityPermissionInfo.Create(Hrib.SystemValue);
-            ops.Store(systemPerms.Value);
+            ops.Store(systemPerms);
         }
 
         return perms with
         {
             AccountEntries = MergeManyEntries(
                 perms.AccountEntries,
-                InheritEntries(systemPerms.Value.AccountEntries)),
+                InheritEntries(systemPerms.AccountEntries)),
             // NB: We ignore RoleEntries and GlobalPermission, since `system` can have neither.
             DependencyGraph = perms.DependencyGraph.SetItem(Hrib.SystemValue, [Hrib.SystemValue])
         };

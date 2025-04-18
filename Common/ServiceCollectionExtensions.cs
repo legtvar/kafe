@@ -30,12 +30,11 @@ public static class ServiceCollectionExtensions
             mod.ConfigureOptions(options);
         }
 
-        var typeRegistry = new KafeTypeRegistry();
+        var typeRegistry = new KafeTypeRegistry(options.SubtypeRegistries);
         var modRegistry = new ModRegistry(
             typeRegistry: typeRegistry,
             configuration: configuration,
-            hostEnvironment: hostEnvironment,
-            subtypeRegistries: options.SubtypeRegistries
+            hostEnvironment: hostEnvironment
         );
         services.AddSingleton(typeRegistry);
         services.AddSingleton(modRegistry);

@@ -10,6 +10,9 @@ using Kafe.Data.Options;
 using Kafe.Data.Projections;
 using Kafe.Data.Services;
 using Marten;
+using Marten.Events;
+using Marten.Events.Aggregation;
+using Marten.Events.Projections;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -23,10 +26,95 @@ using Weasel.Postgresql.Functions;
 
 namespace Kafe.Data;
 
-[Mod("data")]
 public class DataMod : IMod
 {
-    public void ConfigureServices(IServiceCollection services)
+    public static string Name { get; } = "data";
+
+    public void ConfigureOptions(KafeBrewingOptions options)
+    {
+        options.AddSubtypeRegistry(new EntityTypeRegistry());
+        options.AddSubtypeRegistry(new ProjectionTypeRegistry());
+    }
+
+    public void Configure(ModContext context)
+    {
+        ConfigureServices(context.Services);
+
+        context.AddEntityType<ProjectInfo>();
+        context.AddEntityType<ProjectGroupInfo>();
+        context.AddEntityType<AuthorInfo>();
+        context.AddEntityType<NotificationInfo>();
+        context.AddEntityType<PlaylistInfo>();
+        context.AddEntityType<VideoConversionInfo>();
+        context.AddEntityType<AccountInfo>();
+        context.AddEntityType<OrganizationInfo>();
+        context.AddEntityType<RoleInfo>();
+        context.AddEntityType<ArtifactInfo>();
+        context.AddEntityType<ShardInfo>();
+        context.AddEntityType<EntityPermissionInfo>();
+        context.AddEntityType<RoleMembersInfo>();
+
+        context.AddProjection<AuthorInfoProjection>(new()
+        {
+            ProjectionLifecycle = ProjectionLifecycle.Inline
+        });
+        context.AddProjection<NotificationInfoProjection>(new()
+        {
+            ProjectionLifecycle = ProjectionLifecycle.Inline
+        });
+        context.AddProjection<PlaylistInfoProjection>(new()
+        {
+            ProjectionLifecycle = ProjectionLifecycle.Inline
+        });
+        context.AddProjection<ProjectInfoProjection>(new()
+        {
+            ProjectionLifecycle = ProjectionLifecycle.Inline
+        });
+        context.AddProjection<ProjectGroupInfoProjection>(new()
+        {
+            ProjectionLifecycle = ProjectionLifecycle.Inline
+        });
+        context.AddProjection<VideoConversionInfoProjection>(new()
+        {
+            ProjectionLifecycle = ProjectionLifecycle.Inline
+        });
+        context.AddProjection<AccountInfoProjection>(new()
+        {
+            ProjectionLifecycle = ProjectionLifecycle.Inline
+        });
+        context.AddProjection<OrganizationInfoProjection>(new()
+        {
+            ProjectionLifecycle = ProjectionLifecycle.Inline
+        });
+        context.AddProjection<RoleInfoProjection>(new()
+        {
+            ProjectionLifecycle = ProjectionLifecycle.Inline
+        });
+        context.AddProjection<ArtifactInfoProjection>(new()
+        {
+            ProjectionLifecycle = ProjectionLifecycle.Inline
+        });
+        context.AddProjection<ShardInfoProjection>(new()
+        {
+            ProjectionLifecycle = ProjectionLifecycle.Inline
+        });
+        context.AddProjection<EntityPermissionEventProjection>(new()
+        {
+            ProjectionLifecycle = ProjectionLifecycle.Async,
+            AsyncOptions = ao =>
+            {
+                ao.EnableDocumentTrackingByIdentity = true;
+                // NB: Since some of the projections query other perm infos, the events need to be processed
+                //     one by one.
+                ao.BatchSize = 1;
+                ao.TeardownDataOnRebuild = true;
+                ao.DeleteViewTypeOnTeardown<EntityPermissionInfo>();
+                ao.DeleteViewTypeOnTeardown<RoleMembersInfo>();
+            }
+        });
+    }
+
+    private static void ConfigureServices(IServiceCollection services)
     {
         var mce = services.AddMarten(ConfigureMarten)
             .ApplyAllDatabaseChangesOnStartup()
@@ -61,15 +149,12 @@ public class DataMod : IMod
             .ValidateDataAnnotations();
     }
 
-    public void Configure(ModContext context)
-    {
-        throw new NotImplementedException();
-    }
-
     public static StoreOptions ConfigureMarten(IServiceProvider services)
     {
         var configuration = services.GetRequiredService<IConfiguration>();
         var environment = services.GetRequiredService<IHostEnvironment>();
+        var docRegistry = services.GetRequiredService<EntityTypeRegistry>();
+        var projRegistry = services.GetRequiredService<ProjectionTypeRegistry>();
 
         var options = services.GetRequiredService<IOptions<StorageOptions>>().Value;
         var mo = new StoreOptions();
@@ -104,33 +189,48 @@ public class DataMod : IMod
                 .ConnectionLimit(-1);
         });
 
-        mo.Projections.Add<AuthorInfoProjection>(ProjectionLifecycle.Inline);
-        mo.Projections.Add<NotificationInfoProjection>(ProjectionLifecycle.Inline);
-        mo.Projections.Add<PlaylistInfoProjection>(ProjectionLifecycle.Inline);
-        mo.Projections.Add<ProjectInfoProjection>(ProjectionLifecycle.Inline);
-        mo.Projections.Add<ProjectGroupInfoProjection>(ProjectionLifecycle.Inline);
-        mo.Projections.Add<VideoConversionInfoProjection>(ProjectionLifecycle.Inline);
-        mo.Projections.Add<AccountInfoProjection>(ProjectionLifecycle.Inline);
-        mo.Projections.Add<OrganizationInfoProjection>(ProjectionLifecycle.Inline);
-        mo.Projections.Add<RoleInfoProjection>(ProjectionLifecycle.Inline);
-        mo.Projections.Add(
-            ActivatorUtilities.CreateInstance<ArtifactInfoProjection>(services),
-            ProjectionLifecycle.Inline);
-        mo.Projections.Add(
-            ActivatorUtilities.CreateInstance<ShardInfoProjection>(services),
-            ProjectionLifecycle.Inline);
-        mo.Projections.Add<EntityPermissionEventProjection>(
-            ProjectionLifecycle.Async,
-            ao =>
+        foreach (var doc in docRegistry.Metadata.Values)
+        {
+            mo.RegisterDocumentType(doc.DotnetType);
+        }
+
+        foreach (var proj in projRegistry.Metadata.Values)
+        {
+            if (proj.DotnetType.IsAssignableTo(typeof(IProjection)))
             {
-                ao.EnableDocumentTrackingByIdentity = true;
-                // NB: Since some of the projections query other perm infos, the events need to be processed
-                //     one by one.
-                ao.BatchSize = 1;
-                ao.TeardownDataOnRebuild = true;
-                ao.DeleteViewTypeOnTeardown<EntityPermissionInfo>();
-                ao.DeleteViewTypeOnTeardown<RoleMembersInfo>();
-            });
+                mo.Projections.Add(
+                    projection: (IProjection)ActivatorUtilities.CreateInstance(services, proj.DotnetType),
+                    lifecycle: proj.ProjectionLifecycle,
+                    asyncConfiguration: proj.AsyncOptions
+                );
+            }
+            else if (proj.DotnetType.IsAssignableTo(typeof(EventProjection)))
+            {
+                mo.Projections.Add(
+                    projection: (EventProjection)ActivatorUtilities.CreateInstance(services, proj.DotnetType),
+                    lifecycle: proj.ProjectionLifecycle,
+                    asyncConfiguration: proj.AsyncOptions
+                );
+            }
+            else if (proj.DotnetType.BaseType?.GetGenericTypeDefinition() == typeof(GeneratedAggregateProjectionBase<>))
+            {
+                var docType = proj.DotnetType.BaseType.GetGenericArguments()[0];
+                var addMethod = mo.Projections.GetType().GetMethod(
+                    name: nameof(ProjectionOptions.Add),
+                    genericParameterCount: 1,
+                    types: null!,
+                    bindingAttr: BindingFlags.Public
+                );
+                addMethod!.MakeGenericMethod(docType)
+                    .Invoke(mo.Projections, [proj.ProjectionLifecycle, proj.AsyncOptions]);
+            }
+            else
+            {
+                throw new InvalidOperationException(
+                    $"Projection type '{proj.DotnetType}' is not of any supported kind of Marten projections.");
+            }
+        }
+
         mo.Events.Upcast<AccountCapabilityAddedUpcaster>();
         mo.Events.Upcast<AccountCapabilityRemovedUpcaster>();
         mo.Events.Upcast<PlaylistVideoAddedUpcaster>();

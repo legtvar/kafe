@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Text.Json.Serialization;
 
 namespace Kafe;
 
@@ -17,10 +16,13 @@ public class KafeTypeRegistry : IFreezable
 
     public IReadOnlyDictionary<Type, KafeType> DotnetTypeMap { get; }
 
-    public KafeTypeRegistry()
+    public IReadOnlyDictionary<Type, ISubtypeRegistry> SubtypeRegistries { get; }
+
+    public KafeTypeRegistry(IReadOnlyDictionary<Type, ISubtypeRegistry> subtypeRegistries)
     {
         Types = types.AsReadOnly();
         DotnetTypeMap = dotnetTypeMap.AsReadOnly();
+        SubtypeRegistries = subtypeRegistries;
     }
 
     public void Freeze()

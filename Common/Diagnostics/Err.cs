@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Kafe;
 
@@ -46,6 +47,16 @@ public readonly record struct Err<T>
     public static implicit operator Err<T>(Diagnostic error)
     {
         return new Err<T>(error);
+    }
+
+    public static implicit operator Err<T>([DisallowNull] Diagnostic? error)
+    {
+        if (!error.HasValue)
+        {
+            throw new ArgumentException("Cannot turn a null diagnostic into an Err<T>.", nameof(error));
+        }
+
+        return new Err<T>(error.Value);
     }
 
     public static implicit operator Err<T>((T value, Diagnostic? diagnostic) pair)

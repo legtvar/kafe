@@ -1,9 +1,7 @@
 using System;
 using System.Threading.Tasks;
-using Kafe.Core;
 using Kafe.Core.Diagnostics;
-using Kafe.Data;
-using Kafe.Data.Aggregates;
+using Kafe.Data.Requirements;
 using Kafe.Media.Diagnostics;
 
 namespace Kafe.Media.Requirements;
@@ -18,14 +16,7 @@ public record MediaDurationRequirement(
 
 public class MediaDurationRequirementHandler : RequirementHandlerBase<MediaDurationRequirement>
 {
-    private readonly IKafeQuerySession db;
-
     public static readonly TimeSpan AcceptableDurationError = TimeSpan.FromSeconds(1);
-
-    public MediaDurationRequirementHandler(IKafeQuerySession db)
-    {
-        this.db = db;
-    }
 
     public override async ValueTask Handle(IRequirementContext<MediaDurationRequirement> context)
     {
@@ -35,49 +26,20 @@ public class MediaDurationRequirementHandler : RequirementHandlerBase<MediaDurat
             return;
         }
 
-        if (context.Object.Value is not ShardReferenceProperty shardRef)
+        var (shard, mediaInfo) = await context.RequireShardVariant<MediaInfo>(Const.OriginalShardVariant) ?? default;
+        if (shard is null || mediaInfo is null)
         {
-            context.Report(new IncompatibleRequirementDiagnostic(
-                context.RequirementType,
-                context.Object.Type
-            ));
-            return;
-        }
-
-        var shard = await db.LoadAsync<ShardInfo>(shardRef.ShardId, context.CancellationToken);
-        if (shard.Diagnostic is not null)
-        {
-            context.Report(shard.Diagnostic);
             return;
         }
 
         // TODO: replace with real shard names, once shard have names
-        var shardName = LocalizedString.CreateInvariant(shard.Value.Id);
-
-        if (!shard.Value.Variants.TryGetValue(Const.OriginalShardVariant, out var variantObject))
-        {
-            context.Report(new MissingShardVariantDiagnostic(
-                ShardName: shardName,
-                ShardId: shardRef.ShardId,
-                Variant: Const.OriginalShardVariant
-            ));
-            return;
-        }
-
-        if (variantObject.Value is not MediaInfo mediaInfo)
-        {
-            context.Report(new IncompatibleRequirementDiagnostic(
-                context.RequirementType,
-                variantObject.Type
-            ));
-            return;
-        }
+        var shardName = LocalizedString.CreateInvariant(shard.Id);
 
         if (mediaInfo.IsCorrupted)
         {
-            context.Report(new CorruptedShardVariantDiagnostic(
+            context.Report(new CorruptedShardDiagnostic(
                 ShardName: shardName,
-                ShardId: shardRef.ShardId,
+                ShardId: shard.Id,
                 Variant: Const.OriginalShardVariant
             ));
             return;
@@ -88,7 +50,7 @@ public class MediaDurationRequirementHandler : RequirementHandlerBase<MediaDurat
         {
             context.Report(new MediaTooShortDiagnostic(
                 ShardName: shardName,
-                ShardId: shardRef.ShardId,
+                ShardId: shard.Id,
                 Variant: Const.OriginalShardVariant,
                 MinDuration: context.Requirement.MinDuration.Value
             ));
@@ -99,7 +61,7 @@ public class MediaDurationRequirementHandler : RequirementHandlerBase<MediaDurat
         {
             context.Report(new MediaTooLongDiagnostic(
                 ShardName: shardName,
-                ShardId: shardRef.ShardId,
+                ShardId: shard.Id,
                 Variant: Const.OriginalShardVariant,
                 MaxDuration: context.Requirement.MaxDuration.Value
             ));

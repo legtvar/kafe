@@ -50,4 +50,16 @@ public static class ReflectionExtensions
 
         return typedPropertyValue;
     }
+
+    public static bool IsNumeric(this Type type)
+    {
+        var code = Type.GetTypeCode(type);
+        return code >= TypeCode.SByte && code <= TypeCode.Decimal;
+    }
+
+    public static bool IsInteger(this Type type)
+    {
+        var code = Type.GetTypeCode(type);
+        return code >= TypeCode.SByte && code <= TypeCode.UInt64;
+    }
 }

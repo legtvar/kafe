@@ -15,13 +15,13 @@ namespace Kafe.Data.Services;
 
 public class AuthorService
 {
-    private readonly IDocumentSession db;
+    private readonly IKafeDocumentSession db;
     private readonly AccountService accountService;
     private readonly EntityMetadataProvider entityMetadataProvider;
     private readonly DiagnosticFactory diagnosticFactory;
 
     public AuthorService(
-        IDocumentSession db,
+        IKafeDocumentSession db,
         AccountService accountService,
         EntityMetadataProvider entityMetadataProvider,
         DiagnosticFactory diagnosticFactory
@@ -94,7 +94,7 @@ public class AuthorService
         var @old = await Load(modified.Id, token);
         if (@old is null)
         {
-            return Kafe.Diagnostic.NotFound(modified.Id);
+            return diagnosticFactory.NotFound<AuthorInfo>(modified.Id);
         }
 
         if (@old.Uco != modified.Uco
@@ -120,7 +120,7 @@ public class AuthorService
                     + "This should never happen.");
         }
 
-        return Kafe.Diagnostic.Unmodified($"author {modified.Id}");
+        return diagnosticFactory.Unmodified<AuthorInfo>(@old.Id);
     }
 
     /// <summary>
@@ -193,11 +193,11 @@ public class AuthorService
 
     public async Task<AuthorInfo?> Load(Hrib id, CancellationToken token = default)
     {
-        return await db.LoadAsync<AuthorInfo>(id.ToString(), token);
+        return (await db.LoadAsync<AuthorInfo>(id, token)).GetValueOrDefault();
     }
 
     public async Task<ImmutableArray<AuthorInfo>> LoadMany(IEnumerable<Hrib> ids, CancellationToken token = default)
     {
-        return (await db.KafeLoadManyAsync<AuthorInfo>(ids.ToImmutableArray(), token)).Unwrap();
+        return (await db.LoadManyAsync<AuthorInfo>([.. ids], token)).Unwrap();
     }
 }

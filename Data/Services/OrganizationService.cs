@@ -15,12 +15,12 @@ namespace Kafe.Data.Services;
 
 public class OrganizationService
 {
-    private readonly IDocumentSession db;
+    private readonly IKafeDocumentSession db;
     private readonly EntityMetadataProvider entityMetadataProvider;
     private readonly DiagnosticFactory diagnosticFactory;
 
     public OrganizationService(
-        IDocumentSession db,
+        IKafeDocumentSession db,
         EntityMetadataProvider entityMetadataProvider,
         DiagnosticFactory diagnosticFactory
     )
@@ -32,14 +32,14 @@ public class OrganizationService
 
     public async Task<OrganizationInfo?> Load(Hrib id, CancellationToken token = default)
     {
-        return await db.LoadAsync<OrganizationInfo>(id.ToString(), token: token);
+        return (await db.LoadAsync<OrganizationInfo>(id, token: token)).GetValueOrDefault();
     }
 
     public async Task<ImmutableArray<OrganizationInfo>> LoadMany(
         IEnumerable<Hrib> ids,
         CancellationToken token = default)
     {
-        return (await db.KafeLoadManyAsync<OrganizationInfo>(ids.ToImmutableArray(), token)).Unwrap();
+        return (await db.LoadManyAsync<OrganizationInfo>([.. ids], token)).Unwrap();
     }
 
     public async Task<Err<OrganizationInfo>> Create(OrganizationInfo @new, CancellationToken token = default)
@@ -72,7 +72,7 @@ public class OrganizationService
         var @old = await Load(modified.Id, token);
         if (@old is null)
         {
-            return Kafe.Diagnostic.NotFound(modified.Id);
+            return diagnosticFactory.NotFound<OrganizationInfo>(@modified.Id);
         }
 
         if ((LocalizedString)@old.Name != modified.Name)
@@ -87,7 +87,7 @@ public class OrganizationService
                     + "This should never happen.");
         }
 
-        return Kafe.Diagnostic.Unmodified($"organization {modified.Id}");
+        return diagnosticFactory.Unmodified<OrganizationInfo>(modified.Id);
     }
 
     /// <summary>

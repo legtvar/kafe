@@ -166,7 +166,7 @@ public class AccountService(
         var old = await Load(modified.Id, token);
         if (old is null)
         {
-            return Kafe.Diagnostic.NotFound(modified.Id, "An account");
+            return diagnosticFactory.NotFound<AccountInfo>(modified.Id);
         }
 
         var infoChanged = new AccountInfoChanged(
@@ -251,7 +251,7 @@ public class AccountService(
 
         if (!hasChanged)
         {
-            return Kafe.Diagnostic.Unmodified(old.Id, "An account");
+            return diagnosticFactory.Unmodified<AccountInfo>(old.Id);
         }
 
         await db.SaveChangesAsync(token);
@@ -348,7 +348,7 @@ public class AccountService(
         var account = await Load(accountId, token);
         if (account is null)
         {
-            return Kafe.Diagnostic.NotFound(accountId, "An account");
+            return diagnosticFactory.NotFound<AccountInfo>(accountId);
         }
 
         foreach (var permissionPair in permissions)
@@ -389,7 +389,7 @@ public class AccountService(
         var account = await Load(accountId, token);
         if (account is null)
         {
-            return Kafe.Diagnostic.NotFound(accountId, "An account");
+            return diagnosticFactory.NotFound<AccountInfo>(accountId);
         }
 
         foreach (var roleId in roleIds)
@@ -427,7 +427,7 @@ public class AccountService(
         var emailClaim = principal.FindFirst(ClaimTypes.Email);
         if (emailClaim is null || string.IsNullOrEmpty(emailClaim.Value))
         {
-            return Kafe.Diagnostic.MissingValue("email address");
+            return diagnosticFactory.ForParameter(ClaimTypes.Email, new RequiredDiagnostic());
         }
 
         var name = principal.FindFirst(ClaimTypes.Name)?.Value ?? principal.FindFirst(NameClaim)?.Value;

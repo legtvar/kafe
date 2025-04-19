@@ -10,7 +10,7 @@ public record ShardInfo(
     [Hrib] string Id,
     CreationMethod CreationMethod,
     DateTimeOffset CreatedAt,
-    long? Size,
+    long? FileLength,
     string? UploadFilename,
     string? MimeType,
     KafeObject Metadata,
@@ -23,7 +23,7 @@ public record ShardInfo(
         Id: Hrib.InvalidValue,
         CreationMethod: CreationMethod.Unknown,
         CreatedAt: default,
-        Size: null,
+        FileLength: null,
         UploadFilename: null,
         MimeType: null,
         Metadata: KafeObject.Invalid,
@@ -48,7 +48,7 @@ public class ShardInfoProjection : SingleStreamProjection<ShardInfo>
             Id: e.Data.ShardId,
             CreationMethod: e.Data.CreationMethod,
             CreatedAt: e.Timestamp,
-            Size: e.Data.Size,
+            FileLength: e.Data.FileLength,
             UploadFilename: e.Data.UploadFilename,
             MimeType: e.Data.MimeType,
             Metadata: e.Data.Metadata,
@@ -60,7 +60,7 @@ public class ShardInfoProjection : SingleStreamProjection<ShardInfo>
     {
         return s with
         {
-            Size = e.Size ?? s.Size,
+            FileLength = e.FileLength ?? s.FileLength,
             UploadFilename = e.UploadFilename ?? s.UploadFilename,
             MimeType = e.MimeType ?? s.MimeType
         };

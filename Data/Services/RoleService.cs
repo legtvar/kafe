@@ -15,13 +15,13 @@ namespace Kafe.Data.Services;
 
 public class RoleService
 {
-    private readonly IDocumentSession db;
+    private readonly IKafeDocumentSession db;
     private readonly OrganizationService organizationService;
     private readonly EntityMetadataProvider entityMetadataProvider;
     private readonly DiagnosticFactory diagnosticFactory;
 
     public RoleService(
-        IDocumentSession db,
+        IKafeDocumentSession db,
         OrganizationService organizationService,
         EntityMetadataProvider entityMetadataProvider,
         DiagnosticFactory diagnosticFactory
@@ -35,14 +35,14 @@ public class RoleService
 
     public async Task<RoleInfo?> Load(Hrib id, CancellationToken token = default)
     {
-        return await db.LoadAsync<RoleInfo>(id.ToString(), token: token);
+        return (await db.LoadAsync<RoleInfo>(id, token: token)).GetValueOrDefault();
     }
 
     public async Task<ImmutableArray<RoleInfo>> LoadMany(
         IEnumerable<Hrib> ids,
         CancellationToken token = default)
     {
-        return (await db.KafeLoadManyAsync<RoleInfo>(ids.ToImmutableArray(), token)).Unwrap();
+        return (await db.LoadManyAsync<RoleInfo>([.. ids], token)).Unwrap();
     }
 
     public async Task<Err<RoleInfo>> Create(RoleInfo @new, CancellationToken token = default)
@@ -55,7 +55,7 @@ public class RoleService
         var organization = await organizationService.Load(@new.OrganizationId, token);
         if (organization is null)
         {
-            return Kafe.Diagnostic.NotFound(@new.OrganizationId, "An organization");
+            return diagnosticFactory.NotFound<OrganizationInfo>(@new.OrganizationId);
         }
 
 
@@ -94,7 +94,7 @@ public class RoleService
         var @old = await Load(modified.Id, token);
         if (@old is null)
         {
-            return Kafe.Diagnostic.NotFound(modified.Id);
+            return diagnosticFactory.NotFound<RoleInfo>(modified.Id);
         }
 
         var hasChanged = false;
@@ -133,7 +133,7 @@ public class RoleService
 
         if (!hasChanged)
         {
-            return Kafe.Diagnostic.Unmodified($"role {modified.Id}");
+            return diagnosticFactory.Unmodified<RoleInfo>(modified.Id);
         }
 
         await db.SaveChangesAsync(token);
@@ -152,7 +152,7 @@ public class RoleService
         var role = await Load(roleId, token);
         if (role is null)
         {
-            return Kafe.Diagnostic.NotFound(roleId, "A role");
+            return diagnosticFactory.NotFound<RoleInfo>(roleId);
         }
 
         foreach (var permissionPair in permissions)

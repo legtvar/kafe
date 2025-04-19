@@ -15,7 +15,7 @@ namespace Kafe.Data.Services;
 
 public class PlaylistService
 {
-    private readonly IDocumentSession db;
+    private readonly IKafeDocumentSession db;
     private readonly OrganizationService organizationService;
     private readonly ArtifactService artifactService;
     private readonly AccountService accountService;
@@ -23,7 +23,7 @@ public class PlaylistService
     private readonly DiagnosticFactory diagnosticFactory;
 
     public PlaylistService(
-        IDocumentSession db,
+        IKafeDocumentSession db,
         OrganizationService organizationService,
         ArtifactService artifactService,
         AccountService accountService,
@@ -89,14 +89,14 @@ public class PlaylistService
 
     public async Task<PlaylistInfo?> Load(Hrib id, CancellationToken token = default)
     {
-        return await db.LoadAsync<PlaylistInfo>(id.ToString(), token);
+        return (await db.LoadAsync<PlaylistInfo>(id, token)).GetValueOrDefault();
     }
 
     public async Task<ImmutableArray<PlaylistInfo>> LoadMany(
         IEnumerable<Hrib> ids,
         CancellationToken token = default)
     {
-        return (await db.KafeLoadManyAsync<PlaylistInfo>(ids.ToImmutableArray(), token)).Unwrap();
+        return (await db.LoadManyAsync<PlaylistInfo>([.. ids], token)).Unwrap();
     }
 
     public async Task<Err<PlaylistInfo>> Create(
@@ -112,7 +112,7 @@ public class PlaylistService
         var organization = await organizationService.Load(@new.OrganizationId, token);
         if (organization is null)
         {
-            return Kafe.Diagnostic.NotFound(@new.OrganizationId, "An organization");
+            return diagnosticFactory.NotFound<OrganizationInfo>(@new.OrganizationId);
         }
 
         if (id == Hrib.Empty)
@@ -153,7 +153,7 @@ public class PlaylistService
                 token);
             if (existanceCheck.Diagnostic is not null)
             {
-                return existanceCheck.Errors;
+                return existanceCheck.Diagnostic;
             }
 
             var entriesSet = new PlaylistEntriesSet(
@@ -184,7 +184,7 @@ public class PlaylistService
         var old = await Load(@new.Id, token);
         if (old is null)
         {
-            return Kafe.Diagnostic.NotFound(@new.Id, "A playlist");
+            return diagnosticFactory.NotFound<PlaylistInfo>(@new.Id);
         }
 
         var eventStream = await db.Events.FetchForExclusiveWriting<PlaylistInfo>(@new.Id, token);
@@ -215,7 +215,7 @@ public class PlaylistService
                 token);
             if (existanceCheck.Diagnostic is not null)
             {
-                return existanceCheck.Errors;
+                return existanceCheck.Diagnostic;
             }
 
             eventStream.AppendOne(new PlaylistEntriesSet(
@@ -225,9 +225,13 @@ public class PlaylistService
 
         if (@new.OrganizationId != old.OrganizationId)
         {
-            if (!((Hrib)@new.OrganizationId).IsValidNonEmpty)
+            if (!Hrib.TryParse(@new.OrganizationId, out var organizationId, out _)
+                || !organizationId.IsValidNonEmpty)
             {
-                return Kafe.Diagnostic.InvalidOrEmptyHrib(nameof(PlaylistInfo.OrganizationId));
+                return diagnosticFactory.ForParameter(
+                    nameof(PlaylistInfo.OrganizationId),
+                    new BadHribDiagnostic(@new.OrganizationId)
+                );
             }
 
             eventStream.AppendOne(new PlaylistMovedToOrganization(
@@ -245,10 +249,10 @@ public class PlaylistService
         CancellationToken token = default
     )
     {
-        var artifacts = await db.KafeLoadManyAsync<ArtifactInfo>(artifactIds, token);
-        if (artifacts.HasErrors)
+        var artifacts = await db.LoadManyAsync<ArtifactInfo>(artifactIds, token);
+        if (artifacts.Diagnostic is not null)
         {
-            return artifacts.Errors;
+            return artifacts.Diagnostic;
         }
 
         return true;

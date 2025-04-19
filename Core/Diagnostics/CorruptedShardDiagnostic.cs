@@ -1,19 +1,19 @@
 
 namespace Kafe.Core.Diagnostics;
 
-public record CorruptedShardVariantDiagnostic(
+public record CorruptedShardDiagnostic(
     LocalizedString ShardName,
     Hrib ShardId,
-    string Variant
+    string? Variant = null
 ) : IDiagnosticPayload
 {
-    public static string Name { get; } = "corrupted-shard-variant";
+    public static string Name { get; } = "corrupted-shard";
 
     public static DiagnosticSeverity DefaultSeverity { get; } = DiagnosticSeverity.Error;
 
     public static LocalizedString Title { get; } = LocalizedString.Create(
-        (Const.InvariantCulture, "Corrupted Shard Variant"),
-        (Const.CzechCulture, "Poškozená varianta střípku")
+        (Const.InvariantCulture, "Corrupted Shard"),
+        (Const.CzechCulture, "Poškozený střípek")
     );
 
     public static LocalizedString MessageFormat { get; } = LocalizedString.Create(

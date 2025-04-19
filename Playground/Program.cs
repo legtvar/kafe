@@ -1,7 +1,7 @@
 ﻿using Kafe;
-using Kafe.Media.Services;
-using Kafe.Ruv;
 using System.Collections.Immutable;
+using System.Globalization;
 
-var lemma = Hrib.Parse("lemmafimuni");
-Console.WriteLine(lemma);
+var formatProvider = new AggregateFormatProvider(CultureInfo.InvariantCulture, [new FileLengthFormatter()]);
+Console.WriteLine($"{2_000_000.ToString("fs", formatProvider)}");
+Console.WriteLine(string.Format(formatProvider, "{0:fsF2} is the same as {0:FSF2}", 2_000));

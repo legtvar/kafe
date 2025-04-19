@@ -4,27 +4,27 @@ namespace Kafe;
 
 public class DiagnosticFactory
 {
-    private readonly KafeTypeRegistry typeRegistry;
-    private readonly DiagnosticDescriptorRegistry descriptorRegistry;
-    private readonly KafeObjectFactory objectFactory;
-
     public DiagnosticFactory(
         KafeTypeRegistry typeRegistry,
         DiagnosticDescriptorRegistry descriptorRegistry,
         KafeObjectFactory objectFactory
     )
     {
-        this.typeRegistry = typeRegistry;
-        this.descriptorRegistry = descriptorRegistry;
-        this.objectFactory = objectFactory;
+        TypeRegistry = typeRegistry;
+        DescriptorRegistry = descriptorRegistry;
+        ObjectFactory = objectFactory;
     }
+
+    public KafeTypeRegistry TypeRegistry { get; }
+    public DiagnosticDescriptorRegistry DescriptorRegistry { get; }
+    public KafeObjectFactory ObjectFactory { get; }
 
     public Diagnostic FromPayload(object payload, DiagnosticSeverity? severityOverride = null)
     {
         ArgumentNullException.ThrowIfNull(payload);
 
         var payloadType = payload.GetType();
-        if (!typeRegistry.DotnetTypeMap.TryGetValue(payloadType, out var kafeType))
+        if (!TypeRegistry.DotnetTypeMap.TryGetValue(payloadType, out var kafeType))
         {
             throw new ArgumentException(
                 $"No diagnostic type has a payload with .NET type '{payloadType}'.",
@@ -32,7 +32,7 @@ public class DiagnosticFactory
             );
         }
 
-        if (!descriptorRegistry.Metadata.TryGetValue(kafeType, out var descriptor))
+        if (!DescriptorRegistry.Metadata.TryGetValue(kafeType, out var descriptor))
         {
             throw new ArgumentException(
                 $".NET type '{payloadType}' is registered as KAFE type '{kafeType}'. "
@@ -40,7 +40,7 @@ public class DiagnosticFactory
             );
         }
 
-        var payloadObject = objectFactory.Wrap(payload);
+        var payloadObject = ObjectFactory.Wrap(payload);
         return new Diagnostic(
             descriptor: descriptor,
             payload: payloadObject,

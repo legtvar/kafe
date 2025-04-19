@@ -4,7 +4,6 @@ using Kafe.Data.Events;
 using Kafe.Data.Metadata;
 using Marten;
 using Marten.Linq;
-using Marten.Linq.MatchesSql;
 using System;
 using System.Collections.Immutable;
 using System.Linq;
@@ -15,13 +14,13 @@ namespace Kafe.Data.Services;
 
 public class ProjectGroupService
 {
-    private readonly IDocumentSession db;
+    private readonly IKafeDocumentSession db;
     private readonly OrganizationService organizationService;
     private readonly EntityMetadataProvider entityMetadataProvider;
     private readonly DiagnosticFactory diagnosticFactory;
 
     public ProjectGroupService(
-        IDocumentSession db,
+        IKafeDocumentSession db,
         OrganizationService organizationService,
         EntityMetadataProvider entityMetadataProvider,
         DiagnosticFactory diagnosticFactory
@@ -42,10 +41,15 @@ public class ProjectGroupService
             return diagnosticFactory.FromPayload(new BadHribDiagnostic(@new.Id));
         }
 
-        var organization = await organizationService.Load(@new.OrganizationId, token);
-        if (organization is null)
+        if (!Hrib.TryParse(@new.OrganizationId, out var organizationId, out _))
         {
-            return Kafe.Diagnostic.NotFound(@new.OrganizationId, "An organization");
+            return diagnosticFactory.FromPayload(new BadHribDiagnostic(@new.OrganizationId));
+        }
+
+        var orgErr = await db.LoadAsync<OrganizationInfo>(organizationId, token);
+        if (orgErr.Diagnostic is not null)
+        {
+            return orgErr.Diagnostic;
         }
 
         if (id == Hrib.Empty)
@@ -153,16 +157,23 @@ public class ProjectGroupService
 
     public async Task<ProjectGroupInfo?> Load(Hrib id, CancellationToken token = default)
     {
-        return await db.LoadAsync<ProjectGroupInfo>(id.ToString(), token);
+        return (await db.LoadAsync<ProjectGroupInfo>(id, token)).GetValueOrDefault();
     }
 
     public async Task<Err<ProjectGroupInfo>> Edit(ProjectGroupInfo @new, CancellationToken token = default)
     {
-        var @old = await Load(@new.Id, token);
-        if (@old is null)
+        if (!Hrib.TryParse(@new.Id, out var id, out _))
         {
-            return Kafe.Diagnostic.NotFound(@new.Id);
+            return diagnosticFactory.FromPayload(new BadHribDiagnostic(@new.Id));
         }
+
+        var oldErr = await db.LoadAsync<ProjectGroupInfo>(id, token);
+        if (oldErr.Diagnostic is not null)
+        {
+            return oldErr;
+        }
+
+        var @old = oldErr.Value;
 
         var eventStream = await db.Events.FetchForExclusiveWriting<ProjectGroupInfo>(@new.Id, token);
 
@@ -187,9 +198,13 @@ public class ProjectGroupService
 
         if (@old.OrganizationId != @new.OrganizationId)
         {
-            if (!((Hrib)@new.OrganizationId).IsValidNonEmpty)
+            if (!Hrib.TryParse(@new.OrganizationId, out var organizationId, out _)
+                || !organizationId.IsValidNonEmpty)
             {
-                return Kafe.Diagnostic.InvalidOrEmptyHrib(nameof(ProjectGroupInfo.OrganizationId));
+                return diagnosticFactory.ForParameter(
+                    nameof(ProjectGroupInfo.OrganizationId),
+                    new BadHribDiagnostic(@new.OrganizationId)
+                );
             }
 
             eventStream.AppendOne(new ProjectGroupMovedToOrganization(

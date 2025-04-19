@@ -3,7 +3,7 @@
 public record ShardCreated(
     [Hrib] string ShardId,
     CreationMethod CreationMethod,
-    long? Size,
+    long? FileLength,
     string? UploadFilename,
     string? MimeType,
     KafeObject Metadata
@@ -17,7 +17,7 @@ public record ShardMetadataSet(
 
 public record ShardInfoChanged(
     [Hrib] string ShardId,
-    long? Size,
+    long? FileLength,
     string? UploadFilename,
     string? MimeType
 );

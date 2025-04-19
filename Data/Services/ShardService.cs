@@ -68,7 +68,7 @@ public class ShardService
         var created = new ShardCreated(
             ShardId: shardId.ToString(),
             CreationMethod: CreationMethod.Api,
-            Size: stream.Length,
+            FileLength: stream.Length,
             UploadFilename: uploadFilename,
             MimeType: analysis.MimeType ?? mimeType,
             Metadata: kafeObjectFactory.Wrap(analysis.ShardMetadata)

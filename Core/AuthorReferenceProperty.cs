@@ -10,12 +10,17 @@ public record AuthorReferenceProperty(
     string[] Roles
 );
 
-public sealed record AuthorReferenceNameOrIdRequirement : IRequirement;
+public sealed record AuthorReferenceNameOrIdRequirement : IRequirement
+{
+    public static string Name { get; } = "author-ref-name-or-id";
+
+    public static KafeTypeAccessibility Accessibility { get; } = KafeTypeAccessibility.Internal;
+}
 
 public sealed class AuthorReferenceNameOrIdRequirementHandler
     : RequirementHandlerBase<AuthorReferenceNameOrIdRequirement>
 {
-    public override ValueTask Handle(RequirementContext context)
+    public override ValueTask Handle(IRequirementContext<AuthorReferenceNameOrIdRequirement> context)
     {
         if (context.Object.Value is not AuthorReferenceProperty authorRef)
         {

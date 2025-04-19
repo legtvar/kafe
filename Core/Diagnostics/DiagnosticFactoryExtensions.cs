@@ -104,4 +104,48 @@ public static class DiagnosticFactoryExtensions
     {
         return f.Unmodified(typeof(T), id, severityOverride);
     }
+    
+    public static Diagnostic AlreadyExists(
+        this DiagnosticFactory f,
+        Type objectType,
+        Hrib id,
+        DiagnosticSeverity? severityOverride = null
+    )
+    {
+        return f.FromPayload(new AlreadyExistsDiagnostic(
+            EntityType: f.TypeRegistry.RequireType(objectType),
+            Id: id
+        ), severityOverride);
+    }
+
+    public static Diagnostic AlreadyExists<T>(
+        this DiagnosticFactory f,
+        Hrib id,
+        DiagnosticSeverity? severityOverride = null
+    )
+    {
+        return f.AlreadyExists(typeof(T), id, severityOverride);
+    }
+    
+    public static Diagnostic Locked(
+        this DiagnosticFactory f,
+        Type objectType,
+        Hrib id,
+        DiagnosticSeverity? severityOverride = null
+    )
+    {
+        return f.FromPayload(new LockedDiagnostic(
+            EntityType: f.TypeRegistry.RequireType(objectType),
+            Id: id
+        ), severityOverride);
+    }
+
+    public static Diagnostic Locked<T>(
+        this DiagnosticFactory f,
+        Hrib id,
+        DiagnosticSeverity? severityOverride = null
+    )
+    {
+        return f.Locked(typeof(T), id, severityOverride);
+    }
 }

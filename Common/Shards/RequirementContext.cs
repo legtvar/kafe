@@ -3,10 +3,30 @@ using System.Collections.Generic;
 
 namespace Kafe;
 
-public sealed class RequirementContext
+public interface IRequirementContext<out T>
+    where T : IRequirement
+{
+    List<Diagnostic> Diagnostics { get; }
+    T Requirement { get; }
+    KafeObject Object { get; set; }
+    IServiceProvider ServiceProvider { get; }
+    KafeTypeRegistry TypeRegistry { get; }
+    KafeObjectFactory KafeObjectFactory { get; }
+    DiagnosticDescriptorRegistry DiagnosticDescriptorRegistry { get; }
+    DiagnosticFactory DiagnosticFactory { get; }
+
+    IRequirementContext<T> Report(Diagnostic diagnostic)
+    {
+        Diagnostics.Add(diagnostic);
+        return this;
+    }
+}
+
+public sealed class RequirementContext<T> : IRequirementContext<T>
+    where T : IRequirement
 {
     public RequirementContext(
-        IRequirement requirement,
+        T requirement,
         KafeObject @object,
         IServiceProvider serviceProvider,
         KafeTypeRegistry typeRegistry,
@@ -25,24 +45,11 @@ public sealed class RequirementContext
     }
 
     public List<Diagnostic> Diagnostics { get; } = [];
-    public IRequirement Requirement { get; }
+    public T Requirement { get; }
     public KafeObject Object { get; set; }
     public IServiceProvider ServiceProvider { get; }
     public KafeTypeRegistry TypeRegistry { get; }
     public KafeObjectFactory KafeObjectFactory { get; }
     public DiagnosticDescriptorRegistry DiagnosticDescriptorRegistry { get; }
     public DiagnosticFactory DiagnosticFactory { get; }
-
-    public RequirementContext Report(Diagnostic diagnostic)
-    {
-        Diagnostics.Add(diagnostic);
-        return this;
-    }
-
-    public RequirementContext Report<TPayload>(TPayload payload, DiagnosticSeverity? severityOverride = null)
-        where TPayload : notnull
-    {
-        var diagnostic = DiagnosticFactory.FromPayload(payload, severityOverride);
-        return Report(diagnostic);
-    }
 }

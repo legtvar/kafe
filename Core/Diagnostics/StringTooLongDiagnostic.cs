@@ -14,7 +14,13 @@ public record StringTooLongDiagnostic(
     );
 
     public static readonly LocalizedString MessageFormat = LocalizedString.Create(
-        (Const.InvariantCulture, "String '{Value}' is too long. Maximum allowed length is {MaxLength} characters."),
-        (Const.CzechCulture, "Řetězec '{Value}' je příliš dlouhý. Jeho maximální povolená délka je {MaxLength} znaků.")
+        (
+            Const.InvariantCulture,
+            "String '{Value}' is too long. Maximum allowed length is {MaxLength} characters (inclusive)."
+        ),
+        (
+            Const.CzechCulture,
+            "Řetězec '{Value}' je příliš dlouhý. Jeho maximální povolená délka je {MaxLength} znaků (včetně)."
+        )
     );
 }

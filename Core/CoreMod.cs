@@ -1,4 +1,6 @@
-﻿namespace Kafe.Core;
+﻿using Kafe.Core.Requirements;
+
+namespace Kafe.Core;
 
 public sealed class CoreMod : IMod
 {
@@ -64,10 +66,14 @@ public sealed class CoreMod : IMod
     {
         c.AddRequirement<AuthorReferenceNameOrIdRequirement>(new()
         {
-            Name = "author-ref-name-or-id",
-            Accessibility = KafeTypeAccessibility.Internal,
             HandlerTypes = [
                 typeof(AuthorReferenceNameOrIdRequirementHandler)
+            ]
+        });
+        c.AddRequirement<StringLengthRequirement>(new()
+        {
+            HandlerTypes = [
+                typeof(StringLengthRequirementHandler)
             ]
         });
     }

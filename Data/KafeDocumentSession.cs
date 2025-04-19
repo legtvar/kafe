@@ -19,7 +19,7 @@ public partial class KafeDocumentSession : IKafeQuerySession
         where T : notnull, IEntity
     {
         var kafeType = typeRegistry.RequireType<T>();
-        var entity = await LoadAsync<T>(id.ToString(), token: token);
+        var entity = await Inner.LoadAsync<T>(id.ToString(), token: token);
         if (entity is not null)
         {
             return entity;

@@ -22,19 +22,17 @@ namespace Kafe.Data;
 public partial class KafeDocumentSession : IKafeDocumentSession
 {
     public KafeDocumentSession(
-        IKafeDocumentSession inner,
+        IDocumentSession inner,
         KafeTypeRegistry typeRegistry,
-        EntityTypeRegistry entityRegistry,
         DiagnosticFactory diagnosticFactory
     )
     {
         Inner = inner;
         this.typeRegistry = typeRegistry;
-        this.entityRegistry = entityRegistry;
         this.diagnosticFactory = diagnosticFactory;
     }
 
-    public IKafeDocumentSession Inner { get; }
+    public IDocumentSession Inner { get; }
 
     public IMartenDatabase Database => Inner.Database;
 

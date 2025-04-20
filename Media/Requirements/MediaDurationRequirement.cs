@@ -1,14 +1,12 @@
 using System;
 using System.Threading.Tasks;
-using Kafe.Core.Diagnostics;
-using Kafe.Core.Requirements;
 using Kafe.Media.Diagnostics;
 
 namespace Kafe.Media.Requirements;
 
 public record MediaDurationRequirement(
-    TimeSpan? MinDuration,
-    TimeSpan? MaxDuration
+    TimeSpan? Min,
+    TimeSpan? Max
 ) : IRequirement
 {
     public static string Moniker { get; } = "media-duration";
@@ -20,47 +18,37 @@ public class MediaDurationRequirementHandler : RequirementHandlerBase<MediaDurat
 
     public override async ValueTask Handle(IRequirementContext<MediaDurationRequirement> context)
     {
-        if (context.Requirement.MinDuration is null && context.Requirement.MaxDuration is null)
+        if (context.Requirement.Min is null && context.Requirement.Max is null)
         {
             // TODO: warn about the uselessness of the user's doing.
             return;
         }
 
-        var (shard, mediaInfo) = await context.RequireShardVariant<MediaInfo>(Const.OriginalShardVariant) ?? default;
+        var (shard, mediaInfo) = await context.RequireMediaInfo() ?? default;
         if (shard is null || mediaInfo is null)
         {
             return;
         }
 
-        if (mediaInfo.IsCorrupted)
-        {
-            context.Report(new CorruptedShardDiagnostic(
-                ShardName: shard.Name,
-                ShardId: shard.Id,
-                Variant: Const.OriginalShardVariant
-            ));
-            return;
-        }
-
-        if (context.Requirement.MinDuration is not null
-            && mediaInfo.Duration + AcceptableDurationError < context.Requirement.MinDuration.Value)
+        if (context.Requirement.Min is not null
+            && mediaInfo.Duration + AcceptableDurationError < context.Requirement.Min.Value)
         {
             context.Report(new MediaTooShortDiagnostic(
                 ShardName: shard.Name,
                 ShardId: shard.Id,
                 Variant: Const.OriginalShardVariant,
-                MinDuration: context.Requirement.MinDuration.Value
+                MinDuration: context.Requirement.Min.Value
             ));
         }
 
-        if (context.Requirement.MaxDuration is not null
-            && mediaInfo.Duration - AcceptableDurationError > context.Requirement.MaxDuration.Value)
+        if (context.Requirement.Max is not null
+            && mediaInfo.Duration - AcceptableDurationError > context.Requirement.Max.Value)
         {
             context.Report(new MediaTooLongDiagnostic(
                 ShardName: shard.Name,
                 ShardId: shard.Id,
                 Variant: Const.OriginalShardVariant,
-                MaxDuration: context.Requirement.MaxDuration.Value
+                MaxDuration: context.Requirement.Max.Value
             ));
         }
     }

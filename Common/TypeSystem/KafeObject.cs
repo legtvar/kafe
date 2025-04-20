@@ -14,6 +14,7 @@ public readonly record struct KafeObject(
         Value: null!
     );
 
+    [JsonIgnore]
     public bool IsInvalid => Type == KafeType.Invalid || Value is null;
 }
 

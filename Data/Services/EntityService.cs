@@ -70,15 +70,15 @@ public class EntityService
         var perms = await LoadPermissionInfo(entityId, token);
         // NB: Special case: The async deamon might still be processing EntityPermissionEventProjection, so we look into
         //     the account itself.
-        if (perms.Diagnostic is not null)
+        if (perms.HasError)
         {
-            if (perms.Diagnostic.Value.Payload.Value is NotFoundDiagnostic)
+            if (perms.Diagnostic.Payload.Value is NotFoundDiagnostic)
             {
                 var accessingAccount = (await db.LoadAsync<AccountInfo>(accessingAccountId, token)).Unwrap();
                 return accessingAccount.Permissions.GetValueOrDefault(entityId.ToString());
             }
 
-            perms.Unwrap();
+            throw perms.AsException();
         }
 
         return accessingAccountId.IsEmpty

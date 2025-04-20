@@ -8,7 +8,7 @@ public static class ControllerBaseExtensions
 {
     public static ActionResult KafeErrResult<T>(this ControllerBase controller, Err<T> err)
     {
-        if (err.Diagnostic is not null)
+        if (err.HasValue)
         {
             return new OkObjectResult(err.Value);
         }
@@ -18,7 +18,7 @@ public static class ControllerBaseExtensions
             modelState: controller.ModelState,
             skipFrames: 2
         );
-        pd.Errors = pd.Errors.AddRange(err.Errors);
+        pd.Errors = pd.Errors.AddRange(err.Diagnostic);
 
         return new ObjectResult(pd)
         {

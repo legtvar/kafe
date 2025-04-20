@@ -37,7 +37,7 @@ public class TestSeedData(IServiceProvider services, ILogger<TestSeedData> logge
         var accountService = scope.ServiceProvider.GetRequiredService<AccountService>();
 
         var admin = await accountService.Create(AccountInfo.Create(AdminEmail) with { Id = AdminHrib }, ct);
-        if (admin.HasErrors)
+        if (admin.HasError)
         {
             throw admin.AsException();
         }

@@ -27,7 +27,7 @@ namespace Kafe.Data;
 
 public class DataMod : IMod
 {
-    public static string Name { get; } = "data";
+    public static string Moniker { get; } = "data";
 
     public void ConfigureOptions(KafeBrewingOptions options)
     {

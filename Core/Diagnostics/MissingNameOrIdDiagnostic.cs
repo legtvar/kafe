@@ -4,7 +4,7 @@ public record MissingNameOrIdDiagnostic(
     KafeType EntityType
 ) : IDiagnosticPayload
 {
-    public static string Name { get; } = "missing-name-or-id";
+    public static string Moniker { get; } = "missing-name-or-id";
 
     public static DiagnosticSeverity DefaultSeverity { get; } = DiagnosticSeverity.Error;
 

@@ -5,7 +5,7 @@ namespace Kafe.Media;
 
 public sealed class MediaMod : IMod
 {
-    public static string Name { get; } = "media";
+    public static string Moniker { get; } = "media";
 
     public KafeType AudiovisualShardType { get; private set; }
 

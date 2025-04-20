@@ -11,7 +11,7 @@ public record MediaDurationRequirement(
     TimeSpan? MaxDuration
 ) : IRequirement
 {
-    public static string Name { get; } = "media-duration";
+    public static string Moniker { get; } = "media-duration";
 }
 
 public class MediaDurationRequirementHandler : RequirementHandlerBase<MediaDurationRequirement>

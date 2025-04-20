@@ -5,7 +5,7 @@ public record ParameterDiagnostic(
     Diagnostic Inner
 ) : IDiagnosticPayload
 {
-    public static string Name {get;} = "parameter";
+    public static string Moniker {get;} = "parameter";
     
     public static DiagnosticSeverity DefaultSeverity { get; } = DiagnosticSeverity.Error;
 

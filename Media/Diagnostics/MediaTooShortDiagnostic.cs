@@ -9,7 +9,7 @@ public record MediaTooShortDiagnostic(
     TimeSpan MinDuration
 ) : IDiagnosticPayload
 {
-    public static string Name { get; } = "media-too-short";
+    public static string Moniker { get; } = "media-too-short";
     public static DiagnosticSeverity DefaultSeverity { get; } = DiagnosticSeverity.Error;
 
     public static readonly LocalizedString Title = LocalizedString.Create(

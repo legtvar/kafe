@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Kafe.Core.Diagnostics;
-using Kafe.Data.Requirements;
+using Kafe.Core.Requirements;
 using Kafe.Media.Diagnostics;
 
 namespace Kafe.Media.Requirements;
@@ -32,13 +32,10 @@ public class MediaDurationRequirementHandler : RequirementHandlerBase<MediaDurat
             return;
         }
 
-        // TODO: replace with real shard names, once shard have names
-        var shardName = LocalizedString.CreateInvariant(shard.Id);
-
         if (mediaInfo.IsCorrupted)
         {
             context.Report(new CorruptedShardDiagnostic(
-                ShardName: shardName,
+                ShardName: shard.Name,
                 ShardId: shard.Id,
                 Variant: Const.OriginalShardVariant
             ));
@@ -49,7 +46,7 @@ public class MediaDurationRequirementHandler : RequirementHandlerBase<MediaDurat
             && mediaInfo.Duration + AcceptableDurationError < context.Requirement.MinDuration.Value)
         {
             context.Report(new MediaTooShortDiagnostic(
-                ShardName: shardName,
+                ShardName: shard.Name,
                 ShardId: shard.Id,
                 Variant: Const.OriginalShardVariant,
                 MinDuration: context.Requirement.MinDuration.Value
@@ -60,7 +57,7 @@ public class MediaDurationRequirementHandler : RequirementHandlerBase<MediaDurat
             && mediaInfo.Duration - AcceptableDurationError > context.Requirement.MaxDuration.Value)
         {
             context.Report(new MediaTooLongDiagnostic(
-                ShardName: shardName,
+                ShardName: shard.Name,
                 ShardId: shard.Id,
                 Variant: Const.OriginalShardVariant,
                 MaxDuration: context.Requirement.MaxDuration.Value

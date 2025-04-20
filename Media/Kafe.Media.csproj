@@ -15,8 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="../Common/Kafe.Common.csproj" />
-    <ProjectReference Include="..\Core\Kafe.Core.csproj" />
-    <ProjectReference Include="..\Data\Kafe.Data.csproj" />
+    <ProjectReference Include="../Core/Kafe.Core.csproj" />
   </ItemGroup>
 
 </Project>

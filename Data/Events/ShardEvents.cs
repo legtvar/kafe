@@ -2,6 +2,7 @@
 
 public record ShardCreated(
     [Hrib] string ShardId,
+    LocalizedString? Name,
     CreationMethod CreationMethod,
     long? FileLength,
     string? UploadFilename,
@@ -17,6 +18,7 @@ public record ShardMetadataSet(
 
 public record ShardInfoChanged(
     [Hrib] string ShardId,
+    LocalizedString? Name,
     long? FileLength,
     string? UploadFilename,
     string? MimeType

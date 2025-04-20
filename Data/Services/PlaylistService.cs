@@ -147,7 +147,7 @@ public class PlaylistService
             var existanceCheck = await CheckArtifactsExist(
                 @new.EntryIds.Select(i => (Hrib)i).ToImmutableArray(),
                 token);
-            if (existanceCheck.Diagnostic is not null)
+            if (existanceCheck.HasError)
             {
                 return existanceCheck.Diagnostic;
             }
@@ -200,7 +200,7 @@ public class PlaylistService
             var existanceCheck = await CheckArtifactsExist(
                 @new.EntryIds.Select(i => (Hrib)i).ToImmutableArray(),
                 token);
-            if (existanceCheck.Diagnostic is not null)
+            if (existanceCheck.HasError)
             {
                 return existanceCheck.Diagnostic;
             }
@@ -237,7 +237,7 @@ public class PlaylistService
     )
     {
         var artifacts = await db.LoadManyAsync<ArtifactInfo>(artifactIds, token);
-        if (artifacts.Diagnostic is not null)
+        if (artifacts.HasError)
         {
             return artifacts.Diagnostic;
         }

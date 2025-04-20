@@ -57,9 +57,9 @@ public class UserSeedData : IInitialData
                     account.EmailAddress,
                     account.PreferredCulture,
                     token: token);
-                if (res.Diagnostic is not null)
+                if (res.HasDiagnostic)
                 {
-                    throw res.AsException();
+                    throw res.AsException()!;
                 }
 
                 logger.LogInformation("Seed account '{AccountEmailAddress}' created.", account.EmailAddress);
@@ -111,9 +111,9 @@ public class UserSeedData : IInitialData
                     CreationMethod = CreationMethod.Seed
                 },
                 token);
-            if (createResult.Diagnostic is not null)
+            if (createResult.HasError)
             {
-                throw createResult.AsException();
+                throw createResult.AsException()!;
             }
 
             logger.LogInformation("Seed organization '{OrganizationId}' created.", organization.Id);
@@ -146,9 +146,9 @@ public class UserSeedData : IInitialData
                 Description: null,
                 Deadline: deadline
             ));
-            if (createResult.Diagnostic is not null)
+            if (createResult.HasError)
             {
-                throw createResult.AsException();
+                throw createResult.AsException()!;
             }
 
             logger.LogInformation("Seed project group '{ProjectGroupId}' created.", group.Id);

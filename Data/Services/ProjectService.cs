@@ -101,7 +101,7 @@ public partial class ProjectService
         if (existing is null)
         {
             var group = await db.LoadAsync<ProjectGroupInfo>((Hrib)project.ProjectGroupId, token);
-            if (group.Diagnostic is not null)
+            if (group.HasError)
             {
                 return group.Diagnostic;
             }
@@ -147,7 +147,7 @@ public partial class ProjectService
             [.. authorsAdded.Select(a => (Hrib)a.AuthorId)],
             token
         );
-        if (authorsAddedInfos.Diagnostic is not null)
+        if (authorsAddedInfos.HasError)
         {
             return authorsAddedInfos.Diagnostic;
         }
@@ -165,7 +165,7 @@ public partial class ProjectService
             [.. artifactsAdded.Select(a => (Hrib)a.ArtifactId)],
             token
         );
-        if (artifactsAddedInfos.Diagnostic is not null)
+        if (artifactsAddedInfos.HasError)
         {
             return artifactsAddedInfos.Diagnostic;
         }

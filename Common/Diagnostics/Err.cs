@@ -4,39 +4,70 @@ using System.Diagnostics.CodeAnalysis;
 namespace Kafe;
 
 /// <summary>
-/// An error union type. Can be used to return exceptions instead of throwing them.
+/// An error type. Can contain a <see cref="Diagnostic "/>, a value of <typeparamref name="T"/> or both.
 /// </summary>
+// Inspired in part by: https://stackoverflow.com/questions/3151702/discriminated-union-in-c-sharp
+// And: https://ziglang.org/documentation/master/#while-with-Error-Unions
 public readonly record struct Err<T>
 {
-    // Inspired in part by: https://stackoverflow.com/questions/3151702/discriminated-union-in-c-sharp
-    // And: https://ziglang.org/documentation/master/#while-with-Error-Unions
-
-    private readonly T value;
-    private readonly Diagnostic? diagnostic;
+    [MaybeNull]
+    private readonly T value = default!;
+    private readonly Diagnostic diagnostic = default;
+    private readonly bool hasValue = false;
+    private readonly bool hasDiagnostic = false;
 
     public Err()
     {
         value = default!;
-        diagnostic = null;
+        diagnostic = default;
     }
 
-    public Err(T value, Diagnostic? diagnostic)
+    public Err(T? value, Diagnostic? diagnostic)
     {
-        this.value = value;
-        this.diagnostic = diagnostic;
+        if (value is null && diagnostic is null)
+        {
+            throw new ArgumentException("Err<T> must contain a non-null a value or a diagnostic or both.");
+        }
+
+        if (value is not null)
+        {
+            hasValue = true;
+            this.value = value;
+        }
+
+        if (diagnostic is not null)
+        {
+            hasDiagnostic = true;
+            this.diagnostic = diagnostic.Value;
+        }
     }
 
     public Err(T value) : this(value, null)
     {
     }
 
-    public Err(Diagnostic diagnostic) : this(default!, diagnostic)
+    public Err(Diagnostic diagnostic) : this(default, diagnostic)
     {
     }
 
+    [MaybeNull]
     public T Value => value;
 
-    public Diagnostic? Diagnostic => diagnostic;
+    public Diagnostic Diagnostic => diagnostic;
+
+    [MemberNotNullWhen(true, nameof(Diagnostic))]
+    [MemberNotNullWhen(false, nameof(Value))]
+    public bool HasDiagnostic => hasDiagnostic;
+
+    [MemberNotNullWhen(true, nameof(Diagnostic))]
+    [MemberNotNullWhen(false, nameof(Value))]
+    public bool HasError => hasDiagnostic && diagnostic.Severity == DiagnosticSeverity.Error;
+
+    [MemberNotNullWhen(true, nameof(Value))]
+    [MemberNotNullWhen(false, nameof(Diagnostic))]
+    public bool HasValue => hasValue;
+
+    public bool IsInvalid => !hasValue && !hasDiagnostic;
 
 
     public static implicit operator Err<T>(T value)
@@ -70,22 +101,21 @@ public readonly record struct Err<T>
         return err.Unwrap();
     }
 
-    public KafeErrorException? AsException()
+    public KafeErrorException AsException()
     {
-        if (Diagnostic.HasValue && Diagnostic.Value.Severity == DiagnosticSeverity.Error)
+        if (!HasError)
         {
-            return new KafeErrorException(Diagnostic.Value);
+            throw new InvalidOperationException("This Err<T> has no error diagnostic to convert into an exception.");
         }
 
-        return null;
+        return new KafeErrorException(Diagnostic);
     }
 
     public static T Unwrap(Err<T> err)
     {
-        var ex = err.AsException();
-        if (ex is not null)
+        if (err.HasError)
         {
-            throw ex;
+            throw new KafeErrorException(err.Diagnostic);
         }
 
         return err.Value;
@@ -96,8 +126,9 @@ public readonly record struct Err<T>
         return Unwrap(this);
     }
 
-    public T? GetValueOrDefault()
+    [return: MaybeNull]
+    public T GetValueOrDefault()
     {
-        return Diagnostic is not null ? default : Value;
+        return hasValue ? value : default;
     }
 }

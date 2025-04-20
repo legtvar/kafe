@@ -40,7 +40,7 @@ public class TestSeedData : IInitialData
         var accountService = scope.ServiceProvider.GetRequiredService<AccountService>();
 
         var admin = await accountService.CreateOrRefreshTemporaryAccount(AdminEmail, null, AdminHrib, ct);
-        if (admin.Diagnostic is not null)
+        if (admin.HasError)
         {
             throw admin.AsException();
         }

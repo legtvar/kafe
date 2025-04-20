@@ -47,7 +47,7 @@ public class ProjectGroupService
         }
 
         var orgErr = await db.LoadAsync<OrganizationInfo>(organizationId, token);
-        if (orgErr.Diagnostic is not null)
+        if (orgErr.HasError)
         {
             return orgErr.Diagnostic;
         }
@@ -168,7 +168,7 @@ public class ProjectGroupService
         }
 
         var oldErr = await db.LoadAsync<ProjectGroupInfo>(id, token);
-        if (oldErr.Diagnostic is not null)
+        if (oldErr.HasError)
         {
             return oldErr;
         }

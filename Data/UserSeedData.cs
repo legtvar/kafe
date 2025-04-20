@@ -60,7 +60,7 @@ public class UserSeedData : IInitialData
                 );
                 if (res.HasErrors)
                 {
-                    throw res.AsException();
+                    throw res.AsException()!;
                 }
 
                 logger.LogInformation("Seed account '{AccountEmailAddress}' created.", account.EmailAddress);
@@ -114,11 +114,10 @@ public class UserSeedData : IInitialData
                     Id = organization.Id,
                     CreationMethod = CreationMethod.Seed
                 },
-                token
-            );
-            if (createResult.Diagnostic is not null)
+                token);
+            if (createResult.HasError)
             {
-                throw createResult.AsException();
+                throw createResult.AsException()!;
             }
 
             logger.LogInformation("Seed organization '{OrganizationId}' created.", organization.Id);
@@ -144,19 +143,17 @@ public class UserSeedData : IInitialData
             }
 
             var deadline = group.Deadline is null ? default : DateTimeOffset.Parse(group.Deadline);
-            var createResult = await projectGroupService.Create(
-                new ProjectGroupInfo(
-                    Id: group.Id,
-                    CreationMethod: CreationMethod.Seed,
-                    OrganizationId: group.OrganizationId,
-                    Name: LocalizedString.CreateInvariant(group.Name),
-                    Description: null,
-                    Deadline: deadline
-                )
-            );
-            if (createResult.HasErrors)
+            var createResult = await projectGroupService.Create(new ProjectGroupInfo(
+                Id: group.Id,
+                CreationMethod: CreationMethod.Seed,
+                OrganizationId: group.OrganizationId,
+                Name: LocalizedString.CreateInvariant(group.Name),
+                Description: null,
+                Deadline: deadline
+            ));
+            if (createResult.HasError)
             {
-                throw createResult.AsException();
+                throw createResult.AsException()!;
             }
 
             logger.LogInformation("Seed project group '{ProjectGroupId}' created.", group.Id);

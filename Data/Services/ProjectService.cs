@@ -144,7 +144,7 @@ public partial class ProjectService
             [.. authorsAdded.Select(a => (Hrib)a.AuthorId)],
             token
         );
-        if (authorsAddedInfos.Diagnostic is not null)
+        if (authorsAddedInfos.HasError)
         {
             return authorsAddedInfos.Diagnostic;
         }
@@ -162,7 +162,7 @@ public partial class ProjectService
             [.. artifactsAdded.Select(a => (Hrib)a.ArtifactId)],
             token
         );
-        if (artifactsAddedInfos.Diagnostic is not null)
+        if (artifactsAddedInfos.HasError)
         {
             return artifactsAddedInfos.Diagnostic;
         }

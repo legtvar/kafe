@@ -11,26 +11,23 @@ public record ShardFileLengthRequirement(
     public static string Moniker { get; } = "shard-file-length";
 }
 
-public sealed class ShardFileLengthRequirementHandler : RequirementHandlerBase<ShardFileLengthRequirement>
+public sealed class ShardFileLengthRequirementHandler : ShardRequirementHandlerBase<ShardFileLengthRequirement>
 {
-    public override async ValueTask Handle(IRequirementContext<ShardFileLengthRequirement> context)
+    public override ValueTask Handle(
+        IRequirementContext<ShardFileLengthRequirement> context,
+        IShard shard
+    )
     {
         if (context.Requirement.Min is null && context.Requirement.Max is null)
         {
             // TODO: warn about the uselessness of the user's doing.
-            return;
-        }
-
-        var shard = await context.RequireShard();
-        if (shard is null)
-        {
-            return;
+            return ValueTask.CompletedTask;
         }
 
         if (shard.FileLength < 0)
         {
             context.Report(new CorruptedShardDiagnostic(shard.Name, shard.Id));
-            return;
+            return ValueTask.CompletedTask;
         }
 
         if (context.Requirement.Min is not null
@@ -44,5 +41,7 @@ public sealed class ShardFileLengthRequirementHandler : RequirementHandlerBase<S
         {
             context.Report(new ShardTooLargeDiagnostic(shard.Name, shard.Id, context.Requirement.Max.Value));
         }
+        
+        return ValueTask.CompletedTask;
     }
 }

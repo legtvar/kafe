@@ -1,9 +1,8 @@
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Kafe;
 
-public abstract class RequirementHandlerBase<T> : IRequirementHandler<T>
+public abstract class RequirementHandlerBase<T> : IRequirementHandler
     where T : IRequirement
 {
     public virtual bool CanHandle(IRequirement requirement)

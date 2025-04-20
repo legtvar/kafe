@@ -7,7 +7,7 @@ public record UnmodifiedDiagnostic(
     Hrib Id
 ) : IDiagnosticPayload
 {
-    public static string Name { get; } = "unmodified";
+    public static string Moniker { get; } = "unmodified";
 
     public static DiagnosticSeverity DefaultSeverity { get; } = DiagnosticSeverity.Warning;
 

@@ -6,7 +6,7 @@ public interface IDiagnosticPayload
     /// Short identifier used when registering this diagnostic payload type in <see cref="ModContext"/>
     /// and creating a <see cref="DiagnosticDescriptor"/> based on it.
     /// </summary>
-    public static string? Name { get; }
+    public static string? Moniker { get; }
     public static virtual LocalizedString? Title { get; }
     public static virtual LocalizedString? Description { get; }
     public static virtual LocalizedString? MessageFormat { get; }

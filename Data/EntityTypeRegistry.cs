@@ -40,7 +40,7 @@ public static class EntityTypeModContextExtensions
         }
 
         options.HumanReadableName ??= entityType.GetStaticPropertyValue<LocalizedString?>(
-            propertyName: nameof(IEntity.Name),
+            propertyName: nameof(IEntity.Title),
             isRequired: false,
             allowNull: true
         );

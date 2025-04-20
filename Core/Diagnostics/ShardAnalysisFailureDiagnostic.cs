@@ -4,7 +4,7 @@ public record ShardAnalysisFailureDiagnostic(
     KafeType ShardType
 ) : IDiagnosticPayload
 {
-    public static string Name { get; } = "shard-analysis-failure";
+    public static string Moniker { get; } = "shard-analysis-failure";
 
     public static DiagnosticSeverity DefaultSeverity { get; } = DiagnosticSeverity.Error;
 

@@ -12,4 +12,5 @@ public record SubtitlesInfo(
     string? Language,
     string Codec,
     long Bitrate,
-    bool IsCorrupted);
+    bool IsCorrupted
+) : IShardMetadata;

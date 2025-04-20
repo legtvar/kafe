@@ -15,7 +15,7 @@ public record MediaInfo(
     ImmutableArray<SubtitleStreamInfo> SubtitleStreams,
     bool IsCorrupted = false,
     string? Error = null
-)
+) : IShardMetadata
 {
     public static MediaInfo Invalid { get; } = new(
         FileExtension: Const.InvalidFileExtension,

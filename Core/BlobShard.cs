@@ -1,3 +1,3 @@
 namespace Kafe.Core;
 
-public record BlobShard();
+public record BlobShard() : IShardMetadata;

@@ -11,9 +11,3 @@ public interface IRequirementHandler
 
     ValueTask Handle(IRequirementContext<IRequirement> context);
 }
-
-public interface IRequirementHandler<T> : IRequirementHandler
-    where T : IRequirement
-{
-    ValueTask Handle(IRequirementContext<T> context);
-}

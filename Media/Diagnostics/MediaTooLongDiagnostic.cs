@@ -9,7 +9,7 @@ public record MediaTooLongDiagnostic(
     TimeSpan MaxDuration
 ) : IDiagnosticPayload
 {
-    public static string Name { get; } = "media-too-long";
+    public static string Moniker { get; } = "media-too-long";
     public static DiagnosticSeverity DefaultSeverity { get; } = DiagnosticSeverity.Error;
 
     public static readonly LocalizedString Title = LocalizedString.Create(

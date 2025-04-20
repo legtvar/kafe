@@ -43,7 +43,7 @@ public class ModRegistry : IFreezable
         AssertUnfrozen();
 
         var modType = mod.GetType();
-        var modName = (string?)modType.GetProperty(nameof(IMod.Name))?.GetValue(null);
+        var modName = (string?)modType.GetProperty(nameof(IMod.Moniker))?.GetValue(null);
         if (string.IsNullOrWhiteSpace(modName))
         {
             modName = modType.Name;

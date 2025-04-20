@@ -13,7 +13,7 @@ public record StringLengthRequirement(
     int? MaxLength
 ) : IRequirement
 {
-    public static string Name { get; } = "string-length";
+    public static string Moniker { get; } = "string-length";
 }
 
 public sealed class StringLengthRequirementHandler : RequirementHandlerBase<StringLengthRequirement>

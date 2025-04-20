@@ -32,7 +32,7 @@ public static class DiagnosticDescriptorModContextExtensions
         if (diagnosticPayloadType.IsAssignableTo(typeof(IDiagnosticPayload)))
         {
             options.Name ??= diagnosticPayloadType.GetStaticPropertyValue<string>(
-                propertyName: nameof(IDiagnosticPayload.Name),
+                propertyName: nameof(IDiagnosticPayload.Moniker),
                 isRequired: false,
                 allowNull: true
             );

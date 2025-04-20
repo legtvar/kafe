@@ -5,7 +5,7 @@ public record LockedDiagnostic(
     Hrib Id
 ) : IDiagnosticPayload
 {
-    public static string Name { get; } = "locked";
+    public static string Moniker { get; } = "locked";
 
     public static DiagnosticSeverity DefaultSeverity { get; } = DiagnosticSeverity.Error;
 

@@ -5,7 +5,7 @@ public record IncompatibleRequirementDiagnostic(
     KafeType ObjectType
 ) : IDiagnosticPayload
 {
-    public static string Name { get; } = "incompatible-requirement";
+    public static string Moniker { get; } = "incompatible-requirement";
 
     public static DiagnosticSeverity DefaultSeverity { get; } = DiagnosticSeverity.Error;
 

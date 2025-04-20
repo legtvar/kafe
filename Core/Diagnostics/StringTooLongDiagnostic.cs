@@ -5,7 +5,7 @@ public record StringTooLongDiagnostic(
     int MaxLength
 ) : IDiagnosticPayload
 {
-    public static string Name { get; } = "string-too-long";
+    public static string Moniker { get; } = "string-too-long";
     public static DiagnosticSeverity DefaultSeverity { get; } = DiagnosticSeverity.Error;
 
     public static readonly LocalizedString Title = LocalizedString.Create(

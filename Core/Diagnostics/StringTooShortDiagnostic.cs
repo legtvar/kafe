@@ -5,7 +5,7 @@ public record StringTooShortDiagnostic(
     int MinLength
 ) : IDiagnosticPayload
 {
-    public static string Name { get; } = "string-too-short";
+    public static string Moniker { get; } = "string-too-short";
     public static DiagnosticSeverity DefaultSeverity { get; } = DiagnosticSeverity.Error;
 
     public static readonly LocalizedString Title = LocalizedString.Create(

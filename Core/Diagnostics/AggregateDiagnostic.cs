@@ -6,7 +6,7 @@ public record AggregateDiagnostic(
     ImmutableArray<Diagnostic> Inner
 ) : IDiagnosticPayload
 {
-    public static string Name { get; } = "aggregate";
+    public static string Moniker { get; } = "aggregate";
 
     public static DiagnosticSeverity DefaultSeverity { get; } = DiagnosticSeverity.Error;
 

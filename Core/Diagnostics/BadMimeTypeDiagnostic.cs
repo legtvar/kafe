@@ -4,7 +4,7 @@ public record BadMimeTypeDiagnostic(
     string Value
 ) : IDiagnosticPayload
 {
-    public static string Name { get; } = "bad-mime-type";
+    public static string Moniker { get; } = "bad-mime-type";
 
     public static DiagnosticSeverity DefaultSeverity { get; } = DiagnosticSeverity.Error;
 

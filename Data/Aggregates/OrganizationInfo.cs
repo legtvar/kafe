@@ -35,6 +35,8 @@ public record OrganizationInfo(
     {
     }
 
+    Hrib IEntity.Id => Id;
+
     /// <summary>
     /// Creates a bare-bones but valid <see cref="OrganizationInfo"/>.
     /// </summary>

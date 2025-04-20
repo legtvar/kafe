@@ -90,6 +90,8 @@ public class ShardService
 
         var created = new ShardCreated(
             ShardId: shardId.ToString(),
+            // TODO: Allows setting a shard's name
+            Name: null,
             CreationMethod: CreationMethod.Api,
             FileLength: stream.Length,
             UploadFilename: uploadFilename,

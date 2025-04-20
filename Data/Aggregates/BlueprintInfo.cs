@@ -4,4 +4,7 @@
 public record BlueprintInfo(
     [Hrib] string Id
 
-    ) : IEntity;
+    ) : IEntity
+{
+    Hrib IEntity.Id => Id;
+}

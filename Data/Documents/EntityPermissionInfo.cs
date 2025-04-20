@@ -55,6 +55,8 @@ public record EntityPermissionInfo(
 {
     public static readonly EntityPermissionInfo Invalid = new();
 
+    Hrib IEntity.Id => Id;
+
     public EntityPermissionInfo() : this(
         Id: Hrib.InvalidValue,
         GlobalPermission: new(Permission.None, ImmutableDictionary<string, EntityPermissionSource>.Empty),

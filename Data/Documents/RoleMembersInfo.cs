@@ -28,6 +28,8 @@ public record RoleMembersInfo
     {
     }
 
+    Hrib IEntity.Id => Id;
+
     /// <summary>
     /// Creates a bare-bones but valid <see cref="RoleMembersInfo"/> with nothing but the entity's HRIB.
     /// </summary>

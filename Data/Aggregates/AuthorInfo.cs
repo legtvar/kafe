@@ -42,6 +42,8 @@ public record AuthorInfo(
     {
     }
 
+    Hrib IEntity.Id => Id;
+
     /// <summary>
     /// Creates a bare-bones but valid <see cref="AuthorInfo"/>.
     /// </summary>

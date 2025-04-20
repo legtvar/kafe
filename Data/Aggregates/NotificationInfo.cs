@@ -13,7 +13,10 @@ public record NotificationInfo(
     [Hrib] string? ProjectId,
     [LocalizedString] ImmutableDictionary<string, string> Description,
     bool IsSent = false
-) : IEntity;
+) : IEntity
+{
+    Hrib IEntity.Id => Id;
+}
 
 public class NotificationInfoProjection : SingleStreamProjection<NotificationInfo, string>
 {

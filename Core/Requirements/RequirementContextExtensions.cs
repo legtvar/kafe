@@ -75,4 +75,26 @@ public static class RequirementContextExtensions
 
         return (shard, typedVariant);
     }
+    
+    public static async Task<(IShard shard, TMetadata metadata)?> RequireShardMetadata<TMetadata>(
+        this IRequirementContext<IRequirement> context
+    )
+    {
+        var shard = await context.RequireShard();
+        if (shard is null)
+        {
+            return null;
+        }
+        
+        if (shard.Metadata.Value is not TMetadata metadata)
+        {
+            context.Report(new IncompatibleRequirementDiagnostic(
+                context.RequirementType,
+                shard.Metadata.Type
+            ));
+            return null;
+        }
+
+        return (shard, metadata);
+    }
 }

@@ -49,6 +49,8 @@ public record ProjectInfo(
         (Const.CzechCulture, "projekt")
     );
 
+    Hrib IEntity.Id => Id;
+
     public ProjectInfo() : this(
         Id: Hrib.InvalidValue,
         CreationMethod: CreationMethod.Unknown,
@@ -85,12 +87,12 @@ public record ProjectAuthorInfo(
     [Hrib] string Id,
     ProjectAuthorKind Kind,
     ImmutableArray<string> Roles
-) : IEntity;
+);
 
 public record ProjectArtifactInfo(
     [Hrib] string Id,
     string? BlueprintSlot
-) : IEntity;
+);
 
 public record ProjectReviewInfo(
     ReviewKind Kind,

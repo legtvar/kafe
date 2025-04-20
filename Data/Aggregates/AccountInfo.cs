@@ -63,6 +63,7 @@ public record AccountInfo(
     {
     }
 
+    Hrib IEntity.Id => Id;
 
     /// <summary>
     /// Creates a bare-bones but valid <see cref="AccountInfo"/>.

@@ -8,7 +8,6 @@ using Kafe.Data.Events.Upcasts;
 using Kafe.Data.Metadata;
 using Kafe.Data.Options;
 using Kafe.Data.Projections;
-using Kafe.Data.Requirements;
 using Kafe.Data.Services;
 using Marten;
 using Marten.Events;
@@ -112,10 +111,6 @@ public class DataMod : IMod
         });
 
         context.AddDiagnosticFromAssembly(typeof(DataMod).Assembly);
-        context.AddRequirement<ShardFileLengthRequirement>(new()
-        {
-            HandlerTypes = [typeof(ShardFileLengthRequirementHandler)]
-        });
     }
 
     private static void ConfigureServices(IServiceCollection services)

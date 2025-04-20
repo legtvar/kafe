@@ -57,7 +57,7 @@ public partial class KafeDocumentSession : IKafeQuerySession
         var errors = ImmutableArray.CreateBuilder<Diagnostic>();
         if (entities.Length != ids.Length)
         {
-            var missingIds = stringIds.Except(entities.Select(e => e.Id)).ToImmutableArray();
+            var missingIds = ids.Except(entities.Select(e => e.Id)).ToImmutableArray();
             var notFoundErrors = missingIds.Select(id => diagnosticFactory.FromPayload(new NotFoundDiagnostic(
                 EntityType: kafeType,
                 Id: id

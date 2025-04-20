@@ -22,7 +22,10 @@ public record VideoConversionInfo(
     bool IsCompleted = false,
     bool HasFailed = false,
     [LocalizedString] ImmutableDictionary<string, string>? Error = null
-) : IEntity;
+) : IEntity
+{
+    Hrib IEntity.Id => Id;
+}
 
 public class VideoConversionInfoProjection : SingleStreamProjection<VideoConversionInfo, string>
 {

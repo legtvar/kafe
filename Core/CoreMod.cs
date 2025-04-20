@@ -66,15 +66,15 @@ public sealed class CoreMod : IMod
     {
         c.AddRequirement<AuthorReferenceNameOrIdRequirement>(new()
         {
-            HandlerTypes = [
-                typeof(AuthorReferenceNameOrIdRequirementHandler)
-            ]
+            HandlerTypes = [typeof(AuthorReferenceNameOrIdRequirementHandler)]
         });
         c.AddRequirement<StringLengthRequirement>(new()
         {
-            HandlerTypes = [
-                typeof(StringLengthRequirementHandler)
-            ]
+            HandlerTypes = [typeof(StringLengthRequirementHandler)]
+        });
+        c.AddRequirement<ShardFileLengthRequirement>(new()
+        {
+            HandlerTypes = [typeof(ShardFileLengthRequirementHandler)]
         });
     }
 

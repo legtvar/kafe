@@ -145,6 +145,7 @@ namespace Kafe.Data.Events.Upcasts
         {
             return new ShardCreated(
                 ShardId: oldEvent.ShardId,
+                Name: null,
                 CreationMethod: oldEvent.CreationMethod,
                 FileLength: oldEvent.OriginalVariantInfo.FileLength,
                 UploadFilename: $"{oldEvent.ShardId}{oldEvent.OriginalVariantInfo.FileExtension}",
@@ -190,6 +191,7 @@ namespace Kafe.Data.Events.Upcasts
         {
             return new ShardCreated(
                 ShardId: oldEvent.ShardId,
+                Name: null,
                 CreationMethod: oldEvent.CreationMethod,
                 FileLength: null,
                 UploadFilename: $"{oldEvent.ShardId}{oldEvent.OriginalVariantInfo.FileExtension}",
@@ -235,6 +237,7 @@ namespace Kafe.Data.Events.Upcasts
         {
             return new ShardCreated(
                 ShardId: oldEvent.ShardId,
+                Name: null,
                 CreationMethod: oldEvent.CreationMethod,
                 FileLength: null,
                 UploadFilename: $"{oldEvent.ShardId}{oldEvent.OriginalVariantInfo.FileExtension}",
@@ -281,6 +284,7 @@ namespace Kafe.Data.Events.Upcasts
         {
             return new ShardCreated(
                 ShardId: oldEvent.ShardId,
+                Name: null,
                 CreationMethod: oldEvent.CreationMethod,
                 FileLength: null,
                 UploadFilename: $"{oldEvent.ShardId}{oldEvent.OriginalVariantInfo.FileExtension}",

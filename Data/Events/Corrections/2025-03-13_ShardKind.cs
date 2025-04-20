@@ -101,6 +101,8 @@ namespace Kafe.Data.Aggregates
         DateTimeOffset CreatedAt) : IShardEntity
     {
         public abstract ShardKind Kind { get; }
+
+        Hrib IEntity.Id => Id;
     }
 
     [Obsolete("Use the new universal ShardInfo projection instead.")]

@@ -4,7 +4,7 @@ namespace Kafe.Core;
 
 public sealed class CoreMod : IMod
 {
-    public static string Name { get; } = "core";
+    public static string Moniker { get; } = "core";
 
     public void Configure(ModContext c)
     {

@@ -6,7 +6,7 @@ public record InternalErrorDiagnostic(
     Exception? Exception
 ) : IDiagnosticPayload
 {
-    public static string Name { get; } = "internal-error";
+    public static string Moniker { get; } = "internal-error";
 
     public static DiagnosticSeverity DefaultSeverity { get; } = DiagnosticSeverity.Error;
 

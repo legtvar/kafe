@@ -5,7 +5,7 @@ public record NotFoundDiagnostic(
     Hrib Id
 ) : IDiagnosticPayload
 {
-    public static string Name { get; } = "not-found";
+    public static string Moniker { get; } = "not-found";
 
     public static DiagnosticSeverity DefaultSeverity { get; } = DiagnosticSeverity.Error;
 

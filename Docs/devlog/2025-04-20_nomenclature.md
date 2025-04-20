@@ -93,6 +93,7 @@ public class ProjectInfo : IEntity
 - `IDiagnosticPayload`: `Moniker`, `Title`
 - `IRequirement`: `Moniker`, `Title`
 - `IPropertyType`: `Moniker`, `Title`
+- `IShardMetadata`: `Moniker`, `Title`
 
 ## Notes
 

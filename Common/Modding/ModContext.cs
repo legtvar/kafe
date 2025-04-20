@@ -29,7 +29,7 @@ public sealed record class ModContext
     }
 
     /// <summary>
-    /// Short, dash-case name of the mod. Taken from <see cref="IMod.Name"/>.
+    /// Short, dash-case name of the mod. Taken from <see cref="IMod.Moniker"/>.
     /// </summary>
     public string Name { get; }
 

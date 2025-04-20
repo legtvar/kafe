@@ -2,7 +2,7 @@ namespace Kafe.Core.Diagnostics;
 
 public record RequiredDiagnostic : IDiagnosticPayload
 {
-    public static string Name { get; } = "required";
+    public static string Moniker { get; } = "required";
 
     public static DiagnosticSeverity DefaultSeverity { get; } = DiagnosticSeverity.Error;
 

@@ -5,7 +5,7 @@ public record AlreadyExistsDiagnostic(
     Hrib Id
 ) : IDiagnosticPayload
 {
-    public static string Name { get; } = "already-exists";
+    public static string Moniker { get; } = "already-exists";
     public static DiagnosticSeverity DefaultSeverity { get; } = DiagnosticSeverity.Error;
 
     public static readonly LocalizedString Title = LocalizedString.Create(

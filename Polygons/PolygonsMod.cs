@@ -4,7 +4,7 @@ namespace Kafe.Polygons;
 
 public class PolygonsMod : IMod
 {
-    public static string Name {get;} = "polygons";
+    public static string Moniker {get;} = "polygons";
     
     public KafeType BlendShardType { get; private set; }
 

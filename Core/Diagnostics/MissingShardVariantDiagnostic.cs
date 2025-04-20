@@ -7,7 +7,7 @@ public record MissingShardVariantDiagnostic(
     string Variant
 ) : IDiagnosticPayload
 {
-    public static string Name { get; } = "missing-shard-variant";
+    public static string Moniker { get; } = "missing-shard-variant";
 
     public static DiagnosticSeverity DefaultSeverity { get; } = DiagnosticSeverity.Error;
 

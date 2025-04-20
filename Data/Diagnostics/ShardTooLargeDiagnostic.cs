@@ -7,7 +7,7 @@ public record ShardTooLargeDiagnostic(
     string? Variant = null
 ) : IDiagnosticPayload
 {
-    public static string Name { get; } = "shard-too-large";
+    public static string Moniker { get; } = "shard-too-large";
     public static DiagnosticSeverity DefaultSeverity { get; } = DiagnosticSeverity.Error;
 
     public static readonly LocalizedString Title = LocalizedString.Create(

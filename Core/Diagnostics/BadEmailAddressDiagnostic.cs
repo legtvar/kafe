@@ -4,7 +4,7 @@ public record BadEmailAddressDiagnostic(
     string Value
 ) : IDiagnosticPayload
 {
-    public static string Name { get; } = "bad-email-address";
+    public static string Moniker { get; } = "bad-email-address";
     
     public static DiagnosticSeverity DefaultSeverity { get; } = DiagnosticSeverity.Error;
 

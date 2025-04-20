@@ -2,7 +2,7 @@ namespace Kafe.Core.Diagnostics;
 
 public record EmptyHribDiagnostic : IDiagnosticPayload
 {
-    public static string Name { get; } = "empty-hrib";
+    public static string Moniker { get; } = "empty-hrib";
 
     public static DiagnosticSeverity DefaultSeverity { get; } = DiagnosticSeverity.Error;
 

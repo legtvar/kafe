@@ -43,7 +43,7 @@ public static class ServiceCollectionExtensions
 
         foreach (var mod in options.Mods)
         {
-            var modName = (string?)mod.GetType().GetProperty(nameof(IMod.Name))!.GetValue(null);
+            var modName = (string?)mod.GetType().GetProperty(nameof(IMod.Moniker))!.GetValue(null);
             if (string.IsNullOrWhiteSpace(modName))
             {
                 throw new InvalidOperationException($"Mod '{mod.GetType()}' declares an empty name.");

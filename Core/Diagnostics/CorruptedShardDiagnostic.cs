@@ -7,7 +7,7 @@ public record CorruptedShardDiagnostic(
     string? Variant = null
 ) : IDiagnosticPayload
 {
-    public static string Name { get; } = "corrupted-shard";
+    public static string Moniker { get; } = "corrupted-shard";
 
     public static DiagnosticSeverity DefaultSeverity { get; } = DiagnosticSeverity.Error;
 

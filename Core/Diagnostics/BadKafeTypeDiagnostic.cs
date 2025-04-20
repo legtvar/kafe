@@ -4,7 +4,7 @@ public record BadKafeTypeDiagnostic(
     string Value
 ) : IDiagnosticPayload
 {
-    public static string Name { get; } = "bad-type";
+    public static string Moniker { get; } = "bad-type";
 
     public static DiagnosticSeverity DefaultSeverity { get; } = DiagnosticSeverity.Error;
 

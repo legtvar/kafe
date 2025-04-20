@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using Kafe.Data.Events;
 using Marten.Events;
@@ -8,29 +9,35 @@ namespace Kafe.Data.Aggregates;
 
 public record ShardInfo(
     [Hrib] string Id,
+    LocalizedString Name,
     CreationMethod CreationMethod,
     DateTimeOffset CreatedAt,
-    long? FileLength,
+    string MimeType,
+    long FileLength,
     string? UploadFilename,
-    string? MimeType,
     KafeObject Metadata,
     ImmutableDictionary<string, KafeObject> Variants
-) : IEntity
+) : IShard
 {
     public static readonly ShardInfo Invalid = new();
 
     public ShardInfo() : this(
         Id: Hrib.InvalidValue,
+        Name: LocalizedString.Empty,
         CreationMethod: CreationMethod.Unknown,
         CreatedAt: default,
-        FileLength: null,
+        FileLength: -1,
         UploadFilename: null,
-        MimeType: null,
+        MimeType: Const.InvalidMimeType,
         Metadata: KafeObject.Invalid,
         Variants: ImmutableDictionary<string, KafeObject>.Empty
     )
     {
     }
+
+    IReadOnlyDictionary<string, KafeObject> IShard.Variants => Variants;
+
+    Hrib IEntity.Id => Id;
 }
 
 public class ShardInfoProjection : SingleStreamProjection<ShardInfo>
@@ -46,11 +53,12 @@ public class ShardInfoProjection : SingleStreamProjection<ShardInfo>
     {
         return new(
             Id: e.Data.ShardId,
+            Name: e.Data.Name ?? LocalizedString.Empty,
             CreationMethod: e.Data.CreationMethod,
             CreatedAt: e.Timestamp,
-            FileLength: e.Data.FileLength,
+            FileLength: e.Data.FileLength ?? -1,
             UploadFilename: e.Data.UploadFilename,
-            MimeType: e.Data.MimeType,
+            MimeType: e.Data.MimeType ?? Const.InvalidMimeType,
             Metadata: e.Data.Metadata,
             Variants: ImmutableDictionary<string, KafeObject>.Empty
         );
@@ -60,6 +68,7 @@ public class ShardInfoProjection : SingleStreamProjection<ShardInfo>
     {
         return s with
         {
+            Name = e.Name ?? s.Name,
             FileLength = e.FileLength ?? s.FileLength,
             UploadFilename = e.UploadFilename ?? s.UploadFilename,
             MimeType = e.MimeType ?? s.MimeType

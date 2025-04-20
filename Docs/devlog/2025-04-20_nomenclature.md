@@ -5,6 +5,8 @@ There's a lot of things that need to be named.
 While chipping away on the humonguous [#194 Artifact overhaul](https://gitlab.fi.muni.cz/legtvar/kafe/-/issues/194)
 issue, I decided on a nomenclature for code elements related to naming.
 
+## Names
+
 **Id**
 
 - Automatically-assigned unique name for a specific **instance** of an entity.
@@ -46,7 +48,9 @@ issue, I decided on a nomenclature for code elements related to naming.
 
 - The name of the `KafeType`.
 - Always a `string`.
-- Becomes `KafeType.Primary` for artifact property types, or `KafeType.Secondary` for shards, requirements, etc.
+- Becomes `KafeType.Mod` for mods (through `IMod`).
+- Becomes `KafeType.Primary` for artifact property types.
+- Becomes `KafeType.Secondary` for shard metadata type, requirements, etc.
   (because `Primary` is `shard`, `req`, etc.).
 - Must be in dash-case.
 - Optional. If not provided explicitly, is generated based on the .NET type's name.
@@ -60,7 +64,7 @@ issue, I decided on a nomenclature for code elements related to naming.
   public static IRequirement.Moniker {get;} = "dash-case-type";
   ```
 
----
+## Example
 
 For example, an entity might need to have **all** of these names:
 
@@ -79,3 +83,23 @@ public class ProjectInfo : IEntity
     static string IEntity.Moniker { get; } = "project";
 }
 ```
+
+## Interfaces
+
+- `IEntity`: `Id`, `Title`, `Moniker`
+  - `IShard`: `Name` (the rest it inherits from `IEntity`)
+  - `IArtifact`: `Name` (the rest it inherits from `IEntity`)
+- `IMod`: `Moniker`
+- `IDiagnosticPayload`: `Moniker`, `Title`
+- `IRequirement`: `Moniker`, `Title`
+- `IPropertyType`: `Moniker`, `Title`
+
+## Notes
+
+- All of the static properties are `virtual` and thus optional.
+  If they were `abstract` they [could not be used in generic collections].
+  KAFE provides a reasonable fallback method of their deduction if they're missing.
+- `IDiagnosticPayload.Title` is also used as `title` when sending
+  [Problem details](https://www.rfc-editor.org/rfc/rfc7807).
+
+[could not be used in generic collections]: (https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/compiler-messages/static-abstract-interfaces)

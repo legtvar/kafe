@@ -1,4 +1,4 @@
-namespace Kafe.Data.Diagnostics;
+namespace Kafe.Core.Diagnostics;
 
 public record ShardTooSmallDiagnostic(
     LocalizedString ShardName,

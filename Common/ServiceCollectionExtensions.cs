@@ -23,6 +23,7 @@ public static class ServiceCollectionExtensions
         options.AddSubtypeRegistry(new PropertyTypeRegistry());
         options.AddSubtypeRegistry(new DiagnosticDescriptorRegistry());
         options.AddFormatter(new FileLengthFormatter());
+        options.AddFormatter(new BitrateFormatter());
 
         configureOptions(options);
 

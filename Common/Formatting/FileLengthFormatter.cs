@@ -10,13 +10,13 @@ public class FileLengthFormatter : IKafeFormatter
     /// Format the numbers using the International System of Units, using powers of 10
     /// (e.g., kilobyte (KB) = 1 000 B, megabyte (MB) = 1 000 000 B, etc.)
     /// </summary>
-    public const string SIMetricFormat = "fs";
+    public const string SIMetricSpecifier = "fs";
 
     /// <summary>
     /// Format the numbers using the system by the International Electrotechnical Commission, using powers of 2
     /// (e.g., kibibyte (KiB) = 1 024 B, mebibyte (MiB) = 1 048 576 B, etc.)
     /// </summary>
-    public const string IECBinaryFormat = "FS";
+    public const string IECBinarySpecifier = "FS";
 
     public static readonly ImmutableArray<string> SIUnits = [
         "B",
@@ -50,31 +50,31 @@ public class FileLengthFormatter : IKafeFormatter
     {
         return argType.IsInteger()
             && !string.IsNullOrWhiteSpace(format)
-            && (format.StartsWith(SIMetricFormat) || format.StartsWith(IECBinaryFormat));
+            && (format.StartsWith(SIMetricSpecifier) || format.StartsWith(IECBinarySpecifier));
     }
 
     public string Format(string? format, object? arg, IFormatProvider? formatProvider)
     {
-        format ??= IECBinaryFormat;
+        format ??= IECBinarySpecifier;
         arg ??= -1;
         var number = Convert.ToUInt64(arg);
         var scaledDown = 0.0;
         var sb = new StringBuilder();
         var unit = "B";
-        if (format.StartsWith(SIMetricFormat))
+        if (format.StartsWith(SIMetricSpecifier))
         {
             var log = (int)(Math.Log10(number) / 3);
             log = Math.Clamp(log, 0, SIUnits.Length);
             unit = SIUnits[log];
-            format = format[SIMetricFormat.Length..].TrimStart();
+            format = format[SIMetricSpecifier.Length..].TrimStart();
             scaledDown = number / Math.Pow(1000, log);
         }
-        else if (format.StartsWith(IECBinaryFormat))
+        else if (format.StartsWith(IECBinarySpecifier))
         {
             var log = (int)(Math.Log2(number) / 10);
             log = Math.Clamp(log, 0, IECUnits.Length);
             unit = IECUnits[log];
-            format = format[IECBinaryFormat.Length..].TrimStart();
+            format = format[IECBinarySpecifier.Length..].TrimStart();
             scaledDown = number / Math.Pow(1024, log);
         }
 

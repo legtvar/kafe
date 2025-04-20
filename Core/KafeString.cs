@@ -7,7 +7,10 @@ namespace Kafe.Core;
 [JsonConverter(typeof(KafeStringJsonConverter))]
 public record KafeString(
     string? Value
-);
+) : IPropertyType
+{
+    public static string Moniker { get; } = "string";
+}
 
 public class KafeStringJsonConverter : JsonConverter<KafeString>
 {

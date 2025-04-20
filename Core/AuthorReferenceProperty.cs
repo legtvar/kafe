@@ -8,11 +8,14 @@ public record AuthorReferenceProperty(
     Hrib? AuthorId,
     string? Name,
     string[] Roles
-);
+) : IPropertyType
+{
+    public static string Moniker { get; } = "author-ref";
+}
 
 public sealed record AuthorReferenceNameOrIdRequirement : IRequirement
 {
-    public static string Name { get; } = "author-ref-name-or-id";
+    public static string Moniker { get; } = "author-ref-name-or-id";
 
     public static KafeTypeAccessibility Accessibility { get; } = KafeTypeAccessibility.Internal;
 }

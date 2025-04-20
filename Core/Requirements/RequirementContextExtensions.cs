@@ -1,14 +1,12 @@
 using System.Threading.Tasks;
-using Kafe.Core;
 using Kafe.Core.Diagnostics;
-using Kafe.Data.Aggregates;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Kafe.Data.Requirements;
+namespace Kafe.Core.Requirements;
 
 public static class RequirementContextExtensions
 {
-    public static async Task<ShardInfo?> RequireShard(this IRequirementContext<IRequirement> context)
+    public static async Task<IShard?> RequireShard(this IRequirementContext<IRequirement> context)
     {
         if (context.Object.Value is not ShardReferenceProperty shardRef)
         {
@@ -19,18 +17,18 @@ public static class RequirementContextExtensions
             return null;
         }
 
-        var db = context.ServiceProvider.GetRequiredService<IKafeQuerySession>();
-        var shard = await db.LoadAsync<ShardInfo>(shardRef.ShardId, context.CancellationToken);
-        if (shard.Diagnostic is not null)
+        var repo = context.ServiceProvider.GetRequiredService<IRepository<IShard>>();
+        var shard = await repo.Read(shardRef.ShardId, context.CancellationToken);
+        if (shard.HasDiagnostic)
         {
             context.Report(shard.Diagnostic);
-            return null;
+            return shard.Value;
         }
 
         return shard.Value;
     }
 
-    public static async Task<(ShardInfo shard, KafeObject variant)?> RequireShardVariant(
+    public static async Task<(IShard shard, KafeObject variant)?> RequireShardVariant(
         this IRequirementContext<IRequirement> context,
         string variant
     )
@@ -41,13 +39,10 @@ public static class RequirementContextExtensions
             return null;
         }
 
-        // TODO: replace with real shard names, once shard have names
-        var shardName = LocalizedString.CreateInvariant(shard.Id);
-
         if (!shard.Variants.TryGetValue(variant, out var variantObject))
         {
             context.Report(new MissingShardVariantDiagnostic(
-                ShardName: shardName,
+                ShardName: shard.Name,
                 ShardId: shard.Id,
                 Variant: Const.OriginalShardVariant
             ));
@@ -56,7 +51,7 @@ public static class RequirementContextExtensions
         return (shard, variantObject);
     }
 
-    public static async Task<(ShardInfo shard, TVariant variant)?> RequireShardVariant<TVariant>(
+    public static async Task<(IShard shard, TVariant variant)?> RequireShardVariant<TVariant>(
         this IRequirementContext<IRequirement> context,
         string variant
     )

@@ -7,7 +7,10 @@ namespace Kafe.Core;
 [JsonConverter(typeof(NumberPropertyJsonConverter))]
 public record NumberProperty(
     decimal? Value
-);
+) : IPropertyType
+{
+    public static string Moniker { get; } = "number";
+}
 
 public class NumberPropertyJsonConverter : JsonConverter<NumberProperty>
 {

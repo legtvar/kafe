@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>$(DefaultTargetFrameworks)</TargetFrameworks>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\Data\Kafe.Data.csproj" />
+    <ProjectReference Include="..\Media\Kafe.Media.csproj" />
+    <ProjectReference Include="..\Core\Kafe.Core.csproj" />
+  </ItemGroup>
+
+</Project>

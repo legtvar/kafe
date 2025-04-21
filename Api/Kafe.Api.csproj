@@ -37,6 +37,7 @@
     <ProjectReference Include="..\Media\Kafe.Media.csproj" />
     <ProjectReference Include="..\Core\Kafe.Core.csproj" />
     <ProjectReference Include="..\Polygons\Kafe.Polygons.csproj" />
+    <ProjectReference Include="..\Legacy\Kafe.Legacy.csproj" />
   </ItemGroup>
 
 </Project>

@@ -7,7 +7,8 @@ public record VideoBitrateTooLowDiagnostic(
     Hrib ShardId,
     string? Variant,
     int StreamIndex,
-    int Min
+    long Bitrate,
+    long Min
 ) : IDiagnosticPayload
 {
     public static string Moniker { get; } = "video-bitrate-too-low";
@@ -22,12 +23,12 @@ public record VideoBitrateTooLowDiagnostic(
         (
             Const.InvariantCulture,
             "The bitrate of video stream #{StreamIndex} of '{ShardName}' is too low. "
-                + "Minimum required video bitrate is {Min:bps}."
+                + "It is {Bitrate:bps} but the minimum required video bitrate is {Min:bps}."
         ),
         (
             Const.CzechCulture,
             "Bitrate video proudu #{StreamIndex} střípku '{ShardName}' je příliš nízký. "
-                + "Minimální požadováný video bitrate je {Min:bps}."
+                + "Je roven {Bitrate:bps}, ale minimální požadováný video bitrate je {Min:bps}."
         )
     );
 }

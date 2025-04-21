@@ -7,7 +7,8 @@ public record AudioBitrateTooHighDiagnostic(
     Hrib ShardId,
     string? Variant,
     int StreamIndex,
-    int Max
+    long Bitrate,
+    long Max
 ) : IDiagnosticPayload
 {
     public static string Moniker { get; } = "audio-bitrate-too-high";
@@ -22,12 +23,12 @@ public record AudioBitrateTooHighDiagnostic(
         (
             Const.InvariantCulture,
             "The bitrate of audio stream #{StreamIndex} of '{ShardName}' is too high. "
-                + "Maximum allowed audio bitrate is {Max:bps}."
+                + "It is {Bitrate:bps} but the maximum allowed audio bitrate is {Max:bps}."
         ),
         (
             Const.CzechCulture,
             "Bitrate Audio proudu #{StreamIndex} střípku '{ShardName}' je příliš vysoký. "
-                + "Maximální povolený bitrate audia je {Max:bps}."
+                + "Je roven {Bitrate:bps}, ale maximální povolený bitrate audia je {Max:bps}."
         )
     );
 }

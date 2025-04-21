@@ -7,7 +7,8 @@ public record AudioBitrateTooLowDiagnostic(
     Hrib ShardId,
     string? Variant,
     int StreamIndex,
-    int Min
+    long Bitrate,
+    long Min
 ) : IDiagnosticPayload
 {
     public static string Moniker { get; } = "audio-bitrate-too-low";
@@ -22,12 +23,12 @@ public record AudioBitrateTooLowDiagnostic(
         (
             Const.InvariantCulture,
             "The bitrate of audio stream #{StreamIndex} of '{ShardName}' is too low. "
-                + "Minimum required audio bitrate is {Min:bps}."
+                + "It is {Bitrate:bps} but the minimum required audio bitrate is {Min:bps}."
         ),
         (
             Const.CzechCulture,
             "Bitrate audio proudu #{StreamIndex} střípku '{ShardName}' je příliš nízký. "
-                + "Minimální požadovaný bitrate audia je {Min:bps}."
+                + "Je roven {Bitrate:bps}, ale minimální požadovaný bitrate audia je {Min:bps}."
         )
     );
 }

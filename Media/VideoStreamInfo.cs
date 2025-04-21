@@ -11,4 +11,5 @@ public record VideoStreamInfo(
     long Bitrate,
     int Width,
     int Height,
-    double Framerate);
+    double Framerate
+) : IMediaStreamInfo;

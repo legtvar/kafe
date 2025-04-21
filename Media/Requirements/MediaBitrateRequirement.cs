@@ -1,17 +1,11 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Kafe.Core.Requirements;
 using Kafe.Media.Diagnostics;
 
 namespace Kafe.Media.Requirements;
-
-public enum MediaBitrateKind
-{
-    Total,
-    Video,
-    Audio,
-    Subtitles
-}
 
 public record MediaBitrateRequirement(
     int? Min,
@@ -65,183 +59,171 @@ public class MediaBitrateRequirementHandler : ShardRequirementHandlerBase<MediaB
                 break;
 
             case MediaBitrateKind.Video:
-                if (context.Requirement.StreamIndex.HasValue)
-                {
-                    if (mediaInfo.VideoStreams.Length <= context.Requirement.StreamIndex)
-                    {
-                        context.Report(new MissingVideoStreamDiagnostic(
-                            ShardName: context.Shard.Name,
-                            ShardId: context.Shard.Id,
-                            Variant: null,
-                            StreamIndex: context.Requirement.StreamIndex.Value
-                        ));
-                        return ValueTask.CompletedTask;
-                    }
-                    CheckStream(
-                        context,
-                        context.Shard,
-                        mediaInfo.VideoStreams[context.Requirement.StreamIndex.Value],
-                        context.Requirement.StreamIndex.Value
-                    );
-                    return ValueTask.CompletedTask;
-                }
-
-                for (int streamIndex = 0; streamIndex < mediaInfo.VideoStreams.Length; ++streamIndex)
-                {
-                    CheckStream(
-                        context,
-                        context.Shard,
-                        mediaInfo.VideoStreams[streamIndex],
-                        streamIndex
-                    );
-                }
+                CheckAllStreams<VideoStreamInfo>(context, mediaInfo);
                 break;
 
             case MediaBitrateKind.Audio:
-                if (context.Requirement.StreamIndex.HasValue)
-                {
-                    if (mediaInfo.AudioStreams.Length <= context.Requirement.StreamIndex)
-                    {
-                        context.Report(new MissingAudioStreamDiagnostic(
-                            ShardName: context.Shard.Name,
-                            ShardId: context.Shard.Id,
-                            Variant: null,
-                            StreamIndex: context.Requirement.StreamIndex.Value
-                        ));
-                        return ValueTask.CompletedTask;
-                    }
-                    CheckStream(
-                        context,
-                        context.Shard,
-                        mediaInfo.AudioStreams[context.Requirement.StreamIndex.Value],
-                        context.Requirement.StreamIndex.Value
-                    );
-                    return ValueTask.CompletedTask;
-                }
-
-                for (int streamIndex = 0; streamIndex < mediaInfo.AudioStreams.Length; ++streamIndex)
-                {
-                    CheckStream(
-                        context,
-                        context.Shard,
-                        mediaInfo.AudioStreams[streamIndex],
-                        streamIndex
-                    );
-                }
+                CheckAllStreams<AudioStreamInfo>(context, mediaInfo);
                 break;
 
             case MediaBitrateKind.Subtitles:
-                if (context.Requirement.StreamIndex.HasValue)
-                {
-                    if (mediaInfo.SubtitleStreams.Length <= context.Requirement.StreamIndex)
-                    {
-                        context.Report(new MissingSubtitleStreamDiagnostic(
-                            ShardName: context.Shard.Name,
-                            ShardId: context.Shard.Id,
-                            Variant: null,
-                            StreamIndex: context.Requirement.StreamIndex.Value
-                        ));
-                        return ValueTask.CompletedTask;
-                    }
-                    CheckStream(
-                        context,
-                        context.Shard,
-                        mediaInfo.SubtitleStreams[context.Requirement.StreamIndex.Value],
-                        context.Requirement.StreamIndex.Value
-                    );
-                    return ValueTask.CompletedTask;
-                }
-
-                for (int streamIndex = 0; streamIndex < mediaInfo.SubtitleStreams.Length; ++streamIndex)
-                {
-                    CheckStream(
-                        context,
-                        context.Shard,
-                        mediaInfo.SubtitleStreams[streamIndex],
-                        streamIndex
-                    );
-                }
+                CheckAllStreams<SubtitleStreamInfo>(context, mediaInfo);
                 break;
         }
 
         return ValueTask.CompletedTask;
     }
 
+    private static void CheckAllStreams<T>(
+        IShardRequirementContext<MediaBitrateRequirement> context,
+        MediaInfo mediaInfo
+    )
+        where T : IMediaStreamInfo
+    {
+        IReadOnlyList<IMediaStreamInfo> streams = typeof(T) == typeof(VideoStreamInfo) ? mediaInfo.VideoStreams
+            : typeof(T) == typeof(AudioStreamInfo) ? mediaInfo.AudioStreams
+            : typeof(T) == typeof(SubtitleStreamInfo) ? mediaInfo.SubtitleStreams
+            : throw new NotSupportedException($"Media stream type '{typeof(T)}' is not supported.");
+
+        if (context.Requirement.StreamIndex.HasValue)
+        {
+            if (mediaInfo.VideoStreams.Length <= context.Requirement.StreamIndex)
+            {
+                context.Report(MediaConst.CreateMissingMediaStreamDiagnostic(
+                    typeof(T),
+                    context.Shard.Id,
+                    context.Shard.Name,
+                    null,
+                    context.Requirement.StreamIndex.Value
+                ));
+                return;
+            }
+            CheckStream(
+                context,
+                (T)streams[context.Requirement.StreamIndex.Value],
+                context.Requirement.StreamIndex.Value
+            );
+            return;
+        }
+
+        for (int streamIndex = 0; streamIndex < mediaInfo.VideoStreams.Length; ++streamIndex)
+        {
+            CheckStream(
+                context,
+                (T)streams[streamIndex],
+                streamIndex
+            );
+        }
+    }
+
     private static void CheckStream<T>(
-        IRequirementContext<MediaBitrateRequirement> context,
-        IShard shard,
+        IShardRequirementContext<MediaBitrateRequirement> context,
         T mediaStream,
         int streamIndex
     )
+        where T : IMediaStreamInfo
     {
-        var (bitrate, tooLow, tooHigh) = mediaStream switch
+        if (context.Requirement.Min.HasValue && mediaStream.Bitrate < context.Requirement.Min)
         {
-            VideoStreamInfo v =>
-            (
-                v.Bitrate,
-                new Lazy<object>(() => new VideoBitrateTooLowDiagnostic(
-                    ShardName: shard.Name,
-                    ShardId: shard.Id,
-                    Variant: null,
-                    StreamIndex: streamIndex,
-                    Min: context.Requirement.Min.GetValueOrDefault()
-                )),
-                new Lazy<object>(() => new VideoBitrateTooHighDiagnostic(
-                    ShardName: shard.Name,
-                    ShardId: shard.Id,
-                    Variant: null,
-                    StreamIndex: streamIndex,
-                    Max: context.Requirement.Max.GetValueOrDefault()
-                ))
+            context.Report(CreateBitrateTooLowDiagnostic(
+                context.Shard,
+                null,
+                mediaStream,
+                streamIndex,
+                context.Requirement.Min.Value
+            ));
+            return;
+        }
+        if (context.Requirement.Max.HasValue && mediaStream.Bitrate > context.Requirement.Max)
+        {
+            context.Report(CreateBitrateTooHighDiagnostic(
+                context.Shard,
+                null,
+                mediaStream,
+                streamIndex,
+                context.Requirement.Max.Value
+            ));
+            return;
+        }
+    }
+
+    // NB: I have opted NOT to add something like IBitrateTooLowDiagnostic because I intend to source-generate the
+    //     diagnostic types from a JSON file later on.
+    private static object CreateBitrateTooLowDiagnostic<T>(
+        IShard shard,
+        string? variant,
+        T mediaStream,
+        int streamIndex,
+        long min
+    )
+        where T : IMediaStreamInfo
+    {
+        return mediaStream switch
+        {
+            VideoStreamInfo v => new VideoBitrateTooLowDiagnostic(
+                shard.Name,
+                shard.Id,
+                variant,
+                streamIndex,
+                mediaStream.Bitrate,
+                min
             ),
-            AudioStreamInfo a =>
-            (
-                a.Bitrate,
-                new Lazy<object>(() => new AudioBitrateTooLowDiagnostic(
-                    ShardName: shard.Name,
-                    ShardId: shard.Id,
-                    Variant: null,
-                    StreamIndex: streamIndex,
-                    Min: context.Requirement.Min.GetValueOrDefault()
-                )),
-                new Lazy<object>(() => new AudioBitrateTooHighDiagnostic(
-                    ShardName: shard.Name,
-                    ShardId: shard.Id,
-                    Variant: null,
-                    StreamIndex: streamIndex,
-                    Max: context.Requirement.Max.GetValueOrDefault()
-                ))
+            AudioStreamInfo a => new AudioBitrateTooLowDiagnostic(
+                shard.Name,
+                shard.Id,
+                variant,
+                streamIndex,
+                mediaStream.Bitrate,
+                min
             ),
-            SubtitleStreamInfo s =>
-            (
-                s.Bitrate,
-                new Lazy<object>(() => new SubtitleBitrateTooLowDiagnostic(
-                    ShardName: shard.Name,
-                    ShardId: shard.Id,
-                    Variant: null,
-                    StreamIndex: streamIndex,
-                    Min: context.Requirement.Min.GetValueOrDefault()
-                )),
-                new Lazy<object>(() => new SubtitleBitrateTooHighDiagnostic(
-                    ShardName: shard.Name,
-                    ShardId: shard.Id,
-                    Variant: null,
-                    StreamIndex: streamIndex,
-                    Max: context.Requirement.Max.GetValueOrDefault()
-                ))
+            SubtitleStreamInfo => new SubtitleBitrateTooLowDiagnostic(
+                shard.Name,
+                shard.Id,
+                variant,
+                streamIndex,
+                mediaStream.Bitrate,
+                min
             ),
             _ => throw new NotSupportedException($"Media stream type '{typeof(T)}' is not supported.")
         };
+    }
 
-        if (context.Requirement.Min.HasValue && bitrate < context.Requirement.Min)
+    private static object CreateBitrateTooHighDiagnostic<T>(
+        IShard shard,
+        string? variant,
+        T mediaStream,
+        int streamIndex,
+        long max
+    )
+        where T : IMediaStreamInfo
+    {
+        return mediaStream switch
         {
-            context.Report(tooLow.Value);
-            return;
-        }
-        if (context.Requirement.Max.HasValue && bitrate > context.Requirement.Max)
-        {
-            context.Report(tooHigh.Value);
-            return;
-        }
+            VideoStreamInfo v => new VideoBitrateTooHighDiagnostic(
+                shard.Name,
+                shard.Id,
+                variant,
+                streamIndex,
+                v.Bitrate,
+                max
+            ),
+            AudioStreamInfo a => new AudioBitrateTooHighDiagnostic(
+                shard.Name,
+                shard.Id,
+                variant,
+                streamIndex,
+                a.Bitrate,
+                max
+            ),
+            SubtitleStreamInfo s => new SubtitleBitrateTooHighDiagnostic(
+                shard.Name,
+                shard.Id,
+                variant,
+                streamIndex,
+                s.Bitrate,
+                max
+            ),
+            _ => throw new NotSupportedException($"Media stream type '{typeof(T)}' is not supported.")
+        };
     }
 }

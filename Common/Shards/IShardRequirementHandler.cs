@@ -4,5 +4,5 @@ namespace Kafe;
 
 public interface IShardRequirementHandler : IRequirementHandler
 {
-    ValueTask Handle(IRequirementContext<IRequirement> context, IShard shard);
+    ValueTask Handle(IShardRequirementContext<IRequirement> context);
 }

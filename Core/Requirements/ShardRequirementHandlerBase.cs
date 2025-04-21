@@ -15,18 +15,17 @@ public abstract class ShardRequirementHandlerBase<TRequirement> : IShardRequirem
         var shard = await context.RequireShard() ?? default;
         if (shard is not null)
         {
-            await Handle((IRequirementContext<TRequirement>)context, shard);
+            await Handle(new ShardRequirementContext<TRequirement>((IRequirementContext<TRequirement>)context, shard));
         }
     }
 
 
     ValueTask IShardRequirementHandler.Handle(
-        IRequirementContext<IRequirement> context,
-        IShard shard
+        IShardRequirementContext<IRequirement> context
     )
     {
-        return Handle((IRequirementContext<TRequirement>)context, shard);
+        return Handle((IShardRequirementContext<TRequirement>)context);
     }
 
-    public abstract ValueTask Handle(IRequirementContext<TRequirement> context, IShard shard);
+    public abstract ValueTask Handle(IShardRequirementContext<TRequirement> context);
 }

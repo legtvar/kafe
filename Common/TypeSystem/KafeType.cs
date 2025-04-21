@@ -89,7 +89,7 @@ public partial record struct KafeType : IParsable<KafeType>
 
     public static KafeType Parse(
         string s,
-        IFormatProvider? provider
+        IFormatProvider? provider = null
     )
     {
         if (!TryParse(s, out var kafeType))

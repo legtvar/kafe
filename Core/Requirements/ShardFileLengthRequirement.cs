@@ -14,8 +14,7 @@ public record ShardFileLengthRequirement(
 public sealed class ShardFileLengthRequirementHandler : ShardRequirementHandlerBase<ShardFileLengthRequirement>
 {
     public override ValueTask Handle(
-        IRequirementContext<ShardFileLengthRequirement> context,
-        IShard shard
+        IShardRequirementContext<ShardFileLengthRequirement> context
     )
     {
         if (context.Requirement.Min is null && context.Requirement.Max is null)
@@ -24,22 +23,30 @@ public sealed class ShardFileLengthRequirementHandler : ShardRequirementHandlerB
             return ValueTask.CompletedTask;
         }
 
-        if (shard.FileLength < 0)
+        if (context.Shard.FileLength < 0)
         {
-            context.Report(new CorruptedShardDiagnostic(shard.Name, shard.Id));
+            context.Report(new CorruptedShardDiagnostic(context.Shard.Name, context.Shard.Id));
             return ValueTask.CompletedTask;
         }
 
         if (context.Requirement.Min is not null
-            && shard.FileLength < context.Requirement.Min.Value)
+            && context.Shard.FileLength < context.Requirement.Min.Value)
         {
-            context.Report(new ShardTooSmallDiagnostic(shard.Name, shard.Id, context.Requirement.Min.Value));
+            context.Report(new ShardTooSmallDiagnostic(
+                context.Shard.Name,
+                context.Shard.Id,
+                context.Requirement.Min.Value
+            ));
         }
 
         if (context.Requirement.Max is not null
-            && shard.FileLength > context.Requirement.Max.Value)
+            && context.Shard.FileLength > context.Requirement.Max.Value)
         {
-            context.Report(new ShardTooLargeDiagnostic(shard.Name, shard.Id, context.Requirement.Max.Value));
+            context.Report(new ShardTooLargeDiagnostic(
+                context.Shard.Name,
+                context.Shard.Id,
+                context.Requirement.Max.Value
+            ));
         }
         
         return ValueTask.CompletedTask;

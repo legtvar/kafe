@@ -7,7 +7,8 @@ public record VideoBitrateTooHighDiagnostic(
     Hrib ShardId,
     string? Variant,
     int StreamIndex,
-    int Max
+    long Bitrate,
+    long Max
 ) : IDiagnosticPayload
 {
     public static string Moniker { get; } = "video-bitrate-too-high";
@@ -22,12 +23,12 @@ public record VideoBitrateTooHighDiagnostic(
         (
             Const.InvariantCulture,
             "The bitrate of video stream #{StreamIndex} of '{ShardName}' is too high. "
-                + "Maximum allowed video bitrate is {Max:bps}."
+                + "It is {Bitrate:bps} but the maximum allowed video bitrate is {Max:bps}."
         ),
         (
             Const.CzechCulture,
             "Bitrate video proudu #{StreamIndex} střípku '{ShardName}' je příliš vysoký. "
-                + "Maximální povolený video bitrate je {Max:bps}."
+                + "Je roven {Bitrate:bps}, ale maximální povolený video bitrate je {Max:bps}."
         )
     );
 }

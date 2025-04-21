@@ -7,7 +7,8 @@ public record SubtitleBitrateTooHighDiagnostic(
     Hrib ShardId,
     string? Variant,
     int StreamIndex,
-    int Max
+    long Bitrate,
+    long Max
 ) : IDiagnosticPayload
 {
     public static string Moniker { get; } = "subtitle-bitrate-too-high";
@@ -22,12 +23,12 @@ public record SubtitleBitrateTooHighDiagnostic(
         (
             Const.InvariantCulture,
             "The bitrate of subtitles stream #{StreamIndex} of '{ShardName}' is too high. "
-                + "Maximum allowed subtitles bitrate is {Max:bps}."
+                + "It is {Bitrate:bps} but the maximum allowed subtitles bitrate is {Max:bps}."
         ),
         (
             Const.CzechCulture,
             "Bitrate titulkového proudu #{StreamIndex} střípku '{ShardName}' je příliš vysoký. "
-                + "Maximální povolený bitrate titulků je {Max:bps}."
+                + "Je roven {Bitrate:bps}, ale maximální povolený bitrate titulků je {Max:bps}."
         )
     );
 }

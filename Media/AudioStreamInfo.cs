@@ -10,4 +10,5 @@ public record AudioStreamInfo(
     string Codec,
     long Bitrate,
     int Channels,
-    int SampleRate);
+    int SampleRate
+) : IMediaStreamInfo;

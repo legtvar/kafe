@@ -7,7 +7,8 @@ public record SubtitleBitrateTooLowDiagnostic(
     Hrib ShardId,
     string? Variant,
     int StreamIndex,
-    int Min
+    long Bitrate,
+    long Min
 ) : IDiagnosticPayload
 {
     public static string Moniker { get; } = "subtitle-bitrate-too-low";
@@ -22,12 +23,12 @@ public record SubtitleBitrateTooLowDiagnostic(
         (
             Const.InvariantCulture,
             "The bitrate of subtitles stream #{StreamIndex} of '{ShardName}' is too low. "
-                + "Minimum required subtitles bitrate is {Min:bps}."
+                + "Is it {Bitrate:bps} but the minimum required subtitles bitrate is {Min:bps}."
         ),
         (
             Const.CzechCulture,
             "Bitrate titulkového proudu #{StreamIndex} střípku '{ShardName}' je příliš nízký. "
-                + "Minimální požadovaný bitrate titulků je {Min:bps}."
+                + "Je roven {Bitrate:bps}, ale minimální požadovaný bitrate titulků je {Min:bps}."
         )
     );
 }

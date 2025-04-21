@@ -14,8 +14,6 @@ public record MediaShorterSideRequirement(
 
 public class MediaShorterSideRequirementHandler : ShardRequirementHandlerBase<MediaShorterSideRequirement>
 {
-    public static readonly TimeSpan AcceptableDurationError = TimeSpan.FromSeconds(1);
-
     public override ValueTask Handle(IShardRequirementContext<MediaShorterSideRequirement> context)
     {
         if (context.Shard.Metadata.Value is ImageInfo imageInfo)

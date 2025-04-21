@@ -23,4 +23,22 @@ public static class RequirementContextExtensions
 
         return pair;
     }
+
+    public static MediaInfo? RequireMediaInfo(
+        this IShardRequirementContext<IRequirement> context
+    )
+    {
+        var metadata = context.RequireShardMetadata<MediaInfo>();
+        if (metadata is not null && metadata.IsCorrupted)
+        {
+            context.Report(new CorruptedShardDiagnostic(
+                ShardName: context.Shard.Name,
+                ShardId: context.Shard.Id,
+                Variant: null
+            ));
+            return null;
+        }
+
+        return metadata;
+    }
 }

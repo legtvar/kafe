@@ -75,7 +75,7 @@ public static class RequirementContextExtensions
 
         return (shard, typedVariant);
     }
-    
+
     public static async Task<(IShard shard, TMetadata metadata)?> RequireShardMetadata<TMetadata>(
         this IRequirementContext<IRequirement> context
     )
@@ -85,7 +85,7 @@ public static class RequirementContextExtensions
         {
             return null;
         }
-        
+
         if (shard.Metadata.Value is not TMetadata metadata)
         {
             context.Report(new IncompatibleRequirementDiagnostic(
@@ -96,5 +96,21 @@ public static class RequirementContextExtensions
         }
 
         return (shard, metadata);
+    }
+
+    public static TMetadata? RequireShardMetadata<TMetadata>(
+        this IShardRequirementContext<IRequirement> context
+    )
+    {
+        if (context.Shard.Metadata.Value is not TMetadata metadata)
+        {
+            context.Report(new IncompatibleRequirementDiagnostic(
+                context.RequirementType,
+                context.Shard.Metadata.Type
+            ));
+            return default;
+        }
+
+        return metadata;
     }
 }

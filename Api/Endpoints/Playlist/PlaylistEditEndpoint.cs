@@ -18,7 +18,7 @@ namespace Kafe.Api.Endpoints.Playlist;
 
 [ApiVersion("1")]
 [Route("playlist")]
-[Authorize(EndpointPolicy.Write)]
+[Authorize]
 public class PlaylistEditEndpoint : EndpointBaseAsync
     .WithRequest<PlaylistEditDto>
     .WithActionResult<Hrib>

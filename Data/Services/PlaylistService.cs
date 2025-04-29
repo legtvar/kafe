@@ -17,17 +17,20 @@ public class PlaylistService
     private readonly IDocumentSession db;
     private readonly OrganizationService organizationService;
     private readonly ArtifactService artifactService;
+    private readonly AccountService accountService;
     private readonly EntityMetadataProvider entityMetadataProvider;
 
     public PlaylistService(
         IDocumentSession db,
         OrganizationService organizationService,
         ArtifactService artifactService,
+        AccountService accountService,
         EntityMetadataProvider entityMetadataProvider)
     {
         this.db = db;
         this.organizationService = organizationService;
         this.artifactService = artifactService;
+        this.accountService = accountService;
         this.entityMetadataProvider = entityMetadataProvider;
     }
 
@@ -93,6 +96,7 @@ public class PlaylistService
 
     public async Task<Err<PlaylistInfo>> Create(
         PlaylistInfo @new,
+        Hrib? ownerId = null,
         CancellationToken token = default)
     {
         var parseResult = Hrib.Parse(@new.Id);
@@ -156,6 +160,15 @@ public class PlaylistService
         }
 
         await db.SaveChangesAsync(token);
+
+        if (ownerId is not null)
+        {
+            await accountService.AddPermissions(
+                ownerId,
+                [((Hrib)created.PlaylistId, Permission.Read | Permission.Write | Permission.Append | Permission.Inspect)],
+                token);
+        }
+
         var playlist = await db.Events.AggregateStreamAsync<PlaylistInfo>(id.ToString(), token: token)
             ?? throw new InvalidOperationException($"Could not persist a playlist with id '{id}'.");
         return playlist;

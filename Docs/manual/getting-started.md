@@ -76,7 +76,7 @@ However, it takes longer to set up and may conflict with your local configs if y
 4. To run the front end locally: `pnpm run start`
 
 
-## In Docker
+### In Docker
 
 1. Make sure Docker is installed and running.
 2. While in the root of the KAFE repo, run:

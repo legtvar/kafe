@@ -129,6 +129,10 @@ export function PlaylistEdit(props: IPlaylistEditProps) {
                                                 {t('playlistsEdit.files.description').toString()}
                                             </Text>
                                             <Box h={2} borderY="solid 1px" borderColor={border} my={6} />
+                                            {(() => {
+                                                console.log(playlist.entries.map((e) => e.id));
+                                                return <></>;
+                                            })()}
                                             <DraggableList
                                                 order={playlist.entries.map((e) => e.id)}
                                                 // handle=".sortable-handle"
@@ -136,55 +140,77 @@ export function PlaylistEdit(props: IPlaylistEditProps) {
                                                     (acc, item) => ({
                                                         ...acc,
                                                         [item.id]: (
-                                                            <HStack
-                                                                userSelect="none"
-                                                                bg={bg}
-                                                                mb={2}
-                                                                py={4}
-                                                                px={4}
-                                                                borderRadius="md"
-                                                                borderColor={border}
-                                                                borderStyle="solid"
-                                                                borderWidth={1}
-                                                                cursor="grab"
-                                                                spacing={4}
-                                                            >
-                                                                <Icon
-                                                                    as={BsArrowsVertical}
-                                                                    opacity={0.5}
-                                                                    className="sortable-handle"
-                                                                />
-                                                                <Text fontWeight="bold" flexGrow={1}>
-                                                                    {getPrefered(item.name)}
-                                                                </Text>
-                                                                <IconButton
-                                                                    className="hide-on-drag"
-                                                                    icon={<IoTrashOutline />}
-                                                                    aria-label="Remove from playlist"
-                                                                    colorScheme="red"
-                                                                    onClick={() =>
-                                                                        playlist.set(
-                                                                            'entries',
-                                                                            playlist.entries.filter(
-                                                                                (e) => e.id !== item.id,
-                                                                            ),
-                                                                        )
-                                                                    }
-                                                                />
-                                                            </HStack>
+                                                            <AwaitAPI request={(api) => api.artifacts.getById(item.id)}>
+                                                                {(artifact) => (
+                                                                    <AwaitAPI
+                                                                        request={(api) =>
+                                                                            api.projects.getById(
+                                                                                artifact.containingProjectIds[0],
+                                                                            )
+                                                                        }
+                                                                    >
+                                                                        {(project) => (
+                                                                            <HStack
+                                                                                userSelect="none"
+                                                                                bg={bg}
+                                                                                mb={2}
+                                                                                py={4}
+                                                                                px={4}
+                                                                                borderRadius="md"
+                                                                                borderColor={border}
+                                                                                borderStyle="solid"
+                                                                                borderWidth={1}
+                                                                                cursor="grab"
+                                                                                spacing={4}
+                                                                            >
+                                                                                <Icon
+                                                                                    as={BsArrowsVertical}
+                                                                                    opacity={0.5}
+                                                                                    className="sortable-handle"
+                                                                                />
+                                                                                <HStack flexGrow={1}>
+                                                                                    <Text fontWeight="bold">
+                                                                                        {getPrefered(item.name)}
+                                                                                    </Text>{' '}
+                                                                                    <Text>({project.getName()})</Text>
+                                                                                </HStack>
+                                                                                <IconButton
+                                                                                    className="hide-on-drag"
+                                                                                    icon={<IoTrashOutline />}
+                                                                                    aria-label="Remove from playlist"
+                                                                                    colorScheme="red"
+                                                                                    onClick={() =>
+                                                                                        playlist.set(
+                                                                                            'entries',
+                                                                                            playlist.entries.filter(
+                                                                                                (e) => e.id !== item.id,
+                                                                                            ),
+                                                                                        )
+                                                                                    }
+                                                                                />
+                                                                            </HStack>
+                                                                        )}
+                                                                    </AwaitAPI>
+                                                                )}
+                                                            </AwaitAPI>
                                                         ),
                                                     }),
                                                     {} as Record<string, JSX.Element>,
                                                 )}
-                                                onChange={(order) =>
+                                                onChange={(order) => {
+                                                    console.log(order, playlist.entries);
+
                                                     playlist.set(
                                                         'entries',
-                                                        order.map(
-                                                            (key: string) =>
-                                                                playlist.entries.find((entry) => entry.id === key)!,
-                                                        ),
-                                                    )
-                                                }
+                                                        order.map((key: string) => {
+                                                            const found = playlist.entries.find(
+                                                                (entry) => entry.id === key,
+                                                            )!;
+                                                            console.log(found, key);
+                                                            return found;
+                                                        }),
+                                                    );
+                                                }}
                                             />
                                             <Box h={2} borderY="solid 1px" borderColor={border} my={6} />
                                             <Button

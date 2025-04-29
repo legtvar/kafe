@@ -48,17 +48,18 @@ By default:
 - It expects the api to run locally at `https://localhost:44369`.
 
 
-## Running using Docker Compose
-
-Right now, the Docker compose files are configured to either result in the production or staging environment.
-You can get it to work locally, if you really want to, but then it's just easier to run it outside of Docker.
-
-
 ## Running locally
+
+### Without Docker
+
+These instructions explain, how to run KAFE on your local machine, **not in a Docker container**.
+This has the advantage of being easier to debug.
+However, it takes longer to set up and may conflict with your local configs if you have other projects using .NET, Node.js, or Postgres.
 
 **Back end (API)**
 
-1. Open in an editor of your choice.
+1. Make sure Postgres is running on port **5432**.
+   If it's running on a different port, update connection strings in `Api/appsettings.local.json`.
 2. Restore NuGet packages: `dotnet restore`
 3. If you haven't already, create a self-signed dev certificate: `dotnet dev-certs https --trust`
 4. While in the `Api/` dir, to run the API: `dotnet run`
@@ -70,3 +71,30 @@ You can get it to work locally, if you really want to, but then it's just easier
 2. Ensure `pnpm` is installed: `corepack enable pnpm@latest`
 3. Install `npm` packages: `pnpm install`
 4. To run the front end locally: `pnpm run start`
+
+
+## In Docker
+
+1. Make sure Docker is installed and running.
+2. While in the root of the KAFE repo, run:
+   ```bash
+   docker compose -f ./docker-compose.base.yml -f ./docker-compose.local.yml up
+   ```
+3. If you made changes to Marten projections, you may want to rebuild all of them.
+   On Linux, run:
+   ```bash
+   REBUILD_PROJECTIONS=true docker compose -f ./docker-compose.base.yml -f ./docker-compose.local.yml up
+   ```
+   On Windows (in PowerShell), run:
+   ```powershell
+   $env:REBUILD_PROJECTIONS=$true
+   docker compose -f ./docker-compose.base.yml -f ./docker-compose.local.yml up
+   ```
+4. Web is now running at `http://localhost:3000` and the API at `https://localhost:44369`.
+5. To stop the containers, run:
+   ```bash
+   docker compose -f ./docker-compose.base.yml -f ./docker-compose.local.yml down
+   ```
+
+Right now, the Docker compose files are configured to either result in the production or staging environment.
+You can get it to work locally, if you really want to, but then it's just easier to run it outside of Docker.

@@ -74,6 +74,8 @@ build-web:
 
 deploy-production:
   stage: deploy
+  variables:
+    REBUILD_PROJECTIONS: true
   script:
     - cp "$APPSETTINGS_PRODUCTION" "./Api/appsettings.local.json"
     - docker compose -f docker-compose.base.yml -f docker-compose.production.yml build
@@ -93,6 +95,7 @@ deploy-staging:
   stage: deploy
   variables:
     CI: false
+    REBUILD_PROJECTIONS: true
   script:
     - cp "$APPSETTINGS_STAGE" "./Api/appsettings.local.json"
     - docker compose -f docker-compose.base.yml -f docker-compose.staging.yml build

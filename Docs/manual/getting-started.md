@@ -50,6 +50,9 @@ By default:
 
 ## Running locally
 
+You can run KAFE locally either directly on your machine or through Docker.
+If you run into issues, check the instructions below and [Troubleshooting](./troubleshooting.md).
+
 ### Without Docker
 
 These instructions explain, how to run KAFE on your local machine, **not in a Docker container**.
@@ -95,6 +98,3 @@ However, it takes longer to set up and may conflict with your local configs if y
    ```bash
    docker compose -f ./docker-compose.base.yml -f ./docker-compose.local.yml down
    ```
-
-Right now, the Docker compose files are configured to either result in the production or staging environment.
-You can get it to work locally, if you really want to, but then it's just easier to run it outside of Docker.

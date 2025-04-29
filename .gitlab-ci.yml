@@ -86,7 +86,7 @@ deploy-production:
     name: production
     url: https://kafe.fi.muni.cz
   rules:
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_BRANCH == main
       when: manual
 
 deploy-staging:

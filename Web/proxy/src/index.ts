@@ -1,6 +1,7 @@
 import fs from 'fs';
 import httpProxy from 'http-proxy';
 import https from 'https';
+import selfsigned from 'selfsigned';
 
 const sourcePort = 44369;
 const sourceAddress = 'localhost';
@@ -19,7 +20,7 @@ var proxy = httpProxy.createProxyServer({
     cookieDomainRewrite: {
         [targetAddress]: sourceAddress,
     },
-    secure: false
+    secure: false,
 });
 
 proxy.on('proxyRes', (proxyRes, req, res) => {
@@ -41,12 +42,21 @@ proxy.on('proxyReq', (proxyReq, req) => {
     console.log(`${sourceAddress} [ ->] ${targetAddress}    ${req.method} ${req.url}`);
 });
 
-var server = https.createServer({
-    cert: fs.readFileSync('certs/cert.pem'),
-    key: fs.readFileSync('certs/key.pem'),
-}, (req, res) => {
-    proxy.web(req, res);
-});
+if (!fs.existsSync('certs/cert.pem') || !fs.existsSync('certs/key.pem')) {
+    const ss = selfsigned.generate();
+    fs.writeFileSync('certs/cert.pem', ss.cert);
+    fs.writeFileSync('certs/key.pem', ss.private);
+}
+
+var server = https.createServer(
+    {
+        cert: fs.readFileSync('certs/cert.pem'),
+        key: fs.readFileSync('certs/key.pem'),
+    },
+    (req, res) => {
+        proxy.web(req, res);
+    },
+);
 
 console.log('===== Proxy running =====');
 console.log(`${sourceAddress}:${sourcePort} <-> ${targetAddress}:${targetPort}`);

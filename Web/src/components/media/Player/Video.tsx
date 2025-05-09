@@ -175,7 +175,7 @@ export function Video({ sources, subtitles, autoplay, videoProps, onNext, onPrev
                             setError(t('player.loadingError'));
                         } else if (error.message.includes('no supported source')) {
                             setError(t('player.loadingError'));
-                        } else if (!error.message.includes('play()')) {
+                        } else if (error.name !== 'NotAllowedError' && !error.message.includes('play()')) {
                             setError(error.message);
                         }
                     }}

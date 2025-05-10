@@ -2,6 +2,7 @@
 using Marten.Events.Aggregation;
 using Marten.Events.CodeGeneration;
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 
 namespace Kafe.Data.Aggregates;
@@ -12,7 +13,7 @@ public record ArtifactInfo(
     [LocalizedString] ImmutableDictionary<string, string> Name,
     DateTimeOffset AddedOn,
     ImmutableDictionary<string, KafeObject> Properties
-) : IEntity
+) : IArtifact
 {
     public static readonly ArtifactInfo Invalid = new();
 
@@ -27,6 +28,10 @@ public record ArtifactInfo(
     }
 
     Hrib IEntity.Id => Id;
+
+    IReadOnlyDictionary<string, KafeObject> IArtifact.Properties => Properties;
+
+    LocalizedString IArtifact.Name => Name;
 
     /// <summary>
     /// Creates a bare-bones but valid <see cref="ArtifactInfo"/>.

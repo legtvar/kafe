@@ -19,5 +19,5 @@ public interface IShard : IEntity
 
     string MimeType { get; }
 
-    IReadOnlyDictionary<string, KafeObject> Variants { get; }
+    IReadOnlySet<IShardLink> Links { get; }
 }

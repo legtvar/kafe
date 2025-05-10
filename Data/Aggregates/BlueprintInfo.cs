@@ -22,13 +22,13 @@ public record BlueprintInfo(
         LocalizedString name,
         LocalizedString? description = null,
         ImmutableDictionary<string, BlueprintProperty>? properties = null,
-        bool AllowAdditionalProperties = false
+        bool allowAdditionalProperties = false
     ) : this(
         Id: id.ToString(throwOnInvalidAndEmpty: false),
         Name: name,
         Description: description,
         Properties: properties ?? ImmutableDictionary<string, BlueprintProperty>.Empty,
-        AllowAdditionalProperties: AllowAdditionalProperties
+        AllowAdditionalProperties: allowAdditionalProperties
     )
     {
     }

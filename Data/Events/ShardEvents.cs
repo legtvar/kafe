@@ -35,3 +35,13 @@ public record ShardVariantRemoved(
     [Hrib] string ShardId,
     string Name
 );
+
+public record ShardLinkAdded(
+    [Hrib] string Id,
+    KafeObject Metadata
+);
+
+public record ShardLinkRemoved(
+    [Hrib] string? Id,
+    KafeObject? Metadata
+);

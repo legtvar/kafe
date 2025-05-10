@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
+using System.Text.Json.Serialization;
 using Kafe.Data.Events;
 using Marten.Events;
 using Marten.Events.Aggregation;
@@ -16,7 +18,7 @@ public record ShardInfo(
     long FileLength,
     string? UploadFilename,
     KafeObject Metadata,
-    ImmutableDictionary<string, KafeObject> Variants
+    ImmutableHashSet<ShardLink> Links
 ) : IShard
 {
     public static readonly ShardInfo Invalid = new();
@@ -30,14 +32,26 @@ public record ShardInfo(
         UploadFilename: null,
         MimeType: Const.InvalidMimeType,
         Metadata: KafeObject.Invalid,
-        Variants: ImmutableDictionary<string, KafeObject>.Empty
+        Links: []
     )
     {
     }
 
-    IReadOnlyDictionary<string, KafeObject> IShard.Variants => Variants;
-
     Hrib IEntity.Id => Id;
+
+    IReadOnlySet<IShardLink> IShard.Links => Links.Cast<IShardLink>().ToImmutableHashSet();
+
+    [JsonIgnore]
+    public ImmutableDictionary<KafeType, ImmutableHashSet<ShardLink>> LinksByType { get; }
+        = Links.GroupBy(l => l.Metadata.Type).ToImmutableDictionary(g => g.Key, g => g.ToImmutableHashSet());
+}
+
+public readonly record struct ShardLink(
+    [Hrib] string Id,
+    KafeObject Metadata
+) : IShardLink
+{
+    Hrib IShardLink.Id => Id;
 }
 
 public class ShardInfoProjection : SingleStreamProjection<ShardInfo>
@@ -60,10 +74,10 @@ public class ShardInfoProjection : SingleStreamProjection<ShardInfo>
             UploadFilename: e.Data.UploadFilename,
             MimeType: e.Data.MimeType ?? Const.InvalidMimeType,
             Metadata: e.Data.Metadata,
-            Variants: ImmutableDictionary<string, KafeObject>.Empty
+            Links: []
         );
     }
-    
+
     public ShardInfo Apply(ShardInfoChanged e, ShardInfo s)
     {
         return s with
@@ -75,28 +89,33 @@ public class ShardInfoProjection : SingleStreamProjection<ShardInfo>
         };
     }
 
-    public ShardInfo Apply(ShardVariantAdded e, ShardInfo s)
+    public ShardInfo Apply(ShardLinkAdded e, ShardInfo s)
     {
-        var existing = s.Variants.GetValueOrDefault(e.Name);
-        // TODO: Report the error somewhere
-        var newValue = factory.Set(existing, e.Metadata, e.ExistingValueHandling, out _);
-
-        if (newValue is null)
+        return s with
         {
-            return s;
+            Links = s.Links.Add(new(e.Id, e.Metadata))
+        };
+    }
+
+    public ShardInfo Apply(ShardLinkRemoved e, ShardInfo s)
+    {
+        var links = s.Links.ToBuilder();
+        if (e.Id is not null && e.Metadata is not null)
+        {
+            links.Remove(new ShardLink(e.Id, e.Metadata.Value));
+        }
+        if (e.Metadata is not null)
+        {
+            links.ExceptWith(links.Where(l => l.Metadata == e.Metadata));
+        }
+        else
+        {
+            links.ExceptWith(links.Where(l => l.Id == e.Id));
         }
 
         return s with
         {
-            Variants = s.Variants.SetItem(e.Name, newValue.Value)
-        };
-    }
-
-    public ShardInfo Apply(ShardVariantRemoved e, ShardInfo s)
-    {
-        return s with
-        {
-            Variants = s.Variants.Remove(e.Name)
+            Links = links.ToImmutable()
         };
     }
 

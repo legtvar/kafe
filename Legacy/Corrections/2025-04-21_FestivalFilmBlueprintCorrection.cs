@@ -23,7 +23,7 @@ public class FestivalFilmBlueprintCorrection : IEventCorrection
         this.logger = logger;
     }
 
-    public static readonly Hrib FilmBlueprintId = Hrib.Parse("legacy-bpflm");
+    public static readonly Hrib FilmBlueprintId = Hrib.Parse("lgc-bp-film");
 
     public static readonly BlueprintInfo FilmBlueprint = new(
         id: FilmBlueprintId.ToString(),
@@ -63,12 +63,43 @@ public class FestivalFilmBlueprintCorrection : IEventCorrection
         }.ToImmutableDictionary()
     );
 
+    public static readonly Hrib FestivalRegistrationBlueprintId = Hrib.Parse("lgc-bp-freg");
+
+    public static readonly BlueprintInfo FestivalRegistrationBlueprint = new(
+        id: FestivalRegistrationBlueprintId.ToString(),
+        name: LocalizedString.Create(
+            (Const.InvariantCulture, "Film Festival Registration (legacy)"),
+            (Const.CzechCulture, "Přihláška na filmový festival (legacy)")
+        ),
+        properties: new Dictionary<string, BlueprintProperty>
+        {
+            ["film"] = new(
+                name: LocalizedString.Create(
+                    (Const.InvariantCulture, "Film"),
+                    (Const.CzechCulture, "Film")
+                )
+            ),
+            ["video-annotation"] = new(
+                name: LocalizedString.Create(
+                    (Const.InvariantCulture, "Video-Annotation"),
+                    (Const.CzechCulture, "Videoanotace")
+                )
+            ),
+            ["cover-photos"] = new(
+                name: LocalizedString.Create(
+                    (Const.InvariantCulture, "Cover Photos"),
+                    (Const.CzechCulture, "Titulní fotografie")
+                )
+            )
+        }.ToImmutableDictionary()
+    );
+
     public async Task Apply(IDocumentSession db, CancellationToken ct = default)
     {
         var projects = (await db.Query<ProjectInfo>().ToListAsync(ct)).ToImmutableArray();
         if (projects.IsDefaultOrEmpty)
         {
-            logger.LogInformation("No projects found. No blueprints will be added and nothin converted.");
+            logger.LogInformation("No projects found. No blueprints will be added and nothing converted.");
             return;
         }
 

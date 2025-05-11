@@ -1,0 +1,13 @@
+namespace Kafe;
+
+public interface IShardLinkType
+{
+    /// <summary>
+    /// A short name for the shard link type.
+    /// </summary>
+    /// 
+    /// <remarks>
+    /// May contain only lower-case letters, numbers, or '-'.
+    /// </remarks>
+    public virtual static string? Moniker { get; }
+}

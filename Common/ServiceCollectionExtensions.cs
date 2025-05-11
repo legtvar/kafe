@@ -22,6 +22,7 @@ public static class ServiceCollectionExtensions
         options.AddSubtypeRegistry(new ShardTypeRegistry());
         options.AddSubtypeRegistry(new PropertyTypeRegistry());
         options.AddSubtypeRegistry(new DiagnosticDescriptorRegistry());
+        options.AddSubtypeRegistry(new ShardLinkTypeRegistry());
         options.AddFormatter(new FileLengthFormatter());
         options.AddFormatter(new BitrateFormatter());
 

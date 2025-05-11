@@ -30,10 +30,10 @@ public static class ShardLinkTypeModContextExtensions
         options ??= ShardLinkRegistrationOptions.Default;
         options.Subtype ??= ShardTypeRegistry.SubtypePrimary;
         
-        if (shardLinkType.IsAssignableTo(typeof(IShardLinkType)))
+        if (shardLinkType.IsAssignableTo(typeof(IShardLinkMetadata)))
         {
             options.Moniker ??= shardLinkType.GetStaticPropertyValue<string>(
-                propertyName: nameof(IShardLinkType.Moniker),
+                propertyName: nameof(IShardLinkMetadata.Moniker),
                 isRequired: false,
                 allowNull: true
             );

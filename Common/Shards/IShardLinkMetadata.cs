@@ -1,6 +1,6 @@
 namespace Kafe;
 
-public interface IShardLinkType
+public interface IShardLinkMetadata
 {
     /// <summary>
     /// A short name for the shard link type.

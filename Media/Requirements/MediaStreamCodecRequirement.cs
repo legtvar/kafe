@@ -11,10 +11,10 @@ public record MediaStreamCodecRequirement(
     ImmutableArray<string> Include,
     ImmutableArray<string> Exclude,
     MediaStreamKind Kind,
-    int? StreamIndex
+    int? StreamIndex = null
 ) : IRequirement
 {
-    public static string Moniker { get; } = "media-stream-codec";
+    public static string Moniker { get; } = "stream-codec";
 }
 
 public class MediaStreamCodecRequirementHandler : ShardRequirementHandlerBase<MediaStreamCodecRequirement>

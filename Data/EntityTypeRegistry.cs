@@ -30,13 +30,13 @@ public static class EntityTypeModContextExtensions
         options ??= EntityTypeRegistrationOptions.Default;
         options.Subtype ??= EntityTypeRegistry.SubtypePrimary;
 
-        if (string.IsNullOrWhiteSpace(options.Name))
+        if (string.IsNullOrWhiteSpace(options.Moniker))
         {
             var typeName = entityType.Name;
             typeName = Naming.WithoutSuffix(typeName, "Entity");
             typeName = Naming.WithoutSuffix(typeName, "Info");
             typeName = Naming.ToDashCase(typeName);
-            options.Name = typeName;
+            options.Moniker = typeName;
         }
 
         options.HumanReadableName ??= entityType.GetStaticPropertyValue<LocalizedString?>(
@@ -45,7 +45,7 @@ public static class EntityTypeModContextExtensions
             allowNull: true
         );
 
-        options.HumanReadableName ??= LocalizedString.Format(EntityTypeRegistry.FallbackName, options.Name);
+        options.HumanReadableName ??= LocalizedString.Format(EntityTypeRegistry.FallbackName, options.Moniker);
 
         var kafeType = c.AddType(entityType, options);
         var entityMetadata = new EntityTypeMetadata(

@@ -32,18 +32,18 @@ public static class ShardTypeModContextExtensions
         options ??= ShardRegistrationOptions.Default;
         options.Subtype ??= ShardTypeRegistry.SubtypePrimary;
 
-        if (string.IsNullOrWhiteSpace(options.Name))
+        if (string.IsNullOrWhiteSpace(options.Moniker))
         {
             var typeName = shardType.Name;
             typeName = Naming.WithoutSuffix(typeName, "Shard");
             typeName = Naming.WithoutSuffix(typeName, "ShardMetadata");
             typeName = Naming.ToDashCase(typeName);
-            options.Name = typeName;
+            options.Moniker = typeName;
         }
 
         options.HumanReadableName ??= LocalizedString.Format(
             ShardTypeRegistry.FallbackName,
-            options.Name
+            options.Moniker
         );
 
         var kafeType = c.AddType(shardType, options);

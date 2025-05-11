@@ -32,18 +32,18 @@ public static class PropertyTypeModContextExtensions
         options ??= PropertyRegistrationOptions.Default;
         options.Subtype ??= PropertyTypeRegistry.SubtypePrimary;
 
-        if (string.IsNullOrWhiteSpace(options.Name))
+        if (string.IsNullOrWhiteSpace(options.Moniker))
         {
             var typeName = propertyType.Name;
             typeName = Naming.WithoutSuffix(typeName, "Property");
             typeName = Naming.WithoutSuffix(typeName, "PropertyMetadata");
             typeName = Naming.ToDashCase(typeName);
-            options.Name = typeName;
+            options.Moniker = typeName;
         }
 
         options.HumanReadableName ??= LocalizedString.Format(
             PropertyTypeRegistry.FallbackName,
-            options.Name
+            options.Moniker
         );
 
         var kafeType = c.AddType(propertyType, options);

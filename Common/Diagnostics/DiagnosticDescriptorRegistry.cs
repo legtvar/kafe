@@ -31,7 +31,7 @@ public static class DiagnosticDescriptorModContextExtensions
 
         if (diagnosticPayloadType.IsAssignableTo(typeof(IDiagnosticPayload)))
         {
-            options.Name ??= diagnosticPayloadType.GetStaticPropertyValue<string>(
+            options.Moniker ??= diagnosticPayloadType.GetStaticPropertyValue<string>(
                 propertyName: nameof(IDiagnosticPayload.Moniker),
                 isRequired: false,
                 allowNull: true
@@ -63,24 +63,24 @@ public static class DiagnosticDescriptorModContextExtensions
             );
         }
 
-        if (string.IsNullOrWhiteSpace(options.Name))
+        if (string.IsNullOrWhiteSpace(options.Moniker))
         {
             var typeName = diagnosticPayloadType.Name;
             typeName = Naming.WithoutSuffix(typeName, "DiagnosticDescriptor");
             typeName = Naming.WithoutSuffix(typeName, "Diagnostic");
             typeName = Naming.ToDashCase(typeName);
-            options.Name = typeName;
+            options.Moniker = typeName;
         }
 
         options.HumanReadableName ??= LocalizedString.Format(
             DiagnosticDescriptorRegistry.FallbackName,
-            options.Name
+            options.Moniker
         );
 
         var kafeType = c.AddType(diagnosticPayloadType, options);
         var descriptor = new DiagnosticDescriptor()
         {
-            Id = options.Name,
+            Id = options.Moniker,
             KafeType = kafeType,
             DotnetType = diagnosticPayloadType,
             Title = options.Title ?? LocalizedString.CreateInvariant(kafeType.ToString()),

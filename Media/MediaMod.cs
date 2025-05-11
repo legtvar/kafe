@@ -19,15 +19,15 @@ public sealed class MediaMod : IMod
 
         AudiovisualShardType = context.AddShard<MediaInfo>(new()
         {
-            Name = "video",
+            Moniker = "video",
         });
         ImageShardType = context.AddShard<ImageInfo>(new()
         {
-            Name = "image"
+            Moniker = "image"
         });
         SubtitlesShardType = context.AddShard<SubtitlesInfo>(new()
         {
-            Name = "subtitles"
+            Moniker = "subtitles"
         });
     }
 

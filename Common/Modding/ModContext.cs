@@ -49,7 +49,7 @@ public sealed record class ModContext
     public KafeType AddType(Type type, KafeTypeRegistrationOptions? options = null)
     {
         options ??= KafeTypeRegistrationOptions.Default;
-        var typeName = options.Name;
+        var typeName = options.Moniker;
         if (string.IsNullOrWhiteSpace(typeName))
         {
             typeName = Naming.ToDashCase(type.Name);
@@ -88,7 +88,7 @@ public sealed record class ModContext
         /// Short, dash-case name. Will be used for <see cref="KafeType.Primary"/> if <see cref="Subtype"/> is null or 
         /// empty, or for <see cref="KafeType.Secondary"/> if <see cref="Subtype"/> is defined.
         /// </summary>
-        public string? Name { get; set; }
+        public string? Moniker { get; set; }
 
         /// <summary>
         /// The "subtype" or category of this type. Used for <see cref="KafeType.Primary"/>.

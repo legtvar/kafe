@@ -29,6 +29,7 @@ public sealed class MediaMod : IMod
         {
             Moniker = "subtitles"
         });
+        context.AddShardLink<VariantLinkMetadata>();
     }
 
     private static void ConfigureServices(IServiceCollection services)

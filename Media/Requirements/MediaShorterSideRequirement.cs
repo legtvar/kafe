@@ -9,7 +9,7 @@ public record MediaShorterSideRequirement(
     int Min
 ) : IRequirement
 {
-    public static string Moniker { get; } = "media-shorter-side";
+    public static string Moniker { get; } = "shorter-side";
 }
 
 public class MediaShorterSideRequirementHandler : ShardRequirementHandlerBase<MediaShorterSideRequirement>

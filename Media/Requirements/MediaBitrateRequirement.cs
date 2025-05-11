@@ -11,10 +11,10 @@ public record MediaBitrateRequirement(
     int? Min,
     int? Max,
     MediaBitrateKind Kind,
-    int? StreamIndex
+    int? StreamIndex = null
 ) : IRequirement
 {
-    public static string Moniker { get; } = "media-bitrate";
+    public static string Moniker { get; } = "bitrate";
 }
 
 public class MediaBitrateRequirementHandler : ShardRequirementHandlerBase<MediaBitrateRequirement>

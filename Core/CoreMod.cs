@@ -76,6 +76,10 @@ public sealed class CoreMod : IMod
         {
             HandlerTypes = [typeof(ShardFileLengthRequirementHandler)]
         });
+        // TODO: Implement handlers
+        c.AddRequirement<AllRequirement>();
+        c.AddRequirement<ArrayLengthRequirement>();
+        c.AddRequirement<ShardMetadataTypeRequirement>();
     }
 
     private static void AddDiagnostics(ModContext c)

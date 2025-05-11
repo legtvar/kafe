@@ -32,17 +32,17 @@ public static class RequirementTypeModContextExtensions
         options ??= RequirementRegistrationOptions.Default;
         options.Subtype ??= RequirementTypeRegistry.SubtypePrimary;
 
-        if (string.IsNullOrWhiteSpace(options.Name))
+        if (string.IsNullOrWhiteSpace(options.Moniker))
         {
             var typeName = requirementType.Name;
             typeName = Naming.WithoutSuffix(typeName, "Requirement");
             typeName = Naming.ToDashCase(typeName);
-            options.Name = typeName;
+            options.Moniker = typeName;
         }
 
         options.HumanReadableName ??= LocalizedString.Format(
             RequirementTypeRegistry.FallbackName,
-            options.Name
+            options.Moniker
         );
 
         var kafeType = c.AddType(requirementType, options);

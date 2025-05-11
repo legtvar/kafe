@@ -32,24 +32,24 @@ public static class ShardLinkTypeModContextExtensions
         
         if (shardLinkType.IsAssignableTo(typeof(IShardLinkType)))
         {
-            options.Name ??= shardLinkType.GetStaticPropertyValue<string>(
+            options.Moniker ??= shardLinkType.GetStaticPropertyValue<string>(
                 propertyName: nameof(IShardLinkType.Moniker),
                 isRequired: false,
                 allowNull: true
             );
         }
 
-        if (string.IsNullOrWhiteSpace(options.Name))
+        if (string.IsNullOrWhiteSpace(options.Moniker))
         {
             var typeName = shardLinkType.Name;
             typeName = Naming.WithoutSuffix(typeName, "ShardLink");
             typeName = Naming.ToDashCase(typeName);
-            options.Name = typeName;
+            options.Moniker = typeName;
         }
 
         options.HumanReadableName ??= LocalizedString.Format(
             ShardTypeRegistry.FallbackName,
-            options.Name
+            options.Moniker
         );
 
         var kafeType = c.AddType(shardLinkType, options);

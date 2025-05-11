@@ -18,32 +18,32 @@ public sealed class CoreMod : IMod
     {
         c.AddArtifactProperty<LocalizedString>(new()
         {
-            Name = "localized-string",
+            Moniker = "localized-string",
             Converter = new LocalizedStringJsonConverter(),
         });
         c.AddArtifactProperty<DateTimeProperty>(new()
         {
-            Name = "date-time",
+            Moniker = "date-time",
             Converter = new DateTimePropertyJsonConverter(),
         });
         c.AddArtifactProperty<KafeString>(new()
         {
-            Name = "string",
+            Moniker = "string",
             Converter = new KafeStringJsonConverter(),
         });
         c.AddArtifactProperty<NumberProperty>(new()
         {
-            Name = "number",
+            Moniker = "number",
             Converter = new NumberPropertyJsonConverter(),
         });
         c.AddArtifactProperty<ShardReferenceProperty>(new()
         {
-            Name = "shard-ref",
+            Moniker = "shard-ref",
             Converter = new ShardReferencePropertyJsonConverter(),
         });
         c.AddArtifactProperty<AuthorReferenceProperty>(new()
         {
-            Name = "author-ref",
+            Moniker = "author-ref",
             DefaultRequirements = [
                 new AuthorReferenceNameOrIdRequirement()
             ]
@@ -54,11 +54,11 @@ public sealed class CoreMod : IMod
     {
         c.AddShard<BlobShard>(new()
         {
-            Name = "blob"
+            Moniker = "blob"
         });
         c.AddShard<ArchiveShard>(new()
         {
-            Name = "archive"
+            Moniker = "archive"
         });
     }
 

@@ -23,7 +23,6 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
 using Kafe.Api.Options;
 using Kafe.Data.Options;
-using Kafe.Api.Daemons;
 using Kafe.Api.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -355,7 +354,6 @@ public class Startup
                 }
             });
 
-        services.AddHostedService<VideoConversionDaemon>();
 
         var emailServiceType = Configuration.GetSection("Email").Get<EmailOptions>()?.ServiceType
             ?? EmailOptions.EmailServiceType.Default;

@@ -8,14 +8,12 @@ using Kafe.Data;
 using Kafe.Data.Aggregates;
 using Kafe.Data.Events;
 using Kafe.Data.Services;
-using Kafe.Media;
-using Kafe.Media.Services;
 using Marten;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace Kafe.Api.Daemons;
+namespace Kafe.Media.Services;
 
 public class VideoConversionDaemon : BackgroundService
 {

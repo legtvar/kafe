@@ -10,7 +10,7 @@ namespace Kafe.Media.Requirements;
 public record VideoFramerateRequirement(
     ImmutableArray<double> Include,
     ImmutableArray<double> Exclude,
-    int? StreamIndex
+    int? StreamIndex = null
 ) : IRequirement
 {
     public static string Moniker { get; } = "video-framerate";

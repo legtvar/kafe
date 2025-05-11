@@ -17,7 +17,7 @@ public class PolygonsMod : IMod
     {
         BlendShardType = context.AddShard<BlendInfo>(new()
         {
-            Name = "blend",
+            Moniker = "blend",
             AnalyzerTypes = [typeof(BlendShardAnalyzer)]
         });
     }

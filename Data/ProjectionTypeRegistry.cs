@@ -34,17 +34,17 @@ public static class ProjectionTypeModContextExtensions
         options ??= ProjectionTypeRegistrationOptions.Default;
         options.Subtype ??= EntityTypeRegistry.SubtypePrimary;
 
-        if (string.IsNullOrWhiteSpace(options.Name))
+        if (string.IsNullOrWhiteSpace(options.Moniker))
         {
             var typeName = projectionType.Name;
             typeName = Naming.WithoutSuffix(typeName, "EventProjection");
             typeName = Naming.WithoutSuffix(typeName, "Projection");
             typeName = Naming.WithoutSuffix(typeName, "Aggregate");
             typeName = Naming.ToDashCase(typeName);
-            options.Name = typeName;
+            options.Moniker = typeName;
         }
 
-        options.HumanReadableName ??= LocalizedString.Format(EntityTypeRegistry.FallbackName, options.Name);
+        options.HumanReadableName ??= LocalizedString.Format(EntityTypeRegistry.FallbackName, options.Moniker);
 
         var kafeType = c.AddType(projectionType, options);
         var projMetadata = new ProjectionTypeMetadata(

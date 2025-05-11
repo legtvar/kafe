@@ -13,17 +13,10 @@ public sealed class MediaMod : IMod
 
     public KafeType SubtitlesShardType { get; private set; }
 
-    public void ConfigureServices(IServiceCollection services)
-    {
-        services.AddSingleton<IMediaService, FFmpegCoreService>();
-        services.AddSingleton<IImageService, ImageSharpService>();
-        services.AddSingleton<VideoShardAnalyzer>();
-        services.AddSingleton<SubtitlesShardAnalyzer>();
-        services.AddSingleton<ImageShardAnalyzer>();
-    }
-
     public void Configure(ModContext context)
     {
+        ConfigureServices(context.Services);
+
         AudiovisualShardType = context.AddShard<MediaInfo>(new()
         {
             Name = "video",
@@ -36,5 +29,15 @@ public sealed class MediaMod : IMod
         {
             Name = "subtitles"
         });
+    }
+
+    private static void ConfigureServices(IServiceCollection services)
+    {
+        services.AddSingleton<IMediaService, FFmpegCoreService>();
+        services.AddSingleton<IImageService, ImageSharpService>();
+        services.AddSingleton<VideoShardAnalyzer>();
+        services.AddSingleton<SubtitlesShardAnalyzer>();
+        services.AddSingleton<ImageShardAnalyzer>();
+        services.AddHostedService<VideoConversionDaemon>();
     }
 }

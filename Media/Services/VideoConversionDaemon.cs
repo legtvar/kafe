@@ -8,7 +8,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Kafe.Api.Daemons;
+namespace Kafe.Media.Services;
 
 public class VideoConversionDaemon(
     IServiceProvider serviceProvider,

@@ -99,15 +99,21 @@ However, it takes longer to set up and may conflict with your local configs if y
    docker compose -f ./docker-compose.base.yml -f ./docker-compose.local.yml down
    ```
 
-### Configuration
+### Logging in
 
-Your locally running instance of KAFE is configured using the `appsettings.json` and `appsettings.local.json` files.
-The `appsettings.local.json` file is more specific and thus overrides `appsettings.json`.
+To log in:
 
-By default, an admin account registered to `kafe@example.com` is created.
-To log in, use this email address in the front-end's UI or in a call to `TemporaryAccountCreationEndpoint` (POST to `/api/v1/tmp-account`).
-Then, look into back end's console output and look for the confirmation email.
-If you want to log in using the front end, just copy paste the link into the browser.
-If you're using the API (e.g., through Postman), change the URL to match the `TemporaryAccountConfirmationEndpoint`.
-That is, change the request from `https://<your KAFE instance>/account/token/:token` to `/api/v1/tmp-acount/:token`, where `:token` is the login token.
-Now, your user agent of choice should have a valid session cookie.
+1. Use the `kafe@example.com` email address in the front-end's UI or in a call to `TemporaryAccountCreationEndpoint` (POST to `/api/v1/tmp-account`). This is the default admin account.
+2. Look into back end's console output and look for the confirmation email.
+3. Use the confirmation token from the confirmation email.
+   - If you want to log in using the front end, just copy paste the link into the browser.
+   - If you're using the API (e.g., through Postman), change the URL to match the `TemporaryAccountConfirmationEndpoint`. That is, change it:
+   ```
+   ORIGINAL:
+   https://<your KAFE instance>/account/token/:token
+   NEW:
+   https://<your KAFE instance>/api/v1/tmp-account/:token
+   ```
+   where `:token` is the confirmation token.
+
+4. Now, your user agent of choice should have a valid session cookie.

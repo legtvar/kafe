@@ -98,3 +98,16 @@ However, it takes longer to set up and may conflict with your local configs if y
    ```bash
    docker compose -f ./docker-compose.base.yml -f ./docker-compose.local.yml down
    ```
+
+### Configuration
+
+Your locally running instance of KAFE is configured using the `appsettings.json` and `appsettings.local.json` files.
+The `appsettings.local.json` file is more specific and thus overrides `appsettings.json`.
+
+By default, an admin account registered to `kafe@example.com` is created.
+To log in, use this email address in the front-end's UI or in a call to `TemporaryAccountCreationEndpoint` (POST to `/api/v1/tmp-account`).
+Then, look into back end's console output and look for the confirmation email.
+If you want to log in using the front end, just copy paste the link into the browser.
+If you're using the API (e.g., through Postman), change the URL to match the `TemporaryAccountConfirmationEndpoint`.
+That is, change the request from `https://<your KAFE instance>/account/token/:token` to `/api/v1/tmp-acount/:token`, where `:token` is the login token.
+Now, your user agent of choice should have a valid session cookie.

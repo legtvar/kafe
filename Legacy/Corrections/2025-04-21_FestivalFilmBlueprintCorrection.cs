@@ -1,5 +1,6 @@
 #pragma warning disable 0618
 
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Threading;
@@ -19,55 +20,52 @@ Checklist
 ---------
 
 Name:
-- [ ] StringLength [1, 42]
+- [x] StringLength [1, 42]
 
 Description:
-- [ ] StringLength [50, 200]
+- [x] StringLength [50, 200]
 
 Genre:
-- [ ] StringLength [1, 32]
+- [x] StringLength [1, 32]
 
 Videos:
-- [ ] MediaDuration [00:00:01, 00:08:00] +- 00:00:01
-- [ ] FileLength [0, 2 GiB]
-- [ ] MediaBitrate [10 Mbps, 20 Mbps] +- 1 Mbps
-- [ ] MediaShorterSide [1080, inf]
-- [ ] MimeType {video/mp4, video/x-matroska}
-- [ ] MediaStreamCount (Video) [1, 1]
-- [ ] MediaStreamCount (Audio) [1, 1]
-- [ ] VideoSubtitles
-- [ ] MediaStreamCodec (Video) {h264, mpeg4}
-- [ ] MediaStreamCodec (Audio) {aac, mp3, flac}
-- [ ] MediaStreamCodec (Subtitles) {subrip, ass}
-- [ ] MediaBitrate (Audio) [192 Kbps, inf]
-- [ ] VideoFramerate {24 fps, 25 fps}
-
+- [x] MediaDuration [00:00:01, 00:08:00] +- 00:00:01
+- [x] FileLength [0, 2 GiB]
+- [x] MediaBitrate [10 Mbps, 20 Mbps] +- 1 Mbps
+- [x] MediaShorterSide [1080, inf]
+- [x] MimeType {video/mp4, video/x-matroska}
+- [x] MediaStreamCount (Video) [1, 1]
+- [x] MediaStreamCount (Audio) [1, 1]
+- [x] VideoSubtitles {en}
+- [x] MediaStreamCodec (Video) {h264, mpeg4}
+- [x] MediaStreamCodec (Audio) {aac, mp3, flac}
+- [x] MediaStreamCodec (Subtitles) {subrip, ass}
+- [x] MediaBitrate (Audio) [192 Kbps, inf]
+- [x] VideoFramerate {24 fps, 25 fps}
 
 Video-annotation:
-- [ ] MediaDuration [00:00:01, 00:30:00] +- 00:00:01
-- [ ] FileLength [0, 512 MiB]
-- [ ] MediaBitrate [10 Mbps, 20 Mbps] +- 1 Mbps
-- [ ] MediaShorterSide [1080, inf]
-- [ ] MimeType {video/mp4, video/x-matroska}
-- [ ] MediaStreamCount (Video) [1, 1]
-- [ ] MediaStreamCount (Audio) [1, 1]
-- [ ] VideoSubtitles
-- [ ] MediaStreamCodec (Video) {h264, mpeg4}
-- [ ] MediaStreamCodec (Subtitles) {subrip, ass}
-- [ ] VideoFramerate {24 fps, 25 fps}
+- [x] MediaDuration [00:00:01, 00:30:00] +- 00:00:01
+- [x] FileLength [0, 512 MiB]
+- [x] MediaBitrate [10 Mbps, 20 Mbps] +- 1 Mbps
+- [x] MediaShorterSide [1080, inf]
+- [x] MimeType {video/mp4, video/x-matroska}
+- [x] MediaStreamCount (Video) [1, 1]
+- [x] MediaStreamCount (Audio) [1, 1]
+- [x] VideoSubtitles {en}
+- [x] MediaStreamCodec (Video) {h264, mpeg4}
+- [x] MediaStreamCodec (Subtitles) {subrip, ass}
+- [x] VideoFramerate {24 fps, 25 fps}
 
 Cover photo:
-- [ ] MediaShorterSide [1080, inf]
-- [ ] MediaAspectRatio [4:3, 16:9]
-- [ ] MimeType {video/jpeg, video/png}
+- [x] MediaShorterSide [1080, inf]
+- [x] MediaAspectRatio [4:3, 16:9]
+- [x] MimeType {video/jpeg, video/png}
 
 Crew:
-- [ ] Type {core:author-ref[]}
-- [ ] ArrayLength [1, inf]
+- [x] Type {core:author-ref[]}
 
 Cast:
-- [ ] Type {core:author-ref[]}
-- [ ] ArrayLength [1, inf]
+- [x] Type {core:author-ref[]}
 
 Review:
 - [ ] Stage {info, file, tech-review, visual-review, dramaturgy-review}
@@ -113,6 +111,66 @@ public class FestivalFilmBlueprintCorrection : IEventCorrection
             name: LocalizedString.CreateInvariant("WMA Project (legacy)"),
             properties: new Dictionary<string, BlueprintProperty>
             {
+                ["name"] = new(
+                    name: LocalizedString.Create(
+                        (Const.InvariantCulture, "Project name"),
+                        (Const.CzechCulture, "Název projektu")
+                    ),
+                    requirements: [..kof.WrapMany(
+                        new TypeRequirement(
+                            Include: [KafeType.Parse("core:localized-string")],
+                            Exclude: []
+                        )
+                    )]
+                ),
+                ["description"] = new(
+                    name: LocalizedString.Create(
+                        (Const.InvariantCulture, "Project description"),
+                        (Const.CzechCulture, "Popis projektu")
+                    ),
+                    requirements: [..kof.WrapMany(
+                        new TypeRequirement(
+                            Include: [KafeType.Parse("core:localized-string")],
+                            Exclude: []
+                        )
+                    )]
+                ),
+                ["genre"] = new(
+                    name: LocalizedString.Create(
+                        (Const.InvariantCulture, "Genre"),
+                        (Const.CzechCulture, "Žánr")
+                    ),
+                    requirements: [..kof.WrapMany(
+                        new TypeRequirement(
+                            Include: [KafeType.Parse("core:localized-string")],
+                            Exclude: []
+                        )
+                    )]
+                ),
+                ["cast"] = new(
+                    name: LocalizedString.Create(
+                        (Const.InvariantCulture, "Cast"),
+                        (Const.CzechCulture, "Herci")
+                    ),
+                    requirements: [..kof.WrapMany(
+                        new TypeRequirement(
+                            Include: [KafeType.Parse("core:author-ref[]")],
+                            Exclude: []
+                        )
+                    )]
+                ),
+                ["crew"] = new(
+                    name: LocalizedString.Create(
+                        (Const.InvariantCulture, "Crew"),
+                        (Const.CzechCulture, "Štáb")
+                    ),
+                    requirements: [..kof.WrapMany(
+                        new TypeRequirement(
+                            Include: [KafeType.Parse("core:author-ref[]")],
+                            Exclude: []
+                        )
+                    )]
+                ),
                 ["videos"] = new(
                     name: LocalizedString.Create(
                         (Const.InvariantCulture, "Video files"),
@@ -144,6 +202,69 @@ public class FestivalFilmBlueprintCorrection : IEventCorrection
             ),
             properties: new Dictionary<string, BlueprintProperty>
             {
+                ["name"] = new(
+                    name: LocalizedString.Create(
+                        (Const.InvariantCulture, "Film title"),
+                        (Const.CzechCulture, "Název filmu")
+                    ),
+                    requirements: [..kof.WrapMany(
+                        new TypeRequirement(
+                            Include: [KafeType.Parse("core:localized-string")],
+                            Exclude: []
+                        ),
+                        new StringLengthRequirement(1, 42)
+                    )]
+                ),
+                ["description"] = new(
+                    name: LocalizedString.Create(
+                        (Const.InvariantCulture, "Film description"),
+                        (Const.CzechCulture, "Popis filmu")
+                    ),
+                    requirements: [..kof.WrapMany(
+                        new TypeRequirement(
+                            Include: [KafeType.Parse("core:localized-string")],
+                            Exclude: []
+                        ),
+                        new StringLengthRequirement(50, 200)
+                    )]
+                ),
+                ["genre"] = new(
+                    name: LocalizedString.Create(
+                        (Const.InvariantCulture, "Genre"),
+                        (Const.CzechCulture, "Žánr")
+                    ),
+                    requirements: [..kof.WrapMany(
+                        new TypeRequirement(
+                            Include: [KafeType.Parse("core:localized-string")],
+                            Exclude: []
+                        ),
+                        new StringLengthRequirement(1, 32)
+                    )]
+                ),
+                ["cast"] = new(
+                    name: LocalizedString.Create(
+                        (Const.InvariantCulture, "Cast"),
+                        (Const.CzechCulture, "Herci")
+                    ),
+                    requirements: [..kof.WrapMany(
+                        new TypeRequirement(
+                            Include: [KafeType.Parse("core:author-ref[]")],
+                            Exclude: []
+                        )
+                    )]
+                ),
+                ["crew"] = new(
+                    name: LocalizedString.Create(
+                        (Const.InvariantCulture, "Crew"),
+                        (Const.CzechCulture, "Štáb")
+                    ),
+                    requirements: [..kof.WrapMany(
+                        new TypeRequirement(
+                            Include: [KafeType.Parse("core:author-ref[]")],
+                            Exclude: []
+                        )
+                    )]
+                ),
                 ["film"] = new(
                     name: LocalizedString.Create(
                         (Const.InvariantCulture, "Film file"),
@@ -153,9 +274,53 @@ public class FestivalFilmBlueprintCorrection : IEventCorrection
                         new ShardMetadataTypeRequirement(
                             [KafeType.Parse("media:shard/video")]
                         ),
+                        new ShardMimeTypeRequirement(
+                            Include: ["video/mp4", "video/x-matroska"],
+                            Exclude: []
+                        ),
+                        new ShardFileLengthRequirement(
+                            Min: null,
+                            Max: 2 << 30
+                        ),
                         new VideoSubtitlesRequirement(
                             Const.EnglishCulture.TwoLetterISOLanguageName
-                        )
+                        ),
+                        new MediaStreamCodecRequirement(
+                            Include: ["subrip", "ass"],
+                            Exclude: [],
+                            Kind: MediaStreamKind.Subtitles
+                        ),
+                        new MediaStreamCodecRequirement(
+                            Include: ["aac", "mp3", "flac"],
+                            Exclude: [],
+                            Kind: MediaStreamKind.Audio
+                        ),
+                        new MediaStreamCodecRequirement(
+                            Include: ["h264", "mpeg4"],
+                            Exclude: [],
+                            Kind: MediaStreamKind.Video
+                        ),
+                        new MediaBitrateRequirement(
+                            Min: 10_000_000,
+                            Max: 20_000_000,
+                            Kind: MediaBitrateKind.Total
+                        ),
+                        new MediaBitrateRequirement(
+                            Min: 192_000,
+                            Max: null,
+                            Kind: MediaBitrateKind.Audio
+                        ),
+                        new VideoFramerateRequirement(
+                            Include: [24.0, 25.0],
+                            Exclude: []
+                        ),
+                        new MediaDurationRequirement(
+                            Min: null,
+                            Max: TimeSpan.FromMinutes(8)
+                        ),
+                        new MediaShorterSideRequirement(1080),
+                        new MediaStreamCountRequirement(1, 1, MediaStreamKind.Video),
+                        new MediaStreamCountRequirement(1, 1, MediaStreamKind.Audio)
                     )]
                 ),
                 ["video-annotation"] = new(
@@ -201,7 +366,14 @@ public class FestivalFilmBlueprintCorrection : IEventCorrection
                         new VideoFramerateRequirement(
                             Include: [24.0, 25.0],
                             Exclude: []
-                        )
+                        ),
+                        new MediaDurationRequirement(
+                            Min: null,
+                            Max: TimeSpan.FromSeconds(30)
+                        ),
+                        new MediaShorterSideRequirement(1080),
+                        new MediaStreamCountRequirement(1, 1, MediaStreamKind.Video),
+                        new MediaStreamCountRequirement(1, 1, MediaStreamKind.Audio)
                     )]
                 ),
                 ["cover-photos"] = new(

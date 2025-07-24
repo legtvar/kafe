@@ -13,6 +13,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddSingleton<IMediaService, FFmpegCoreService>();
         services.AddSingleton<IImageService, ImageSharpService>();
+        services.AddSingleton<PigeonsCoreService>();
         return services;
     }
 }

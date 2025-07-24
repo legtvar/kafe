@@ -287,6 +287,16 @@ public class ShardService
         return ((IShardCreated)firstEvent.Data).GetShardKind();
     }
 
+    public async Task<string> GetShardPath(Hrib id, CancellationToken token = default)
+    {
+        var shardKind = await GetShardKind(id, token);
+        if (!storageService.TryGetFilePath(shardKind, id, Const.OriginalShardVariant, out var path))
+        {
+            throw new ArgumentException($"The shard '{id}' does not exist.");
+        }
+        return path;
+    }
+    
     public record VariantInfo(
         Hrib ShardId,
         string Variant,

@@ -3,6 +3,7 @@ using Kafe.Data.Events;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -644,6 +645,23 @@ public partial class ProjectService
                 $"{CoverPhotoMinRatioDescription} a {CoverPhotoMaxRatioDescription}.")
         )
     );
+    public static readonly Diagnostic MissingPigeonsTestResult = new Diagnostic(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: FileStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, "PIGEOnS test result cannot be found."),
+            (Const.CzechCulture, "Výsledek PIGEOnS testu nelze nalézt.")
+        )
+    );
+
+    public static readonly Diagnostic IncorrectPigeonsTestResultFormat = new Diagnostic(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: FileStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, "PIGEOnS test result is of incorrect format."),
+            (Const.CzechCulture, "Výsledek PIGEOnS testu má nesprávný formát.")
+        )
+    );
 
     public ProjectReport ValidateBasicInfo(ProjectInfo project, ProjectValidationSettings? settings = null)
     {
@@ -970,6 +988,15 @@ public partial class ProjectService
             }
         }
 
+        var blendArtifacts = artifacts.Where(a => a.projectArtifact.BlueprintSlot == Const.BlendBlueprintSlot);
+        var blendShards = blendArtifacts.SelectMany(a => a.info.Shards.Where(s => s.Kind == ShardKind.Blend))
+            .ToImmutableArray();
+        foreach (var blendShard in blendShards)
+        {
+            var blendShardInfo = await db.LoadAsync<BlendShardInfo>(blendShard.ShardId, token);
+            diagnostics.AddRange(ValidatePigeons(blendShardInfo));
+        }
+
         return new(
             ProjectId: id,
             ValidatedOn: DateTimeOffset.UtcNow,
@@ -1158,6 +1185,103 @@ public partial class ProjectService
         if (!AllowedSubtitleCodecs.Contains(originalVariant.Codec))
         {
             yield return SubtitlesWrongFormat;
+        }
+    }
+
+    private static DiagnosticKind StatusToDiagnosticKind(string status)
+    {
+        switch (status)
+        {
+            case "INIT":
+                return DiagnosticKind.Info;
+            case "OK":
+                return DiagnosticKind.Info;
+            case "SKIPPED":
+                return DiagnosticKind.Info;
+            case "WARNING":
+                return DiagnosticKind.Warning;
+            case "ERROR":
+                return DiagnosticKind.Error;
+            case "CRASHED":
+                return DiagnosticKind.Error;
+            default:
+                return DiagnosticKind.Info;
+        }
+    }
+
+
+    private static IEnumerable<Diagnostic> ValidatePigeons(BlendShardInfo? blend)
+    {
+        if (blend is null)
+        {
+            yield break;
+        }
+
+        foreach (var variant in blend.Variants.Values)
+        {
+            if (variant.Error is not null)
+            {
+                yield return new Diagnostic(
+                    Kind: DiagnosticKind.Error,
+                    ValidationStage: FileStage,
+                    Message: LocalizedString.Create(
+                        (Const.InvariantCulture, $"PIGEOnS test could not be run: {variant.Error}"),
+                        (Const.CzechCulture, $"PIGEOnS test nemohl být spuštěn: {variant.Error}")
+                    )
+                );
+                yield break;
+            }
+
+            if (variant.Tests is null)
+            {
+                yield return MissingPigeonsTestResult;
+                yield break;
+            }
+            foreach (var result in variant.Tests)
+            {
+                var sb = new System.Text.StringBuilder();
+                if (!string.IsNullOrWhiteSpace(result.Label))
+                {
+                    sb.Append(result.Label);
+                }
+                // Append additional info if any of the fields are present
+                if (!string.IsNullOrWhiteSpace(result.Datablock) ||
+                    !string.IsNullOrWhiteSpace(result.Message) ||
+                    !string.IsNullOrWhiteSpace(result.Traceback))
+                {
+                    sb.Append(":");
+                }
+                else
+                {
+                    sb.Append(".");
+                }
+                if (!string.IsNullOrWhiteSpace(result.Datablock))
+                {
+                    sb.Append(" [");
+                    sb.Append(result.Datablock);
+                    sb.Append("]");
+                }
+                if (!string.IsNullOrWhiteSpace(result.Message))
+                {
+                    sb.Append(" ");
+                    sb.Append(result.Message);
+                }
+                if (!string.IsNullOrWhiteSpace(result.Traceback))
+                {
+                    sb.Append(" ");
+                    sb.Append("Traceback: ");
+                    sb.Append(result.Traceback);
+                }
+                string message = sb.ToString();
+
+                yield return new Diagnostic(
+                    Kind: StatusToDiagnosticKind(result.State ?? "UNKNOWN"),
+                    ValidationStage: FileStage,
+                    Message: LocalizedString.Create(
+                        (Const.InvariantCulture, message)
+                    )
+                );
+            }
         }
     }
 }

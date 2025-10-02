@@ -65,11 +65,7 @@ public class PigeonTestEndpoint : EndpointBaseAsync
         var shardPath = await shardService.GetShardPath(id, cancellationToken);
 
         var service = new PigeonsCoreService();
-        var success = await service.RunPigeonsTest(id, shardPath);
-        if(!success)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError, "Pigeons test failed to run.");
-        }
+        var result = await service.RunPigeonsTest(id, shardPath);
 
         return Ok();
     }

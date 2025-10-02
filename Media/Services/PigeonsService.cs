@@ -4,6 +4,9 @@ using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using System.Collections.Immutable;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Kafe.Media.Services;
 
@@ -13,11 +16,13 @@ public class PigeonsCoreService
 
     private const string pigeonsTestOutputName = "pigeons_test_result";
     private const string pigeonsTestOutputExtension = "json";
+    private const int pigeonsTestTimeoutMs = 100000;
+
     public PigeonsCoreService(ILogger<PigeonsCoreService>? logger = null)
     {
         this.logger = logger ?? NullLogger<PigeonsCoreService>.Instance;
     }
-    
+
 
     public static string? FindPigeonsManagerPath()
     {
@@ -67,6 +72,7 @@ public class PigeonsCoreService
         string args = string.Join(" ", new[]
         {
             "--background",
+            "--python-exit-code", "1",
             "--python",$"\"{FindPigeonsManagerPath()}\"",
             "--",
             "test",
@@ -76,10 +82,65 @@ public class PigeonsCoreService
         });
         return args;
     }
+    
+    public class PigeonsTestResult : Dictionary<int, PigeonsTestResultDetails>
+    {
+    }
 
-    public async Task<bool> RunPigeonsTest(Hrib id, string shardPath)
+    public class PigeonsTestResultDetails
+    {
+        public string? label { get; set; }
+        public string? state { get; set; }
+        public string? datablock { get; set; }
+        public string? message { get; set; }
+        public string? traceback { get; set; }
+    };
+
+    public async Task<BlendInfo> RunPigeonsTest(Hrib id, string shardPath)
     {
         string arguments = GetPigeonsTestCommand(id, shardPath, GetHomeworkType());
-        return await Blender.RunBlenderCommand(arguments);
+        BlenderProcessOutput output = await Blender.RunBlenderCommand(arguments, pigeonsTestTimeoutMs);
+        if (!output.Success)
+        {
+            return BlendInfo.Invalid(output.Message);
+        }
+
+        FileInfo shardFile = new FileInfo(shardPath);
+        if (!shardFile.Exists || shardFile.DirectoryName is null)
+        {
+            return BlendInfo.Invalid("Shard file was not found");
+        }
+        DirectoryInfo shardDir = new DirectoryInfo(shardFile.DirectoryName);
+        if (shardDir is null)
+        {
+            return BlendInfo.Invalid("Shard file was not found");
+        }
+        string testResultPath = shardDir.GetFiles()
+            .Where(f => f.Name.StartsWith("pigeons_test_result") && f.Name.EndsWith(".json"))
+            .OrderByDescending(f => f.LastWriteTime)
+            .First()
+            .ToString();
+
+        string jsonContent = File.ReadAllText(testResultPath);
+        List<BlendTestInfo> tests = new List<BlendTestInfo>();
+        PigeonsTestResult? pigeonsResult = System.Text.Json.JsonSerializer.Deserialize<PigeonsTestResult>(jsonContent);
+        if (pigeonsResult != null)
+        {
+            foreach (var result in pigeonsResult.Values)
+            {
+                tests.Add(new BlendTestInfo(
+                    result.label,
+                    result.state,
+                    result.datablock,
+                    result.message,
+                    result.traceback
+                ));
+            }
+        }
+        return new BlendInfo(
+            Const.BlendFileExtension,
+            Const.BlendMimeType,
+            tests.ToImmutableArray()
+        );
     }
 }

@@ -37,7 +37,7 @@ public static class Blender
         }
         return null;
     }
-    public static async Task<bool> RunBlenderCommand(string arguments)
+    public static async Task<BlenderProcessOutput> RunBlenderCommand(string arguments, int? timeout = null)
     {
         using var pro = new Process
         {
@@ -52,8 +52,31 @@ public static class Blender
             }
         };
         pro.Start();
-        await pro.WaitForExitAsync();
-        bool success = pro.ExitCode == 0;
-        return success;
+        if (timeout == null)
+        {
+            await pro.WaitForExitAsync();
+        } else
+        {
+            Task task = pro.WaitForExitAsync();
+            Task result = await Task.WhenAny(task, Task.Delay(timeout.Value));
+            if (result != task)
+            {
+                try
+                {
+                    pro.Kill();
+                }
+                catch (Exception)
+                {
+                    // Ignore exceptions from Kill, process might have already exited.
+                }
+                return new BlenderProcessOutput(false, "Blender process timed out.");
+            }
+        }
+        if (pro.ExitCode == 0)
+        {
+            return new BlenderProcessOutput(true);
+        }
+        string message = await pro.StandardError.ReadToEndAsync();
+        return new BlenderProcessOutput(false, "Blender process exited with code " + pro.ExitCode + ": " + message);
     }
 }

@@ -235,29 +235,39 @@ public class ShardService
         Hrib? shardId = null,
         CancellationToken token = default
     )
-    {
-        var blendInfo = new BlendInfo(".blend", "application/x-blender");
+    {  
         blendStream.Seek(0, SeekOrigin.Begin);
         shardId ??= Hrib.Create();
 
+        if (!await storageService.TryStoreShard(
+            ShardKind.Blend,
+            shardId,
+            blendStream,
+            Const.OriginalShardVariant,
+            Const.BlendFileExtension,
+            token
+        ))
+        {
+            throw new InvalidOperationException("The .blend file could not be stored.");
+        }
+
+        if (!storageService.TryGetFilePath(
+            ShardKind.Blend,
+            shardId,
+            Const.OriginalShardVariant,
+            out var shardFilePath))
+        {
+            throw new ArgumentException("The shard stream could not be opened just after being saved.");
+        }
+
+        var service = new PigeonsCoreService();
+        var blendInfo = await service.RunPigeonsTest(shardId, shardFilePath);
+        
         var created = new BlendShardCreated(
             ShardId: shardId.ToString(),
             CreationMethod: CreationMethod.Api,
             ArtifactId: artifactId.ToString(),
-            OriginalVariantInfo: blendInfo
-        );
-
-        if (!await storageService.TryStoreShard(
-                ShardKind.Blend,
-                created.ShardId,
-                blendStream,
-                Const.OriginalShardVariant,
-                blendInfo.FileExtension,
-                token
-            ))
-        {
-            throw new InvalidOperationException("The .blend file could not be stored.");
-        }
+            OriginalVariantInfo: blendInfo);
 
         db.Events.KafeStartStream<BlendShardInfo>(created.ShardId, created);
         await db.SaveChangesAsync(token);

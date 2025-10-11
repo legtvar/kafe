@@ -23,6 +23,15 @@ public class PigeonsCoreService
         this.logger = logger ?? NullLogger<PigeonsCoreService>.Instance;
     }
 
+    private static readonly ImmutableArray<string> supportedHomeworkTypes = 
+        ImmutableArray.Create(
+            "Homework 2 - Composition",
+            "Homework 3 - Chair",
+            "Homework 3 - Your own model",
+            "Homework 4 - Retopology",
+            "Homework 5 - Materials"
+        );
+
 
     public static string? FindPigeonsManagerPath()
     {
@@ -61,9 +70,13 @@ public class PigeonsCoreService
         return Path.Combine(filePathDirectory, $"{pigeonsTestOutputName}_{hashSuffix}.{pigeonsTestOutputExtension}");
     }
 
-    public static string GetHomeworkType()
+    public string? GetHomeworkType(string projectGroupName)
     {
-        return "homework5materials";
+        if (!supportedHomeworkTypes.Contains(projectGroupName))
+        {
+            return null;
+        }
+        return projectGroupName.Replace(" ", "").Replace("-", "").ToLowerInvariant();
     }
 
 
@@ -96,9 +109,18 @@ public class PigeonsCoreService
         public string? traceback { get; set; }
     };
 
-    public async Task<BlendInfo> RunPigeonsTest(Hrib id, string shardPath)
+    public async Task<BlendInfo> RunPigeonsTest(Hrib id, string shardPath, string projectGroupName)
     {
-        string arguments = GetPigeonsTestCommand(id, shardPath, GetHomeworkType());
+        string? homeworkType = GetHomeworkType(projectGroupName);
+        if (homeworkType is null)
+        {
+            return new BlendInfo(
+                Const.BlendFileExtension,
+                Const.BlendMimeType,
+                null
+            );
+        }
+        string arguments = GetPigeonsTestCommand(id, shardPath, homeworkType);
         BlenderProcessOutput output = await Blender.RunBlenderCommand(arguments, pigeonsTestTimeoutMs);
         if (!output.Success)
         {

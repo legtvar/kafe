@@ -261,7 +261,14 @@ public class ShardService
         }
 
         var service = new PigeonsCoreService();
-        var blendInfo = await service.RunPigeonsTest(shardId, shardFilePath);
+        var artifactService = new ArtifactService(db);
+        var projectGroupNames = await artifactService.GetArtifactProjectGroupNames(artifactId.ToString(), token);
+        if (projectGroupNames.Length != 1)
+        {
+            throw new InvalidOperationException($"A blend shard must belong to exactly one project group. Found {projectGroupNames.Length}.");
+        }
+        var projectGroupName = projectGroupNames[0]["iv"];
+        var blendInfo = await service.RunPigeonsTest(shardId, shardFilePath, projectGroupName);
         
         var created = new BlendShardCreated(
             ShardId: shardId.ToString(),

@@ -63,9 +63,15 @@ public class PigeonTestEndpoint : EndpointBaseAsync
             return BadRequest("The shard is not a Blend file.");
         }
         var shardPath = await shardService.GetShardPath(id, cancellationToken);
+        var projectGroupNames = await artifactService.GetArtifactProjectGroupNames(id, cancellationToken);
+        if (projectGroupNames.Length != 1)
+        {
+            throw new InvalidOperationException("A blend shard must belong to exactly one project group.");
+        }
+        var projectGroupName = projectGroupNames[0]["iv"];
 
         var service = new PigeonsCoreService();
-        var result = await service.RunPigeonsTest(id, shardPath);
+        var result = await service.RunPigeonsTest(id, shardPath, projectGroupName);
 
         return Ok();
     }

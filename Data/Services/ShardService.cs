@@ -66,6 +66,7 @@ public class ShardService
     public async Task<Hrib?> Create(
         ShardKind kind,
         Hrib artifactId,
+        string? fileName,
         Stream stream,
         string mimeType,
         Hrib? shardId = null,
@@ -77,7 +78,7 @@ public class ShardService
             ShardKind.Video => await CreateVideo(artifactId, stream, mimeType, shardId, token),
             ShardKind.Image => await CreateImage(artifactId, stream, shardId, token),
             ShardKind.Subtitles => await CreateSubtitles(artifactId, stream, shardId, token),
-            ShardKind.Blend => await CreateBlend(artifactId, stream, shardId, token),
+            ShardKind.Blend => await CreateBlend(artifactId, fileName, stream, shardId, token),
             _ => throw new NotSupportedException($"Creation of '{kind}' shards is not supported yet.")
         };
     }
@@ -236,6 +237,7 @@ public class ShardService
 
     private async Task<Hrib?> CreateBlend(
         Hrib artifactId,
+        string? fileName,
         Stream blendStream,
         Hrib? shardId = null,
         CancellationToken token = default
@@ -287,6 +289,7 @@ public class ShardService
 
         var created = new BlendShardCreated(
             ShardId: shardId.ToString(),
+            FileName: fileName,
             CreationMethod: CreationMethod.Api,
             ArtifactId: artifactId.ToString(),
             OriginalVariantInfo: content.ToBlendInfo());

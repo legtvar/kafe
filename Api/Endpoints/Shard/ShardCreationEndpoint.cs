@@ -61,6 +61,7 @@ public class ShardCreationEndpoint : EndpointBaseAsync
         var id = await shardService.Create(
             kind: request.Kind,
             artifactId: request.ArtifactId,
+            fileName: request.File.FileName,
             stream: stream,
             mimeType: request.File.ContentType,
             token: cancellationToken);

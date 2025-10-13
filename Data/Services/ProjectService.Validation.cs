@@ -1240,6 +1240,11 @@ public partial class ProjectService
             foreach (var result in variant.Tests)
             {
                 var sb = new System.Text.StringBuilder();
+                if (!string.IsNullOrWhiteSpace(blend.FileName))
+                {
+                    sb.Append(blend.FileName);
+                    sb.Append(" - ");
+                }
                 if (!string.IsNullOrWhiteSpace(result.Label))
                 {
                     sb.Append(result.Label);

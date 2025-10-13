@@ -8,6 +8,7 @@ public interface IBlendShardEvent : IShardEvent
 
 public record BlendShardCreated(
     [Hrib] string ShardId,
+    string? FileName,
     CreationMethod CreationMethod,
     [Hrib] string ArtifactId,
     BlendInfo OriginalVariantInfo

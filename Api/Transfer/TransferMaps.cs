@@ -380,6 +380,7 @@ public static class TransferMaps
     {
         return new BlendShardDetailDto(
             Id: data.Id,
+            FileName: data.FileName,
             Kind: data.Kind,
             ArtifactId: data.ArtifactId,
             Variants: data.Variants.ToImmutableDictionary(p => p.Key, p => ToBlendDto(p.Value)));

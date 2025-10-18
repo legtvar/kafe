@@ -7,22 +7,12 @@ using Microsoft.Extensions.Logging.Abstractions;
 using System.Collections.Immutable;
 using System.Collections.Generic;
 using System.Linq;
+using Pigeons;
 
-namespace Kafe.Media.Services;
+namespace Pigeons.Services;
 
-public class PigeonsCoreService
+public class PigeonsService
 {
-    private readonly ILogger<PigeonsCoreService> logger;
-
-    private const string pigeonsTestOutputName = "pigeons_test_result";
-    private const string pigeonsTestOutputExtension = "json";
-    private const int pigeonsTestTimeoutMs = 100000;
-
-    public PigeonsCoreService(ILogger<PigeonsCoreService>? logger = null)
-    {
-        this.logger = logger ?? NullLogger<PigeonsCoreService>.Instance;
-    }
-
     private static readonly ImmutableArray<string> supportedHomeworkTypes = 
         ImmutableArray.Create(
             "Homework 2 - Composition",
@@ -32,6 +22,7 @@ public class PigeonsCoreService
             "Homework 5 - Materials"
         );
 
+    private const int pigeonsTestTimeoutMs = 100000;
 
     public static string? FindPigeonsManagerPath()
     {
@@ -59,15 +50,15 @@ public class PigeonsCoreService
         return null;
     }
 
-    public static string GetPigeonsTestOutputPath(Hrib id, string filePath)
+    public static string GetPigeonsTestOutputPath(string id, string filePath)
     {
         string? filePathDirectory = Path.GetDirectoryName(filePath);
         if (filePathDirectory is null)
         {
             throw new InvalidOperationException("Failed to find pigeons output file path directory .");
         }
-        string hashSuffix = id.ToString() + "_" + DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
-        return Path.Combine(filePathDirectory, $"{pigeonsTestOutputName}_{hashSuffix}.{pigeonsTestOutputExtension}");
+        string hashSuffix = id + "_" + DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
+        return Path.Combine(filePathDirectory, $"{Const.PigeonsTestOutputName}_{hashSuffix}.{Const.PigeonsTestOutputExtension}");
     }
 
     public string? GetHomeworkType(string projectGroupName)
@@ -80,7 +71,7 @@ public class PigeonsCoreService
     }
 
 
-    public static string GetPigeonsTestCommand(Hrib id, string filePath, string type)
+    public static string GetPigeonsTestCommand(string id, string filePath, string type)
     {
         string args = string.Join(" ", new[]
         {
@@ -88,28 +79,31 @@ public class PigeonsCoreService
             "--python-exit-code", "1",
             "--python",$"\"{FindPigeonsManagerPath()}\"",
             "--",
-            "test",
             $"--hw={type}",
             $"--homework-file=\"{filePath}\"",
             "--output-to-file", $"\"{GetPigeonsTestOutputPath(id, filePath)}\""
         });
         return args;
     }
-    
-    public class PigeonsTestResult : Dictionary<int, PigeonsTestResultDetails>
+
+    public static string GetPigeonsUpdateCommand(bool allowOnline)
     {
+        string args = string.Join(" ", new[]
+        {
+            "--background",
+            "--python",$"\"{FindPigeonsManagerPath()}\"",
+            "--",
+            "update",
+        });
+
+        if (allowOnline)
+        {
+            args += " --allow-online";
+        }
+        return args;
     }
 
-    public class PigeonsTestResultDetails
-    {
-        public string? label { get; set; }
-        public string? state { get; set; }
-        public string? datablock { get; set; }
-        public string? message { get; set; }
-        public string? traceback { get; set; }
-    };
-
-    public async Task<BlendInfo> RunPigeonsTest(Hrib id, string shardPath, string projectGroupName)
+    public async Task<BlendInfo> RunPigeonsTest(string id, string shardPath, string projectGroupName)
     {
         string? homeworkType = GetHomeworkType(projectGroupName);
         if (homeworkType is null)
@@ -144,13 +138,13 @@ public class PigeonsCoreService
             .ToString();
 
         string jsonContent = File.ReadAllText(testResultPath);
-        List<BlendTestInfo> tests = new List<BlendTestInfo>();
-        PigeonsTestResult? pigeonsResult = System.Text.Json.JsonSerializer.Deserialize<PigeonsTestResult>(jsonContent);
+        List<PigeonsTestInfo> tests = new List<PigeonsTestInfo>();
+        PigeonsTestResultsSerializable? pigeonsResult = System.Text.Json.JsonSerializer.Deserialize<PigeonsTestResultsSerializable>(jsonContent);
         if (pigeonsResult != null)
         {
             foreach (var result in pigeonsResult.Values)
             {
-                tests.Add(new BlendTestInfo(
+                tests.Add(new PigeonsTestInfo(
                     result.label,
                     result.state,
                     result.datablock,

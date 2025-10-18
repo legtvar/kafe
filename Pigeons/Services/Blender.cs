@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
-namespace Kafe.Media;
+namespace Pigeons.Services;
 
 public static class Blender
 {
@@ -24,7 +24,7 @@ public static class Blender
             {
                 foreach (var file in dir.EnumerateFiles("blender*"))
                 {
-                    if (file.Name == "blender")
+                    if (file.Name == "blender-headless" || file.Name == "blender")
                     {
                         return file.FullName;
                     }

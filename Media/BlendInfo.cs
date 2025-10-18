@@ -1,11 +1,13 @@
+using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 
 namespace Kafe.Media;
 
 public record BlendInfo(
     string FileExtension,
     string MimeType,
-    ImmutableArray<BlendTestInfo>? Tests,
+    ImmutableArray<PigeonsTestInfo>? Tests,
     string? Error = null
 )
 {
@@ -17,9 +19,22 @@ public record BlendInfo(
     );
 }
 
+public class BlendInfoJsonFormat
+{
+    public string FileExtension { get; set; }
+    public string MimeType { get; set; }
+    public List<PigeonsTestInfoJsonFormat>? Tests { get; set; }
+    public string? Error { get; set; }
 
-public record BlenderProcessOutput(
-    bool Success,
-    string Message = ""
-)
-{ }
+    public BlendInfo ToBlendInfo()
+    {
+        return new BlendInfo(
+            FileExtension,
+            MimeType,
+            Tests != null
+                ? Tests.Select(dto => dto.ToPigeonsTestInfo()).ToImmutableArray()
+                : ImmutableArray<PigeonsTestInfo>.Empty,
+            Error
+        );
+    }
+}

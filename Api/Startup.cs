@@ -220,6 +220,15 @@ public partial class Startup
         // {
         // });
 
+        var pigeonsEndpoint = Configuration.GetValue<string>("Pigeons:Endpoint") ?? "http://localhost:8042";
+        Log.Logger.Information("Pigeons: Endpoint={PigeonsEndpoint}", pigeonsEndpoint);
+        services.AddHttpClient("Pigeons", client =>
+        {
+            client.BaseAddress = new Uri(pigeonsEndpoint);
+        });
+
+        services.AddHttpClient();
+
         RegisterKafe(services);
 
         var otel = services.AddOpenTelemetry();

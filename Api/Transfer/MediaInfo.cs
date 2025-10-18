@@ -53,11 +53,11 @@ public record SubtitlesDto(
 public record BlendDto(
     string FileExtension,
     string MimeType,
-    ImmutableArray<BlendTestDto>? Tests,
+    ImmutableArray<PigeonsTestInfoDto>? Tests,
     string? Error
 );
 
-public record BlendTestDto(
+public record PigeonsTestInfoDto(
     string? Label,
     string? State,
     string? Datablock,

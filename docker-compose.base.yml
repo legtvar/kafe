@@ -59,6 +59,24 @@ services:
           - kafe-web
     restart: always
 
+  blender:
+    build:
+      context: ./
+      dockerfile: Blender.Dockerfile
+    expose:
+      - 80
+    volumes:
+      - kafe_archive:/mnt/kafe_archive
+      - kafe_generated:/mnt/kafe_generated
+      - kafe_secrets:/mnt/kafe_secrets
+      - kafe_temp:/mnt/kafe_temp
+    depends_on:
+      - db
+    networks:
+      default:
+        aliases:
+          - kafe-blender
+
 networks:
   # NB: we use `backbone` because the default `bridge` network does not support aliases
   #     https://github.com/docker/compose/issues/3012

@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace Kafe.Data.Services;
 
@@ -16,9 +17,10 @@ public class StorageService
 {
     private readonly IOptions<StorageOptions> options;
 
-    public StorageService(IOptions<StorageOptions> options)
+    public StorageService(IOptions<StorageOptions> options, ILogger<StorageOptions> logger)
     {
         this.options = options;
+        logger.LogInformation("Archive set to '{ArchivePath}.'", options.Value.ArchiveDirectory);
     }
 
     public async Task<bool> TryStoreShard(

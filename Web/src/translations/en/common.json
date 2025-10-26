@@ -187,7 +187,9 @@
       "submit": "Submit the review",
       "kind": {
         "accepted": "Accept",
-        "rejected": "Reject"
+        "needsRevision": "Revision Required",
+        "rejected": "Reject",
+        "notReviewed": "Not reviewed"
       },
       "confirm": "Careful! This will send an email to the project author! This operation is irreversible!",
       "new": "New review",

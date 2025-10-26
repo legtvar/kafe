@@ -1890,7 +1890,7 @@ export interface components {
       requiredGenreCultures?: string[] | null;
     };
     /** @enum {string} */
-    ReviewKind: "notReviewed" | "accepted" | "rejected";
+    ReviewKind: "notReviewed" | "accepted" | "rejected" | "needsRevision";
     RoleCreationDto: {
       /**
        * Format: hrib

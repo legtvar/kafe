@@ -1,6 +1,6 @@
-import { Box, HStack, Text, VStack } from '@chakra-ui/react';
+import { Box, HStack, Text, useColorModeValue, VStack } from '@chakra-ui/react';
 import { t } from 'i18next';
-import { BsCheckCircleFill, BsFillExclamationCircleFill } from 'react-icons/bs';
+import { BsCheckCircleFill, BsFillExclamationCircleFill, BsFillXCircleFill, BsCircle } from 'react-icons/bs';
 import { Project } from '../../../data/Project';
 import { useColorScheme } from '../../../hooks/useColorScheme';
 import { getPrefered } from '../../../utils/preferedLanguage';
@@ -31,17 +31,7 @@ export function ReviewList({ project }: IReviewListProps) {
                         alignItems="start"
                         key={i}
                     >
-                        <Box fontSize="2em" mt={2}>
-                            {review.kind === 'accepted' ? (
-                                <Text color="green.500">
-                                    <BsCheckCircleFill />
-                                </Text>
-                            ) : (
-                                <Text color="red.500">
-                                    <BsFillExclamationCircleFill />
-                                </Text>
-                            )}
-                        </Box>
+                        <ReviewIcon kind={review.kind} />
                         <Box>
                             {review.reviewerId ?
                                 <AwaitAPI
@@ -66,5 +56,31 @@ export function ReviewList({ project }: IReviewListProps) {
                     </HStack>
                 ))}
         </VStack>
+    );
+}
+
+export function ReviewIcon({ kind }: { kind: string }) {
+    return (
+        <HStack spacing={4} alignItems="center">
+            <Box fontSize="2.5rem">
+                {kind === 'accepted' ? (
+                    <Text color="green.500" title={t('project.admin.kind.accepted')}>
+                        <BsCheckCircleFill />
+                    </Text>
+                ) : kind === 'needsRevision' ? (
+                    <Text color="yellow.500" title={t('project.admin.kind.needsRevision')}>
+                        <BsFillExclamationCircleFill />
+                    </Text>
+                ) : kind === 'rejected' ? (
+                    <Text color="red.500" title={t('project.admin.kind.rejected')}>
+                        <BsFillXCircleFill />
+                    </Text>
+                ) : (
+                    <Text color={useColorModeValue('gray.300', 'gray.600')} title={t('project.admin.kind.notReviewed')}>
+                        <BsCircle />
+                    </Text>
+                )}
+            </Box>
+        </HStack>
     );
 }

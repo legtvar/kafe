@@ -105,6 +105,7 @@ export function AddReview(props: IAddReviewProps) {
                             bg={bg}
                         >
                             <option value={'Accepted'}>{t(`project.admin.kind.accepted`).toString()}</option>
+                            <option value={'NeedsRevision'}>{t(`project.admin.kind.needsRevision`).toString()}</option>
                             <option value={'Rejected'}>{t(`project.admin.kind.rejected`).toString()}</option>
                         </Select>
                     </FormControl>

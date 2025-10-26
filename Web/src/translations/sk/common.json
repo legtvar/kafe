@@ -184,8 +184,10 @@
       },
       "submit": "Odoslať posudok",
       "kind": {
-        "accepted": "Prijať",
-        "rejected": "Zamietnuť"
+        "accepted": "Prijatý",
+        "needsRevision": "Požadované úpravy",
+        "notReviewed": "Neohodnotený",
+        "rejected": "Zamietnutý"
       },
       "confirm": "Pozor! toto odošle mail autorovi projektu! Táto operácia je nevratná!",
       "new": "Nový posudok",

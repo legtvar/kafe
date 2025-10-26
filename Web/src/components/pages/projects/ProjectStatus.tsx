@@ -11,6 +11,7 @@ import { AwaitAPI } from '../../utils/AwaitAPI';
 import { StatusCheck } from './StatusCheck';
 import { IoCheckbox, IoCloseCircleSharp, IoHelpCircleOutline } from 'react-icons/io5';
 import { useOrganizations } from '../../../hooks/Caffeine';
+import { ReviewIcon } from './ReviewList';
 
 interface IProjectStatusProps {
     projectId: HRIB;

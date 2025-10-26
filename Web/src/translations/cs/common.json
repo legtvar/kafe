@@ -185,7 +185,9 @@
       "submit": "Odeslat posudek",
       "kind": {
         "accepted": "Přijmout",
-        "rejected": "Zamítnout"
+        "needsRevision": "Požadována revize",
+        "rejected": "Zamítnout",
+        "notReviewed": "Neohodnoceno"
       },
       "confirm": "Pozor! tohle odešle mail autorovi projektu! Tato operace je nevratná!",
       "new": "Nový posudek",

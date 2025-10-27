@@ -4,3 +4,4 @@ bin/
 MockIdentity/keys/
 artifacts/
 .idea/
+*.DotSettings.user

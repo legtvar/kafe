@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Globalization;
 using System.Linq;
+using JasperFx.Events;
 
 namespace Kafe.Data.Aggregates;
 
@@ -22,7 +23,7 @@ public record ImageShardInfo(
 }
 
 
-public class ImageShardInfoProjection : SingleStreamProjection<ImageShardInfo>
+public class ImageShardInfoProjection : SingleStreamProjection<ImageShardInfo, string>
 {
     public ImageShardInfoProjection()
     {

@@ -11,6 +11,8 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using JasperFx.Events;
+using JasperFx.Events.Grouping;
 
 namespace Kafe.Data.Aggregates;
 
@@ -106,7 +108,7 @@ public class ArtifactDetailProjection : MultiStreamProjection<ArtifactDetail, st
 
     private class Grouper : IAggregateGrouper<string>
     {
-        public async Task Group(IQuerySession session, IEnumerable<IEvent> events, ITenantSliceGroup<string> grouping)
+        public async Task Group(IQuerySession session, IEnumerable<IEvent> events, IEventGrouping<string> grouping)
         {
             var filteredEvents = events.Where(e => e.EventType.IsAssignableTo(typeof(IShardVariantAdded))
                 || e.EventType.IsAssignableTo(typeof(IShardVariantRemoved)))

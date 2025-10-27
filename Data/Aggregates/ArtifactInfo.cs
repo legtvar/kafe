@@ -38,7 +38,7 @@ public record ArtifactInfo(
     }
 }
 
-public class ArtifactInfoProjection : SingleStreamProjection<ArtifactInfo>
+public class ArtifactInfoProjection : SingleStreamProjection<ArtifactInfo, string>
 {
     public static ArtifactInfo Create(ArtifactCreated e)
     {

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Immutable;
+using JasperFx.Events;
 using Kafe.Data.Events;
 using Marten.Events;
 using Marten.Events.Aggregation;
@@ -47,7 +48,7 @@ public record MigrationInfo(
     }
 }
 
-public class MigrationInfoProjection : SingleStreamProjection<MigrationInfo>
+public class MigrationInfoProjection : SingleStreamProjection<MigrationInfo, string>
 {
     public MigrationInfoProjection()
     {

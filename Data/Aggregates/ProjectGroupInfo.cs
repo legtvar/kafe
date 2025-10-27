@@ -57,7 +57,7 @@ public record ProjectGroupInfo(
     }
 }
 
-public class ProjectGroupInfoProjection : SingleStreamProjection<ProjectGroupInfo>
+public class ProjectGroupInfoProjection : SingleStreamProjection<ProjectGroupInfo, string>
 {
     public ProjectGroupInfoProjection()
     {

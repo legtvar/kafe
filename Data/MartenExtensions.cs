@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using JasperFx.Events;
 using Kafe.Data.Aggregates;
 using Marten;
 using Marten.Events;
@@ -96,7 +97,7 @@ public static class MartenExtensions
     }
 
     public static Task<T?> KafeAggregateStream<T>(
-        this IEventStore store,
+        this IQueryEventStore store,
         Hrib id,
         long version = 0L,
         DateTimeOffset? timestamp = null,
@@ -115,7 +116,7 @@ public static class MartenExtensions
     }
 
     public static async Task<T> KafeAggregateRequiredStream<T>(
-        this IEventStore store,
+        this IQueryEventStore store,
         Hrib id,
         long version = 0L,
         DateTimeOffset? timestamp = null,

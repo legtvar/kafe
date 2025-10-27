@@ -27,7 +27,6 @@
     <PackageReference Include="Serilog.Sinks.OpenTelemetry" Version="4.2.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.6" />
     <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="9.0.6" />
-    <PackageReference Include="Marten.CommandLine" Version="7.40.5" />
     <PackageReference Include="System.Text.Json" />
   </ItemGroup>
 

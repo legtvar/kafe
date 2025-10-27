@@ -57,7 +57,7 @@ public record PlaylistInfo(
     }
 }
 
-public class PlaylistInfoProjection : SingleStreamProjection<PlaylistInfo>
+public class PlaylistInfoProjection : SingleStreamProjection<PlaylistInfo, string>
 {
     public PlaylistInfoProjection()
     {

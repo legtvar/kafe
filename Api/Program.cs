@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
-using Oakton;
 using System.Threading.Tasks;
+using JasperFx;
 using Serilog;
 using Serilog.Events;
 
@@ -29,7 +29,7 @@ public class Program
 
         var builder = CreateHostBuilder(args);
         var host = builder.Build();
-        return await host.RunOaktonCommands(args);
+        return await host.RunJasperFxCommands(args);
     }
 
     public static IHostBuilder CreateHostBuilder(string[] args)
@@ -50,6 +50,6 @@ public class Program
                 });
                 builder.UseStartup<Startup>();
             })
-            .ApplyOaktonExtensions();
+            .ApplyJasperFxExtensions();
     }
 }

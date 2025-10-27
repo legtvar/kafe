@@ -19,9 +19,8 @@
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="GitInfo" Version="3.5.0">
+    <PackageReference Include="GitInfo" PrivateAssets="all">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
     </PackageReference>
   </ItemGroup>
 </Project>

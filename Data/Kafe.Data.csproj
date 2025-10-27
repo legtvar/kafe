@@ -14,10 +14,10 @@
     <PackageReference Include="Microsoft.Extensions.Options" Version="9.0.10" />
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.10" />
     <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" />
-    <PackageReference Include="MimeKit" Version="4.8.0" />
+    <PackageReference Include="MimeKit" Version="4.14.0" />
     <PackageReference Include="System.Text.Json" />
   </ItemGroup>
-  
+
   <ItemGroup>
     <EmbeddedResource Include="Sql/Functions/*.sql" LogicalName="Sql/Functions/%(filename)%(extension)" />
   </ItemGroup>

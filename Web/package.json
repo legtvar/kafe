@@ -22,9 +22,7 @@
     "localforage": "^1.10.0",
     "mime": "^4.0.0",
     "moment": "^2.29.4",
-    "npm": "^10.2.5",
     "react": "^18.2.0",
-    "react-app-rewired": "^2.2.1",
     "react-cookie": "^6.1.1",
     "react-copy-to-clipboard": "^5.1.0",
     "react-countdown": "^2.3.5",
@@ -35,7 +33,6 @@
     "react-markdown": "^9.0.1",
     "react-player": "^2.13.0",
     "react-router-dom": "^6.20.1",
-    "react-scripts": "5.0.1",
     "screenfull": "^6.0.2",
     "sortablejs": "^1.15.3",
     "styled-components": "^6.1.1",
@@ -79,7 +76,7 @@
   "scripts": {
     "dev": "vite",
     "start": "vite",
-    "build": "tsc && bite build",
+    "build": "tsc && vite build",
     "preview": "vite preview",
     "lint": "eslint src",
     "extract-translations": "i18next 'src/**/*.{ts,tsx,js}' -c i18next-parser.config.mjs",
@@ -104,5 +101,5 @@
       "last 1 safari version"
     ]
   },
-  "packageManager": "pnpm@10.19.1-oidc-test.3+sha512.e5961a4b56bb37620f97b65da4ca56216634bf39ed358eda925f0f036534d458fa249d93ed0021410523f8bb7ed8512b61fe5532ed3e81777793366c6be026b5"
+  "packageManager": "pnpm@10.20.0+sha512.cf9998222162dd85864d0a8102e7892e7ba4ceadebbf5a31f9c2fce48dfce317a9c53b9f6464d1ef9042cba2e02ae02a9f7c143a2b438cd93c91840f0192b9dd"
 }

@@ -5,3 +5,4 @@ MockIdentity/keys/
 artifacts/
 .idea/
 *.DotSettings.user
+**/node_modules/

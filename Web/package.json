@@ -1,5 +1,5 @@
 {
-  "name": "kafe",
+  "name": "kafe-web",
   "version": "0.1.0",
   "homepage": "/",
   "private": true,
@@ -11,6 +11,7 @@
     "@emotion/styled": "^11.11.0",
     "@ladjs/country-language": "^1.0.3",
     "@types/react-copy-to-clipboard": "^5.0.7",
+    "@vitejs/plugin-react": "^5.1.0",
     "axios": "^1.6.2",
     "chakra-ui-markdown-renderer": "^4.1.0",
     "country-flag-icons": "^1.5.9",
@@ -53,7 +54,7 @@
     "@types/crypto-js": "^4.2.1",
     "@types/jest": "^29.5.11",
     "@types/ladjs__country-language": "^1.0.0",
-    "@types/node": "^20.10.4",
+    "@types/node": "^20.19.23",
     "@types/react": "^18.2.43",
     "@types/react-dom": "^18.2.17",
     "@types/sortablejs": "^1.15.8",
@@ -71,12 +72,15 @@
     "i18next-parser": "^8.9.0",
     "less": "^4.2.0",
     "less-loader": "^11.1.3",
-    "openapi-typescript": "^6.7.2"
+    "openapi-typescript": "^6.7.2",
+    "vite": "^7.1.12",
+    "vite-tsconfig-paths": "^5.1.4"
   },
   "scripts": {
-    "start": "react-app-rewired start",
-    "build": "react-app-rewired build",
-    "test": "react-app-rewired test",
+    "dev": "vite",
+    "start": "vite",
+    "build": "tsc && bite build",
+    "preview": "vite preview",
     "lint": "eslint src",
     "extract-translations": "i18next 'src/**/*.{ts,tsx,js}' -c i18next-parser.config.mjs",
     "generate-typings": "openapi-typescript ./swagger.json --output src/schemas/api.ts",
@@ -100,5 +104,5 @@
       "last 1 safari version"
     ]
   },
-  "packageManager": "pnpm@10.2.0+sha512.0d27364e0139c6aadeed65ada153135e0ca96c8da42123bd50047f961339dc7a758fc2e944b428f52be570d1bd3372455c1c65fa2e7aa0bfbf931190f9552001"
+  "packageManager": "pnpm@10.19.1-oidc-test.3+sha512.e5961a4b56bb37620f97b65da4ca56216634bf39ed358eda925f0f036534d458fa249d93ed0021410523f8bb7ed8512b61fe5532ed3e81777793366c6be026b5"
 }

@@ -2,17 +2,19 @@
   "version": 1,
   "isRoot": true,
   "tools": {
-    "docfx": {
-      "version": "2.76.0",
-      "commands": [
-        "docfx"
-      ]
-    },
     "swashbuckle.aspnetcore.cli": {
-      "version": "6.5.0",
+      "version": "9.0.6",
       "commands": [
         "swagger"
-      ]
+      ],
+      "rollForward": false
+    },
+    "dotnet-ef": {
+      "version": "9.0.10",
+      "commands": [
+        "dotnet-ef"
+      ],
+      "rollForward": false
     }
   }
 }

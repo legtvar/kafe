@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Immutable;
+using JasperFx.Events;
 using Kafe.Data.Events;
 using Marten.Events;
 using Marten.Events.Aggregation;
@@ -57,7 +58,7 @@ public record RoleInfo(
     }
 }
 
-public class RoleInfoProjection : SingleStreamProjection<RoleInfo>
+public class RoleInfoProjection : SingleStreamProjection<RoleInfo, string>
 {
     public RoleInfoProjection()
     {

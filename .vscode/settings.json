@@ -4,7 +4,12 @@
     "titleBar.activeBackground": "#362d26",
     "titleBar.activeForeground": "#FFF8E7" // cosmic latte
   },
-  "deno.config": "./Docs/deno.json",
+  "deno.enablePaths": [
+    "./Docs"
+  ],
+  "deno.disablePaths": [
+    "./Web"
+  ],
   "i18n-ally.localesPaths": "Web/translations",
   "i18n-ally.enabledFrameworks": [
     "react",
@@ -12,5 +17,7 @@
     "general",
     "i18next",
     "vscode"
-  ]
+  ],
+  "typescript.tsdk": "Web/node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true,
 }

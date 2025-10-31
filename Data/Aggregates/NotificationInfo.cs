@@ -15,7 +15,7 @@ public record NotificationInfo(
     bool IsSent = false
 ) : IEntity;
 
-public class NotificationInfoProjection : SingleStreamProjection<NotificationInfo>
+public class NotificationInfoProjection : SingleStreamProjection<NotificationInfo, string>
 {
     public NotificationInfoProjection()
     {

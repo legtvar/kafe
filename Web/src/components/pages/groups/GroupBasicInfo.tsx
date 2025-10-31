@@ -7,9 +7,9 @@ import {
     HStack,
     Input,
     Stack,
-    useConst,
-    useForceUpdate,
+    useConst
 } from '@chakra-ui/react';
+import useForceUpdate from 'use-force-update';
 import { t } from 'i18next';
 import moment from 'moment';
 import { useNavigate } from 'react-router-dom';

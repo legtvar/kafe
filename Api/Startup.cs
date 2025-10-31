@@ -39,13 +39,14 @@ using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 using Npgsql;
 using System.Globalization;
+using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Kafe.Api.Middleware;
 
 namespace Kafe.Api;
 
-public class Startup
+public partial class Startup
 {
     public IConfiguration Configuration { get; }
     public ApiOptions ApiOptions { get; }
@@ -167,6 +168,7 @@ public class Startup
                 p.AllowAnyMethod();
                 p.AllowCredentials();
                 p.SetIsOriginAllowedToAllowWildcardSubdomains();
+                p.SetIsOriginAllowed(s => GetLocalhostRegex().IsMatch(s));
                 p.WithOrigins(ApiOptions.AllowedOrigins.ToArray());
             });
         });
@@ -379,4 +381,7 @@ public class Startup
         services.AddDataProtection()
             .PersistKeysToFileSystem(new DirectoryInfo(secretsFullPath));
     }
+
+    [GeneratedRegex(@"^https?:\/\/localhost(?::\d+)?$")]
+    private static partial Regex GetLocalhostRegex();
 }

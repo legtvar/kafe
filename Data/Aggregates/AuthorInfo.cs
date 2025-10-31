@@ -56,7 +56,7 @@ public record AuthorInfo(
     }
 }
 
-public class AuthorInfoProjection : SingleStreamProjection<AuthorInfo>
+public class AuthorInfoProjection : SingleStreamProjection<AuthorInfo, string>
 {
     public AuthorInfoProjection()
     {

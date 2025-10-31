@@ -39,7 +39,7 @@ namespace Kafe.Data.Events.Corrections
         {
             var events = await db.Events.QueryAllRawEvents()
                 .Where(e => e.EventTypeName
-                    == EventMappingExtensions.GetEventTypeName<GlobalPermissionsChanged>())
+                    == "global_permissions_changed")
                 .ToListAsync(token: ct);
             var groups = events.GroupBy(e => e.StreamKey!);
             foreach (var group in groups)

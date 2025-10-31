@@ -6,6 +6,7 @@ using Marten.Schema;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using JasperFx.Events;
 
 namespace Kafe.Data.Aggregates;
 
@@ -78,7 +79,7 @@ public record AccountInfo(
     }
 }
 
-public class AccountInfoProjection : SingleStreamProjection<AccountInfo>
+public class AccountInfoProjection : SingleStreamProjection<AccountInfo, string>
 {
     public AccountInfoProjection()
     {

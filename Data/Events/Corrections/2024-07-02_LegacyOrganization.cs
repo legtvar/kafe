@@ -40,8 +40,8 @@ internal class LegacyOrganizationCorrection : IEventCorrection
 
         var events = await db.Events.QueryAllRawEvents()
             .Where(e =>
-                e.EventTypeName == EventMappingExtensions.GetEventTypeName<PlaylistCreated>()
-                || e.EventTypeName == EventMappingExtensions.GetEventTypeName<ProjectGroupCreated>())
+                e.EventTypeName == "playlist_created"
+                || e.EventTypeName == "project_group_created")
             .ToListAsync(token: ct);
         foreach (var @event in events)
         {

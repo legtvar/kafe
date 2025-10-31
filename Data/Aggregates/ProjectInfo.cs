@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Immutable;
 using System.Linq;
+using JasperFx.Events;
 using Kafe.Data.Events;
 using Marten.Events;
 using Marten.Events.Aggregation;
@@ -94,7 +95,7 @@ public record ProjectReviewInfo(
     DateTimeOffset AddedOn
 );
 
-public class ProjectInfoProjection : SingleStreamProjection<ProjectInfo>
+public class ProjectInfoProjection : SingleStreamProjection<ProjectInfo, string>
 {
     public ProjectInfoProjection()
     {

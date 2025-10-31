@@ -14,7 +14,7 @@ public record VideoConversionInfo(
     [LocalizedString] ImmutableDictionary<string, string>? Error = null
 ) : IEntity;
 
-public class VideoConversionInfoProjection : SingleStreamProjection<VideoConversionInfo>
+public class VideoConversionInfoProjection : SingleStreamProjection<VideoConversionInfo, string>
 {
     public VideoConversionInfoProjection()
     {

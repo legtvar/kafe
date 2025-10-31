@@ -1,5 +1,5 @@
 import { Heading, ListItem, OrderedList, UnorderedList } from '@chakra-ui/layout';
-import ChakraUIRenderer from 'chakra-ui-markdown-renderer';
+import ChakraUIRenderer from './ChakraMarkdownRenderer';
 import Markdown, { Options } from 'react-markdown';
 
 export function ChakraMarkdown(props: Partial<Options>) {

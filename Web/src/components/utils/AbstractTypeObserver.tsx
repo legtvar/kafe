@@ -1,4 +1,4 @@
-import { useForceUpdate } from '@chakra-ui/react';
+import useForceUpdate from 'use-force-update';
 import { useEffect } from 'react';
 import { AbstractType } from '../../data/AbstractType';
 

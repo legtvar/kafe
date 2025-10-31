@@ -10,8 +10,8 @@ import {
     MenuList,
     MenuOptionGroup,
     Text,
-    useForceUpdate,
 } from '@chakra-ui/react';
+import useForceUpdate from 'use-force-update';
 import CountryLanguage from '@ladjs/country-language';
 import * as Flags from 'country-flag-icons/react/3x2';
 import i18next, { t } from 'i18next';

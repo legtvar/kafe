@@ -1,5 +1,5 @@
 import { Box, Center, Flex, Heading, HStack, Text, VStack } from '@chakra-ui/layout';
-import { useForceUpdate } from '@chakra-ui/react';
+import useForceUpdate from 'use-force-update';
 import { t } from 'i18next';
 import { Link, Navigate } from 'react-router-dom';
 import { useOrganizations } from '../../../hooks/Caffeine';

@@ -1,4 +1,5 @@
-import { Button, FormControl, FormLabel, HStack, Input, Stack, useConst, useForceUpdate } from '@chakra-ui/react';
+import { Button, FormControl, FormLabel, HStack, Input, Stack, useConst } from '@chakra-ui/react';
+import useForceUpdate from 'use-force-update';
 import { t } from 'i18next';
 import { useNavigate } from 'react-router-dom';
 import { API } from '../../../../api/API';

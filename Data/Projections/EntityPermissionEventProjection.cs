@@ -109,13 +109,13 @@ public class EntityPermissionEventProjection : EventProjection
         entityPerms = entityPerms with
         {
             AccountEntries = SetPermission(
-            entries: entityPerms.AccountEntries,
-            accountOrRoleId: e.AccountId,
-            // NB: Explicit permissions have source Id equal to the entity Id.
-            //     This makes them easy to find and allows for consistent inheriting of info about perms sources.
-            sourceId: e.EntityId,
-            permission: e.Permission,
-            grantedAt: metadata.Timestamp)
+                entries: entityPerms.AccountEntries,
+                accountOrRoleId: e.AccountId,
+                // NB: Explicit permissions have source Id equal to the entity Id.
+                //     This makes them easy to find and allows for consistent inheriting of info about perms sources.
+                sourceId: e.EntityId,
+                permission: e.Permission,
+                grantedAt: metadata.Timestamp)
         };
         ops.Store(entityPerms);
 
@@ -162,6 +162,7 @@ public class EntityPermissionEventProjection : EventProjection
                 )
             };
         }
+
         ops.Store(entityPerms);
 
         var inheritedPermission = InheritPermission(e.Permission);
@@ -229,6 +230,7 @@ public class EntityPermissionEventProjection : EventProjection
                     )
                 };
             }
+
             ops.Store(changed);
         }
     }
@@ -255,7 +257,7 @@ public class EntityPermissionEventProjection : EventProjection
             if (!affected.AccountEntries.TryGetValue(e.AccountId, out var entry))
             {
                 throw new InvalidOperationException("A role-implied permission cannot be removed from an entity "
-                    + "because it is not present. This is a bug.");
+                                                    + "because it is not present. This is a bug.");
             }
 
             entry = entry with
@@ -300,7 +302,8 @@ public class EntityPermissionEventProjection : EventProjection
             version: metadata.Version - 1);
         if (entitySoFar is null)
         {
-            throw new InvalidOperationException("Project group could not be aggregated to a point before the event.");
+            throw new InvalidOperationException(
+                $"Project group '{e.ProjectGroupId}' could not be aggregated to a point before the event.");
         }
 
         var perms = await RequireEntityPermissionInfo(ops, e.ProjectGroupId);
@@ -315,12 +318,13 @@ public class EntityPermissionEventProjection : EventProjection
 
     public async Task Project(PlaylistMovedToOrganization e, IEvent metadata, IDocumentOperations ops)
     {
-        var entitySoFar = await ops.Events.KafeAggregateStream<ProjectGroupInfo>(
+        var entitySoFar = await ops.Events.KafeAggregateStream<PlaylistInfo>(
             id: e.PlaylistId,
             version: metadata.Version - 1);
         if (entitySoFar is null)
         {
-            throw new InvalidOperationException("Project group could not be aggregated to a point before the event.");
+            throw new InvalidOperationException(
+                $"Playlist '{e.PlaylistId}' could not be aggregated to a point before the event.");
         }
 
         var perms = await RequireEntityPermissionInfo(ops, e.PlaylistId);
@@ -414,9 +418,10 @@ public class EntityPermissionEventProjection : EventProjection
             }
 
             throw new InvalidOperationException($"No permission info exists for '{entityId}'. "
-                + "Either the events are out of order or the permission info projection is broken.",
+                                                + "Either the events are out of order or the permission info projection is broken.",
                 entityPerms.AsException());
         }
+
         return entityPerms.Value;
     }
 
@@ -428,9 +433,10 @@ public class EntityPermissionEventProjection : EventProjection
         if (roleInfo.HasErrors)
         {
             throw new InvalidOperationException($"No role members info exists for '{roleId}'. "
-                + "Either the events are out of order or the permission info projection is broken.",
+                                                + "Either the events are out of order or the permission info projection is broken.",
                 roleInfo.AsException());
         }
+
         return roleInfo.Value;
     }
 
@@ -597,9 +603,9 @@ public class EntityPermissionEventProjection : EventProjection
     private static Permission InheritPermission(Permission parentPermission)
     {
         return (parentPermission.HasFlag(Permission.Inspect)
-                ? Permission.Read
-                : Permission.None)
-            | (parentPermission & Permission.Inheritable);
+                   ? Permission.Read
+                   : Permission.None)
+               | (parentPermission & Permission.Inheritable);
     }
 
     private static EntityPermissionEntry RecalculateEffectivePermission(EntityPermissionEntry entry)
@@ -737,14 +743,16 @@ public class EntityPermissionEventProjection : EventProjection
         {
             entry = new EntityPermissionEntry(
                 EffectivePermission: permission,
-                Sources: ImmutableDictionary.CreateRange([new KeyValuePair<string, EntityPermissionSource>(
-                    sourceId.ToString(),
-                    new EntityPermissionSource(
-                        Permission: permission,
-                        GrantedAt: grantedAt,
-                        RoleId: intermediaryRoleId
+                Sources: ImmutableDictionary.CreateRange([
+                    new KeyValuePair<string, EntityPermissionSource>(
+                        sourceId.ToString(),
+                        new EntityPermissionSource(
+                            Permission: permission,
+                            GrantedAt: grantedAt,
+                            RoleId: intermediaryRoleId
+                        )
                     )
-                )])
+                ])
             );
         }
 
@@ -754,8 +762,8 @@ public class EntityPermissionEventProjection : EventProjection
         }
 
         return entry.EffectivePermission == Permission.None
-                ? entries.Remove(accountOrRoleId.ToString())
-                : entries.SetItem(accountOrRoleId.ToString(), entry);
+            ? entries.Remove(accountOrRoleId.ToString())
+            : entries.SetItem(accountOrRoleId.ToString(), entry);
     }
 
     /// <summary>
@@ -800,6 +808,7 @@ public class EntityPermissionEventProjection : EventProjection
                         grantedAt)
                 };
             }
+
             ops.Store(changed);
         }
     }
@@ -850,6 +859,7 @@ public class EntityPermissionEventProjection : EventProjection
                     )
                 };
             }
+
             ops.Store(changed);
         }
     }
@@ -936,6 +946,7 @@ public class EntityPermissionEventProjection : EventProjection
                 }
             }
         }
+
         removedKeys = removedBuilder.ToImmutable();
         return builder.ToImmutable();
     }

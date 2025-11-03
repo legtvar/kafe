@@ -9,6 +9,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Kafe.Data.Documents;
 
 namespace Kafe.Data.Services;
 
@@ -30,7 +31,9 @@ public class ProjectGroupService
 
     public async Task<Err<ProjectGroupInfo>> Create(
         ProjectGroupInfo @new,
-        CancellationToken token = default)
+        bool shouldWaitForDaemon = true,
+        CancellationToken token = default
+    )
     {
         var parseResult = Hrib.Parse(@new.Id);
         if (parseResult.HasErrors)
@@ -77,6 +80,14 @@ public class ProjectGroupService
         }
 
         await db.SaveChangesAsync(token);
+
+        if (shouldWaitForDaemon)
+        {
+            await db.QueryForNonStaleData<EntityPermissionInfo>(TimeSpan.FromSeconds(5))
+                .Where(i => i.Id == id.ToString())
+                .SingleOrDefaultAsync(token);
+        }
+
         return await db.Events.KafeAggregateRequiredStream<ProjectGroupInfo>(id, token: token);
     }
 
@@ -197,14 +208,20 @@ public class ProjectGroupService
 
         await db.SaveChangesAsync(token);
         return await db.Events.AggregateStreamAsync<ProjectGroupInfo>(@old.Id, token: token)
-            ?? throw new InvalidOperationException($"The project group is no longer present in the database. "
-                + "This should never happen.");
+               ?? throw new InvalidOperationException($"The project group is no longer present in the database. "
+                                                      + "This should never happen.");
     }
 
-    public async Task<Err<ProjectGroupInfo>> CreateOrEdit(ProjectGroupInfo info, CancellationToken token = default)
+    public async Task<Err<ProjectGroupInfo>> CreateOrEdit(
+        ProjectGroupInfo info,
+        bool shouldWaitForDaemon = true,
+        CancellationToken token = default
+    )
     {
         // TODO: Get rid of the unnecessary trip to DB (by calling Load twice).
         var existing = info.Id == Hrib.InvalidValue ? null : await Load(info.Id, token);
-        return existing is null ? await Create(info, token) : await Edit(info, token);
+        return existing is null
+            ? await Create(info, shouldWaitForDaemon: shouldWaitForDaemon, token: token)
+            : await Edit(info, token);
     }
 }

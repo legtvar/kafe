@@ -5,6 +5,8 @@ using Kafe.Data;
 using Kafe.Data.Aggregates;
 using Kafe.Data.Services;
 using Marten;
+using Marten.Events;
+using Marten.Events.Daemon.Coordination;
 using Marten.Schema;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -35,6 +37,9 @@ public class TestSeedData : IInitialData
 
     public async Task Populate(IDocumentStore store, CancellationToken ct)
     {
+        // logger.LogInformation("Waiting for async daemon.");
+        // await store.WaitForNonStaleProjectionDataAsync(TimeSpan.FromSeconds(60));
+        
         logger.LogInformation("Populating test seed data.");
         using var scope = services.CreateScope();
         var accountService = scope.ServiceProvider.GetRequiredService<AccountService>();
@@ -72,7 +77,8 @@ public class TestSeedData : IInitialData
                 Id = Group1Hrib,
                 IsOpen = true
             },
-            ct
+            shouldWaitForDaemon: false,
+            token: ct
         );
         await projectGroupService.Create(
             ProjectGroupInfo.Create(Org2Hrib, (LocalizedString)"Test Group 2") with
@@ -80,7 +86,8 @@ public class TestSeedData : IInitialData
                 Id = Group2Hrib,
                 IsOpen = true
             },
-            ct
+            shouldWaitForDaemon: false,
+            token: ct
         );
 
         var projectService = scope.ServiceProvider.GetRequiredService<ProjectService>();

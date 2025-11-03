@@ -13,7 +13,7 @@ namespace Kafe.Api.Endpoints.ProjectGroup;
 
 [ApiVersion("1")]
 [Route("project-group")]
-[Authorize(EndpointPolicy.Append)]
+[Authorize]
 public class ProjectGroupCreationEndpoint : EndpointBaseAsync
     .WithRequest<ProjectGroupCreationDto>
     .WithActionResult<Hrib>
@@ -46,7 +46,7 @@ public class ProjectGroupCreationEndpoint : EndpointBaseAsync
             Description = dto.Description,
             Deadline = dto.Deadline,
             IsOpen = dto.IsOpen
-        }, cancellationToken);
+        }, token: cancellationToken);
         if (group.HasErrors)
         {
             return this.KafeErrResult(group);

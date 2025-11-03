@@ -84,6 +84,7 @@ public static class ServiceCollectionExtensions
                     // NB: Since some of the projections query other perm infos, the events need to be processed
                     //     one by one.
                     ao.BatchSize = 1;
+                    ao.TeardownDataOnRebuild = true;
                     ao.DeleteViewTypeOnTeardown<EntityPermissionInfo>();
                     ao.DeleteViewTypeOnTeardown<RoleMembersInfo>();
                 });

@@ -33,6 +33,15 @@ pg_restore -U postgres --clean --create --dbname postgres --format d lemma-2023-
 > NOTE: `--dbname postgres` is there because the first thing the restore does is `CREATE DATABASE lemma`.
 >       See [this](https://stackoverflow.com/questions/40784677/pg-restore-with-c-option-does-not-create-the-database).
 
+To restore KAFE from `backup_2025-11-03_04-05.tar.gz`:
+
+```bash
+mkdir kafe-backup
+tar -xzvf .\backup_2025-11-03_04-05.tar.gz -C kafe-backup
+dropdb -U postgres kafe
+pg_restore -U postgres --clean --if-exists --create --dbname kafe --format d kafe-backup
+```
+
 ## Get an IP address of a container
 
 To get the IP address of the Postgres container to use in PgAdmin remotely:

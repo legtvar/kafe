@@ -484,7 +484,7 @@ public class MigrationService
                 : entity.Description,
             IsOpen = order.IsOpen
         };
-        entity = (await projectGroupService.CreateOrEdit(entity, token)).Unwrap();
+        entity = (await projectGroupService.CreateOrEdit(entity, false, token)).Unwrap();
 
         var newOrModifiedMigration = (existingMigration ?? MigrationInfo.Create(order.OriginalStorageName, order.OriginalId, entity.Id)) with
         {

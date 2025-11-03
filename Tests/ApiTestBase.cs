@@ -41,13 +41,14 @@ public class ApiTestBase : IAsyncLifetime
         var outputSink = Host.Server.Services.GetRequiredService<IInjectableTestOutputSink>();
         outputSink.Inject(testOutput, fixture.DiagnosticSink);
 
-        ProjectionCoordinator = (ProjectionCoordinator)Host.Server.Services.GetRequiredService<IProjectionCoordinator>();
+        ProjectionCoordinator =
+            (ProjectionCoordinator)Host.Server.Services.GetRequiredService<IProjectionCoordinator>();
         await ProjectionCoordinator.PauseAsync();
 
         await Store.Advanced.ResetAllData();
 
         await ProjectionCoordinator.ResumeAsync();
-        
+
         await WaitForProjections();
 
         Log.Information("Initialization complete.");
@@ -59,6 +60,7 @@ public class ApiTestBase : IAsyncLifetime
         {
             await ProjectionCoordinator.PauseAsync();
         }
+
         Log?.Information("Disposal complete.");
     }
 

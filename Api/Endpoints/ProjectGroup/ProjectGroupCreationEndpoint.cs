@@ -46,7 +46,7 @@ public class ProjectGroupCreationEndpoint : EndpointBaseAsync
             Description = dto.Description,
             Deadline = dto.Deadline,
             IsOpen = dto.IsOpen
-        }, cancellationToken);
+        }, token: cancellationToken);
         if (group.HasErrors)
         {
             return this.KafeErrResult(group);

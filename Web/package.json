@@ -60,6 +60,7 @@
     "@types/video.js": "^7.3.58",
     "@typescript-eslint/eslint-plugin": "^8.46.2",
     "@typescript-eslint/parser": "^8.46.2",
+    "concurrently": "^9.2.1",
     "eslint": "^9.38.0",
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-jsdoc": "^61.1.11",
@@ -74,9 +75,10 @@
     "vite-tsconfig-paths": "^5.1.4"
   },
   "scripts": {
-    "dev": "vite",
-    "start": "vite",
-    "build": "tsc && vite build",
+    "dev": "concurrently --kill-others -p \"[{name}]\" -n \"CLIENT,PROXY\" -c \"red.yellow,blue.bold\" \"pnpm run start\" \"pnpm run proxy\"",
+    "start": "vite --host --port 3000",
+    "prebuild": "tsc",
+    "build": "vite build",
     "preview": "vite preview",
     "lint": "eslint src",
     "extract-translations": "i18next 'src/**/*.{ts,tsx,js}' -c i18next-parser.config.mjs",

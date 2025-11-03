@@ -333,7 +333,7 @@
     "author": "{{author}} | \nAuthor"
   },
   "sendApi": {
-    "error": "There is a problem with the form",
+    "error": "An error occurred",
     "unknownError": "An error occurred while submitting the form"
   },
   "status": {

@@ -331,7 +331,7 @@
     "author": "{{author}} | Autor"
   },
   "sendApi": {
-    "error": "Vo formulári je chyba",
+    "error": "Došlo k chybe",
     "unknownError": "Došlo k chybe pri odosielaní formulára"
   },
   "status": {

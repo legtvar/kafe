@@ -5,8 +5,16 @@ services:
     environment:
       - BaseUrl=https://kafe.fi.muni.cz
     labels:
-      - "traefik.http.routers.kafe-production-api.rule=Host(`kafe.fi.muni.cz`,`kafe.lemma.fi.muni.cz`)
-          && PathPrefix(`/api`, `/swagger`, `/confirm`, `/signin-oidc`)"
+      - "traefik.http.routers.kafe-production-api.rule=
+        (
+          Host(`kafe.fi.muni.cz`)
+          || Host(`kafe.lemma.fi.muni.cz`)
+        ) && (
+          PathPrefix(`/api`)
+          || PathPrefix(`/swagger`)
+          || PathPrefix(`/confirm`)
+          || PathPrefix(`/signin-oidc`)
+        )"
       - "traefik.http.routers.kafe-production-api.priority=100"
       - "traefik.http.routers.kafe-production-api.tls=true"
       - "traefik.http.routers.kafe-production-api.tls.certresolver=lets-encrypt"
@@ -17,8 +25,11 @@ services:
 
   web:
     labels:
-      - "traefik.http.routers.kafe-production-web.rule=Host(`kafe.fi.muni.cz`,`kafe.lemma.fi.muni.cz`)\
-          && PathPrefix(`/`)"
+      - "traefik.http.routers.kafe-production-web.rule=
+        (
+          Host(`kafe.fi.muni.cz`)
+          || Host(`kafe.lemma.fi.muni.cz`)
+        ) && PathPrefix(`/`)"
       - "traefik.http.routers.kafe-production-web.middlewares=kafe-lemma-redirect"
       - "traefik.http.routers.kafe-production-web.priority=0" # web is the fallback for all other services
       - "traefik.http.routers.kafe-production-web.tls=true"

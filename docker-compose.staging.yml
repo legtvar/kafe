@@ -6,7 +6,12 @@ services:
       - BaseUrl=https://kafe-stage.fi.muni.cz
     labels:
       - "traefik.http.routers.kafe-staging-api.rule=Host(`kafe-stage.fi.muni.cz`)
-          && PathPrefix(`/api`, `/swagger`, `/confirm`, `/signin-oidc`)"
+          && (
+            PathPrefix(`/api`)
+            || PathPrefix(`/swagger`)
+            || PathPrefix(`/confirm`)
+            || PathPrefix(`/signin-oidc`)
+          )"
       - "traefik.http.routers.kafe-staging-api.priority=100"
       - "traefik.http.routers.kafe-staging-api.tls=true"
       - "traefik.http.routers.kafe-staging-api.tls.certresolver=lets-encrypt"

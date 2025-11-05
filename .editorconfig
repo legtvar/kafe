@@ -1,5 +1,6 @@
 [*]
 guidelines = 120
+rulers = 120
 
 [*.{csproj,props,targets}]
 tab_width = 2
@@ -88,3 +89,21 @@ csharp_style_expression_bodied_indexers = true:silent
 csharp_style_expression_bodied_accessors = true:silent
 csharp_style_expression_bodied_lambdas = true:silent
 csharp_style_expression_bodied_local_functions = false:silent
+namespace_body = file_scoped
+insert_final_newline = true
+trim_trailing_whitespace = true
+csharp_keep_user_linebreaks = true
+csharp_keep_existing_linebreaks = true
+max_line_length = 120
+csharp_place_attribute_on_same_line = never
+csharp_wrap_before_binary_opsign = true
+csharp_wrap_parameters_style = chop_if_long
+csharp_wrap_before_declaration_rpar = true
+csharp_wrap_before_primary_constructor_declaration_rpar = true
+csharp_wrap_before_invocation_rpar = true
+csharp_wrap_after_declaration_lpar = true
+csharp_wrap_after_invocation_lpar = true
+csharp_wrap_arguments_style = chop_if_long
+csharp_braces_for_ifelse = required
+csharp_align_multiline_binary_patterns = false
+csharp_align_multiline_binary_expressions_chain = false

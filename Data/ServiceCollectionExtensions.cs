@@ -76,6 +76,7 @@ public static class ServiceCollectionExtensions
             mo.Projections.Add<AccountInfoProjection>(ProjectionLifecycle.Inline);
             mo.Projections.Add<OrganizationInfoProjection>(ProjectionLifecycle.Inline);
             mo.Projections.Add<RoleInfoProjection>(ProjectionLifecycle.Inline);
+            mo.Projections.Add<InviteInfoProjection>(ProjectionLifecycle.Inline);
             mo.Projections.Add<EntityPermissionEventProjection>(
                 ProjectionLifecycle.Async,
                 ao =>

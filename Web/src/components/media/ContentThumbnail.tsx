@@ -1,5 +1,6 @@
 import { Box, BoxProps, Center, HStack, Icon, useColorModeValue, useDisclosure, VStack } from '@chakra-ui/react';
 import { IoVideocam, IoWarning } from 'react-icons/io5';
+import { SiBlender } from "react-icons/si";
 import { Artifact } from '../../data/Artifact';
 import { useApi } from '../../hooks/Caffeine';
 import { ContentPopup } from './ContentPopup';
@@ -10,7 +11,7 @@ interface IContentThumbnailProps extends BoxProps {
     onClick?: () => void;
 }
 
-type ContentType = 'Video' | 'Image' | 'Unknown';
+type ContentType = 'Video' | 'Image' | 'Blend' | 'Unknown';
 
 export function ContentThumbnail({ artifact, passive, onClick, ...props }: IContentThumbnailProps) {
     const api = useApi();
@@ -23,6 +24,8 @@ export function ContentThumbnail({ artifact, passive, onClick, ...props }: ICont
         type = 'Video';
     } else if (artifact.shards.some((shard) => shard.kind === 'image')) {
         type = 'Image';
+    } else if (artifact.shards.some((shard) => shard.kind === 'blend')) {
+        type = 'Blend';
     }
 
     const onClickHandler = () => {
@@ -124,6 +127,23 @@ export function ContentThumbnail({ artifact, passive, onClick, ...props }: ICont
                                         backgroundPosition="center"
                                         backgroundImage={`url(${api.shards.defaultStreamUrl(image.id)})`}
                                     ></Box>
+                                );
+                            case 'Blend':
+                                return (
+                                    <Box
+                                        flexGrow={1}
+                                        w="full"
+                                        borderRadius="md"
+                                        overflow="hidden"
+                                        bg={useColorModeValue('gray.100', 'gray.800')}
+                                        borderColor={useColorModeValue('gray.300', 'gray.700')}
+                                        borderWidth={1}
+                                        borderStyle="solid"
+                                    >
+                                        <Center h="full" color={useColorModeValue('gray.200', 'gray.900')}>
+                                            <Icon as={SiBlender} w={16} h={16} />
+                                        </Center>
+                                    </Box>
                                 );
                         }
                     }

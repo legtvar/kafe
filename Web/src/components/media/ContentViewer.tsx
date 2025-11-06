@@ -1,6 +1,7 @@
-import { Button, Text, VStack } from '@chakra-ui/react';
+import { Button, Center, Text, VStack } from '@chakra-ui/react';
 import { t } from 'i18next';
 import { AiOutlineDownload } from 'react-icons/ai';
+import { SiBlender } from "react-icons/si";
 import { ReactPlayerProps } from 'react-player';
 import { Artifact } from '../../data/Artifact';
 import { Shard } from '../../data/Shard';
@@ -17,7 +18,7 @@ interface IContentViewerProps {
     width?: string;
 }
 
-type ContentType = 'Video' | 'Image' | 'Unknown';
+type ContentType = 'Video' | 'Image' | 'Unknown' | 'Blend';
 
 export function ContentViewer({
     artifact,
@@ -37,6 +38,8 @@ export function ContentViewer({
         type = 'Video';
     } else if (artifact.shards.some((shard) => shard.kind === 'image')) {
         type = 'Image';
+    } else if (artifact.shards.some((shard) => shard.kind === 'blend')) {
+        type = 'Blend';
     }
 
     if (type) {
@@ -90,6 +93,30 @@ export function ContentViewer({
                             objectPosition: 'center center',
                         }}
                     />
+                );
+
+            case 'Blend':
+                return (
+                    <VStack spacing={6}>
+                        <Center h="full" color={'gray.200'}>
+                            <SiBlender size={64} />
+                        </Center>
+                        {artifact.shards.map((shard) => (
+                            <Button
+                                key={shard.id}
+                                as={'a'}
+                                href={api.shards.defaultStreamUrl(shard.id)}
+                                leftIcon={<AiOutlineDownload />}
+                            >
+                                {t('generic.download')} {t('generic.file')} {shard.id}
+                            </Button>
+                        ))}
+                        {artifact.shards.length === 0 && (
+                            <Text color="gray.500" fontStyle="italic">
+                                {t('artifact.noContent').toString()}
+                            </Text>
+                        )}
+                    </VStack>
                 );
         }
     }

@@ -1,18 +1,29 @@
 namespace Kafe.Data.Events;
 
 public record InviteCreated(
-    [Hrib] string InviteId,
+    [Hrib]
+    string InviteId,
     CreationMethod CreationMethod,
-    string EmailAddress
+    string EmailAddress,
+    string? PreferredCulture
 );
 
-public record InviteDestroyed(
-    [Hrib] string InviteId
+public record InviteCanceled(
+    [Hrib]
+    string InviteId
+);
+
+public record InviteAccepted(
+    [Hrib]
+    string InviteId
 );
 
 public record InvitePermissionSet(
-    [Hrib] string InviteId,
-    [Hrib] string InviterAccountId,
+    [Hrib]
+    string InviteId,
+    [Hrib]
+    string InviterAccountId,
     Permission Permission,
-    [Hrib] string EntityId
+    [Hrib]
+    string EntityId
 );

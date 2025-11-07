@@ -13,27 +13,22 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
+using Kafe.Data.Documents;
 
 namespace Kafe.Data.Services;
 
-public class AccountService
+public class AccountService(
+    IDocumentSession db,
+    EntityMetadataProvider entityMetadataProvider
+)
 {
     public static readonly TimeSpan ConfirmationTokenExpiration = TimeSpan.FromHours(24);
-    private readonly IDocumentSession db;
-    private readonly EntityMetadataProvider entityMetadataProvider;
     public const string PreferredUsernameClaim = "preferred_username";
-
-    public AccountService(
-        IDocumentSession db,
-        EntityMetadataProvider entityMetadataProvider)
-    {
-        this.db = db;
-        this.entityMetadataProvider = entityMetadataProvider;
-    }
 
     public async Task<AccountInfo?> Load(
         Hrib id,
-        CancellationToken token = default)
+        CancellationToken token = default
+    )
     {
         return (await db.KafeLoadAsync<AccountInfo>(id, token: token)).GetValueOrDefault();
     }
@@ -43,6 +38,24 @@ public class AccountService
         return await db.Query<AccountInfo>()
             .Where(a => a.EmailAddress == emailAddress)
             .SingleOrDefaultAsync(token: token);
+    }
+
+    public async Task<LoginTicketInfo?> LoadTicket(Guid id, CancellationToken ct = default)
+    {
+        return await db.LoadAsync<LoginTicketInfo>(id, ct);
+    }
+
+    public async Task<InviteInfo?> LoadInvite(Hrib id, CancellationToken ct = default)
+    {
+        return (await db.KafeLoadAsync<InviteInfo>(id, ct)).GetValueOrDefault();
+    }
+
+    public async Task<InviteInfo?> FindInviteByEmail(string emailAddress, CancellationToken token = default)
+    {
+        return await db.Query<InviteInfo>()
+            .Where(i => !i.Deleted && i.EmailAddress == emailAddress)
+            .OrderByDescending(i => i.CreatedAt)
+            .FirstOrDefaultAsync(token);
     }
 
     public async Task<Err<AccountInfo>> Create(AccountInfo @new, CancellationToken token = default)
@@ -89,7 +102,8 @@ public class AccountService
                     AccountId: id.ToString(),
                     IdentityProvider: @new.IdentityProvider,
                     Name: @new.Name,
-                    Uco: @new.Uco);
+                    Uco: @new.Uco
+                );
                 db.Events.KafeAppend(id, associated);
                 break;
         }
@@ -103,25 +117,32 @@ public class AccountService
                 PreferredCulture: null,
                 Name: @new.Name,
                 Uco: @new.Uco,
-                Phone: @new.Phone);
+                Phone: @new.Phone
+            );
             db.Events.KafeAppend(id, infoChanged);
         }
 
         foreach (var permission in (@new.Permissions ?? ImmutableDictionary<string, Permission>.Empty))
         {
-            db.Events.KafeAppend(@new.Id, new AccountPermissionSet(
-                AccountId: @new.Id,
-                EntityId: permission.Key,
-                Permission: permission.Value
-            ));
+            db.Events.KafeAppend(
+                @new.Id,
+                new AccountPermissionSet(
+                    AccountId: @new.Id,
+                    EntityId: permission.Key,
+                    Permission: permission.Value
+                )
+            );
         }
 
         foreach (var role in @new.RoleIds)
         {
-            db.Events.KafeAppend(@new.Id, new AccountRoleSet(
-                AccountId: @new.Id,
-                RoleId: role
-            ));
+            db.Events.KafeAppend(
+                @new.Id,
+                new AccountRoleSet(
+                    AccountId: @new.Id,
+                    RoleId: role
+                )
+            );
         }
 
         await db.SaveChangesAsync(token);
@@ -166,42 +187,54 @@ public class AccountService
         foreach (var changedPermission in changedPermissions)
         {
             hasChanged = true;
-            db.Events.KafeAppend(old.Id, new AccountPermissionSet(
-                AccountId: old.Id,
-                EntityId: changedPermission.Key,
-                Permission: changedPermission.Value
-            ));
+            db.Events.KafeAppend(
+                old.Id,
+                new AccountPermissionSet(
+                    AccountId: old.Id,
+                    EntityId: changedPermission.Key,
+                    Permission: changedPermission.Value
+                )
+            );
         }
 
         var removedPermissions = old.Permissions.Keys.Except(modified.Permissions.Keys);
         foreach (var removedPermission in removedPermissions)
         {
             hasChanged = true;
-            db.Events.KafeAppend(old.Id, new AccountPermissionSet(
-                AccountId: old.Id,
-                EntityId: removedPermission,
-                Permission: Permission.None
-            ));
+            db.Events.KafeAppend(
+                old.Id,
+                new AccountPermissionSet(
+                    AccountId: old.Id,
+                    EntityId: removedPermission,
+                    Permission: Permission.None
+                )
+            );
         }
 
         var addedRoles = modified.RoleIds.Except(modified.RoleIds);
         foreach (var newRole in addedRoles)
         {
             hasChanged = true;
-            db.Events.KafeAppend(old.Id, new AccountRoleSet(
-                AccountId: old.Id,
-                RoleId: newRole
-            ));
+            db.Events.KafeAppend(
+                old.Id,
+                new AccountRoleSet(
+                    AccountId: old.Id,
+                    RoleId: newRole
+                )
+            );
         }
 
         var removedRoles = old.RoleIds.Except(modified.RoleIds);
         foreach (var removedRole in removedRoles)
         {
             hasChanged = true;
-            db.Events.KafeAppend(old.Id, new AccountRoleUnset(
-                AccountId: old.Id,
-                RoleId: removedRole
-            ));
+            db.Events.KafeAppend(
+                old.Id,
+                new AccountRoleUnset(
+                    AccountId: old.Id,
+                    RoleId: removedRole
+                )
+            );
         }
 
         if (!hasChanged)
@@ -215,7 +248,7 @@ public class AccountService
 
     public record AccountFilter(
         string? Uco = null,
-        ImmutableDictionary<string, Permission>? Permissions = default
+        ImmutableDictionary<string, Permission>? Permissions = null
     );
 
     public async Task<ImmutableArray<AccountInfo>> List(
@@ -236,10 +269,14 @@ public class AccountService
         {
             var permValues = string.Join(",", filter.Permissions.Select(p => $"('{p.Key}',{(int)p.Value})"));
             query = (IMartenQueryable<AccountInfo>)query.Where(a => a.MatchesSql(
-$@"TRUE = ALL(
-    SELECT (data -> 'Permissions' -> entity_id)::int & expected = expected
-    FROM (VALUES {permValues}) as expected_perms (entity_id, expected)
-)"));
+                    $"""
+                     TRUE = ALL(
+                         SELECT (data -> 'Permissions' -> entity_id)::int & expected = expected
+                         FROM (VALUES {permValues}) as expected_perms (entity_id, expected)
+                     )
+                     """
+                )
+            );
         }
 
         if (!string.IsNullOrEmpty(sort))
@@ -247,81 +284,7 @@ $@"TRUE = ALL(
             query = (IMartenQueryable<AccountInfo>)query.OrderBySortString(entityMetadataProvider, sort);
         }
 
-        return (await query.ToListAsync(token: token)).ToImmutableArray();
-    }
-
-    public async Task<Err<AccountInfo>> CreateOrRefreshTemporaryAccount(
-        string emailAddress,
-        string? preferredCulture,
-        Hrib? id = null,
-        CancellationToken token = default)
-    {
-        // TODO: Add a "ticket" entity that will be identified by a guid, and will be one-time only instead of these
-        //       tokens.
-
-        if (!IsValidEmailAddress(emailAddress))
-        {
-            return Error.InvalidValue("The provided email address does not have a valid format.")
-                .WithArgument(Error.ParameterArgument, nameof(emailAddress));
-        }
-
-        var account = await FindByEmail(emailAddress, token);
-        if (account is null)
-        {
-            return await Create(AccountInfo.Create(emailAddress) with
-            {
-                Id = (id ?? Hrib.Create()).ToString(),
-                Kind = AccountKind.Temporary,
-                PreferredCulture = preferredCulture ?? Const.InvariantCultureCode
-            }, token);
-        }
-        else
-        {
-            var refreshed = new TemporaryAccountRefreshed(
-                AccountId: account.Id,
-                SecurityStamp: Guid.NewGuid().ToString()
-            );
-            db.Events.KafeAppend(account.Id, refreshed);
-            await db.SaveChangesAsync(token);
-            return await db.Events.KafeAggregateRequiredStream<AccountInfo>(account.Id, token: token);
-        }
-    }
-
-    public async Task<bool> TryConfirmTemporaryAccount(
-        Hrib id,
-        string securityStamp,
-        CancellationToken token = default)
-    {
-        // TODO: Add a "ticket" entity that will be identified by a guid, and will be one-time only instead of these
-        //       tokens.
-
-        var account = await Load(id, token);
-        if (account is null)
-        {
-            // throw new UnauthorizedAccessException("The account does not exist.");
-            return false;
-        }
-
-        if (account.RefreshedOn + ConfirmationTokenExpiration < DateTimeOffset.UtcNow)
-        {
-            // var closedExpired = new TemporaryAccountClosed(account.Id);
-            // db.Events.Append(account.Id, closedExpired);
-            // await db.SaveChangesAsync(token);
-            // throw new UnauthorizedAccessException("The token has expired.");
-            return false;
-        }
-
-        if (account.SecurityStamp != securityStamp)
-        {
-            // throw new UnauthorizedAccessException("The token has been already used or revoked.");
-            return false;
-        }
-
-        return true;
-
-        //var closedSuccessfully = new TemporaryAccountClosed(account.Id);
-        //db.Events.Append(account.Id, closedSuccessfully);
-        //await db.SaveChangesAsync(token);
+        return [..await query.ToListAsync(token: token)];
     }
 
     /// <summary>
@@ -330,7 +293,8 @@ $@"TRUE = ALL(
     public async Task<Err<bool>> AddPermissions(
         Hrib accountId,
         IEnumerable<(Hrib entityId, Permission permission)> permissions,
-        CancellationToken token = default)
+        CancellationToken token = default
+    )
     {
         // TODO: Find a cheaper way of knowing that an account exists.
         var account = await Load(accountId, token);
@@ -344,13 +308,17 @@ $@"TRUE = ALL(
             if (!account.Permissions.TryGetValue(permissionPair.entityId.ToString(), out var existingPermission)
                 || existingPermission != permissionPair.permission)
             {
-                db.Events.KafeAppend(accountId, new AccountPermissionSet(
-                    AccountId: accountId.ToString(),
-                    EntityId: permissionPair.entityId.ToString(),
-                    Permission: permissionPair.permission
-                ));
+                db.Events.KafeAppend(
+                    accountId,
+                    new AccountPermissionSet(
+                        AccountId: accountId.ToString(),
+                        EntityId: permissionPair.entityId.ToString(),
+                        Permission: permissionPair.permission
+                    )
+                );
             }
         }
+
         await db.SaveChangesAsync(token);
         return true;
     }
@@ -358,7 +326,8 @@ $@"TRUE = ALL(
     public Task<Err<bool>> AddPermissions(
         Hrib accountId,
         CancellationToken token = default,
-        params (Hrib entityId, Permission permission)[] permissions)
+        params (Hrib entityId, Permission permission)[] permissions
+    )
     {
         return AddPermissions(accountId, permissions, token);
     }
@@ -366,7 +335,8 @@ $@"TRUE = ALL(
     public async Task<Err<bool>> AddRoles(
         Hrib accountId,
         IEnumerable<Hrib> roleIds,
-        CancellationToken token = default)
+        CancellationToken token = default
+    )
     {
         var account = await Load(accountId, token);
         if (account is null)
@@ -378,12 +348,16 @@ $@"TRUE = ALL(
         {
             if (!account.RoleIds.Contains(roleId.ToString()))
             {
-                db.Events.KafeAppend(accountId, new AccountRoleSet(
-                    AccountId: accountId.ToString(),
-                    RoleId: roleId.ToString()
-                ));
+                db.Events.KafeAppend(
+                    accountId,
+                    new AccountRoleSet(
+                        AccountId: accountId.ToString(),
+                        RoleId: roleId.ToString()
+                    )
+                );
             }
         }
+
         await db.SaveChangesAsync(token);
         return true;
     }
@@ -391,14 +365,16 @@ $@"TRUE = ALL(
     public Task<Err<bool>> AddRoles(
         Hrib accountId,
         CancellationToken token = default,
-        params Hrib[] roleIds)
+        params Hrib[] roleIds
+    )
     {
         return AddRoles(accountId, token, roleIds);
     }
 
     public async Task<Err<AccountInfo>> AssociateExternalAccount(
         ClaimsPrincipal principal,
-        CancellationToken token = default)
+        CancellationToken token = default
+    )
     {
         var emailClaim = principal.FindFirst(ClaimTypes.Email);
         if (emailClaim is null || string.IsNullOrEmpty(emailClaim.Value))
@@ -423,7 +399,8 @@ $@"TRUE = ALL(
             AccountId: id,
             IdentityProvider: identityProvider,
             Name: name,
-            Uco: uco);
+            Uco: uco
+        );
 
         if (existing is null)
         {
@@ -442,6 +419,123 @@ $@"TRUE = ALL(
 
         await db.SaveChangesAsync(token);
         return await db.Events.KafeAggregateRequiredStream<AccountInfo>(id, token: token);
+    }
+
+    public async Task<LoginTicketInfo> IssueLoginTicket(
+        string emailAddress,
+        string? preferredCulture,
+        CancellationToken ct = default
+    )
+    {
+        var existingAccount = await FindByEmail(emailAddress, ct);
+        InviteInfo? existingInvite = null;
+        if (existingAccount is not null)
+        {
+            existingInvite = await FindInviteByEmail(emailAddress, ct);
+        }
+
+        preferredCulture ??= existingAccount?.PreferredCulture
+            ?? existingInvite?.PreferredCulture
+            ?? Const.InvariantCultureCode;
+
+        var ticket = new LoginTicketInfo(
+            Id: Guid.NewGuid(),
+            EmailAddress: emailAddress,
+            PreferredCulture: preferredCulture,
+            AccountId: existingAccount?.Id,
+            InviteId: existingInvite?.Id,
+            CreatedAt: DateTimeOffset.UtcNow
+        );
+
+        db.Insert(ticket);
+        await db.SaveChangesAsync(ct);
+        return ticket;
+    }
+
+    public async Task<Err<AccountInfo>> PunchTicket(
+        Guid loginTicketId,
+        CancellationToken ct = default
+    )
+    {
+        var ticket = await db.LoadAsync<LoginTicketInfo>(loginTicketId, ct);
+        if (ticket is null)
+        {
+            return Error.NotFound("The login ticket does not exist.");
+        }
+
+        if (ticket.Deleted)
+        {
+            return Error.InvalidValue("The login ticket is no longer valid.");
+        }
+
+        ticket = ticket with { Deleted = true };
+        db.Delete(ticket);
+        await db.SaveChangesAsync(ct);
+
+        if (ticket.CreatedAt + ConfirmationTokenExpiration < DateTimeOffset.UtcNow)
+        {
+            return Error.InvalidValue("The login ticket has expired.");
+        }
+
+        AccountInfo? account = null;
+
+        if (ticket.AccountId is not null)
+        {
+            account = await Load(ticket.AccountId, ct);
+            if (account is null)
+            {
+                return Error.NotFound("The account referred to by the login ticket does not exist.");
+            }
+        }
+        else
+        {
+            var errAccount = await Create(
+                AccountInfo.Create(ticket.EmailAddress, ticket.PreferredCulture) with
+                {
+                    Kind = AccountKind.Temporary
+                },
+                ct
+            );
+
+            if (errAccount.HasErrors)
+            {
+                return errAccount;
+            }
+
+            account = errAccount.Value;
+        }
+
+        var accountId = Hrib.Parse(account.Id).Unwrap();
+        if (ticket.InviteId is not null)
+        {
+            var invite = await LoadInvite(ticket.InviteId, ct);
+            if (invite is null)
+            {
+                return Error.NotFound(ticket.InviteId, "Invite");
+            }
+
+            var err = await AddPermissions(
+                accountId,
+                invite.Permissions.Select(p => (Hrib.Parse(p.Key).Unwrap(), p.Value)),
+                ct
+            );
+
+            if (err.HasErrors)
+            {
+                return err.Errors;
+            }
+
+            db.Events.KafeAppend(accountId, new InviteAccepted(invite.Id));
+            await db.SaveChangesAsync(ct);
+        }
+
+        account = await db.Events.KafeAggregateStream<AccountInfo>(accountId, token: ct);
+        if (account is null)
+        {
+            return Error.NotFound(accountId);
+        }
+
+        return account;
     }
 
     public static bool IsValidEmailAddress(string emailAddress)

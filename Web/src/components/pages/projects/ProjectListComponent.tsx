@@ -56,8 +56,8 @@ export function ProjectListComponent({ projects }: IProjectListComponentProps) {
                                     md: 'row',
                                 }}
                                 mx={-4}
-                                py={7}
-                                px={8}
+                                py={5}
+                                px={5}
                                 borderBottomWidth="1px"
                                 borderBottomColor={borderColor}
                                 align={'start'}

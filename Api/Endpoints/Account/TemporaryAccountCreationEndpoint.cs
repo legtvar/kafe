@@ -13,7 +13,6 @@ using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.Annotations;
 using System;
 using System.Security.Cryptography;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -36,7 +35,8 @@ public class TemporaryAccountCreationEndpoint : EndpointBaseAsync
         IDataProtectionProvider dataProtectionProvider,
         IEmailService emailService,
         IOptions<ApiOptions> apiOptions,
-        ILogger<TemporaryAccountCreationEndpoint> logger)
+        ILogger<TemporaryAccountCreationEndpoint> logger
+    )
     {
         this.accountService = accountService;
         this.emailService = emailService;
@@ -51,51 +51,35 @@ public class TemporaryAccountCreationEndpoint : EndpointBaseAsync
     [ProducesResponseType(400)]
     public override async Task<ActionResult> HandleAsync(
         TemporaryAccountCreationDto dto,
-        CancellationToken token = default)
+        CancellationToken ct = default
+    )
     {
-        if (string.IsNullOrWhiteSpace(dto.EmailAddress))
-        {
-            return BadRequest("Email address is null or white space.");
-        }
-
         dto = dto with { EmailAddress = dto.EmailAddress.Trim() };
 
-        var createRes = await accountService.CreateOrRefreshTemporaryAccount(
-            dto.EmailAddress,
-            dto.PreferredCulture,
-            null,
-            token);
-        if (createRes.HasErrors)
+        if (string.IsNullOrEmpty(dto.EmailAddress))
         {
-            return this.KafeErrResult(createRes);
+            return BadRequest("The email address is either null or whitespace.");
         }
 
-        var account = createRes.Value;
-
-        if (string.IsNullOrEmpty(account.SecurityStamp))
-        {
-            logger.LogError("Missing security stamp.");
-            return StatusCode(500);
-        }
-
-        var confirmationToken = EncodeToken(new(account.Id, Const.EmailConfirmationPurpose, account.SecurityStamp));
+        var ticket = await accountService.IssueLoginTicket(dto.EmailAddress, dto.PreferredCulture, ct);
+        var confirmationToken = EncodeToken(ticket.Id);
         var pathString = new PathString(apiOptions.Value.AccountConfirmPath)
             .Add(new PathString("/" + confirmationToken));
         var confirmationUrl = new Uri(new Uri(apiOptions.Value.BaseUrl), pathString);
-        var emailSubject = Const.ConfirmationEmailSubject[account!.PreferredCulture]!;
+        var emailSubject = Const.ConfirmationEmailSubject[ticket.PreferredCulture]!;
         var emailMessage = string.Format(
-            Const.ConfirmationEmailMessageTemplate[account!.PreferredCulture]!,
+            Const.ConfirmationEmailMessageTemplate[ticket.PreferredCulture]!,
             confirmationUrl,
-            Const.EmailSignOffs[RandomNumberGenerator.GetInt32(0, Const.EmailSignOffs.Length)][account!.PreferredCulture]);
-        await emailService.SendEmail(account.EmailAddress, emailSubject, emailMessage, null, token);
+            Const.EmailSignOffs[RandomNumberGenerator.GetInt32(0, Const.EmailSignOffs.Length)][ticket.PreferredCulture]
+        );
+        await emailService.SendEmail(dto.EmailAddress, emailSubject, emailMessage, null, ct);
 
         return Ok();
     }
 
-    private string EncodeToken(TemporaryAccountTokenDto dto)
+    private string EncodeToken(Guid loginTicketId)
     {
-        var token = $"{dto.Purpose}:{dto.AccountId}:{dto.SecurityStamp}";
-        var protectedBytes = dataProtector.Protect(Encoding.UTF8.GetBytes(token));
+        var protectedBytes = dataProtector.Protect(loginTicketId.ToByteArray());
         return WebEncoders.Base64UrlEncode(protectedBytes);
     }
 }

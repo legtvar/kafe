@@ -17,7 +17,9 @@ public record InviteInfo(
     string Id,
     CreationMethod CreationMethod,
     string EmailAddress,
-    DateTimeOffset CreatedOn,
+    string? PreferredCulture,
+    InviteStatus Status,
+    DateTimeOffset CreatedAt,
     DateTimeOffset UpdatedOn,
     ImmutableDictionary<string, Permission> Permissions
 ) : IEntity, ISoftDeleted
@@ -26,7 +28,9 @@ public record InviteInfo(
         Id: Hrib.InvalidValue,
         CreationMethod: CreationMethod.Unknown,
         EmailAddress: Const.InvalidEmailAddress,
-        CreatedOn: default,
+        PreferredCulture: null,
+        Status: default,
+        CreatedAt: default,
         UpdatedOn: default,
         Permissions: ImmutableDictionary<string, Permission>.Empty
     )
@@ -37,12 +41,20 @@ public record InviteInfo(
     public DateTimeOffset? DeletedAt { get; set; }
 }
 
+public enum InviteStatus
+{
+    Created,
+    Accepted,
+    Canceled
+}
+
 public class InviteInfoProjection : SingleStreamProjection<InviteInfo, string>
 {
     public InviteInfoProjection()
     {
         IncludeType<InviteCreated>();
-        IncludeType<InviteDestroyed>();
+        IncludeType<InviteCanceled>();
+        IncludeType<InviteAccepted>();
         IncludeType<InvitePermissionSet>();
     }
 
@@ -71,17 +83,30 @@ public class InviteInfoProjection : SingleStreamProjection<InviteInfo, string>
                         Id: create.InviteId,
                         CreationMethod: create.CreationMethod,
                         EmailAddress: create.EmailAddress,
-                        CreatedOn: @event.Timestamp,
+                        PreferredCulture: create.PreferredCulture,
+                        Status: default,
+                        CreatedAt: @event.Timestamp,
                         UpdatedOn: @event.Timestamp,
                         Permissions: ImmutableDictionary<string, Permission>.Empty
                     );
                     break;
 
-                case InviteDestroyed when snapshot is { Deleted: false }:
+                case InviteCanceled when snapshot is { Deleted: false }:
                     snapshot = snapshot with
                     {
                         Deleted = true,
-                        UpdatedOn = @event.Timestamp
+                        UpdatedOn = @event.Timestamp,
+                        Status = InviteStatus.Canceled
+                    };
+                    action = ActionType.StoreThenSoftDelete;
+                    break;
+
+                case InviteAccepted when snapshot is { Deleted: false }:
+                    snapshot = snapshot with
+                    {
+                        Deleted = true,
+                        UpdatedOn = @event.Timestamp,
+                        Status = InviteStatus.Accepted
                     };
                     action = ActionType.StoreThenSoftDelete;
                     break;

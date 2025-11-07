@@ -35,7 +35,8 @@ public class TemporaryAccountConfirmationEndpoint : EndpointBaseAsync
     public TemporaryAccountConfirmationEndpoint(
         AccountService accountService,
         UserProvider userProvider,
-        IDataProtectionProvider dataProtectionProvider)
+        IDataProtectionProvider dataProtectionProvider
+    )
     {
         this.accountService = accountService;
         this.userProvider = userProvider;
@@ -43,62 +44,46 @@ public class TemporaryAccountConfirmationEndpoint : EndpointBaseAsync
     }
 
     [HttpGet]
-    [SwaggerOperation(Tags = new[] { EndpointArea.Account })]
+    [SwaggerOperation(Tags = [EndpointArea.Account])]
     [ProducesResponseType(200)]
     [ProducesResponseType(400)]
     [ProducesResponseType(404)]
     public override async Task<ActionResult> HandleAsync(
         [FromRoute] string token,
-        CancellationToken cancellationToken = default)
+        CancellationToken ct = default
+    )
     {
-        if (!TryDecodeToken(token, out var tokenDto))
+        if (!TryDecodeToken(token, out var loginTicketId))
         {
             return Unauthorized();
         }
 
-        if (tokenDto.Purpose != Const.EmailConfirmationPurpose)
+        var account = await accountService.PunchTicket(
+            loginTicketId.Value,
+            ct
+        );
+        if (account.HasErrors)
         {
+            // NB: we disregard any specific information about the errors for security reasons
             return Unauthorized();
         }
 
-        if (!await accountService.TryConfirmTemporaryAccount(
-            tokenDto.AccountId,
-            tokenDto.SecurityStamp,
-            cancellationToken))
-        {
-            return Unauthorized();
-        }
-
-        var account = await accountService.Load(tokenDto.AccountId, cancellationToken);
-        if (account is null)
-        {
-            return NotFound();
-        }
-
-        await userProvider.SignIn(account);
+        await userProvider.SignIn(account.Value);
 
         return Ok();
     }
 
-    private bool TryDecodeToken(string encodedToken, [NotNullWhen(true)] out TemporaryAccountTokenDto? dto)
+    private bool TryDecodeToken(string encodedToken, [NotNullWhen(true)] out Guid? loginTicketId)
     {
         try
         {
             var unprotectedBytes = dataProtector.Unprotect(WebEncoders.Base64UrlDecode(encodedToken));
-            var token = Encoding.UTF8.GetString(unprotectedBytes);
-            var fields = token.Split(':', 3);
-            if (fields.Length != 3)
-            {
-                dto = null;
-                return false;
-            }
-
-            dto = new(Purpose: fields[0], AccountId: fields[1], SecurityStamp: fields[2]);
+            loginTicketId = new Guid(unprotectedBytes);
             return true;
         }
         catch (Exception)
         {
-            dto = null;
+            loginTicketId = null;
             return false;
         }
     }

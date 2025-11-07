@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Kafe.Api;
@@ -24,8 +25,8 @@ public static class ControllerBaseExtensions
             StatusCode = pd.Status
         };
     }
-    
-    public static ActionResult KafeErrorResult(this ControllerBase controller, params Error[] errors)
+
+    public static ActionResult KafeErrorResult(this ControllerBase controller, params IEnumerable<Error> errors)
     {
         var pd = KafeProblemDetails.Create(
             httpContext: controller.HttpContext,

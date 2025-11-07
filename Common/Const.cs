@@ -83,7 +83,7 @@ public static class Const
             (InvariantCulture,
 @"Hello,
 
-Please click the following link to log into KAFE:
+Please click the following one-time link to log into KAFE:
 
 {0}
 
@@ -95,7 +95,7 @@ KAFE
             (CzechCulture,
 @"Dobrý den,
 
-prosím klikněte na následující odkaz pro přihlášení do KAFE:
+prosím klikněte na následující jednorázový odkaz pro přihlášení do KAFE:
 
 {0}
 
@@ -106,7 +106,7 @@ Vaše KAFE
             (SlovakCulture,
 @"Dobrý deň,
 
-prosím kliknite na nasledujúci odkaz pre prihlásenie do KAFE:
+prosím kliknite na nasledujúci jednorazový odkaz pre prihlásenie do KAFE:
 
 {0}
 

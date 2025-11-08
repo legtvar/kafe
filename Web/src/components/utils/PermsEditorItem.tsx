@@ -30,7 +30,7 @@ export function PermsEditorItem({ user, options, initialPerms, readonly, onChang
         onChange(perms, email);
     };
 
-    const rightNames: Record<Permission, string> = {
+    const permsNames: Record<Permission, string> = {
         read: t('perms.read').toString(),
         write: t('perms.write').toString(),
         inspect: t('perms.inspect').toString(),
@@ -137,7 +137,7 @@ export function PermsEditorItem({ user, options, initialPerms, readonly, onChang
                                     }
                                 }}
                             >
-                                {rightNames[right]}
+                                {permsNames[right]}
                             </Checkbox>
                         </InputGroup>
                     ))}

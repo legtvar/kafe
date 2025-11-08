@@ -1,17 +1,6 @@
-import {
-    Button,
-    Checkbox,
-    FormControl,
-    FormLabel,
-    Heading,
-    HStack,
-    Input,
-    Stack,
-    useConst
-} from '@chakra-ui/react';
+import { Button, Checkbox, FormControl, FormLabel, Heading, HStack, Input, Stack, useConst } from '@chakra-ui/react';
 import useForceUpdate from 'use-force-update';
 import { t } from 'i18next';
-import moment from 'moment';
 import { useNavigate } from 'react-router-dom';
 import { API } from '../../../api/API';
 import { Group } from '../../../data/Group';
@@ -21,6 +10,7 @@ import { HRIB } from '../../../schemas/generic';
 import { LocalizedInput } from '../../utils/LocalizedInput';
 import { SendAPI } from '../../utils/SendAPI';
 import { TextareaMarkdown } from '../../utils/TextareaMarkdown';
+import { DateTime } from 'luxon';
 
 interface IGroupBasicInfoProps {
     // Cannot be changed after initial draw
@@ -109,9 +99,19 @@ export function GroupBasicInfo(props: IGroupBasicInfoProps) {
                             borderColor={border}
                             bg={bg}
                             placeholder={t('createGroup.fields.deadline').toString()}
-                            defaultValue={moment(group.deadline).format('YYYY-MM-DD HH:mm:ss')}
+                            defaultValue={
+                                group.deadline
+                                    ? DateTime.fromISO(group.deadline).toLocal().toISO({
+                                          suppressSeconds: true,
+                                          suppressMilliseconds: true,
+                                          includeOffset: false,
+                                      }) ?? undefined
+                                    : undefined
+                            }
                             onChange={(event) =>
-                                forceUpdate(group.set('deadline', moment(event.target.value).toISOString()))
+                                forceUpdate(
+                                    group.set('deadline', DateTime.fromISO(event.target.value).toISO() ?? undefined),
+                                )
                             }
                             maxW={96}
                         />

@@ -1,10 +1,10 @@
 import { Box, HStack, Text, VStack } from '@chakra-ui/react';
 import { t } from 'i18next';
-import moment from 'moment';
 import { BsCheckCircleFill, BsFillExclamationCircleFill } from 'react-icons/bs';
 import { Project } from '../../../data/Project';
 import { useColorScheme } from '../../../hooks/useColorScheme';
 import { getPrefered } from '../../../utils/preferedLanguage';
+import { DateTime } from 'luxon';
 
 interface IReviewListProps {
     project: Project;
@@ -42,9 +42,11 @@ export function ReviewList({ project }: IReviewListProps) {
                         </Box>
                         <Box>
                             <Text fontWeight="bold">{t(`project.admin.role.${review.reviewerRole}`).toString()}</Text>
-                            <Text color="gray.500" pb={4}>
-                                {moment(review.addedOn).calendar()}
-                            </Text>
+                            {review.addedOn && (
+                                <Text color="gray.500" pb={4}>
+                                    {DateTime.fromISO(review.addedOn).toLocaleString()}
+                                </Text>
+                            )}
                             {getPrefered(review.comment as any)}
                         </Box>
                     </HStack>

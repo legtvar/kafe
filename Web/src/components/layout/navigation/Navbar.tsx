@@ -66,6 +66,15 @@ export function Navbar({ onOpen, forceReload, signedIn, ...rest }: INavbarProps)
                     icon={<FiMenu />}
                 />
             )}
+
+            {signedIn && <Spacer display={{ base: 'flex', md: 'none' }} />}
+
+            <Flex h="20" alignItems="center" ml={2} mr={8} justifyContent="space-between" key="heading">
+                <Link to="/">
+                    <Logo />
+                </Link>
+            </Flex>
+            
             {api.isStaging && (
                 <MessageButton
                     warningKey="staging.warning"
@@ -80,14 +89,6 @@ export function Navbar({ onOpen, forceReload, signedIn, ...rest }: INavbarProps)
                     descriptionKey="localhost.description"
                 />
             )}
-
-            {signedIn && <Spacer display={{ base: 'flex', md: 'none' }} />}
-
-            <Flex h="20" alignItems="center" ml={2} mr={8} justifyContent="space-between" key="heading">
-                <Link to="/">
-                    <Logo />
-                </Link>
-            </Flex>
 
             <Spacer />
 

@@ -5,6 +5,7 @@ import {
     Heading,
     HStack,
     Icon,
+    Link,
     ListItem,
     Tab,
     TabList,
@@ -16,7 +17,6 @@ import {
     useColorModeValue,
 } from '@chakra-ui/react';
 import { t } from 'i18next';
-import moment from 'moment';
 import { useCallback } from 'react';
 import { IoSaveOutline, IoWarning } from 'react-icons/io5';
 import { useNavigate } from 'react-router-dom';
@@ -29,6 +29,7 @@ import { AwaitAPI } from '../../utils/AwaitAPI';
 import { OutletOrChildren } from '../../utils/OutletOrChildren';
 import { RightsEditor } from '../../utils/RightsEditor';
 import { SendAPI } from '../../utils/SendAPI';
+import { DateTime } from 'luxon';
 
 interface ISystemComponentProps {}
 
@@ -136,15 +137,20 @@ export function SystemComponent(props: ISystemComponentProps) {
                                                         Version <strong>{status.version}</strong>
                                                     </ListItem>
                                                     <ListItem>
-                                                        Commit <strong>{status.commit}</strong>{' '}
-                                                        {moment(status.commitDate).calendar()}
+                                                        Commit{' '}
+                                                        <Link
+                                                            href={`https://gitlab.fi.muni.cz/legtvar/kafe/-/commit/${status.commit}`}
+                                                            fontWeight="bold"
+                                                            textDecoration="underline"
+                                                        >
+                                                            {status.commit}
+                                                        </Link>{' '}
+                                                        from {DateTime.fromISO(status.commitDate).toLocaleString(DateTime.DATETIME_SHORT)}
                                                     </ListItem>
                                                     <ListItem>
                                                         {t('system.runningFrom')}{' '}
                                                         <strong>
-                                                            {moment(status.runningSince).format(
-                                                                'YYYY-MM-DD HH:mm:ss Z',
-                                                            )}
+                                                            {DateTime.fromISO(status.runningSince).toLocaleString(DateTime.DATETIME_SHORT)}
                                                         </strong>
                                                     </ListItem>
                                                 </UnorderedList>

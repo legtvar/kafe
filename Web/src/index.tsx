@@ -8,19 +8,18 @@ import { languageConfig } from './languageConfig';
 import { routerConfig } from './routes';
 
 import { ChakraProvider, ColorModeScript } from '@chakra-ui/react';
-import moment from 'moment';
-import 'moment/locale/cs';
 import { CookiesProvider } from 'react-cookie';
 import { SortableProvider } from 'use-sortablejs';
 import { overrideConsole } from './consoleOverride';
 import theme from './theme';
+import {Settings} from "luxon";
 
 overrideConsole();
 
 (async () => {
     i18next.init(languageConfig);
     i18next.on('languageChanged', function (lng) {
-        moment.locale(lng);
+        Settings.defaultLocale = lng;
     });
 
     const router = createBrowserRouter(routerConfig(i18next.t), {

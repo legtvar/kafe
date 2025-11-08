@@ -15,7 +15,6 @@ import {
     VStack,
 } from '@chakra-ui/react';
 import { t } from 'i18next';
-import moment from 'moment';
 import { useCallback } from 'react';
 import Countdown from 'react-countdown';
 import { IoCubeOutline } from 'react-icons/io5';
@@ -27,6 +26,7 @@ import { AwaitAPI } from '../../utils/AwaitAPI';
 import { ChakraMarkdown } from '../../utils/ChakraMarkdown';
 import { OrganizationAvatar } from '../../utils/OrganizationAvatar/OrganizationAvatar';
 import { OutletOrChildren } from '../../utils/OutletOrChildren';
+import { DateTime } from 'luxon';
 
 interface IHomeProps {}
 
@@ -96,42 +96,47 @@ export function Home(props: IHomeProps) {
                                                             </ChakraMarkdown>
                                                         </Box>
                                                     )}
-                                                    {group.deadline && moment(group.deadline).isAfter() && (
-                                                        <Box mb={-6}>
-                                                            <Countdown
-                                                                date={new Date(group.deadline)}
-                                                                renderer={({ days, hours, minutes, seconds }) => (
-                                                                    <>
-                                                                        <Box mb={-5}>
-                                                                            {t('createProject.doNotforget')}
-                                                                        </Box>
-                                                                        <SimpleGrid
-                                                                            columns={4}
-                                                                            display="inline-grid"
-                                                                            w="full"
-                                                                        >
-                                                                            <CountdownItem title={t('countdown.days')}>
-                                                                                {days}
-                                                                            </CountdownItem>
-                                                                            <CountdownItem title={t('countdown.hours')}>
-                                                                                {hours}
-                                                                            </CountdownItem>
-                                                                            <CountdownItem
-                                                                                title={t('countdown.minutes')}
+                                                    {group.deadline &&
+                                                        DateTime.fromISO(group.deadline) > DateTime.now() && (
+                                                            <Box mb={-6}>
+                                                                <Countdown
+                                                                    date={new Date(group.deadline)}
+                                                                    renderer={({ days, hours, minutes, seconds }) => (
+                                                                        <>
+                                                                            <Box mb={-5}>
+                                                                                {t('createProject.doNotforget')}
+                                                                            </Box>
+                                                                            <SimpleGrid
+                                                                                columns={4}
+                                                                                display="inline-grid"
+                                                                                w="full"
                                                                             >
-                                                                                {minutes}
-                                                                            </CountdownItem>
-                                                                            <CountdownItem
-                                                                                title={t('countdown.seconds')}
-                                                                            >
-                                                                                {seconds}
-                                                                            </CountdownItem>
-                                                                        </SimpleGrid>
-                                                                    </>
-                                                                )}
-                                                            />
-                                                        </Box>
-                                                    )}
+                                                                                <CountdownItem
+                                                                                    title={t('countdown.days')}
+                                                                                >
+                                                                                    {days}
+                                                                                </CountdownItem>
+                                                                                <CountdownItem
+                                                                                    title={t('countdown.hours')}
+                                                                                >
+                                                                                    {hours}
+                                                                                </CountdownItem>
+                                                                                <CountdownItem
+                                                                                    title={t('countdown.minutes')}
+                                                                                >
+                                                                                    {minutes}
+                                                                                </CountdownItem>
+                                                                                <CountdownItem
+                                                                                    title={t('countdown.seconds')}
+                                                                                >
+                                                                                    {seconds}
+                                                                                </CountdownItem>
+                                                                            </SimpleGrid>
+                                                                        </>
+                                                                    )}
+                                                                />
+                                                            </Box>
+                                                        )}
                                                 </Stack>
                                             </CardBody>
                                             <Divider />

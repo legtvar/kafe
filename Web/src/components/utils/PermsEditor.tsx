@@ -4,9 +4,9 @@ import { useState } from 'react';
 import { EntityPermissions, EntityPermissionsUser } from '../../data/EntityPermissions';
 import { useColorScheme } from '../../hooks/useColorScheme';
 import { Permission } from '../../schemas/generic';
-import { RightsItem } from './RightsItem';
+import { PermsEditorItem } from './PermsEditorItem';
 
-export interface IRightsEditorProps {
+export interface IPermsEditor {
     perms: EntityPermissions;
     readonly?: boolean;
     options: Readonly<Array<Permission>>;
@@ -14,7 +14,7 @@ export interface IRightsEditorProps {
     onChange?: (perms: EntityPermissions) => void;
 }
 
-export function RightsEditor({ perms, readonly, explanation, options, onChange }: IRightsEditorProps) {
+export function PermsEditor({ perms, readonly, explanation, options, onChange }: IPermsEditor) {
     const { border } = useColorScheme();
 
     const [newItems, setNewItems] = useState<Array<EntityPermissionsUser>>([
@@ -31,7 +31,7 @@ export function RightsEditor({ perms, readonly, explanation, options, onChange }
                     {options.map((o, i) => (
                         <li key={i}>
                             <Text as="span" fontWeight="bold">
-                                {t(`rights.${o}`).toString()}
+                                {t(`perms.${o}`).toString()}
                             </Text>
                             <Text as="span"> - {explanation[o]}</Text>
                         </li>
@@ -40,7 +40,7 @@ export function RightsEditor({ perms, readonly, explanation, options, onChange }
             </Box>
             <Box>
                 {perms.globalPermissions !== null && (
-                    <RightsItem
+                    <PermsEditorItem
                         user={0}
                         initialPerms={perms.globalPermissions}
                         {...{ readonly, options }}
@@ -57,7 +57,7 @@ export function RightsEditor({ perms, readonly, explanation, options, onChange }
                 {perms.accountPermissions
                     .filter((a) => a.id)
                     .map((a, i) => (
-                        <RightsItem
+                        <PermsEditorItem
                             key={i}
                             user={a}
                             initialPerms={a.permissions}
@@ -76,7 +76,7 @@ export function RightsEditor({ perms, readonly, explanation, options, onChange }
                 <Spacer borderBottomColor={border} borderBottomWidth={1} mx={-4} mt={1} />
 
                 {newItems.map((item, i) => (
-                    <RightsItem
+                    <PermsEditorItem
                         key={i}
                         user={null}
                         initialPerms={[]}

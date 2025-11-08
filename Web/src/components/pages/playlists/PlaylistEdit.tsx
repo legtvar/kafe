@@ -28,7 +28,7 @@ import { getPrefered } from '../../../utils/preferedLanguage';
 import { observeAbstactType } from '../../utils/AbstractTypeObserver';
 import { AwaitAPI } from '../../utils/AwaitAPI';
 import { DraggableList } from '../../utils/DraggableList';
-import { RightsEditor } from '../../utils/RightsEditor';
+import { PermsEditor } from '../../utils/PermsEditor';
 import { SendAPI } from '../../utils/SendAPI';
 import { Status } from '../../utils/Status';
 import { WithTitle } from '../../utils/WithTitle';
@@ -117,7 +117,7 @@ export function PlaylistEdit(props: IPlaylistEditProps) {
                                     <TabList>
                                         <Tab>{t('playlistsEdit.tabs.info').toString()}</Tab>
                                         <Tab>{t('playlistsEdit.tabs.files').toString()}</Tab>
-                                        <Tab>{t('playlistsEdit.tabs.rights').toString()}</Tab>
+                                        <Tab>{t('playlistsEdit.tabs.perms').toString()}</Tab>
                                     </TabList>
 
                                     <TabPanels pt={6}>
@@ -237,13 +237,13 @@ export function PlaylistEdit(props: IPlaylistEditProps) {
                                         </TabPanel>
                                         <TabPanel>
                                             <VStack align="stretch">
-                                                <RightsEditor
+                                                <PermsEditor
                                                     perms={perms}
                                                     options={['read', 'write', 'inspect']}
                                                     explanation={{
-                                                        read: t('rights.groups.playlist.read').toString(),
-                                                        write: t('rights.groups.playlist.write').toString(),
-                                                        inspect: t('rights.groups.playlist.inspect').toString(),
+                                                        read: t('perms.groups.playlist.read').toString(),
+                                                        write: t('perms.groups.playlist.write').toString(),
+                                                        inspect: t('perms.groups.playlist.inspect').toString(),
                                                     }}
                                                 />
                                             </VStack>

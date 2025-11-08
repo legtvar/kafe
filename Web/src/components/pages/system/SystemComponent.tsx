@@ -27,7 +27,7 @@ import { AllPermissions, SystemHRIB } from '../../../schemas/generic';
 import { useTitle } from '../../../utils/useTitle';
 import { AwaitAPI } from '../../utils/AwaitAPI';
 import { OutletOrChildren } from '../../utils/OutletOrChildren';
-import { RightsEditor } from '../../utils/RightsEditor';
+import { PermsEditor } from '../../utils/PermsEditor';
 import { SendAPI } from '../../utils/SendAPI';
 import { DateTime } from 'luxon';
 
@@ -106,21 +106,21 @@ export function SystemComponent(props: ISystemComponentProps) {
                         </SendAPI>
                         <Tabs>
                             <TabList>
-                                <Tab>{t('system.rights').toString()}</Tab>
+                                <Tab>{t('system.perms').toString()}</Tab>
                                 <Tab>{t('system.status').toString()}</Tab>
                             </TabList>
 
                             <TabPanels pt={6}>
                                 <TabPanel>
-                                    <RightsEditor
+                                    <PermsEditor
                                         perms={perms}
                                         options={AllPermissions}
                                         explanation={{
-                                            read: t('rights.groups.system.read').toString(),
-                                            write: t('rights.groups.system.write').toString(),
-                                            inspect: t('rights.groups.system.inspect').toString(),
-                                            append: t('rights.groups.system.append').toString(),
-                                            review: t('rights.groups.system.review').toString(),
+                                            read: t('perms.groups.system.read').toString(),
+                                            write: t('perms.groups.system.write').toString(),
+                                            inspect: t('perms.groups.system.inspect').toString(),
+                                            append: t('perms.groups.system.append').toString(),
+                                            review: t('perms.groups.system.review').toString(),
                                         }}
                                         readonly={readonly}
                                     />

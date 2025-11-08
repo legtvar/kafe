@@ -9,7 +9,7 @@ import { EntityPermissions } from '../../../data/EntityPermissions';
 import { Group } from '../../../data/Group';
 import { observeAbstactType } from '../../utils/AbstractTypeObserver';
 import { AwaitAPI } from '../../utils/AwaitAPI';
-import { RightsEditor } from '../../utils/RightsEditor';
+import { PermsEditor } from '../../utils/PermsEditor';
 import { SendAPI } from '../../utils/SendAPI';
 import { Status } from '../../utils/Status';
 import { WithTitle } from '../../utils/WithTitle';
@@ -91,7 +91,7 @@ export function GroupsEdit(props: IGroupsEditProps) {
                             <Tabs>
                                 <TabList>
                                     <Tab>{t('groupsEdit.tabs.info').toString()}</Tab>
-                                    <Tab>{t('groupsEdit.tabs.rights').toString()}</Tab>
+                                    <Tab>{t('groupsEdit.tabs.perms').toString()}</Tab>
                                 </TabList>
 
                                 <TabPanels pt={6}>
@@ -100,15 +100,15 @@ export function GroupsEdit(props: IGroupsEditProps) {
                                     </TabPanel>
                                     <TabPanel>
                                         <VStack align="stretch">
-                                            <RightsEditor
+                                            <PermsEditor
                                                 perms={perms}
                                                 options={['read', 'write', 'inspect', 'append', 'review']}
                                                 explanation={{
-                                                    read: t('rights.groups.group.read').toString(),
-                                                    write: t('rights.groups.group.write').toString(),
-                                                    inspect: t('rights.groups.group.inspect').toString(),
-                                                    append: t('rights.groups.group.append').toString(),
-                                                    review: t('rights.groups.group.review').toString(),
+                                                    read: t('perms.groups.group.read').toString(),
+                                                    write: t('perms.groups.group.write').toString(),
+                                                    inspect: t('perms.groups.group.inspect').toString(),
+                                                    append: t('perms.groups.group.append').toString(),
+                                                    review: t('perms.groups.group.review').toString(),
                                                 }}
                                             />
                                         </VStack>

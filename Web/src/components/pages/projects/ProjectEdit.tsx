@@ -25,7 +25,7 @@ import { Project } from '../../../data/Project';
 import { useAuth } from '../../../hooks/Caffeine';
 import { observeAbstactType } from '../../utils/AbstractTypeObserver';
 import { AwaitAPI } from '../../utils/AwaitAPI';
-import { RightsEditor } from '../../utils/RightsEditor';
+import { PermsEditor } from '../../utils/PermsEditor';
 import { SendAPI } from '../../utils/SendAPI';
 import { Status } from '../../utils/Status';
 import { ArtifactGroupUpload } from '../../utils/Upload/ArtifactGroup';
@@ -116,7 +116,7 @@ export function ProjectEdit(props: IProjectEditProps) {
                                     <Tab>{t('projectEdit.tabs.status').toString()}</Tab>
                                     <Tab>{t('projectEdit.tabs.info').toString()}</Tab>
                                     <Tab>{t('projectEdit.tabs.files').toString()}</Tab>
-                                    <Tab>{t('projectEdit.tabs.rights').toString()}</Tab>
+                                    <Tab>{t('projectEdit.tabs.perms').toString()}</Tab>
                                     {project.userPermissions.includes('review') && (
                                         <Tab>
                                             <AiOutlineUnlock />
@@ -157,14 +157,14 @@ export function ProjectEdit(props: IProjectEditProps) {
                                     </TabPanel>
                                     <TabPanel>
                                         <VStack align="stretch">
-                                            <RightsEditor
+                                            <PermsEditor
                                                 perms={perms}
                                                 options={['read', 'inspect', 'write', 'append']}
                                                 explanation={{
-                                                    read: t('rights.groups.project.read').toString(),
-                                                    inspect: t('rights.groups.project.inspect').toString(),
-                                                    write: t('rights.groups.project.write').toString(),
-                                                    append: t('rights.groups.project.append').toString(),
+                                                    read: t('perms.groups.project.read').toString(),
+                                                    inspect: t('perms.groups.project.inspect').toString(),
+                                                    write: t('perms.groups.project.write').toString(),
+                                                    append: t('perms.groups.project.append').toString(),
                                                 }}
                                             />
                                         </VStack>

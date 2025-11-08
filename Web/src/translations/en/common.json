@@ -212,7 +212,7 @@
       "info": "Basic information",
       "status": "State",
       "admin": "Admin access",
-      "rights": "Rights"
+      "perms": "Permissions"
     }
   },
   "projects": {
@@ -304,7 +304,7 @@
       "title": "System"
     },
     "organizations": {
-      "title": "Organizations",
+      "title": "Organization",
       "create": {
         "title": "Create an organization"
       },
@@ -419,13 +419,13 @@
   "system": {
     "title": "System settings",
     "warning": "Please be careful! Anything you change here can have a catastrophic impact on the final taste of KAFE! Proceed with caution!",
-    "rights": "Rights",
+    "perms": "Permissions",
     "homepage": "Homepage",
     "status": "System status",
     "runningFrom": "Running since",
     "console": "Console"
   },
-  "rights": {
+  "perms": {
     "read": "View",
     "write": "Edit",
     "append": "Append",
@@ -434,18 +434,18 @@
     "special": {
       "anyone": {
         "title": "Anyone on the Internet",
-        "warning": "Beware, any user will have these rights even on inherited items!"
+        "warning": "Beware, any user will have these permissions even on inherited items!"
       },
       "new": {
         "title": "Add a user (email)"
       }
     },
-    "none": "No rights",
+    "none": "No permissions",
     "groups": {
       "system": {
         "read": "View these settings",
         "append": "Create new projects, project groups and playlists",
-        "write": "Change rights and system settings",
+        "write": "Change permissions and system settings",
         "inspect": "View all projects, project groups and playlists",
         "review": "Write reviews for all projects in all groups"
       },
@@ -466,7 +466,7 @@
   },
   "groupsEdit": {
     "tabs": {
-      "rights": "Rights",
+      "perms": "Permissions",
       "info": "Basic information"
     }
   },
@@ -523,7 +523,7 @@
     "tabs": {
       "info": "Basic info",
       "files": "Files",
-      "rights": "Rights",
+      "perms": "Permissions",
       "addFile": "Add new file"
     },
     "addFile": "Add file",

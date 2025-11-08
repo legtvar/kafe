@@ -210,7 +210,7 @@
       "files": "Soubory",
       "info": "Základní informace",
       "status": "Stav",
-      "rights": "Oprávnění"
+      "perms": "Oprávnění"
     }
   },
   "projects": {
@@ -417,13 +417,13 @@
   "system": {
     "title": "Systémová nastavení",
     "warning": "Prosím pozor! Cokoliv změníš tady může mít katastrofický dopad na finální chuť KAFE! Postupujte opatrně!",
-    "rights": "Oprávnění",
+    "perms": "Oprávnění",
     "homepage": "Domovská obrazovka",
     "status": "Stav systému",
     "runningFrom": "Běží od",
     "console": "Konzole"
   },
-  "rights": {
+  "perms": {
     "read": "Zobrazit",
     "write": "Upravit",
     "append": "Přidat",
@@ -470,7 +470,7 @@
   "groupsEdit": {
     "tabs": {
       "info": "Základní informace",
-      "rights": "Oprávnění"
+      "perms": "Oprávnění"
     }
   },
   "createGroup": {
@@ -526,7 +526,7 @@
     "tabs": {
       "info": "Základní informace",
       "files": "Soubory",
-      "rights": "Oprávnění",
+      "perms": "Oprávnění",
       "addFile": "Přidat nový soubor"
     },
     "addFile": "Přidat soubor",

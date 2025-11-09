@@ -155,6 +155,7 @@ public static class TransferMaps
             ReleasedOn: data.ReleasedOn,
             Crew: [],
             Cast: [],
+            OwnerId: data.OwnerId,
             Artifacts: [],
             Reviews: data.Reviews.IsDefaultOrEmpty
                 ? []

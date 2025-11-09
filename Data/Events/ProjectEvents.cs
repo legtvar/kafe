@@ -5,6 +5,7 @@ namespace Kafe.Data.Events;
 
 public record ProjectCreated(
     [Hrib] string ProjectId,
+    [Hrib] string? OwnerId,
     CreationMethod CreationMethod,
     string ProjectGroupId,
     [LocalizedString] ImmutableDictionary<string, string> Name

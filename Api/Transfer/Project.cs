@@ -35,6 +35,7 @@ public record ProjectDetailDto(
     DateTimeOffset ReleasedOn,
     ImmutableArray<ProjectAuthorDto> Crew,
     ImmutableArray<ProjectAuthorDto> Cast,
+    Hrib? OwnerId,
     ImmutableArray<ProjectArtifactDto> Artifacts,
     ImmutableArray<ProjectReviewDto> Reviews,
     ProjectBlueprintDto Blueprint,

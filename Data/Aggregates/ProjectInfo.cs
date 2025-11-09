@@ -26,6 +26,8 @@ public record ProjectInfo(
     [property:LocalizedString]
     ImmutableDictionary<string, string> Name,
 
+    [Hrib] string? OwnerId,
+
     [property:Sortable]
     [property:LocalizedString]
     ImmutableDictionary<string, string>? Description = null,
@@ -57,7 +59,8 @@ public record ProjectInfo(
         Genre: null,
         GlobalPermissions: Permission.None,
         ReleasedOn: default,
-        IsLocked: false
+        IsLocked: false,
+        OwnerId: Hrib.InvalidValue
     )
     {
     }
@@ -110,7 +113,8 @@ public class ProjectInfoProjection : SingleStreamProjection<ProjectInfo, string>
             Authors: ImmutableArray<ProjectAuthorInfo>.Empty,
             Artifacts: ImmutableArray<ProjectArtifactInfo>.Empty,
             Reviews: ImmutableArray<ProjectReviewInfo>.Empty,
-            Name: e.Name);
+            Name: e.Name,
+            OwnerId: e.OwnerId);
     }
 
     public ProjectInfo Apply(ProjectInfoChanged e, ProjectInfo p)

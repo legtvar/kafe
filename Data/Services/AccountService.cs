@@ -13,6 +13,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
+using JasperFx.Events;
 using Kafe.Data.Documents;
 
 namespace Kafe.Data.Services;
@@ -536,6 +537,49 @@ public class AccountService(
         }
 
         return account;
+    }
+
+    public async Task<Err<InviteInfo>> CreateInvite(
+        InviteInfo invite,
+        Hrib inviterAccountId,
+        CancellationToken ct = default
+    )
+    {
+        var idResult = Hrib.Parse(invite.Id);
+        if (idResult.HasErrors)
+        {
+            return idResult.Errors;
+        }
+
+        var id = idResult.Value;
+        if (!id.IsValidNonEmpty)
+        {
+            return Error.InvalidOrEmptyHrib("The invite ID");
+        }
+
+        if (!IsValidEmailAddress(invite.EmailAddress))
+        {
+            return Error.InvalidValue("The email address is invalid.");
+        }
+
+        var eventStream = db.Events.KafeStartStream<InviteInfo>(
+            id,
+            new InviteCreated(
+                InviteId: id.ToString(),
+                CreationMethod: CreationMethod.Api,
+                EmailAddress: invite.EmailAddress,
+                PreferredCulture: invite.PreferredCulture
+            )
+        );
+        foreach (var permission in invite.Permissions)
+        {
+            eventStream.AddEvent(new InvitePermissionSet(
+                InviteId: id.ToString(),
+                InviterAccountId: inviterAccountId.ToString(),
+                Permission: permission.Key))
+        }
+
+        throw new NotImplementedException();
     }
 
     public static bool IsValidEmailAddress(string emailAddress)

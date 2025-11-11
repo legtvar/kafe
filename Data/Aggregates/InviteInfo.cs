@@ -9,6 +9,7 @@ using Marten.Events.Aggregation;
 using Marten.Metadata;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Newtonsoft.Json;
 
 namespace Kafe.Data.Aggregates;
 
@@ -37,7 +38,10 @@ public record InviteInfo(
     {
     }
 
+    [JsonIgnore]
     public bool Deleted { get; set; }
+
+    [JsonIgnore]
     public DateTimeOffset? DeletedAt { get; set; }
 }
 

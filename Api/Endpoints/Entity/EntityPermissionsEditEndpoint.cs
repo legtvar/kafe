@@ -33,7 +33,8 @@ public class EntityPermissionsEditEndpoint : EndpointBaseAsync
         IAuthorizationService authorizationService,
         EntityService entityService,
         UserProvider userProvider,
-        AccountService accountService)
+        AccountService accountService
+    )
     {
         this.authorizationService = authorizationService;
         this.entityService = entityService;
@@ -42,10 +43,11 @@ public class EntityPermissionsEditEndpoint : EndpointBaseAsync
     }
 
     [HttpPatch]
-    [SwaggerOperation(Tags = new[] { EndpointArea.Entity })]
+    [SwaggerOperation(Tags = [EndpointArea.Entity])]
     public override async Task<ActionResult<string>> HandleAsync(
         EntityPermissionsEditDto dto,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         // TODO: Remove this hack once permission masks for project groups are implemented.
         if (dto.Id != Hrib.System)
@@ -58,7 +60,11 @@ public class EntityPermissionsEditEndpoint : EndpointBaseAsync
 
             if (entity is ProjectInfo project)
             {
-                var auth = await authorizationService.AuthorizeAsync(User, project.ProjectGroupId, EndpointPolicy.Write);
+                var auth = await authorizationService.AuthorizeAsync(
+                    User,
+                    project.ProjectGroupId,
+                    EndpointPolicy.Write
+                );
                 if (!auth.Succeeded)
                 {
                     return Unauthorized();
@@ -74,7 +80,8 @@ public class EntityPermissionsEditEndpoint : EndpointBaseAsync
 
         var accountPermissions = dto.AccountPermissions ?? ImmutableArray<EntityPermissionsAccountEditDto>.Empty;
         if (accountPermissions.Any(a => string.IsNullOrEmpty(a.Id?.ToString())
-            && string.IsNullOrEmpty(a.EmailAddress)))
+                && string.IsNullOrEmpty(a.EmailAddress)
+            ))
         {
             return ValidationProblem(title: "All accounts must be identified by either id or email address.");
         }
@@ -89,20 +96,31 @@ public class EntityPermissionsEditEndpoint : EndpointBaseAsync
             accounts.Add((dto: accountPerm, entity: account));
         }
 
-        if (accounts.Any(a => a.entity is null))
+        var notFoundAccounts = accounts.Where(a => a.entity is null).ToImmutableArray();
+        foreach (var account in notFoundAccounts)
         {
-            var notFoundAccounts = string.Join(", ", accounts.Where(a => a.entity is null)
-                .Select(a => $"\"{a.dto.Id ?? a.dto.EmailAddress}\""));
-            return NotFound($"Could not find accounts: {notFoundAccounts}.");
+            if (string.IsNullOrWhiteSpace(account.dto.EmailAddress)
+                || !AccountService.IsValidEmailAddress(account.dto.EmailAddress))
+            {
+                return this.KafeErrorResult(
+                    Error.InvalidValue($"String '{account.dto.EmailAddress}' is not a valid email address.")
+                );
+            }
         }
 
-        foreach (var account in accounts)
+        foreach (var account in notFoundAccounts)
+        {
+            // TODO: create invites and send emails
+        }
+
+        foreach (var account in accounts.Where(a => a.entity is not null))
         {
             await entityService.SetPermissions(
                 dto.Id,
                 TransferMaps.FromPermissionArray(account.dto.Permissions),
                 account.entity!.Id,
-                cancellationToken);
+                cancellationToken
+            );
         }
 
         if (dto.GlobalPermissions is not null)
@@ -111,7 +129,8 @@ public class EntityPermissionsEditEndpoint : EndpointBaseAsync
                 entityId: (Hrib)dto.Id,
                 permissions: TransferMaps.FromPermissionArray(dto.GlobalPermissions),
                 accessingAccountId: Hrib.Empty, // sets global permissions
-                token: cancellationToken);
+                token: cancellationToken
+            );
         }
 
         return Ok(dto.Id);

@@ -4,6 +4,7 @@ import { AbstractType } from './AbstractType';
 
 export class User extends AbstractType {
     public name!: string | null;
+    public uco?: string | null;
     public emailAddress!: string;
     public preferredCulture!: string;
     public role!: 'admin' | 'temp' | 'user';

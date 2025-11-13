@@ -1526,6 +1526,7 @@ export interface components {
       }) | null;
       crew: components["schemas"]["ProjectCreationAuthorDto"][];
       cast: components["schemas"]["ProjectCreationAuthorDto"][];
+      ownerId?: string | null;
       isLocked: boolean;
     };
     ProjectDetailDto: {
@@ -1575,6 +1576,7 @@ export interface components {
       releasedOn: string;
       crew: components["schemas"]["ProjectAuthorDto"][];
       cast: components["schemas"]["ProjectAuthorDto"][];
+      ownerId?: string | null;
       artifacts: components["schemas"]["ProjectArtifactDto"][];
       reviews: components["schemas"]["ProjectReviewDto"][];
       blueprint: components["schemas"]["ProjectBlueprintDto"];
@@ -1776,6 +1778,7 @@ export interface components {
       /** @description Permissions that apply to the currently logged in user. Includes the global permissions. */
       userPermissions: components["schemas"]["Permission"][];
       /** Format: date-time */
+      ownerId?: string | null;
       releasedOn: string;
       isLocked: boolean;
     };

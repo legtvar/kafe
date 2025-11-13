@@ -60,7 +60,7 @@ public record ProjectInfo(
         GlobalPermissions: Permission.None,
         ReleasedOn: default,
         IsLocked: false,
-        OwnerId: Hrib.InvalidValue
+        OwnerId: null
     )
     {
     }

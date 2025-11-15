@@ -15,12 +15,12 @@
   "staging": {
     "warning": "Staging",
     "title": "This is Staging!",
-    "description": "All changes on this domain get thrown away at athe end of the day (around 3:00 AM)."
+    "description": "All changes made to this KAFE instance are discarded at the end of the day (around 3:00 AM)."
   },
   "localhost": {
     "warning": "Localhost",
     "title": "This is localhost!",
-    "description": "The app is connected to a locally running back-end."
+    "description": "The app is connected to a locally running backend."
   },
   "troubleshooting": {
     "title": "Report an issue",

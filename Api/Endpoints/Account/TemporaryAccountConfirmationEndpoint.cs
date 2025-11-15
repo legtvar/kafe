@@ -53,14 +53,15 @@ public class TemporaryAccountConfirmationEndpoint : EndpointBaseAsync
         CancellationToken ct = default
     )
     {
-        if (!TryDecodeToken(token, out var loginTicketId))
+        var ticketId = accountService.DecodeLoginTicketId(token);
+        if (ticketId is null)
         {
             return Unauthorized();
         }
 
         var account = await accountService.PunchTicket(
-            loginTicketId.Value,
-            ct
+            ticketId.Value,
+            ct: ct
         );
         if (account.HasErrors)
         {
@@ -71,20 +72,5 @@ public class TemporaryAccountConfirmationEndpoint : EndpointBaseAsync
         await userProvider.SignIn(account.Value);
 
         return Ok();
-    }
-
-    private bool TryDecodeToken(string encodedToken, [NotNullWhen(true)] out Guid? loginTicketId)
-    {
-        try
-        {
-            var unprotectedBytes = dataProtector.Unprotect(WebEncoders.Base64UrlDecode(encodedToken));
-            loginTicketId = new Guid(unprotectedBytes);
-            return true;
-        }
-        catch (Exception)
-        {
-            loginTicketId = null;
-            return false;
-        }
     }
 }

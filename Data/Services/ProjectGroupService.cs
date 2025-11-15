@@ -83,9 +83,7 @@ public class ProjectGroupService
 
         if (shouldWaitForDaemon)
         {
-            await db.QueryForNonStaleData<EntityPermissionInfo>(TimeSpan.FromSeconds(5))
-                .Where(i => i.Id == id.ToString())
-                .SingleOrDefaultAsync(token);
+            await db.TryWaitForEntityPermissions(id, token);
         }
 
         return await db.Events.KafeAggregateRequiredStream<ProjectGroupInfo>(id, token: token);

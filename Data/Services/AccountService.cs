@@ -8,23 +8,29 @@ using MimeKit;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
-using JasperFx.Events;
 using Kafe.Data.Documents;
+using Marten.Events;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.Logging;
 
 namespace Kafe.Data.Services;
 
 public class AccountService(
     IDocumentSession db,
-    EntityMetadataProvider entityMetadataProvider
+    EntityMetadataProvider entityMetadataProvider,
+    IDataProtectionProvider dataProtectionProvider,
+    ILogger<AccountService> logger
 )
 {
     public static readonly TimeSpan ConfirmationTokenExpiration = TimeSpan.FromHours(24);
     public const string PreferredUsernameClaim = "preferred_username";
+
+    private readonly IDataProtector dataProtector = dataProtectionProvider.CreateProtector(nameof(AccountService));
 
     public async Task<AccountInfo?> Load(
         Hrib id,
@@ -429,11 +435,7 @@ public class AccountService(
     )
     {
         var existingAccount = await FindByEmail(emailAddress, ct);
-        InviteInfo? existingInvite = null;
-        if (existingAccount is not null)
-        {
-            existingInvite = await FindInviteByEmail(emailAddress, ct);
-        }
+        var existingInvite = await FindInviteByEmail(emailAddress, ct);
 
         preferredCulture ??= existingAccount?.PreferredCulture
             ?? existingInvite?.PreferredCulture
@@ -455,6 +457,7 @@ public class AccountService(
 
     public async Task<Err<AccountInfo>> PunchTicket(
         Guid loginTicketId,
+        bool shouldWaitForDaemon = true,
         CancellationToken ct = default
     )
     {
@@ -515,19 +518,30 @@ public class AccountService(
                 return Error.NotFound(ticket.InviteId, "Invite");
             }
 
-            var err = await AddPermissions(
-                accountId,
-                invite.Permissions.Select(p => (Hrib.Parse(p.Key).Unwrap(), p.Value)),
-                ct
-            );
-
-            if (err.HasErrors)
+            if (!invite.Deleted)
             {
-                return err.Errors;
-            }
+                var err = await AddPermissions(
+                    accountId,
+                    invite.Permissions.Select(p => (Hrib.Parse(p.Key).Unwrap(), p.Value.Permission)),
+                    ct
+                );
 
-            db.Events.KafeAppend(accountId, new InviteAccepted(invite.Id));
-            await db.SaveChangesAsync(ct);
+                if (err.HasErrors)
+                {
+                    return err.Errors;
+                }
+
+                db.Events.KafeAppend(accountId, new InviteAccepted(invite.Id));
+                await db.SaveChangesAsync(ct);
+            }
+        }
+
+        if (shouldWaitForDaemon)
+        {
+            if (!await db.TryWaitForEntityPermissions(accountId, ct))
+            {
+                logger.LogWarning("Failed to wait for permissions to update within timeout.");
+            }
         }
 
         account = await db.Events.KafeAggregateStream<AccountInfo>(accountId, token: ct);
@@ -539,7 +553,7 @@ public class AccountService(
         return account;
     }
 
-    public async Task<Err<InviteInfo>> CreateInvite(
+    public async Task<Err<InviteInfo>> UpsertInvite(
         InviteInfo invite,
         Hrib inviterAccountId,
         CancellationToken ct = default
@@ -552,9 +566,9 @@ public class AccountService(
         }
 
         var id = idResult.Value;
-        if (!id.IsValidNonEmpty)
+        if (id.IsInvalid)
         {
-            return Error.InvalidOrEmptyHrib("The invite ID");
+            return Error.InvalidValue("The invite ID");
         }
 
         if (!IsValidEmailAddress(invite.EmailAddress))
@@ -562,24 +576,66 @@ public class AccountService(
             return Error.InvalidValue("The email address is invalid.");
         }
 
-        var eventStream = db.Events.KafeStartStream<InviteInfo>(
-            id,
-            new InviteCreated(
-                InviteId: id.ToString(),
-                CreationMethod: CreationMethod.Api,
-                EmailAddress: invite.EmailAddress,
-                PreferredCulture: invite.PreferredCulture
-            )
-        );
-        foreach (var permission in invite.Permissions)
+        db.LastModifiedBy = inviterAccountId.ToString();
+
+        if (id.IsEmpty)
         {
-            eventStream.AddEvent(new InvitePermissionSet(
-                InviteId: id.ToString(),
-                InviterAccountId: inviterAccountId.ToString(),
-                Permission: permission.Key))
+            var existing = await FindInviteByEmail(invite.EmailAddress, ct);
+            IEventStream<InviteInfo>? eventStream = null;
+            if (existing is not null)
+            {
+                id = Hrib.Parse(existing.Id).Unwrap();
+                eventStream = await db.Events.FetchForExclusiveWriting<InviteInfo>(id.ToString(), ct);
+            }
+
+            if (existing is null || eventStream?.Aggregate?.Deleted == true)
+            {
+                id = Hrib.Create();
+                db.Events.KafeStartStream<InviteInfo>(
+                    id,
+                    new InviteCreated(
+                        InviteId: id.ToString(),
+                        CreationMethod: CreationMethod.Api,
+                        EmailAddress: invite.EmailAddress,
+                        PreferredCulture: invite.PreferredCulture
+                    )
+                );
+            }
         }
 
-        throw new NotImplementedException();
+        foreach (var permission in invite.Permissions)
+        {
+            db.Events.KafeAppend(
+                id,
+                new InvitePermissionSet(
+                    InviteId: id.ToString(),
+                    Permission: permission.Value.Permission,
+                    EntityId: permission.Value.EntityId
+                )
+            );
+        }
+
+        await db.SaveChangesAsync(ct);
+        return await db.Events.KafeAggregateRequiredStream<InviteInfo>(id, token: ct);
+    }
+
+    public string EncodeLoginTicketId(Guid id)
+    {
+        var protectedBytes = dataProtector.Protect(id.ToByteArray());
+        return WebEncoders.Base64UrlEncode(protectedBytes);
+    }
+
+    public Guid? DecodeLoginTicketId(string protectedId)
+    {
+        try
+        {
+            var unprotectedBytes = dataProtector.Unprotect(WebEncoders.Base64UrlDecode(protectedId));
+            return new Guid(unprotectedBytes);
+        }
+        catch (Exception)
+        {
+            return null;
+        }
     }
 
     public static bool IsValidEmailAddress(string emailAddress)

@@ -22,7 +22,7 @@ public record InviteInfo(
     InviteStatus Status,
     DateTimeOffset CreatedAt,
     DateTimeOffset UpdatedOn,
-    ImmutableDictionary<string, Permission> Permissions
+    ImmutableDictionary<string, InvitePermissionEntry> Permissions
 ) : IEntity, ISoftDeleted
 {
     public InviteInfo() : this(
@@ -33,9 +33,20 @@ public record InviteInfo(
         Status: default,
         CreatedAt: default,
         UpdatedOn: default,
-        Permissions: ImmutableDictionary<string, Permission>.Empty
+        Permissions: ImmutableDictionary<string, InvitePermissionEntry>.Empty
     )
     {
+    }
+
+    public static InviteInfo Create(string emailAddress, string? preferredCulture = null)
+    {
+        return new InviteInfo() with
+        {
+            Id = Hrib.EmptyValue,
+            CreationMethod = CreationMethod.Api,
+            EmailAddress = emailAddress,
+            PreferredCulture = preferredCulture
+        };
     }
 
     [JsonIgnore]
@@ -44,6 +55,14 @@ public record InviteInfo(
     [JsonIgnore]
     public DateTimeOffset? DeletedAt { get; set; }
 }
+
+public record InvitePermissionEntry(
+    [Hrib]
+    string EntityId,
+    Permission Permission,
+    [Hrib]
+    string? InviterAccountId
+);
 
 public enum InviteStatus
 {
@@ -91,7 +110,7 @@ public class InviteInfoProjection : SingleStreamProjection<InviteInfo, string>
                         Status: default,
                         CreatedAt: @event.Timestamp,
                         UpdatedOn: @event.Timestamp,
-                        Permissions: ImmutableDictionary<string, Permission>.Empty
+                        Permissions: ImmutableDictionary<string, InvitePermissionEntry>.Empty
                     );
                     break;
 
@@ -121,7 +140,14 @@ public class InviteInfoProjection : SingleStreamProjection<InviteInfo, string>
                         UpdatedOn = @event.Timestamp,
                         Permissions = setEvent.Permission == Permission.None
                             ? snapshot.Permissions.Remove(setEvent.EntityId)
-                            : snapshot.Permissions.SetItem(setEvent.EntityId, setEvent.Permission)
+                            : snapshot.Permissions.SetItem(
+                                setEvent.EntityId,
+                                new InvitePermissionEntry(
+                                    EntityId: setEvent.EntityId,
+                                    Permission: setEvent.Permission,
+                                    InviterAccountId: @event.UserName
+                                )
+                            )
                     };
                     break;
 

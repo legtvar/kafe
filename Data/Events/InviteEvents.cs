@@ -21,8 +21,6 @@ public record InviteAccepted(
 public record InvitePermissionSet(
     [Hrib]
     string InviteId,
-    [Hrib]
-    string InviterAccountId,
     Permission Permission,
     [Hrib]
     string EntityId

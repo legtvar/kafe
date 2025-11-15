@@ -20,7 +20,7 @@
   "localhost": {
     "warning": "Localhost",
     "title": "Toto je localhost!",
-    "description": "Táto aplikácia je pripojená k lokálne bežiacemu back-endu."
+    "description": "Táto aplikácia je pripojená k lokálne bežiacemu backendu."
   },
   "troubleshooting": {
     "title": "Nahlásiť problém",

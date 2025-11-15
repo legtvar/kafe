@@ -15,12 +15,12 @@
   "staging": {
     "warning": "Staging",
     "title": "Tohle je Staging!",
-    "description": "Všechny změny na této doméně se na konci dne (kolem 3:00 ráno) zahodí."
+    "description": "Všechny změny provedené na této instance KAFE se na konci dne (kolem 3:00 ráno) zahodí."
   },
   "localhost": {
     "warning": "Localhost",
     "title": "Tohle je localhost!",
-    "description": "Tahle appka je přikonektěná k lokálně běžícímu back-endu."
+    "description": "Tahle appka je přikonektěná k lokálně běžícímu backendu."
   },
   "troubleshooting": {
     "title": "Nahlásit problém",

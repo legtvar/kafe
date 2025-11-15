@@ -4,6 +4,8 @@
     <PackageReference Update="System.Text.Json" Version="9.0.10" />
     <PackageReference Update="Microsoft.Extensions.Logging.Abstractions" Version="9.0.10" />
     <PackageReference Update="Microsoft.Extensions.Options.DataAnnotations" Version="9.0.10" />
+    <PackageReference Update="Microsoft.AspNetCore.DataProtection.Abstractions" Version="9.0.10" />
+    <PackageReference Update="Microsoft.AspNetCore.WebUtilities" Version="9.0.10" />
     <PackageReference Update="Serilog.AspNetCore" Version="9.0.0" />
     <PackageReference Update="GitInfo" Version="3.6.0" />
   </ItemGroup>

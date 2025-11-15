@@ -20,33 +20,19 @@ namespace Kafe.Api.Endpoints.Account;
 
 [ApiVersion("1")]
 [Route("tmp-account")]
-public class TemporaryAccountCreationEndpoint : EndpointBaseAsync
-    .WithRequest<TemporaryAccountCreationDto>
-    .WithActionResult
+public class TemporaryAccountCreationEndpoint(
+    AccountService accountService,
+    IEmailService emailService,
+    IOptions<ApiOptions> apiOptions,
+    ILogger<TemporaryAccountCreationEndpoint> logger
+)
+    : EndpointBaseAsync
+        .WithRequest<TemporaryAccountCreationDto>
+        .WithActionResult
 {
-    private readonly AccountService accountService;
-    private readonly IEmailService emailService;
-    private readonly IOptions<ApiOptions> apiOptions;
-    private readonly ILogger<TemporaryAccountCreationEndpoint> logger;
-    private readonly IDataProtector dataProtector;
-
-    public TemporaryAccountCreationEndpoint(
-        AccountService accountService,
-        IDataProtectionProvider dataProtectionProvider,
-        IEmailService emailService,
-        IOptions<ApiOptions> apiOptions,
-        ILogger<TemporaryAccountCreationEndpoint> logger
-    )
-    {
-        this.accountService = accountService;
-        this.emailService = emailService;
-        this.apiOptions = apiOptions;
-        this.logger = logger;
-        this.dataProtector = dataProtectionProvider.CreateProtector(Const.TemporaryAccountPurpose);
-    }
 
     [HttpPost]
-    [SwaggerOperation(Tags = new[] { EndpointArea.Account })]
+    [SwaggerOperation(Tags = [EndpointArea.Account])]
     [ProducesResponseType(200)]
     [ProducesResponseType(400)]
     public override async Task<ActionResult> HandleAsync(
@@ -62,7 +48,7 @@ public class TemporaryAccountCreationEndpoint : EndpointBaseAsync
         }
 
         var ticket = await accountService.IssueLoginTicket(dto.EmailAddress, dto.PreferredCulture, ct);
-        var confirmationToken = EncodeToken(ticket.Id);
+        var confirmationToken = accountService.EncodeLoginTicketId(ticket.Id);
         var pathString = new PathString(apiOptions.Value.AccountConfirmPath)
             .Add(new PathString("/" + confirmationToken));
         var confirmationUrl = new Uri(new Uri(apiOptions.Value.BaseUrl), pathString);
@@ -75,11 +61,5 @@ public class TemporaryAccountCreationEndpoint : EndpointBaseAsync
         await emailService.SendEmail(dto.EmailAddress, emailSubject, emailMessage, null, ct);
 
         return Ok();
-    }
-
-    private string EncodeToken(Guid loginTicketId)
-    {
-        var protectedBytes = dataProtector.Protect(loginTicketId.ToByteArray());
-        return WebEncoders.Base64UrlEncode(protectedBytes);
     }
 }

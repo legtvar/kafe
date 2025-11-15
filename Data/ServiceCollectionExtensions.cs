@@ -44,6 +44,9 @@ public static class ServiceCollectionExtensions
             mo.Connection(configuration.GetConnectionString("KAFE")
                 ?? throw new ArgumentException("The KAFE connection string is missing!"));
             mo.Events.StreamIdentity = StreamIdentity.AsString;
+            mo.Events.UseMandatoryStreamTypeDeclaration = true;
+            mo.Events.MetadataConfig.UserNameEnabled = true;
+
             if (environment.IsDevelopment())
             {
                 mo.AutoCreateSchemaObjects = AutoCreate.All;

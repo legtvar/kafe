@@ -441,6 +441,7 @@
       }
     },
     "none": "No permissions",
+    "invited": "Invited",
     "groups": {
       "system": {
         "read": "View these settings",

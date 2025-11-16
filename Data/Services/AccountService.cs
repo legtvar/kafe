@@ -294,6 +294,36 @@ public class AccountService(
         return [..await query.ToListAsync(token: token)];
     }
 
+    public record InviteFilter(
+        ImmutableDictionary<string, Permission>? Permissions = null
+    );
+
+    public async Task<ImmutableArray<InviteInfo>> ListInvites(
+        InviteFilter? filter = null,
+        CancellationToken ct = default
+    )
+    {
+        filter ??= new InviteFilter();
+
+        var query = db.Query<InviteInfo>();
+
+        if (filter.Permissions is not null)
+        {
+            var permValues = string.Join(",", filter.Permissions.Select(p => $"('{p.Key}',{(int)p.Value})"));
+            query = (IMartenQueryable<InviteInfo>)query.Where(a => a.MatchesSql(
+                    $"""
+                     TRUE = ALL(
+                         SELECT (data -> 'Permissions' -> entity_id -> 'Permission')::int & expected = expected
+                         FROM (VALUES {permValues}) as expected_perms (entity_id, expected)
+                     )
+                     """
+                )
+            );
+        }
+
+        return [..await query.ToListAsync(ct)];
+    }
+
     /// <summary>
     /// Gives the account the specified capabilities.
     /// </summary>

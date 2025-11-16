@@ -11,8 +11,9 @@ public record EntityPermissionsDetailDto(
 );
 
 public record EntityPermissionsAccountListDto(
-    Hrib Id,
-    string EmailAddress,
+    Hrib? Id,
+    string? EmailAddress,
+    string? Name,
     ImmutableArray<Permission> Permissions
 );
 

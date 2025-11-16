@@ -380,7 +380,7 @@ public static class TransferMaps
     {
         return new BlendDto(
             FileExtension: data.FileExtension,
-            MimeType: data.MimeType,  
+            MimeType: data.MimeType,
             Error: data.Error);
     }
 
@@ -423,6 +423,7 @@ public static class TransferMaps
         string? entityType,
         Permission? globalPermissions,
         Permission? userPermissions,
+        IEnumerable<InviteInfo> invites,
         IEnumerable<AccountInfo> accounts
     )
     {
@@ -431,11 +432,21 @@ public static class TransferMaps
             EntityType: entityType,
             GlobalPermissions: globalPermissions is null ? null : ToPermissionArray(globalPermissions.Value),
             UserPermissions: userPermissions is null ? null : ToPermissionArray(userPermissions.Value),
-            AccountPermissions: accounts.Select(a => new EntityPermissionsAccountListDto(
-                Id: a.Id,
-                EmailAddress: a.EmailAddress,
-                Permissions: ToPermissionArray(a.Permissions?.GetValueOrDefault(id.ToString()) ?? Permission.None)
-            )).ToImmutableArray()
+            AccountPermissions: [
+                ..accounts.Select(a => new EntityPermissionsAccountListDto(
+                    Id: a.Id,
+                    EmailAddress: a.EmailAddress,
+                    Name: a.Name,
+                    Permissions: ToPermissionArray(a.Permissions?.GetValueOrDefault(id.ToString()) ?? Permission.None)
+                )).Concat(invites.Select(i => new EntityPermissionsAccountListDto(
+                    Id: null,
+                    EmailAddress: i.EmailAddress,
+                    Name: null,
+                    Permissions: ToPermissionArray(i.Permissions?.GetValueOrDefault(id.ToString())?.Permission
+                        ?? Permission.None)
+                    )))
+                    .OrderBy(e => e.EmailAddress)
+            ]
         );
     }
 

@@ -1,4 +1,4 @@
-import { Avatar, Box, Checkbox, Flex, Input, InputGroup, Text, useColorModeValue } from '@chakra-ui/react';
+import {Avatar, Badge, Box, Checkbox, Flex, Input, InputGroup, Text, useColorModeValue} from '@chakra-ui/react';
 import { t } from 'i18next';
 import { useState } from 'react';
 import { IoAdd, IoEarth } from 'react-icons/io5';
@@ -92,9 +92,11 @@ export function PermsEditorItem({ user, options, initialPerms, readonly, onChang
                     />
                 </Flex>
             ) : (
-                <Flex direction="row" flex="1" align={'center'}>
-                    <KafeAvatar size={'sm'} person={user} mr={4} />
+                <Flex direction="row" flex="1" align={'center'} gap={4}>
+                    <KafeAvatar size={'sm'} person={user} />
                     <Text>{user.emailAddress}</Text>
+                    {user.name && <Text fontSize={"xs"}>({user.name})</Text>}
+                    {user.id == null && <Badge>{t("perms.invited")}</Badge>}
                 </Flex>
             )}
             <Box

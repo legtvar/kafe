@@ -1,9 +1,15 @@
-import { components } from '../schemas/api';
-import { Permission } from '../schemas/generic';
-import { AbstractType } from './AbstractType';
-import { Serializer } from './serialize/Serializer';
+import {components} from '../schemas/api';
+import {Permission} from '../schemas/generic';
+import {AbstractType} from './AbstractType';
+import {Serializer} from './serialize/Serializer';
 
-export type EntityPermissionsUser = { permissions: Array<Permission>; emailAddress: string; id?: string };
+export type EntityPermissionsUser = {
+    permissions: Array<Permission>;
+    emailAddress: string;
+    id?: string,
+    name?: string,
+    isNew?: boolean
+};
 
 export class EntityPermissions extends AbstractType {
     public globalPermissions!: Array<Permission> | null;

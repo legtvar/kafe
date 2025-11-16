@@ -439,6 +439,7 @@
       }
     },
     "none": "Žiadne práva",
+    "invited": "Pozvánka",
     "groups": {
       "system": {
         "read": "Zobraziť tieto nastavenia",

@@ -1,9 +1,23 @@
-import { Center, HStack, IconButton, Text, VStack } from '@chakra-ui/react';
-import { t } from 'i18next';
-import React from 'react';
-import { AiOutlineLeft, AiOutlineRight } from 'react-icons/ai';
-import { BsFillInboxFill } from 'react-icons/bs';
-import { sequence } from '../../utils/sequence';
+import {
+    Box,
+    Center,
+    HStack,
+    IconButton,
+    Text,
+    useColorModeValue,
+    useSizes,
+    VStack,
+} from "@chakra-ui/react";
+import { t } from "i18next";
+import React from "react";
+import {
+    AiOutlineDoubleLeft,
+    AiOutlineDoubleRight,
+    AiOutlineLeft,
+    AiOutlineRight,
+} from "react-icons/ai";
+import { BsFillInboxFill } from "react-icons/bs";
+import { sequence } from "../../utils/sequence";
 
 interface IPaginationProps<T> {
     data: Array<T>;
@@ -28,7 +42,7 @@ export function Pagination<T>(props: IPaginationProps<T>) {
                         <BsFillInboxFill />
                     </Text>
                     <Text fontSize="18px" mt={3} mb={2}>
-                        {t('generic.empty').toString()}
+                        {t("generic.empty").toString()}
                     </Text>
                 </VStack>
             </Center>
@@ -60,41 +74,78 @@ export function Pagination<T>(props: IPaginationProps<T>) {
 
     const currentPage = data.slice(page * perPage, (page + 1) * perPage);
 
+    const pagerBgColor = useColorModeValue("gray.100", "gray.800");
+    const pagerBorderColor = useColorModeValue("gray.300", "gray.700");
+    const pagerPy = 3;
+
     return (
         <>
             <>{currentPage.map(children)}</>
             {pagesInData > 1 && (
-                <HStack my={7} overflowX="auto">
-                    <IconButton
-                        size="md"
-                        variant="solid"
-                        onClick={() => setPage(Math.max(page - 1, 0))}
-                        aria-label={'Previous'}
-                        icon={<AiOutlineLeft />}
-                        isDisabled={page === 0}
-                        key={-1}
-                    />
-                    {visiblePages.map((id) => (
+                <>
+                    <Box blockSize={10 + 2 * pagerPy}></Box>
+                    <HStack
+                        py={pagerPy}
+                        px={5}
+                        mx={-4}
+                        overflowX="auto"
+                        position={"fixed"}
+                        bottom={0}
+                        bgColor={pagerBgColor}
+                        width="100%"
+                        borderTopWidth="1px"
+                        borderTopColor={pagerBorderColor}
+                    >
                         <IconButton
                             size="md"
                             variant="solid"
-                            colorScheme={id === page ? 'brand' : undefined}
-                            onClick={() => setPage(id)}
-                            aria-label={`Page ${(id + 1).toString()}`}
-                            icon={<>{id + 1}</>}
-                            key={id}
+                            onClick={() => setPage(0)}
+                            aria-label={"First"}
+                            icon={<AiOutlineDoubleLeft />}
+                            isDisabled={page === 0}
+                            key={-2}
                         />
-                    ))}
-                    <IconButton
-                        size="md"
-                        variant="solid"
-                        onClick={() => setPage(Math.min(page + 1, pagesInData - 1))}
-                        aria-label={'Next'}
-                        icon={<AiOutlineRight />}
-                        isDisabled={page === pagesInData - 1}
-                        key={-2}
-                    />
-                </HStack>
+                        <IconButton
+                            size="md"
+                            variant="solid"
+                            onClick={() => setPage(Math.max(page - 1, 0))}
+                            aria-label={"Previous"}
+                            icon={<AiOutlineLeft />}
+                            isDisabled={page === 0}
+                            key={-1}
+                        />
+                        {visiblePages.map((id) => (
+                            <IconButton
+                                size="md"
+                                variant="solid"
+                                colorScheme={id === page ? "brand" : undefined}
+                                onClick={() => setPage(id)}
+                                aria-label={`Page ${(id + 1).toString()}`}
+                                icon={<>{id + 1}</>}
+                                key={id}
+                            />
+                        ))}
+                        <IconButton
+                            size="md"
+                            variant="solid"
+                            onClick={() =>
+                                setPage(Math.min(page + 1, pagesInData - 1))}
+                            aria-label={"Next"}
+                            icon={<AiOutlineRight />}
+                            isDisabled={page === pagesInData - 1}
+                            key={-11}
+                        />
+                        <IconButton
+                            size="md"
+                            variant="solid"
+                            onClick={() => setPage(pagesInData - 1)}
+                            aria-label={"Last"}
+                            icon={<AiOutlineDoubleRight />}
+                            isDisabled={page === pagesInData - 1}
+                            key={-12}
+                        />
+                    </HStack>
+                </>
             )}
         </>
     );

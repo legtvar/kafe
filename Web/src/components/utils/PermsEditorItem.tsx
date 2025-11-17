@@ -1,4 +1,4 @@
-import { Avatar, Box, Checkbox, Flex, Input, InputGroup, Text, useColorModeValue } from '@chakra-ui/react';
+import {Avatar, Badge, Box, Checkbox, Flex, Input, InputGroup, Text, useColorModeValue} from '@chakra-ui/react';
 import { t } from 'i18next';
 import { useState } from 'react';
 import { IoAdd, IoEarth } from 'react-icons/io5';
@@ -7,7 +7,7 @@ import { useColorScheme } from '../../hooks/useColorScheme';
 import { Permission } from '../../schemas/generic';
 import { KafeAvatar } from './KafeAvatar';
 
-export interface IRightsItemProps {
+export interface IPermsEditorItemProps {
     user: EntityPermissionsUser | number | null; // User, 0 for anyone, null for new user
     options: Readonly<Array<Permission>>;
     initialPerms: Array<Permission>;
@@ -15,7 +15,7 @@ export interface IRightsItemProps {
     readonly?: boolean;
 }
 
-export function RightsItem({ user, options, initialPerms, readonly, onChange }: IRightsItemProps) {
+export function PermsEditorItem({ user, options, initialPerms, readonly, onChange }: IPermsEditorItemProps) {
     const borderColor = useColorModeValue('gray.300', 'gray.700');
     const { border, bg } = useColorScheme();
 
@@ -30,12 +30,12 @@ export function RightsItem({ user, options, initialPerms, readonly, onChange }: 
         onChange(perms, email);
     };
 
-    const rightNames: Record<Permission, string> = {
-        read: t('rights.read').toString(),
-        write: t('rights.write').toString(),
-        inspect: t('rights.inspect').toString(),
-        append: t('rights.append').toString(),
-        review: t('rights.review').toString(),
+    const permsNames: Record<Permission, string> = {
+        read: t('perms.read').toString(),
+        write: t('perms.write').toString(),
+        inspect: t('perms.inspect').toString(),
+        append: t('perms.append').toString(),
+        review: t('perms.review').toString(),
     };
 
     return (
@@ -65,9 +65,9 @@ export function RightsItem({ user, options, initialPerms, readonly, onChange }: 
                                 icon={<IoEarth size="1.5em" />}
                             ></Avatar>
                             <Flex direction="column">
-                                <Text>{t('rights.special.anyone.title').toString()}</Text>
+                                <Text>{t('perms.special.anyone.title').toString()}</Text>
                                 <Text fontSize="smaller" color="red.500">
-                                    {t('rights.special.anyone.warning').toString()}
+                                    {t('perms.special.anyone.warning').toString()}
                                 </Text>
                             </Flex>
                         </Flex>
@@ -84,7 +84,7 @@ export function RightsItem({ user, options, initialPerms, readonly, onChange }: 
                     <Input
                         w="full"
                         mr={4}
-                        placeholder={t('rights.special.new.title').toString()}
+                        placeholder={t('perms.special.new.title').toString()}
                         type="text"
                         value={newEmail}
                         onChange={(event) => onValueChanges(perms, event.target.value)}
@@ -92,9 +92,11 @@ export function RightsItem({ user, options, initialPerms, readonly, onChange }: 
                     />
                 </Flex>
             ) : (
-                <Flex direction="row" flex="1" align={'center'}>
-                    <KafeAvatar size={'sm'} person={user} mr={4} />
+                <Flex direction="row" flex="1" align={'center'} gap={4}>
+                    <KafeAvatar size={'sm'} person={user} />
                     <Text>{user.emailAddress}</Text>
+                    {user.name && <Text fontSize={"xs"}>({user.name})</Text>}
+                    {user.id == null && <Badge>{t("perms.invited")}</Badge>}
                 </Flex>
             )}
             <Box
@@ -137,7 +139,7 @@ export function RightsItem({ user, options, initialPerms, readonly, onChange }: 
                                     }
                                 }}
                             >
-                                {rightNames[right]}
+                                {permsNames[right]}
                             </Checkbox>
                         </InputGroup>
                     ))}

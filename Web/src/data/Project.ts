@@ -1,4 +1,4 @@
-import moment from 'moment';
+import { DateTime } from 'luxon';
 import { components } from '../schemas/api';
 import { localizedString } from '../schemas/generic';
 import { getPrefered } from '../utils/preferedLanguage';
@@ -79,7 +79,7 @@ export class Project extends AbstractType {
             .add('artifacts', (artifacts: Artifact[]) =>
                 artifacts ? artifacts.map((artifact) => artifact.serialize(false)) : undefined,
             )
-            .add('releasedOn', (date: Date | null) => moment(date).toISOString())
+            .add('releasedOn', (date: Date | null) => date ? DateTime.fromJSDate(date).toISO() : null)
             .add('crew', rolesMapper)
             .add('cast', rolesMapper)
             .build();

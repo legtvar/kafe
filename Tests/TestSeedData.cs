@@ -13,10 +13,8 @@ using Microsoft.Extensions.Logging;
 
 namespace Kafe.Tests;
 
-public class TestSeedData : IInitialData
+public class TestSeedData(IServiceProvider services, ILogger<TestSeedData> logger) : IInitialData
 {
-    private readonly IServiceProvider services;
-    private readonly ILogger<TestSeedData> logger;
     public const string AdminHrib = "testadmin00";
     public const string AdminEmail = "admin@example.com";
     public const string UserHrib = "testuser000";
@@ -29,22 +27,16 @@ public class TestSeedData : IInitialData
     public const string Project2Hrib = "testprj0002";
     public const string Artifact1Hrib = "testart0001";
 
-    public TestSeedData(IServiceProvider services, ILogger<TestSeedData> logger)
-    {
-        this.services = services;
-        this.logger = logger;
-    }
-
     public async Task Populate(IDocumentStore store, CancellationToken ct)
     {
         // logger.LogInformation("Waiting for async daemon.");
         // await store.WaitForNonStaleProjectionDataAsync(TimeSpan.FromSeconds(60));
-        
+
         logger.LogInformation("Populating test seed data.");
         using var scope = services.CreateScope();
         var accountService = scope.ServiceProvider.GetRequiredService<AccountService>();
 
-        var admin = await accountService.CreateOrRefreshTemporaryAccount(AdminEmail, null, AdminHrib, ct);
+        var admin = await accountService.Create(AccountInfo.Create(AdminEmail) with { Id = AdminHrib }, ct);
         if (admin.HasErrors)
         {
             throw admin.AsException();
@@ -52,7 +44,7 @@ public class TestSeedData : IInitialData
 
         await accountService.AddPermissions(admin.Value.Id, [(Hrib.System.ToString(), Permission.All)], ct);
 
-        await accountService.CreateOrRefreshTemporaryAccount(UserEmail, null, UserHrib, ct);
+        await accountService.Create(AccountInfo.Create(UserEmail) with { Id = UserHrib }, ct);
 
         var organizationService = scope.ServiceProvider.GetRequiredService<OrganizationService>();
         await organizationService.Create(
@@ -97,14 +89,16 @@ public class TestSeedData : IInitialData
                 Id = Project1Hrib
             },
             existingEntityHandling: ExistingEntityHandling.Insert,
-            token: ct);
+            token: ct
+        );
         await projectService.Upsert(
             project: ProjectInfo.Create(Group2Hrib, (LocalizedString)"Test Project 2") with
             {
                 Id = Project2Hrib
             },
             existingEntityHandling: ExistingEntityHandling.Insert,
-            token: ct);
+            token: ct
+        );
 
         var artifactService = scope.ServiceProvider.GetRequiredService<ArtifactService>();
         await artifactService.Create(

@@ -13,89 +13,54 @@ using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.Annotations;
 using System;
 using System.Security.Cryptography;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication;
 
 namespace Kafe.Api.Endpoints.Account;
 
 [ApiVersion("1")]
 [Route("tmp-account")]
-public class TemporaryAccountCreationEndpoint : EndpointBaseAsync
-    .WithRequest<TemporaryAccountCreationDto>
-    .WithActionResult
+public class TemporaryAccountCreationEndpoint(
+    AccountService accountService,
+    IEmailService emailService,
+    IOptions<ApiOptions> apiOptions,
+    ILogger<TemporaryAccountCreationEndpoint> logger
+)
+    : EndpointBaseAsync
+        .WithRequest<TemporaryAccountCreationDto>
+        .WithActionResult
 {
-    private readonly AccountService accountService;
-    private readonly IEmailService emailService;
-    private readonly IOptions<ApiOptions> apiOptions;
-    private readonly ILogger<TemporaryAccountCreationEndpoint> logger;
-    private readonly IDataProtector dataProtector;
-
-    public TemporaryAccountCreationEndpoint(
-        AccountService accountService,
-        IDataProtectionProvider dataProtectionProvider,
-        IEmailService emailService,
-        IOptions<ApiOptions> apiOptions,
-        ILogger<TemporaryAccountCreationEndpoint> logger)
-    {
-        this.accountService = accountService;
-        this.emailService = emailService;
-        this.apiOptions = apiOptions;
-        this.logger = logger;
-        this.dataProtector = dataProtectionProvider.CreateProtector(Const.TemporaryAccountPurpose);
-    }
-
     [HttpPost]
-    [SwaggerOperation(Tags = new[] { EndpointArea.Account })]
+    [SwaggerOperation(Tags = [EndpointArea.Account])]
     [ProducesResponseType(200)]
     [ProducesResponseType(400)]
     public override async Task<ActionResult> HandleAsync(
         TemporaryAccountCreationDto dto,
-        CancellationToken token = default)
+        CancellationToken ct = default
+    )
     {
-        if (string.IsNullOrWhiteSpace(dto.EmailAddress))
-        {
-            return BadRequest("Email address is null or white space.");
-        }
-
         dto = dto with { EmailAddress = dto.EmailAddress.Trim() };
 
-        var createRes = await accountService.CreateOrRefreshTemporaryAccount(
-            dto.EmailAddress,
-            dto.PreferredCulture,
-            null,
-            token);
-        if (createRes.HasErrors)
+        var ticket = await accountService.IssueLoginTicket(dto.EmailAddress, dto.PreferredCulture, ct);
+        if (ticket.HasErrors)
         {
-            return this.KafeErrResult(createRes);
+            return this.KafeErrorResult(ticket.Errors);
         }
 
-        var account = createRes.Value;
-
-        if (string.IsNullOrEmpty(account.SecurityStamp))
-        {
-            logger.LogError("Missing security stamp.");
-            return StatusCode(500);
-        }
-
-        var confirmationToken = EncodeToken(new(account.Id, Const.EmailConfirmationPurpose, account.SecurityStamp));
+        var confirmationToken = accountService.EncodeLoginTicketId(ticket.Value.Id);
         var pathString = new PathString(apiOptions.Value.AccountConfirmPath)
             .Add(new PathString("/" + confirmationToken));
         var confirmationUrl = new Uri(new Uri(apiOptions.Value.BaseUrl), pathString);
-        var emailSubject = Const.ConfirmationEmailSubject[account!.PreferredCulture]!;
+        var emailSubject = Const.ConfirmationEmailSubject[ticket.Value.PreferredCulture]!;
         var emailMessage = string.Format(
-            Const.ConfirmationEmailMessageTemplate[account!.PreferredCulture]!,
+            Const.ConfirmationEmailMessageTemplate[ticket.Value.PreferredCulture]!,
             confirmationUrl,
-            Const.EmailSignOffs[RandomNumberGenerator.GetInt32(0, Const.EmailSignOffs.Length)][account!.PreferredCulture]);
-        await emailService.SendEmail(account.EmailAddress, emailSubject, emailMessage, null, token);
+            Const.EmailSignOffs[RandomNumberGenerator.GetInt32(0, Const.EmailSignOffs.Length)]
+                [ticket.Value.PreferredCulture]
+        );
+        await emailService.SendEmail(dto.EmailAddress, emailSubject, emailMessage, null, ct);
 
         return Ok();
-    }
-
-    private string EncodeToken(TemporaryAccountTokenDto dto)
-    {
-        var token = $"{dto.Purpose}:{dto.AccountId}:{dto.SecurityStamp}";
-        var protectedBytes = dataProtector.Protect(Encoding.UTF8.GetBytes(token));
-        return WebEncoders.Base64UrlEncode(protectedBytes);
     }
 }

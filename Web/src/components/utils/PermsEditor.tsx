@@ -1,12 +1,12 @@
-import { Box, List, Spacer, Text } from '@chakra-ui/react';
-import { t } from 'i18next';
-import { useState } from 'react';
-import { EntityPermissions, EntityPermissionsUser } from '../../data/EntityPermissions';
-import { useColorScheme } from '../../hooks/useColorScheme';
-import { Permission } from '../../schemas/generic';
-import { RightsItem } from './RightsItem';
+import {Box, List, Spacer, Text} from '@chakra-ui/react';
+import {t} from 'i18next';
+import {useState} from 'react';
+import {EntityPermissions, EntityPermissionsUser} from '../../data/EntityPermissions';
+import {useColorScheme} from '../../hooks/useColorScheme';
+import {Permission} from '../../schemas/generic';
+import {PermsEditorItem} from './PermsEditorItem';
 
-export interface IRightsEditorProps {
+export interface IPermsEditor {
     perms: EntityPermissions;
     readonly?: boolean;
     options: Readonly<Array<Permission>>;
@@ -14,13 +14,14 @@ export interface IRightsEditorProps {
     onChange?: (perms: EntityPermissions) => void;
 }
 
-export function RightsEditor({ perms, readonly, explanation, options, onChange }: IRightsEditorProps) {
-    const { border } = useColorScheme();
+export function PermsEditor({perms, readonly, explanation, options, onChange}: IPermsEditor) {
+    const {border} = useColorScheme();
 
     const [newItems, setNewItems] = useState<Array<EntityPermissionsUser>>([
         {
             emailAddress: '',
             permissions: [],
+            isNew: true,
         },
     ]);
 
@@ -31,7 +32,7 @@ export function RightsEditor({ perms, readonly, explanation, options, onChange }
                     {options.map((o, i) => (
                         <li key={i}>
                             <Text as="span" fontWeight="bold">
-                                {t(`rights.${o}`).toString()}
+                                {t(`perms.${o}`).toString()}
                             </Text>
                             <Text as="span"> - {explanation[o]}</Text>
                         </li>
@@ -40,10 +41,10 @@ export function RightsEditor({ perms, readonly, explanation, options, onChange }
             </Box>
             <Box>
                 {perms.globalPermissions !== null && (
-                    <RightsItem
+                    <PermsEditorItem
                         user={0}
                         initialPerms={perms.globalPermissions}
-                        {...{ readonly, options }}
+                        {...{readonly, options}}
                         onChange={(permissions) => {
                             perms.set('globalPermissions', permissions);
 
@@ -52,19 +53,19 @@ export function RightsEditor({ perms, readonly, explanation, options, onChange }
                     />
                 )}
 
-                <Spacer borderBottomColor={border} borderBottomWidth={1} mx={-4} mt={1} />
+                <Spacer borderBottomColor={border} borderBottomWidth={1} mx={-4} mt={1}/>
 
                 {perms.accountPermissions
-                    .filter((a) => a.id)
+                    .filter(a => a.isNew != true)
                     .map((a, i) => (
-                        <RightsItem
+                        <PermsEditorItem
                             key={i}
                             user={a}
                             initialPerms={a.permissions}
-                            {...{ readonly, options }}
+                            {...{readonly, options}}
                             onChange={(permissions) => {
                                 perms.accountPermissions
-                                    .filter((b) => b.id === a.id)
+                                    .filter((b, index) => index === i)
                                     .forEach((b) => (b.permissions = permissions));
                                 perms.set('accountPermissions', perms.accountPermissions);
 
@@ -73,29 +74,31 @@ export function RightsEditor({ perms, readonly, explanation, options, onChange }
                         />
                     ))}
 
-                <Spacer borderBottomColor={border} borderBottomWidth={1} mx={-4} mt={1} />
+                <Spacer borderBottomColor={border} borderBottomWidth={1} mx={-4} mt={1}/>
 
                 {newItems.map((item, i) => (
-                    <RightsItem
+                    <PermsEditorItem
                         key={i}
                         user={null}
                         initialPerms={[]}
-                        {...{ readonly, options }}
+                        {...{readonly, options}}
                         onChange={(permissions, email) => {
                             newItems[i] = {
                                 emailAddress: email || '',
                                 permissions,
+                                isNew: true,
                             };
                             if (newItems.length === 0 || newItems.at(-1)!.emailAddress.length > 0) {
                                 newItems.push({
                                     emailAddress: '',
                                     permissions: [],
+                                    isNew: true,
                                 });
                             }
                             setNewItems([...newItems]);
 
                             perms.accountPermissions = [
-                                ...perms.accountPermissions.filter((a) => a.id),
+                                ...perms.accountPermissions.filter(a => a.isNew != true),
                                 ...(newItems.filter((a) => a.emailAddress) as EntityPermissionsUser[]),
                             ];
                             perms.set('accountPermissions', perms.accountPermissions);

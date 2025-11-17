@@ -26,7 +26,8 @@ public class UserSeedData : IInitialData
         IOptions<StorageOptions> storageOptions,
         IOptions<SeedOptions> options,
         IServiceProvider services,
-        ILogger<UserSeedData> logger)
+        ILogger<UserSeedData> logger
+    )
     {
         this.storageOptions = storageOptions;
         this.options = options;
@@ -53,10 +54,10 @@ public class UserSeedData : IInitialData
             var data = await accountService.FindByEmail(account.EmailAddress, token);
             if (data is null)
             {
-                var res = await accountService.CreateOrRefreshTemporaryAccount(
-                    account.EmailAddress,
-                    account.PreferredCulture,
-                    token: token);
+                var res = await accountService.Create(
+                    AccountInfo.Create(account.EmailAddress, account.PreferredCulture),
+                    token: token
+                );
                 if (res.HasErrors)
                 {
                     throw res.AsException();
@@ -79,7 +80,8 @@ public class UserSeedData : IInitialData
                     await accountService.AddPermissions(data.Id, missingPermissions, token);
                     logger.LogInformation(
                         "Permissions of seed account '{AccountEmailAddress}' updated.",
-                        account.EmailAddress);
+                        account.EmailAddress
+                    );
                 }
             }
         }
@@ -90,7 +92,8 @@ public class UserSeedData : IInitialData
             {
                 logger.LogWarning(
                     "Ignoring seed organization {@Organization} as its name is null or empty.",
-                    organization);
+                    organization
+                );
                 continue;
             }
 
@@ -100,7 +103,8 @@ public class UserSeedData : IInitialData
             {
                 logger.LogDebug(
                     "Ignoring seed organization '{OrganizationId}' as it already exists.",
-                    organization.Id);
+                    organization.Id
+                );
                 continue;
             }
 
@@ -110,7 +114,8 @@ public class UserSeedData : IInitialData
                     Id = organization.Id,
                     CreationMethod = CreationMethod.Seed
                 },
-                token);
+                token
+            );
             if (createResult.HasErrors)
             {
                 throw createResult.AsException();
@@ -133,19 +138,22 @@ public class UserSeedData : IInitialData
             {
                 logger.LogDebug(
                     "Ignoring seed project group '{ProjectGroupId}' as it already exists.",
-                    group.Id);
+                    group.Id
+                );
                 continue;
             }
 
             var deadline = group.Deadline is null ? default : DateTimeOffset.Parse(group.Deadline);
-            var createResult = await projectGroupService.Create(new ProjectGroupInfo(
-                Id: group.Id,
-                CreationMethod: CreationMethod.Seed,
-                OrganizationId: group.OrganizationId,
-                Name: LocalizedString.CreateInvariant(group.Name),
-                Description: null,
-                Deadline: deadline
-            ));
+            var createResult = await projectGroupService.Create(
+                new ProjectGroupInfo(
+                    Id: group.Id,
+                    CreationMethod: CreationMethod.Seed,
+                    OrganizationId: group.OrganizationId,
+                    Name: LocalizedString.CreateInvariant(group.Name),
+                    Description: null,
+                    Deadline: deadline
+                )
+            );
             if (createResult.HasErrors)
             {
                 throw createResult.AsException();

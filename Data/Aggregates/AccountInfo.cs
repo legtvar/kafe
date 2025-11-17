@@ -35,8 +35,6 @@ public record AccountInfo(
     [property:Sortable]
     string? Phone,
 
-    string? SecurityStamp,
-
     DateTimeOffset RefreshedOn,
 
     ImmutableDictionary<string, Permission> Permissions,
@@ -56,7 +54,6 @@ public record AccountInfo(
         Name: null,
         Uco: null,
         Phone: null,
-        SecurityStamp: null,
         RefreshedOn: default,
         Permissions: ImmutableDictionary<string, Permission>.Empty,
         RoleIds: []
@@ -69,12 +66,13 @@ public record AccountInfo(
     /// Creates a bare-bones but valid <see cref="AccountInfo"/>.
     /// </summary>
     [MartenIgnore]
-    public static AccountInfo Create(string emailAddress)
+    public static AccountInfo Create(string emailAddress, string? preferredCulture = null)
     {
         return new AccountInfo() with
         {
             Id = Hrib.EmptyValue,
-            EmailAddress = emailAddress
+            EmailAddress = emailAddress,
+            PreferredCulture = preferredCulture ?? Const.InvariantCultureCode
         };
     }
 }
@@ -94,7 +92,6 @@ public class AccountInfoProjection : SingleStreamProjection<AccountInfo, string>
             IdentityProvider: null,
             EmailAddress: e.EmailAddress,
             PreferredCulture: e.PreferredCulture,
-            SecurityStamp: null,
             Name: null,
             Uco: null,
             Phone: null,
@@ -113,32 +110,11 @@ public class AccountInfoProjection : SingleStreamProjection<AccountInfo, string>
         {
             Kind = AccountKind.External,
             IdentityProvider = e.Data.IdentityProvider,
-            SecurityStamp = null,
             Name = e.Data.Name,
             Uco = e.Data.Uco,
             RefreshedOn = e.Timestamp
         };
     }
-
-    public AccountInfo Apply(IEvent<TemporaryAccountRefreshed> e, AccountInfo a)
-    {
-        return a with
-        {
-            Kind = AccountKind.Temporary,
-            SecurityStamp = e.Data.SecurityStamp,
-            RefreshedOn = e.Timestamp
-        };
-    }
-
-    // // TODO: Add a "ticket" entity that will be identified by a guid, and will be one-time only instead of these
-    // //       tokens.
-    // public AccountInfo Apply(TemporaryAccountClosed e, AccountInfo a)
-    // {
-    //    return a with
-    //    {
-    //        SecurityStamp = null
-    //    };
-    // }
 
     public AccountInfo Apply(AccountInfoChanged e, AccountInfo a)
     {

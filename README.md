@@ -10,7 +10,7 @@ KAFE can be thus extended for, for example, games, 3D models, photographs, gener
 
 ## Attribution / External Dependencies
 
-### Back-end
+### Backend
 
 - [PostgreSQL](https://www.postgresql.org/) -- the underlying database.
 - [Marten](https://martendb.io/) -- event sourcing built on Postgres.
@@ -19,7 +19,7 @@ KAFE can be thus extended for, for example, games, 3D models, photographs, gener
 - [MailKit](https://github.com/jstedfast/MailKit/) -- for saner email handling.
 - ...and many more (see `*.csproj` files).
 
-### Front-end
+### Frontend
 
 - [React](https://react.dev/)
 - [Chakra UI](https://chakra-ui.com/)

@@ -1,6 +1,5 @@
 import { Box, Flex, FormControl, Highlight, Icon, Input, Text, useColorModeValue } from '@chakra-ui/react';
 import { t } from 'i18next';
-import moment from 'moment';
 import { useState } from 'react';
 import { IoCubeOutline } from 'react-icons/io5';
 import { Link } from 'react-router-dom';
@@ -9,6 +8,7 @@ import { useAuthLink } from '../../../hooks/useAuthLink';
 import { useColorScheme, useHighlightStyle } from '../../../hooks/useColorScheme';
 import { fulltextFilter } from '../../../utils/fulltextFilter';
 import { Pagination } from '../../utils/Pagination';
+import { DateTime } from 'luxon';
 
 interface IProjectListComponentProps {
     projects: Project[];
@@ -56,8 +56,8 @@ export function ProjectListComponent({ projects }: IProjectListComponentProps) {
                                     md: 'row',
                                 }}
                                 mx={-4}
-                                py={7}
-                                px={8}
+                                py={5}
+                                px={5}
                                 borderBottomWidth="1px"
                                 borderBottomColor={borderColor}
                                 align={'start'}
@@ -92,7 +92,9 @@ export function ProjectListComponent({ projects }: IProjectListComponentProps) {
                                     }}
                                     color="gray.500"
                                 >
-                                    {project.releasedOn ? moment(project.releasedOn).calendar() : 'Neuvedeno'}
+                                    {project.releasedOn
+                                        ? DateTime.fromJSDate(project.releasedOn).toLocaleString()
+                                        : t('project.releaseDate.na')}
                                 </Text>
                             </Flex>
                         </Link>

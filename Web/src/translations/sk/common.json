@@ -20,7 +20,7 @@
   "localhost": {
     "warning": "Localhost",
     "title": "Toto je localhost!",
-    "description": "Táto aplikácia je pripojená k lokálne bežiacemu back-endu."
+    "description": "Táto aplikácia je pripojená k lokálne bežiacemu backendu."
   },
   "troubleshooting": {
     "title": "Nahlásiť problém",
@@ -210,7 +210,7 @@
       "files": "Súbory",
       "info": "Základné informácie",
       "status": "Stav",
-      "rights": "Oprávnenia"
+      "perms": "Oprávnenia"
     }
   },
   "projects": {
@@ -417,13 +417,13 @@
   "system": {
     "title": "Systémové nastavenia",
     "warning": "Prosím pozor! Čokoľvek zmeníte tu môže mať katastrofický dopad na finálnu chuť KAFE! Postupujte opatrne!",
-    "rights": "Oprávnenia",
+    "perms": "Oprávnenia",
     "homepage": "Domovská obrazovka",
     "status": "Stav systému",
     "runningFrom": "Beží od",
     "console": "Konzola"
   },
-  "rights": {
+  "perms": {
     "read": "Zobraziť",
     "write": "Upraviť",
     "append": "Pridať",
@@ -439,6 +439,7 @@
       }
     },
     "none": "Žiadne práva",
+    "invited": "Pozvánka",
     "groups": {
       "system": {
         "read": "Zobraziť tieto nastavenia",
@@ -469,7 +470,7 @@
   "groupsEdit": {
     "tabs": {
       "info": "Základné informácie",
-      "rights": "Oprávnenia"
+      "perms": "Oprávnenia"
     }
   },
   "createGroup": {
@@ -525,7 +526,7 @@
     "tabs": {
       "info": "Základné informácie",
       "files": "Súbory",
-      "rights": "Oprávnenia",
+      "perms": "Oprávnenia",
       "addFile": "Pridať nový súbor"
     },
     "addFile": "Pridať súbor",

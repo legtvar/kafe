@@ -6,9 +6,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using JasperFx.Events;
 using Kafe.Data.Aggregates;
+using Kafe.Data.Documents;
 using Marten;
 using Marten.Events;
-using Marten.Linq.SoftDeletes;
 
 namespace Kafe.Data;
 
@@ -20,7 +20,8 @@ public static class MartenExtensions
     public static async Task<Err<T>> KafeLoadAsync<T>(
         this IQuerySession db,
         Hrib id,
-        CancellationToken token = default)
+        CancellationToken token = default
+    )
         where T : notnull, IEntity
     {
         var entity = await db.LoadAsync<T>(id.ToString(), token: token);
@@ -56,8 +57,10 @@ public static class MartenExtensions
         if (entities.Length != ids.Length)
         {
             var missingIds = stringIds.Except(entities.Select(e => e.Id)).ToImmutableArray();
-            var notFoundError = Error.NotFound("Some of the sought entities could not be found: "
-                + $"{string.Join(", ", missingIds)}.");
+            var notFoundError = Error.NotFound(
+                "Some of the sought entities could not be found: "
+                + $"{string.Join(", ", missingIds)}."
+            );
             return (entities, notFoundError);
         }
 
@@ -67,7 +70,8 @@ public static class MartenExtensions
     public static StreamAction KafeStartStream<TAggregate>(
         this IEventOperations ops,
         Hrib id,
-        IEnumerable<object> events) where TAggregate : class, IEntity
+        IEnumerable<object> events
+    ) where TAggregate : class, IEntity
     {
         return ops.StartStream<TAggregate>(streamKey: id.ToString(), events: events);
     }
@@ -75,7 +79,8 @@ public static class MartenExtensions
     public static StreamAction KafeStartStream<TAggregate>(
         this IEventOperations ops,
         Hrib id,
-        params object[] events) where TAggregate : class, IEntity
+        params object[] events
+    ) where TAggregate : class, IEntity
     {
         return KafeStartStream<TAggregate>(ops, id, events.AsEnumerable());
     }
@@ -83,7 +88,8 @@ public static class MartenExtensions
     public static StreamAction KafeAppend(
         this IEventOperations ops,
         Hrib streamId,
-        IEnumerable<object> events)
+        IEnumerable<object> events
+    )
     {
         return ops.Append(streamId.ToString(), events);
     }
@@ -91,7 +97,8 @@ public static class MartenExtensions
     public static StreamAction KafeAppend(
         this IEventOperations ops,
         Hrib streamId,
-        params object[] events)
+        params object[] events
+    )
     {
         return KafeAppend(ops, streamId, events.AsEnumerable());
     }
@@ -103,7 +110,8 @@ public static class MartenExtensions
         DateTimeOffset? timestamp = null,
         T? state = null,
         long fromVersion = 0L,
-        CancellationToken token = default)
+        CancellationToken token = default
+    )
         where T : class, IEntity
     {
         return store.AggregateStreamAsync(
@@ -112,7 +120,8 @@ public static class MartenExtensions
             timestamp: timestamp,
             state: state,
             fromVersion: fromVersion,
-            token: token);
+            token: token
+        );
     }
 
     public static async Task<T> KafeAggregateRequiredStream<T>(
@@ -122,17 +131,38 @@ public static class MartenExtensions
         DateTimeOffset? timestamp = null,
         T? state = null,
         long fromVersion = 0L,
-        CancellationToken token = default)
+        CancellationToken token = default
+    )
         where T : class, IEntity
     {
         return await KafeAggregateStream(
-            store: store,
-            id: id,
-            version: version,
-            timestamp: timestamp,
-            state: state,
-            fromVersion: fromVersion,
-            token: token)
+                store: store,
+                id: id,
+                version: version,
+                timestamp: timestamp,
+                state: state,
+                fromVersion: fromVersion,
+                token: token
+            )
             ?? throw new InvalidOperationException($"{typeof(T).Name} '{id}' could not be live-aggregated.");
+    }
+
+    public static async Task<bool> TryWaitForEntityPermissions(
+        this IQuerySession db,
+        Hrib entityId,
+        CancellationToken ct = default
+    )
+    {
+        try
+        {
+            await db.QueryForNonStaleData<EntityPermissionInfo>(TimeSpan.FromSeconds(5))
+                .Where(i => i.Id == entityId.ToString())
+                .SingleOrDefaultAsync(ct);
+            return true;
+        }
+        catch (TaskCanceledException)
+        {
+            return false;
+        }
     }
 }

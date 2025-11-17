@@ -801,7 +801,8 @@ export interface paths {
     post: {
       requestBody?: {
         content: {
-          "multipart/form-data": components["schemas"]["ShardKind"] & {
+          "multipart/form-data": {
+            Kind?: components["schemas"]["ShardKind"];
             ArtifactId?: string;
             /** Format: binary */
             File?: string;
@@ -983,7 +984,7 @@ export interface components {
     AccountDetailDto: {
       /**
        * Format: hrib
-       * @description Human-Readable Identifier Ballast
+       * @description The id of the account.
        * @example AAAAbadf00d
        */
       id: string;
@@ -1115,8 +1116,9 @@ export interface components {
        * @description Human-Readable Identifier Ballast
        * @example AAAAbadf00d
        */
-      id: string;
-      emailAddress: string;
+      id?: string | null;
+      emailAddress?: string | null;
+      name?: string | null;
       permissions: components["schemas"]["Permission"][];
     };
     EntityPermissionsDetailDto: {
@@ -1416,6 +1418,7 @@ export interface components {
         video: components["schemas"]["ProjectArtifactShardBlueprintDto"];
         image: components["schemas"]["ProjectArtifactShardBlueprintDto"];
         subtitles: components["schemas"]["ProjectArtifactShardBlueprintDto"];
+        blend: components["schemas"]["ProjectArtifactShardBlueprintDto"];
       };
     };
     ProjectArtifactDto: {
@@ -1933,7 +1936,7 @@ export interface components {
       artifactId: string;
     };
     /** @enum {string} */
-    ShardKind: "unknown" | "video" | "image" | "subtitles";
+    ShardKind: "unknown" | "video" | "image" | "subtitles" | "blend";
     ShardListDto: {
       /**
        * Format: hrib

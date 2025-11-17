@@ -19,32 +19,21 @@ namespace Kafe.Api.Endpoints.Entity;
 [ApiVersion("1")]
 [Route("entity/perms/{id}")]
 [Authorize]
-public class EntityPermissionsDetailEndpoint : EndpointBaseAsync
+public class EntityPermissionsDetailEndpoint(
+    IAuthorizationService authorizationService,
+    EntityService entityService,
+    UserProvider userProvider,
+    AccountService accountService
+) : EndpointBaseAsync
     .WithRequest<string>
     .WithActionResult<EntityPermissionsDetailDto>
 {
-    private readonly IAuthorizationService authorizationService;
-    private readonly EntityService entityService;
-    private readonly UserProvider userProvider;
-    private readonly AccountService accountService;
-
-    public EntityPermissionsDetailEndpoint(
-        IAuthorizationService authorizationService,
-        EntityService entityService,
-        UserProvider userProvider,
-        AccountService accountService)
-    {
-        this.authorizationService = authorizationService;
-        this.entityService = entityService;
-        this.userProvider = userProvider;
-        this.accountService = accountService;
-    }
-
     [HttpGet]
-    [SwaggerOperation(Tags = new[] { EndpointArea.Entity })]
+    [SwaggerOperation(Tags = [EndpointArea.Entity])]
     public override async Task<ActionResult<EntityPermissionsDetailDto>> HandleAsync(
         string id,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         var auth = await authorizationService.AuthorizeAsync(User, id, EndpointPolicy.Read);
         if (!auth.Succeeded)
@@ -66,19 +55,39 @@ public class EntityPermissionsDetailEndpoint : EndpointBaseAsync
 
         var userPermissions = await entityService.GetPermission(entityId, userProvider.AccountId, cancellationToken);
 
-        var relevantAccounts = await accountService.List(new()
-        {
-            Permissions = ImmutableDictionary.CreateRange(new[]
+        var relevantAccounts = await accountService.List(
+            new AccountService.AccountFilter
             {
-                new KeyValuePair<string, Permission>(id, Permission.None)
-            })
-        });
+                Permissions = ImmutableDictionary.CreateRange(
+                    [
+                        new KeyValuePair<string, Permission>(id, Permission.None)
+                    ]
+                )
+            },
+            token: cancellationToken
+        );
 
-        return Ok(TransferMaps.ToEntityPermissionsDetailDto(
-            id: entityId,
-            entityType: entityId == Hrib.System ? null : entity?.GetType().Name,
-            globalPermissions: entity is IVisibleEntity visible ? visible.GlobalPermissions : null,
-            userPermissions: userPermissions,
-            accounts: relevantAccounts.OrderBy(a => a.EmailAddress)));
+        var relevantInvites = await accountService.ListInvites(
+            new AccountService.InviteFilter
+            {
+                Permissions = ImmutableDictionary.CreateRange(
+                    [
+                        new KeyValuePair<string, Permission>(id, Permission.None)
+                    ]
+                )
+            },
+            ct: cancellationToken
+        );
+
+        return Ok(
+            TransferMaps.ToEntityPermissionsDetailDto(
+                id: entityId,
+                entityType: entityId == Hrib.System ? null : entity?.GetType().Name,
+                globalPermissions: entity is IVisibleEntity visible ? visible.GlobalPermissions : null,
+                userPermissions: userPermissions,
+                accounts: relevantAccounts,
+                invites: relevantInvites
+            )
+        );
     }
 }

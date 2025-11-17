@@ -26,7 +26,7 @@ public enum Permission : int
     /// The contents or children of the entity can be viewed. Is inheritable.
     /// </summary>
     /// <remarks>
-    /// This right implies read on all descendant entities. For example:
+    /// This permission implies <see cref="Read"/> on all descendant entities. For example:
     /// <list type="bullet">
     ///     <item>
     ///     Inspect on Organization implies Read and Inspect on all of its Playlists and ProjectGroups.
@@ -48,7 +48,7 @@ public enum Permission : int
     Inspect = 1 << 2,
 
     /// <summary>
-    /// The entity can be edited. Is inheritable.
+    /// The entity can be edited. Is inheritable. Implies <see cref="Append"/> on descendants.
     /// </summary>
     Write = 1 << 3,
 

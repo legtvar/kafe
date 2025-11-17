@@ -115,7 +115,8 @@ public class EntityPermissionEventProjection : EventProjection
                 //     This makes them easy to find and allows for consistent inheriting of info about perms sources.
                 sourceId: e.EntityId,
                 permission: e.Permission,
-                grantedAt: metadata.Timestamp)
+                grantedAt: metadata.Timestamp
+            )
         };
         ops.Store(entityPerms);
 
@@ -128,7 +129,8 @@ public class EntityPermissionEventProjection : EventProjection
             sourceId: e.EntityId,
             permission: inheritedPermission,
             grantedAt: metadata.Timestamp,
-            ignoreSelf: true);
+            ignoreSelf: true
+        );
     }
 
     public async Task Project(RolePermissionSet e, IEvent metadata, IDocumentOperations ops)
@@ -172,7 +174,8 @@ public class EntityPermissionEventProjection : EventProjection
             sourceId: e.EntityId,
             permission: inheritedPermission,
             grantedAt: metadata.Timestamp,
-            ignoreSelf: true);
+            ignoreSelf: true
+        );
     }
 
     public Task Project(ProjectGroupGlobalPermissionsChanged e, IEvent metadata, IDocumentOperations ops)
@@ -256,8 +259,10 @@ public class EntityPermissionEventProjection : EventProjection
 
             if (!affected.AccountEntries.TryGetValue(e.AccountId, out var entry))
             {
-                throw new InvalidOperationException("A role-implied permission cannot be removed from an entity "
-                                                    + "because it is not present. This is a bug.");
+                throw new InvalidOperationException(
+                    "A role-implied permission cannot be removed from an entity "
+                    + "because it is not present. This is a bug."
+                );
             }
 
             entry = entry with
@@ -299,11 +304,13 @@ public class EntityPermissionEventProjection : EventProjection
     {
         var entitySoFar = await ops.Events.KafeAggregateStream<ProjectGroupInfo>(
             id: e.ProjectGroupId,
-            version: metadata.Version - 1);
+            version: metadata.Version - 1
+        );
         if (entitySoFar is null)
         {
             throw new InvalidOperationException(
-                $"Project group '{e.ProjectGroupId}' could not be aggregated to a point before the event.");
+                $"Project group '{e.ProjectGroupId}' could not be aggregated to a point before the event."
+            );
         }
 
         var perms = await RequireEntityPermissionInfo(ops, e.ProjectGroupId);
@@ -320,11 +327,13 @@ public class EntityPermissionEventProjection : EventProjection
     {
         var entitySoFar = await ops.Events.KafeAggregateStream<PlaylistInfo>(
             id: e.PlaylistId,
-            version: metadata.Version - 1);
+            version: metadata.Version - 1
+        );
         if (entitySoFar is null)
         {
             throw new InvalidOperationException(
-                $"Playlist '{e.PlaylistId}' could not be aggregated to a point before the event.");
+                $"Playlist '{e.PlaylistId}' could not be aggregated to a point before the event."
+            );
         }
 
         var perms = await RequireEntityPermissionInfo(ops, e.PlaylistId);
@@ -361,7 +370,8 @@ public class EntityPermissionEventProjection : EventProjection
         EntityPermissionInfo entityPerms,
         Hrib sourceId,
         Permission globalPermission,
-        DateTimeOffset grantedAt)
+        DateTimeOffset grantedAt
+    )
     {
         globalPermission &= Permission.Publishable;
 
@@ -370,11 +380,14 @@ public class EntityPermissionEventProjection : EventProjection
         {
             Sources = globalPermission == Permission.None
                 ? entry.Sources.Remove(sourceId.ToString())
-                : entry.Sources.SetItem(sourceId.ToString(), new EntityPermissionSource(
-                    Permission: globalPermission,
-                    GrantedAt: grantedAt,
-                    RoleId: null
-                ))
+                : entry.Sources.SetItem(
+                    sourceId.ToString(),
+                    new EntityPermissionSource(
+                        Permission: globalPermission,
+                        GrantedAt: grantedAt,
+                        RoleId: null
+                    )
+                )
         };
         entry = RecalculateEffectivePermission(entry);
         entityPerms = entityPerms with { GlobalPermission = entry };
@@ -383,7 +396,8 @@ public class EntityPermissionEventProjection : EventProjection
 
     private static async Task<EntityPermissionInfo> RequireEntityPermissionInfo(
         IDocumentOperations ops,
-        Hrib entityId)
+        Hrib entityId
+    )
     {
         var entityPerms = await ops.KafeLoadAsync<EntityPermissionInfo>(entityId);
         if (entityPerms.HasErrors)
@@ -396,7 +410,7 @@ public class EntityPermissionEventProjection : EventProjection
             //     Unfortunately, the FFFIMU23 project group came to exist AFTER some of the AccountCapabilityAdded
             //     events were already issued. More specifily events 10909, 10911, 10912, 10916, and 10917 are the band
             //     of misfits that somehow got created before 10918, when the group itself came to be.
-            //    
+            //
             //     So now here we are... and those five events are bombs that destroy this projection every time they
             //     are encountered because they reference a group that will not have existed for another less than a
             //     second. Thus we have a new hero, this `if` below that will hopefully save us from the mistake
@@ -417,9 +431,11 @@ public class EntityPermissionEventProjection : EventProjection
                 return EntityPermissionInfo.Create(entityId);
             }
 
-            throw new InvalidOperationException($"No permission info exists for '{entityId}'. "
-                                                + "Either the events are out of order or the permission info projection is broken.",
-                entityPerms.AsException());
+            throw new InvalidOperationException(
+                $"No permission info exists for '{entityId}'. "
+                + "Either the events are out of order or the permission info projection is broken.",
+                entityPerms.AsException()
+            );
         }
 
         return entityPerms.Value;
@@ -427,14 +443,17 @@ public class EntityPermissionEventProjection : EventProjection
 
     private static async Task<RoleMembersInfo> RequireRoleMembersInfo(
         IDocumentOperations ops,
-        Hrib roleId)
+        Hrib roleId
+    )
     {
         var roleInfo = await ops.KafeLoadAsync<RoleMembersInfo>(roleId);
         if (roleInfo.HasErrors)
         {
-            throw new InvalidOperationException($"No role members info exists for '{roleId}'. "
-                                                + "Either the events are out of order or the permission info projection is broken.",
-                roleInfo.AsException());
+            throw new InvalidOperationException(
+                $"No role members info exists for '{roleId}'. "
+                + "Either the events are out of order or the permission info projection is broken.",
+                roleInfo.AsException()
+            );
         }
 
         return roleInfo.Value;
@@ -460,7 +479,8 @@ public class EntityPermissionEventProjection : EventProjection
         {
             AccountEntries = MergeManyEntries(
                 perms.AccountEntries,
-                InheritEntries(systemPerms.Value.AccountEntries)),
+                InheritEntries(systemPerms.Value.AccountEntries)
+            ),
             // NB: We ignore RoleEntries and GlobalPermission, since `system` can have neither.
             DependencyGraph = perms.DependencyGraph.SetItem(Hrib.SystemValue, [Hrib.SystemValue])
         };
@@ -483,10 +503,12 @@ public class EntityPermissionEventProjection : EventProjection
         {
             AccountEntries = MergeManyEntries(
                 perms.AccountEntries,
-                InheritEntries(ancestorPerms.AccountEntries)),
+                InheritEntries(ancestorPerms.AccountEntries)
+            ),
             RoleEntries = MergeManyEntries(
                 perms.RoleEntries,
-                InheritEntries(ancestorPerms.RoleEntries)),
+                InheritEntries(ancestorPerms.RoleEntries)
+            ),
             GlobalPermission = MergeTwoEntries(
                 perms.GlobalPermission,
                 InheritEntry(ancestorPerms.GlobalPermission)
@@ -505,10 +527,12 @@ public class EntityPermissionEventProjection : EventProjection
             {
                 AccountEntries = MergeManyEntries(
                     affected.AccountEntries,
-                    InheritEntries(changedPerms.AccountEntries)),
+                    InheritEntries(changedPerms.AccountEntries)
+                ),
                 RoleEntries = MergeManyEntries(
                     affected.RoleEntries,
-                    InheritEntries(changedPerms.RoleEntries)),
+                    InheritEntries(changedPerms.RoleEntries)
+                ),
                 GlobalPermission = MergeTwoEntries(
                     affected.GlobalPermission,
                     InheritEntry(changedPerms.GlobalPermission)
@@ -535,7 +559,8 @@ public class EntityPermissionEventProjection : EventProjection
         var changedGraph = RemoveFromDependencyGraph(
             perms.DependencyGraph,
             dependencyId.ToString(),
-            out var removedGrantors);
+            out var removedGrantors
+        );
 
         var changedPerms = perms with
         {
@@ -555,7 +580,8 @@ public class EntityPermissionEventProjection : EventProjection
                 affected.DependencyGraph,
                 dependencyId.ToString(),
                 out var removedAffectedGrantors,
-                changedPerms.Id);
+                changedPerms.Id
+            );
 
             var changed = affected with
             {
@@ -577,10 +603,13 @@ public class EntityPermissionEventProjection : EventProjection
             EffectivePermission: InheritPermission(entry.EffectivePermission),
             Sources: entry.Sources
                 .Where(s => (s.Value.Permission & Permission.Inheritable) != 0)
-                .ToImmutableDictionary(s => s.Key, s => s.Value with
-                {
-                    Permission = InheritPermission(s.Value.Permission)
-                })
+                .ToImmutableDictionary(
+                    s => s.Key,
+                    s => s.Value with
+                    {
+                        Permission = InheritPermission(s.Value.Permission)
+                    }
+                )
         );
     }
 
@@ -603,9 +632,12 @@ public class EntityPermissionEventProjection : EventProjection
     private static Permission InheritPermission(Permission parentPermission)
     {
         return (parentPermission.HasFlag(Permission.Inspect)
-                   ? Permission.Read
-                   : Permission.None)
-               | (parentPermission & Permission.Inheritable);
+                ? Permission.Read
+                : Permission.None)
+            | (parentPermission.HasFlag(Permission.Write)
+                ? Permission.Append
+                : Permission.None)
+            | (parentPermission & Permission.Inheritable);
     }
 
     private static EntityPermissionEntry RecalculateEffectivePermission(EntityPermissionEntry entry)
@@ -614,7 +646,8 @@ public class EntityPermissionEventProjection : EventProjection
         {
             EffectivePermission = entry.Sources.Values.Aggregate(
                 Permission.None,
-                (e, s) => e | s.Permission)
+                (e, s) => e | s.Permission
+            )
         };
     }
 
@@ -677,10 +710,12 @@ public class EntityPermissionEventProjection : EventProjection
             return entry;
         }
 
-        var newEntry = RecalculateEffectivePermission(entry with
-        {
-            Sources = newSources
-        });
+        var newEntry = RecalculateEffectivePermission(
+            entry with
+            {
+                Sources = newSources
+            }
+        );
 
         return newEntry;
     }
@@ -721,7 +756,8 @@ public class EntityPermissionEventProjection : EventProjection
         Hrib sourceId,
         Permission permission,
         DateTimeOffset grantedAt,
-        string? intermediaryRoleId = null)
+        string? intermediaryRoleId = null
+    )
     {
         if (entries.TryGetValue(accountOrRoleId.ToString(), out var entry))
         {
@@ -731,20 +767,7 @@ public class EntityPermissionEventProjection : EventProjection
             {
                 Sources = permission == Permission.None
                     ? entry.Sources.Remove(sourceId.ToString())
-                    : entry.Sources.SetItem(sourceId.ToString(), new EntityPermissionSource(
-                        Permission: permission,
-                        GrantedAt: grantedAt,
-                        RoleId: intermediaryRoleId
-                    ))
-            };
-            entry = RecalculateEffectivePermission(entry);
-        }
-        else if (permission != Permission.None)
-        {
-            entry = new EntityPermissionEntry(
-                EffectivePermission: permission,
-                Sources: ImmutableDictionary.CreateRange([
-                    new KeyValuePair<string, EntityPermissionSource>(
+                    : entry.Sources.SetItem(
                         sourceId.ToString(),
                         new EntityPermissionSource(
                             Permission: permission,
@@ -752,7 +775,25 @@ public class EntityPermissionEventProjection : EventProjection
                             RoleId: intermediaryRoleId
                         )
                     )
-                ])
+            };
+            entry = RecalculateEffectivePermission(entry);
+        }
+        else if (permission != Permission.None)
+        {
+            entry = new EntityPermissionEntry(
+                EffectivePermission: permission,
+                Sources: ImmutableDictionary.CreateRange(
+                    [
+                        new KeyValuePair<string, EntityPermissionSource>(
+                            sourceId.ToString(),
+                            new EntityPermissionSource(
+                                Permission: permission,
+                                GrantedAt: grantedAt,
+                                RoleId: intermediaryRoleId
+                            )
+                        )
+                    ]
+                )
             );
         }
 
@@ -805,7 +846,8 @@ public class EntityPermissionEventProjection : EventProjection
                         accountId,
                         sourceId,
                         permission,
-                        grantedAt)
+                        grantedAt
+                    )
                 };
             }
 
@@ -842,7 +884,8 @@ public class EntityPermissionEventProjection : EventProjection
                     accountOrRoleId: roleId,
                     sourceId: sourceId,
                     permission: permission,
-                    grantedAt: grantedAt)
+                    grantedAt: grantedAt
+                )
             };
 
             foreach (var accountId in roleInfo.MemberIds)

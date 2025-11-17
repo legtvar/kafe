@@ -16,32 +16,18 @@ using System.Threading.Tasks;
 
 namespace Kafe.Api.Services;
 
-public class UserProvider
+public class UserProvider(
+    IHttpContextAccessor contextAccessor,
+    EntityService entityService,
+    AccountService accountService,
+    ILogger<UserProvider> logger,
+    IQuerySession query
+)
 {
-    private readonly IHttpContextAccessor contextAccessor;
-    private readonly EntityService entityService;
-    private readonly AccountService accountService;
-    private readonly IQuerySession query;
-    private readonly ILogger<UserProvider> logger;
-
-    public UserProvider(
-        IHttpContextAccessor contextAccessor,
-        EntityService entityService,
-        AccountService accountService,
-        ILogger<UserProvider> logger,
-        IQuerySession query)
-    {
-        this.contextAccessor = contextAccessor;
-        this.entityService = entityService;
-        this.accountService = accountService;
-        this.logger = logger;
-        this.query = query;
-    }
-
     public AccountInfo? Account { get; private set; }
 
     /// <summary>
-    /// Returns the logged users's account HRIB or <see cref="Hrib.Empty"/> if the user is anonymous.
+    /// Returns the current user's account HRIB or <see cref="Hrib.Empty"/> if the user is anonymous.
     /// </summary>
     public Hrib AccountId => Account?.Id ?? Hrib.Empty;
 

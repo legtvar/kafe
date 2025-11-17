@@ -51,7 +51,7 @@ public class PermissionTests(ApiFixture fixture, ITestOutputHelper testOutput) :
         {
             var expected = perms.Id == Hrib.System
                 ? Permission.All
-                : Permission.Read | Permission.Inheritable;
+                : Permission.Read | Permission.Append | Permission.Inheritable;
             AssertAccountPermission(
                 perms: perms,
                 accountHrib: TestSeedData.AdminHrib,
@@ -244,7 +244,7 @@ public class PermissionTests(ApiFixture fixture, ITestOutputHelper testOutput) :
         AssertAccountPermission(
             perms: perms,
             accountHrib: TestSeedData.AdminHrib,
-            permission: Permission.Read | Permission.Inheritable,
+            permission: Permission.Read | Permission.Append | Permission.Inheritable,
             sourceHrib: Hrib.System
         );
     }
@@ -326,7 +326,7 @@ public class PermissionTests(ApiFixture fixture, ITestOutputHelper testOutput) :
         AssertAccountPermission(
             perms: perms,
             accountHrib: TestSeedData.UserHrib,
-            permission: Permission.Read | Permission.Inspect | Permission.Write,
+            permission: Permission.Read | Permission.Inspect | Permission.Append | Permission.Write,
             sourceHrib: TestSeedData.Project1Hrib
         );
     }

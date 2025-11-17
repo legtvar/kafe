@@ -14,6 +14,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Kafe.Data.Documents;
 using Marten.Events;
+using Marten.Linq.SoftDeletes;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
@@ -295,7 +296,8 @@ public class AccountService(
     }
 
     public record InviteFilter(
-        ImmutableDictionary<string, Permission>? Permissions = null
+        ImmutableDictionary<string, Permission>? Permissions = null,
+        bool? Deleted = false
     );
 
     public async Task<ImmutableArray<InviteInfo>> ListInvites(
@@ -319,6 +321,11 @@ public class AccountService(
                      """
                 )
             );
+        }
+
+        if (filter.Deleted is not null)
+        {
+            query = (IMartenQueryable<InviteInfo>)query.Where(i => i.Deleted == filter.Deleted.Value);
         }
 
         return [..await query.ToListAsync(ct)];
@@ -568,7 +575,7 @@ public class AccountService(
                     return err.Errors;
                 }
 
-                db.Events.KafeAppend(accountId, new InviteAccepted(invite.Id));
+                db.Events.KafeAppend(invite.Id, new InviteAccepted(invite.Id));
                 await db.SaveChangesAsync(ct);
             }
         }

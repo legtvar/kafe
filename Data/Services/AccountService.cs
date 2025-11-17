@@ -428,7 +428,10 @@ public class AccountService(
         var existing = await FindByEmail(emailClaim.Value, token);
         if (existing is not null
             && existing.Kind == AccountKind.External
-            && existing.IdentityProvider == identityProvider)
+            && existing.IdentityProvider == identityProvider
+            && existing.Name == name
+            && existing.Uco == uco
+        )
         {
             return existing;
         }
@@ -451,7 +454,7 @@ public class AccountService(
             );
             db.Events.KafeStartStream<AccountInfo>(id, created, associated);
         }
-        else if (existing.IdentityProvider != identityProvider || existing.Name != name || existing.Uco != uco)
+        else
         {
             db.Events.KafeAppend(id, associated);
         }

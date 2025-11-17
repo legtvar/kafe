@@ -458,12 +458,19 @@ public class AccountService(
         return await db.Events.KafeAggregateRequiredStream<AccountInfo>(id, token: token);
     }
 
-    public async Task<LoginTicketInfo> IssueLoginTicket(
+    public async Task<Err<LoginTicketInfo>> IssueLoginTicket(
         string emailAddress,
         string? preferredCulture,
         CancellationToken ct = default
     )
     {
+        emailAddress = emailAddress?.Trim() ?? string.Empty;
+
+        if (string.IsNullOrEmpty(emailAddress) || !IsValidEmailAddress(emailAddress))
+        {
+            return Error.InvalidValue("The email address is invalid.", nameof(emailAddress));
+        }
+
         var existingAccount = await FindByEmail(emailAddress, ct);
         var existingInvite = await FindInviteByEmail(emailAddress, ct);
 

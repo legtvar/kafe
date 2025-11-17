@@ -156,19 +156,24 @@ public class EntityPermissionsEditEndpoint(
                 preferredCulture: null,
                 ct: ct
             );
-            var confirmationToken = accountService.EncodeLoginTicketId(ticket.Id);
+            if (ticket.HasErrors)
+            {
+                return this.KafeErrorResult(ticket.Errors);
+            }
+
+            var confirmationToken = accountService.EncodeLoginTicketId(ticket.Value.Id);
             var pathString = new PathString(apiOptions.Value.AccountConfirmPath)
                 .Add(new PathString("/" + confirmationToken));
             var confirmationUrl = new Uri(new Uri(apiOptions.Value.BaseUrl), pathString);
             // TODO: Custom email template for invites.
-            var emailSubject = Const.ConfirmationEmailSubject[ticket.PreferredCulture]!;
+            var emailSubject = Const.ConfirmationEmailSubject[ticket.Value.PreferredCulture]!;
             var emailMessage = string.Format(
-                Const.ConfirmationEmailMessageTemplate[ticket.PreferredCulture]!,
+                Const.ConfirmationEmailMessageTemplate[ticket.Value.PreferredCulture]!,
                 confirmationUrl,
                 Const.EmailSignOffs[RandomNumberGenerator.GetInt32(0, Const.EmailSignOffs.Length)][
-                    ticket.PreferredCulture]
+                    ticket.Value.PreferredCulture]
             );
-            await emailService.SendEmail(ticket.EmailAddress, emailSubject, emailMessage, null, ct);
+            await emailService.SendEmail(ticket.Value.EmailAddress, emailSubject, emailMessage, null, ct);
         }
 
         return Ok(dto.Id);

@@ -29,6 +29,8 @@ public class AccountService(
 )
 {
     public static readonly TimeSpan ConfirmationTokenExpiration = TimeSpan.FromHours(24);
+
+    public const string NameClaim = "name";
     public const string PreferredUsernameClaim = "preferred_username";
 
     private readonly IDataProtector dataProtector = dataProtectionProvider.CreateProtector(nameof(AccountService));
@@ -93,13 +95,6 @@ public class AccountService(
 
         switch (@new.Kind)
         {
-            case AccountKind.Temporary:
-                var refreshed = new TemporaryAccountRefreshed(
-                    AccountId: id.ToString(),
-                    SecurityStamp: Guid.NewGuid().ToString()
-                );
-                db.Events.KafeAppend(id, refreshed);
-                break;
             case AccountKind.External:
                 if (string.IsNullOrEmpty(@new.IdentityProvider))
                 {
@@ -292,7 +287,7 @@ public class AccountService(
             query = (IMartenQueryable<AccountInfo>)query.OrderBySortString(entityMetadataProvider, sort);
         }
 
-        return [..await query.ToListAsync(token: token)];
+        return [.. await query.ToListAsync(token: token)];
     }
 
     public record InviteFilter(
@@ -328,7 +323,7 @@ public class AccountService(
             query = (IMartenQueryable<InviteInfo>)query.Where(i => i.Deleted == filter.Deleted.Value);
         }
 
-        return [..await query.ToListAsync(ct)];
+        return [.. await query.ToListAsync(ct)];
     }
 
     /// <summary>
@@ -426,7 +421,7 @@ public class AccountService(
             return Error.MissingValue("email address");
         }
 
-        var name = principal.FindFirst(ClaimTypes.Name)?.Value;
+        var name = principal.FindFirst(ClaimTypes.Name)?.Value ?? principal.FindFirst(NameClaim)?.Value;
         var uco = principal.FindFirst(PreferredUsernameClaim)?.Value;
         var identityProvider = emailClaim.Issuer;
 
@@ -456,7 +451,7 @@ public class AccountService(
             );
             db.Events.KafeStartStream<AccountInfo>(id, created, associated);
         }
-        else
+        else if (existing.IdentityProvider != identityProvider || existing.Name != name || existing.Uco != uco)
         {
             db.Events.KafeAppend(id, associated);
         }

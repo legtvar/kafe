@@ -15,6 +15,7 @@ using System;
 using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication;
 
 namespace Kafe.Api.Endpoints.Account;
 
@@ -30,7 +31,6 @@ public class TemporaryAccountCreationEndpoint(
         .WithRequest<TemporaryAccountCreationDto>
         .WithActionResult
 {
-
     [HttpPost]
     [SwaggerOperation(Tags = [EndpointArea.Account])]
     [ProducesResponseType(200)]
@@ -42,21 +42,22 @@ public class TemporaryAccountCreationEndpoint(
     {
         dto = dto with { EmailAddress = dto.EmailAddress.Trim() };
 
-        if (string.IsNullOrEmpty(dto.EmailAddress))
+        var ticket = await accountService.IssueLoginTicket(dto.EmailAddress, dto.PreferredCulture, ct);
+        if (ticket.HasErrors)
         {
-            return BadRequest("The email address is either null or whitespace.");
+            return this.KafeErrorResult(ticket.Errors);
         }
 
-        var ticket = await accountService.IssueLoginTicket(dto.EmailAddress, dto.PreferredCulture, ct);
-        var confirmationToken = accountService.EncodeLoginTicketId(ticket.Id);
+        var confirmationToken = accountService.EncodeLoginTicketId(ticket.Value.Id);
         var pathString = new PathString(apiOptions.Value.AccountConfirmPath)
             .Add(new PathString("/" + confirmationToken));
         var confirmationUrl = new Uri(new Uri(apiOptions.Value.BaseUrl), pathString);
-        var emailSubject = Const.ConfirmationEmailSubject[ticket.PreferredCulture]!;
+        var emailSubject = Const.ConfirmationEmailSubject[ticket.Value.PreferredCulture]!;
         var emailMessage = string.Format(
-            Const.ConfirmationEmailMessageTemplate[ticket.PreferredCulture]!,
+            Const.ConfirmationEmailMessageTemplate[ticket.Value.PreferredCulture]!,
             confirmationUrl,
-            Const.EmailSignOffs[RandomNumberGenerator.GetInt32(0, Const.EmailSignOffs.Length)][ticket.PreferredCulture]
+            Const.EmailSignOffs[RandomNumberGenerator.GetInt32(0, Const.EmailSignOffs.Length)]
+                [ticket.Value.PreferredCulture]
         );
         await emailService.SendEmail(dto.EmailAddress, emailSubject, emailMessage, null, ct);
 

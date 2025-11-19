@@ -46,6 +46,7 @@ public class Program
                 builder.ConfigureAppConfiguration(c =>
                 {
                     c.AddJsonFile("appsettings.local.json");
+                    c.AddUserSecrets(typeof(Program).Assembly);
                     c.AddEnvironmentVariables();
                 });
                 builder.UseStartup<Startup>();

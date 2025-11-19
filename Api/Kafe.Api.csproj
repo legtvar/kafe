@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>$(DefaultExecutableFramework)</TargetFramework>
     <IsPackable>false</IsPackable>
+    <UserSecretsId>440de273-37ee-468f-a664-90714ae530fc</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>

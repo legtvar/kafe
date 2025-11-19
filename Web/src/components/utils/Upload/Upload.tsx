@@ -1,5 +1,5 @@
 import { Box, Center, Flex, Text, useColorModeValue, useToken } from '@chakra-ui/react';
-import { keyframes } from 'styled-components';
+import { keyframes } from '@emotion/react';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 import Dropzone from 'react-dropzone';

@@ -338,6 +338,10 @@ public partial class Startup
                         + string.Join(", ", nonCultures) + ".");
                 }
             });
+        services.AddOptions<VideoConversionOptions>()
+            .BindConfiguration("VideoConversion")
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
 
         services.AddHostedService<VideoConversionDaemon>();
 

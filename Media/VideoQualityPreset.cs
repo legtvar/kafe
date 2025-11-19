@@ -10,9 +10,9 @@ public enum VideoQualityPreset
 {
     Invalid = 0,
     Original = 1,
-    SD = 2,
-    HD = 3,
-    FullHD = 4
+    Sd = 2,
+    Hd = 3,
+    FullHd = 4
 }
 
 public static class VideoQualityPresetExtensions
@@ -22,9 +22,9 @@ public static class VideoQualityPresetExtensions
         return preset switch
         {
             VideoQualityPreset.Original => "original",
-            VideoQualityPreset.SD => "sd",
-            VideoQualityPreset.HD => "hd",
-            VideoQualityPreset.FullHD => "fullhd",
+            VideoQualityPreset.Sd => "sd",
+            VideoQualityPreset.Hd => "hd",
+            VideoQualityPreset.FullHd => "fullhd",
             _ => null
         };
     }
@@ -33,9 +33,9 @@ public static class VideoQualityPresetExtensions
     {
         return preset switch
         {
-            VideoQualityPreset.SD => 480,
-            VideoQualityPreset.HD => 720,
-            VideoQualityPreset.FullHD => 1080,
+            VideoQualityPreset.Sd => 480,
+            VideoQualityPreset.Hd => 720,
+            VideoQualityPreset.FullHd => 1080,
             _ => -1
         };
     }

@@ -10,11 +10,16 @@ using Marten.Events.CodeGeneration;
 namespace Kafe.Data.Aggregates;
 
 public record ProjectInfo(
-    [Hrib] string Id,
+    [property:Hrib]
+    string Id,
 
     CreationMethod CreationMethod,
 
-    [Hrib] string ProjectGroupId,
+    [property:Hrib]
+    string ProjectGroupId,
+
+    [property:Hrib]
+    string ArtifactId,
 
     ImmutableArray<ProjectAuthorInfo> Authors,
 
@@ -58,6 +63,7 @@ public record ProjectInfo(
         Id: Hrib.InvalidValue,
         CreationMethod: CreationMethod.Unknown,
         ProjectGroupId: Hrib.InvalidValue,
+        ArtifactId: Hrib.InvalidValue,
         Authors: [],
         Artifacts: [],
         Reviews: [],

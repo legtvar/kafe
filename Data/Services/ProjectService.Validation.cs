@@ -73,7 +73,7 @@ public partial class ProjectService
     public const string TechReviewStage = "tech-review";
     public const string VisualReviewStage = "visual-review";
     public const string DramaturgyReviewStage = "dramaturgy-review";
-    public const string PigeonsTestStage = "pigeons-test"; 
+    public const string PigeonsTestStage = "pigeons-test";
 
     public static readonly Diagnostic NameTooLong = new Diagnostic(
         Kind: DiagnosticKind.Error,
@@ -877,12 +877,12 @@ public partial class ProjectService
             diagnostics.Add(MissingDramaturgyReview);
         }
 
-        if ((project.Authors.Count(a => a.Kind == ProjectAuthorKind.Crew) < 1 && group.OrganizationId != "mate-fimuni") 
+        if ((project.Authors.Count(a => a.Kind == ProjectAuthorKind.Crew) < 1 && group.OrganizationId != "mate-fimuni")
             || (group.OrganizationId == "mate-fimuni" && project.OwnerId is null))
         {
             diagnostics.Add(MissingCrew);
         }
-        
+
         var artifactBlueprints = projectBlueprint.ArtifactBlueprints;
 
         var artifactInfos = await db.LoadManyAsync<ArtifactDetail>(token, project.Artifacts.Select(a => a.Id));
@@ -892,7 +892,7 @@ public partial class ProjectService
 
         if (artifactBlueprints!.GetValueOrDefault(Const.FilmBlueprintSlot, null) is not null)
         {
-            var filmShardsBlueprints = artifactBlueprints[Const.FilmBlueprintSlot].ShardBlueprints; 
+            var filmShardsBlueprints = artifactBlueprints[Const.FilmBlueprintSlot].ShardBlueprints;
             var filmArtifacts = artifacts.Where(a => a.projectArtifact.BlueprintSlot == Const.FilmBlueprintSlot)
                 .ToImmutableArray();
 
@@ -906,7 +906,7 @@ public partial class ProjectService
             }
             else
             {
-                
+
                 if (filmShardsBlueprints!.GetValueOrDefault(ShardKind.Video, null) is not null)
                 {
                     var videoShards = filmArtifacts.Single().info.Shards.Where(s => s.Kind == ShardKind.Video)
@@ -984,7 +984,7 @@ public partial class ProjectService
 
             if (artifactBlueprints!.GetValueOrDefault(Const.VideoAnnotationBlueprintSlot, null) is not null)
             {
-                var annotationsShardsBlueprints = artifactBlueprints[Const.VideoAnnotationBlueprintSlot].ShardBlueprints; 
+                var annotationsShardsBlueprints = artifactBlueprints[Const.VideoAnnotationBlueprintSlot].ShardBlueprints;
                 var videoAnnotationArtifacts = artifacts.Where(a => a.projectArtifact.BlueprintSlot == Const.VideoAnnotationBlueprintSlot)
                     .ToImmutableArray();
                 if (videoAnnotationArtifacts.Length > artifactBlueprints[Const.VideoAnnotationBlueprintSlot].Arity.Max)

@@ -9,34 +9,20 @@ using Marten.Events.CodeGeneration;
 namespace Kafe.Data.Aggregates;
 
 public record ProjectInfo(
-    [Hrib] string Id,
+    [property:Hrib]
+    string Id,
 
     CreationMethod CreationMethod,
 
-    [Hrib] string ProjectGroupId,
+    [property:Hrib]
+    string ProjectGroupId,
 
-    ImmutableArray<ProjectAuthorInfo> Authors,
-
-    ImmutableArray<ProjectArtifactInfo> Artifacts,
+    [property:Hrib]
+    string ArtifactId,
 
     ImmutableArray<ProjectReviewInfo> Reviews,
 
-    [property:Sortable]
-    [property:LocalizedString]
-    ImmutableDictionary<string, string> Name,
-
-    [property:Sortable]
-    [property:LocalizedString]
-    ImmutableDictionary<string, string>? Description = null,
-
-    [property:Sortable]
-    [property:LocalizedString]
-    ImmutableDictionary<string, string>? Genre = null,
-
     Permission GlobalPermissions = Permission.None,
-
-    [property:Sortable]
-    DateTimeOffset ReleasedOn = default,
 
     [property:Sortable]
     bool IsLocked = false
@@ -55,14 +41,9 @@ public record ProjectInfo(
         Id: Hrib.InvalidValue,
         CreationMethod: CreationMethod.Unknown,
         ProjectGroupId: Hrib.InvalidValue,
-        Authors: [],
-        Artifacts: [],
+        ArtifactId: Hrib.InvalidValue,
         Reviews: [],
-        Name: LocalizedString.CreateInvariant(Const.InvalidName),
-        Description: null,
-        Genre: null,
         GlobalPermissions: Permission.None,
-        ReleasedOn: default,
         IsLocked: false
     )
     {

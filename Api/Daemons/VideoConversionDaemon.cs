@@ -125,11 +125,14 @@ public class VideoConversionDaemon(
 
         query = (IMartenQueryable<VideoShardInfo>)query.Where(v =>
             v.Variants.ContainsKey(Const.OriginalShardVariant)
-            && v.MatchesSql($"NOT (d.data -> '{nameof(VideoShardInfo.Variants)}' -> '{Const.OriginalShardVariant}' ->> '{nameof(MediaInfo.IsCorrupted)}')::boolean")
+            && v.MatchesSql(
+                $"NOT (d.data -> '{nameof(VideoShardInfo.Variants)}' -> '{Const.OriginalShardVariant}' "
+                + $"->> '{nameof(MediaInfo.IsCorrupted)}')::boolean"
+            )
             && v.MatchesSql(
                 $"""
                  NOT EXISTS (
-                 	SELECT * FROM {db.DocumentStore.Options.Schema.For<VideoConversionInfo>()} as conversion
+                 	SELECT * FROM {db.DocumentStore.Options.Schema.For<VideoConversionInfo>(true)} as conversion
                  	WHERE conversion.data ->> '{nameof(VideoConversionInfo.VideoId)}' = d.data ->> '{nameof(VideoShardInfo.Id)}'
                  	    AND ((conversion.data -> '{nameof(VideoConversionInfo.IsCompleted)}')::boolean
                  	        OR (conversion.data -> '{nameof(VideoConversionInfo.HasFailed)}')::boolean

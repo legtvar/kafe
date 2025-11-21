@@ -17,18 +17,16 @@ using Xunit.Abstractions;
 
 namespace Kafe.Tests;
 
-public class ApiFixture : IAsyncLifetime
+public class ApiFixture(IMessageSink diagnosticSink) : IAsyncLifetime
 {
+    public const string TestLogTemplate
+        = "[{Timestamp:HH:mm:ss.fff} {Level:u3} {SourceContext}]{NewLine}{Message:lj}{NewLine}{Exception}";
+
     private readonly string testSchema
         = $"test_{DateTimeOffset.UtcNow:yyyy_MM_dd_T_HH_mm}_{Guid.NewGuid().ToString()[..8]}";
 
-    public ApiFixture(IMessageSink diagnosticSink)
-    {
-        DiagnosticSink = diagnosticSink;
-    }
-
     public IAlbaHost Host { get; private set; } = null!;
-    public IMessageSink DiagnosticSink { get; }
+    public IMessageSink DiagnosticSink { get; } = diagnosticSink;
 
     public async Task InitializeAsync()
     {
@@ -38,7 +36,7 @@ public class ApiFixture : IAsyncLifetime
             b.ConfigureServices((context, services) =>
             {
                 var injectableSink = new InjectableTestOutputSink(
-                    outputTemplate: Api.Program.LogTemplate
+                    outputTemplate: TestLogTemplate
                 );
                 services.AddSingleton<IInjectableTestOutputSink>(injectableSink);
                 services.AddSerilog((sp, lc) => lc

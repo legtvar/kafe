@@ -13,21 +13,13 @@ namespace Kafe.Api.Endpoints.Shard;
 [ApiVersion("1")]
 [Route("shard-download/{id}")]
 [Route("shard-download/{id}/{variant}")]
-public class ShardDownloadEndpoint : EndpointBaseAsync
+public class ShardDownloadEndpoint(
+    ShardService shardService,
+    IAuthorizationService authorizationService
+) : EndpointBaseAsync
     .WithRequest<ShardDownloadEndpoint.RequestData>
     .WithActionResult
 {
-    private readonly ShardService shardService;
-    private readonly IAuthorizationService authorizationService;
-
-    public ShardDownloadEndpoint(
-        ShardService shardService,
-        IAuthorizationService authorizationService)
-    {
-        this.shardService = shardService;
-        this.authorizationService = authorizationService;
-    }
-
     [HttpGet]
     [SwaggerOperation(Tags = new[] { EndpointArea.Shard })]
     [Produces(typeof(FileStreamResult))]

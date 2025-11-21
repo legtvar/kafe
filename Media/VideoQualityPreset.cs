@@ -28,7 +28,7 @@ public static class VideoQualityPresetExtensions
             _ => null
         };
     }
-    
+
     public static int ToHeight(this VideoQualityPreset preset)
     {
         return preset switch
@@ -36,6 +36,17 @@ public static class VideoQualityPresetExtensions
             VideoQualityPreset.Sd => 480,
             VideoQualityPreset.Hd => 720,
             VideoQualityPreset.FullHd => 1080,
+            _ => -1
+        };
+    }
+
+    public static int ToWidth(this VideoQualityPreset preset)
+    {
+        return preset switch
+        {
+            VideoQualityPreset.Sd => 854, // FWVGA
+            VideoQualityPreset.Hd => 1280,
+            VideoQualityPreset.FullHd => 1920,
             _ => -1
         };
     }

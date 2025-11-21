@@ -45,6 +45,7 @@ public class ApiTestBase : IAsyncLifetime
         await ProjectionCoordinator.PauseAsync();
 
         await Store.Advanced.ResetAllData();
+        await Host.StartAsync();
 
         await ProjectionCoordinator.ResumeAsync();
 
@@ -65,6 +66,6 @@ public class ApiTestBase : IAsyncLifetime
 
     public async Task WaitForProjections()
     {
-        await Store.WaitForNonStaleProjectionDataAsync(TimeSpan.FromMinutes(4));
+        await Store.WaitForNonStaleProjectionDataAsync(TimeSpan.FromSeconds(30));
     }
 }

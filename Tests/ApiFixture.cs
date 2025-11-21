@@ -46,7 +46,7 @@ public class ApiFixture(IMessageSink diagnosticSink) : IAsyncLifetime
                     .Enrich.FromLogContext()
                     .WriteTo.InjectableTestOutput(injectableSink)
                 );
-                services.MartenDaemonModeIsSolo();
+                // services.MartenDaemonModeIsSolo();
                 services.InitializeMartenWith<TestSeedData>();
                 services.Configure<StorageOptions>(o =>
                 {
@@ -55,9 +55,6 @@ public class ApiFixture(IMessageSink diagnosticSink) : IAsyncLifetime
                 });
             });
         }, authenticationStub);
-        // NB: Let the test start the daemon
-        // var coordinator = (ProjectionCoordinator)Host.Server.Services.GetRequiredService<IProjectionCoordinator>();
-        // await coordinator.PauseAsync();
     }
 
     public async Task DisposeAsync()

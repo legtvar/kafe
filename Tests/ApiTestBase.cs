@@ -30,7 +30,7 @@ public class ApiTestBase : IAsyncLifetime
 
     public IAlbaHost Host { get; }
     public IDocumentStore Store { get; }
-    public ProjectionCoordinator? ProjectionCoordinator { get; private set; }
+    public IProjectionCoordinator? ProjectionCoordinator { get; private set; }
     public ILogger? Log { get; private set; }
 
     public async Task InitializeAsync()
@@ -41,8 +41,7 @@ public class ApiTestBase : IAsyncLifetime
         var outputSink = Host.Server.Services.GetRequiredService<IInjectableTestOutputSink>();
         outputSink.Inject(testOutput, fixture.DiagnosticSink);
 
-        ProjectionCoordinator =
-            (ProjectionCoordinator)Host.Server.Services.GetRequiredService<IProjectionCoordinator>();
+        ProjectionCoordinator = Host.Server.Services.GetRequiredService<IProjectionCoordinator>();
         await ProjectionCoordinator.PauseAsync();
 
         await Store.Advanced.ResetAllData();

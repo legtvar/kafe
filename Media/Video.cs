@@ -25,10 +25,8 @@ public static class Video
             presets.Add(VideoQualityPreset.Hd);
         }
 
-        if (maxHeight >= 480)
-        {
-            presets.Add(VideoQualityPreset.Sd);
-        }
+        // NB: `sd` is always present because at least we get to convert to web-friendly codec
+        presets.Add(VideoQualityPreset.Sd);
 
         // Reverse the presets so that the smallest resolution is first.
         presets.Reverse();

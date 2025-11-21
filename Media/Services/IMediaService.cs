@@ -11,15 +11,15 @@ namespace Kafe.Media.Services;
 
 public interface IMediaService
 {
-    public const string SDFileName = "sd";
-    public const string HDFileName = "hd";
-    public const string FullHDFileName = "fullhd";
+    public const string SdFileName = "sd";
+    public const string HdFileName = "hd";
+    public const string FullHdFileName = "fullhd";
     public const string OriginalFileName = "original";
 
     Task<MediaInfo> GetInfo(string filePath, CancellationToken token = default);
 
     Task<MediaInfo> GetInfo(Stream stream, CancellationToken token = default);
-    
+
     Task<MediaInfo> CreateVariant(
         string filePath,
         VideoQualityPreset preset,

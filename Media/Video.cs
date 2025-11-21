@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using System.Linq;
+using Kafe.Media.Services;
 
 namespace Kafe.Media;
 
@@ -16,33 +17,31 @@ public static class Video
         var presets = ImmutableArray.CreateBuilder<VideoQualityPreset>();
         if (maxHeight >= 1080)
         {
-            presets.Add(VideoQualityPreset.FullHD);
+            presets.Add(VideoQualityPreset.FullHd);
         }
 
         if (maxHeight >= 720)
         {
-            presets.Add(VideoQualityPreset.HD);
+            presets.Add(VideoQualityPreset.Hd);
         }
 
-        if (maxHeight >= 480)
-        {
-            presets.Add(VideoQualityPreset.SD);
-        }
+        // NB: `sd` is always present because at least we get to convert to web-friendly codec
+        presets.Add(VideoQualityPreset.Sd);
 
         // Reverse the presets so that the smallest resolution is first.
         presets.Reverse();
 
         return presets.ToImmutable();
     }
-    
+
     public static VideoQualityPreset GetPresetFromFileName(string fileName)
     {
         return fileName switch
         {
             Const.OriginalShardVariant => VideoQualityPreset.Original,
-            "fullhd" => VideoQualityPreset.FullHD,
-            "hd" => VideoQualityPreset.HD,
-            "sd" => VideoQualityPreset.SD,
+            IMediaService.FullHdFileName => VideoQualityPreset.FullHd,
+            IMediaService.HdFileName => VideoQualityPreset.Hd,
+            IMediaService.SdFileName => VideoQualityPreset.Sd,
             _ => VideoQualityPreset.Invalid
         };
     }

@@ -14,14 +14,9 @@ using System.Threading.Tasks;
 
 namespace Kafe.Media.Services;
 
-public class FFmpegCoreService : IMediaService
+public class FFmpegCoreService(ILogger<FFmpegCoreService>? logger = null) : IMediaService
 {
-    private readonly ILogger<FFmpegCoreService> logger;
-
-    public FFmpegCoreService(ILogger<FFmpegCoreService>? logger = null)
-    {
-        this.logger = logger ?? NullLogger<FFmpegCoreService>.Instance;
-    }
+    private readonly ILogger<FFmpegCoreService> logger = logger ?? NullLogger<FFmpegCoreService>.Instance;
 
     static FFmpegCoreService()
     {
@@ -69,7 +64,8 @@ public class FFmpegCoreService : IMediaService
         }
         catch (FFMpegException e)
         {
-            return MediaInfo.Invalid with { Error = e.Message }; ;
+            return MediaInfo.Invalid with { Error = e.Message };
+            ;
         }
     }
 
@@ -78,7 +74,8 @@ public class FFmpegCoreService : IMediaService
         VideoQualityPreset preset,
         string? outputDir = null,
         bool overwrite = false,
-        CancellationToken token = default)
+        CancellationToken token = default
+    )
     {
         var name = preset.ToFileName()
             ?? throw new ArgumentException($"Preset '{preset}' is not valid.");
@@ -102,22 +99,39 @@ public class FFmpegCoreService : IMediaService
 
         try
         {
-            await FFMpegArguments
+            var args = FFMpegArguments
                 .FromFileInput(filePath)
-                .OutputToFile(outputPath, overwrite, o =>
-                    o.WithVideoCodec("libvpx-vp9")
-                    .WithAudioCodec("libopus")
-                    .ForceFormat("webm")
-                    .WithVideoFilters(f => f.Scale(-2, preset.ToHeight()))
-                    .WithFastStart())
+                .OutputToFile(
+                    file: outputPath,
+                    overwrite: overwrite,
+                    addArguments: o => o.WithVideoCodec("libvpx-vp9")
+                        .WithAudioCodec("libopus")
+                        .ForceFormat("webm")
+                        .WithVideoFilters(f =>
+                            f.Arguments.Add(
+                                new ScaleArgument(
+                                    preset.ToWidth(),
+                                    preset.ToHeight(),
+                                    "decrease",
+                                    forceDivisibleBy: 2,
+                                    resetSar: true
+                                )
+                            )
+                        )
+                )
                 // .NotifyOnProgress(p => logger.LogDebug($"Progress {Path.GetFileName(filePath)} ({name}): '{p}'"))
                 .NotifyOnOutput(p => logger.LogError(
-                    "An FFmpeg error occurred while processing '{FilePath}' ({Preset}):\n{Message}",
-                    filePath,
-                    preset,
-                    p))
-                .CancellableThrough(token, 1_000)
-                .ProcessAsynchronously(true);
+                        "An FFmpeg error occurred while processing '{FilePath}' ({Preset}):\n{Message}",
+                        filePath,
+                        preset,
+                        p
+                    )
+                );
+
+            logger.LogDebug("Running ffmpeg with args:\n{Args}", args.Arguments);
+
+            await args.CancellableThrough(token, 1_000)
+                .ProcessAsynchronously(throwOnError: true);
         }
         catch (Exception)
         {
@@ -136,27 +150,33 @@ public class FFmpegCoreService : IMediaService
     private MediaInfo GetMediaInfo(IMediaAnalysis data)
     {
         var videoInfos = data.VideoStreams
-                .Select(v => new VideoStreamInfo(
-                        Codec: v.CodecName,
-                        Bitrate: v.BitRate,
+            .Select(v => new VideoStreamInfo(
+                    Codec: v.CodecName,
+                    Bitrate: v.BitRate,
                     Width: v.Width,
                     Height: v.Height,
-                    Framerate: v.FrameRate))
-                .ToImmutableArray();
+                    Framerate: v.FrameRate
+                )
+            )
+            .ToImmutableArray();
 
         var audioInfos = data.AudioStreams
             .Select(a => new AudioStreamInfo(
-                Codec: a.CodecName,
-                Bitrate: a.BitRate,
-                Channels: a.Channels,
-                SampleRate: a.SampleRateHz))
+                    Codec: a.CodecName,
+                    Bitrate: a.BitRate,
+                    Channels: a.Channels,
+                    SampleRate: a.SampleRateHz
+                )
+            )
             .ToImmutableArray();
 
         var subtitleInfos = data.SubtitleStreams
             .Select(s => new SubtitleStreamInfo(
-                Language: s.Language,
-                Codec: s.CodecName,
-                Bitrate: s.BitRate))
+                    Language: s.Language,
+                    Codec: s.CodecName,
+                    Bitrate: s.BitRate
+                )
+            )
             .ToImmutableArray();
 
         return new MediaInfo(
@@ -168,6 +188,7 @@ public class FFmpegCoreService : IMediaService
             Bitrate: data.Format.BitRate,
             VideoStreams: videoInfos,
             AudioStreams: audioInfos,
-            SubtitleStreams: subtitleInfos);
+            SubtitleStreams: subtitleInfos
+        );
     }
 }

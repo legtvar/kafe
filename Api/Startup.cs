@@ -31,7 +31,6 @@ using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.IdentityModel.Logging;
 using Kafe.Data.Services;
 using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.Extensions.Logging;
 using System.Net;
 using Serilog;
 using OpenTelemetry.Resources;
@@ -71,9 +70,7 @@ public partial class Startup
             .ReadFrom.Configuration(Configuration)
             .ReadFrom.Services(sp)
             .Enrich.FromLogContext()
-            .WriteTo.Console(
-                outputTemplate: Program.LogTemplate
-            )
+            .WriteTo.Console(Program.LogTemplate)
             .WriteTo.OpenTelemetry(options =>
                 {
                     options.Endpoint = $"{otlpEndpoint}/v1/logs";
@@ -90,98 +87,131 @@ public partial class Startup
         services.AddHttpContextAccessor();
 
         services.AddAuthentication(o =>
-        {
-            o.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-            o.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-        })
-        .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, o =>
-        {
-            o.Events.OnRedirectToAccessDenied = c =>
-            {
-                c.Response.StatusCode = 403;
-                return Task.CompletedTask;
-            };
-            o.Events.OnRedirectToLogin = c =>
-            {
-                c.Response.StatusCode = 401;
-                return Task.CompletedTask;
-            };
-            o.AccessDeniedPath = "/error?title=403&detail='Access Denied'";
-        })
-        .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, o =>
-        {
-            o.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                {
+                    o.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                    o.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                }
+            )
+            .AddCookie(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                o =>
+                {
+                    o.Events.OnRedirectToAccessDenied = c =>
+                    {
+                        c.Response.StatusCode = 403;
+                        return Task.CompletedTask;
+                    };
+                    o.Events.OnRedirectToLogin = c =>
+                    {
+                        c.Response.StatusCode = 401;
+                        return Task.CompletedTask;
+                    };
+                    o.AccessDeniedPath = "/error?title=403&detail='Access Denied'";
+                }
+            )
+            .AddOpenIdConnect(
+                OpenIdConnectDefaults.AuthenticationScheme,
+                o =>
+                {
+                    o.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
 
-            var oidcConfig = Configuration.GetRequiredSection("Oidc").Get<OidcOptions>()
-                ?? throw new ArgumentException("OIDC is not configured well.");
+                    var oidcConfig = Configuration.GetRequiredSection("Oidc").Get<OidcOptions>()
+                        ?? throw new ArgumentException("OIDC is not configured well.");
 
-            o.Authority = oidcConfig.Authority;
-            o.ClientId = oidcConfig.ClientId;
-            o.ClientSecret = oidcConfig.ClientSecret;
-            o.ResponseType = OpenIdConnectResponseType.Code;
-            o.Scope.Add("openid");
-            o.Scope.Add("profile");
-            o.Scope.Add("email");
-            o.CallbackPath = new PathString("/signin-oidc");
-            // o.GetClaimsFromUserInfoEndpoint = true;
-            // o.SaveTokens = true;
+                    o.Authority = oidcConfig.Authority;
+                    o.ClientId = oidcConfig.ClientId;
+                    o.ClientSecret = oidcConfig.ClientSecret;
+                    o.ResponseType = OpenIdConnectResponseType.Code;
+                    o.Scope.Add("openid");
+                    o.Scope.Add("profile");
+                    o.Scope.Add("email");
+                    o.CallbackPath = new PathString("/signin-oidc");
+                    // o.GetClaimsFromUserInfoEndpoint = true;
+                    // o.SaveTokens = true;
 
-            o.Events.OnRemoteFailure += c =>
-            {
-                var clientHost = Uri.TryCreate(c.Properties?.RedirectUri, UriKind.Absolute, out var redirect)
-                    ? redirect.GetComponents(UriComponents.SchemeAndServer, UriFormat.Unescaped)
-                    : null;
-                c.Response.Redirect($"{clientHost}/error?title=External Login Failed&detail={c.Failure?.Message}");
-                c.HandleResponse();
-                return Task.CompletedTask;
-            };
-        });
+                    o.Events.OnRemoteFailure += c =>
+                    {
+                        var clientHost = Uri.TryCreate(c.Properties?.RedirectUri, UriKind.Absolute, out var redirect)
+                            ? redirect.GetComponents(UriComponents.SchemeAndServer, UriFormat.Unescaped)
+                            : null;
+                        c.Response.Redirect(
+                            $"{clientHost}/error?title=External Login Failed&detail={c.Failure?.Message}"
+                        );
+                        c.HandleResponse();
+                        return Task.CompletedTask;
+                    };
+                }
+            );
 
         services.AddAuthorization(o =>
-        {
-            o.AddPolicy(EndpointPolicy.Read, b => b.AddRequirements(new PermissionRequirement(Permission.Read)));
-            o.AddPolicy(EndpointPolicy.Write, b => b.AddRequirements(new PermissionRequirement(Permission.Write)));
-            o.AddPolicy(EndpointPolicy.Append, b => b.AddRequirements(new PermissionRequirement(Permission.Append)));
-            o.AddPolicy(EndpointPolicy.Inspect, b => b.AddRequirements(new PermissionRequirement(Permission.Inspect)));
-            o.AddPolicy(EndpointPolicy.ReadInspect, b => b.AddRequirements(new PermissionRequirement(Permission.Read | Permission.Inspect)));
-            o.AddPolicy(EndpointPolicy.Review, b => b.AddRequirements(new PermissionRequirement(Permission.Review)));
-            o.AddPolicy(EndpointPolicy.Administer, b => b.AddRequirements(new PermissionRequirement(Permission.Administer)));
-        });
+            {
+                o.AddPolicy(EndpointPolicy.Read, b => b.AddRequirements(new PermissionRequirement(Permission.Read)));
+                o.AddPolicy(EndpointPolicy.Write, b => b.AddRequirements(new PermissionRequirement(Permission.Write)));
+                o.AddPolicy(
+                    EndpointPolicy.Append,
+                    b => b.AddRequirements(new PermissionRequirement(Permission.Append))
+                );
+                o.AddPolicy(
+                    EndpointPolicy.Inspect,
+                    b => b.AddRequirements(new PermissionRequirement(Permission.Inspect))
+                );
+                o.AddPolicy(
+                    EndpointPolicy.ReadInspect,
+                    b => b.AddRequirements(new PermissionRequirement(Permission.Read | Permission.Inspect))
+                );
+                o.AddPolicy(
+                    EndpointPolicy.Review,
+                    b => b.AddRequirements(new PermissionRequirement(Permission.Review))
+                );
+                o.AddPolicy(
+                    EndpointPolicy.Administer,
+                    b => b.AddRequirements(new PermissionRequirement(Permission.Administer))
+                );
+            }
+        );
 
         ConfigureDataProtection(services);
 
         services.AddEndpointsApiExplorer();
 
         services.AddApiVersioning(o =>
-        {
-            o.ReportApiVersions = true;
-            o.DefaultApiVersion = new ApiVersion(1);
-        });
+            {
+                o.ReportApiVersions = true;
+                o.DefaultApiVersion = new ApiVersion(1);
+            }
+        );
         services.AddSwaggerGen();
         services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
 
         services.AddCors(o =>
-        {
-            o.AddDefaultPolicy(p =>
             {
-                p.AllowAnyHeader();
-                p.AllowAnyMethod();
-                p.AllowCredentials();
-                p.SetIsOriginAllowedToAllowWildcardSubdomains();
-                p.SetIsOriginAllowed(s => GetLocalhostRegex().IsMatch(s));
-                p.WithOrigins(ApiOptions.AllowedOrigins.ToArray());
-            });
-        });
+                o.AddDefaultPolicy(p =>
+                    {
+                        p.AllowAnyHeader();
+                        p.AllowAnyMethod();
+                        p.AllowCredentials();
+                        p.SetIsOriginAllowedToAllowWildcardSubdomains();
+                        p.SetIsOriginAllowed(s => GetLocalhostRegex().IsMatch(s));
+                        p.WithOrigins(ApiOptions.AllowedOrigins.ToArray());
+                    }
+                );
+            }
+        );
 
         services.Configure<ForwardedHeadersOptions>(o =>
-        {
-            o.ForwardedHeaders = ForwardedHeaders.All;
+            {
+                o.ForwardedHeaders = ForwardedHeaders.All;
 
-            // Accept proxies at all local IPv4 addresses
-            o.KnownNetworks.Add(new Microsoft.AspNetCore.HttpOverrides.IPNetwork(IPAddress.Parse("192.168.0.0"), 16));
-            o.KnownNetworks.Add(new Microsoft.AspNetCore.HttpOverrides.IPNetwork(IPAddress.Parse("172.16.0.0"), 12));
-            o.KnownNetworks.Add(new Microsoft.AspNetCore.HttpOverrides.IPNetwork(IPAddress.Parse("10.0.0.0"), 8));
-        });
+                // Accept proxies at all local IPv4 addresses
+                o.KnownNetworks.Add(
+                    new Microsoft.AspNetCore.HttpOverrides.IPNetwork(IPAddress.Parse("192.168.0.0"), 16)
+                );
+                o.KnownNetworks.Add(
+                    new Microsoft.AspNetCore.HttpOverrides.IPNetwork(IPAddress.Parse("172.16.0.0"), 12)
+                );
+                o.KnownNetworks.Add(new Microsoft.AspNetCore.HttpOverrides.IPNetwork(IPAddress.Parse("10.0.0.0"), 8));
+            }
+        );
 
         services.AddProblemDetails();
 
@@ -194,25 +224,22 @@ public partial class Startup
         var otel = services.AddOpenTelemetry();
         otel.ConfigureResource(r => r
             .AddTelemetrySdk()
-            .AddService(serviceName: otlpName));
+            .AddService(serviceName: otlpName)
+        );
         otel.WithMetrics(m => m
             .AddRuntimeInstrumentation()
             .AddAspNetCoreInstrumentation()
             .AddMeter("Microsoft.AspNetCore.Hosting")
             .AddMeter("Microsoft.AspNetCore.Server.Kestrel")
-            .AddOtlpExporter(o =>
-            {
-                o.Endpoint = new Uri(otlpEndpoint);
-            }));
+            .AddOtlpExporter(o => { o.Endpoint = new Uri(otlpEndpoint); })
+        );
         otel.WithTracing(t => t
             .AddAspNetCoreInstrumentation()
             .AddHttpClientInstrumentation()
             .AddSource(otlpName)
             .AddNpgsql()
-            .AddOtlpExporter(o =>
-            {
-                o.Endpoint = new Uri(otlpEndpoint);
-            }));
+            .AddOtlpExporter(o => { o.Endpoint = new Uri(otlpEndpoint); })
+        );
 
         services.AddControllers();
         services.AddTransient<IConfigureOptions<MvcOptions>, ConfigureMvcOptions>();
@@ -235,8 +262,10 @@ public partial class Startup
         app.UseHttpsRedirection();
 
         var apiOptions = app.ApplicationServices.GetRequiredService<IOptions<ApiOptions>>();
-        app.UseRewriter(new RewriteOptions()
-            .AddRewrite($"^{apiOptions.Value.AccountConfirmPath.Trim('/')}/(.*)$", "api/v1/tmp-account/$1", true));
+        app.UseRewriter(
+            new RewriteOptions()
+                .AddRewrite($"^{apiOptions.Value.AccountConfirmPath.Trim('/')}/(.*)$", "api/v1/tmp-account/$1", true)
+        );
 
         app.UseRouting();
 
@@ -257,41 +286,43 @@ public partial class Startup
 
         app.UseAuthentication();
         app.Use(async (ctx, next) =>
-        {
-            var emailClaim = ctx.User.FindFirst(ClaimTypes.Email);
-            if (emailClaim is null || string.IsNullOrEmpty(emailClaim.Value))
             {
-                await next();
-                return;
-            }
-
-            var oidcConfig = Configuration.GetRequiredSection("Oidc").Get<OidcOptions>()
-                ?? throw new ArgumentException("OIDC is not configured well.");
-
-            if (emailClaim.Issuer.StartsWith(oidcConfig.Authority))
-            {
-                var result = await ctx.RequestServices.GetRequiredService<AccountService>()
-                    .AssociateExternalAccount(ctx.User);
-                if (result.HasErrors)
+                var emailClaim = ctx.User.FindFirst(ClaimTypes.Email);
+                if (emailClaim is null || string.IsNullOrEmpty(emailClaim.Value))
                 {
-                    await ctx.ForbidAsync();
+                    await next();
                     return;
                 }
 
-                await ctx.RequestServices.GetRequiredService<UserProvider>().SignIn(result.Value);
-            }
+                var oidcConfig = Configuration.GetRequiredSection("Oidc").Get<OidcOptions>()
+                    ?? throw new ArgumentException("OIDC is not configured well.");
 
-            await ctx.RequestServices.GetRequiredService<UserProvider>().RefreshAccount();
-            await next();
-        });
+                if (emailClaim.Issuer.StartsWith(oidcConfig.Authority))
+                {
+                    var result = await ctx.RequestServices.GetRequiredService<AccountService>()
+                        .AssociateExternalAccount(ctx.User);
+                    if (result.HasErrors)
+                    {
+                        await ctx.ForbidAsync();
+                        return;
+                    }
+
+                    await ctx.RequestServices.GetRequiredService<UserProvider>().SignIn(result.Value);
+                }
+
+                await ctx.RequestServices.GetRequiredService<UserProvider>().RefreshAccount();
+                await next();
+            }
+        );
 
         app.UseAuthorization();
 
         app.UseEndpoints(e =>
-        {
-            e.MapControllers();
-            e.MapSwagger();
-        });
+            {
+                e.MapControllers();
+                e.MapSwagger();
+            }
+        );
     }
 
     private void RegisterKafe(IServiceCollection services)
@@ -319,25 +350,32 @@ public partial class Startup
             .ValidateDataAnnotations()
             .ValidateOnStart()
             .Configure(o =>
-            {
-                o.Languages = o.Languages.Select(o => o.ToLower()).ToList();
-
-                if (!o.Languages.Contains(Const.InvariantCultureCode))
                 {
-                    o.Languages.Add(Const.InvariantCultureCode);
-                }
+                    o.Languages = o.Languages.Select(o => o.ToLower()).ToList();
 
-                var twoLetterCodes = CultureInfo.GetCultures(CultureTypes.AllCultures)
-                    .Select(c => c.TwoLetterISOLanguageName)
-                    .ToImmutableHashSet();
+                    if (!o.Languages.Contains(Const.InvariantCultureCode))
+                    {
+                        o.Languages.Add(Const.InvariantCultureCode);
+                    }
 
-                var nonCultures = o.Languages.Except(twoLetterCodes).ToImmutableArray();
-                if (nonCultures.Length > 0)
-                {
-                    throw new NotSupportedException("These languages are not valid two-letter ISO language codes: "
-                        + string.Join(", ", nonCultures) + ".");
+                    var twoLetterCodes = CultureInfo.GetCultures(CultureTypes.AllCultures)
+                        .Select(c => c.TwoLetterISOLanguageName)
+                        .ToImmutableHashSet();
+
+                    var nonCultures = o.Languages.Except(twoLetterCodes).ToImmutableArray();
+                    if (nonCultures.Length > 0)
+                    {
+                        throw new NotSupportedException(
+                            "These languages are not valid two-letter ISO language codes: "
+                            + string.Join(", ", nonCultures) + "."
+                        );
+                    }
                 }
-            });
+            );
+        services.AddOptions<VideoConversionOptions>()
+            .BindConfiguration("VideoConversion")
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
 
         services.AddHostedService<VideoConversionDaemon>();
 
@@ -359,7 +397,6 @@ public partial class Startup
                 services.AddSingleton<IEmailService, DefaultEmailService>();
                 break;
         }
-
     }
 
     private void ConfigureDataProtection(IServiceCollection services)

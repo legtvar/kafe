@@ -22,7 +22,7 @@ public static class MartenExtensions
         Hrib id,
         CancellationToken token = default
     )
-        where T : notnull, IEntity
+        where T : IEntity
     {
         var entity = await db.LoadAsync<T>(id.ToString(), token: token);
         if (entity is not null)
@@ -164,5 +164,18 @@ public static class MartenExtensions
         {
             return false;
         }
+    }
+
+    public static async Task<T> RequireLatest<T>(
+        this IEventStoreOperations db,
+        Hrib entityId,
+        CancellationToken ct = default
+    )
+        where T : class, IEntity
+    {
+        return await db.FetchLatest<T>(entityId.ToString(), ct)
+            ?? throw new InvalidOperationException(
+                $"The latest version of {typeof(T).Name} '{entityId}' could not be fetched."
+            );
     }
 }

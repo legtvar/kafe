@@ -85,16 +85,16 @@ public readonly record struct Err<T>
     {
         return new Err<T>(pair.value, pair.error);
     }
-    
+
     public static implicit operator Err<T>((T value, Exception exception) pair)
     {
         return new Err<T>(pair.value, pair.exception);
     }
 
     // NB: This is explicit to force people to unwrap their errors properly.
-    public static explicit operator T?(Err<T> err)
+    public static explicit operator T(Err<T> err)
     {
-        return err.HasErrors ? default : err.value;
+        return err.Unwrap();
     }
 
     public KafeErrorException AsException()

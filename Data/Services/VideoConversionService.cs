@@ -144,8 +144,9 @@ public class VideoConversionService(
         TimeSpan? Range = null,
         bool? HasOriginalVariant = true,
         bool? IsCorrupted = false,
-        bool? HasCompletedConversion = false,
-        bool? HasFailedConversion = false
+        bool? HasCompletedConversion = null,
+        bool? HasFailedConversion = null,
+        bool? HasCompletedOrFailedConversion = false
     );
 
     public IMartenQueryable<VideoShardInfo> QueryVideoShards(VideoShardFilter? filter = null)
@@ -204,6 +205,24 @@ public class VideoConversionService(
                          SELECT * FROM {db.DocumentStore.Options.Schema.For<VideoConversionInfo>(true)} as conversion
                          WHERE conversion.data ->> '{nameof(VideoConversionInfo.VideoId)}' = d.data ->> '{nameof(VideoShardInfo.Id)}'
                              AND (conversion.data -> '{nameof(VideoConversionInfo.HasFailed)}')::boolean
+                     )
+                     """
+                )
+            );
+        }
+
+        if (filter.HasCompletedOrFailedConversion is not null)
+        {
+            var hasCompletedOrFailedConversion = filter.HasCompletedOrFailedConversion.Value;
+            query = (IMartenQueryable<VideoShardInfo>)query.Where(v => v.MatchesSql(
+                    $"""
+                     {(hasCompletedOrFailedConversion ? "" : "NOT")} EXISTS
+                     (SELECT * FROM {db.DocumentStore.Options.Schema.For<VideoConversionInfo>(true)} as conversion
+                         WHERE conversion.data ->> '{nameof(VideoConversionInfo.VideoId)}' = d.data ->> '{nameof(VideoShardInfo.Id)}'
+                             AND (
+                                (conversion.data -> '{nameof(VideoConversionInfo.IsCompleted)}')::boolean
+                                OR (conversion.data -> '{nameof(VideoConversionInfo.HasFailed)}')::boolean
+                             )
                      )
                      """
                 )
@@ -424,8 +443,7 @@ public class VideoConversionService(
                 Range: range,
                 HasOriginalVariant: true,
                 IsCorrupted: false,
-                HasCompletedConversion: false,
-                HasFailedConversion: false
+                HasCompletedOrFailedConversion: false
             )
         );
         var video = await query.FirstOrDefaultAsync(ct);

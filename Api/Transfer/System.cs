@@ -11,3 +11,9 @@ public record SystemDetailDto(
     DateTimeOffset CommitDate,
     DateTimeOffset RunningSince
 );
+
+public record VideoConversionStatsDto(
+    int TotalVideoShardCount,
+    int CorruptedVideoShardCount,
+    int PendingVideoConversionCount
+);

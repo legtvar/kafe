@@ -162,31 +162,31 @@ public class VideoConversionService(
 
         if (filter.HasOriginalVariant is not null)
         {
-            var shouldHaveOriginal = filter.HasOriginalVariant.Value;
+            var hasOriginal = filter.HasOriginalVariant.Value;
             query = (IMartenQueryable<VideoShardInfo>)query.Where(v => v.MatchesSql(
                     $"d.data -> '{nameof(VideoShardInfo.Variants)}' "
-                    + $"-> '{Const.OriginalShardVariant}' IS {(shouldHaveOriginal ? "" : "NOT")} NULL"
+                    + $"-> '{Const.OriginalShardVariant}' IS {(hasOriginal ? "NOT" : "")} NULL"
                 )
             );
         }
 
         if (filter.IsCorrupted is not null)
         {
-            var shouldBeCorrupted = filter.IsCorrupted.Value;
+            var isCorrupted = filter.IsCorrupted.Value;
             query = (IMartenQueryable<VideoShardInfo>)query.Where(v => v.MatchesSql(
                     $"(d.data -> '{nameof(VideoShardInfo.Variants)}' -> '{Const.OriginalShardVariant}' "
                     + $"->> '{nameof(MediaInfo.IsCorrupted)}')::boolean = ?",
-                    shouldBeCorrupted
+                    isCorrupted
                 )
             );
         }
 
         if (filter.HasCompletedConversion is not null)
         {
-            var shouldHaveCompletedConversion = filter.HasCompletedConversion.Value;
+            var hasCompletedConversion = filter.HasCompletedConversion.Value;
             query = (IMartenQueryable<VideoShardInfo>)query.Where(v => v.MatchesSql(
                     $"""
-                     {(shouldHaveCompletedConversion ? "" : "NOT")} EXISTS (
+                     {(hasCompletedConversion ? "" : "NOT")} EXISTS (
                          SELECT * FROM {db.DocumentStore.Options.Schema.For<VideoConversionInfo>(true)} as conversion
                          WHERE conversion.data ->> '{nameof(VideoConversionInfo.VideoId)}' = d.data ->> '{nameof(VideoShardInfo.Id)}'
                              AND (conversion.data -> '{nameof(VideoConversionInfo.IsCompleted)}')::boolean
@@ -198,10 +198,10 @@ public class VideoConversionService(
 
         if (filter.HasFailedConversion is not null)
         {
-            var shouldHaveFailedConversion = filter.HasFailedConversion.Value;
+            var hasFailedConversion = filter.HasFailedConversion.Value;
             query = (IMartenQueryable<VideoShardInfo>)query.Where(v => v.MatchesSql(
                     $"""
-                     {(shouldHaveFailedConversion ? "" : "NOT")} EXISTS (
+                     {(hasFailedConversion ? "" : "NOT")} EXISTS (
                          SELECT * FROM {db.DocumentStore.Options.Schema.For<VideoConversionInfo>(true)} as conversion
                          WHERE conversion.data ->> '{nameof(VideoConversionInfo.VideoId)}' = d.data ->> '{nameof(VideoShardInfo.Id)}'
                              AND (conversion.data -> '{nameof(VideoConversionInfo.HasFailed)}')::boolean
@@ -356,6 +356,16 @@ public class VideoConversionService(
                 isDryRun: options.Value.IsDry,
                 token: ct
             );
+
+            if (!result.IsCorrupted && options.Value.IsDry)
+            {
+                result = result with
+                {
+                    IsCorrupted = true,
+                    Error = "No variant has been created because dry mode is on."
+                    + (string.IsNullOrEmpty(result.Error) ? "" : "\n\n" + result.Error)
+                };
+            }
         }
 
         return result;

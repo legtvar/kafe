@@ -14,5 +14,5 @@ public record VideoConversionCompleted(
 
 public record VideoConversionFailed(
     [Hrib] string ConversionId,
-    [LocalizedString] ImmutableDictionary<string, string> Reason
+    [LocalizedString] ImmutableDictionary<string, string>? Reason
 );

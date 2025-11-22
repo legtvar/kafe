@@ -129,6 +129,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<MigrationService>();
         services.AddScoped<OrganizationService>();
         services.AddScoped<RoleService>();
+        services.AddScoped<VideoConversionService>();
 
         services.AddOptions<StorageOptions>()
             .BindConfiguration("Storage")

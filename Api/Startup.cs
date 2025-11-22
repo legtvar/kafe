@@ -377,7 +377,8 @@ public partial class Startup
             .ValidateDataAnnotations()
             .ValidateOnStart();
 
-        services.AddHostedService<VideoConversionDaemon>();
+        services.AddSingleton<VideoConversionDaemon>();
+        services.AddHostedService<VideoConversionDaemon>(s => s.GetRequiredService<VideoConversionDaemon>());
 
         var emailServiceType = Configuration.GetSection("Email").Get<EmailOptions>()?.ServiceType
             ?? EmailOptions.EmailServiceType.Default;

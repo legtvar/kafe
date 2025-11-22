@@ -61,6 +61,7 @@ public record ProjectUnlocked(
 
 public record ProjectReviewAdded(
     [Hrib] string ProjectId,
+    [Hrib] string? ReviewerId,
     ReviewKind Kind,
     string ReviewerRole,
     [LocalizedString] ImmutableDictionary<string, string>? Comment

@@ -831,6 +831,7 @@ public partial class ProjectService
 
     public async Task<Err<bool>> AddReview(
         Hrib projectId,
+        Hrib? reviewerId,
         ReviewKind kind,
         string reviewerRole,
         LocalizedString? comment,
@@ -848,7 +849,7 @@ public partial class ProjectService
         }
 
         var eventStream = await db.Events.FetchForExclusiveWriting<ProjectInfo>(projectId.ToString(), token);
-        var reviewAdded = new ProjectReviewAdded(projectId.ToString(), kind, reviewerRole, comment);
+        var reviewAdded = new ProjectReviewAdded(projectId.ToString(), reviewerId?.ToString(), kind, reviewerRole, comment);
         eventStream.AppendOne(reviewAdded);
         await db.SaveChangesAsync(token);
         return true;

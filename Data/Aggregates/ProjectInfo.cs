@@ -92,6 +92,7 @@ public record ProjectArtifactInfo(
 ) : IEntity;
 
 public record ProjectReviewInfo(
+    [Hrib] string? ReviewerId,
     ReviewKind Kind,
     string ReviewerRole,
     [LocalizedString] ImmutableDictionary<string, string>? Comment,
@@ -241,6 +242,7 @@ public class ProjectInfoProjection : SingleStreamProjection<ProjectInfo, string>
         return p with
         {
             Reviews = p.Reviews.Add(new ProjectReviewInfo(
+                ReviewerId: e.Data.ReviewerId,
                 Kind: e.Data.Kind,
                 ReviewerRole: e.Data.ReviewerRole,
                 Comment: e.Data.Comment,

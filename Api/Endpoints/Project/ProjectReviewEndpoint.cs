@@ -58,9 +58,11 @@ public class ProjectReviewEndpoint : EndpointBaseAsync
         {
             return Unauthorized();
         }
+        var reviewerId = userProvider.Account?.Id;
 
         var result = await projectService.AddReview(
             projectId: dto.ProjectId,
+            reviewerId: reviewerId,
             kind: dto.Kind,
             reviewerRole: dto.ReviewerRole,
             comment: dto.Comment,

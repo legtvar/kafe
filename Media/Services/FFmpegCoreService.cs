@@ -74,6 +74,7 @@ public class FFmpegCoreService(ILogger<FFmpegCoreService>? logger = null) : IMed
         VideoQualityPreset preset,
         string? outputDir = null,
         bool overwrite = false,
+        bool isDryRun = false,
         CancellationToken token = default
     )
     {
@@ -106,7 +107,7 @@ public class FFmpegCoreService(ILogger<FFmpegCoreService>? logger = null) : IMed
                     overwrite: overwrite,
                     addArguments: o => o.WithVideoCodec("libvpx-vp9")
                         .WithAudioCodec("libopus")
-                        .ForceFormat("webm")
+                        .ForceFormat(isDryRun ? "null" : "webm")
                         .WithVideoFilters(f =>
                             f.Arguments.Add(
                                 new ScaleArgument(

@@ -25,5 +25,6 @@ public interface IMediaService
         VideoQualityPreset preset,
         string? outputDir = null,
         bool overwrite = false,
+        bool isDryRun = false,
         CancellationToken token = default);
 }

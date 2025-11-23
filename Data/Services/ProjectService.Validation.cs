@@ -15,7 +15,7 @@ public partial class ProjectService
 {
     public const int NameMaxLength = 42;
     public const int DescriptionMinLength = 50;
-    public const int DescriptionMaxLength = 200;
+    public const int DescriptionMaxLength = 10000;
     public const int GenreMaxLength = 32;
     public static readonly TimeSpan FilmMinLength = TimeSpan.FromSeconds(1);
     public static readonly TimeSpan FilmMaxLength = TimeSpan.FromMinutes(8);

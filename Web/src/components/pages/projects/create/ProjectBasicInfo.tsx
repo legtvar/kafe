@@ -12,6 +12,9 @@ import { LocalizedInput } from '../../../utils/LocalizedInput';
 import { ProjectAuthorList } from '../../../utils/ProjectAuthorList';
 import { SendAPI } from '../../../utils/SendAPI';
 import { TextareaLimited } from '../../../utils/TextareaLimited';
+import { ProjectBasicInfoForm } from './ProjectBasicInfoForm';
+import { MateProjectBasicInfoForm } from './MateProjectBasicInfoForm';
+import { currentOrganizationIdMapper } from '../../../../data/serialize/currentOrganizationIdMapper';
 
 interface IProjectBasicInfoProps {
     // Cannot be changed after initial draw
@@ -29,6 +32,8 @@ export function ProjectBasicInfo(props: IProjectBasicInfoProps) {
                 projectGroupId: props.groupId,
             } as any),
     );
+    const orgId = currentOrganizationIdMapper();
+
     const fu = useForceUpdate();
     const navigate = useNavigate();
     const authLink = useAuthLinkFunction();
@@ -56,122 +61,25 @@ export function ProjectBasicInfo(props: IProjectBasicInfoProps) {
 
     return (
         <SendAPI {...sendApiProps}>
-            {(onSubmit, status) => (
-                <Stack spacing={8} direction="column" mb={8}>
-                    <FormControl>
-                        <FormLabel>{t('createProject.fields.name').toString()}</FormLabel>
-                        <LocalizedInput
-                            as={Input}
-                            type="text"
-                            borderColor={border}
-                            bg={bg}
-                            name="name"
-                            placeholder={t('createProject.fields.name').toString()}
-                            value={project.name}
-                            onChange={(value) => forceUpdate(project.set('name', value))}
-                        />
-                    </FormControl>
-                    <FormControl>
-                        <FormLabel>{t('createProject.fields.genre').toString()}</FormLabel>
-                        <LocalizedInput
-                            as={Input}
-                            type="text"
-                            borderColor={border}
-                            bg={bg}
-                            name="genre"
-                            placeholder={t('createProject.fields.genre').toString()}
-                            value={project.genre}
-                            onChange={(value) => forceUpdate(project.set('genre', value))}
-                        />
-                    </FormControl>
-                    <FormControl>
-                        <FormLabel>{t('createProject.fields.description').toString()}</FormLabel>
-                        <LocalizedInput
-                            as={TextareaLimited}
-                            min={50}
-                            max={200}
-                            borderColor={border}
-                            bg={bg}
-                            name="description"
-                            placeholder={t('createProject.fields.description').toString()}
-                            value={project.description}
-                            onChange={(value) => forceUpdate(project.set('description', value))}
-                        />
-                    </FormControl>
-                    <FormControl py={12}>
-                        <FormLabel>{t('createProject.fields.crew').toString()}</FormLabel>
-                        <ProjectAuthorList
-                            authors={project.crew || []}
-                            editable
-                            requestDetails
-                            onRemove={(id) =>
-                                forceUpdate(
-                                    project.set(
-                                        'crew',
-                                        (project.crew || []).filter((member) => member.id !== id),
-                                    ),
-                                )
-                            }
-                        />
-                        <AuthorSelect
-                            onSelect={(id, roles) =>
-                                forceUpdate(
-                                    project.set('crew', [
-                                        ...(project.crew || []),
-                                        {
-                                            id,
-                                            roles,
-                                        } as any,
-                                    ]),
-                                )
-                            }
-                        />
-                    </FormControl>
-                    <FormControl pb={12}>
-                        <FormLabel>{t('createProject.fields.cast').toString()}</FormLabel>
-                        <ProjectAuthorList
-                            authors={project.cast || []}
-                            editable
-                            requestDetails
-                            onRemove={(id) =>
-                                forceUpdate(
-                                    project.set(
-                                        'cast',
-                                        (project.cast || []).filter((member) => member.id !== id),
-                                    ),
-                                )
-                            }
-                        />
-                        <AuthorSelect
-                            onSelect={(id, roles) =>
-                                forceUpdate(
-                                    project.set('cast', [
-                                        ...(project.cast || []),
-                                        {
-                                            id,
-                                            roles,
-                                        } as any,
-                                    ]),
-                                )
-                            }
-                        />
-                    </FormControl>
-                    {!props.noSelfSubmit && (
-                        <HStack w="100%">
-                            <Button
-                                colorScheme="blue"
-                                ml="auto"
-                                isDisabled={status === 'sending' || status === 'ok'}
-                                onClick={onSubmit}
-                            >
-                                {update
-                                    ? t('createProject.button.update').toString()
-                                    : t('createProject.button.create').toString()}
-                            </Button>
-                        </HStack>
-                    )}
-                </Stack>
-            )}
+            {(onSubmit, status) =>
+            orgId === 'mate-fimuni' ? (
+                <MateProjectBasicInfoForm
+                project={project}
+                onSubmit={onSubmit}
+                status={status}
+                update={update}
+                noSelfSubmit={props.noSelfSubmit}
+                />
+            ) : (
+                <ProjectBasicInfoForm
+                project={project}
+                onSubmit={onSubmit}
+                status={status}
+                update={update}
+                noSelfSubmit={props.noSelfSubmit}
+                />
+            )
+            }
         </SendAPI>
     );
 }

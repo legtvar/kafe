@@ -66,7 +66,8 @@
       "genre": "Genre",
       "movie": "Movie",
       "name": "Name of the movie",
-      "videoannotation": "Video annotation"
+      "videoannotation": "Video annotation",
+      "nameMate": "Project name"
     },
     "language": {
       "cs": "in czech",

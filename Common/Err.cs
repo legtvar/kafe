@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
 
@@ -12,13 +13,10 @@ public readonly record struct Err<T>
     // Inspired in part by: https://stackoverflow.com/questions/3151702/discriminated-union-in-c-sharp
     // And: https://ziglang.org/documentation/master/#while-with-Error-Unions
 
-    private readonly T value;
-    private readonly ImmutableArray<Error> errors;
-
     public Err()
     {
-        value = default!;
-        errors = ImmutableArray<Error>.Empty;
+        Value = default!;
+        Errors = ImmutableArray<Error>.Empty;
     }
 
     public Err(T value) : this(value, [])
@@ -36,24 +34,24 @@ public readonly record struct Err<T>
     public Err(Exception exception) : this()
     {
         var stackTrace = new StackTrace(skipFrames: 1, fNeedFileInfo: true);
-        errors = [new Error(exception, stackTrace.ToString())];
+        Errors = [new Error(exception, stackTrace.ToString())];
     }
 
     public Err(T value, ImmutableArray<Error> errors) : this()
     {
-        this.value = value;
-        this.errors = errors;
+        Value = value;
+        Errors = errors;
     }
 
     public Err(T value, Error error) : this(value, [error])
     {
     }
 
-    public T Value => value;
+    public T Value { get; init; }
 
-    public ImmutableArray<Error> Errors => errors;
+    public ImmutableArray<Error> Errors { get; init; }
 
-    public bool HasErrors => !errors.IsEmpty;
+    public bool HasErrors => !Errors.IsEmpty;
 
 
     public static implicit operator Err<T>(T value)
@@ -120,5 +118,13 @@ public readonly record struct Err<T>
     public T? GetValueOrDefault()
     {
         return HasErrors ? default : Value;
+    }
+
+    public Err<T> WithErrors(params IEnumerable<Error> newErrors)
+    {
+        return this with
+        {
+            Errors = Errors.AddRange(newErrors)
+        };
     }
 }

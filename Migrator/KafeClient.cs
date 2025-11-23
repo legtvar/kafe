@@ -225,6 +225,7 @@ public sealed class KafeClient : IAsyncDisposable
     {
         hrib ??= Hrib.Create();
         var created = new ProjectCreated(
+            OwnerId: null,
             ProjectId: hrib.ToString(),
             CreationMethod: CreationMethod.Migrator,
             ProjectGroupId: projectGroupId.ToString(),

@@ -11,3 +11,16 @@ public record SystemDetailDto(
     DateTimeOffset CommitDate,
     DateTimeOffset RunningSince
 );
+
+public record VideoConversionStatsDto(
+    int TotalVideoShardCount,
+    int CorruptedVideoShardCount,
+    int PendingVideoConversionCount,
+    int FailedVideoConversionCount
+);
+
+public record VideoConversionRetryDto(
+    ImmutableArray<Hrib>? Ids = null,
+    bool ShouldRetryOriginalAnalysis = false,
+    bool ShouldRetryConversion = true
+);

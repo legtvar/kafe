@@ -46,6 +46,7 @@ public static class ServiceCollectionExtensions
             mo.Events.StreamIdentity = StreamIdentity.AsString;
             mo.Events.UseMandatoryStreamTypeDeclaration = true;
             mo.Events.MetadataConfig.UserNameEnabled = true;
+            mo.Events.UseIdentityMapForAggregates = true;
 
             if (environment.IsDevelopment())
             {
@@ -128,6 +129,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<MigrationService>();
         services.AddScoped<OrganizationService>();
         services.AddScoped<RoleService>();
+        services.AddScoped<VideoConversionService>();
 
         services.AddOptions<StorageOptions>()
             .BindConfiguration("Storage")

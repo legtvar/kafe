@@ -9,6 +9,9 @@ public readonly partial record struct Error
     public const string LockedId = nameof(Locked);
     public const string InvalidValueId = nameof(InvalidValue);
     public const string AlreadyExistsId = nameof(AlreadyExists);
+    public const string AlreadyCompletedId = nameof(AlreadyCompleted);
+    public const string AlreadyFailedId = nameof(AlreadyFailed);
+    public const string AnalysisFailedId = nameof(AnalysisFailed);
     public const string ParameterArgument = "parameter";
 
     public static Error NotFound(string? message = null)
@@ -29,9 +32,12 @@ public readonly partial record struct Error
 
     public static Error InvalidOrEmptyHrib(string? description = null)
     {
-        return new Error(BadHribId, description is null
-            ? $"Encounterd an invalid or empty identifier."
-            : $"{description} must be a valid and non-empty identifier.");
+        return new Error(
+            BadHribId,
+            description is null
+                ? $"Encountered an invalid or empty identifier."
+                : $"{description} must be a valid and non-empty identifier."
+        );
     }
 
     public static Error MissingValue(string what)
@@ -69,7 +75,7 @@ public readonly partial record struct Error
     {
         return new Error(InvalidValueId, message);
     }
-    
+
     public static Error AlreadyExists(string? message = null)
     {
         return new Error(AlreadyExistsId, message ?? "Value already exists.");
@@ -78,5 +84,23 @@ public readonly partial record struct Error
     public static Error AlreadyExists(Hrib id, string description = "An entity")
     {
         return new Error(AlreadyExistsId, $"{description} with identifier '{id}' already exists.");
+    }
+
+    public static Error AlreadyFailed(string description = "The operation")
+    {
+        return new Error(
+            AlreadyFailedId,
+            $"{description} already failed and thus cannot be completed nor fail with a different error."
+        );
+    }
+
+    public static Error AlreadyCompleted(string description = "The operation")
+    {
+        return new Error(AlreadyCompletedId, $"{description} already completed successfully and thus cannot fail.");
+    }
+
+    public static Error AnalysisFailed(Hrib shardId, string? message = null)
+    {
+        return new Error(AnalysisFailedId, $"Analysis of shard '{shardId}' failed:\n\n{message}");
     }
 }

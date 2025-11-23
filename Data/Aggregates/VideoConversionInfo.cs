@@ -1,7 +1,8 @@
+using System;
 using Kafe.Data.Events;
-using Marten.Events;
 using Marten.Events.Aggregation;
 using System.Collections.Immutable;
+using JasperFx.Events;
 
 namespace Kafe.Data.Aggregates;
 
@@ -17,6 +18,7 @@ public record VideoConversionInfo(
     [Hrib] string Id,
     string VideoId,
     string Variant,
+    DateTimeOffset CreatedAt = default,
     bool IsCompleted = false,
     bool HasFailed = false,
     [LocalizedString] ImmutableDictionary<string, string>? Error = null
@@ -28,12 +30,14 @@ public class VideoConversionInfoProjection : SingleStreamProjection<VideoConvers
     {
     }
 
-    public static VideoConversionInfo Create(VideoConversionCreated e)
+    public static VideoConversionInfo Create(IEvent<VideoConversionCreated> e)
     {
         return new VideoConversionInfo(
-            Id: e.ConversionId,
-            VideoId: e.VideoId,
-            Variant: e.Variant);
+            Id: e.Data.ConversionId,
+            VideoId: e.Data.VideoId,
+            Variant: e.Data.Variant,
+            CreatedAt: e.Timestamp
+        );
     }
 
     public VideoConversionInfo Apply(VideoConversionCompleted e, VideoConversionInfo c)

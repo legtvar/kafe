@@ -90,13 +90,15 @@ public record Hrib : IParsable<Hrib>
         {
             sb.Append(Alphabet[RandomNumberGenerator.GetInt32(Alphabet.Length)]);
         }
+
         return new Hrib(sb.ToString());
     }
 
     public static bool TryParse(
         string? value,
         [NotNullWhen(true)] out Hrib? hrib,
-        [NotNullWhen(false)] out string? error)
+        [NotNullWhen(false)] out string? error
+    )
     {
         hrib = null;
         error = null;
@@ -154,7 +156,8 @@ public record Hrib : IParsable<Hrib>
     static bool IParsable<Hrib>.TryParse(
         [NotNullWhen(true)] string? value,
         IFormatProvider? provider,
-        [MaybeNullWhen(false)] out Hrib hrib)
+        [MaybeNullWhen(false)] out Hrib hrib
+    )
     {
         var result = Parse(value);
         if (result.HasErrors)
@@ -167,20 +170,58 @@ public record Hrib : IParsable<Hrib>
         return true;
     }
 
+    /// <summary>
+    /// Parses <paramref name="value"/> and ensures it's a valid <see cref="Hrib"/>.
+    /// </summary>
+    /// <param name="value">Value to be parsed</param>
+    /// <param name="shouldReplaceEmpty">Replace <see cref="Empty"/> with a fresh <see cref="Hrib"/></param>
+    /// <returns>A valid HRIB or an error</returns>
+    public static Err<Hrib> EnsureValid(string value, bool shouldReplaceEmpty = false)
+    {
+        var result = Parse(value);
+        if (result.HasErrors)
+        {
+            return result.Errors;
+        }
+
+        var hrib = result.Unwrap();
+        if (hrib.IsInvalid)
+        {
+            return Error.BadHrib(hrib.RawValue);
+        }
+
+        if (hrib.IsEmpty)
+        {
+            if (shouldReplaceEmpty)
+            {
+                hrib = Hrib.Create();
+            }
+            else
+            {
+                return Error.InvalidOrEmptyHrib();
+            }
+        }
+
+        return hrib;
+    }
+
     public string ToString(bool throwOnInvalidAndEmpty)
     {
         if (throwOnInvalidAndEmpty && RawValue == InvalidValue)
         {
             throw new InvalidOperationException(
-                "This Hrib is invalid and cannot be stringified to prevent accidental use in a database.");
+                "This Hrib is invalid and cannot be stringified to prevent accidental use in a database."
+            );
         }
 
         if (throwOnInvalidAndEmpty && RawValue == EmptyValue)
         {
             throw new InvalidOperationException(
                 "This Hrib is empty and cannot be stringified to prevent accidental use in a database."
-                    + "This value is meant to be replaced with a proper HRIB by an entity service.");
+                + "This value is meant to be replaced with a proper HRIB by an entity service."
+            );
         }
+
         return RawValue;
     }
 

@@ -15,7 +15,8 @@ public record SystemDetailDto(
 public record VideoConversionStatsDto(
     int TotalVideoShardCount,
     int CorruptedVideoShardCount,
-    int PendingVideoConversionCount
+    int PendingVideoConversionCount,
+    int FailedVideoConversionCount
 );
 
 public record VideoConversionRetryDto(

@@ -115,7 +115,8 @@ public class FFmpegCoreService(ILogger<FFmpegCoreService>? logger = null) : IMed
                                     preset.ToHeight(),
                                     "decrease",
                                     forceDivisibleBy: 2,
-                                    resetSar: true
+                                    // TODO: set reset_sar to true one we update ffmpeg to 8.0
+                                    resetSar: false
                                 )
                             )
                         )

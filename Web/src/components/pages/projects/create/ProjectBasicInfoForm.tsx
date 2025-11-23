@@ -56,7 +56,7 @@ export function ProjectBasicInfoForm({ project, onSubmit, status, update, noSelf
                 <LocalizedInput
                     as={TextareaLimited}
                     min={50}
-                    max={200}
+                    max={10000}
                     borderColor={border}
                     bg={bg}
                     name="description"

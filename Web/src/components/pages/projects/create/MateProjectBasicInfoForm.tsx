@@ -43,7 +43,7 @@ export function MateProjectBasicInfoForm({ project, onSubmit, status, update, no
                 <LocalizedInput
                     as={TextareaLimited}
                     min={50}
-                    max={200}
+                    max={10000}
                     borderColor={border}
                     bg={bg}
                     name="description"

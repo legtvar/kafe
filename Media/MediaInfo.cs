@@ -33,5 +33,5 @@ public record MediaInfo(
         AudioStreams: ImmutableArray<AudioStreamInfo>.Empty,
         SubtitleStreams: ImmutableArray<SubtitleStreamInfo>.Empty,
         IsCorrupted: true,
-        Error: "This MediaInfo is Invalid.");
+        Error: null);
 }

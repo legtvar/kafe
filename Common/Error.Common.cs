@@ -11,6 +11,7 @@ public readonly partial record struct Error
     public const string AlreadyExistsId = nameof(AlreadyExists);
     public const string AlreadyCompletedId = nameof(AlreadyCompleted);
     public const string AlreadyFailedId = nameof(AlreadyFailed);
+    public const string AnalysisFailedId = nameof(AnalysisFailed);
     public const string ParameterArgument = "parameter";
 
     public static Error NotFound(string? message = null)
@@ -96,5 +97,10 @@ public readonly partial record struct Error
     public static Error AlreadyCompleted(string description = "The operation")
     {
         return new Error(AlreadyCompletedId, $"{description} already completed successfully and thus cannot fail.");
+    }
+
+    public static Error AnalysisFailed(Hrib shardId, string? message = null)
+    {
+        return new Error(AnalysisFailedId, $"Analysis of shard '{shardId}' failed:\n\n{message}");
     }
 }

@@ -4,6 +4,8 @@ using Kafe.Media;
 using Kafe.Media.Services;
 using Marten;
 using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -22,7 +24,8 @@ public class ShardService
         IDocumentSession db,
         StorageService storageService,
         IMediaService mediaService,
-        IImageService imageService)
+        IImageService imageService
+    )
     {
         this.db = db;
         this.storageService = storageService;
@@ -49,13 +52,20 @@ public class ShardService
         return shard;
     }
 
+    public async Task<ImmutableArray<T>> LoadMany<T>(IEnumerable<Hrib> ids, CancellationToken ct = default)
+        where T : IShardEntity
+    {
+        return (await db.KafeLoadManyAsync<T>([..ids], ct)).Unwrap();
+    }
+
     public async Task<Hrib?> Create(
         ShardKind kind,
         Hrib artifactId,
         Stream stream,
         string mimeType,
         Hrib? shardId = null,
-        CancellationToken token = default)
+        CancellationToken token = default
+    )
     {
         return kind switch
         {
@@ -72,12 +82,15 @@ public class ShardService
         Stream videoStream,
         string mimeType,
         Hrib? shardId = null,
-        CancellationToken token = default)
+        CancellationToken token = default
+    )
     {
         if (mimeType != Const.MatroskaMimeType && mimeType != Const.Mp4MimeType)
         {
-            throw new ArgumentException($"Only '{Const.MatroskaMimeType}' and '{Const.Mp4MimeType}' video container " +
-                $"formats are supported.");
+            throw new ArgumentException(
+                $"Only '{Const.MatroskaMimeType}' and '{Const.Mp4MimeType}' video container " +
+                $"formats are supported."
+            );
         }
 
         shardId ??= Hrib.Create();
@@ -85,21 +98,23 @@ public class ShardService
             ? Const.MatroskaFileExtension
             : Const.Mp4FileExtension;
         if (!await storageService.TryStoreShard(
-            ShardKind.Video,
-            shardId,
-            videoStream,
-            Const.OriginalShardVariant,
-            originalFileExtension,
-            token))
+                ShardKind.Video,
+                shardId,
+                videoStream,
+                Const.OriginalShardVariant,
+                originalFileExtension,
+                token
+            ))
         {
             throw new InvalidOperationException($"Failed to store shard '{shardId}'.");
         }
 
         if (!storageService.TryGetFilePath(
-            ShardKind.Video,
-            shardId,
-            Const.OriginalShardVariant,
-            out var shardFilePath))
+                ShardKind.Video,
+                shardId,
+                Const.OriginalShardVariant,
+                out var shardFilePath
+            ))
         {
             throw new ArgumentException("The shard stream could not be opened just after being saved.");
         }
@@ -110,7 +125,8 @@ public class ShardService
             ShardId: shardId.ToString(),
             CreationMethod: CreationMethod.Api,
             ArtifactId: artifactId.ToString(),
-            OriginalVariantInfo: mediaInfo);
+            OriginalVariantInfo: mediaInfo
+        );
         db.Events.KafeStartStream<VideoShardInfo>(created.ShardId, created);
         await db.SaveChangesAsync(token);
 
@@ -121,7 +137,8 @@ public class ShardService
         Hrib artifactId,
         Stream imageStream,
         Hrib? shardId = null,
-        CancellationToken token = default)
+        CancellationToken token = default
+    )
     {
         var imageInfo = await imageService.GetInfo(imageStream, token);
 
@@ -133,15 +150,17 @@ public class ShardService
             ShardId: shardId.ToString(),
             CreationMethod: CreationMethod.Api,
             ArtifactId: artifactId.ToString(),
-            OriginalVariantInfo: imageInfo);
+            OriginalVariantInfo: imageInfo
+        );
 
         if (!await storageService.TryStoreShard(
-            ShardKind.Image,
-            created.ShardId,
-            imageStream,
-            Const.OriginalShardVariant,
-            imageInfo.FileExtension,
-            token))
+                ShardKind.Image,
+                created.ShardId,
+                imageStream,
+                Const.OriginalShardVariant,
+                imageInfo.FileExtension,
+                token
+            ))
         {
             throw new InvalidOperationException("The image could not be stored.");
         }
@@ -156,7 +175,8 @@ public class ShardService
         Hrib artifactId,
         Stream subtitlesStream,
         Hrib? shardId = null,
-        CancellationToken token = default)
+        CancellationToken token = default
+    )
     {
         var mediaInfo = await mediaService.GetInfo(subtitlesStream, token);
 
@@ -179,7 +199,8 @@ public class ShardService
             Language: ssInfo.Language,
             Codec: ssInfo.Codec,
             Bitrate: ssInfo.Bitrate,
-            IsCorrupted: mediaInfo.IsCorrupted);
+            IsCorrupted: mediaInfo.IsCorrupted
+        );
 
         shardId ??= Hrib.Create();
 
@@ -187,15 +208,17 @@ public class ShardService
             ShardId: shardId.ToString(),
             CreationMethod: CreationMethod.Api,
             ArtifactId: artifactId.ToString(),
-            OriginalVariantInfo: info);
+            OriginalVariantInfo: info
+        );
 
         if (!await storageService.TryStoreShard(
-            ShardKind.Subtitles,
-            shardId,
-            subtitlesStream,
-            Const.OriginalShardVariant,
-            info.FileExtension,
-            token))
+                ShardKind.Subtitles,
+                shardId,
+                subtitlesStream,
+                Const.OriginalShardVariant,
+                info.FileExtension,
+                token
+            ))
         {
             throw new InvalidOperationException("The subtitles could not be stored.");
         }
@@ -210,7 +233,8 @@ public class ShardService
         Hrib artifactId,
         Stream blendStream,
         Hrib? shardId = null,
-        CancellationToken token = default)
+        CancellationToken token = default
+    )
     {
         var blendInfo = new BlendInfo(".blend", "application/x-blender");
         blendStream.Seek(0, SeekOrigin.Begin);
@@ -220,19 +244,21 @@ public class ShardService
             ShardId: shardId.ToString(),
             CreationMethod: CreationMethod.Api,
             ArtifactId: artifactId.ToString(),
-            OriginalVariantInfo: blendInfo);
+            OriginalVariantInfo: blendInfo
+        );
 
         if (!await storageService.TryStoreShard(
-            ShardKind.Blend,
-            created.ShardId,
-            blendStream,
-            Const.OriginalShardVariant,
-            blendInfo.FileExtension,
-            token))
+                ShardKind.Blend,
+                created.ShardId,
+                blendStream,
+                Const.OriginalShardVariant,
+                blendInfo.FileExtension,
+                token
+            ))
         {
             throw new InvalidOperationException("The .blend file could not be stored.");
         }
-        
+
         db.Events.KafeStartStream<BlendShardInfo>(created.ShardId, created);
         await db.SaveChangesAsync(token);
         return created.ShardId;
@@ -260,7 +286,7 @@ public class ShardService
 
         return ((IShardCreated)firstEvent.Data).GetShardKind();
     }
-    
+
     public record VariantInfo(
         Hrib ShardId,
         string Variant,
@@ -271,7 +297,8 @@ public class ShardService
     public async Task<VariantInfo?> GetShardVariantMediaType(
         Hrib id,
         string? variant,
-        CancellationToken token = default)
+        CancellationToken token = default
+    )
     {
         variant = SanitizeVariantName(variant);
 
@@ -289,31 +316,36 @@ public class ShardService
                     ShardId: shard.Id,
                     Variant: variant,
                     FileExtension: media.FileExtension,
-                    MimeType: media.MimeType)
+                    MimeType: media.MimeType
+                )
                 : null,
             ShardKind.Image => ((ImageShardInfo)shard).Variants.TryGetValue(variant, out var image)
                 ? new VariantInfo(
                     ShardId: shard.Id,
                     Variant: variant,
                     FileExtension: image.FileExtension,
-                    MimeType: image.MimeType)
+                    MimeType: image.MimeType
+                )
                 : null,
             ShardKind.Subtitles => ((SubtitlesShardInfo)shard).Variants.TryGetValue(variant, out var image)
                 ? new VariantInfo(
                     ShardId: shard.Id,
                     Variant: variant,
                     FileExtension: image.FileExtension,
-                    MimeType: image.MimeType)
+                    MimeType: image.MimeType
+                )
                 : null,
             ShardKind.Blend => ((BlendShardInfo)shard).Variants.TryGetValue(variant, out var media)
                 ? new VariantInfo(
                     ShardId: shard.Id,
                     Variant: variant,
                     FileExtension: media.FileExtension,
-                    MimeType: media.MimeType)
+                    MimeType: media.MimeType
+                )
                 : null,
             _ => throw new NotImplementedException()
-        }; ;
+        };
+        ;
     }
 
     private static string SanitizeVariantName(string? variant)

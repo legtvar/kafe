@@ -265,12 +265,12 @@ public class VideoConversionService(
         }
         catch (Exception e)
         {
-            logger.LogError(e, "Failed with error.");
             mediaInfo = mediaInfo with { IsCorrupted = true, Error = e.Message };
         }
 
         if (mediaInfo.IsCorrupted || mediaInfo.Error is not null)
         {
+            logger.LogError("Failed with error.\n{Error}", mediaInfo.Error);
             conversion = conversion with
             {
                 HasFailed = true,
@@ -372,7 +372,7 @@ public class VideoConversionService(
                 token: ct
             );
 
-            if (!result.IsCorrupted && options.Value.IsDry)
+            if (options.Value.IsDry)
             {
                 result = result with
                 {

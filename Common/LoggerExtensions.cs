@@ -8,4 +8,9 @@ public static class LoggerExtensions
     {
         self.LogError(message + "\n{Errors}", [..args, err.Errors]);
     }
+
+    public static void LogError(this ILogger self, Error error, string? message, params object?[] args)
+    {
+        self.LogError(new Err<bool>(error), message, args);
+    }
 }

@@ -17,3 +17,9 @@ public record VideoConversionStatsDto(
     int CorruptedVideoShardCount,
     int PendingVideoConversionCount
 );
+
+public record VideoConversionRetryDto(
+    ImmutableArray<Hrib>? Ids = null,
+    bool ShouldRetryOriginalAnalysis = false,
+    bool ShouldRetryConversion = true
+);

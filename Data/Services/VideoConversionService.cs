@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Kafe.Data.Aggregates;
@@ -31,6 +33,14 @@ public class VideoConversionService(
     )
     {
         return (await db.KafeLoadAsync<VideoConversionInfo>(id, token: ct)).GetValueOrDefault();
+    }
+
+    public async Task<ImmutableArray<VideoConversionInfo>> LoadMany(
+        IEnumerable<Hrib> ids,
+        CancellationToken ct = default
+    )
+    {
+        return (await db.KafeLoadManyAsync<VideoConversionInfo>([..ids], ct)).Unwrap();
     }
 
     public async Task<Err<VideoConversionInfo>> Upsert(VideoConversionInfo conversion, CancellationToken ct = default)
@@ -118,35 +128,67 @@ public class VideoConversionService(
 
     public record VideoConversionFilter(
         bool? IsCompleted = false,
-        bool? HasFailed = false
+        bool? HasFailed = false,
+        bool ShouldFetchLatestOnly = true
     );
 
-    public IMartenQueryable<VideoConversionInfo> Query(VideoConversionFilter? filter = null)
+    public async Task<ImmutableArray<VideoConversionInfo>> List(
+        VideoConversionFilter? filter = null,
+        CancellationToken ct = default
+    )
     {
         filter ??= new VideoConversionFilter();
-        var query = db.Query<VideoConversionInfo>();
+
+        if (!filter.ShouldFetchLatestOnly)
+        {
+            var query = db.Query<VideoConversionInfo>();
+            if (filter.IsCompleted is not null)
+            {
+                var isCompleted = filter.IsCompleted.Value;
+                query = (IMartenQueryable<VideoConversionInfo>)query.Where(v => v.IsCompleted == isCompleted);
+            }
+
+            if (filter.HasFailed is not null)
+            {
+                var hasFailed = filter.HasFailed.Value;
+                query = (IMartenQueryable<VideoConversionInfo>)query.Where(v => v.HasFailed == hasFailed);
+            }
+
+            return [..await query.ToListAsync(ct)];
+        }
+
+        var sb = new StringBuilder();
+        sb.Append(
+            $"""
+             SELECT a.id, a.data, a.mt_version
+             FROM {db.DocumentStore.Options.Schema.For<VideoConversionInfo>()} AS a
+                 LEFT OUTER JOIN {db.DocumentStore.Options.Schema.For<VideoConversionInfo>()} AS b
+             	    ON a.data ->> '{nameof(VideoConversionInfo.VideoId)}' = b.data ->> '{nameof(VideoConversionInfo.VideoId)}'
+             		    AND a.data ->> '{nameof(VideoConversionInfo.Variant)}' = b.data ->> '{nameof(VideoConversionInfo.Variant)}'
+             		    AND (a.data ->> '{nameof(VideoConversionInfo.CreatedAt)}')::timestamptz < (b.data ->> '{nameof(VideoConversionInfo.CreatedAt)}')::timestamptz
+                 WHERE b.id IS NULL
+             """
+        );
         if (filter.IsCompleted is not null)
         {
             var isCompleted = filter.IsCompleted.Value;
-            query = (IMartenQueryable<VideoConversionInfo>)query.Where(v => v.IsCompleted == isCompleted);
+            sb.Append($" AND ((a.data ->> '{nameof(VideoConversionInfo.IsCompleted)}')::boolean = {isCompleted})");
         }
 
         if (filter.HasFailed is not null)
         {
             var hasFailed = filter.HasFailed.Value;
-            query = (IMartenQueryable<VideoConversionInfo>)query.Where(v => v.HasFailed == hasFailed);
+            sb.Append($" AND ((a.data ->> '{nameof(VideoConversionInfo.HasFailed)}')::boolean = {hasFailed})");
         }
 
-        return query;
+        return [..await db.AdvancedSql.QueryAsync<VideoConversionInfo>(sb.ToString(), ct)];
     }
 
     public record VideoShardFilter(
         TimeSpan? Range = null,
         bool? HasOriginalVariant = true,
         bool? IsCorrupted = false,
-        bool? HasCompletedConversion = null,
-        bool? HasFailedConversion = null,
-        bool? HasCompletedOrFailedConversion = false
+        bool? HasAnyCompletedOrFailedConversions = false
     );
 
     public IMartenQueryable<VideoShardInfo> QueryVideoShards(VideoShardFilter? filter = null)
@@ -181,48 +223,21 @@ public class VideoConversionService(
             );
         }
 
-        if (filter.HasCompletedConversion is not null)
+        if (filter.HasAnyCompletedOrFailedConversions is not null)
         {
-            var hasCompletedConversion = filter.HasCompletedConversion.Value;
+            var hasCompletedOrFailedConversions = filter.HasAnyCompletedOrFailedConversions.Value;
             query = (IMartenQueryable<VideoShardInfo>)query.Where(v => v.MatchesSql(
                     $"""
-                     {(hasCompletedConversion ? "" : "NOT")} EXISTS (
-                         SELECT * FROM {db.DocumentStore.Options.Schema.For<VideoConversionInfo>(true)} as conversion
-                         WHERE conversion.data ->> '{nameof(VideoConversionInfo.VideoId)}' = d.data ->> '{nameof(VideoShardInfo.Id)}'
-                             AND (conversion.data -> '{nameof(VideoConversionInfo.IsCompleted)}')::boolean
-                     )
-                     """
-                )
-            );
-        }
-
-        if (filter.HasFailedConversion is not null)
-        {
-            var hasFailedConversion = filter.HasFailedConversion.Value;
-            query = (IMartenQueryable<VideoShardInfo>)query.Where(v => v.MatchesSql(
-                    $"""
-                     {(hasFailedConversion ? "" : "NOT")} EXISTS (
-                         SELECT * FROM {db.DocumentStore.Options.Schema.For<VideoConversionInfo>(true)} as conversion
-                         WHERE conversion.data ->> '{nameof(VideoConversionInfo.VideoId)}' = d.data ->> '{nameof(VideoShardInfo.Id)}'
-                             AND (conversion.data -> '{nameof(VideoConversionInfo.HasFailed)}')::boolean
-                     )
-                     """
-                )
-            );
-        }
-
-        if (filter.HasCompletedOrFailedConversion is not null)
-        {
-            var hasCompletedOrFailedConversion = filter.HasCompletedOrFailedConversion.Value;
-            query = (IMartenQueryable<VideoShardInfo>)query.Where(v => v.MatchesSql(
-                    $"""
-                     {(hasCompletedOrFailedConversion ? "" : "NOT")} EXISTS
-                     (SELECT * FROM {db.DocumentStore.Options.Schema.For<VideoConversionInfo>(true)} as conversion
-                         WHERE conversion.data ->> '{nameof(VideoConversionInfo.VideoId)}' = d.data ->> '{nameof(VideoShardInfo.Id)}'
-                             AND (
-                                (conversion.data -> '{nameof(VideoConversionInfo.IsCompleted)}')::boolean
-                                OR (conversion.data -> '{nameof(VideoConversionInfo.HasFailed)}')::boolean
-                             )
+                     {(hasCompletedOrFailedConversions ? "" : "NOT")} EXISTS (
+                         SELECT a.*  FROM {db.DocumentStore.Options.Schema.For<VideoConversionInfo>(true)} AS a
+                         LEFT OUTER JOIN {db.DocumentStore.Options.Schema.For<VideoConversionInfo>(true)} AS b
+                     	    ON a.data ->> '{nameof(VideoConversionInfo.VideoId)}' = b.data ->> '{nameof(VideoConversionInfo.VideoId)}'
+                     		    AND a.data ->> '{nameof(VideoConversionInfo.Variant)}' = b.data ->> '{nameof(VideoConversionInfo.Variant)}'
+                     		    AND (a.data ->> '{nameof(VideoConversionInfo.CreatedAt)}')::timestamptz < (b.data ->> '{nameof(VideoConversionInfo.CreatedAt)}')::timestamptz
+                         WHERE b.id is null AND a.data ->> '{nameof(VideoConversionInfo.VideoId)}' = d.id AND (
+                            (a.data ->> '{nameof(VideoConversionInfo.IsCompleted)}')::boolean
+                            OR (a.data ->> '{nameof(VideoConversionInfo.HasFailed)}')::boolean
+                         )
                      )
                      """
                 )
@@ -373,13 +388,14 @@ public class VideoConversionService(
 
     public async Task<VideoConversionInfo?> FindConversionToHandle(CancellationToken ct = default)
     {
-        var unfinishedConversions = await Query(
+        var unfinishedConversions = await List(
             new VideoConversionFilter(
                 IsCompleted: false,
                 HasFailed: false
-            )
-        ).ToListAsync(ct);
-        if (unfinishedConversions.Count > 0)
+            ),
+            ct
+        );
+        if (unfinishedConversions.Length > 0)
         {
             var conversion = unfinishedConversions
                 .Select(c => (conversion: c, preset: Video.GetPresetFromFileName(c.Variant)))
@@ -443,6 +459,115 @@ public class VideoConversionService(
         return newConversion;
     }
 
+    public async Task<Err<bool>> RetryConversions(
+        IEnumerable<Hrib>? ids = null,
+        CancellationToken ct = default
+    )
+    {
+        ImmutableArray<VideoConversionInfo> conversions;
+        if (ids is not null)
+        {
+            conversions = await LoadMany(ids, ct);
+        }
+        else
+        {
+            conversions = await List(
+                new VideoConversionFilter(
+                    IsCompleted: null,
+                    HasFailed: true
+                ),
+                ct
+            );
+        }
+
+        logger.LogInformation("Retrying {ConversionCount} video conversions.", conversions.Length);
+        foreach (var conversion in conversions)
+        {
+            var err = await Upsert(
+                new VideoConversionInfo(
+                    Id: Hrib.EmptyValue,
+                    VideoId: conversion.VideoId,
+                    Variant: conversion.Variant
+                ),
+                ct
+            );
+            if (err.HasErrors)
+            {
+                return err.Errors;
+            }
+        }
+
+        return true;
+    }
+
+    public async Task<Err<bool>> RetryOriginalAnalysis(
+        IEnumerable<Hrib>? shardIds = null,
+        CancellationToken ct = default
+    )
+    {
+        ImmutableArray<VideoShardInfo> videos;
+        if (shardIds is not null)
+        {
+            videos = await shardService.LoadMany<VideoShardInfo>(shardIds, ct);
+        }
+        else
+        {
+            videos =
+            [
+                ..await QueryVideoShards(
+                        new VideoShardFilter(
+                            HasOriginalVariant: true,
+                            IsCorrupted: true,
+                            HasAnyCompletedOrFailedConversions: null
+                        )
+                    )
+                    .ToListAsync(ct)
+            ];
+        }
+
+        logger.LogInformation("Retrying {AnalysisCount} media analysis of original variants.", videos.Length);
+
+        var result = new Err<bool>();
+
+        foreach (var video in videos)
+        {
+            if (!storageService.TryGetFilePath(
+                    ShardKind.Video,
+                    video.Id,
+                    Const.OriginalShardVariant,
+                    out var shardFilePath
+                ))
+            {
+                logger.LogError("Cound not find original variant of video shard {VideoShardId}.", video.Id);
+                result = result.WithErrors(
+                    Error.NotFound($"Original variant of shard '{video.Id}' could not be found.")
+                );
+                continue;
+            }
+
+            var mediaInfo = await mediaService.GetInfo(shardFilePath, ct);
+            if (mediaInfo.IsCorrupted)
+            {
+                var error = Error.AnalysisFailed(video.Id, mediaInfo.Error);
+                result = result.WithErrors(error);
+                logger.LogError(error, "Retry of media analysis of video shard {VideoShardId} failed.");
+                continue;
+            }
+
+            db.Events.Append(
+                video.Id,
+                new VideoShardVariantAdded(
+                    ShardId: video.Id,
+                    Name: Const.OriginalShardVariant,
+                    Info: mediaInfo
+                )
+            );
+            await db.SaveChangesAsync(ct);
+        }
+
+        return result;
+    }
+
     private async Task<VideoShardInfo?> FindVideoInRange(
         TimeSpan? range,
         CancellationToken ct = default
@@ -453,7 +578,7 @@ public class VideoConversionService(
                 Range: range,
                 HasOriginalVariant: true,
                 IsCorrupted: false,
-                HasCompletedOrFailedConversion: false
+                HasAnyCompletedOrFailedConversions: false
             )
         );
         var video = await query.FirstOrDefaultAsync(ct);

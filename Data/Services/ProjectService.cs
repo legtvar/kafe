@@ -96,6 +96,7 @@ public partial class ProjectService
 
             var created = new ProjectCreated(
                 ProjectId: id.ToString(),
+                OwnerId: ownerId?.ToString(),
                 CreationMethod: CreationMethod.Api,
                 ProjectGroupId: project.ProjectGroupId,
                 Name: project.Name);

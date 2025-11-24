@@ -138,7 +138,8 @@ public static class TransferMaps
             GlobalPermissions: ToPermissionArray(data.GlobalPermissions),
             UserPermissions: ToPermissionArray(data.GlobalPermissions | userPermission),
             ReleasedOn: data.ReleasedOn,
-            IsLocked: data.IsLocked);
+            IsLocked: data.IsLocked,
+            OwnerId: data.OwnerId);
     }
 
     public static ProjectDetailDto ToProjectDetailDto(ProjectInfo data, Permission userPermission = Permission.None)
@@ -155,6 +156,7 @@ public static class TransferMaps
             ReleasedOn: data.ReleasedOn,
             Crew: [],
             Cast: [],
+            OwnerId: data.OwnerId,
             Artifacts: [],
             Reviews: data.Reviews.IsDefaultOrEmpty
                 ? []

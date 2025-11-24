@@ -19,7 +19,8 @@ public record ProjectListDto(
     ImmutableArray<Permission> GlobalPermissions,
     ImmutableArray<Permission> UserPermissions,
     DateTimeOffset ReleasedOn,
-    bool IsLocked
+    bool IsLocked,
+    Hrib? OwnerId
     // TODO: Thumbnail
 );
 
@@ -35,6 +36,7 @@ public record ProjectDetailDto(
     DateTimeOffset ReleasedOn,
     ImmutableArray<ProjectAuthorDto> Crew,
     ImmutableArray<ProjectAuthorDto> Cast,
+    Hrib? OwnerId,
     ImmutableArray<ProjectArtifactDto> Artifacts,
     ImmutableArray<ProjectReviewDto> Reviews,
     ProjectBlueprintDto Blueprint,

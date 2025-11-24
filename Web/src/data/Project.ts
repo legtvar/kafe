@@ -21,6 +21,7 @@ export class Project extends AbstractType {
     // Authors
     public crew!: components['schemas']['ProjectAuthorDto'][];
     public cast!: components['schemas']['ProjectAuthorDto'][];
+    public ownerId?: string;
 
     public artifacts!: Artifact[];
 
@@ -28,7 +29,6 @@ export class Project extends AbstractType {
     public blueprint!: components['schemas']['ProjectBlueprintDto'];
     public globalPermissions!: components['schemas']['Permission'];
     public userPermissions!: components['schemas']['Permission'];
-
     public isLocked!: boolean;
 
     public constructor(struct: components['schemas']['ProjectListDto'] | components['schemas']['ProjectDetailDto']) {

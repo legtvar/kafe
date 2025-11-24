@@ -8,7 +8,9 @@ import { useAuthLink } from '../../../hooks/useAuthLink';
 import { useColorScheme, useHighlightStyle } from '../../../hooks/useColorScheme';
 import { fulltextFilter } from '../../../utils/fulltextFilter';
 import { Pagination } from '../../utils/Pagination';
+import { AwaitAPI } from '../../utils/AwaitAPI';
 import { DateTime } from 'luxon';
+import { User } from '../../../data/User';
 
 interface IProjectListComponentProps {
     projects: Project[];
@@ -75,6 +77,18 @@ export function ProjectListComponent({ projects }: IProjectListComponentProps) {
                                             </Highlight>
                                         }
                                     </Text>
+                                    {project.ownerId && <AwaitAPI
+                                        request={(api) => api.accounts.info.getById(project.ownerId!)}
+                                        error={() => <></>}
+                                    >
+                                        {(owner: User) => {
+                                            return (
+                                                <Text color="gray.500" fontStyle="italic">
+                                                    {owner.name && owner.name} {owner.uco && (<span>({owner.uco})</span>)}
+                                                </Text>
+                                            );
+                                        }}
+                                    </AwaitAPI>}
                                     <Text fontSize="smaller" color="gray.500">
                                         <Highlight styles={highlightStyle} query={filter}>
                                             {project.getDescription()}

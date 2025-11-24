@@ -166,6 +166,7 @@ public class PermissionTests(ApiFixture fixture, ITestOutputHelper testOutput) :
             typeof(ProjectInfo),
             new ProjectCreated(
                 Hrib.Parse("createtst-p").Unwrap().ToString(),
+                TestSeedData.AdminHrib,
                 CreationMethod.Manual,
                 TestSeedData.Group1Hrib,
                 LocalizedString.CreateInvariant("CreateEventTest project")
@@ -259,6 +260,7 @@ public class PermissionTests(ApiFixture fixture, ITestOutputHelper testOutput) :
                 testHrib,
                 new ProjectCreated(
                     testHrib,
+                    TestSeedData.AdminHrib,
                     CreationMethod.Manual,
                     TestSeedData.Org1Hrib,
                     LocalizedString.CreateInvariant("SetPermissionTest project"))

@@ -58,6 +58,7 @@ public record ProjectArtifactDto(
 );
 
 public record ProjectReviewDto(
+    Hrib? ReviewerId,
     ReviewKind Kind,
     string ReviewerRole,
     LocalizedString? Comment,

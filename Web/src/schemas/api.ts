@@ -1800,6 +1800,7 @@ export interface components {
       }) | null;
     };
     ProjectReviewDto: {
+      reviewerId: string | null;
       kind: components["schemas"]["ReviewKind"];
       reviewerRole: string;
       /** LocalizedString */

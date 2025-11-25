@@ -5,6 +5,8 @@ import { Project } from '../../../data/Project';
 import { useColorScheme } from '../../../hooks/useColorScheme';
 import { getPrefered } from '../../../utils/preferedLanguage';
 import { DateTime } from 'luxon';
+import { User } from '../../../data/User';
+import { AwaitAPI } from '../../utils/AwaitAPI';
 
 interface IReviewListProps {
     project: Project;
@@ -41,7 +43,19 @@ export function ReviewList({ project }: IReviewListProps) {
                             )}
                         </Box>
                         <Box>
-                            <Text fontWeight="bold">{t(`project.admin.role.${review.reviewerRole}`).toString()}</Text>
+                            {review.reviewerId ?
+                                <AwaitAPI
+                                    request={(api) => api.accounts.info.getById(review.reviewerId!)}
+                                    error={() => <Text fontWeight="bold">{t(`project.admin.role.${review.reviewerRole}`).toString()}</Text>}
+                                >
+                                    {(owner: User) => {
+                                        return (
+                                            <Text fontWeight="bold"> {owner.name && owner.name} </Text>
+                                        );
+                                    }}
+                                </AwaitAPI> :
+                                <Text fontWeight="bold">{t(`project.admin.role.${review.reviewerRole}`).toString()}</Text>
+                            }
                             {review.addedOn && (
                                 <Text color="gray.500" pb={4}>
                                     {DateTime.fromISO(review.addedOn).toLocaleString()}

@@ -169,6 +169,7 @@ public static class TransferMaps
     public static ProjectReviewDto ToProjectReviewDto(ProjectReviewInfo review)
     {
         return new ProjectReviewDto(
+            ReviewerId: review.ReviewerId,
             Kind: review.Kind,
             ReviewerRole: review.ReviewerRole,
             Comment: review.Comment,

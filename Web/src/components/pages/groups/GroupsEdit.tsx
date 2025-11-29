@@ -14,6 +14,7 @@ import { SendAPI } from '../../utils/SendAPI';
 import { Status } from '../../utils/Status';
 import { WithTitle } from '../../utils/WithTitle';
 import { GroupBasicInfo } from './GroupBasicInfo';
+import { PermsCsvEditorModal } from '@/components/utils/PermsEditorFromCsv';
 
 interface IGroupsEditProps {}
 
@@ -112,6 +113,11 @@ export function GroupsEdit(props: IGroupsEditProps) {
                                                 }}
                                             />
                                         </VStack>
+                                        <PermsCsvEditorModal 
+                                            id={id}
+                                            initialPerms={[]}
+                                            options = {['read', 'write', 'inspect', 'append', 'review']}
+                                        />
                                     </TabPanel>
                                 </TabPanels>
                             </Tabs>

@@ -50,6 +50,13 @@ public class AccountService(
             .SingleOrDefaultAsync(token: token);
     }
 
+    public async Task<AccountInfo?> FindByUco(string uco, CancellationToken token = default)
+    {
+        return await db.Query<AccountInfo>()
+            .Where(a => a.Uco == uco)
+            .SingleOrDefaultAsync(token: token);
+    }
+
     public async Task<LoginTicketInfo?> LoadTicket(Guid id, CancellationToken ct = default)
     {
         return await db.LoadAsync<LoginTicketInfo>(id, ct);

@@ -58,7 +58,11 @@ public static class Const
     public static readonly LocalizedString UnknownAuthor;
     public static readonly LocalizedString UnknownProjectGroup;
     public static readonly LocalizedString ConfirmationEmailSubject;
+    public static readonly LocalizedString InvitationEmailSubject;
     public static readonly LocalizedString ConfirmationEmailMessageTemplate;
+    public static readonly LocalizedString InvitationTemplate;
+    public static readonly LocalizedString InvitationGenericTemplate;
+    public static readonly LocalizedString InvitationEmailMessageTemplate;
     public static readonly LocalizedString ProjectReviewEmailSubject;
     public static readonly LocalizedString[] EmailSignOffs;
     public static readonly LocalizedString CzechLanguageName;
@@ -82,6 +86,10 @@ public static class Const
             (InvariantCulture, "Login Request"),
             (CzechCulture, "Přihlášení"),
             (SlovakCulture, "Prihlásenie"));
+        InvitationEmailSubject = LocalizedString.Create(
+            (InvariantCulture, "Invitation to join KAFE"),
+            (CzechCulture, "Přihlaš se do KAFE"),
+            (SlovakCulture, "Prihlás sa do KAFE"));
         ProjectReviewEmailSubject = LocalizedString.Create(
             (InvariantCulture, "Project Review"),
             (CzechCulture, "Posouzení projektu"),
@@ -119,6 +127,58 @@ prosím kliknite na nasledujúci jednorazový odkaz pre prihlásenie do KAFE:
 {0}
 
 {1}
+
+Vaše KAFE
+"));
+
+InvitationTemplate = LocalizedString.Create(
+    (InvariantCulture, @"{0} invited you to KAFE!"),
+    (CzechCulture, @"{0} Vás pozval(a) do KAFE!"),
+    (SlovakCulture, @"{0} Vás pozval(a) do KAFE!"));
+
+InvitationGenericTemplate = LocalizedString.Create(
+    (InvariantCulture, @"You have been invited to KAFE!"),
+    (CzechCulture, @"Byli jste pozváni do KAFE!"),
+    (SlovakCulture, @"Boli ste pozvaní do KAFE!"));
+
+InvitationEmailMessageTemplate = LocalizedString.Create(
+            (InvariantCulture,
+@"Hello,
+
+{0}
+
+Please click the link to activate your account:
+
+{1}
+
+{2}
+
+Yours,
+KAFE
+"),
+            (CzechCulture,
+@"Dobrý den,
+
+{0}
+
+Prosím klikněte na následující odkaz pro přihlášení do KAFE:
+
+{1}
+
+{2}
+
+Vaše KAFE
+"),
+            (SlovakCulture,
+@"Dobrý deň,
+
+{0}
+
+Prosím kliknite na nasledujúci odkaz pre prihlásenie do KAFE:
+
+{1}
+
+{2}
 
 Vaše KAFE
 "));

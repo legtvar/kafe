@@ -1,5 +1,7 @@
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using Kafe.Data;
+using Microsoft.AspNetCore.Http;
 
 namespace Kafe.Api.Transfer;
 public record EntityPermissionsDetailDto(
@@ -21,6 +23,12 @@ public record EntityPermissionsEditDto(
     Hrib Id,
     ImmutableArray<Permission>? GlobalPermissions,
     ImmutableArray<EntityPermissionsAccountEditDto>? AccountPermissions
+);
+
+public record EntityPermissionsEditFromCsvDto(
+    Hrib Id,
+    List<Permission>? Permissions,
+    IFormFile CsvFile
 );
 
 public record EntityPermissionsAccountEditDto(

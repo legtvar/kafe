@@ -4,10 +4,8 @@ using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
-using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using SmartFormat;
 
 namespace Kafe;
 
@@ -16,10 +14,9 @@ public sealed partial class LocalizedString : IEquatable<LocalizedString>
 {
     public static readonly LocalizedString Empty = new LocalizedString(
         ImmutableDictionary.CreateRange(
-            new[]
-            {
+            [
                 new KeyValuePair<string, string>(Const.InvariantCultureCode, string.Empty)
-            }
+            ]
         )
     );
 
@@ -28,13 +25,7 @@ public sealed partial class LocalizedString : IEquatable<LocalizedString>
     public string this[CultureInfo culture] => this[culture.TwoLetterISOLanguageName];
 
     public string this[string cultureCode]
-        => data.GetValueOrDefault(cultureCode)
-            ?? data.GetValueOrDefault(Const.InvariantCultureCode)
-            ?? data.GetValueOrDefault(Const.EnglishCultureName)
-            ?? data.GetValueOrDefault(Const.CzechCultureName)
-            ?? data.GetValueOrDefault(Const.SlovakCultureName)
-            ?? data.Values.FirstOrDefault() // return whatever is there
-            ?? throw new NullReferenceException("This localized string is empty."); // give up
+        => ToString(cultureCode) ?? throw new NullReferenceException("This localized string is empty.");
 
     public string Invariant => this[Const.InvariantCultureCode];
 
@@ -109,7 +100,7 @@ public sealed partial class LocalizedString : IEquatable<LocalizedString>
                 p =>
                 {
                     var arr = args.Select(a => a is LocalizedString lsa ? lsa[p.Key] : a).ToArray();
-                    return Smart.Format(p.Value, arr);
+                    return string.Format(p.Value, arr);
                 }
             )
         );
@@ -224,9 +215,26 @@ public sealed partial class LocalizedString : IEquatable<LocalizedString>
         return data.GetHashCode();
     }
 
-    public override string ToString()
+    public override string? ToString()
     {
-        return this[CultureInfo.CurrentCulture] ?? Invariant;
+        return ToString(CultureInfo.CurrentCulture.TwoLetterISOLanguageName);
+    }
+
+    public string? ToString(CultureInfo culture)
+    {
+        return ToString(culture.TwoLetterISOLanguageName);
+    }
+
+    public string? ToString(string? cultureCode)
+    {
+        cultureCode ??= CultureInfo.CurrentCulture.TwoLetterISOLanguageName;
+
+        return data.GetValueOrDefault(cultureCode)
+            ?? data.GetValueOrDefault(Const.InvariantCultureCode)
+            ?? data.GetValueOrDefault(Const.EnglishCultureName)
+            ?? data.GetValueOrDefault(Const.CzechCultureName)
+            ?? data.GetValueOrDefault(Const.SlovakCultureName)
+            ?? data.Values.FirstOrDefault(); // return whatever is there
     }
 
     public bool HasVariant(string cultureCode)

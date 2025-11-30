@@ -75,32 +75,75 @@ public partial class ProjectService
     public const string VisualReviewStage = "visual-review";
     public const string DramaturgyReviewStage = "dramaturgy-review";
 
-    public static readonly Diagnostic InvalidName = new Diagnostic(
+    public static readonly Diagnostic NameTooLong = new Diagnostic(
         Kind: DiagnosticKind.Error,
         ValidationStage: InfoStage,
         Message: LocalizedString.Create(
-            (Const.InvariantCulture, $"The project must have a name that is at most {NameMaxLength} characters long."),
-            (Const.CzechCulture, $"Projekt musí mít název o nejvýše {NameMaxLength} znacích.")
+            (Const.InvariantCulture, "The project name in the '{Culture}' language is too long. It may have at most {MaxLength} characters."),
+            (Const.CzechCulture, "Název projektu v jazyce '{Culture}' je příliš dlouhý. Může mít nanajevýš {MaxLength} znaků.")
         )
     );
 
-    public static readonly Diagnostic InvalidDescription = new Diagnostic(
+    public static readonly Diagnostic NameTooShort = new Diagnostic(
         Kind: DiagnosticKind.Error,
         ValidationStage: InfoStage,
         Message: LocalizedString.Create(
-            (Const.InvariantCulture, $"The project must have a description that is " +
-                $"between {DescriptionMinLength} and {DescriptionMaxLength} characters long."),
-            (Const.CzechCulture, $"Projekt musí mít anotaci o " +
-                $"délce {DescriptionMinLength} až {DescriptionMaxLength} znaků.")
+            (Const.InvariantCulture, "The project name in the '{Culture}' language is too short. It must have at least {MinLength} characters."),
+            (Const.CzechCulture, "Název projektu v jazyce '{Culture}' je příliš krátký. Musí míň alespoň {MinLength} znaků.")
         )
     );
 
-    public static readonly Diagnostic MissingGenre = new Diagnostic(
+    public static readonly Diagnostic MissingName = new Diagnostic(
         Kind: DiagnosticKind.Error,
         ValidationStage: InfoStage,
         Message: LocalizedString.Create(
-            (Const.InvariantCulture, $"The project is missing a genre."),
-            (Const.CzechCulture, $"Projektu chybí žánr.")
+            (Const.InvariantCulture, "The project is missing a name."),
+            (Const.CzechCulture, "Projektu chybí název.")
+        )
+    );
+
+    public static readonly Diagnostic MissingNameCulture = new Diagnostic(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: InfoStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, "The project is missing a name in the '{Culture}' language."),
+            (Const.CzechCulture, "Projektu chybí název v jazyce '{Culture}'.")
+        )
+    );
+
+    public static readonly Diagnostic DescriptionTooLong = new Diagnostic(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: InfoStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, "The project description in the '{Culture}' language is too long. It may have at most {MaxLength} characters."),
+            (Const.CzechCulture, "Popis projektu v jazyce '{Culture}' je příliš dlouhý. Může mít nanajevýš {MaxLength} znaků.")
+        )
+    );
+
+    public static readonly Diagnostic DescriptionTooShort = new Diagnostic(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: InfoStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, "The project description in the '{Culture}' language is too short. It must have at least {MinLength} characters."),
+            (Const.CzechCulture, "Popis projektu v jazyce '{Culture}' je příliš krátký. Musí míň alespoň {MinLength} znaků.")
+        )
+    );
+
+    public static readonly Diagnostic MissingDescription = new Diagnostic(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: InfoStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, "The project is missing a description."),
+            (Const.CzechCulture, "Projektu chybí popis.")
+        )
+    );
+
+    public static readonly Diagnostic MissingDescriptionCulture = new Diagnostic(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: InfoStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, "The project is missing a description in the '{Culture}' language."),
+            (Const.CzechCulture, "Projektu chybí popis v jazyce '{Culture}'.")
         )
     );
 
@@ -108,8 +151,35 @@ public partial class ProjectService
         Kind: DiagnosticKind.Error,
         ValidationStage: InfoStage,
         Message: LocalizedString.Create(
-            (Const.InvariantCulture, $"The project genre must be at most {GenreMaxLength} characters long."),
-            (Const.CzechCulture, $"Žánr projektu musí mít nejvýše {DescriptionMaxLength} znaků.")
+            (Const.InvariantCulture, "The project genre in the '{Culture}' language is too long. It may have at most {MaxLength} characters."),
+            (Const.CzechCulture, "Žánr projektu v jazyce '{Culture}' je příliš dlouhý. Může mít nanajevýš {MaxLength} znaků.")
+        )
+    );
+
+    public static readonly Diagnostic GenreTooShort = new Diagnostic(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: InfoStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, "The project genre in the '{Culture}' language is too short. It must have at least {MinLength} characters."),
+            (Const.CzechCulture, "Žánr projektu v jazyce '{Culture}' je příliš krátký. Musí mít alespoň {MinLength} znaků.")
+        )
+    );
+
+    public static readonly Diagnostic MissingGenre = new Diagnostic(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: InfoStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, "The project is missing a genre."),
+            (Const.CzechCulture, "Projektu chybí žánr.")
+        )
+    );
+
+    public static readonly Diagnostic MissingGenreCulture = new Diagnostic(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: InfoStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, "The project in the '{Culture}' language is missing a genre in the '{Culture}' language."),
+            (Const.CzechCulture, "Projektu chybí žánr v jazyce '{Culture}'.")
         )
     );
 
@@ -577,41 +647,121 @@ public partial class ProjectService
         )
     );
 
+    public ProjectReport ValidateBasicInfo(ProjectInfo project, ProjectValidationSettings? settings = null)
+    {
+        settings = ProjectValidationSettings.Merge(settings, ProjectValidationSettings.Default);
+        var diagnostics = ImmutableArray.CreateBuilder<Diagnostic>();
+
+        ValidateLocalizedString(
+            diagnostics,
+            project.Name,
+            settings.MinNameLength,
+            settings.MaxNameLength,
+            settings.RequiredNameCultures,
+            MissingName,
+            MissingNameCulture,
+            NameTooLong,
+            NameTooShort
+        );
+        ValidateLocalizedString(
+            diagnostics,
+            project.Description,
+            settings.MinDescriptionLength,
+            settings.MaxDescriptionLength,
+            settings.RequiredDescriptionCultures,
+            MissingDescription,
+            MissingDescriptionCulture,
+            DescriptionTooLong,
+            DescriptionTooShort
+        );
+        ValidateLocalizedString(
+            diagnostics,
+            project.Genre,
+            settings.MinGenreLength,
+            settings.MaxGenreLength,
+            settings.RequiredGenreCultures,
+            MissingGenre,
+            MissingGenreCulture,
+            GenreTooLong,
+            GenreTooShort
+        );
+
+        return new ProjectReport(
+            ProjectId: project.Id,
+            ValidatedOn: DateTimeOffset.UtcNow,
+            Diagnostics: diagnostics.ToImmutable()
+        );
+    }
+
+    private static void ValidateLocalizedString(
+        IList<Diagnostic> diagnostics,
+        LocalizedString? ls,
+        int? minLength,
+        int? maxLength,
+        ImmutableHashSet<string>? requiredCultures,
+        Diagnostic missing,
+        Diagnostic missingCulture,
+        Diagnostic tooLong,
+        Diagnostic tooShort
+    )
+    {
+        if (minLength is > 0 && LocalizedString.IsNullOrEmpty(ls))
+        {
+            diagnostics.Add(missing);
+        }
+
+        if (requiredCultures is not null && !requiredCultures.IsEmpty)
+        {
+            foreach (var culture in requiredCultures)
+            {
+                if (ls is null || !ls.HasVariant(culture))
+                {
+                    diagnostics.Add(missingCulture.Format(Const.GetLanguageName(culture)));
+                }
+            }
+        }
+
+        if (!LocalizedString.IsNullOrEmpty(ls))
+        {
+            foreach (var (culture, variant) in ls)
+            {
+                if (minLength is not null && variant.Length < minLength)
+                {
+                    diagnostics.Add(tooShort.Format(Const.GetLanguageName(culture), minLength.Value));
+                }
+
+                if (maxLength is not null && variant.Length > maxLength)
+                {
+                    diagnostics.Add(tooLong.Format(Const.GetLanguageName(culture), maxLength.Value));
+                }
+            }
+        }
+    }
+
     // TODO: Blueprints instead of these hard-coded validation settings for FFFI MU 2023.
     public async Task<ProjectReport> Validate(Hrib id, CancellationToken token = default)
     {
-        var project = await db.LoadAsync<ProjectInfo>(id.ToString(), token);
+        var project = await db.Events.RequireLatest<ProjectInfo>(id, token);
         if (project is null)
         {
-            throw new IndexOutOfRangeException();
+            throw new ArgumentException($"Project '{id}' does not exist.");
         }
+
+        var projectGroup = await db.Events.RequireLatest<ProjectGroupInfo>(project.ProjectGroupId, token);
+        if (projectGroup is null)
+        {
+            throw new ArgumentException($"Project group '{project.ProjectGroupId}' does not exist.");
+        }
+
+        var settings = ProjectValidationSettings.Merge(
+            projectGroup.ValidationSettings,
+            ProjectValidationSettings.Default
+        );
 
         var diagnostics = ImmutableArray.CreateBuilder<Diagnostic>();
 
-        if (project.Name.Values.Any(n => string.IsNullOrWhiteSpace(n) || n.Length > NameMaxLength))
-        {
-            diagnostics.Add(InvalidName);
-        }
-
-        if (project.Description is null
-            || project.Description.Values.Any(n => string.IsNullOrWhiteSpace(n)
-            || n.Length < DescriptionMinLength
-            || n.Length > DescriptionMaxLength))
-        {
-            diagnostics.Add(InvalidDescription);
-        }
-
-        if (project.Genre is null
-            || project.Genre.Values.Any(g => string.IsNullOrWhiteSpace(g)))
-        {
-            diagnostics.Add(MissingGenre);
-        }
-
-        if (project.Genre is not null
-            && project.Genre.Values.Any(g => g.Length > GenreMaxLength))
-        {
-            diagnostics.Add(GenreTooLong);
-        }
+        var basicReport = ValidateBasicInfo(project, settings);
+        diagnostics.AddRange(basicReport.Diagnostics);
 
         if (!project.Reviews.Any(r => r.ReviewerRole == Const.TechReviewer && r.Kind == ReviewKind.Accepted))
         {
@@ -788,7 +938,7 @@ public partial class ProjectService
                     diagnostics.AddRange(ValidateSubtitles(subtitleShard));
                 }
             }
-        } 
+        }
 
         var coverPhotoArtifacts = artifacts.Where(a => a.projectArtifact.BlueprintSlot == Const.CoverPhotoBlueprintSlot)
             .ToImmutableArray();

@@ -57,6 +57,8 @@ public static class Const
     public static readonly LocalizedString ConfirmationEmailMessageTemplate;
     public static readonly LocalizedString ProjectReviewEmailSubject;
     public static readonly LocalizedString[] EmailSignOffs;
+    public static readonly LocalizedString CzechLanguageName;
+    public static readonly LocalizedString InvariantLanguageName;
 
     static Const()
     {
@@ -137,5 +139,30 @@ Vaše KAFE
                 (CzechCulture, "Užijte si to."),
                 (SlovakCulture, "Užite si to."))
         };
+
+        CzechLanguageName = LocalizedString.Create(
+            (InvariantCulture, "Czech"),
+            (CzechCulture, "čeština")
+        );
+
+        InvariantLanguageName = LocalizedString.Create(
+            (InvariantCulture, "international"),
+            (CzechCulture, "mezinárodní")
+        );
+    }
+
+    public static LocalizedString GetLanguageName(string cultureCode)
+    {
+        if (cultureCode == InvariantCultureCode)
+        {
+            return InvariantLanguageName;
+        }
+
+        if (cultureCode == CzechCultureName)
+        {
+            return CzechLanguageName;
+        }
+
+        return LocalizedString.CreateInvariant(cultureCode);
     }
 }

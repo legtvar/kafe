@@ -34,4 +34,35 @@ public record ProjectValidationSettings
     public int? MaxGenreLength { get; init; }
 
     public ImmutableHashSet<string>? RequiredGenreCultures { get; init; }
+
+    /// <summary>
+    /// Merge <paramref name="left"/> with <paramref name="right"/>, but prefer settings from <paramref name="left"/>.
+    /// </summary>
+    public static ProjectValidationSettings Merge(ProjectValidationSettings? left, ProjectValidationSettings right)
+    {
+        if (left is null)
+        {
+            return right;
+        }
+
+        return new ProjectValidationSettings
+        {
+            MinNameLength = left.MinNameLength ?? right.MinNameLength,
+            MaxNameLength = left.MaxNameLength ?? right.MaxNameLength,
+            RequiredNameCultures = left.RequiredNameCultures is null || left.RequiredNameCultures.IsEmpty
+                ? right.RequiredNameCultures
+                : null,
+            MinDescriptionLength = left.MinDescriptionLength ?? right.MinDescriptionLength,
+            MaxDescriptionLength = left.MaxDescriptionLength ?? right.MaxDescriptionLength,
+            RequiredDescriptionCultures =
+                left.RequiredDescriptionCultures is null || left.RequiredDescriptionCultures.IsEmpty
+                    ? right.RequiredDescriptionCultures
+                    : null,
+            MinGenreLength = left.MinGenreLength ?? right.MinGenreLength,
+            MaxGenreLength = left.MaxGenreLength ?? right.MaxGenreLength,
+            RequiredGenreCultures = left.RequiredGenreCultures is null || left.RequiredGenreCultures.IsEmpty
+                ? right.RequiredGenreCultures
+                : null
+        };
+    }
 }

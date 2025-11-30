@@ -4,17 +4,24 @@ using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using SmartFormat;
 
 namespace Kafe;
 
 [JsonConverter(typeof(LocalizedStringJsonConverter))]
 public sealed partial class LocalizedString : IEquatable<LocalizedString>
 {
-    public static readonly LocalizedString Empty = new LocalizedString(ImmutableDictionary.CreateRange(new[] {
-        new KeyValuePair<string, string>(Const.InvariantCultureCode, string.Empty)
-    }));
+    public static readonly LocalizedString Empty = new LocalizedString(
+        ImmutableDictionary.CreateRange(
+            new[]
+            {
+                new KeyValuePair<string, string>(Const.InvariantCultureCode, string.Empty)
+            }
+        )
+    );
 
     private readonly ImmutableDictionary<string, string> data;
 
@@ -22,12 +29,12 @@ public sealed partial class LocalizedString : IEquatable<LocalizedString>
 
     public string this[string cultureCode]
         => data.GetValueOrDefault(cultureCode)
-        ?? data.GetValueOrDefault(Const.InvariantCultureCode)
-        ?? data.GetValueOrDefault(Const.EnglishCultureName)
-        ?? data.GetValueOrDefault(Const.CzechCultureName)
-        ?? data.GetValueOrDefault(Const.SlovakCultureName)
-        ?? data.Values.FirstOrDefault() // return whatever is there
-        ?? throw new NullReferenceException("This localized string is empty."); // give up
+            ?? data.GetValueOrDefault(Const.InvariantCultureCode)
+            ?? data.GetValueOrDefault(Const.EnglishCultureName)
+            ?? data.GetValueOrDefault(Const.CzechCultureName)
+            ?? data.GetValueOrDefault(Const.SlovakCultureName)
+            ?? data.Values.FirstOrDefault() // return whatever is there
+            ?? throw new NullReferenceException("This localized string is empty."); // give up
 
     public string Invariant => this[Const.InvariantCultureCode];
 
@@ -39,6 +46,7 @@ public sealed partial class LocalizedString : IEquatable<LocalizedString>
         {
             throw new ArgumentException("Data must contain at least one localized string.");
         }
+
         this.data = data;
     }
 
@@ -64,6 +72,7 @@ public sealed partial class LocalizedString : IEquatable<LocalizedString>
         {
             builder.Add(pair.localCulture, pair.localString);
         }
+
         return Create(builder.ToImmutable());
     }
 
@@ -92,6 +101,20 @@ public sealed partial class LocalizedString : IEquatable<LocalizedString>
         return IsNullOrEmpty(value) || IsTooLong(value, maxLength);
     }
 
+    public static LocalizedString Format(LocalizedString value, params IEnumerable<object?> args)
+    {
+        return new LocalizedString(
+            value.data.ToImmutableDictionary(
+                p => p.Key,
+                p =>
+                {
+                    var arr = args.Select(a => a is LocalizedString lsa ? lsa[p.Key] : a).ToArray();
+                    return Smart.Format(p.Value, arr);
+                }
+            )
+        );
+    }
+
     [return: NotNullIfNotNull(nameof(localized))]
     public static implicit operator ImmutableDictionary<string, string>?(LocalizedString? localized)
     {
@@ -99,6 +122,7 @@ public sealed partial class LocalizedString : IEquatable<LocalizedString>
         {
             return null;
         }
+
         return localized.data;
     }
 
@@ -109,6 +133,7 @@ public sealed partial class LocalizedString : IEquatable<LocalizedString>
         {
             return null;
         }
+
         return new(data);
     }
 
@@ -125,6 +150,7 @@ public sealed partial class LocalizedString : IEquatable<LocalizedString>
         {
             return null;
         }
+
         return CreateInvariant(invariantString);
     }
 
@@ -170,6 +196,7 @@ public sealed partial class LocalizedString : IEquatable<LocalizedString>
         {
             return false;
         }
+
         return Equals(other);
     }
 
@@ -188,6 +215,7 @@ public sealed partial class LocalizedString : IEquatable<LocalizedString>
                 return false;
             }
         }
+
         return true;
     }
 
@@ -199,6 +227,16 @@ public sealed partial class LocalizedString : IEquatable<LocalizedString>
     public override string ToString()
     {
         return this[CultureInfo.CurrentCulture] ?? Invariant;
+    }
+
+    public bool HasVariant(string cultureCode)
+    {
+        return data.ContainsKey(cultureCode);
+    }
+
+    public bool HasVariant(CultureInfo culture)
+    {
+        return data.ContainsKey(culture.TwoLetterISOLanguageName);
     }
 
     public static LocalizedString Merge(LocalizedString? old, LocalizedString? @new)
@@ -215,7 +253,7 @@ public sealed partial class LocalizedString : IEquatable<LocalizedString>
     /// <summary>
     /// Generates value that can be used in <c>*InfoChanged</c> events.
     /// </summary>
-    /// 
+    ///
     /// <remarks>
     /// Returns <c>null</c> if no change should be made or <paramref name="new"/>
     /// if it should override <paramref name="old"/>.

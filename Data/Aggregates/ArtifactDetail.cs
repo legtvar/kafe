@@ -138,6 +138,10 @@ public class ArtifactDetailProjection : MultiStreamProjection<ArtifactDetail, st
                         .Where(e => e.ShardId == id)
                         .Select(e => new { e.ArtifactId, e.ShardId })
                         .SingleOrDefaultAsync(),
+                    ShardKind.Blend => await session.Events.QueryRawEventDataOnly<BlendShardCreated>()
+                        .Where(e => e.ShardId == id)
+                        .Select(e => new { e.ArtifactId, e.ShardId })
+                        .SingleOrDefaultAsync(),
                     _ => throw new InvalidOperationException($"Shard kind '{kind}' is not supported.")
                 };
                 if (pair is not null)

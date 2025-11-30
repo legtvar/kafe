@@ -308,6 +308,54 @@ public class ShardService
         return created.ShardId;
     }
 
+    public async Task<BlendShardInfo> UpdateBlend(
+        Hrib shardId,
+        BlendInfo blendInfo,
+        CancellationToken token = default)
+    {
+        var changed = new BlendShardVariantAdded(
+            ShardId: shardId.ToString(),
+            Name: "original",
+            Info: blendInfo
+        );
+        db.Events.KafeAppend(changed.ShardId, changed);
+
+        await db.SaveChangesAsync(token);
+
+        return await db.Events.KafeAggregateRequiredStream<BlendShardInfo>(shardId, token: token);
+    }
+    
+    private async Task<string> TestBlend(
+        Hrib shardId,
+        CancellationToken token = default)
+    {
+        if (!storageService.TryGetFilePath(
+            ShardKind.Blend,
+            shardId,
+            Const.OriginalShardVariant,
+            out var shardFilePath))
+        {
+            throw new ArgumentException("The shard stream could not be opened just after being saved.");
+        }
+
+        
+        var shard = await Load(shardId, token);
+        if (shard is null || shard.Kind != ShardKind.Blend)
+        {
+            throw new ArgumentException($"The shard '{shardId}' is not a blend shard.");
+        }
+        var artifactService = new ArtifactService(db);
+        var projectGroupNames = await artifactService.GetArtifactProjectGroupNames(shard.ArtifactId.ToString(), token);
+        if (projectGroupNames.Length != 1)
+        {
+            throw new InvalidOperationException($"A blend shard must belong to exactly one project group. Found {projectGroupNames.Length}.");
+        }
+
+        var projectGroupName = projectGroupNames[0]["iv"];
+
+        return $"{shardId}|{projectGroupName}|{shardFilePath}";
+    }
+
     public async Task<Stream> OpenStream(Hrib id, string? variant, CancellationToken token = default)
     {
         variant = SanitizeVariantName(variant);

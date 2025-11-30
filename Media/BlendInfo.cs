@@ -5,9 +5,9 @@ using System.Linq;
 namespace Kafe.Media;
 
 public record BlendInfo(
-    string FileExtension,
-    string MimeType,
-    ImmutableArray<PigeonsTestInfo>? Tests,
+    string FileExtension = Const.BlendFileExtension,
+    string MimeType = Const.BlendMimeType,
+    ImmutableArray<PigeonsTestInfo>? Tests = null,
     string? Error = null
 )
 {

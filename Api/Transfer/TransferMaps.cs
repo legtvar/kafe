@@ -238,7 +238,9 @@ public static class TransferMaps
             Description: data.Description,
             Deadline: data.Deadline,
             IsOpen: data.IsOpen,
-            Projects: []);
+            Projects: [],
+            ValidationSettings: data.ValidationSettings
+        );
     }
 
     public static ArtifactDetailDto ToArtifactDetailDto(ArtifactDetail data)
@@ -246,8 +248,8 @@ public static class TransferMaps
         return new ArtifactDetailDto(
             Id: data.Id,
             Name: data.Name,
-            Shards: data.Shards.Select(ToShardListDto).ToImmutableArray(),
-            ContainingProjectIds: data.ContainingProjectIds.Select(i => (Hrib)i).ToImmutableArray(),
+            Shards: [..data.Shards.Select(ToShardListDto)],
+            ContainingProjectIds: [..data.ContainingProjectIds.Select(i => (Hrib)i)],
             AddedOn: data.AddedOn
         );
     }

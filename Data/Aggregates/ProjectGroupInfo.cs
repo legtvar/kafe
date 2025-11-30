@@ -27,7 +27,9 @@ public record ProjectGroupInfo(
     [property:Sortable]
     bool IsOpen = false,
 
-    Permission GlobalPermissions = Permission.None
+    Permission GlobalPermissions = Permission.None,
+
+    ProjectValidationSettings? ValidationSettings = null
 ) : IVisibleEntity
 {
     public static readonly ProjectGroupInfo Invalid = new();
@@ -106,6 +108,14 @@ public class ProjectGroupInfoProjection : SingleStreamProjection<ProjectGroupInf
         return p with
         {
             OrganizationId = e.OrganizationId
+        };
+    }
+
+    public ProjectGroupInfo Apply(ProjectGroupValidationSettingsChanged e, ProjectGroupInfo g)
+    {
+        return g with
+        {
+            ValidationSettings = e.Value
         };
     }
 }

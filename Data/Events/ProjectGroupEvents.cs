@@ -41,3 +41,7 @@ public record ProjectGroupMovedToOrganization(
     [Hrib] string ProjectGroupId,
     [Hrib] string OrganizationId
 );
+
+public record ProjectGroupValidationSettingsChanged(
+    ProjectValidationSettings? Value
+);

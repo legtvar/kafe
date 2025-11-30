@@ -20,7 +20,8 @@ public record ProjectGroupDetailDto(
     LocalizedString? Description,
     DateTimeOffset Deadline,
     bool IsOpen,
-    ImmutableArray<ProjectListDto> Projects
+    ImmutableArray<ProjectListDto> Projects,
+    ProjectValidationSettings? ValidationSettings
 );
 
 public record ProjectGroupCreationDto(
@@ -37,5 +38,6 @@ public record ProjectGroupEditDto(
     LocalizedString? Name,
     LocalizedString? Description,
     DateTimeOffset? Deadline,
-    bool? IsOpen
+    bool? IsOpen,
+    ProjectValidationSettings? ValidationSettings
 );

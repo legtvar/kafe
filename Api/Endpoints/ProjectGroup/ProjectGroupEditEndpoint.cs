@@ -59,7 +59,8 @@ public class ProjectGroupEditEndpoint : EndpointBaseAsync
             Description = request.Description ?? @old.Description,
             IsOpen = request.IsOpen ?? @old.IsOpen,
             Deadline = request.Deadline ?? @old.Deadline,
-            OrganizationId = request.OrganizationId?.ToString() ?? @old.OrganizationId
+            OrganizationId = request.OrganizationId?.ToString() ?? @old.OrganizationId,
+            ValidationSettings = request.ValidationSettings ?? @old.ValidationSettings
         };
 
         if (@new.OrganizationId != old.OrganizationId)

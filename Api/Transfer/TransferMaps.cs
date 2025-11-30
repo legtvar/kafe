@@ -148,6 +148,7 @@ public static class TransferMaps
             Id: data.Id,
             ProjectGroupId: data.ProjectGroupId,
             ProjectGroupName: null,
+            ValidationSettings: ProjectValidationSettings.Default,
             Genre: data.Genre,
             Name: data.Name,
             Description: data.Description,
@@ -239,7 +240,10 @@ public static class TransferMaps
             Deadline: data.Deadline,
             IsOpen: data.IsOpen,
             Projects: [],
-            ValidationSettings: data.ValidationSettings
+            ValidationSettings: ProjectValidationSettings.Merge(
+                data.ValidationSettings,
+                ProjectValidationSettings.Default
+            )
         );
     }
 
@@ -289,9 +293,9 @@ public static class TransferMaps
             MimeType: data.MimeType,
             FileLength: data.FileLength,
             Duration: data.Duration,
-            VideoStreams: data.VideoStreams.Select(ToVideoStreamDto).ToImmutableArray(),
-            AudioStreams: data.AudioStreams.Select(ToAudioStreamDto).ToImmutableArray(),
-            SubtitleStreams: data.SubtitleStreams.Select(ToSubtitleStreamDto).ToImmutableArray(),
+            VideoStreams: [.. data.VideoStreams.Select(ToVideoStreamDto)],
+            AudioStreams: [.. data.AudioStreams.Select(ToAudioStreamDto)],
+            SubtitleStreams: [.. data.SubtitleStreams.Select(ToSubtitleStreamDto)],
             IsCorrupted: data.IsCorrupted,
             Error: data.Error);
     }

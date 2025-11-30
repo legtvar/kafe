@@ -27,7 +27,8 @@ public partial class ProjectService
         AccountService accountService,
         ArtifactService artifactService,
         AuthorService authorService,
-        EntityMetadataProvider entityMetadataProvider)
+        EntityMetadataProvider entityMetadataProvider
+    )
     {
         this.db = db;
         this.accountService = accountService;
@@ -41,6 +42,7 @@ public partial class ProjectService
         Hrib? ownerId = null,
         ExistingEntityHandling existingEntityHandling = ExistingEntityHandling.Upsert,
         bool shouldOverrideLock = false,
+        string? preferredCulture = null,
         CancellationToken token = default
     )
     {
@@ -71,29 +73,23 @@ public partial class ProjectService
             return Error.Locked(id, "The project");
         }
 
-        if (LocalizedString.IsTooLong(project.Name, NameMaxLength))
+        var group = await db.KafeLoadAsync<ProjectGroupInfo>(project.ProjectGroupId, token);
+        if (group.HasErrors)
         {
-            return new Error("Name is too long.");
+            return group.Errors;
         }
 
-        if (LocalizedString.IsTooLong(project.Genre, GenreMaxLength))
+        var report = ValidateBasicInfo(project, group.Value.ValidationSettings);
+        if (report.Diagnostics.Any(d => d.Kind == DiagnosticKind.Error))
         {
-            return new Error("Genre is too long.");
-        }
-
-        if (LocalizedString.IsTooLong(project.Description, DescriptionMaxLength))
-        {
-            return new Error("Description is too long.");
+            return report.Diagnostics
+                .Where(d => d.Kind == DiagnosticKind.Error)
+                .Select(d => Error.ValidationError(d.Message.ToString(preferredCulture)))
+                .ToImmutableArray();
         }
 
         if (existing is null)
         {
-            var group = await db.KafeLoadAsync<ProjectGroupInfo>(project.ProjectGroupId, token);
-            if (group.HasErrors)
-            {
-                return group.Errors;
-            }
-
             var created = new ProjectCreated(
                 ProjectId: id.ToString(),
                 OwnerId: ownerId?.ToString(),
@@ -334,7 +330,7 @@ public partial class ProjectService
     private async Task<Err<bool>> LockUnlock(Hrib projectId, bool shouldLock, CancellationToken token = default)
     {
         var stream = await db.Events.FetchForExclusiveWriting<ProjectInfo>(projectId.ToString(), token);
-        if (stream is null)
+        if (stream is null || stream.Aggregate is null)
         {
             return Error.NotFound(projectId, "A project");
         }

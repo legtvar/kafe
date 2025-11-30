@@ -1,7 +1,5 @@
 ﻿using Kafe.Data.Aggregates;
-using Kafe.Data.Capabilities;
 using Kafe.Data.Events;
-using Marten;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -79,8 +77,8 @@ public partial class ProjectService
         Kind: DiagnosticKind.Error,
         ValidationStage: InfoStage,
         Message: LocalizedString.Create(
-            (Const.InvariantCulture, "The project name in the '{Culture}' language is too long. It may have at most {MaxLength} characters."),
-            (Const.CzechCulture, "Název projektu v jazyce '{Culture}' je příliš dlouhý. Může mít nanajevýš {MaxLength} znaků.")
+            (Const.InvariantCulture, "The project name in the '{0}' language is too long. It may have at most {1} characters."),
+            (Const.CzechCulture, "Název projektu v jazyce '{0}' je příliš dlouhý. Může mít nanajevýš {1} znaků.")
         )
     );
 
@@ -88,8 +86,8 @@ public partial class ProjectService
         Kind: DiagnosticKind.Error,
         ValidationStage: InfoStage,
         Message: LocalizedString.Create(
-            (Const.InvariantCulture, "The project name in the '{Culture}' language is too short. It must have at least {MinLength} characters."),
-            (Const.CzechCulture, "Název projektu v jazyce '{Culture}' je příliš krátký. Musí míň alespoň {MinLength} znaků.")
+            (Const.InvariantCulture, "The project name in the '{0}' language is too short. It must have at least {1} characters."),
+            (Const.CzechCulture, "Název projektu v jazyce '{0}' je příliš krátký. Musí míň alespoň {1} znaků.")
         )
     );
 
@@ -106,8 +104,8 @@ public partial class ProjectService
         Kind: DiagnosticKind.Error,
         ValidationStage: InfoStage,
         Message: LocalizedString.Create(
-            (Const.InvariantCulture, "The project is missing a name in the '{Culture}' language."),
-            (Const.CzechCulture, "Projektu chybí název v jazyce '{Culture}'.")
+            (Const.InvariantCulture, "The project is missing a name in the '{0}' language."),
+            (Const.CzechCulture, "Projektu chybí název v jazyce '{0}'.")
         )
     );
 
@@ -115,8 +113,8 @@ public partial class ProjectService
         Kind: DiagnosticKind.Error,
         ValidationStage: InfoStage,
         Message: LocalizedString.Create(
-            (Const.InvariantCulture, "The project description in the '{Culture}' language is too long. It may have at most {MaxLength} characters."),
-            (Const.CzechCulture, "Popis projektu v jazyce '{Culture}' je příliš dlouhý. Může mít nanajevýš {MaxLength} znaků.")
+            (Const.InvariantCulture, "The project description in the '{0}' language is too long. It may have at most {1} characters."),
+            (Const.CzechCulture, "Popis projektu v jazyce '{0}' je příliš dlouhý. Může mít nanajevýš {1} znaků.")
         )
     );
 
@@ -124,8 +122,8 @@ public partial class ProjectService
         Kind: DiagnosticKind.Error,
         ValidationStage: InfoStage,
         Message: LocalizedString.Create(
-            (Const.InvariantCulture, "The project description in the '{Culture}' language is too short. It must have at least {MinLength} characters."),
-            (Const.CzechCulture, "Popis projektu v jazyce '{Culture}' je příliš krátký. Musí míň alespoň {MinLength} znaků.")
+            (Const.InvariantCulture, "The project description in the '{0}' language is too short. It must have at least {1} characters."),
+            (Const.CzechCulture, "Popis projektu v jazyce '{0}' je příliš krátký. Musí míň alespoň {1} znaků.")
         )
     );
 
@@ -142,8 +140,8 @@ public partial class ProjectService
         Kind: DiagnosticKind.Error,
         ValidationStage: InfoStage,
         Message: LocalizedString.Create(
-            (Const.InvariantCulture, "The project is missing a description in the '{Culture}' language."),
-            (Const.CzechCulture, "Projektu chybí popis v jazyce '{Culture}'.")
+            (Const.InvariantCulture, "The project is missing a description in the '{0}' language."),
+            (Const.CzechCulture, "Projektu chybí popis v jazyce '{0}'.")
         )
     );
 
@@ -151,8 +149,8 @@ public partial class ProjectService
         Kind: DiagnosticKind.Error,
         ValidationStage: InfoStage,
         Message: LocalizedString.Create(
-            (Const.InvariantCulture, "The project genre in the '{Culture}' language is too long. It may have at most {MaxLength} characters."),
-            (Const.CzechCulture, "Žánr projektu v jazyce '{Culture}' je příliš dlouhý. Může mít nanajevýš {MaxLength} znaků.")
+            (Const.InvariantCulture, "The project genre in the '{0}' language is too long. It may have at most {1} characters."),
+            (Const.CzechCulture, "Žánr projektu v jazyce '{0}' je příliš dlouhý. Může mít nanajevýš {1} znaků.")
         )
     );
 
@@ -160,8 +158,8 @@ public partial class ProjectService
         Kind: DiagnosticKind.Error,
         ValidationStage: InfoStage,
         Message: LocalizedString.Create(
-            (Const.InvariantCulture, "The project genre in the '{Culture}' language is too short. It must have at least {MinLength} characters."),
-            (Const.CzechCulture, "Žánr projektu v jazyce '{Culture}' je příliš krátký. Musí mít alespoň {MinLength} znaků.")
+            (Const.InvariantCulture, "The project genre in the '{0}' language is too short. It must have at least {1} characters."),
+            (Const.CzechCulture, "Žánr projektu v jazyce '{0}' je příliš krátký. Musí mít alespoň {1} znaků.")
         )
     );
 
@@ -178,8 +176,8 @@ public partial class ProjectService
         Kind: DiagnosticKind.Error,
         ValidationStage: InfoStage,
         Message: LocalizedString.Create(
-            (Const.InvariantCulture, "The project in the '{Culture}' language is missing a genre in the '{Culture}' language."),
-            (Const.CzechCulture, "Projektu chybí žánr v jazyce '{Culture}'.")
+            (Const.InvariantCulture, "The project is missing a genre in the '{0}' language."),
+            (Const.CzechCulture, "Projektu chybí žánr v jazyce '{0}'.")
         )
     );
 

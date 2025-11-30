@@ -28,6 +28,7 @@ public record ProjectDetailDto(
     Hrib Id,
     Hrib ProjectGroupId,
     LocalizedString? ProjectGroupName,
+    ProjectValidationSettings ValidationSettings,
     LocalizedString? Genre,
     LocalizedString Name,
     LocalizedString? Description,

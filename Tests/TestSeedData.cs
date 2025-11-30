@@ -83,22 +83,24 @@ public class TestSeedData(IServiceProvider services, ILogger<TestSeedData> logge
         );
 
         var projectService = scope.ServiceProvider.GetRequiredService<ProjectService>();
-        await projectService.Upsert(
+        (await projectService.Upsert(
             project: ProjectInfo.Create(Group1Hrib, (LocalizedString)"Test Project 1") with
             {
                 Id = Project1Hrib
             },
             existingEntityHandling: ExistingEntityHandling.Insert,
+            shouldSkipValidation: true,
             token: ct
-        );
-        await projectService.Upsert(
+        )).Unwrap();
+        (await projectService.Upsert(
             project: ProjectInfo.Create(Group2Hrib, (LocalizedString)"Test Project 2") with
             {
                 Id = Project2Hrib
             },
             existingEntityHandling: ExistingEntityHandling.Insert,
+            shouldSkipValidation: true,
             token: ct
-        );
+        )).Unwrap();
 
         var artifactService = scope.ServiceProvider.GetRequiredService<ArtifactService>();
         await artifactService.Create(

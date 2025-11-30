@@ -15,11 +15,13 @@ import { TextareaLimited } from '../../../utils/TextareaLimited';
 import { ProjectBasicInfoForm } from './ProjectBasicInfoForm';
 import { MateProjectBasicInfoForm } from './MateProjectBasicInfoForm';
 import { currentOrganizationIdMapper } from '../../../../data/serialize/currentOrganizationIdMapper';
+import { components } from '@/schemas/api';
 
 interface IProjectBasicInfoProps {
     // Cannot be changed after initial draw
     project?: Project;
     groupId?: HRIB;
+    validationSettings?: components['schemas']['ProjectValidationSettings']
     noSelfSubmit?: boolean;
 }
 
@@ -30,6 +32,7 @@ export function ProjectBasicInfo(props: IProjectBasicInfoProps) {
         props.project ||
             new Project({
                 projectGroupId: props.groupId,
+                validationSettings: props.validationSettings
             } as any),
     );
     const orgId = currentOrganizationIdMapper();

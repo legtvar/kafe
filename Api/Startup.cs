@@ -42,6 +42,7 @@ using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Kafe.Api.Middleware;
+using Microsoft.AspNetCore.Localization;
 
 namespace Kafe.Api;
 
@@ -266,6 +267,13 @@ public partial class Startup
             new RewriteOptions()
                 .AddRewrite($"^{apiOptions.Value.AccountConfirmPath.Trim('/')}/(.*)$", "api/v1/tmp-account/$1", true)
         );
+
+        app.UseRequestLocalization(o =>
+        {
+            var dataOptions = app.ApplicationServices.GetRequiredService<IOptions<DataOptions>>();
+            o.AddSupportedCultures([.. dataOptions.Value.Languages]);
+            o.DefaultRequestCulture = new RequestCulture(Const.InvariantCulture);
+        });
 
         app.UseRouting();
 

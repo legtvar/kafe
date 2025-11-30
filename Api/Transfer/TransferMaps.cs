@@ -148,6 +148,7 @@ public static class TransferMaps
             Id: data.Id,
             ProjectGroupId: data.ProjectGroupId,
             ProjectGroupName: null,
+            ValidationSettings: ProjectValidationSettings.Default,
             Genre: data.Genre,
             Name: data.Name,
             Description: data.Description,
@@ -238,7 +239,12 @@ public static class TransferMaps
             Description: data.Description,
             Deadline: data.Deadline,
             IsOpen: data.IsOpen,
-            Projects: []);
+            Projects: [],
+            ValidationSettings: ProjectValidationSettings.Merge(
+                data.ValidationSettings,
+                ProjectValidationSettings.Default
+            )
+        );
     }
 
     public static ArtifactDetailDto ToArtifactDetailDto(ArtifactDetail data)
@@ -246,8 +252,8 @@ public static class TransferMaps
         return new ArtifactDetailDto(
             Id: data.Id,
             Name: data.Name,
-            Shards: data.Shards.Select(ToShardListDto).ToImmutableArray(),
-            ContainingProjectIds: data.ContainingProjectIds.Select(i => (Hrib)i).ToImmutableArray(),
+            Shards: [..data.Shards.Select(ToShardListDto)],
+            ContainingProjectIds: [..data.ContainingProjectIds.Select(i => (Hrib)i)],
             AddedOn: data.AddedOn
         );
     }
@@ -287,9 +293,9 @@ public static class TransferMaps
             MimeType: data.MimeType,
             FileLength: data.FileLength,
             Duration: data.Duration,
-            VideoStreams: data.VideoStreams.Select(ToVideoStreamDto).ToImmutableArray(),
-            AudioStreams: data.AudioStreams.Select(ToAudioStreamDto).ToImmutableArray(),
-            SubtitleStreams: data.SubtitleStreams.Select(ToSubtitleStreamDto).ToImmutableArray(),
+            VideoStreams: [.. data.VideoStreams.Select(ToVideoStreamDto)],
+            AudioStreams: [.. data.AudioStreams.Select(ToAudioStreamDto)],
+            SubtitleStreams: [.. data.SubtitleStreams.Select(ToSubtitleStreamDto)],
             IsCorrupted: data.IsCorrupted,
             Error: data.Error);
     }

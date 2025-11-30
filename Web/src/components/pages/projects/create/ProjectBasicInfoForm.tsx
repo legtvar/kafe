@@ -28,7 +28,9 @@ export function ProjectBasicInfoForm({ project, onSubmit, status, update, noSelf
             <FormControl>
                 <FormLabel>{t('createProject.fields.name').toString()}</FormLabel>
                 <LocalizedInput
-                    as={Input}
+                    as={TextareaLimited}
+                    min={project.validationSettings?.minNameLength ?? undefined}
+                    max={project.validationSettings?.maxNameLength ?? undefined}
                     type="text"
                     borderColor={border}
                     bg={bg}
@@ -41,7 +43,9 @@ export function ProjectBasicInfoForm({ project, onSubmit, status, update, noSelf
             <FormControl>
                 <FormLabel>{t('createProject.fields.genre').toString()}</FormLabel>
                 <LocalizedInput
-                    as={Input}
+                    as={TextareaLimited}
+                    min={project.validationSettings?.minGenreLength ?? undefined}
+                    max={project.validationSettings?.maxGenreLength ?? undefined}
                     type="text"
                     borderColor={border}
                     bg={bg}
@@ -55,8 +59,8 @@ export function ProjectBasicInfoForm({ project, onSubmit, status, update, noSelf
                 <FormLabel>{t('createProject.fields.description').toString()}</FormLabel>
                 <LocalizedInput
                     as={TextareaLimited}
-                    min={50}
-                    max={10000}
+                    min={project.validationSettings?.minDescriptionLength ?? undefined}
+                    max={project.validationSettings?.maxDescriptionLength ?? undefined}
                     borderColor={border}
                     bg={bg}
                     name="description"

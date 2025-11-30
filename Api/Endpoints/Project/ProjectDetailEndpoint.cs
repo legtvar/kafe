@@ -79,7 +79,11 @@ public class ProjectDetailEndpoint : EndpointBaseAsync
 
         var dto = TransferMaps.ToProjectDetailDto(project, userPerms) with
         {
-            ProjectGroupName = group.Name
+            ProjectGroupName = group.Name,
+            ValidationSettings = ProjectValidationSettings.Merge(
+                group.ValidationSettings,
+                ProjectValidationSettings.Default
+            )
         };
 
         var artifactDetails = await artifactService.LoadDetailMany(
@@ -109,7 +113,7 @@ public class ProjectDetailEndpoint : EndpointBaseAsync
                         Name: authors.SingleOrDefault(e => e?.Id == a.Id)?.Name ?? (string)Const.UnknownAuthor,
                         Roles: a.Roles))
                     .ToImmutableArray()
-        };        
+        };
 
         return Ok(dto);
     }

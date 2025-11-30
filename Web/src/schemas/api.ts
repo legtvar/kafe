@@ -974,6 +974,41 @@ export interface paths {
       };
     };
   };
+  "/api/v1/system/video-conversion-retry": {
+    post: {
+      requestBody?: {
+        content: {
+          "application/json": components["schemas"]["VideoConversionRetryDto"];
+          "text/json": components["schemas"]["VideoConversionRetryDto"];
+          "application/*+json": components["schemas"]["VideoConversionRetryDto"];
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          content: {
+            "text/plain": components["schemas"]["VideoConversionStatsDto"];
+            "application/json": components["schemas"]["VideoConversionStatsDto"];
+            "text/json": components["schemas"]["VideoConversionStatsDto"];
+          };
+        };
+      };
+    };
+  };
+  "/api/v1/system/video-conversion-stats": {
+    get: {
+      responses: {
+        /** @description OK */
+        200: {
+          content: {
+            "text/plain": components["schemas"]["VideoConversionStatsDto"];
+            "application/json": components["schemas"]["VideoConversionStatsDto"];
+            "text/json": components["schemas"]["VideoConversionStatsDto"];
+          };
+        };
+      };
+    };
+  };
 }
 
 export type webhooks = Record<string, never>;
@@ -1526,7 +1561,6 @@ export interface components {
       }) | null;
       crew: components["schemas"]["ProjectCreationAuthorDto"][];
       cast: components["schemas"]["ProjectCreationAuthorDto"][];
-      ownerId?: string | null;
       isLocked: boolean;
     };
     ProjectDetailDto: {
@@ -1549,6 +1583,7 @@ export interface components {
         cs?: string | null;
         sk?: string | null;
       }) | null;
+      validationSettings: components["schemas"]["ProjectValidationSettings"];
       /** LocalizedString */
       genre?: ({
         iv: string;
@@ -1576,6 +1611,11 @@ export interface components {
       releasedOn: string;
       crew: components["schemas"]["ProjectAuthorDto"][];
       cast: components["schemas"]["ProjectAuthorDto"][];
+      /**
+       * Format: hrib
+       * @description Human-Readable Identifier Ballast
+       * @example AAAAbadf00d
+       */
       ownerId?: string | null;
       artifacts: components["schemas"]["ProjectArtifactDto"][];
       reviews: components["schemas"]["ProjectReviewDto"][];
@@ -1682,6 +1722,7 @@ export interface components {
       deadline: string;
       isOpen: boolean;
       projects: components["schemas"]["ProjectListDto"][];
+      validationSettings: components["schemas"]["ProjectValidationSettings"];
     };
     ProjectGroupEditDto: {
       /**
@@ -1713,6 +1754,7 @@ export interface components {
       /** Format: date-time */
       deadline?: string | null;
       isOpen?: boolean | null;
+      validationSettings: components["schemas"]["ProjectValidationSettings"];
     };
     ProjectGroupListDto: {
       /**
@@ -1778,9 +1820,14 @@ export interface components {
       /** @description Permissions that apply to the currently logged in user. Includes the global permissions. */
       userPermissions: components["schemas"]["Permission"][];
       /** Format: date-time */
-      ownerId?: string | null;
       releasedOn: string;
       isLocked: boolean;
+      /**
+       * Format: hrib
+       * @description Human-Readable Identifier Ballast
+       * @example AAAAbadf00d
+       */
+      ownerId?: string | null;
     };
     ProjectReviewCreationDto: {
       /**
@@ -1800,7 +1847,12 @@ export interface components {
       }) | null;
     };
     ProjectReviewDto: {
-      reviewerId: string | null;
+      /**
+       * Format: hrib
+       * @description Human-Readable Identifier Ballast
+       * @example AAAAbadf00d
+       */
+      reviewerId?: string | null;
       kind: components["schemas"]["ReviewKind"];
       reviewerRole: string;
       /** LocalizedString */
@@ -1823,6 +1875,23 @@ export interface components {
       /** Format: date-time */
       validatedOn: string;
       diagnostics: components["schemas"]["ProjectDiagnosticDto"][];
+    };
+    ProjectValidationSettings: {
+      /** Format: int32 */
+      minNameLength?: number | null;
+      /** Format: int32 */
+      maxNameLength?: number | null;
+      requiredNameCultures?: string[] | null;
+      /** Format: int32 */
+      minDescriptionLength?: number | null;
+      /** Format: int32 */
+      maxDescriptionLength?: number | null;
+      requiredDescriptionCultures?: string[] | null;
+      /** Format: int32 */
+      minGenreLength?: number | null;
+      /** Format: int32 */
+      maxGenreLength?: number | null;
+      requiredGenreCultures?: string[] | null;
     };
     /** @enum {string} */
     ReviewKind: "notReviewed" | "accepted" | "rejected";
@@ -1977,6 +2046,21 @@ export interface components {
        * @example AAAAbadf00d
        */
       id: string;
+    };
+    VideoConversionRetryDto: {
+      ids?: string[] | null;
+      shouldRetryOriginalAnalysis: boolean;
+      shouldRetryConversion: boolean;
+    };
+    VideoConversionStatsDto: {
+      /** Format: int32 */
+      totalVideoShardCount: number;
+      /** Format: int32 */
+      corruptedVideoShardCount: number;
+      /** Format: int32 */
+      pendingVideoConversionCount: number;
+      /** Format: int32 */
+      failedVideoConversionCount: number;
     };
     VideoShardDetailDto: {
       kind: "Video";

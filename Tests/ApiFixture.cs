@@ -47,6 +47,14 @@ public class ApiFixture(IMessageSink diagnosticSink) : IAsyncLifetime
                     .WriteTo.InjectableTestOutput(injectableSink)
                 );
                 // services.MartenDaemonModeIsSolo();
+                services.ConfigureMarten(mo =>
+                    {
+                        mo.Projections.Errors.SkipApplyErrors = false;
+                        mo.Projections.Errors.SkipSerializationErrors = false;
+                        mo.Projections.RebuildErrors.SkipApplyErrors = false;
+                        mo.Projections.RebuildErrors.SkipSerializationErrors = false;
+                    }
+                );
                 services.InitializeMartenWith<TestSeedData>();
                 services.Configure<StorageOptions>(o =>
                 {

@@ -43,7 +43,7 @@ export function CreateProject(props: ICreateProjectProps) {
                         <Box fontSize="xl" fontWeight="semibold" as="h3" lineHeight="tight">
                             {t('project.general').toString()}
                         </Box>
-                        <ProjectBasicInfo groupId={id} />
+                        <ProjectBasicInfo groupId={id} validationSettings={group.validationSettings}/>
 
                         {/*
                             - Genre

@@ -12,6 +12,7 @@ public readonly partial record struct Error
     public const string AlreadyCompletedId = nameof(AlreadyCompleted);
     public const string AlreadyFailedId = nameof(AlreadyFailed);
     public const string AnalysisFailedId = nameof(AnalysisFailed);
+    public const string ValidationErrorId = nameof(ValidationError);
     public const string ParameterArgument = "parameter";
 
     public static Error NotFound(string? message = null)
@@ -102,5 +103,20 @@ public readonly partial record struct Error
     public static Error AnalysisFailed(Hrib shardId, string? message = null)
     {
         return new Error(AnalysisFailedId, $"Analysis of shard '{shardId}' failed:\n\n{message}");
+    }
+
+    public static Error ValidationError(string? message = null, string? parameterName = null)
+    {
+        var error = new Error(
+            ValidationErrorId,
+            message ?? "A validation error occurred."
+        );
+
+        if (!string.IsNullOrEmpty(parameterName))
+        {
+            error = error.WithArgument(ParameterArgument, parameterName);
+        }
+
+        return error;
     }
 }

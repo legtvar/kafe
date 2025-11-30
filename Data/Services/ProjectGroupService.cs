@@ -79,6 +79,15 @@ public class ProjectGroupService
             db.Events.KafeAppend(id, opened);
         }
 
+        if (@new.ValidationSettings is not null)
+        {
+            var validationSettingsChanged = new ProjectGroupValidationSettingsChanged(
+                ProjectGroupId: id.ToString(),
+                ValidationSettings: @new.ValidationSettings
+            );
+            db.Events.KafeAppend(id, validationSettingsChanged);
+        }
+
         await db.SaveChangesAsync(token);
 
         if (shouldWaitForDaemon)
@@ -201,6 +210,14 @@ public class ProjectGroupService
             eventStream.AppendOne(new ProjectGroupMovedToOrganization(
                 @old.Id,
                 @new.OrganizationId
+            ));
+        }
+
+        if (@old.ValidationSettings != @new.ValidationSettings)
+        {
+            eventStream.AppendOne(new ProjectGroupValidationSettingsChanged(
+                @old.Id,
+                @new.ValidationSettings
             ));
         }
 

@@ -2329,6 +2329,83 @@
           }
         }
       }
+    },
+    "/api/v1/system/video-conversion-retry": {
+      "post": {
+        "tags": [
+          "System"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VideoConversionRetryDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VideoConversionRetryDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/VideoConversionRetryDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/VideoConversionStatsDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VideoConversionStatsDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VideoConversionStatsDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/system/video-conversion-stats": {
+      "get": {
+        "tags": [
+          "System"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/VideoConversionStatsDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VideoConversionStatsDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VideoConversionStatsDto"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -3976,7 +4053,8 @@
           "projectGroupId",
           "releasedOn",
           "reviews",
-          "userPermissions"
+          "userPermissions",
+          "validationSettings"
         ],
         "type": "object",
         "properties": {
@@ -4016,6 +4094,9 @@
               }
             },
             "nullable": true
+          },
+          "validationSettings": {
+            "$ref": "#/components/schemas/ProjectValidationSettings"
           },
           "genre": {
             "title": "LocalizedString",
@@ -4118,6 +4199,13 @@
             "items": {
               "$ref": "#/components/schemas/ProjectAuthorDto"
             }
+          },
+          "ownerId": {
+            "type": "string",
+            "description": "Human-Readable Identifier Ballast",
+            "format": "hrib",
+            "nullable": true,
+            "example": "AAAAbadf00d"
           },
           "artifacts": {
             "type": "array",
@@ -4377,7 +4465,8 @@
           "isOpen",
           "name",
           "organizationId",
-          "projects"
+          "projects",
+          "validationSettings"
         ],
         "type": "object",
         "properties": {
@@ -4454,13 +4543,17 @@
             "items": {
               "$ref": "#/components/schemas/ProjectListDto"
             }
+          },
+          "validationSettings": {
+            "$ref": "#/components/schemas/ProjectValidationSettings"
           }
         },
         "additionalProperties": false
       },
       "ProjectGroupEditDto": {
         "required": [
-          "id"
+          "id",
+          "validationSettings"
         ],
         "type": "object",
         "properties": {
@@ -4535,6 +4628,9 @@
           "isOpen": {
             "type": "boolean",
             "nullable": true
+          },
+          "validationSettings": {
+            "$ref": "#/components/schemas/ProjectValidationSettings"
           }
         },
         "additionalProperties": false
@@ -4713,6 +4809,13 @@
           },
           "isLocked": {
             "type": "boolean"
+          },
+          "ownerId": {
+            "type": "string",
+            "description": "Human-Readable Identifier Ballast",
+            "format": "hrib",
+            "nullable": true,
+            "example": "AAAAbadf00d"
           }
         },
         "additionalProperties": false,
@@ -4774,6 +4877,13 @@
         ],
         "type": "object",
         "properties": {
+          "reviewerId": {
+            "type": "string",
+            "description": "Human-Readable Identifier Ballast",
+            "format": "hrib",
+            "nullable": true,
+            "example": "AAAAbadf00d"
+          },
           "kind": {
             "$ref": "#/components/schemas/ReviewKind"
           },
@@ -4835,6 +4945,66 @@
             "items": {
               "$ref": "#/components/schemas/ProjectDiagnosticDto"
             }
+          }
+        },
+        "additionalProperties": false
+      },
+      "ProjectValidationSettings": {
+        "type": "object",
+        "properties": {
+          "minNameLength": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "maxNameLength": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "requiredNameCultures": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "minDescriptionLength": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "maxDescriptionLength": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "requiredDescriptionCultures": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "minGenreLength": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "maxGenreLength": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "requiredGenreCultures": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -5261,6 +5431,60 @@
             "description": "Human-Readable Identifier Ballast",
             "format": "hrib",
             "example": "AAAAbadf00d"
+          }
+        },
+        "additionalProperties": false
+      },
+      "VideoConversionRetryDto": {
+        "required": [
+          "shouldRetryConversion",
+          "shouldRetryOriginalAnalysis"
+        ],
+        "type": "object",
+        "properties": {
+          "ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "description": "Human-Readable Identifier Ballast",
+              "format": "hrib",
+              "example": "AAAAbadf00d"
+            },
+            "nullable": true
+          },
+          "shouldRetryOriginalAnalysis": {
+            "type": "boolean"
+          },
+          "shouldRetryConversion": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "VideoConversionStatsDto": {
+        "required": [
+          "corruptedVideoShardCount",
+          "failedVideoConversionCount",
+          "pendingVideoConversionCount",
+          "totalVideoShardCount"
+        ],
+        "type": "object",
+        "properties": {
+          "totalVideoShardCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "corruptedVideoShardCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pendingVideoConversionCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "failedVideoConversionCount": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false

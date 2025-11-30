@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 
 namespace Kafe.Data;
@@ -64,5 +66,55 @@ public record ProjectValidationSettings
                 ? right.RequiredGenreCultures
                 : null
         };
+    }
+
+    public virtual bool Equals(ProjectValidationSettings? other)
+    {
+        if (other is null)
+        {
+            return false;
+        }
+
+        return MinNameLength == other.MinNameLength
+            && MaxNameLength == other.MaxNameLength
+            && SetEquals(RequiredNameCultures, other.RequiredNameCultures)
+            && MinDescriptionLength == other.MinDescriptionLength
+            && MaxDescriptionLength == other.MaxDescriptionLength
+            && SetEquals(RequiredDescriptionCultures, other.RequiredDescriptionCultures)
+            && MinGenreLength == other.MinGenreLength
+            && MaxGenreLength == other.MaxGenreLength
+            && SetEquals(RequiredGenreCultures, other.RequiredGenreCultures);
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(
+            MinNameLength,
+            MaxNameLength,
+            MinDescriptionLength,
+            MaxDescriptionLength,
+            MinGenreLength,
+            MaxDescriptionLength
+        )
+        ^ HashCode.Combine(
+            RequiredNameCultures?.Count,
+            RequiredDescriptionCultures?.Count,
+            RequiredGenreCultures?.Count
+        );
+    }
+
+    private static bool SetEquals<T>(ISet<T>? lhs, ISet<T>? rhs)
+    {
+        if (lhs is null && rhs is null)
+        {
+            return true;
+        }
+
+        if (lhs is null || rhs is null)
+        {
+            return false;
+        }
+
+        return lhs.SetEquals(rhs);
     }
 }

@@ -115,7 +115,7 @@ public class ProjectGroupInfoProjection : SingleStreamProjection<ProjectGroupInf
     {
         return g with
         {
-            ValidationSettings = e.Value
+            ValidationSettings = e.ValidationSettings
         };
     }
 }

@@ -12,6 +12,7 @@ export class Project extends AbstractType {
     // API object
     public projectGroupId!: string;
     public projectGroupName!: localizedString;
+    public validationSettings?: components['schemas']['ProjectValidationSettings'];
     public name?: localizedString;
     public genre?: localizedString;
     public description?: localizedString;

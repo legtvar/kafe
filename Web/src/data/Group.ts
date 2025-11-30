@@ -16,6 +16,7 @@ export class Group extends AbstractType {
     public projects!: Project[];
     public customFields: Record<string, any> = {};
     public organizationId!: HRIB;
+    public validationSettings?: components['schemas']['ProjectValidationSettings'];
 
     public constructor(
         struct: components['schemas']['ProjectGroupListDto'] | components['schemas']['ProjectGroupDetailDto'],

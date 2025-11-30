@@ -12,6 +12,7 @@ import { User } from '../data/User';
 import { components } from '../schemas/api';
 import { HRIB, localizedString } from '../schemas/generic';
 import { IntRange } from '../utils/IntRange';
+import { LS_LANGUAGE_APP_KEY } from '@/languageConfig';
 
 export type ApiCredentials = {
     username: string;
@@ -47,6 +48,11 @@ export class API {
             baseURL: this.apiUrl,
             withCredentials: true,
             validateStatus: (status) => [200].includes(status) || (status >= 400 && status < 500),
+        });
+
+        this.client.interceptors.request.use((config) => {
+            config.headers['Accept-Language'] = localStorage.getItem(LS_LANGUAGE_APP_KEY);
+            return config;
         });
     }
 

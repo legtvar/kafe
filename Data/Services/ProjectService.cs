@@ -43,6 +43,7 @@ public partial class ProjectService
         ExistingEntityHandling existingEntityHandling = ExistingEntityHandling.Upsert,
         bool shouldOverrideLock = false,
         string? preferredCulture = null,
+        bool shouldSkipValidation = false,
         CancellationToken token = default
     )
     {
@@ -79,13 +80,16 @@ public partial class ProjectService
             return group.Errors;
         }
 
-        var report = ValidateBasicInfo(project, group.Value.ValidationSettings);
-        if (report.Diagnostics.Any(d => d.Kind == DiagnosticKind.Error))
+        if (!shouldSkipValidation)
         {
-            return report.Diagnostics
-                .Where(d => d.Kind == DiagnosticKind.Error)
-                .Select(d => Error.ValidationError(d.Message.ToString(preferredCulture)))
-                .ToImmutableArray();
+            var report = ValidateBasicInfo(project, group.Value.ValidationSettings);
+            if (report.Diagnostics.Any(d => d.Kind == DiagnosticKind.Error))
+            {
+                return report.Diagnostics
+                    .Where(d => d.Kind == DiagnosticKind.Error)
+                    .Select(d => Error.ValidationError(d.Message.ToString(preferredCulture)))
+                    .ToImmutableArray();
+            }
         }
 
         if (existing is null)

@@ -22,7 +22,14 @@ services:
       context: ./
       dockerfile: Api.Dockerfile
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__postgres: host=kafe-db;port=5432;database=postgres;password=postgres;username=postgres
+      ConnectionStrings__KAFE: host=kafe-db;port=5432;database=kafe;password=postgres;username=postgres
+      Storage__SecretsDirectory: /mnt/kafe_secrets
+      Storage__TempDirectory: /mnt/kafe_temp
+      Storage__ArchiveDirectory: /mnt/kafe_archive
+      Storage__GeneratedDirectory: /mnt/kafe_generated
+      Pigeons__Endpoint: http://kafe-blender:8042
     expose:
       - 80
     volumes:
@@ -32,6 +39,7 @@ services:
       - kafe_temp:/mnt/kafe_temp
     depends_on:
       - db
+      - blender
     command: [
       "bash",
       "-c",
@@ -58,6 +66,27 @@ services:
         aliases:
           - kafe-web
     restart: always
+
+  blender:
+    build:
+      context: ./
+      dockerfile: Blender.Dockerfile
+    environment:
+      Storage__TempDirectory: /mnt/kafe_temp
+      Storage__ArchiveDirectory: /mnt/kafe_archive
+      Storage__GeneratedDirectory: /mnt/kafe_generated
+    expose:
+      - 8042
+    volumes:
+      - kafe_archive:/mnt/kafe_archive:ro
+      - kafe_generated:/mnt/kafe_generated
+      - kafe_temp:/mnt/kafe_temp
+    depends_on:
+      - db
+    networks:
+      default:
+        aliases:
+          - kafe-blender
 
 networks:
   # NB: we use `backbone` because the default `bridge` network does not support aliases

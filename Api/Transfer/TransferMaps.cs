@@ -390,8 +390,20 @@ public static class TransferMaps
         return new BlendDto(
             FileExtension: data.FileExtension,
             MimeType: data.MimeType,
+            Tests: data.Tests?.Select(ToBlendTestResponseDto).ToImmutableArray(),
             Error: data.Error);
     }
+
+    public static PigeonsTestInfoDto ToBlendTestResponseDto(PigeonsTestInfo data)
+    {
+        return new PigeonsTestInfoDto(
+            Label: data.Label,
+            State: data.State,
+            Datablock: data.Datablock,
+            Message: data.Message,
+            Traceback: data.Traceback);
+    }
+                
 
     public static TemporaryAccountInfoDto ToTemporaryAccountInfoDto(AccountInfo data)
     {

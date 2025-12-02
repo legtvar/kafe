@@ -38,6 +38,9 @@ public static class Const
     public const string Mp4MimeType = "video/mp4";
     public const string Mp4FileExtension = ".mp4";
 
+    public const string BlendMimeType = "application/x-blender";
+    public const string BlendFileExtension = ".blend";
+
     public const string InvariantCultureCode = "iv";
     public static readonly CultureInfo InvariantCulture = CultureInfo.InvariantCulture;
 

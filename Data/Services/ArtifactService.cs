@@ -72,4 +72,29 @@ public class ArtifactService
         await db.SaveChangesAsync(token);
         return await db.Events.KafeAggregateRequiredStream<ArtifactInfo>(id, token: token);
     }
+
+    public async Task<ImmutableArray<ImmutableDictionary<string, string>>> GetArtifactProjectGroupNames(string id, CancellationToken token = default)
+    {
+        var containingProjectGroupIds = new List<ImmutableDictionary<string, string>>();
+        var artifact = await db.LoadAsync<ArtifactDetail>(id, token);
+        if (artifact is null)
+        {
+            return containingProjectGroupIds.ToImmutableArray();
+        }
+        foreach (var projectId in artifact.ContainingProjectIds)
+        {
+            var project = await db.LoadAsync<ProjectInfo>(projectId, token);
+            if (project is null)
+            {
+                continue;
+            }
+            var projectGroup = await db.LoadAsync<ProjectGroupInfo>(project.ProjectGroupId, token);
+            if (projectGroup is null)
+            {
+                continue;
+            }
+            containingProjectGroupIds.Add(projectGroup.Name.ToImmutableDictionary());
+        }
+        return containingProjectGroupIds.Distinct().ToImmutableArray();
+    }
 }

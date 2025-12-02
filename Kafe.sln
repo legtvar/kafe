@@ -27,13 +27,24 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.gitlab-ci.yml = .gitlab-ci.yml
 		Api.Dockerfile = Api.Dockerfile
 		Directory.Build.props = Directory.Build.props
-		docker-compose.yml = docker-compose.yml
 		NuGet.config = NuGet.config
+		docker-compose.local.yml = docker-compose.local.yml
+		Announcer.Dockerfile = Announcer.Dockerfile
+		README.md = README.md
+		Web.Dockerfile = Web.Dockerfile
+		docker-compose.staging.yml = docker-compose.staging.yml
+		docker-compose.docs.yml = docker-compose.docs.yml
+		docker-compose.base.yml = docker-compose.base.yml
+		docker-compose.production.yml = docker-compose.production.yml
+		Blender.Dockerfile = Blender.Dockerfile
+		Directory.Build.targets = Directory.Build.targets
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kafe.MockIdentity", "MockIdentity\Kafe.MockIdentity.csproj", "{3A0F9596-06EC-4B5B-AA12-DB5B28D351DA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kafe.Announcer", "Announcer\Kafe.Announcer.csproj", "{02C5E470-3ABC-471B-BB9C-36E279E2917A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kafe.Pigeons", "Pigeons\Kafe.Pigeons.csproj", "{0471CCDE-174B-4396-A2C8-93F041044C2B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -81,6 +92,10 @@ Global
 		{02C5E470-3ABC-471B-BB9C-36E279E2917A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{02C5E470-3ABC-471B-BB9C-36E279E2917A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{02C5E470-3ABC-471B-BB9C-36E279E2917A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0471CCDE-174B-4396-A2C8-93F041044C2B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0471CCDE-174B-4396-A2C8-93F041044C2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0471CCDE-174B-4396-A2C8-93F041044C2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0471CCDE-174B-4396-A2C8-93F041044C2B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

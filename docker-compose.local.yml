@@ -9,17 +9,18 @@ services:
       BaseUrl: https://0.0.0.0:44369
       Kestrel__Endpoints__Http__Url: http://0.0.0.0:8069
       Kestrel__Endpoints__Https__Url: https://0.0.0.0:44369
-      ConnectionStrings__postgres: host=kafe-db;port=5432;database=postgres;password=postgres;username=postgres
-      ConnectionStrings__KAFE: host=kafe-db;port=5432;database=kafe;password=postgres;username=postgres
-      Storage__SecretsDirectory: /mnt/kafe_secrets
-      Storage__TempDirectory: /mnt/kafe_temp
-      Storage__ArchiveDirectory: /mnt/kafe_archive
-      Storage__GeneratedDirectory: /mnt/kafe_generated
     restart: no
 
   web:
     ports:
       - 3000:80
+
+  blender:
+    environment:
+        BaseUrl: http://0.0.0.0:8042
+        Kestrel__Endpoints__Http__Url: http://0.0.0.0:8042
+    ports:
+      - 8042:8042
 
 volumes:
   kafe_postgres:

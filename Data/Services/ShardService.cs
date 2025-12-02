@@ -10,6 +10,8 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Net.Http;
+using System.Net.Http.Json;
 
 namespace Kafe.Data.Services;
 
@@ -19,18 +21,21 @@ public class ShardService
     private readonly StorageService storageService;
     private readonly IMediaService mediaService;
     private readonly IImageService imageService;
+    private readonly IHttpClientFactory httpClientFactory;
 
     public ShardService(
         IDocumentSession db,
         StorageService storageService,
         IMediaService mediaService,
-        IImageService imageService
+        IImageService imageService,
+        IHttpClientFactory httpClientFactory
     )
     {
         this.db = db;
         this.storageService = storageService;
         this.mediaService = mediaService;
         this.imageService = imageService;
+        this.httpClientFactory = httpClientFactory;
     }
 
     public async Task<IShardEntity?> Load(Hrib id, CancellationToken token = default)
@@ -236,28 +241,55 @@ public class ShardService
         CancellationToken token = default
     )
     {
-        var blendInfo = new BlendInfo(".blend", "application/x-blender");
         blendStream.Seek(0, SeekOrigin.Begin);
         shardId ??= Hrib.Create();
+
+        if (!await storageService.TryStoreShard(
+            ShardKind.Blend,
+            shardId,
+            blendStream,
+            Const.OriginalShardVariant,
+            Const.BlendFileExtension,
+            token
+        ))
+        {
+            throw new InvalidOperationException("The .blend file could not be stored.");
+        }
+
+        if (!storageService.TryGetFilePath(
+            ShardKind.Blend,
+            shardId,
+            Const.OriginalShardVariant,
+            out var shardFilePath))
+        {
+            throw new ArgumentException("The shard stream could not be opened just after being saved.");
+        }
+
+        var artifactService = new ArtifactService(db);
+        var projectGroupNames = await artifactService.GetArtifactProjectGroupNames(artifactId.ToString(), token);
+        if (projectGroupNames.Length != 1)
+        {
+            throw new InvalidOperationException($"A blend shard must belong to exactly one project group. Found {projectGroupNames.Length}.");
+        }
+
+        var client = httpClientFactory.CreateClient("Pigeons");
+        var request = new PigeonsTestRequest(
+            ShardId: shardId,
+            HomeworkType: projectGroupNames[0]["iv"] ?? string.Empty,
+            Path: shardFilePath
+        );
+        var response = await client.PostAsJsonAsync("/test", request, cancellationToken: token);
+        var content = await response.Content.ReadFromJsonAsync<BlendInfoJsonFormat>(cancellationToken: token);
+        if (content is null)
+        {
+            throw new InvalidOperationException("Failed to get pigeons test info from pigeons service.");
+        }
 
         var created = new BlendShardCreated(
             ShardId: shardId.ToString(),
             CreationMethod: CreationMethod.Api,
             ArtifactId: artifactId.ToString(),
-            OriginalVariantInfo: blendInfo
-        );
-
-        if (!await storageService.TryStoreShard(
-                ShardKind.Blend,
-                created.ShardId,
-                blendStream,
-                Const.OriginalShardVariant,
-                blendInfo.FileExtension,
-                token
-            ))
-        {
-            throw new InvalidOperationException("The .blend file could not be stored.");
-        }
+            OriginalVariantInfo: content.ToBlendInfo());
 
         db.Events.KafeStartStream<BlendShardInfo>(created.ShardId, created);
         await db.SaveChangesAsync(token);

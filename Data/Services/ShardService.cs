@@ -240,7 +240,7 @@ public class ShardService
         Hrib? shardId = null,
         CancellationToken token = default
     )
-    {  
+    {
         blendStream.Seek(0, SeekOrigin.Begin);
         shardId ??= Hrib.Create();
 
@@ -278,8 +278,8 @@ public class ShardService
             HomeworkType: projectGroupNames[0]["iv"] ?? string.Empty,
             Path: shardFilePath
         );
-        var response = await client.PostAsJsonAsync("/test", request);
-        var content = await response.Content.ReadFromJsonAsync<BlendInfoJsonFormat>();
+        var response = await client.PostAsJsonAsync("/test", request, cancellationToken: token);
+        var content = await response.Content.ReadFromJsonAsync<BlendInfoJsonFormat>(cancellationToken: token);
         if (content is null)
         {
             throw new InvalidOperationException("Failed to get pigeons test info from pigeons service.");
@@ -292,7 +292,7 @@ public class ShardService
             OriginalVariantInfo: content.ToBlendInfo());
 
         db.Events.KafeStartStream<BlendShardInfo>(created.ShardId, created);
-        await db.SaveChangesAsync();
+        await db.SaveChangesAsync(token);
         return created.ShardId;
     }
 
@@ -318,7 +318,7 @@ public class ShardService
 
         return ((IShardCreated)firstEvent.Data).GetShardKind();
     }
-    
+
     public record VariantInfo(
         Hrib ShardId,
         string Variant,

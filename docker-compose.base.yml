@@ -66,9 +66,8 @@ services:
     expose:
       - 80
     volumes:
-      - kafe_archive:/mnt/kafe_archive
+      - kafe_archive:/mnt/kafe_archive:ro
       - kafe_generated:/mnt/kafe_generated
-      - kafe_secrets:/mnt/kafe_secrets
       - kafe_temp:/mnt/kafe_temp
     depends_on:
       - db

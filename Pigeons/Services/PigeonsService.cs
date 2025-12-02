@@ -55,7 +55,7 @@ public class PigeonsService
         string? filePathDirectory = Path.GetDirectoryName(filePath);
         if (filePathDirectory is null)
         {
-            throw new InvalidOperationException("Failed to find pigeons output file path directory .");
+            throw new InvalidOperationException("Failed to find pigeons output file path directory.");
         }
         string hashSuffix = id + "_" + DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
         return Path.Combine(filePathDirectory, $"{Const.PigeonsTestOutputName}_{hashSuffix}.{Const.PigeonsTestOutputExtension}");

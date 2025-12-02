@@ -1,4 +1,4 @@
-namespace Pigeons.Services;
+namespace Kafe.Pigeons.Services;
 
 public record BlenderProcessOutput(
     bool Success,

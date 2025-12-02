@@ -1,6 +1,6 @@
 using System.Collections.Immutable;
 
-namespace Pigeons.Services;
+namespace Kafe.Pigeons.Services;
 
 public record BlendInfo(
     string FileExtension,

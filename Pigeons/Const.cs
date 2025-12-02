@@ -1,4 +1,4 @@
-namespace Pigeons
+namespace Kafe.Pigeons
 {
     public static class Const
     {

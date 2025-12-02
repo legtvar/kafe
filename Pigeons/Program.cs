@@ -1,4 +1,4 @@
-using Pigeons.Endpoints;
+using Kafe.Pigeons.Endpoints;
 
 var builder = WebApplication.CreateBuilder(args);
 

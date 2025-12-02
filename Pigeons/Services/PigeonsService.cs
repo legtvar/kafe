@@ -7,13 +7,13 @@ using Microsoft.Extensions.Logging.Abstractions;
 using System.Collections.Immutable;
 using System.Collections.Generic;
 using System.Linq;
-using Pigeons;
+using Kafe.Pigeons;
 
-namespace Pigeons.Services;
+namespace Kafe.Pigeons.Services;
 
 public class PigeonsService
 {
-    private static readonly ImmutableArray<string> supportedHomeworkTypes = 
+    private static readonly ImmutableArray<string> supportedHomeworkTypes =
         ImmutableArray.Create(
             "Homework 2 - Composition",
             "Homework 3 - Chair",

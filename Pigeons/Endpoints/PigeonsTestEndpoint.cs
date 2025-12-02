@@ -1,6 +1,6 @@
-using Pigeons.Services;
+using Kafe.Pigeons.Services;
 
-namespace Pigeons.Endpoints
+namespace Kafe.Pigeons.Endpoints
 {
     public static class PigeonsTestEndpoint
     {

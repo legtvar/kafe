@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
-namespace Pigeons.Services;
+namespace Kafe.Pigeons.Services;
 
 public static class Blender
 {

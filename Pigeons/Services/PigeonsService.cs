@@ -11,8 +11,10 @@ using Kafe.Pigeons;
 
 namespace Kafe.Pigeons.Services;
 
-public class PigeonsService
+public class PigeonsService(string tempDirectory, ILogger logger)
 {
+    public string TempDirectory { get; } = tempDirectory;
+
     private static readonly ImmutableArray<string> supportedHomeworkTypes =
         ImmutableArray.Create(
             "Homework 2 - Composition",
@@ -71,7 +73,7 @@ public class PigeonsService
     }
 
 
-    public static string GetPigeonsTestCommand(string id, string filePath, string type)
+    public static string GetPigeonsTestCommand(string id, string filePath, string outputPath, string type)
     {
         string args = string.Join(" ", new[]
         {
@@ -81,7 +83,7 @@ public class PigeonsService
             "--",
             $"--hw={type}",
             $"--homework-file=\"{filePath}\"",
-            "--output-to-file", $"\"{GetPigeonsTestOutputPath(id, filePath)}\""
+            "--output-to-file", $"\"{outputPath}\""
         });
         return args;
     }
@@ -114,30 +116,42 @@ public class PigeonsService
                 null
             );
         }
-        string arguments = GetPigeonsTestCommand(id, shardPath, homeworkType);
-        BlenderProcessOutput output = await Blender.RunBlenderCommand(arguments, pigeonsTestTimeoutMs);
-        if (!output.Success)
-        {
-            return BlendInfo.Invalid(output.Message);
-        }
 
         FileInfo shardFile = new FileInfo(shardPath);
         if (!shardFile.Exists || shardFile.DirectoryName is null)
         {
             return BlendInfo.Invalid("Shard file was not found");
         }
-        DirectoryInfo shardDir = new DirectoryInfo(shardFile.DirectoryName);
-        if (shardDir is null)
-        {
-            return BlendInfo.Invalid("Shard file was not found");
-        }
-        string testResultPath = shardDir.GetFiles()
-            .Where(f => f.Name.StartsWith("pigeons_test_result") && f.Name.EndsWith(".json"))
-            .OrderByDescending(f => f.LastWriteTime)
-            .First()
-            .ToString();
 
-        string jsonContent = File.ReadAllText(testResultPath);
+        DirectoryInfo shardDir = new DirectoryInfo(shardFile.DirectoryName);
+        if (!shardDir.Exists)
+        {
+            return BlendInfo.Invalid("Shard file directory was not found");
+        }
+
+        var hash = DateTime.UtcNow.ToString("yyyy-MM-dd_HH-mm-ss");
+        var outputDir = new DirectoryInfo(Path.Combine(TempDirectory, shardDir.Name));
+        if (!outputDir.Exists)
+        {
+            outputDir.Create();
+        }
+
+        var outputPath = Path.Combine(
+            TempDirectory,
+            shardDir.Name,
+            $"{Const.PigeonsTestOutputName}_{hash}.{Const.PigeonsTestOutputExtension}"
+        );
+
+        string arguments = GetPigeonsTestCommand(id, shardPath, outputPath, homeworkType);
+        logger.LogInformation("Running Blender with the following arguments:\n\t{Arguments}", arguments);
+        BlenderProcessOutput output = await Blender.RunBlenderCommand(arguments, pigeonsTestTimeoutMs);
+        if (!output.Success)
+        {
+            logger.LogInformation("Pigeons tests for shard '{ShardId}' failed.", shardDir.Name);
+            return BlendInfo.Invalid(output.Message);
+        }
+
+        string jsonContent = File.ReadAllText(outputPath);
         List<PigeonsTestInfo> tests = new List<PigeonsTestInfo>();
         PigeonsTestResultsSerializable? pigeonsResult = System.Text.Json.JsonSerializer.Deserialize<PigeonsTestResultsSerializable>(jsonContent);
         if (pigeonsResult != null)

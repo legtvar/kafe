@@ -1,7 +1,7 @@
 FROM mcr.microsoft.com/dotnet/sdk:9.0-alpine AS builder
 COPY ./ /kafe/src
 RUN apk update && apk add git
-RUN dotnet publish /kafe/src/Pigeons/Pigeons.csproj --configuration Release --output /kafe/publish --runtime linux-musl-x64 --self-contained
+RUN dotnet publish /kafe/src/Pigeons/Kafe.Pigeons.csproj --configuration Release --output /kafe/publish --runtime linux-musl-x64 --self-contained
 
 FROM mcr.microsoft.com/dotnet/sdk:9.0-alpine
 RUN apk update && apk add blender-headless
@@ -12,4 +12,4 @@ RUN blender-headless --background --python "/app/pigeons_setup.py" -- --repo-nam
 
 EXPOSE 8042
 
-CMD ["/app/Pigeons"]
+CMD ["/app/Kafe.Pigeons"]

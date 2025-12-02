@@ -10,4 +10,9 @@ var app = builder.Build();
 // Map endpoints
 app.MapPigeonsEndpoint();
 
+app.Logger.LogInformation(
+    "Temp directory: {TempDirectory}",
+    app.Configuration.GetValue<string>("Storage:TempDirectory")
+);
+
 app.Run();

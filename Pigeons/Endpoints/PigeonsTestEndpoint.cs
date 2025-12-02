@@ -8,7 +8,10 @@ namespace Kafe.Pigeons.Endpoints
         {
             app.MapPost("/test", async (RequestData request) =>
             {
-                var service = new PigeonsService();
+                var service = new PigeonsService(app.Configuration.GetValue<string>("Storage:TempDirectory")
+                    ?? throw new ArgumentException("The temp directory is not configured."),
+                    app.Logger
+                );
                 var pigeonsInfo = await service.RunPigeonsTest(request.ShardId, Uri.UnescapeDataString(request.Path), request.HomeworkType);
 
                 return Results.Ok(pigeonsInfo);

@@ -35,7 +35,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Data\Kafe.Data.csproj" />
     <ProjectReference Include="..\Media\Kafe.Media.csproj" />
-    <ProjectReference Include="..\Media\Kafe.Pigeons.csproj" />
+    <ProjectReference Include="..\Pigeons\Kafe.Pigeons.csproj" />
   </ItemGroup>
 
 </Project>

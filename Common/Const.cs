@@ -53,6 +53,7 @@ public static class Const
     public const string SlovakCultureName = "sk";
     public static readonly CultureInfo SlovakCulture;
 
+    public const string CzechOrSlovakPseudoCultureName = $"{CzechCultureName}|{SlovakCultureName}";
 
     public static readonly LocalizedString UnknownAuthor;
     public static readonly LocalizedString UnknownProjectGroup;
@@ -61,7 +62,9 @@ public static class Const
     public static readonly LocalizedString ProjectReviewEmailSubject;
     public static readonly LocalizedString[] EmailSignOffs;
     public static readonly LocalizedString CzechLanguageName;
+    public static readonly LocalizedString CzechOrSlovakLanguageName;
     public static readonly LocalizedString InvariantLanguageName;
+    public static readonly LocalizedString EnglishLanguageName;
 
     static Const()
     {
@@ -148,6 +151,16 @@ Vaše KAFE
             (CzechCulture, "čeština")
         );
 
+        CzechOrSlovakLanguageName = LocalizedString.Create(
+            (InvariantCulture, "Czech or Slovak"),
+            (CzechCulture, "čeština nebo slovenština")
+        );
+
+        EnglishLanguageName = LocalizedString.Create(
+            (InvariantCulture, "English"),
+            (CzechCulture, "angličtina")
+        );
+
         InvariantLanguageName = LocalizedString.Create(
             (InvariantCulture, "international"),
             (CzechCulture, "mezinárodní")
@@ -164,6 +177,16 @@ Vaše KAFE
         if (cultureCode == CzechCultureName)
         {
             return CzechLanguageName;
+        }
+
+        if (cultureCode == CzechOrSlovakPseudoCultureName)
+        {
+            return CzechOrSlovakLanguageName;
+        }
+
+        if (cultureCode == EnglishCultureName)
+        {
+            return EnglishLanguageName;
         }
 
         return LocalizedString.CreateInvariant(cultureCode);

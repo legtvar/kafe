@@ -10,13 +10,13 @@ public record ProjectValidationSettings
     {
         MinNameLength = 1,
         MaxNameLength = 42,
-        RequiredNameCultures = [Const.InvariantCultureCode, Const.CzechCultureName],
+        RequiredNameCultures = [Const.EnglishCultureName, Const.CzechOrSlovakPseudoCultureName],
         MinDescriptionLength = 50,
         MaxDescriptionLength = 200,
-        RequiredDescriptionCultures = [Const.InvariantCultureCode, Const.CzechCultureName],
+        RequiredDescriptionCultures = [Const.EnglishCultureName, Const.CzechOrSlovakPseudoCultureName],
         MinGenreLength = 1,
         MaxGenreLength = 32,
-        RequiredGenreCultures = [Const.InvariantCultureCode, Const.CzechCultureName],
+        RequiredGenreCultures = [Const.EnglishCultureName, Const.CzechOrSlovakPseudoCultureName],
     };
 
     public int? MinNameLength { get; init; }

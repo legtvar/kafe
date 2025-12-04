@@ -239,6 +239,11 @@ public sealed partial class LocalizedString : IEquatable<LocalizedString>
 
     public bool HasVariant(string cultureCode)
     {
+        if (cultureCode == Const.CzechOrSlovakPseudoCultureName)
+        {
+            return data.ContainsKey(Const.CzechCultureName) || data.ContainsKey(Const.SlovakCultureName);
+        }
+
         return data.ContainsKey(cultureCode);
     }
 

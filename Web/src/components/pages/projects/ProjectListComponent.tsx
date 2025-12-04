@@ -8,9 +8,11 @@ import { useAuthLink } from '../../../hooks/useAuthLink';
 import { useColorScheme, useHighlightStyle } from '../../../hooks/useColorScheme';
 import { fulltextFilter } from '../../../utils/fulltextFilter';
 import { Pagination } from '../../utils/Pagination';
+import { ProjectStatusMini } from './ProjectStatus';
 import { AwaitAPI } from '../../utils/AwaitAPI';
 import { DateTime } from 'luxon';
 import { User } from '../../../data/User';
+import { useOrganizations } from '../../../hooks/Caffeine';
 
 interface IProjectListComponentProps {
     projects: Project[];
@@ -18,6 +20,7 @@ interface IProjectListComponentProps {
 
 export function ProjectListComponent({ projects }: IProjectListComponentProps) {
     const { border, bg } = useColorScheme();
+    const { currentOrganization } = useOrganizations();
 
     const borderColor = useColorModeValue('gray.300', 'gray.700');
     const hoverColor = useColorModeValue('gray.200', 'gray.700');
@@ -62,7 +65,6 @@ export function ProjectListComponent({ projects }: IProjectListComponentProps) {
                                 px={5}
                                 borderBottomWidth="1px"
                                 borderBottomColor={borderColor}
-                                align={'start'}
                                 cursor="pointer"
                                 _hover={{
                                     background: hoverColor,
@@ -89,27 +91,34 @@ export function ProjectListComponent({ projects }: IProjectListComponentProps) {
                                             );
                                         }}
                                     </AwaitAPI>}
-                                    <Text fontSize="smaller" color="gray.500">
+                                    <Text
+                                        fontSize="smaller"
+                                        color="gray.500"
+                                        isTruncated
+                                        maxWidth={{ base: '100%', md: '600px' }}
+                                    >
                                         <Highlight styles={highlightStyle} query={filter}>
                                             {project.getDescription()}
                                         </Highlight>
                                     </Text>
                                 </Flex>
-                                <Text
-                                    flex={{
-                                        base: '1 0 0%',
-                                        md: '0 0 120px',
-                                    }}
-                                    textAlign={{
-                                        base: 'left',
-                                        md: 'right',
-                                    }}
-                                    color="gray.500"
+                                <Flex
+                                    justifyContent="end"
+                                    alignItems="center"
+                                    gap={4}
                                 >
-                                    {project.releasedOn
-                                        ? DateTime.fromJSDate(project.releasedOn).toLocaleString()
-                                        : t('project.releaseDate.na')}
-                                </Text>
+                                    <Text
+                                        minW={100}
+                                        color="gray.500"
+                                    >
+                                        {project.releasedOn
+                                            ? DateTime.fromJSDate(project.releasedOn).toLocaleString()
+                                            : t('project.releaseDate.na')}
+                                    </Text>
+                                    {project.userPermissions.includes('review') 
+                                    && currentOrganization?.id === 'mate-fimuni' 
+                                    && (<ProjectStatusMini project={project} stage={"pigeons-test"} />)}
+                                </Flex>
                             </Flex>
                         </Link>
                     )}

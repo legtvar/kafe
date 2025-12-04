@@ -240,6 +240,16 @@
       "ok": "Projekt prošel kontrolou grafikem",
       "nok": "Projekt neprošel kontrolou grafikem"
     },
+    "pigeons-test": {
+      "ok": "Projekt prošel automatizovanými testy PIGEOnS",
+      "nok": "Projekt neprošel automatizovanými testy PIGEOnS",
+      "unknown": "Projekt zatím nebyl testován pomocí PIGEOnS"
+    },
+    "pigeons-review": {
+      "ok": "Projekt byl přijat",
+      "nok": "Projekt byl zamítnut nebo vyžaduje revizi",
+      "unknown": "Projekt zatím neobdržel žádný posudek"
+    },
     "disclaimer": "Automatická kontrola je zatím ve stádiu vývoje. Výsledky prosím berte s rezervou."
   },
   "register": {

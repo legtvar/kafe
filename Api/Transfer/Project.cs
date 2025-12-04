@@ -19,6 +19,7 @@ public record ProjectListDto(
     ImmutableArray<Permission> GlobalPermissions,
     ImmutableArray<Permission> UserPermissions,
     DateTimeOffset ReleasedOn,
+    ReviewKind LatestReviewKind,
     bool IsLocked,
     Hrib? OwnerId
     // TODO: Thumbnail

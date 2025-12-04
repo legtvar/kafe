@@ -31,6 +31,7 @@ export class Project extends AbstractType {
     public globalPermissions!: components['schemas']['Permission'];
     public userPermissions!: components['schemas']['Permission'];
     public isLocked!: boolean;
+    public latestReviewKind?: components['schemas']['ReviewKind'];
 
     public constructor(struct: components['schemas']['ProjectListDto'] | components['schemas']['ProjectDetailDto']) {
         super();

@@ -50,6 +50,9 @@ public static class TransferMaps
             UserPermissions: ToPermissionArray(data.GlobalPermissions | userPermission),
             ReleasedOn: data.ReleasedOn,
             IsLocked: data.IsLocked,
+            LatestReviewKind: data.Reviews != null && !data.Reviews.IsDefaultOrEmpty
+            ? data.Reviews.OrderByDescending(r => r.AddedOn).First().Kind
+            : ReviewKind.NotReviewed,
             OwnerId: data.OwnerId);
     }
 

@@ -224,7 +224,8 @@
   "projectStatus": {
     "dramaturgy": {
       "ok": "The project has been accepted to the festival",
-      "nok": "The project has not been accepted to the festival"
+      "nok": "The project has not been accepted to the festival",
+      "unknown": "The project has not yet received a review"
     },
     "file": {
       "ok": "Files are uploaded and passed the automated check",
@@ -236,11 +237,23 @@
     },
     "tech": {
       "ok": "The project passed the technician's check",
-      "nok": "The project did not pass the technician's check"
+      "nok": "The project did not pass the technician's check",
+      "unknown": "The project has not yet received a review"
     },
     "visual": {
       "ok": "The project passed the graphic designer's check",
-      "nok": "The project did not pass the graphic designer's check"
+      "nok": "The project did not pass the graphic designer's check",
+      "unknown": "The project has not yet received a review"
+    },
+    "pigeons-test": {
+      "ok": "The project passed the PIGEOnS automated tests",
+      "nok": "The project did not pass the PIGEOnS automated tests",
+      "unknown": "The project has not been tested by PIGEOnS yet"
+    },
+    "pigeons-review": {
+      "ok": "The project was accepted",
+      "nok": "The project was rejected or needs revision",
+      "unknown": "The project has not yet received a review"
     },
     "disclaimer": "The automated check is still in development. Please take the results with caution."
   },

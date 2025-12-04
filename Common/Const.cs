@@ -42,6 +42,10 @@ public static class Const
     public const string BlendMimeType = "application/x-blender";
     public const string BlendFileExtension = ".blend";
 
+    public const string TextureBlueprintSlot = "texture";
+    public const string RenderedImageBlueprintSlot = "rendered-image";
+    public const string RenderedAnimationBlueprintSlot = "rendered-animation";
+
     public const string InvariantCultureCode = "iv";
     public static readonly CultureInfo InvariantCulture = CultureInfo.InvariantCulture;
 

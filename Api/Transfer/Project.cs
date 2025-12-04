@@ -74,8 +74,6 @@ public record ProjectReviewCreationDto(
 );
 
 public record ProjectBlueprintDto(
-    LocalizedString Name,
-    LocalizedString? Description,
     ImmutableArray<string> RequiredReviewers,
     ImmutableDictionary<string, ProjectArtifactBlueprintDto> ArtifactBlueprints
 );

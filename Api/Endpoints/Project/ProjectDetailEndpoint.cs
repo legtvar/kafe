@@ -83,7 +83,10 @@ public class ProjectDetailEndpoint : EndpointBaseAsync
             ValidationSettings = ProjectValidationSettings.Merge(
                 group.ValidationSettings,
                 ProjectValidationSettings.Default
-            )
+            ),
+            Blueprint = group.OrganizationId == "mate-fimuni"
+            ? TransferMaps.TemporaryMateProjectBlueprintMockup
+            : TransferMaps.TemporaryProjectBlueprintMockup
         };
 
         var artifactDetails = await artifactService.LoadDetailMany(

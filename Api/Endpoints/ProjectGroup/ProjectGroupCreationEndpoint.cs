@@ -1,6 +1,7 @@
 ﻿using Ardalis.ApiEndpoints;
 using Asp.Versioning;
 using Kafe.Api.Transfer;
+using Kafe.Data;
 using Kafe.Data.Aggregates;
 using Kafe.Data.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -45,7 +46,8 @@ public class ProjectGroupCreationEndpoint : EndpointBaseAsync
         {
             Description = dto.Description,
             Deadline = dto.Deadline,
-            IsOpen = dto.IsOpen
+            IsOpen = dto.IsOpen,
+            ValidationSettings = dto.OrganizationId == "mate-fimuni" ? ProjectValidationSettings.MateValidationSettings : null
         }, token: cancellationToken);
         if (group.HasErrors)
         {

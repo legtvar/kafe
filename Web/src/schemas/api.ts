@@ -1145,6 +1145,16 @@ export interface components {
       emailAddress?: string | null;
       permissions: components["schemas"]["Permission"][];
     };
+    EntityPermissionsEditFromCsvDto: {
+      /**
+       * Format: hrib
+       * @description Human-Readable Identifier Ballast
+       * @example AAAAbadf00d
+       */
+      id: string;
+      permissions?: components["schemas"]["Permission"][] | null;
+      csvFile: File;
+    };
     EntityPermissionsAccountListDto: {
       /**
        * Format: hrib

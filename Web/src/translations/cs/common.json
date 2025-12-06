@@ -440,6 +440,10 @@
       }
     },
     "none": "Žádná práva",
+    "editCsv": "Importovat uživatele z IS MUNI",
+    "uploadCsv": "Vyberte csv soubor",
+    "noCsv": "Není vybraný žádný csv soubor",
+    "setPerms": "Nastavit oprávnění",
     "invited": "Pozvánka",
     "groups": {
       "system": {

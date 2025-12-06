@@ -10,7 +10,7 @@ import { Shard } from '../data/Shard';
 import { System } from '../data/System';
 import { User } from '../data/User';
 import { components } from '../schemas/api';
-import { HRIB, localizedString } from '../schemas/generic';
+import { HRIB, localizedString, Permission } from '../schemas/generic';
 import { IntRange } from '../utils/IntRange';
 import { LS_LANGUAGE_APP_KEY } from '@/languageConfig';
 
@@ -283,6 +283,14 @@ export class API {
                         perms.serialize(true),
                     );
                 },
+                async updateFromCsv(id: string, perms: Permission[], csvFile: File) {
+                    const formData = new FormData();
+                    formData.append("Id", id);
+                    perms.length > 0 && formData.append("Permissions", perms.join(","));
+                    formData.append("CsvFile", csvFile);
+
+                    return await api.upload<FormData, string>(`entity/perms-csv`, formData);
+                }
             },
         };
     }

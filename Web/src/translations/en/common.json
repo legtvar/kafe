@@ -442,6 +442,10 @@
       }
     },
     "none": "No permissions",
+    "editCsv": "Import users from IS MUNI",
+    "uploadCsv": "Choose a csv file",
+    "noCsv": "No csv file selected",
+    "setPerms": "Set permissions",
     "invited": "Invited",
     "groups": {
       "system": {

@@ -15,6 +15,7 @@ import { SendAPI } from '../../utils/SendAPI';
 import { Status } from '../../utils/Status';
 import { WithTitle } from '../../utils/WithTitle';
 import { OrganizationBasicInfo } from './OrganizationBasicInfo';
+import { PermsCsvEditorModal } from '@/components/utils/PermsEditorFromCsv';
 
 interface IOrganizationsEditProps {}
 
@@ -116,6 +117,11 @@ export function OrganizationsEdit(props: IOrganizationsEditProps) {
                                                 }}
                                             />
                                         </VStack>
+                                        <PermsCsvEditorModal 
+                                            id={id}
+                                            initialPerms={[]}
+                                            options = {['read', 'write', 'inspect', 'append', 'review']}
+                                        />
                                     </TabPanel>
                                 </TabPanels>
                             </Tabs>

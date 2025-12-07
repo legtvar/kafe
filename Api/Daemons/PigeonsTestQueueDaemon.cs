@@ -35,30 +35,7 @@ public class PigeonsTestQueueDaemon(
         {
             try
             {
-                var shard_exists = shardService.Load(shard.Id, ct);
-                if (shard_exists == null)
-                {
-                    throw new InvalidOperationException($"Shard {shard.Id} no longer exists.");
-                }
-                var projectGroupNames = await artifactService.GetArtifactProjectGroupNames(shard.ArtifactId.ToString(), ct);
-                if (projectGroupNames.Length != 1)
-                {
-                    throw new InvalidOperationException($"Shard {shard.Id} does not belong to any project.");
-                }
-                if (!storageService.TryGetFilePath(
-                    ShardKind.Blend,
-                    shard.Id,
-                    Const.OriginalShardVariant,
-                    out var shardFilePath))
-                {
-                    throw new InvalidOperationException($"Can't find shard path of {shard.Id}.");
-                }
-                var request = new PigeonsTestRequest(
-                    ShardId: shard.Id,
-                    HomeworkType: projectGroupNames[0]["iv"] ?? string.Empty,
-                    Path: shardFilePath);
-
-                await PigeonsTestQueue.EnqueueAsync(request);
+                await PigeonsTestQueue.EnqueueAsync(shard.Id);
                 logger.LogInformation("Re-enqueued Pigeons test request for shard {ShardId}", shard.Id);
             }
             catch (Exception ex)
@@ -81,14 +58,13 @@ public class PigeonsTestQueueDaemon(
         var shardService = scope.ServiceProvider.GetRequiredService<ShardService>();
         while (!ct.IsCancellationRequested)
         {
-            var request = await PigeonsTestQueue.DequeueAsync(ct);
-            if (request is null)
+            var shardId = await PigeonsTestQueue.DequeueAsync(ct);
+            if (shardId is null)
             {
                 logger.LogInformation("Pigeons test daemon: No Pigeons test requests in queue. Waiting.");
                 await Task.Delay(TimeSpan.FromSeconds(10), ct);
                 return;
             }
-
             int attempt = 0;
             bool success = false;
 
@@ -96,18 +72,17 @@ public class PigeonsTestQueueDaemon(
             {
                 try
                 {
-                    bool shardExists = await IsExistingShard(
-                        request.ShardId,
+                    var request = await GetPigeonsTestRequest(
+                        shardId,
                         shardService,
                         scope.ServiceProvider.GetRequiredService<ArtifactService>(),
                         scope.ServiceProvider.GetRequiredService<StorageService>(),
                         ct);
-                    if (!shardExists)
+                    if (request is null)
                     {
                         attempt = retryMaxAttempts;
-                        throw new InvalidOperationException($"Shard {request.ShardId} no longer exists.");
+                        throw new InvalidOperationException($"Failed to create Pigeons test request for shard {shardId}.");
                     }
-
                     var client = httpClientFactory.CreateClient("Pigeons");
                     var response = await client.PostAsJsonAsync("/test", request, cancellationToken: ct);
                     var content = await response.Content.ReadFromJsonAsync<BlendInfoJsonFormat>(cancellationToken: ct);
@@ -115,24 +90,17 @@ public class PigeonsTestQueueDaemon(
                     {
                         throw new InvalidOperationException("Failed to get pigeons test info from pigeons service.");
                     }
-
                     var blendInfo = content.ToBlendInfo();
-                    if (await shardService.UpdateBlendTest(request.ShardId, blendInfo, ct) == null)
-                    {
-                        throw new InvalidOperationException($"Failed to update shard {request.ShardId} with pigeons test info.");
-                    }
-                    else
-                    {
-                        logger.LogInformation("Pigeons test daemon: Processed Pigeons test request for shard {ShardId}", request.ShardId);
-                        success = true;
-                    }
+                    await shardService.UpdateBlendTest(request.ShardId, blendInfo, ct);
+                    logger.LogInformation("Pigeons test daemon: Processed Pigeons test request for shard {ShardId}", request.ShardId);
+                    success = true;
                 }
                 catch (Exception ex)
                 {
                     attempt++;
                     if (attempt < retryMaxAttempts)
                     {
-                        logger.LogWarning(ex, "Pigeons test daemon: Attempt {Attempt}/{MaxAttempts} failed for shard {ShardId}. Retrying in {Delay}s...", attempt, retryMaxAttempts, request.ShardId, retryDelaySeconds);
+                        logger.LogWarning(ex, "Pigeons test daemon: Attempt {Attempt}/{MaxAttempts} failed for shard {ShardId}. Retrying in {Delay}s...", attempt, retryMaxAttempts, shardId, retryDelaySeconds);
                         await Task.Delay(TimeSpan.FromSeconds(retryDelaySeconds), ct);
                     }
                     else
@@ -143,16 +111,16 @@ public class PigeonsTestQueueDaemon(
                             Tests: null,
                             Error: $"{ex?.Message}"
                         );
-                        await shardService.UpdateBlendTest(request.ShardId, blendInfo, ct);
-                        logger.LogError(ex, "Pigeons test daemon: All {MaxAttempts} attempts failed for shard {ShardId}. Giving up.", retryMaxAttempts, request.ShardId);
+                        await shardService.UpdateBlendTest(shardId, blendInfo, ct);
+                        logger.LogError(ex, "Pigeons test daemon: All {MaxAttempts} attempts failed for shard {ShardId}. Giving up.", retryMaxAttempts, shardId);
                     }
                 }
             }
         }
     }
 
-    private async Task<bool> IsExistingShard(
-        string shardId,
+    private async Task<PigeonsTestRequest?> GetPigeonsTestRequest(
+        Hrib shardId,
         ShardService shardService,
         ArtifactService artifactService,
         StorageService storageService,
@@ -161,12 +129,12 @@ public class PigeonsTestQueueDaemon(
         var shard = await shardService.Load(shardId, ct);
         if (shard == null)
         {
-            return false;
+            return null;
         }
         var projectGroupNames = await artifactService.GetArtifactProjectGroupNames(shard.ArtifactId.ToString(), ct);
         if (projectGroupNames.Length < 1)
         {
-            return false;
+            return null;
         }
         if (!storageService.TryGetFilePath(
             ShardKind.Blend,
@@ -174,8 +142,11 @@ public class PigeonsTestQueueDaemon(
             Const.OriginalShardVariant,
             out var shardFilePath))
         {
-            return false;
+            return null;
         }
-        return true;
+        return new PigeonsTestRequest(
+            ShardId: shardId.ToString(),
+            HomeworkType: projectGroupNames[0]["iv"] ?? string.Empty,
+            Path: shardFilePath);
     }
 }

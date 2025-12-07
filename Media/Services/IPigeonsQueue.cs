@@ -8,13 +8,13 @@ namespace Kafe.Media.Services;
 
 public interface IPigeonsTestQueue
 {
-    ValueTask EnqueueAsync(PigeonsTestRequest request);
-    ValueTask<PigeonsTestRequest> DequeueAsync(CancellationToken ct);
+    ValueTask EnqueueAsync(Hrib ShardId);
+    ValueTask<Hrib> DequeueAsync(CancellationToken ct);
 }
 
 public sealed class PigeonsTestQueue : IPigeonsTestQueue
 {
-    private readonly Channel<PigeonsTestRequest> _queue;
+    private readonly Channel<Hrib> _queue;
     private const int queueMaxCapacity = 300;
 
     public PigeonsTestQueue()
@@ -25,18 +25,18 @@ public sealed class PigeonsTestQueue : IPigeonsTestQueue
             SingleReader = true,
             SingleWriter = false,
         };
-        _queue = Channel.CreateBounded<PigeonsTestRequest>(options);
+        _queue = Channel.CreateBounded<Hrib>(options);
     }
 
-    public async ValueTask EnqueueAsync(PigeonsTestRequest request)
+    public async ValueTask EnqueueAsync(Hrib ShardId)
     {
-        ArgumentNullException.ThrowIfNull(request);
-        await _queue.Writer.WriteAsync(request);
+        ArgumentNullException.ThrowIfNull(ShardId);
+        await _queue.Writer.WriteAsync(ShardId);
     }
 
-    public async ValueTask<PigeonsTestRequest> DequeueAsync(CancellationToken ct)
+    public async ValueTask<Hrib> DequeueAsync(CancellationToken ct)
     {
-        PigeonsTestRequest? request = await _queue.Reader.ReadAsync(ct);
-        return request;
+        Hrib? ShardId = await _queue.Reader.ReadAsync(ct);
+        return ShardId;
     }
 }

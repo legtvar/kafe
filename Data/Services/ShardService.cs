@@ -293,19 +293,15 @@ public class ShardService
             OriginalVariantInfo: blendInfo);
 
         db.Events.KafeStartStream<BlendShardInfo>(created.ShardId, created);
-
-        var request = new PigeonsTestRequest(
-            ShardId: shardId.ToString(),
-            HomeworkType: projectGroupNames[0]["iv"] ?? string.Empty,
-            Path: shardFilePath
-        );
-        await pigeonsQueue.EnqueueAsync(request);
+        await db.SaveChangesAsync(token);
 
         var queued = new BlendShardTestQueued(
             ShardId: shardId.ToString()
         );
+        await pigeonsQueue.EnqueueAsync(shardId);
         db.Events.Append(queued.ShardId, queued);
         await db.SaveChangesAsync(token);
+        
         return created.ShardId;
     }
 

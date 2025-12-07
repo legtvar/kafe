@@ -24,7 +24,7 @@ public class PigeonsTestInfoJsonFormat
 }
 
 public record PigeonsTestRequest(
-    Hrib ShardId,
+    [Hrib] string ShardId,
     string HomeworkType,
     string Path
 )

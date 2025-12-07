@@ -8,7 +8,7 @@ namespace Kafe.Media.Services;
 
 public interface IPigeonsTestQueue
 {
-    ValueTask QueueAsync(PigeonsTestRequest request);
+    ValueTask EnqueueAsync(PigeonsTestRequest request);
     ValueTask<PigeonsTestRequest> DequeueAsync(CancellationToken ct);
 }
 
@@ -28,7 +28,7 @@ public sealed class PigeonsTestQueue : IPigeonsTestQueue
         _queue = Channel.CreateBounded<PigeonsTestRequest>(options);
     }
 
-    public async ValueTask QueueAsync(PigeonsTestRequest request)
+    public async ValueTask EnqueueAsync(PigeonsTestRequest request)
     {
         ArgumentNullException.ThrowIfNull(request);
         await _queue.Writer.WriteAsync(request);

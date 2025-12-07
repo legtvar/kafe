@@ -12,6 +12,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Net.Http;
 using System.Net.Http.Json;
+using Org.BouncyCastle.Asn1.Misc;
+using System.Runtime.InteropServices.Marshalling;
 
 namespace Kafe.Data.Services;
 
@@ -276,20 +278,7 @@ public class ShardService
         {
             throw new InvalidOperationException($"A blend shard must belong to exactly one project group. Found {projectGroupNames.Length}.");
         }
-
-        // var client = httpClientFactory.CreateClient("Pigeons");
-        var request = new PigeonsTestRequest(
-            ShardId: shardId,
-            HomeworkType: projectGroupNames[0]["iv"] ?? string.Empty,
-            Path: shardFilePath
-        );
-        await pigeonsQueue.QueueAsync(request);
-        // var response = await client.PostAsJsonAsync("/test", request, cancellationToken: token);
-        // var content = await response.Content.ReadFromJsonAsync<BlendInfoJsonFormat>(cancellationToken: token);
-        // if (content is null)
-        // {
-        //     throw new InvalidOperationException("Failed to get pigeons test info from pigeons service.");
-        // }
+        
         var blendInfo = new BlendInfo(
             FileExtension: Const.BlendFileExtension,
             MimeType: Const.BlendMimeType,
@@ -304,18 +293,29 @@ public class ShardService
             OriginalVariantInfo: blendInfo);
 
         db.Events.KafeStartStream<BlendShardInfo>(created.ShardId, created);
+
+        var request = new PigeonsTestRequest(
+            ShardId: shardId.ToString(),
+            HomeworkType: projectGroupNames[0]["iv"] ?? string.Empty,
+            Path: shardFilePath
+        );
+        await pigeonsQueue.EnqueueAsync(request);
+
+        var queued = new BlendShardTestQueued(
+            ShardId: shardId.ToString()
+        );
+        db.Events.Append(queued.ShardId, queued);
         await db.SaveChangesAsync(token);
         return created.ShardId;
     }
 
-    public async Task<BlendShardInfo> UpdateBlend(
+    public async Task<BlendShardInfo> UpdateBlendTest(
         Hrib shardId,
         BlendInfo blendInfo,
         CancellationToken token = default)
     {
-        var changed = new BlendShardVariantAdded(
+        var changed = new BlendShardTested(
             ShardId: shardId.ToString(),
-            Name: "original",
             Info: blendInfo
         );
         db.Events.KafeAppend(changed.ShardId, changed);
@@ -323,6 +323,37 @@ public class ShardService
         await db.SaveChangesAsync(token);
 
         return await db.Events.KafeAggregateRequiredStream<BlendShardInfo>(shardId, token: token);
+    }
+
+    public async Task<List<BlendShardInfo>> GetShardsMissingTestAsync(CancellationToken ct)
+    {
+        // Fetch all stream IDs that were queued for testing but have not yet been tested
+        var sql = @"
+        SELECT q.stream_id
+        FROM mt_events q
+        WHERE q.type = 'blend_shard_test_queued'
+        AND NOT EXISTS (
+            SELECT 1
+            FROM mt_events t
+            WHERE t.stream_id = q.stream_id
+                AND t.type = 'blend_shard_tested'
+        );
+        ";
+
+        var streams = await db.QueryAsync<string>(sql);
+        var result = new List<BlendShardInfo>();
+
+        foreach (var streamId in streams)
+        {
+            var id = (Hrib)streamId;
+            var kind = await GetShardKind(id, ct);
+            if (kind == ShardKind.Blend)
+            {
+                var info = await db.Events.KafeAggregateRequiredStream<BlendShardInfo>(id, token: ct);
+                result.Add(info);
+            }
+        }
+        return result;
     }
     
     private async Task<string> TestBlend(

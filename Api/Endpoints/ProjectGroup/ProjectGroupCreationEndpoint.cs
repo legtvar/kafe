@@ -47,7 +47,7 @@ public class ProjectGroupCreationEndpoint : EndpointBaseAsync
             Description = dto.Description,
             Deadline = dto.Deadline,
             IsOpen = dto.IsOpen,
-            ValidationSettings = dto.OrganizationId == "mate-fimuni" ? ProjectValidationSettings.MateValidationSettings : null
+            ValidationSettings = dto.OrganizationId == "mate-fimuni" ? ProjectValidationSettings.MateValidationSettings : null // TODO: temporary workaround until artifact blueprints are implemented
         }, token: cancellationToken);
         if (group.HasErrors)
         {

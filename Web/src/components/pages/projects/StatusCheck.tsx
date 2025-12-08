@@ -21,7 +21,7 @@ export function StatusCheck({ children, status, details }: IStatusCheckProps) {
         },
         unknown: {
             icon: <BsCircle />,
-            color: useColorModeValue('gray.300', 'gray.700'),
+            color: useColorModeValue('gray.300', 'gray.600'),
         },
     }[status];
 

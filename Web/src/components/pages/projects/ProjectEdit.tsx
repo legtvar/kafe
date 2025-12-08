@@ -143,16 +143,16 @@ export function ProjectEdit(props: IProjectEditProps) {
                                             <Text fontStyle="italic">{t('general.autosave').toString()}</Text>
                                         </HStack>
                                         <Stack spacing={8} direction="column">
-                                            {Object.entries(project.blueprint.artifactBlueprints).map(
-                                                ([slotName, blueprint], i) => (
+                                            {Object.entries(project.blueprint.artifactBlueprints)
+                                                .sort(([a], [b]) => a.localeCompare(b))
+                                                .map(([slotName, blueprint], i) => (
                                                     <ArtifactGroupUpload
                                                         key={i}
                                                         project={project}
                                                         artifactBlueprint={blueprint!}
                                                         slotName={slotName}
                                                     />
-                                                ),
-                                            )}
+                                                ))}
                                         </Stack>
                                     </TabPanel>
                                     <TabPanel>

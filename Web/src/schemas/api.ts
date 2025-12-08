@@ -1513,20 +1513,6 @@ export interface components {
       roles: string[];
     };
     ProjectBlueprintDto: {
-      /** LocalizedString */
-      name: {
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      };
-      /** LocalizedString */
-      description?: ({
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      }) | null;
       requiredReviewers: string[];
       artifactBlueprints: {
         [key: string]: components["schemas"]["ProjectArtifactBlueprintDto"];
@@ -1904,7 +1890,7 @@ export interface components {
       requiredGenreCultures?: string[] | null;
     };
     /** @enum {string} */
-    ReviewKind: "notReviewed" | "accepted" | "rejected";
+    ReviewKind: "notReviewed" | "accepted" | "rejected" | "needsRevision";
     RoleCreationDto: {
       /**
        * Format: hrib

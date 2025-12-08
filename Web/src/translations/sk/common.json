@@ -184,8 +184,10 @@
       },
       "submit": "Odoslať posudok",
       "kind": {
-        "accepted": "Prijať",
-        "rejected": "Zamietnuť"
+        "accepted": "Prijatý",
+        "needsRevision": "Požadované úpravy",
+        "notReviewed": "Neohodnotený",
+        "rejected": "Zamietnutý"
       },
       "confirm": "Pozor! toto odošle mail autorovi projektu! Táto operácia je nevratná!",
       "new": "Nový posudok",
@@ -239,6 +241,16 @@
     "visual": {
       "ok": "Projekt prešiel kontrolou grafikom",
       "nok": "Projekt neprešiel kontrolou grafikom"
+    },
+    "pigeons-test": {
+      "ok": "Projekt prešiel automatizovanými testami PIGEOnS",
+      "nok": "Projekt neprešiel automatizovanými testami PIGEOnS",
+      "unknown": "Projekt zatiaľ nebol testovaný systémom PIGEOnS"
+    },
+    "pigeons-review": {
+      "ok": "Projekt bol prijatý",
+      "nok": "Projekt bol zamietnutý alebo vyžaduje úpravy",
+      "unknown": "Projekt zatiaľ nebol hodnotený"
     },
     "disclaimer": "Automatická kontrola je zatiaľ vo fáze vývoja. Výsledky prosím berte s rezervou."
   },

@@ -40,6 +40,7 @@ public record SubtitlesShardDetailDto(
 
 public record BlendShardDetailDto(
     Hrib Id,
+    string? FileName,
     ShardKind Kind,
     Hrib ArtifactId,
     ImmutableDictionary<string, BlendDto> Variants

@@ -10,5 +10,6 @@ public enum ReviewKind
 {
     NotReviewed,
     Accepted,
-    Rejected
+    Rejected,
+    NeedsRevision,
 }

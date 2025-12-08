@@ -13,6 +13,7 @@ namespace Kafe.Data.Aggregates;
 
 public record BlendShardInfo(
     [Hrib] string Id,
+    string? FileName,
     CreationMethod CreationMethod,
     DateTimeOffset CreatedAt,
     [Hrib] string ArtifactId,
@@ -33,6 +34,7 @@ public class BlendShardInfoProjection : SingleStreamProjection<BlendShardInfo, s
     {
         return new(
             Id: e.Data.ShardId,
+            FileName: e.Data.FileName,
             CreationMethod: e.Data.CreationMethod,
             ArtifactId: e.Data.ArtifactId,
             CreatedAt: e.Timestamp,

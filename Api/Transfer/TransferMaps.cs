@@ -10,123 +10,34 @@ namespace Kafe.Api.Transfer;
 
 public static class TransferMaps
 {
-    public static readonly ProjectBlueprintDto TemporaryProjectBlueprintMockup
-        = new(
-            RequiredReviewers: ImmutableArray.Create(
-                Const.TechReviewer,
-                Const.VisualReviewer,
-                Const.DramaturgyReviewer
-            ),
-            Name: LocalizedString.Create(
-                (Const.InvariantCulture, "Film registration to FFFI MU 2023"),
-                (Const.CzechCulture, "Přihlášení filmu na 23. FFFI MU")
-            ),
-            Description: null,
-            ArtifactBlueprints: new Dictionary<string, ProjectArtifactBlueprintDto>
-            {
-                [Const.FilmBlueprintSlot] = new ProjectArtifactBlueprintDto(
-                    Name: LocalizedString.Create(
-                        (Const.InvariantCulture, "Film"),
-                        (Const.CzechCulture, "Film")
-                    ),
-                    Description: null,
-                    Arity: ArgumentArity.ExactlyOne,
-                    ShardBlueprints: new Dictionary<ShardKind, ProjectArtifactShardBlueprintDto>
-                    {
-                        [ShardKind.Video] = new ProjectArtifactShardBlueprintDto(
-                            Name: LocalizedString.Create(
-                                (Const.InvariantCulture, "Film file"),
-                                (Const.CzechCulture, "Soubor s filmem")
-                            ),
-                            Description: null,
-                            Arity: ArgumentArity.ExactlyOne),
-                        [ShardKind.Subtitles] = new ProjectArtifactShardBlueprintDto(
-                            Name: LocalizedString.Create(
-                                (
-                                    Const.InvariantCulture,
-                                    "Subtitles"
-                                ),
-                                (
-                                    Const.CzechCulture,
-                                    "Titulky"
-                                )
-                            ),
-                            Description: LocalizedString.Create(
-                                (
-                                    Const.InvariantCulture,
-                                    "English subtitles if the film is in Czech, "
-                                    + "or Czech subtitles if the film is in English."
-                                ),
-                                (
-                                    Const.CzechCulture,
-                                    "Anglické titulky, pokud je film v češtině, "
-                                    + "nebo české titulky, pokud je film v angličtině)"
-                                )
-                            ),
-                            Arity: ArgumentArity.ExactlyOne)
-                    }
-                    .ToImmutableDictionary()
-                ),
-                [Const.VideoAnnotationBlueprintSlot] = new ProjectArtifactBlueprintDto(
-                    Name: LocalizedString.Create(
-                        (Const.InvariantCulture, "Video-annotation"),
-                        (Const.CzechCulture, "Videoanotace")
-                    ),
-                    Description: null,
-                    Arity: ArgumentArity.ZeroOrOne,
-                    ShardBlueprints: new Dictionary<ShardKind, ProjectArtifactShardBlueprintDto>
-                    {
-                        [ShardKind.Video] = new ProjectArtifactShardBlueprintDto(
-                            Name: LocalizedString.Create(
-                                (Const.InvariantCulture, "Video-annotation file"),
-                                (Const.CzechCulture, "Soubor s videoanotací")
-                            ),
-                            Description: null,
-                            Arity: ArgumentArity.ExactlyOne),
-                        [ShardKind.Subtitles] = new ProjectArtifactShardBlueprintDto(
-                            Name: LocalizedString.Create(
-                                (Const.InvariantCulture,"Subtitles"),
-                                (Const.CzechCulture, "Titulky")
-                            ),
-                            Description: LocalizedString.Create(
-                                (
-                                    Const.InvariantCulture,
-                                    "English subtitles if the film is in Czech, "
-                                    + "or Czech subtitles if the film is in English."
-                                ),
-                                (
-                                    Const.CzechCulture,
-                                    "Anglické titulky, pokud je film v češtině, "
-                                    + "nebo české titulky, pokud je film v angličtině)"
-                                )
-                            ),
-                            Arity: ArgumentArity.ExactlyOne)
-                    }
-                    .ToImmutableDictionary()
-                ),
-                [Const.CoverPhotoBlueprintSlot] = new ProjectArtifactBlueprintDto(
-                    Name: LocalizedString.Create(
-                        (Const.InvariantCulture, "Cover photo"),
-                        (Const.CzechCulture, "Titulní fotografie")
-                    ),
-                    Description: null,
-                    Arity: new ArgumentArity(Const.CoverPhotoMinCount, Const.CoverPhotoMaxCount),
-                    ShardBlueprints: new Dictionary<ShardKind, ProjectArtifactShardBlueprintDto>
-                    {
-                        [ShardKind.Image] = new ProjectArtifactShardBlueprintDto(
-                            Name: LocalizedString.Create(
-                                (Const.InvariantCulture, "Cover photo file"),
-                                (Const.CzechCulture, "Soubor s titulní fotografií")
-                            ),
-                            Description: null,
-                            Arity: ArgumentArity.ExactlyOne)
-                    }
-                    .ToImmutableDictionary()
-                )
-            }
-            .ToImmutableDictionary()
+    public static ProjectBlueprintDto ToProjectBlueprintDto(ProjectBlueprint projectBlueprint)
+    {
+        return new ProjectBlueprintDto(
+            RequiredReviewers: projectBlueprint.RequiredReviewers,
+            ArtifactBlueprints: projectBlueprint.ArtifactBlueprints.ToDictionary(
+                kvp => kvp.Key,
+                kvp => new ProjectArtifactBlueprintDto(
+                    Name: kvp.Value.Name,
+                    Description: kvp.Value.Description,
+                    Arity: kvp.Value.Arity,
+                    ShardBlueprints: kvp.Value.ShardBlueprints.ToDictionary(
+                        skvp => skvp.Key,
+                        skvp => new ProjectArtifactShardBlueprintDto(
+                            Name: skvp.Value.Name,
+                            Description: skvp.Value.Description,
+                            Arity: skvp.Value.Arity
+                        ))
+                        .ToImmutableDictionary()
+                ))
+                .ToImmutableDictionary()
         );
+    }
 
+    public static readonly ProjectBlueprintDto TemporaryProjectBlueprintMockup = 
+        ToProjectBlueprintDto(ProjectBlueprint.TemporaryProjectBlueprint);
+        
+    public static ProjectBlueprintDto TemporaryMateProjectBlueprintMockup = 
+        ToProjectBlueprintDto(ProjectBlueprint.TemporaryMateProjectBlueprint);
 
     public static ProjectListDto ToProjectListDto(ProjectInfo data, Permission userPermission = Permission.None)
     {
@@ -139,6 +50,9 @@ public static class TransferMaps
             UserPermissions: ToPermissionArray(data.GlobalPermissions | userPermission),
             ReleasedOn: data.ReleasedOn,
             IsLocked: data.IsLocked,
+            LatestReviewKind: data.Reviews != null && !data.Reviews.IsDefaultOrEmpty
+            ? data.Reviews.OrderByDescending(r => r.AddedOn).First().Kind
+            : ReviewKind.NotReviewed,
             OwnerId: data.OwnerId);
     }
 
@@ -380,6 +294,7 @@ public static class TransferMaps
     {
         return new BlendShardDetailDto(
             Id: data.Id,
+            FileName: data.FileName,
             Kind: data.Kind,
             ArtifactId: data.ArtifactId,
             Variants: data.Variants.ToImmutableDictionary(p => p.Key, p => ToBlendDto(p.Value)));

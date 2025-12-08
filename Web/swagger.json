@@ -3846,55 +3846,6 @@
         ],
         "type": "object",
         "properties": {
-          "name": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            }
-          },
-          "description": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            },
-            "nullable": true
-          },
           "requiredReviewers": {
             "type": "array",
             "items": {

@@ -19,6 +19,19 @@ public record ProjectValidationSettings
         RequiredGenreCultures = [Const.EnglishCultureName, Const.CzechOrSlovakPseudoCultureName],
     };
 
+    public static readonly ProjectValidationSettings MateValidationSettings = new ProjectValidationSettings
+    {
+        MinNameLength = 1,
+        MaxNameLength = 42,
+        RequiredNameCultures = [Const.InvariantCultureCode],
+        MinDescriptionLength = 50,
+        MaxDescriptionLength = 10000,
+        RequiredDescriptionCultures = [Const.InvariantCultureCode],
+        MinGenreLength = 0,
+        MaxGenreLength = 0,
+        RequiredGenreCultures = [],
+    };
+
     public int? MinNameLength { get; init; }
 
     public int? MaxNameLength { get; init; }
@@ -51,20 +64,20 @@ public record ProjectValidationSettings
         {
             MinNameLength = left.MinNameLength ?? right.MinNameLength,
             MaxNameLength = left.MaxNameLength ?? right.MaxNameLength,
-            RequiredNameCultures = left.RequiredNameCultures is null || left.RequiredNameCultures.IsEmpty
+            RequiredNameCultures = left.RequiredNameCultures is null
                 ? right.RequiredNameCultures
-                : null,
+                : left.RequiredNameCultures,
             MinDescriptionLength = left.MinDescriptionLength ?? right.MinDescriptionLength,
             MaxDescriptionLength = left.MaxDescriptionLength ?? right.MaxDescriptionLength,
             RequiredDescriptionCultures =
-                left.RequiredDescriptionCultures is null || left.RequiredDescriptionCultures.IsEmpty
+                left.RequiredDescriptionCultures is null 
                     ? right.RequiredDescriptionCultures
-                    : null,
+                    : left.RequiredDescriptionCultures,
             MinGenreLength = left.MinGenreLength ?? right.MinGenreLength,
             MaxGenreLength = left.MaxGenreLength ?? right.MaxGenreLength,
-            RequiredGenreCultures = left.RequiredGenreCultures is null || left.RequiredGenreCultures.IsEmpty
+            RequiredGenreCultures = left.RequiredGenreCultures is null
                 ? right.RequiredGenreCultures
-                : null
+                : left.RequiredGenreCultures
         };
     }
 

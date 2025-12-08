@@ -19,6 +19,7 @@ public record ProjectListDto(
     ImmutableArray<Permission> GlobalPermissions,
     ImmutableArray<Permission> UserPermissions,
     DateTimeOffset ReleasedOn,
+    ReviewKind LatestReviewKind,
     bool IsLocked,
     Hrib? OwnerId
     // TODO: Thumbnail
@@ -74,8 +75,6 @@ public record ProjectReviewCreationDto(
 );
 
 public record ProjectBlueprintDto(
-    LocalizedString Name,
-    LocalizedString? Description,
     ImmutableArray<string> RequiredReviewers,
     ImmutableDictionary<string, ProjectArtifactBlueprintDto> ArtifactBlueprints
 );

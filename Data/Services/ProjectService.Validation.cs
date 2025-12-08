@@ -3,6 +3,7 @@ using Kafe.Data.Events;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -72,6 +73,7 @@ public partial class ProjectService
     public const string TechReviewStage = "tech-review";
     public const string VisualReviewStage = "visual-review";
     public const string DramaturgyReviewStage = "dramaturgy-review";
+    public const string PigeonsTestStage = "pigeons-test"; 
 
     public static readonly Diagnostic NameTooLong = new Diagnostic(
         Kind: DiagnosticKind.Error,
@@ -645,6 +647,95 @@ public partial class ProjectService
         )
     );
 
+    public static readonly Diagnostic TooFewBlends = new Diagnostic(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: FileStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, "At least one blend file is required."),
+            (Const.CzechCulture, "Je vyžadován alespoň jeden blend soubor.")
+        )
+    );
+
+    public static readonly Diagnostic TooManyBlends = new Diagnostic(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: FileStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, "Too many blend files have been provided."),
+            (Const.CzechCulture, "Projekt obsahuje příliš mnoho blend souborů.")
+        )
+    );
+
+    public static readonly Diagnostic TooFewRenderedImages = new Diagnostic(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: FileStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, "At least one rendered image is required."),
+            (Const.CzechCulture, "Je vyžadován alespoň jeden renderovaný obrázek.")
+        )
+    );
+
+    public static readonly Diagnostic TooManyRenderedImages = new Diagnostic(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: FileStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, "Too many rendered images have been provided."),
+            (Const.CzechCulture, "Projekt obsahuje příliš mnoho renderovaných obrázků.")
+        )
+    );
+
+    public static readonly Diagnostic TooFewRenderedAnimations = new Diagnostic(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: FileStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, "At least one rendered animation is required."),
+            (Const.CzechCulture, "Je vyžadována alespoň jedna renderovaná animace.")
+        )
+    );
+
+    public static readonly Diagnostic TooManyRenderedAnimations = new Diagnostic(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: FileStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, "Too many rendered animations have been provided."),
+            (Const.CzechCulture, "Projekt obsahuje příliš mnoho renderovaných animací.")
+        )
+    );
+
+    public static readonly Diagnostic TooFewTextures = new Diagnostic(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: FileStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, "At least one texture is required."),
+            (Const.CzechCulture, "Je vyžadována alespoň jedna textura.")
+        )
+    );
+
+    public static readonly Diagnostic TooManyTextures = new Diagnostic(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: FileStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, "Too many textures have been provided."),
+            (Const.CzechCulture, "Projekt obsahuje příliš mnoho textur.")
+        )
+    );
+    public static readonly Diagnostic MissingPigeonsTestResult = new Diagnostic(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: FileStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, "PIGEOnS test result cannot be found."),
+            (Const.CzechCulture, "Výsledek PIGEOnS testu nelze nalézt.")
+        )
+    );
+
+    public static readonly Diagnostic IncorrectPigeonsTestResultFormat = new Diagnostic(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: FileStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, "PIGEOnS test result is of incorrect format."),
+            (Const.CzechCulture, "Výsledek PIGEOnS testu má nesprávný formát.")
+        )
+    );
+
     public ProjectReport ValidateBasicInfo(ProjectInfo project, ProjectValidationSettings? settings = null)
     {
         settings = ProjectValidationSettings.Merge(settings, ProjectValidationSettings.Default);
@@ -756,6 +847,16 @@ public partial class ProjectService
             ProjectValidationSettings.Default
         );
 
+        var group = await db.LoadAsync<ProjectGroupInfo>(project.ProjectGroupId, token);
+        if (group is null)
+        {
+            throw new InvalidOperationException($"Project group '{project.ProjectGroupId}' could not be found.");
+        }
+        // TODO: Placeholder blueprints until the artifact overhaul is done.
+        var projectBlueprint = group.OrganizationId == "mate-fimuni"
+        ? ProjectBlueprint.TemporaryMateProjectBlueprint
+        : ProjectBlueprint.TemporaryProjectBlueprint;
+
         var diagnostics = ImmutableArray.CreateBuilder<Diagnostic>();
 
         var basicReport = ValidateBasicInfo(project, settings);
@@ -776,197 +877,292 @@ public partial class ProjectService
             diagnostics.Add(MissingDramaturgyReview);
         }
 
-        if (project.Authors.Count(a => a.Kind == ProjectAuthorKind.Crew) < 1)
+        if ((project.Authors.Count(a => a.Kind == ProjectAuthorKind.Crew) < 1 && group.OrganizationId != "mate-fimuni") 
+            || (group.OrganizationId == "mate-fimuni" && project.OwnerId is null))
         {
             diagnostics.Add(MissingCrew);
         }
+        
+        var artifactBlueprints = projectBlueprint.ArtifactBlueprints;
 
         var artifactInfos = await db.LoadManyAsync<ArtifactDetail>(token, project.Artifacts.Select(a => a.Id));
         var artifacts = project.Artifacts
             .Join(artifactInfos, a => a.Id, i => i.Id, (a, i) => (projectArtifact: a, info: i))
             .ToImmutableArray();
 
-        var filmArtifacts = artifacts.Where(a => a.projectArtifact.BlueprintSlot == Const.FilmBlueprintSlot)
-            .ToImmutableArray();
-        if (filmArtifacts.Length == 0)
+        if (artifactBlueprints!.GetValueOrDefault(Const.FilmBlueprintSlot, null) is not null)
         {
-            diagnostics.Add(MissingFilm);
-        }
-        else if (filmArtifacts.Length > 1)
-        {
-            diagnostics.Add(TooManyFilms);
-        }
-        else
-        {
-            var videoShards = filmArtifacts.Single().info.Shards.Where(s => s.Kind == ShardKind.Video)
+            var filmShardsBlueprints = artifactBlueprints[Const.FilmBlueprintSlot].ShardBlueprints; 
+            var filmArtifacts = artifacts.Where(a => a.projectArtifact.BlueprintSlot == Const.FilmBlueprintSlot)
                 .ToImmutableArray();
-            if (videoShards.Length == 0)
+
+            if (filmArtifacts.Length < artifactBlueprints[Const.FilmBlueprintSlot].Arity.Min)
             {
                 diagnostics.Add(MissingFilm);
             }
-            else if (videoShards.Length > 1)
+            else if (filmArtifacts.Length > artifactBlueprints[Const.FilmBlueprintSlot].Arity.Max)
             {
                 diagnostics.Add(TooManyFilms);
             }
             else
             {
-                var videoShard = await db.LoadAsync<VideoShardInfo>(videoShards[0].ShardId, token);
-                if (videoShard is null)
+                
+                if (filmShardsBlueprints!.GetValueOrDefault(ShardKind.Video, null) is not null)
                 {
-                    diagnostics.Add(MissingFilm);
-                }
-                else
-                {
-                    diagnostics.AddRange(ValidateVideo(
-                        video: videoShard,
-                        maxFileLength: FilmMaxFileLength,
-                        minLength: FilmMinLength,
-                        maxLength: FilmMaxLength,
-                        corruptedError: FilmCorrupted,
-                        zeroFileLengthError: FilmHasZeroFileLength,
-                        tooLargeError: FilmIsTooLarge,
-                        tooShortError: FilmTooShort,
-                        tooLongError: FilmTooLong,
-                        streamMismatchError: FilmInvalidStreamCount,
-                        unsupportedContainerError: FilmUnsupportedContainerFormat,
-                        bitrateTooLowError: FilmUnsupportedBitrate,
-                        bitrateTooHighError: FilmUnsupportedBitrate,
-                        unsupportedVideoCodecError: FilmUnsupportedVideoCodec,
-                        unsupportedAudioCodecError: FilmUnsupportedAudioCodec,
-                        mp3BitrateTooLowError: FilmMp3BitrateTooLow,
-                        unsupportedFramerateError: FilmUnsupportedFramerate,
-                        wrongResolutionError: FilmWrongResolution
-                    ));
+                    var videoShards = filmArtifacts.Single().info.Shards.Where(s => s.Kind == ShardKind.Video)
+                        .ToImmutableArray();
+                    if (filmArtifacts.Length < filmShardsBlueprints[ShardKind.Video].Arity.Min)
+                    {
+                        diagnostics.Add(MissingFilm);
+                    }
+                    else if (filmArtifacts.Length > filmShardsBlueprints[ShardKind.Video].Arity.Max)
+                    {
+                        diagnostics.Add(TooManyFilms);
+                    }
+                    else
+                    {
+                        var videoShard = await db.LoadAsync<VideoShardInfo>(videoShards[0].ShardId, token);
+                        if (videoShard is null)
+                        {
+                            if (filmShardsBlueprints[ShardKind.Video].Arity.Min > 0)
+                                diagnostics.Add(MissingFilm);
+                        }
+                        else
+                        {
+                            diagnostics.AddRange(ValidateVideo(
+                                video: videoShard,
+                                maxFileLength: FilmMaxFileLength,
+                                minLength: FilmMinLength,
+                                maxLength: FilmMaxLength,
+                                corruptedError: FilmCorrupted,
+                                zeroFileLengthError: FilmHasZeroFileLength,
+                                tooLargeError: FilmIsTooLarge,
+                                tooShortError: FilmTooShort,
+                                tooLongError: FilmTooLong,
+                                streamMismatchError: FilmInvalidStreamCount,
+                                unsupportedContainerError: FilmUnsupportedContainerFormat,
+                                bitrateTooLowError: FilmUnsupportedBitrate,
+                                bitrateTooHighError: FilmUnsupportedBitrate,
+                                unsupportedVideoCodecError: FilmUnsupportedVideoCodec,
+                                unsupportedAudioCodecError: FilmUnsupportedAudioCodec,
+                                mp3BitrateTooLowError: FilmMp3BitrateTooLow,
+                                unsupportedFramerateError: FilmUnsupportedFramerate,
+                                wrongResolutionError: FilmWrongResolution
+                            ));
+                        }
+                    }
                 }
             }
 
-            var subtitleShards = filmArtifacts.Single().info.Shards.Where(s => s.Kind == ShardKind.Subtitles)
-                .ToImmutableArray();
-            if (subtitleShards.Length == 0)
+            if (filmShardsBlueprints!.GetValueOrDefault(ShardKind.Subtitles, null) is not null
+                && filmArtifacts.Length > 0)
             {
-                diagnostics.Add(MissingFilmSubtitles);
-            }
-            else if (subtitleShards.Length > 1)
-            {
-                diagnostics.Add(TooManyFilmSubtitles);
-            }
-            else
-            {
-                var subtitleShard = await db.LoadAsync<SubtitlesShardInfo>(subtitleShards[0].ShardId, token);
-                if (subtitleShard is null)
+                var subtitleShards = filmArtifacts.Single().info.Shards.Where(s => s.Kind == ShardKind.Subtitles)
+                    .ToImmutableArray();
+                if (subtitleShards.Length < filmShardsBlueprints[ShardKind.Subtitles].Arity.Min)
                 {
                     diagnostics.Add(MissingFilmSubtitles);
                 }
+                else if (subtitleShards.Length > filmShardsBlueprints[ShardKind.Subtitles].Arity.Max)
+                {
+                    diagnostics.Add(TooManyFilmSubtitles);
+                }
                 else
                 {
-                    diagnostics.AddRange(ValidateSubtitles(subtitleShard));
+                    var subtitleShard = await db.LoadAsync<SubtitlesShardInfo>(subtitleShards[0].ShardId, token);
+                    if (subtitleShard is null)
+                    {
+                        if (filmShardsBlueprints[ShardKind.Subtitles].Arity.Min > 0)
+                            diagnostics.Add(MissingFilmSubtitles);
+                    }
+                    else
+                    {
+                        diagnostics.AddRange(ValidateSubtitles(subtitleShard));
+                    }
+                }
+            }
+
+            if (artifactBlueprints!.GetValueOrDefault(Const.VideoAnnotationBlueprintSlot, null) is not null)
+            {
+                var annotationsShardsBlueprints = artifactBlueprints[Const.VideoAnnotationBlueprintSlot].ShardBlueprints; 
+                var videoAnnotationArtifacts = artifacts.Where(a => a.projectArtifact.BlueprintSlot == Const.VideoAnnotationBlueprintSlot)
+                    .ToImmutableArray();
+                if (videoAnnotationArtifacts.Length > artifactBlueprints[Const.VideoAnnotationBlueprintSlot].Arity.Max)
+                {
+                    diagnostics.Add(TooManyVideoAnnotations);
+                }
+                else if (videoAnnotationArtifacts.Length == 1)
+                {
+                    var videoShards = videoAnnotationArtifacts.Single().info.Shards.Where(s => s.Kind == ShardKind.Video)
+                        .ToImmutableArray();
+                    if (videoShards.Length < annotationsShardsBlueprints[ShardKind.Video].Arity.Min)
+                    {
+                        diagnostics.Add(MissingVideoAnnotationVideo);
+                    }
+                    else if (videoShards.Length > annotationsShardsBlueprints[ShardKind.Video].Arity.Min)
+                    {
+                        diagnostics.Add(TooManyVideoAnnotations);
+                    }
+                    else
+                    {
+                        var videoShard = await db.LoadAsync<VideoShardInfo>(videoShards[0].ShardId, token);
+                        if (videoShard is null)
+                        {
+                            if (annotationsShardsBlueprints[ShardKind.Video].Arity.Min > 0)
+                                diagnostics.Add(MissingFilm);
+                        }
+                        else
+                        {
+                            diagnostics.AddRange(ValidateVideo(
+                                video: videoShard,
+                                maxFileLength: VideoAnnotationMaxFileLength,
+                                minLength: VideoAnnotationMinLength,
+                                maxLength: VideoAnnotationMaxLength,
+                                corruptedError: VideoAnnotationCorrupted,
+                                zeroFileLengthError: VideoAnnotationHasZeroFileLength,
+                                tooLargeError: VideoAnnotationIsTooLarge,
+                                tooShortError: VideoAnnotationTooShort,
+                                tooLongError: VideoAnnotationTooLong,
+                                streamMismatchError: VideoAnnotationInvalidStreamCount,
+                                unsupportedContainerError: VideoAnnotationUnsupportedContainerFormat,
+                                bitrateTooLowError: VideoAnnotationUnsupportedBitrate,
+                                bitrateTooHighError: VideoAnnotationUnsupportedBitrate,
+                                unsupportedVideoCodecError: VideoAnnotationUnsupportedVideoCodec,
+                                unsupportedAudioCodecError: VideoAnnotationUnsupportedAudioCodec,
+                                mp3BitrateTooLowError: VideoAnnotationMp3BitrateTooLow,
+                                unsupportedFramerateError: VideoAnnotationUnsupportedFramerate,
+                                wrongResolutionError: VideoAnnotationWrongResolution
+                            ));
+                        }
+                    }
+
+                    var subtitleShards = videoAnnotationArtifacts.Single().info.Shards.Where(s => s.Kind == ShardKind.Subtitles)
+                        .ToImmutableArray();
+                    if (subtitleShards.Length < annotationsShardsBlueprints[ShardKind.Subtitles].Arity.Min)
+                    {
+                        diagnostics.Add(MissingVideoAnnotationSubtitles);
+                    }
+                    else if (subtitleShards.Length > annotationsShardsBlueprints[ShardKind.Subtitles].Arity.Max)
+                    {
+                        diagnostics.Add(TooManyVideoAnnotationSubtitles);
+                    }
+                    else
+                    {
+                        var subtitleShard = await db.LoadAsync<SubtitlesShardInfo>(subtitleShards[0].ShardId, token);
+                        if (subtitleShard is null)
+                        {
+                            if (annotationsShardsBlueprints[ShardKind.Subtitles].Arity.Min > 0)
+                                diagnostics.Add(MissingVideoAnnotationSubtitles);
+                        }
+                        else
+                        {
+                            diagnostics.AddRange(ValidateSubtitles(subtitleShard));
+                        }
+                    }
                 }
             }
         }
 
-        var videoAnnotationArtifacts = artifacts.Where(a => a.projectArtifact.BlueprintSlot == Const.VideoAnnotationBlueprintSlot)
-            .ToImmutableArray();
-        if (videoAnnotationArtifacts.Length > 1)
+        if (artifactBlueprints!.GetValueOrDefault(Const.CoverPhotoBlueprintSlot, null) is not null)
         {
-            diagnostics.Add(TooManyVideoAnnotations);
-        }
-        else if (videoAnnotationArtifacts.Length == 1)
-        {
-            var videoShards = videoAnnotationArtifacts.Single().info.Shards.Where(s => s.Kind == ShardKind.Video)
+            var coverPhotoArtifacts = artifacts.Where(a => a.projectArtifact.BlueprintSlot == Const.CoverPhotoBlueprintSlot)
                 .ToImmutableArray();
-            if (videoShards.Length == 0)
+            if (coverPhotoArtifacts.Length < artifactBlueprints[Const.CoverPhotoBlueprintSlot].Arity.Min)
             {
-                diagnostics.Add(MissingVideoAnnotationVideo);
+                diagnostics.Add(TooFewCoverPhotos);
             }
-            else if (videoShards.Length > 1)
+            else if (coverPhotoArtifacts.Length > artifactBlueprints[Const.CoverPhotoBlueprintSlot].Arity.Max)
             {
-                diagnostics.Add(TooManyVideoAnnotations);
+                diagnostics.Add(TooManyCoverPhotos);
             }
-            else
+            else if (artifactBlueprints[Const.CoverPhotoBlueprintSlot].Arity.Min > 0)
             {
-                var videoShard = await db.LoadAsync<VideoShardInfo>(videoShards[0].ShardId, token);
-                if (videoShard is null)
+                foreach (var coverPhotoArtifact in coverPhotoArtifacts)
                 {
-                    diagnostics.Add(MissingFilm);
-                }
-                else
-                {
-                    diagnostics.AddRange(ValidateVideo(
-                        video: videoShard,
-                        maxFileLength: VideoAnnotationMaxFileLength,
-                        minLength: VideoAnnotationMinLength,
-                        maxLength: VideoAnnotationMaxLength,
-                        corruptedError: VideoAnnotationCorrupted,
-                        zeroFileLengthError: VideoAnnotationHasZeroFileLength,
-                        tooLargeError: VideoAnnotationIsTooLarge,
-                        tooShortError: VideoAnnotationTooShort,
-                        tooLongError: VideoAnnotationTooLong,
-                        streamMismatchError: VideoAnnotationInvalidStreamCount,
-                        unsupportedContainerError: VideoAnnotationUnsupportedContainerFormat,
-                        bitrateTooLowError: VideoAnnotationUnsupportedBitrate,
-                        bitrateTooHighError: VideoAnnotationUnsupportedBitrate,
-                        unsupportedVideoCodecError: VideoAnnotationUnsupportedVideoCodec,
-                        unsupportedAudioCodecError: VideoAnnotationUnsupportedAudioCodec,
-                        mp3BitrateTooLowError: VideoAnnotationMp3BitrateTooLow,
-                        unsupportedFramerateError: VideoAnnotationUnsupportedFramerate,
-                        wrongResolutionError: VideoAnnotationWrongResolution
-                    ));
-                }
-            }
+                    if (coverPhotoArtifact.info.Shards.Length != 1)
+                    {
+                        diagnostics.Add(MissingCoverPhotoFile);
+                        continue;
+                    }
 
-            var subtitleShards = videoAnnotationArtifacts.Single().info.Shards.Where(s => s.Kind == ShardKind.Subtitles)
+                    var imageShard = await db.LoadAsync<ImageShardInfo>(
+                        coverPhotoArtifact.info.Shards.Single().ShardId,
+                        token);
+                    if (imageShard is null)
+                    {
+                        diagnostics.Add(MissingCoverPhotoFile);
+                        continue;
+                    }
+                    diagnostics.AddRange(ValidateImage(imageShard));
+                }
+            }
+        }
+
+        if (artifactBlueprints!.GetValueOrDefault(Const.BlendBlueprintSlot, null) is not null)
+        {
+            var blendArtifacts = artifacts.Where(a => a.projectArtifact.BlueprintSlot == Const.BlendBlueprintSlot).ToImmutableArray();
+
+            if (blendArtifacts.Length < artifactBlueprints[Const.BlendBlueprintSlot].Arity.Min)
+            {
+                diagnostics.Add(TooFewBlends);
+            }
+            else if (blendArtifacts.Length > artifactBlueprints[Const.BlendBlueprintSlot].Arity.Max)
+            {
+                diagnostics.Add(TooManyBlends);
+            }
+            else if (artifactBlueprints[Const.BlendBlueprintSlot].Arity.Min > 0)
+            {
+                var blendShards = blendArtifacts.SelectMany(a => a.info.Shards.Where(s => s.Kind == ShardKind.Blend))
+                    .ToImmutableArray();
+                foreach (var blendShard in blendShards)
+                {
+                    var blendShardInfo = await db.LoadAsync<BlendShardInfo>(blendShard.ShardId, token);
+                    diagnostics.AddRange(ValidatePigeons(blendShardInfo));
+                }
+            }
+        }
+
+        if (artifactBlueprints!.GetValueOrDefault(Const.RenderedImageBlueprintSlot, null) is not null)
+        {
+            var renderedImageArtifacts = artifacts.Where(a => a.projectArtifact.BlueprintSlot == Const.RenderedImageBlueprintSlot)
                 .ToImmutableArray();
-            if (subtitleShards.Length == 0)
+
+            if (renderedImageArtifacts.Length < artifactBlueprints[Const.RenderedImageBlueprintSlot].Arity.Min)
             {
-                diagnostics.Add(MissingVideoAnnotationSubtitles);
+                diagnostics.Add(TooFewRenderedImages);
             }
-            else if (subtitleShards.Length > 1)
+            else if (renderedImageArtifacts.Length > artifactBlueprints[Const.RenderedImageBlueprintSlot].Arity.Max)
             {
-                diagnostics.Add(TooManyVideoAnnotationSubtitles);
-            }
-            else
-            {
-                var subtitleShard = await db.LoadAsync<SubtitlesShardInfo>(subtitleShards[0].ShardId, token);
-                if (subtitleShard is null)
-                {
-                    diagnostics.Add(MissingVideoAnnotationSubtitles);
-                }
-                else
-                {
-                    diagnostics.AddRange(ValidateSubtitles(subtitleShard));
-                }
+                diagnostics.Add(TooManyRenderedImages);
             }
         }
 
-        var coverPhotoArtifacts = artifacts.Where(a => a.projectArtifact.BlueprintSlot == Const.CoverPhotoBlueprintSlot)
-            .ToImmutableArray();
-        if (coverPhotoArtifacts.Length < Const.CoverPhotoMinCount)
+        if (artifactBlueprints!.GetValueOrDefault(Const.RenderedAnimationBlueprintSlot, null) is not null)
         {
-            diagnostics.Add(TooFewCoverPhotos);
-        }
-        else if (coverPhotoArtifacts.Length > Const.CoverPhotoMaxCount)
-        {
-            diagnostics.Add(TooManyCoverPhotos);
-        }
-        else
-        {
-            foreach (var coverPhotoArtifact in coverPhotoArtifacts)
+            var renderedAnimationArtifacts = artifacts.Where(a => a.projectArtifact.BlueprintSlot == Const.RenderedAnimationBlueprintSlot)
+                .ToImmutableArray();
+            if (renderedAnimationArtifacts.Length < artifactBlueprints[Const.RenderedAnimationBlueprintSlot].Arity.Min)
             {
-                if (coverPhotoArtifact.info.Shards.Length != 1)
-                {
-                    diagnostics.Add(MissingCoverPhotoFile);
-                    continue;
-                }
+                diagnostics.Add(TooFewRenderedAnimations);
+            }
+            else if (renderedAnimationArtifacts.Length > artifactBlueprints[Const.RenderedAnimationBlueprintSlot].Arity.Max)
+            {
+                diagnostics.Add(TooManyRenderedAnimations);
+            }
+        }
 
-                var imageShard = await db.LoadAsync<ImageShardInfo>(
-                    coverPhotoArtifact.info.Shards.Single().ShardId,
-                    token);
-                if (imageShard is null)
-                {
-                    diagnostics.Add(MissingCoverPhotoFile);
-                    continue;
-                }
-                diagnostics.AddRange(ValidateImage(imageShard));
+        if (artifactBlueprints!.GetValueOrDefault(Const.TextureBlueprintSlot, null) is not null)
+        {
+            var textureArtifacts = artifacts.Where(a => a.projectArtifact.BlueprintSlot == Const.TextureBlueprintSlot)
+                .ToImmutableArray();
+
+            if (textureArtifacts.Length < artifactBlueprints[Const.TextureBlueprintSlot].Arity.Min)
+            {
+                diagnostics.Add(TooFewTextures);
+            }
+            else if (textureArtifacts.Length > artifactBlueprints[Const.TextureBlueprintSlot].Arity.Max)
+            {
+                diagnostics.Add(TooManyTextures);
             }
         }
 
@@ -1158,6 +1354,108 @@ public partial class ProjectService
         if (!AllowedSubtitleCodecs.Contains(originalVariant.Codec))
         {
             yield return SubtitlesWrongFormat;
+        }
+    }
+
+    private static DiagnosticKind StatusToDiagnosticKind(string status)
+    {
+        switch (status)
+        {
+            case "INIT":
+                return DiagnosticKind.Info;
+            case "OK":
+                return DiagnosticKind.Info;
+            case "SKIPPED":
+                return DiagnosticKind.Info;
+            case "WARNING":
+                return DiagnosticKind.Warning;
+            case "ERROR":
+                return DiagnosticKind.Error;
+            case "CRASHED":
+                return DiagnosticKind.Error;
+            default:
+                return DiagnosticKind.Info;
+        }
+    }
+
+
+    private static IEnumerable<Diagnostic> ValidatePigeons(BlendShardInfo? blend)
+    {
+        if (blend is null)
+        {
+            yield break;
+        }
+
+        foreach (var variant in blend.Variants.Values)
+        {
+            if (variant.Error is not null)
+            {
+                yield return new Diagnostic(
+                    Kind: DiagnosticKind.Error,
+                    ValidationStage: PigeonsTestStage,
+                    Message: LocalizedString.Create(
+                        (Const.InvariantCulture, $"PIGEOnS test could not be run: {variant.Error}"),
+                        (Const.CzechCulture, $"PIGEOnS test nemohl být spuštěn: {variant.Error}")
+                    )
+                );
+                yield break;
+            }
+
+            if (variant.Tests is null)
+            {
+                yield return MissingPigeonsTestResult;
+                yield break;
+            }
+            foreach (var result in variant.Tests)
+            {
+                var sb = new System.Text.StringBuilder();
+                if (!string.IsNullOrWhiteSpace(blend.FileName))
+                {
+                    sb.Append(blend.FileName);
+                    sb.Append(" - ");
+                }
+                if (!string.IsNullOrWhiteSpace(result.Label))
+                {
+                    sb.Append(result.Label);
+                }
+                // Append additional info if any of the fields are present
+                if (!string.IsNullOrWhiteSpace(result.Datablock) ||
+                    !string.IsNullOrWhiteSpace(result.Message) ||
+                    !string.IsNullOrWhiteSpace(result.Traceback))
+                {
+                    sb.Append(":");
+                }
+                else
+                {
+                    sb.Append(".");
+                }
+                if (!string.IsNullOrWhiteSpace(result.Datablock))
+                {
+                    sb.Append(" [");
+                    sb.Append(result.Datablock);
+                    sb.Append("]");
+                }
+                if (!string.IsNullOrWhiteSpace(result.Message))
+                {
+                    sb.Append(" ");
+                    sb.Append(result.Message);
+                }
+                if (!string.IsNullOrWhiteSpace(result.Traceback))
+                {
+                    sb.Append(" ");
+                    sb.Append("Traceback: ");
+                    sb.Append(result.Traceback);
+                }
+                string message = sb.ToString();
+
+                yield return new Diagnostic(
+                    Kind: StatusToDiagnosticKind(result.State ?? "UNKNOWN"),
+                    ValidationStage: PigeonsTestStage,
+                    Message: LocalizedString.Create(
+                        (Const.InvariantCulture, message)
+                    )
+                );
+            }
         }
     }
 }

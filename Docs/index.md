@@ -30,3 +30,8 @@ to the public.
 **Maintenance**
 - [Grafana](https://grafana.mlejnek.cafour.cz/)
 - [Portainer](https://portainer.mlejnek.cafour.cz/)
+
+**Other docs**
+- [Marten docs](https://martendb.io/)
+- [PostgreSQL JSON operators](https://www.postgresql.org/docs/current/functions-json.html)
+- [Chakra v2 components](https://v2.chakra-ui.com/docs/components)

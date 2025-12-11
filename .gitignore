@@ -6,3 +6,4 @@ artifacts/
 .idea/
 *.DotSettings.user
 **/node_modules/
+.pnpm-store/

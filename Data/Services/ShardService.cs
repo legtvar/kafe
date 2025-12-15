@@ -12,8 +12,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Net.Http;
 using System.Net.Http.Json;
-using Org.BouncyCastle.Asn1.Misc;
-using System.Runtime.InteropServices.Marshalling;
 
 namespace Kafe.Data.Services;
 
@@ -282,7 +280,8 @@ public class ShardService
         var blendInfo = new BlendInfo(
             FileExtension: Const.BlendFileExtension,
             MimeType: Const.BlendMimeType,
-            Tests: null
+            Tests: null,
+            Error: null
         );
 
         var created = new BlendShardCreated(
@@ -295,23 +294,19 @@ public class ShardService
         db.Events.KafeStartStream<BlendShardInfo>(created.ShardId, created);
         await db.SaveChangesAsync(token);
 
-        var queued = new BlendShardTestQueued(
-            ShardId: shardId.ToString()
-        );
         await pigeonsQueue.EnqueueAsync(shardId);
-        db.Events.Append(queued.ShardId, queued);
-        await db.SaveChangesAsync(token);
         
         return created.ShardId;
     }
 
-    public async Task<BlendShardInfo> UpdateBlendTest(
+    public async Task<BlendShardInfo> UpdateBlend(
         Hrib shardId,
         BlendInfo blendInfo,
         CancellationToken token = default)
     {
-        var changed = new BlendShardTested(
+        var changed = new BlendShardVariantAdded(
             ShardId: shardId.ToString(),
+            Name: Const.OriginalShardVariant,
             Info: blendInfo
         );
         db.Events.KafeAppend(changed.ShardId, changed);
@@ -321,66 +316,52 @@ public class ShardService
         return await db.Events.KafeAggregateRequiredStream<BlendShardInfo>(shardId, token: token);
     }
 
-    public async Task<List<BlendShardInfo>> GetShardsMissingTestAsync(CancellationToken ct)
+    public async Task<List<Hrib>> GetMissingTestBlends(CancellationToken ct)
     {
-        // Fetch all stream IDs that were queued for testing but have not yet been tested
-        var sql = @"
-        SELECT q.stream_id
-        FROM mt_events q
-        WHERE q.type = 'blend_shard_test_queued'
-        AND NOT EXISTS (
-            SELECT 1
-            FROM mt_events t
-            WHERE t.stream_id = q.stream_id
-                AND t.type = 'blend_shard_tested'
-        );
-        ";
+        // Fetch all shard IDs that were queued for testing but have not yet been tested
+        var blendShards = await db.Query<BlendShardInfo>().ToListAsync();
+        var missingTestShards = blendShards
+            .Where(s => s.Variants.ContainsKey(Const.OriginalShardVariant) 
+                && s.Variants[Const.OriginalShardVariant].Tests == null
+                && s.Variants[Const.OriginalShardVariant].Error == null)
+            .Select(s => (Hrib)s.Id);
 
-        var streams = await db.QueryAsync<string>(sql);
-        var result = new List<BlendShardInfo>();
-
-        foreach (var streamId in streams)
-        {
-            var id = (Hrib)streamId;
-            var kind = await GetShardKind(id, ct);
-            if (kind == ShardKind.Blend)
-            {
-                var info = await db.Events.KafeAggregateRequiredStream<BlendShardInfo>(id, token: ct);
-                result.Add(info);
-            }
-        }
-        return result;
+        return missingTestShards.ToList();
     }
-    
-    private async Task<string> TestBlend(
-        Hrib shardId,
-        CancellationToken token = default)
+
+    public async Task<BlendShardInfo?> TestBlend(Hrib shardId, CancellationToken ct)
     {
+        var shard = await Load(shardId, ct);
+        if (shard == null)
+        {
+            return null;
+        }
+        var artifactService = new ArtifactService(db);
+        var projectGroupNames = await artifactService.GetArtifactProjectGroupNames(shard.ArtifactId.ToString(), ct);
+        if (projectGroupNames.Length < 1)
+        {
+            return null;
+        }
         if (!storageService.TryGetFilePath(
             ShardKind.Blend,
-            shardId,
+            shard.Id,
             Const.OriginalShardVariant,
             out var shardFilePath))
         {
-            throw new ArgumentException("The shard stream could not be opened just after being saved.");
+            return null;
         }
-
-        
-        var shard = await Load(shardId, token);
-        if (shard is null || shard.Kind != ShardKind.Blend)
+        var request = new PigeonsTestRequest(
+            ShardId: shardId.ToString(),
+            HomeworkType: projectGroupNames[0]["iv"] ?? string.Empty,
+            Path: shardFilePath);
+        var client = httpClientFactory.CreateClient("Pigeons");
+        var response = await client.PostAsJsonAsync("/test", request, cancellationToken: ct);
+        var content = await response.Content.ReadFromJsonAsync<BlendInfoJsonFormat>(cancellationToken: ct);
+        if (content is null)
         {
-            throw new ArgumentException($"The shard '{shardId}' is not a blend shard.");
+            throw new InvalidOperationException("Failed to get pigeons test info from pigeons service.");
         }
-        var artifactService = new ArtifactService(db);
-        var projectGroupNames = await artifactService.GetArtifactProjectGroupNames(shard.ArtifactId.ToString(), token);
-        if (projectGroupNames.Length != 1)
-        {
-            throw new InvalidOperationException($"A blend shard must belong to exactly one project group. Found {projectGroupNames.Length}.");
-        }
-
-        var projectGroupName = projectGroupNames[0]["iv"];
-
-        return $"{shardId}|{projectGroupName}|{shardFilePath}";
+        return await UpdateBlend(shardId, content.ToBlendInfo(), ct);
     }
 
     public async Task<Stream> OpenStream(Hrib id, string? variant, CancellationToken token = default)

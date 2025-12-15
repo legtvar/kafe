@@ -24,12 +24,3 @@ public record BlendShardVariantRemoved(
     [Hrib] string ShardId,
     string Name
 ) : IBlendShardEvent, IShardVariantRemoved;
-
-public record BlendShardTestQueued(
-    [Hrib] string ShardId
-) : IBlendShardEvent;
-
-public record BlendShardTested(
-    [Hrib] string ShardId,
-    BlendInfo Info
-) : IBlendShardEvent;

@@ -60,12 +60,4 @@ public class BlendShardInfoProjection : SingleStreamProjection<BlendShardInfo, s
             Variants = s.Variants.Remove(e.Name)
         };
     }
-
-    public BlendShardInfo Apply(BlendShardTested e, BlendShardInfo s)
-    {
-        return s with
-        {
-            Variants = s.Variants.Remove(Const.OriginalShardVariant).Add(Const.OriginalShardVariant, e.Info)
-        };
-    }
 }

@@ -89,6 +89,9 @@ export class API {
             async update(project: Project) {
                 return api.patch<components['schemas']['ProjectCreationDto'], HRIB>(`project`, project.serialize(true));
             },
+            defaultStreamUrl(id: string) {
+                return `${api.apiUrl}project-download/${id}`;
+            },
         };
     }
 

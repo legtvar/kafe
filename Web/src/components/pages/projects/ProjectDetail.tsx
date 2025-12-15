@@ -1,7 +1,7 @@
 import { Box, Button, Flex, Heading, SimpleGrid } from '@chakra-ui/react';
 import { t } from 'i18next';
 import { useCallback } from 'react';
-import { AiOutlineEdit } from 'react-icons/ai';
+import { AiOutlineDownload, AiOutlineEdit } from 'react-icons/ai';
 import { Link, useParams } from 'react-router-dom';
 import { Project } from '../../../data/Project';
 import { ContentThumbnail } from '../../media/ContentThumbnail';
@@ -12,11 +12,13 @@ import { Status } from '../../utils/Status';
 import { WithTitle } from '../../utils/WithTitle';
 import { ProjectTags } from './ProjectTags';
 import { User } from '../../../data/User';
+import { useApi } from '@/hooks/Caffeine';
 
 interface IProjectDetailProps {}
 
 export function ProjectDetail(props: IProjectDetailProps) {
     const { id } = useParams();
+    const api = useApi();
 
     if (!id) {
         return <Status statusCode={404} embeded />;
@@ -46,6 +48,15 @@ export function ProjectDetail(props: IProjectDetailProps) {
                                 <Heading fontSize="4xl" fontWeight="semibold" as="h2" lineHeight="tight" mr="auto">
                                     {project.getName()}
                                 </Heading>
+                                {project.userPermissions.includes('review') && (
+                                    <Button
+                                        as={'a'}
+                                        href={api.projects.defaultStreamUrl(project.id)}
+                                        leftIcon={<AiOutlineDownload />}
+                                    >
+                                        {t('generic.download')}
+                                    </Button>)
+                                }
                                 <Link to="edit">
                                     <Button leftIcon={<AiOutlineEdit />}>{t('generic.edit').toString()}</Button>
                                 </Link>

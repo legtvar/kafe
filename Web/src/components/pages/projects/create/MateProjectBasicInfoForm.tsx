@@ -42,7 +42,6 @@ export function MateProjectBasicInfoForm({ project, onSubmit, status, update, no
                 <FormLabel>{t('createProject.fields.description').toString()}</FormLabel>
                 <LocalizedInput
                     as={TextareaLimited}
-                    min={50}
                     max={10000}
                     borderColor={border}
                     bg={bg}

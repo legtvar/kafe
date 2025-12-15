@@ -23,6 +23,10 @@ export class Artifact extends AbstractType {
         return getPrefered(this.name);
     }
 
+    public getAddedOn() {
+        return this.addedOn;
+    }
+
     serialize(update: boolean = false): components['schemas']['ArtifactCreationDto'] {
         return new Serializer(this, update).add('id').add('blueprintSlot').build();
     }

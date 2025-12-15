@@ -110,11 +110,7 @@ public class PigeonsService(string tempDirectory, ILogger logger)
         string? homeworkType = GetHomeworkType(projectGroupName);
         if (homeworkType is null)
         {
-            return new BlendInfo(
-                Const.BlendFileExtension,
-                Const.BlendMimeType,
-                null
-            );
+            return BlendInfo.Invalid("No valid homework type found for the provided project group.");
         }
 
         FileInfo shardFile = new FileInfo(shardPath);

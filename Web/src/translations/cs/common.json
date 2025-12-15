@@ -105,7 +105,9 @@
     "construction": "Kde nic tu nic, tato stránka se připravuje...",
     "allowMarkdown": "Toto pole umožňuje zadat text formátovaný, jako Markdown",
     "download": "Stáhnout",
-    "file": "soubor"
+    "file": "soubor",
+    "lastUpdate": "Poslední aktualizace",
+    "addedOn": "Přidáno"
   },
   "home": {
     "signin": "Přihlásit se",

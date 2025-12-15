@@ -56,7 +56,7 @@ export function ProjectBasicInfo(props: IProjectBasicInfoProps) {
           }
         : {
               onSubmited: (id: HRIB) => {
-                  navigate(authLink(`/projects/${id}`));
+                  navigate(authLink(`/projects/${id}/edit`));
               },
               value: project!,
               request: (api: API, value: Project) => api.projects.create(value),

@@ -21,6 +21,7 @@ public class ShardService
     private readonly StorageService storageService;
     private readonly IMediaService mediaService;
     private readonly IImageService imageService;
+    private readonly IPigeonsTestQueue pigeonsQueue;
     private readonly IHttpClientFactory httpClientFactory;
 
     public ShardService(
@@ -28,6 +29,7 @@ public class ShardService
         StorageService storageService,
         IMediaService mediaService,
         IImageService imageService,
+        IPigeonsTestQueue pigeonsQueue,
         IHttpClientFactory httpClientFactory
     )
     {
@@ -35,6 +37,7 @@ public class ShardService
         this.storageService = storageService;
         this.mediaService = mediaService;
         this.imageService = imageService;
+        this.pigeonsQueue = pigeonsQueue;
         this.httpClientFactory = httpClientFactory;
     }
 
@@ -273,30 +276,92 @@ public class ShardService
         {
             throw new InvalidOperationException($"A blend shard must belong to exactly one project group. Found {projectGroupNames.Length}.");
         }
-
-        var client = httpClientFactory.CreateClient("Pigeons");
-        var request = new PigeonsTestRequest(
-            ShardId: shardId,
-            HomeworkType: projectGroupNames[0]["iv"] ?? string.Empty,
-            Path: shardFilePath
+        
+        var blendInfo = new BlendInfo(
+            FileExtension: Const.BlendFileExtension,
+            MimeType: Const.BlendMimeType,
+            Tests: null,
+            Error: null
         );
-        var response = await client.PostAsJsonAsync("/test", request, cancellationToken: token);
-        var content = await response.Content.ReadFromJsonAsync<BlendInfoJsonFormat>(cancellationToken: token);
-        if (content is null)
-        {
-            throw new InvalidOperationException("Failed to get pigeons test info from pigeons service.");
-        }
 
         var created = new BlendShardCreated(
             ShardId: shardId.ToString(),
             FileName: fileName,
             CreationMethod: CreationMethod.Api,
             ArtifactId: artifactId.ToString(),
-            OriginalVariantInfo: content.ToBlendInfo());
+            OriginalVariantInfo: blendInfo);
 
         db.Events.KafeStartStream<BlendShardInfo>(created.ShardId, created);
         await db.SaveChangesAsync(token);
+
+        await pigeonsQueue.EnqueueAsync(shardId);
+        
         return created.ShardId;
+    }
+
+    public async Task<BlendShardInfo> UpdateBlend(
+        Hrib shardId,
+        BlendInfo blendInfo,
+        CancellationToken token = default)
+    {
+        var changed = new BlendShardVariantAdded(
+            ShardId: shardId.ToString(),
+            Name: Const.OriginalShardVariant,
+            Info: blendInfo
+        );
+        db.Events.KafeAppend(changed.ShardId, changed);
+
+        await db.SaveChangesAsync(token);
+
+        return await db.Events.KafeAggregateRequiredStream<BlendShardInfo>(shardId, token: token);
+    }
+
+    public async Task<List<Hrib>> GetMissingTestBlends(CancellationToken ct)
+    {
+        // Fetch all shard IDs that were queued for testing but have not yet been tested
+        var blendShards = await db.Query<BlendShardInfo>().ToListAsync();
+        var missingTestShards = blendShards
+            .Where(s => s.Variants.ContainsKey(Const.OriginalShardVariant) 
+                && s.Variants[Const.OriginalShardVariant].Tests == null
+                && s.Variants[Const.OriginalShardVariant].Error == null)
+            .Select(s => (Hrib)s.Id);
+
+        return missingTestShards.ToList();
+    }
+
+    public async Task<BlendShardInfo?> TestBlend(Hrib shardId, CancellationToken ct)
+    {
+        var shard = await Load(shardId, ct);
+        if (shard == null)
+        {
+            return null;
+        }
+        var artifactService = new ArtifactService(db);
+        var projectGroupNames = await artifactService.GetArtifactProjectGroupNames(shard.ArtifactId.ToString(), ct);
+        if (projectGroupNames.Length < 1)
+        {
+            return null;
+        }
+        if (!storageService.TryGetFilePath(
+            ShardKind.Blend,
+            shard.Id,
+            Const.OriginalShardVariant,
+            out var shardFilePath))
+        {
+            return null;
+        }
+        var request = new PigeonsTestRequest(
+            ShardId: shardId.ToString(),
+            HomeworkType: projectGroupNames[0]["iv"] ?? string.Empty,
+            Path: shardFilePath);
+        var client = httpClientFactory.CreateClient("Pigeons");
+        var response = await client.PostAsJsonAsync("/test", request, cancellationToken: ct);
+        var content = await response.Content.ReadFromJsonAsync<BlendInfoJsonFormat>(cancellationToken: ct);
+        if (content is null)
+        {
+            throw new InvalidOperationException("Failed to get pigeons test info from pigeons service.");
+        }
+        return await UpdateBlend(shardId, content.ToBlendInfo(), ct);
     }
 
     public async Task<Stream> OpenStream(Hrib id, string? variant, CancellationToken token = default)

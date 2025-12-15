@@ -43,6 +43,7 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Kafe.Api.Middleware;
 using Microsoft.AspNetCore.Localization;
+using Kafe.Media.Services;
 
 namespace Kafe.Api;
 
@@ -396,6 +397,10 @@ public partial class Startup
 
         services.AddSingleton<VideoConversionDaemon>();
         services.AddHostedService<VideoConversionDaemon>(s => s.GetRequiredService<VideoConversionDaemon>());
+
+        services.AddSingleton<IPigeonsTestQueue, PigeonsTestQueue>();
+        services.AddSingleton<PigeonsTestQueueDaemon>();
+        services.AddHostedService<PigeonsTestQueueDaemon>(s => s.GetRequiredService<PigeonsTestQueueDaemon>());
 
         var emailServiceType = Configuration.GetSection("Email").Get<EmailOptions>()?.ServiceType
             ?? EmailOptions.EmailServiceType.Default;

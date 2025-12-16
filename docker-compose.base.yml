@@ -75,6 +75,8 @@ services:
       Storage__TempDirectory: /mnt/kafe_temp
       Storage__ArchiveDirectory: /mnt/kafe_archive
       Storage__GeneratedDirectory: /mnt/kafe_generated
+      BaseUrl: http://0.0.0.0:8042
+      Kestrel__Endpoints__Http__Url: http://0.0.0.0:8042
     expose:
       - 8042
     volumes:

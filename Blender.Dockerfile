@@ -12,4 +12,5 @@ RUN blender-headless --background --python "/app/pigeons_setup.py" -- --repo-nam
 
 EXPOSE 8042
 
+WORKDIR /app
 CMD ["/app/Kafe.Pigeons"]

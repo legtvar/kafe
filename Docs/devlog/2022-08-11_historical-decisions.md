@@ -3,6 +3,7 @@
 These decisions were made before we started writing this devlog.
 (This page bears the date of the first commit to the KAFE repo.)
 Nevertheless, they are important to remember.
+The remembering started on 2023-12-16 but I'm still adding more to it continually.
 
 ## Event Sourcing
 

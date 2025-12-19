@@ -5,11 +5,6 @@
     ],
     "service": "all",
     "workspaceFolder": "/kafe",
-    "forwardPorts": [
-        "42069:42069",
-        "42080:3000",
-        "42032:5432"
-    ],
     "postCreateCommand": "/root/post-create.sh",
     "postAttachCommand": "/root/post-attach.sh"
 }

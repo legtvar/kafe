@@ -43,7 +43,7 @@ proxy.on('proxyReq', (proxyReq, req) => {
 });
 
 if (!fs.existsSync('certs/cert.pem') || !fs.existsSync('certs/key.pem')) {
-    const ss = selfsigned.generate();
+    const ss = selfsigned.generate(undefined, { clientCertificateKeySize: 4096, keySize: 4096 });
     fs.writeFileSync('certs/cert.pem', ss.cert);
     fs.writeFileSync('certs/key.pem', ss.private);
 }

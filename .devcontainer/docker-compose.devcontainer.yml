@@ -11,14 +11,19 @@ services:
 
       # KAFE API
       ASPNETCORE_ENVIRONMENT: Development
-      BaseUrl: https://0.0.0.0:42069
-      Kestrel__Endpoints__Http_Url: http://0.0.0.0:42069
+      BaseUrl: https://0.0.0.0:44369
+      Kestrel__Endpoints__Https__Url: https://0.0.0.0:44369
       ConnectionStrings__postgres: host=localhost;port=5432;database=postgres;password=postgres;username=postgres
       ConnectionStrings__KAFE: host=localhost;port=5432;database=kafe;password=postgres;username=postgres
       Storage__SecretsDirectory: /mnt/kafe_secrets
       Storage__TempDirectory: /mnt/kafe_temp
       Storage__ArchiveDirectory: /mnt/kafe_archive
       Storage__GeneratedDirectory: /mnt/kafe_generated
+      
+    ports:
+      - 44369:44369
+      - 3000:3000
+      - 42032:5432
 
     volumes:
       - ..:/kafe:cached
@@ -26,7 +31,7 @@ services:
       - generated:/mnt/kafe_generated
       - secrets:/mnt/kafe_secrets
       - temp:/mnt/kafe_temp
-      - postgres:/var/lib/postgres/data
+      - postgres:/var/lib/postgres
 
     build:
       context: .

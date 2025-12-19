@@ -6,13 +6,57 @@ priority: 010
 
 # Getting Started
 
-1. Install the prerequisites below.
-1. Clone the repository.
-2. Optionally [set up a VM](./vm-setup) or [Docker](https://www.docker.com/).
-3. Install KAFE using Docker compose or run it locally through `pnpm` or `dotnet` CLI.
+You have a few options of how to set up your developer environment. If you run into issues, check the instructions below and [Troubleshooting](./troubleshooting.md).
+
+## Dev Container
+
+Click on the image below to clone the repository and open it in a dev container. For it to work you must have Docker installed and set up for Linux containers.
+
+[![KAFE Dev Container](https://img.shields.io/static/v1?label=KAFE%20Dev%20Container&message=Open&color=blue)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://gitlab.fi.muni.cz/legtvar/kafe)
+
+Alternatively:
+
+1. Install Docker and set it up for Linux containers.
+2. Clone the repository.
+3. Open the repository in Visual Studio Code and run the _"Dev Containers: Reopen in Container"_ command.
+
+When you have your dev container set up, you're ready to run KAFE:
+1. To run the web UI and have it connect to the staging environment, go to `/kafe/Web` and run `pnpm run dev`.
+2. To run the API locally, go to `/kafe/Api` and run `dotnet run`.
+3. To run the web UI and have it connect to the locally running API, go to `/kafe/Web` and run `pnpm run start`.
+4. The web UI will be accessible at https://localhost:3000 and the API at https://localhost:44369.
+
+## Docker Compose
+
+If you need an environment closer to what runs on staging or production, you can also run KAFE using [`docker compose`](https://docs.docker.com/compose/):
+
+1. Install Docker and set it up for Linux containers.
+2. Clone the repository.
+3. Run:
+   ```bash
+   docker compose -f docker-compose.base.yml -f docker-compose.local.yml build
+   docker compose -f docker-compose.base.yml -f docker-compose.local.yml up
+   ```
+4. The web UI will be accessible at https://localhost:3000 and the API at https://localhost:44369.
+
+## Local Development
+
+You can also run KAFE without Docker. This has the advantage of being easier to debug. However, it takes longer to set up and may conflict with your local configs if you have other projects using .NET, Node.js, or Postgres.
+
+1. Install the dependencies below.
+2. Clone the repository.
+3. Make sure PostgreSQL is running at port 5432
+   If it's running on a different port, update connection strings in `Api/appsettings.local.json`.
+4. Make sure you have `pnpm` is installed: `npm install -g pnpm`.
+4. Install web UI dependencies by running `pnpm install` in the `Web` and `Web/proxy` directories.
+5. Install API dependencies by running `dotnet restore` in the `Api` directory.
+6. To run the web UI and have it connect to the staging environment, go to `Web` and run `pnpm run dev`.
+7. To run the API locally, go to `Api` and run `dotnet run`.
+8. To run the web UI and have it connect to the locally running API, go to `Web` and run `pnpm run start`.
+9. The web UI will be accessible at https://localhost:3000 and the API at https://localhost:44369.
 
 
-## Prerequisites
+## Dependencies
 
 **Back end (API)**
 
@@ -47,59 +91,7 @@ By default:
 
 - It expects the api to run locally at `https://localhost:44369`.
 
-
-## Running locally
-
-You can run KAFE locally either directly on your machine or through Docker.
-If you run into issues, check the instructions below and [Troubleshooting](./troubleshooting.md).
-
-### Without Docker
-
-These instructions explain, how to run KAFE on your local machine, **not in a Docker container**.
-This has the advantage of being easier to debug.
-However, it takes longer to set up and may conflict with your local configs if you have other projects using .NET, Node.js, or Postgres.
-
-**Back end (API)**
-
-1. Make sure Postgres is running on port **5432**.
-   If it's running on a different port, update connection strings in `Api/appsettings.local.json`.
-2. Restore NuGet packages: `dotnet restore`
-3. If you haven't already, create a self-signed dev certificate: `dotnet dev-certs https --trust`
-4. While in the `Api/` dir, to run the API: `dotnet run`
-5. Run the front end or use Postman.
-
-**Front end (Web)**
-
-1. Go to the `Web` directory.
-2. Ensure `pnpm` is installed: `corepack enable pnpm@latest`
-3. Install `npm` packages: `pnpm install`
-4. To run the front end locally: `pnpm run start`
-
-
-### In Docker
-
-1. Make sure Docker is installed and running.
-2. While in the root of the KAFE repo, run:
-   ```bash
-   docker compose -f ./docker-compose.base.yml -f ./docker-compose.local.yml up
-   ```
-3. If you made changes to Marten projections, you may want to rebuild all of them.
-   On Linux, run:
-   ```bash
-   REBUILD_PROJECTIONS=true docker compose -f ./docker-compose.base.yml -f ./docker-compose.local.yml up
-   ```
-   On Windows (in PowerShell), run:
-   ```powershell
-   $env:REBUILD_PROJECTIONS=$true
-   docker compose -f ./docker-compose.base.yml -f ./docker-compose.local.yml up
-   ```
-4. Web is now running at `http://localhost:3000` and the API at `https://localhost:44369`.
-5. To stop the containers, run:
-   ```bash
-   docker compose -f ./docker-compose.base.yml -f ./docker-compose.local.yml down
-   ```
-
-### Logging in
+## Logging in
 
 To log in:
 
@@ -116,4 +108,28 @@ To log in:
    ```
    where `:token` is the confirmation token.
 
-4. Now, your user agent of choice should have a valid session cookie.
+4. Now, your browser should have a valid session cookie.
+
+
+## Rebuilding projections
+
+If you've made changes to Marten projectsion, you may need to rebuild them.
+
+### Locally or in Dev Container
+
+In `Api`, run `dotnet run -- projections rebuild --shard-timeout 30m`.
+
+### Docker Compose
+
+On Linux, run:
+```bash
+docker compose -f ./docker-compose.base.yml -f ./docker-compose.local.yml down
+REBUILD_PROJECTIONS=true docker compose -f ./docker-compose.base.yml -f ./docker-compose.local.yml up
+```
+
+On Windows run:
+```powershell
+docker compose -f docker-compose.base.yml -f docker-compose.local.yml down
+$env:REBUILD_PROJECTIONS=$true
+docker compose -f ./docker-compose.base.yml -f ./docker-compose.local.yml up
+```

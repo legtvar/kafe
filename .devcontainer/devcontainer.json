@@ -1,0 +1,10 @@
+{
+    "name": "KAFE",
+    "dockerComposeFile": [
+        "./docker-compose.devcontainer.yml"
+    ],
+    "service": "all",
+    "workspaceFolder": "/kafe",
+    "postCreateCommand": "/root/post-create.sh",
+    "postAttachCommand": "/root/post-attach.sh"
+}

@@ -10,6 +10,5 @@
         "42080:3000",
         "42032:5432"
     ],
-    "postCreateCommand": "cd /kafe/Web && pnpm install --force && cd /kafe/Api && dotnet restore --force"
-    // "customizations": {},
+    "postCreateCommand": "~/init-devcontainer.sh"
 }

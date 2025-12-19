@@ -10,5 +10,6 @@
         "42080:3000",
         "42032:5432"
     ],
-    "postCreateCommand": "~/init-devcontainer.sh"
+    "postCreateCommand": "/root/post-create.sh",
+    "postAttachCommand": "/root/post-attach.sh"
 }

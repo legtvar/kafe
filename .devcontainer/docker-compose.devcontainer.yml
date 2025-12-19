@@ -26,6 +26,7 @@ services:
       - generated:/mnt/kafe_generated
       - secrets:/mnt/kafe_secrets
       - temp:/mnt/kafe_temp
+      - postgres:/var/lib/postgres/data
 
     build:
       context: .

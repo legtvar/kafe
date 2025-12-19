@@ -20,6 +20,12 @@ KAFE can be thus extended for, for example, games, 3D models, photographs, gener
     <img width="33%" src="./Docs/img/screenshots/kafe_screenshot_playlists.thumb.webp" />
 </a>
 
+## Contributing
+
+> [Folks wanted for hazardous journey.](https://discerninghistory.com/2013/05/shackletons-ad-men-wanted-for-hazerdous-journey/) Low wages, bitter cold, long hours of complete darkness. Safe return doubtful. Honour and recognition in event of success.
+
+There's a lot to be done in and around this project. If you find it interesting, get in touch! We'll find you something to work on. We can even offer some topics for a bachelor's or master's thesis.
+
 ## Attribution / External Dependencies
 
 ### Backend

@@ -84,38 +84,34 @@ public record Hrib : IParsable<Hrib>, IInvalidable<Hrib>
             return hrib;
         }
 
-        throw new ArgumentException(error, nameof(value));
+        throw new ArgumentException($"Failed to parse '{value}' as a HRIB ({error})");
     }
 
     public static Hrib Create()
     {
-        var sb = new StringBuilder(Length);
-        for (int i = 0; i < Length; i++)
-        {
-            sb.Append(Alphabet[RandomNumberGenerator.GetInt32(Alphabet.Length)]);
-        }
-
-        return new Hrib(sb.ToString());
+        return new Hrib(RandomNumberGenerator.GetString(Alphabet, Length));
     }
 
     public static bool TryParse(
         string? value,
         [NotNullWhen(true)] out Hrib? hrib,
-        [NotNullWhen(false)] out string? error
+        out HribParsingError error
     )
     {
         hrib = null;
-        error = null;
+        error = HribParsingError.None;
 
         if (value is null)
         {
-            error = "Value is null.";
+            // Value is null.
+            error = HribParsingError.ValueIsNull;
             return false;
         }
 
         if (string.IsNullOrWhiteSpace(value))
         {
-            error = "Value is an empty string, or made up of white-space.";
+            // Value is an empty string, or made up of white-space.
+            error = HribParsingError.ValueIsEmpty;
             return false;
         }
 
@@ -127,14 +123,16 @@ public record Hrib : IParsable<Hrib>, IInvalidable<Hrib>
 
         if (value.Length != Length)
         {
-            error = $"A Hrib must be {Length} characters long.";
+            // A Hrib must be {Length} characters long.
+            error = HribParsingError.BadLength;
             return false;
         }
 
         var invalidChar = value.FirstOrDefault(c => !Alphabet.Contains(c));
         if (invalidChar != default)
         {
-            error = $"A Hrib cannot contain the '{invalidChar}' character.";
+            // A Hrib cannot contain the '{invalidChar}' character.
+            error = HribParsingError.BadCharacter;
             return false;
         }
 
@@ -166,38 +164,52 @@ public record Hrib : IParsable<Hrib>, IInvalidable<Hrib>
     }
 
     /// <summary>
-    /// Parses <paramref name="value"/> and ensures it's a valid <see cref="Hrib"/>.
+    /// Parses <paramref name="value"/> and ensures it's a valid, and optionally non-empty and non-system
+    /// <see cref="Hrib"/>.
+    ///
     /// </summary>
     /// <param name="value">Value to be parsed</param>
     /// <param name="shouldReplaceEmpty">Replace <see cref="Empty"/> with a fresh <see cref="Hrib"/></param>
+    /// <param name="shouldDisallowSystem">Disallow parsing the system HRIB</param>
     /// <returns>A valid HRIB or an error</returns>
-    public static Err<Hrib> EnsureValid(string value, bool shouldReplaceEmpty = false)
+    public static bool TryParseValid(
+        string value,
+        [NotNullWhen(true)] out Hrib? hrib,
+        out HribParsingError error,
+        bool shouldReplaceEmpty = false,
+        bool shouldDisallowSystem = true
+    )
     {
-        var result = Parse(value);
-        if (result.HasError)
+        if (!TryParse(value, out hrib, out error))
         {
-            return result.Errors;
+            return false;
         }
 
-        var hrib = result.Unwrap();
         if (hrib.IsInvalid)
         {
-            return Error.BadHrib(hrib.RawValue);
+            error = HribParsingError.InvalidDisallowed;
+            return false;
         }
 
         if (hrib.IsEmpty)
         {
             if (shouldReplaceEmpty)
             {
-                hrib = Hrib.Create();
+                hrib = Create();
+                return true;
             }
-            else
-            {
-                return Error.InvalidOrEmptyHrib();
-            }
+
+            error = HribParsingError.EmptyDisallowed;
+            return false;
         }
 
-        return hrib;
+        if (hrib == System && shouldDisallowSystem)
+        {
+            error = HribParsingError.SystemDisallowed;
+            return false;
+        }
+
+        return true;
     }
 
     public string ToString(bool throwOnInvalidAndEmpty)
@@ -223,5 +235,26 @@ public record Hrib : IParsable<Hrib>, IInvalidable<Hrib>
     public override string ToString()
     {
         return ToString(throwOnInvalidAndEmpty: true);
+    }
+
+    /// <summary>
+    /// The possible results of a <see cref="Hrib"/> parsing operation.
+    /// </summary>
+    ///
+    /// <remarks>
+    /// If you're wondering why we don't just use a <see cref="Err{T}"/> here, it's because <see cref="Hrib"/> is
+    /// outside of the <see cref="IMod"/> ecosystem and thus cannot reference any <see cref="DiagnosticDescriptor"/>s.
+    /// It kind of sucks, but it's better to have access to our custom ID type wherever you need it.
+    /// </remarks>
+    public enum HribParsingError
+    {
+        None,
+        ValueIsNull,
+        ValueIsEmpty,
+        BadLength,
+        BadCharacter,
+        InvalidDisallowed,
+        EmptyDisallowed,
+        SystemDisallowed
     }
 }

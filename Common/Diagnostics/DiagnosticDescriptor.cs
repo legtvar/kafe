@@ -3,14 +3,16 @@ using System;
 
 namespace Kafe;
 
-public sealed record DiagnosticDescriptor : ISubtypeMetadata
+public sealed record DiagnosticDescriptor : ISubtypeMetadata, IInvalidable
 {
-    public static readonly DiagnosticDescriptor Invalid = new();
+    public static readonly DiagnosticDescriptor Invalid = new DiagnosticDescriptor();
 
     public static readonly LocalizedString FallbackMessageFormat = LocalizedString.Create(
         (Const.InvariantCulture, "A diagnostic of type '{0}' has been reported."),
         (Const.CzechCulture, "Vyskytlo se hlášení typu '{0}'.")
     );
+
+    public bool IsValid => Id != Const.InvalidEmailAddress;
 
     /// <summary>
     /// A short name/ID that is unique within the mod.

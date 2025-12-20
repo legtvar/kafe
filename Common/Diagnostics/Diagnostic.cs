@@ -10,9 +10,17 @@ namespace Kafe;
 /// Compared to exception messages, these must be localized as they are sent and may be displayed to the user through
 /// the client.
 /// </summary>
-public record struct Diagnostic : IFormattable
+public record struct Diagnostic : IFormattable, IInvalidable
 {
     private DiagnosticMessage? invariantMessage;
+
+    public static readonly Diagnostic Invalid = new Diagnostic()
+    {
+        Descriptor = DiagnosticDescriptor.Invalid,
+        Payload = KafeObject.Invalid,
+        Severity = default,
+        StackTrace = string.Empty,
+    };
 
     public Diagnostic(
         DiagnosticDescriptor descriptor,
@@ -27,6 +35,8 @@ public record struct Diagnostic : IFormattable
         Severity = severity ?? descriptor.DefaultSeverity;
         StackTrace = stackTrace ?? new StackTrace(skipFrames: skipFrames, fNeedFileInfo: true).ToString();
     }
+
+    public readonly bool IsValid => Descriptor?.IsValid == true && Payload.IsValid;
 
     public DiagnosticDescriptor Descriptor { get; init; }
 

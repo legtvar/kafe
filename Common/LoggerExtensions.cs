@@ -1,16 +1,29 @@
+using System.Globalization;
 using Microsoft.Extensions.Logging;
 
 namespace Kafe;
 
 public static class LoggerExtensions
 {
-    public static void LogError<T>(this ILogger self, Err<T> err, string? message, params object?[] args)
+    public static void LogErr<T>(this ILogger self, Err<T> err, string? message, params object?[] args)
     {
-        self.LogError(message + "\n{Errors}", [..args, err.Errors]);
+        if (err.HasDiagnostic)
+        {
+            LogDiagnostic(self, err.Diagnostic, message, args);
+        }
     }
 
-    public static void LogError(this ILogger self, Error error, string? message, params object?[] args)
+    public static void LogDiagnostic(this ILogger self, Diagnostic diagnostic, string? message, params object?[] args)
     {
-        self.LogError(new Err<bool>(error), message, args);
+        var level = diagnostic.Severity switch
+        {
+            DiagnosticSeverity.Debug => LogLevel.Debug,
+            DiagnosticSeverity.Info => LogLevel.Information,
+            DiagnosticSeverity.Warning => LogLevel.Warning,
+            DiagnosticSeverity.Error => LogLevel.Error,
+            _ => LogLevel.None
+        };
+
+        self.Log(level, message + "\n{Diagnostic}", [..args, diagnostic.ToMessage(CultureInfo.CurrentCulture)]);
     }
 }

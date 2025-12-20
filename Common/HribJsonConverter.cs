@@ -19,7 +19,7 @@ public class HribJsonConverter : JsonConverter<Hrib>
 
         if (!Hrib.TryParse(value, out var result, out var error))
         {
-            throw new JsonException(error);
+            throw new JsonException($"Failed to parse a HRIB ({error}).");
         }
 
         return result;

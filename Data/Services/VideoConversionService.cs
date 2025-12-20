@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Kafe.Core.Diagnostics;
 using Kafe.Data.Aggregates;
 using Kafe.Data.Events;
 using Kafe.Data.Options;
@@ -24,7 +25,8 @@ public class VideoConversionService(
     IOptions<VideoConversionOptions> options,
     ShardService shardService,
     IMediaService mediaService,
-    StorageService storageService
+    StorageService storageService,
+    DiagnosticFactory diagnosticFactory
 )
 {
     public async Task<VideoConversionInfo?> Load(
@@ -45,19 +47,18 @@ public class VideoConversionService(
 
     public async Task<Err<VideoConversionInfo>> Upsert(VideoConversionInfo conversion, CancellationToken ct = default)
     {
-        var id = Hrib.EnsureValid(conversion.Id, shouldReplaceEmpty: true);
-        if (id.HasErrors)
+        if (!Hrib.TryParseValid(conversion.Id, out var id, out var idError, shouldReplaceEmpty: true))
         {
-            return id.Errors;
+            // TODO: pass the error to BadHribDiagnostic
+            return diagnosticFactory.FromPayload(new BadHribDiagnostic(conversion.Id));
         }
 
-        var videoId = Hrib.EnsureValid(conversion.VideoId, shouldReplaceEmpty: false);
-        if (videoId.HasErrors)
+        if (!Hrib.TryParseValid(conversion.VideoId, out var videoId, out _ , shouldReplaceEmpty: false))
         {
-            return videoId.Errors;
+            return diagnosticFactory.FromPayload(new BadHribDiagnostic(conversion.VideoId));
         }
 
-        var shard = await shardService.Load((Hrib)videoId, ct);
+        var shard = await shardService.Load(videoId, ct);
         if (shard is null)
         {
             return Error.NotFound("The referenced video");

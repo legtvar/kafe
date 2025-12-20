@@ -11,10 +11,10 @@ public sealed record DiagnosticDescriptor : ISubtypeMetadata, IInvalidable<Diagn
 
     public static readonly LocalizedString FallbackMessageFormat = LocalizedString.Create(
         (Const.InvariantCulture, "A diagnostic of type '{0}' has been reported."),
-        (Const.CzechCulture, "Vyskytlo se hlášení typu '{0}'.")
+        (Const.CzechCulture, "Zpráva typu '{0}' byla nahlášena.")
     );
 
-    public bool IsValid => Id != Const.InvalidEmailAddress;
+    public bool IsValid => Id != Const.InvalidId;
 
     /// <summary>
     /// A short name/ID that is unique within the mod.

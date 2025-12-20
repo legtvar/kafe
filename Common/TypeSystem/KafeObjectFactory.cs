@@ -48,7 +48,7 @@ public class KafeObjectFactory
                 return @new;
 
             case ExistingKafeObjectHandling.KeepExisting:
-                return existing is null || existing.Value.IsInvalid ? @new : existing;
+                return existing is null || !existing.Value.IsValid ? @new : existing;
 
             case ExistingKafeObjectHandling.MergeOrOverwrite:
             case ExistingKafeObjectHandling.MergeOrKeep:

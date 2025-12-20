@@ -11,7 +11,7 @@ namespace Kafe;
 /// Human-Readable Identifier Ballast
 /// </summary>
 [JsonConverter(typeof(HribJsonConverter))]
-public record Hrib : IParsable<Hrib>
+public record Hrib : IParsable<Hrib>, IInvalidable<Hrib>
 {
     public const string Alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
     public const int Length = 11;
@@ -29,6 +29,8 @@ public record Hrib : IParsable<Hrib>
     /// Special HRIB representing an error state.
     /// </summary>
     public static readonly Hrib Invalid = new(InvalidValue);
+
+    static Hrib IInvalidable<Hrib>.Invalid => Invalid;
 
     /// <summary>
     /// Special HRIB for newly-created entities that don't have an Id yet.
@@ -48,6 +50,8 @@ public record Hrib : IParsable<Hrib>
     public bool IsEmpty => RawValue == EmptyValue;
 
     public bool IsInvalid => RawValue == InvalidValue;
+
+    public bool IsValid => RawValue != InvalidValue;
 
     /// <summary>
     /// Checks whether this HRIB is a regular id or `system`.
@@ -170,7 +174,7 @@ public record Hrib : IParsable<Hrib>
     public static Err<Hrib> EnsureValid(string value, bool shouldReplaceEmpty = false)
     {
         var result = Parse(value);
-        if (result.HasErrors)
+        if (result.HasError)
         {
             return result.Errors;
         }

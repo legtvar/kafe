@@ -3,9 +3,11 @@ using System;
 
 namespace Kafe;
 
-public sealed record DiagnosticDescriptor : ISubtypeMetadata, IInvalidable
+public sealed record DiagnosticDescriptor : ISubtypeMetadata, IInvalidable<DiagnosticDescriptor>
 {
     public static readonly DiagnosticDescriptor Invalid = new DiagnosticDescriptor();
+
+    static DiagnosticDescriptor IInvalidable<DiagnosticDescriptor>.Invalid => Invalid;
 
     public static readonly LocalizedString FallbackMessageFormat = LocalizedString.Create(
         (Const.InvariantCulture, "A diagnostic of type '{0}' has been reported."),

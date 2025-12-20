@@ -13,9 +13,7 @@ public readonly record struct Err<T>
 {
     [MaybeNull]
     private readonly T value = default!;
-    private readonly Diagnostic diagnostic = default;
-    private readonly bool hasValue = false;
-    private readonly bool hasDiagnostic = false;
+    private readonly Diagnostic diagnostic = Diagnostic.Invalid;
 
     public Err()
     {
@@ -23,52 +21,53 @@ public readonly record struct Err<T>
         diagnostic = default;
     }
 
-    public Err(T? value, Diagnostic? diagnostic)
+    public Err(T value, Diagnostic diagnostic)
     {
-        if (value is null && diagnostic is null)
+        if (value is null && !diagnostic.IsValid)
         {
-            throw new ArgumentException("Err<T> must contain a non-null a value or a diagnostic or both.");
+            throw new ArgumentException("Cannot create an Err<T> using an invalid diagnostic.", nameof(diagnostic));
         }
 
-        if (value is not null)
+        if ((value is null || (value is IInvalidable invalidable && !invalidable.IsValid))
+            && (diagnostic.Severity != DiagnosticSeverity.Error))
         {
-            hasValue = true;
-            this.value = value;
+            throw new ArgumentException(
+                "Value cannot be null or invalid if there is no error diagnostic.",
+                nameof(value)
+            );
         }
 
-        if (diagnostic is not null)
-        {
-            hasDiagnostic = true;
-            this.diagnostic = diagnostic.Value;
-        }
+        this.value = value;
+        this.diagnostic = diagnostic;
     }
 
-    public Err(T value) : this(value, null)
+    public Err(T value) : this(value, Diagnostic.Invalid)
     {
     }
 
-    public Err(Diagnostic diagnostic) : this(default, diagnostic)
+    public Err(Diagnostic diagnostic) : this(default!, diagnostic)
     {
     }
 
     [MaybeNull]
     public T Value => value;
 
-    public Diagnostic Diagnostic => diagnostic;
+    public Diagnostic Diagnostic => diagnostic.IsValid
+        ? diagnostic
+        : throw new InvalidOperationException("This Err<T> has no valid diagnostic.");
 
-    [MemberNotNullWhen(true, nameof(Diagnostic))]
-    [MemberNotNullWhen(false, nameof(Value))]
-    public bool HasDiagnostic => hasDiagnostic;
+    public bool HasDiagnostic => diagnostic.IsValid;
 
-    [MemberNotNullWhen(true, nameof(Diagnostic))]
+    /// <summary>
+    /// Is there an error diagnostic? If yes, <see cref="Value"/> is undefined.
+    /// </summary>
     [MemberNotNullWhen(false, nameof(Value))]
-    public bool HasError => hasDiagnostic && diagnostic.Severity == DiagnosticSeverity.Error;
+    public bool HasError => (Diagnostic.IsValid && Diagnostic.Severity == DiagnosticSeverity.Error)
+        || !HasValue; // NB: This ensures that !HasError implies there's a valid value even if the Diagnostic is trash.
 
     [MemberNotNullWhen(true, nameof(Value))]
-    [MemberNotNullWhen(false, nameof(Diagnostic))]
-    public bool HasValue => hasValue;
-
-    public bool IsInvalid => !hasValue && !hasDiagnostic;
+    public bool HasValue => value is not null
+        && (value is not IInvalidable invalidableValue || invalidableValue.IsValid);
 
 
     public static implicit operator Err<T>(T value)
@@ -76,24 +75,24 @@ public readonly record struct Err<T>
         return new Err<T>(value);
     }
 
-    public static implicit operator Err<T>(Diagnostic error)
+    public static implicit operator Err<T>(Diagnostic diagnostic)
     {
-        return new Err<T>(error);
+        return new Err<T>(diagnostic);
     }
 
-    public static implicit operator Err<T>([DisallowNull] Diagnostic? error)
+    public static implicit operator Err<T>([DisallowNull] Diagnostic? diagnostic)
     {
-        if (!error.HasValue)
+        if (!diagnostic.HasValue)
         {
-            throw new ArgumentException("Cannot turn a null diagnostic into an Err<T>.", nameof(error));
+            throw new ArgumentException("Cannot turn a null diagnostic into an Err<T>.", nameof(diagnostic));
         }
 
-        return new Err<T>(error.Value);
+        return new Err<T>(diagnostic.Value);
     }
 
     public static implicit operator Err<T>((T value, Diagnostic? diagnostic) pair)
     {
-        return new Err<T>(pair.value, pair.diagnostic);
+        return new Err<T>(pair.value, pair.diagnostic ?? Diagnostic.Invalid);
     }
 
     public static implicit operator Err<T>((T value, Diagnostic error) pair)
@@ -124,6 +123,11 @@ public readonly record struct Err<T>
             throw new KafeErrorException(err.Diagnostic);
         }
 
+        if (!err.HasValue)
+        {
+            throw new InvalidOperationException("This Err<T> has no valid Value or Diagnostic to unwrap.");
+        }
+
         return err.Value;
     }
 
@@ -135,14 +139,6 @@ public readonly record struct Err<T>
     [return: MaybeNull]
     public T GetValueOrDefault()
     {
-        return hasValue ? value : default;
-    }
-
-    public Err<T> WithErrors(params IEnumerable<Error> newErrors)
-    {
-        return this with
-        {
-            Errors = Errors.AddRange(newErrors)
-        };
+        return HasValue ? Value : default;
     }
 }

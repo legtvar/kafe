@@ -7,7 +7,7 @@ namespace Kafe;
 public readonly record struct KafeObject(
     KafeType Type,
     object Value
-)
+) : IInvalidable
 {
     public static readonly KafeObject Invalid = new(
         Type: KafeType.Invalid,
@@ -15,7 +15,7 @@ public readonly record struct KafeObject(
     );
 
     [JsonIgnore]
-    public bool IsInvalid => Type == KafeType.Invalid || Value is null;
+    public bool IsValid => Type != KafeType.Invalid && Value is not null;
 }
 
 public class KafeObjectJsonConverter : JsonConverter<KafeObject>

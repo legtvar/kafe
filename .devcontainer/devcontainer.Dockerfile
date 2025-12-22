@@ -16,12 +16,10 @@ RUN pacman -Syu --noconfirm && pacman -S --noconfirm \
     ffmpeg \
     postgresql \
     nodejs \
-    npm
+    npm \
+    glibc \
+    glibc-locales
 RUN git lfs install
 RUN mandb
-RUN sed -i '/en_US/s/^#//g' /etc/locale.gen \
-    && sed -i '/cs_CZ/s/^#//g' /etc/locale.gen \
-    && sed -i '/sk_SK/s/^#//g' /etc/locale.gen \
-    && locale-gen
 RUN npm install -g pnpm
 COPY ["post-create.sh", "post-attach.sh", "/root"]

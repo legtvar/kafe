@@ -1,8 +1,7 @@
 FROM archlinux:latest
-RUN sed -i '/NoExtract.*i18n/d' /etc/pacman.conf \
-    && sed -i '/NoExtract.*locale/d' /etc/pacman.conf \
-    && sed -i '/NoExtract.*man/d' /etc/pacman.conf \
-    && sed -i '/NoExtract.*help/d' /etc/pacman.conf
+RUN sed -i '/NoExtract.*usr\/share\/i18n/d' /etc/pacman.conf \
+    && sed -i '/NoExtract.*usr\/share\/man/d' /etc/pacman.conf \
+    && sed -i '/NoExtract.*usr\/share\/help/d' /etc/pacman.conf
 RUN pacman -Syu --noconfirm && pacman -S --noconfirm \
     openssh \
     git \

@@ -4,7 +4,7 @@ import https from 'https';
 import selfsigned from 'selfsigned';
 
 const sourcePort = 44369;
-const sourceAddress = 'localhost';
+const sourceAddress = '0.0.0.0';
 const targetPort = 443;
 const targetAddress = 'kafe-stage.fi.muni.cz';
 

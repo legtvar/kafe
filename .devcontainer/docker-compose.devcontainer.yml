@@ -11,7 +11,7 @@ services:
 
       # KAFE API
       ASPNETCORE_ENVIRONMENT: Development
-      BaseUrl: https://0.0.0.0:44369
+      BaseUrl: https://localhost:44369
       Kestrel__Endpoints__Https__Url: https://0.0.0.0:44369
       ConnectionStrings__postgres: host=localhost;port=5432;database=postgres;password=postgres;username=postgres
       ConnectionStrings__KAFE: host=localhost;port=5432;database=kafe;password=postgres;username=postgres

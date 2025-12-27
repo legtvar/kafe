@@ -6,7 +6,7 @@ services:
       - 8069:8069
       - 44369:44369
     environment:
-      BaseUrl: https://0.0.0.0:44369
+      BaseUrl: https://localhost:44369
       Kestrel__Endpoints__Http__Url: http://0.0.0.0:8069
       Kestrel__Endpoints__Https__Url: https://0.0.0.0:44369
     restart: no
@@ -17,7 +17,7 @@ services:
 
   blender:
     environment:
-      BaseUrl: http://0.0.0.0:8042
+      BaseUrl: http://localhost:8042
       Kestrel__Endpoints__Http__Url: http://0.0.0.0:8042
     ports:
       - 8042:8042

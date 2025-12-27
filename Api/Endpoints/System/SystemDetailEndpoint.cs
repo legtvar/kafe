@@ -12,6 +12,8 @@ using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using System;
 using System.Diagnostics;
+using Microsoft.Extensions.Options;
+using Kafe.Api.Options;
 
 namespace Kafe.Api.Endpoints.System;
 
@@ -20,6 +22,7 @@ namespace Kafe.Api.Endpoints.System;
 [Authorize(EndpointPolicy.Read)]
 public class SystemDetailEndpoint(
     IHostEnvironment hostEnvironment,
+    IOptions<ApiOptions> apiOptions,
     IServer server
 ) : EndpointBaseAsync
     .WithoutRequest
@@ -32,7 +35,7 @@ public class SystemDetailEndpoint(
     {
         var dto = new SystemDetailDto(
             Name: hostEnvironment.ApplicationName,
-            BaseUrls: [..(server.Features.Get<IServerAddressesFeature>()?.Addresses ?? Enumerable.Empty<string>())],
+            BaseUrls: [apiOptions.Value.BaseUrl, ..server.Features.Get<IServerAddressesFeature>()?.Addresses ?? []],
             Version: ThisAssembly.Git.Tag,
             Commit: ThisAssembly.Git.Commit,
             CommitDate: DateTimeOffset.Parse(ThisAssembly.Git.CommitDate),

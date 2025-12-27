@@ -21,4 +21,4 @@ RUN pacman -Syu --noconfirm && pacman -S --noconfirm \
 RUN git lfs install
 RUN mandb
 RUN npm install -g pnpm
-COPY ["post-create.sh", "post-attach.sh", "/root"]
+COPY ["post-create.sh", "post-start.sh", "post-attach.sh", "/root"]

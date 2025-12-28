@@ -37,7 +37,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		docker-compose.base.yml = docker-compose.base.yml
 		docker-compose.production.yml = docker-compose.production.yml
 		Blender.Dockerfile = Blender.Dockerfile
-		Directory.Build.targets = Directory.Build.targets
+		Directory.Packages.props = Directory.Packages.props
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kafe.MockIdentity", "MockIdentity\Kafe.MockIdentity.csproj", "{3A0F9596-06EC-4B5B-AA12-DB5B28D351DA}"
@@ -45,11 +45,14 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kafe.Announcer", "Announcer\Kafe.Announcer.csproj", "{02C5E470-3ABC-471B-BB9C-36E279E2917A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kafe.Pigeons", "Pigeons\Kafe.Pigeons.csproj", "{0471CCDE-174B-4396-A2C8-93F041044C2B}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kafe.Core", "Core\Kafe.Core.csproj", "{C836E570-A4B6-4CD5-B95C-B84442425D19}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kafe.Polygons", "Polygons\Kafe.Polygons.csproj", "{6AE2DBF2-A9B9-4105-85C7-C4BC5FE22C0A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kafe.Legacy", "Legacy\Kafe.Legacy.csproj", "{C73E9E1B-CC4E-4389-BBD1-734F60371723}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kafe.SourceGenerators", "SourceGenerators\Kafe.SourceGenerators.csproj", "{9C1D39F9-6C6C-48F7-95CC-FE923090B717}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -177,14 +180,14 @@ Global
 		{02C5E470-3ABC-471B-BB9C-36E279E2917A}.Debug|x86.Build.0 = Debug|Any CPU
 		{02C5E470-3ABC-471B-BB9C-36E279E2917A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{02C5E470-3ABC-471B-BB9C-36E279E2917A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0471CCDE-174B-4396-A2C8-93F041044C2B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0471CCDE-174B-4396-A2C8-93F041044C2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0471CCDE-174B-4396-A2C8-93F041044C2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0471CCDE-174B-4396-A2C8-93F041044C2B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{02C5E470-3ABC-471B-BB9C-36E279E2917A}.Release|x64.ActiveCfg = Release|Any CPU
 		{02C5E470-3ABC-471B-BB9C-36E279E2917A}.Release|x64.Build.0 = Release|Any CPU
 		{02C5E470-3ABC-471B-BB9C-36E279E2917A}.Release|x86.ActiveCfg = Release|Any CPU
 		{02C5E470-3ABC-471B-BB9C-36E279E2917A}.Release|x86.Build.0 = Release|Any CPU
+		{0471CCDE-174B-4396-A2C8-93F041044C2B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0471CCDE-174B-4396-A2C8-93F041044C2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0471CCDE-174B-4396-A2C8-93F041044C2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0471CCDE-174B-4396-A2C8-93F041044C2B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C836E570-A4B6-4CD5-B95C-B84442425D19}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C836E570-A4B6-4CD5-B95C-B84442425D19}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C836E570-A4B6-4CD5-B95C-B84442425D19}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -221,6 +224,18 @@ Global
 		{C73E9E1B-CC4E-4389-BBD1-734F60371723}.Release|x64.Build.0 = Release|Any CPU
 		{C73E9E1B-CC4E-4389-BBD1-734F60371723}.Release|x86.ActiveCfg = Release|Any CPU
 		{C73E9E1B-CC4E-4389-BBD1-734F60371723}.Release|x86.Build.0 = Release|Any CPU
+		{9C1D39F9-6C6C-48F7-95CC-FE923090B717}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9C1D39F9-6C6C-48F7-95CC-FE923090B717}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9C1D39F9-6C6C-48F7-95CC-FE923090B717}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{9C1D39F9-6C6C-48F7-95CC-FE923090B717}.Debug|x64.Build.0 = Debug|Any CPU
+		{9C1D39F9-6C6C-48F7-95CC-FE923090B717}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{9C1D39F9-6C6C-48F7-95CC-FE923090B717}.Debug|x86.Build.0 = Debug|Any CPU
+		{9C1D39F9-6C6C-48F7-95CC-FE923090B717}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9C1D39F9-6C6C-48F7-95CC-FE923090B717}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9C1D39F9-6C6C-48F7-95CC-FE923090B717}.Release|x64.ActiveCfg = Release|Any CPU
+		{9C1D39F9-6C6C-48F7-95CC-FE923090B717}.Release|x64.Build.0 = Release|Any CPU
+		{9C1D39F9-6C6C-48F7-95CC-FE923090B717}.Release|x86.ActiveCfg = Release|Any CPU
+		{9C1D39F9-6C6C-48F7-95CC-FE923090B717}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

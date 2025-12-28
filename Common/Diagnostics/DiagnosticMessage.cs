@@ -5,17 +5,23 @@ using System.Text.Json.Serialization;
 namespace Kafe;
 
 /// <summary>
-/// A culture-specific <see cref="Diagnostic"/> structure meant to be serialized and sent (not necessarily received).
+/// A culture-specific <see cref="Diagnostic"/> structure meant to be serialized and sent.
 /// </summary>
-public readonly record struct DiagnosticMessage
+public readonly record struct DiagnosticMessage : IInvalidable<DiagnosticMessage>
 {
+    public static DiagnosticMessage Invalid => new DiagnosticMessage();
+
     public DiagnosticMessage()
     {
     }
 
+    public bool IsValid => Id != KafeType.Invalid;
+
     public KafeType Id { get; init; } = KafeType.Invalid;
 
     public string Text { get; init; } = Const.InvalidId;
+
+    public DiagnosticSeverity Severity { get; init; }
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public ImmutableDictionary<string, object> Arguments { get; init; }
@@ -33,4 +39,6 @@ public readonly record struct DiagnosticMessage
         sb.Append(')');
         return sb.ToString();
     }
+
+
 }

@@ -8,11 +8,11 @@ public static class RequirementContextExtensions
 {
     public static async Task<IShard?> RequireShard(this IRequirementContext<IRequirement> context)
     {
-        if (context.Object.Value is not ShardReferenceProperty shardRef)
+        if (context.Target.Value is not ShardReferenceProperty shardRef)
         {
             context.Report(new IncompatibleRequirementDiagnostic(
                 context.RequirementType,
-                context.Object.Type
+                context.Target.Type
             ));
             return null;
         }

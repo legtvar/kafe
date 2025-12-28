@@ -12,12 +12,11 @@ namespace Kafe;
 /// </summary>
 public record struct Diagnostic : IFormattable, IInvalidable<Diagnostic>
 {
-    private DiagnosticMessage? invariantMessage;
+    private LocalizedString? message = null;
 
     public static readonly Diagnostic Invalid = new Diagnostic()
     {
         Descriptor = DiagnosticDescriptor.Invalid,
-        Payload = KafeObject.Invalid,
         Severity = default,
         StackTrace = string.Empty,
     };
@@ -25,42 +24,47 @@ public record struct Diagnostic : IFormattable, IInvalidable<Diagnostic>
     static Diagnostic IInvalidable<Diagnostic>.Invalid => Invalid;
 
     public Diagnostic(
-        DiagnosticDescriptor descriptor,
-        KafeObject payload,
-        DiagnosticSeverity? severity = null,
+        IDiagnosticPayload payload,
+        DiagnosticDescriptor? descriptorOverride = null,
+        DiagnosticSeverity? severityOverride = null,
         string? stackTrace = null,
         int skipFrames = 1
     )
     {
-        Descriptor = descriptor;
+        var descriptor = descriptorOverride;
+        descriptor ??= DiagnosticDescriptor.FromPayloadType(payload.GetType());
+        Debug.Assert(payload.GetType() == descriptor.Value.PayloadType);
+
+        Descriptor = descriptor.Value;
         Payload = payload;
-        Severity = severity ?? descriptor.DefaultSeverity;
+        Severity = severityOverride ?? descriptor.Value.Severity;
         StackTrace = stackTrace ?? new StackTrace(skipFrames: skipFrames, fNeedFileInfo: true).ToString();
     }
 
-    public readonly bool IsValid => Descriptor?.IsValid == true && Payload.IsValid;
+    public readonly bool IsValid => IInvalidable.GetIsValid(Payload);
 
     public DiagnosticDescriptor Descriptor { get; init; }
 
-    public KafeObject Payload { get; init; }
+    public IDiagnosticPayload Payload { get; init; }
 
     public DiagnosticSeverity Severity { get; init; }
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string StackTrace { get; init; }
 
-    public DiagnosticMessage InvariantMessage
+    public string ToString(CultureInfo culture)
     {
-        get
+        if (message is null)
         {
-            invariantMessage ??= ToMessage(CultureInfo.InvariantCulture);
-            return invariantMessage.Value;
+            message = Descriptor.GetMessage(Payload);
         }
+
+        return message[culture];
     }
 
-    public DiagnosticMessage ToMessage(CultureInfo culture)
+    public override string ToString()
     {
-        throw new NotImplementedException();
+        return ToString(CultureInfo.InvariantCulture);
     }
 
     string IFormattable.ToString(string? _, IFormatProvider? formatProvider)
@@ -70,11 +74,6 @@ public record struct Diagnostic : IFormattable, IInvalidable<Diagnostic>
             throw new ArgumentException("Format provider must be a CultureInfo.", nameof(formatProvider));
         }
 
-        return ToMessage(culture).ToString();
-    }
-
-    public override string ToString()
-    {
-        return InvariantMessage.ToString();
+        return ToString(culture);
     }
 }

@@ -28,7 +28,7 @@ public readonly record struct Err<T>
             throw new ArgumentException("Cannot create an Err<T> using an invalid diagnostic.", nameof(diagnostic));
         }
 
-        if ((value is null || (value is IInvalidable invalidable && !invalidable.IsValid))
+        if ((value is null || value is IInvalidable { IsValid: false })
             && (diagnostic.Severity != DiagnosticSeverity.Error))
         {
             throw new ArgumentException(

@@ -8,7 +8,7 @@ public sealed partial class LocalizedString : IDictionary<string, string>
 {
     string IDictionary<string, string>.this[string key] { get => ((IDictionary<string, string>)data)[key]; set => ((IDictionary<string, string>)data)[key] = value; }
 
-    ICollection<string> IDictionary<string, string>.Keys => ((IDictionary<string, string>)data).Keys;
+    public ICollection<string> Keys => ((IDictionary<string, string>)data).Keys;
 
     public ICollection<string> Values => ((IDictionary<string, string>)data).Values;
 

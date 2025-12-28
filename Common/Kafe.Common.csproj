@@ -15,5 +15,9 @@
     <PackageReference Include="Serilog" />
     <PackageReference Include="Serilog.Expressions" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="../SourceGenerators/Kafe.SourceGenerators.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
+  </ItemGroup>
 
 </Project>

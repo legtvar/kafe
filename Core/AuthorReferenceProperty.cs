@@ -25,15 +25,15 @@ public sealed class AuthorReferenceNameOrIdRequirementHandler
 {
     public override ValueTask Handle(IRequirementContext<AuthorReferenceNameOrIdRequirement> context)
     {
-        if (context.Object.Value is not AuthorReferenceProperty authorRef)
+        if (context.Target is not AuthorReferenceProperty authorRef)
         {
             throw new InvalidOperationException($"{nameof(AuthorReferenceNameOrIdRequirement)} is not valid "
-                + $"on objects of type '{context.Object.Type}'.");
+                + $"on objects of type '{context.Target.GetType()}'.");
         }
 
         if (authorRef.Name is null && authorRef.AuthorId is null)
         {
-            context.Report(new MissingNameOrIdDiagnostic(context.Object.Type));
+            context.Report(new MissingNameOrIdDiagnostic(context.Target.Type));
         }
 
         return ValueTask.CompletedTask;

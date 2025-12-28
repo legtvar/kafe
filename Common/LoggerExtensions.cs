@@ -24,6 +24,6 @@ public static class LoggerExtensions
             _ => LogLevel.None
         };
 
-        self.Log(level, message + "\n{Diagnostic}", [..args, diagnostic.ToMessage(CultureInfo.CurrentCulture)]);
+        self.Log(level, message + "\n{Diagnostic}", [..args, diagnostic.ToString(CultureInfo.CurrentCulture)]);
     }
 }

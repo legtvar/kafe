@@ -8,7 +8,7 @@ public record struct ShardAnalysis
     {
         IsSuccessful = false
     };
-    
+
     public ShardAnalysis(object shardMetadata, string? fileExtension)
     {
         IsSuccessful = true;
@@ -25,10 +25,10 @@ public record struct ShardAnalysis
 
     /// <summary>
     /// File extension that will be used when saving the shard to the file system.
-    /// When null, a file extension will be obtain from the shard's MIME type using <see cref="FileExtensionMimeMap"/>.
+    /// When null, a file extension will be taken from the shard's MIME type using <see cref="FileExtensionMimeMap"/>.
     /// </summary>
     public string? FileExtension { get; init; }
-    
+
     /// <summary>
     /// An override for the shard's MIME type. This will be sent to the browser upon downloading the shard.
     /// When null, the original MIME type provided by the browser upon upload will be used.

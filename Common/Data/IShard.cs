@@ -11,6 +11,13 @@ namespace Kafe;
 /// </remarks>
 public interface IShard : IEntity
 {
+    static string? IEntity.Moniker => "shard";
+
+    static LocalizedString? IEntity.Title => LocalizedString.Create(
+        (Const.InvariantCulture, "Shard"),
+        (Const.CzechCulture, "Střípek")
+    );
+
     LocalizedString Name { get; }
 
     KafeObject Metadata { get; }

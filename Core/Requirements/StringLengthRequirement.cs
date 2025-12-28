@@ -26,9 +26,9 @@ public sealed class StringLengthRequirementHandler : RequirementHandlerBase<Stri
             return ValueTask.CompletedTask;
         }
 
-        if (context.Object.Value is not LocalizedString value)
+        if (context.Target.Value is not LocalizedString value)
         {
-            if (context.Object.Value is string stringValue)
+            if (context.Target.Value is string stringValue)
             {
                 value = LocalizedString.CreateInvariant(stringValue);
             }
@@ -36,7 +36,7 @@ public sealed class StringLengthRequirementHandler : RequirementHandlerBase<Stri
             {
                 context.Report(new IncompatibleRequirementDiagnostic(
                     context.TypeRegistry.RequireType<StringLengthRequirement>(),
-                    context.Object.Type
+                    context.Target.Type
                 ));
                 return ValueTask.CompletedTask;
             }

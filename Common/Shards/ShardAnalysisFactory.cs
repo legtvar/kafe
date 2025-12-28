@@ -6,20 +6,11 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Kafe;
 
-public class ShardAnalysisFactory
+public class ShardAnalysisFactory(
+    ShardTypeRegistry shardTypes,
+    IServiceProvider serviceProvider
+)
 {
-    private readonly ShardTypeRegistry shardTypes;
-    private readonly IServiceProvider services;
-
-    public ShardAnalysisFactory(
-        ShardTypeRegistry shardTypes,
-        IServiceProvider services
-    )
-    {
-        this.shardTypes = shardTypes;
-        this.services = services;
-    }
-
     public async ValueTask<ShardAnalysis> Create(
         KafeType shardType,
         string filePath,
@@ -32,8 +23,8 @@ public class ShardAnalysisFactory
 
         foreach (var analyzerType in shardTypeMetadata.AnalyzerTypes)
         {
-            var analyzer = services.GetService(analyzerType)
-                ?? ActivatorUtilities.CreateInstance(services, analyzerType);
+            var analyzer = serviceProvider.GetService(analyzerType)
+                ?? ActivatorUtilities.CreateInstance(serviceProvider, analyzerType);
             if (analyzer is not IShardAnalyzer shardAnalyzer)
             {
                 throw new InvalidOperationException($"Could not obtain an instance of the "

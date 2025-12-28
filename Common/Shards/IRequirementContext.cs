@@ -8,13 +8,15 @@ public interface IRequirementContext<out T>
     where T : IRequirement
 {
     List<Diagnostic> Diagnostics { get; }
+
     T Requirement { get; }
-    KafeType RequirementType { get; }
-    KafeObject Object { get; }
+
+    /// <summary>
+    /// The object upon which the requirement is imposed.
+    /// </summary>
+    object Target { get; }
+
     IServiceProvider ServiceProvider { get; }
-    KafeTypeRegistry TypeRegistry { get; }
-    KafeObjectFactory KafeObjectFactory { get; }
-    DiagnosticDescriptorRegistry DiagnosticDescriptorRegistry { get; }
-    DiagnosticFactory DiagnosticFactory { get; }
+
     CancellationToken CancellationToken { get; }
 }

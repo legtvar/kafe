@@ -5,7 +5,7 @@ namespace Kafe;
 public class KafeErrorException : Exception
 {
     public KafeErrorException(Diagnostic diagnostic)
-        : base($"A '{diagnostic.Descriptor.KafeType}' has been thrown as exception.")
+        : base($"A diagnostic with a '{diagnostic.Payload.GetType().Name}' payload has been thrown as exception.")
     {
         Diagnostic = diagnostic;
         StackTrace = diagnostic.StackTrace;

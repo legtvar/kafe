@@ -1,4 +1,4 @@
-namespace Kafe.Media;
+namespace Kafe.Mate;
 
 public record PigeonsTestInfo(
     string? Label,

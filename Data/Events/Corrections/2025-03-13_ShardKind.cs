@@ -19,7 +19,7 @@ namespace Kafe.Data
 
 namespace Kafe.Media.Deprecated
 {
-    [Obsolete("Use `Kafe.Polygons.BlendInfo` instead.")]
+    [Obsolete("Use `Kafe.Mate.BlendInfo` instead.")]
     public record BlendInfo(
         string FileExtension,
         string MimeType,

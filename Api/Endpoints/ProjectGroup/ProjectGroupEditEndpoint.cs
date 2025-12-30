@@ -79,7 +79,7 @@ public class ProjectGroupEditEndpoint : EndpointBaseAsync
         }
 
         var result = await projectGroupService.Edit(@new, cancellationToken);
-        if (result.Diagnostic is not null)
+        if (result.HasError)
         {
             return this.KafeErrResult(result);
         }

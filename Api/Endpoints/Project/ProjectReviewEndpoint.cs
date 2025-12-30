@@ -67,7 +67,7 @@ public class ProjectReviewEndpoint : EndpointBaseAsync
             reviewerRole: dto.ReviewerRole,
             comment: dto.Comment,
             token: cancellationToken);
-        if (result.Diagnostic is not null)
+        if (result.HasError)
         {
             return this.KafeErrResult(result);
         }

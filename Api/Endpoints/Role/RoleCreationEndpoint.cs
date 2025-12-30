@@ -24,7 +24,7 @@ public class RoleCreationEndpoint : EndpointBaseAsync
     private readonly RoleService roleService;
     private readonly UserProvider userProvider;
     private readonly IAuthorizationService authorizationService;
-    
+
 
     public RoleCreationEndpoint(
         RoleService roleService,
@@ -47,12 +47,12 @@ public class RoleCreationEndpoint : EndpointBaseAsync
         {
             return Unauthorized();
         }
-        
+
         var role = await roleService.Create(RoleInfo.Create(dto.OrganizationId, dto.Name) with {
             Description = dto.Description
         }, cancellationToken);
 
-        if (role.Diagnostic is not null)
+        if (role.HasError)
         {
             return this.KafeErrResult(role);
         }

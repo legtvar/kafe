@@ -1,7 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Kafe.Polygons;
+namespace Kafe.Mate;
 
 public class BlendShardAnalyzer : IShardAnalyzer
 {

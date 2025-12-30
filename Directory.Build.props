@@ -17,10 +17,4 @@
     <PackageProjectUrl>https://kafe.fi.muni.cz</PackageProjectUrl>
     <Authors>LeGTVaR</Authors>
   </PropertyGroup>
-  
-  <ItemGroup>
-    <PackageReference Include="GitInfo" PrivateAssets="all">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-  </ItemGroup>
 </Project>

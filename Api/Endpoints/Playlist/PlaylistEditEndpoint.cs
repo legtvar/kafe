@@ -82,7 +82,7 @@ public class PlaylistEditEndpoint : EndpointBaseAsync
         }
 
         var result = await playlistService.Edit(@new, cancellationToken);
-        if (result.Diagnostic is not null)
+        if (result.HasError)
         {
             return this.KafeErrResult(result);
         }

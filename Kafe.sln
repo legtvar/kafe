@@ -48,7 +48,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kafe.Pigeons", "Pigeons\Kaf
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kafe.Core", "Core\Kafe.Core.csproj", "{C836E570-A4B6-4CD5-B95C-B84442425D19}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kafe.Polygons", "Polygons\Kafe.Polygons.csproj", "{6AE2DBF2-A9B9-4105-85C7-C4BC5FE22C0A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kafe.Mate", "Mate\Kafe.Mate.csproj", "{6AE2DBF2-A9B9-4105-85C7-C4BC5FE22C0A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kafe.Legacy", "Legacy\Kafe.Legacy.csproj", "{C73E9E1B-CC4E-4389-BBD1-734F60371723}"
 EndProject

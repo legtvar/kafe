@@ -36,6 +36,6 @@ public record StorageOptions
         [new KafeType("media", "shard", "image")] = "images",
         [new KafeType("media", "shard", "video")] = "videos",
         [new KafeType("media", "shard", "subtitles")] = "subtitles",
-        [new KafeType("polygons", "shard", "blend")] = "blends"
+        [new KafeType("mate", "shard", "blend")] = "blends"
     };
 }

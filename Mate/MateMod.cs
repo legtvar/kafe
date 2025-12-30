@@ -1,10 +1,10 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-namespace Kafe.Polygons;
+namespace Kafe.Mate;
 
-public class PolygonsMod : IMod
+public class MateMod : IMod
 {
-    public static string Moniker { get; } = "polygons";
+    public static string Moniker => "mate";
 
     public KafeType BlendShardType { get; private set; }
 

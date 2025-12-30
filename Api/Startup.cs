@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Kafe.Data;
 using Kafe.Media;
 using Kafe.Core;
-using Kafe.Polygons;
+using Kafe.Mate;
 using Kafe.Api.Endpoints;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
@@ -361,7 +361,7 @@ public partial class Startup
                 o.AddMod<CoreMod>();
                 o.AddMod<DataMod>();
                 o.AddMod<MediaMod>();
-                o.AddMod<PolygonsMod>();
+                o.AddMod<MateMod>();
             }
         );
 

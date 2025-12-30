@@ -11,8 +11,11 @@ namespace Kafe;
 // And: https://ziglang.org/documentation/master/#while-with-Error-Unions
 public readonly record struct Err<T>
 {
+    private static readonly Diagnostic FallbackDiagnostic = new Diagnostic(new GenericErrorDiagnostic());
+
     [MaybeNull]
     private readonly T value = default!;
+
     private readonly Diagnostic diagnostic = Diagnostic.Invalid;
 
     public Err()
@@ -52,18 +55,15 @@ public readonly record struct Err<T>
     [MaybeNull]
     public T Value => value;
 
-    public Diagnostic Diagnostic => diagnostic.IsValid
-        ? diagnostic
-        : throw new InvalidOperationException("This Err<T> has no valid diagnostic.");
-
-    public bool HasDiagnostic => diagnostic.IsValid;
+    public Diagnostic Diagnostic => !HasValue && diagnostic is not { IsValid: true, Severity: DiagnosticSeverity.Error }
+        ? new Diagnostic(new GenericErrorDiagnostic(), skipFrames: 2)
+        : diagnostic;
 
     /// <summary>
     /// Is there an error diagnostic? If yes, <see cref="Value"/> is undefined.
     /// </summary>
     [MemberNotNullWhen(false, nameof(Value))]
-    public bool HasError => (Diagnostic.IsValid && Diagnostic.Severity == DiagnosticSeverity.Error)
-        || !HasValue; // NB: This ensures that !HasError implies there's a valid value even if the Diagnostic is trash.
+    public bool HasError => !HasValue;
 
     [MemberNotNullWhen(true, nameof(Value))]
     public bool HasValue => value is not null
@@ -140,5 +140,24 @@ public readonly record struct Err<T>
     public T GetValueOrDefault()
     {
         return HasValue ? Value : default;
+    }
+}
+
+public static class Err
+{
+    public static Err<T> Fail<T>(
+        IDiagnosticPayload diagnosticPayload,
+        DiagnosticSeverity? severityOverride = null,
+        DiagnosticDescriptor? descriptorOverride = null
+    )
+    {
+        return new Err<T>(
+            new Diagnostic(
+                diagnosticPayload,
+                skipFrames: 2,
+                descriptorOverride: descriptorOverride,
+                severityOverride: severityOverride
+            )
+        );
     }
 }

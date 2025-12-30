@@ -57,7 +57,7 @@ public class ArtifactCreationEndpoint : EndpointBaseAsync
         },
             cancellationToken);
 
-        if (createResult.Diagnostic is not null)
+        if (createResult.HasError)
         {
             return this.KafeErrResult(createResult);
         }
@@ -67,7 +67,7 @@ public class ArtifactCreationEndpoint : EndpointBaseAsync
             var addArtifactsResult = await projectService.AddArtifacts(
                 request.ContainingProject,
                 [(createResult.Value.Id, request.BlueprintSlot)]);
-            if (addArtifactsResult.Diagnostic is not null)
+            if (addArtifactsResult.HasError)
             {
                 return this.KafeErrResult(addArtifactsResult);
             }

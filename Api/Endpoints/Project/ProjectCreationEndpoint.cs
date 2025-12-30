@@ -66,7 +66,7 @@ public class ProjectCreationEndpoint : EndpointBaseAsync
             existingEntityHandling: ExistingEntityHandling.Insert,
             token: cancellationToken
         );
-        if (project.Diagnostic is not null)
+        if (project.HasError)
         {
             return this.KafeErrResult(project);
         }

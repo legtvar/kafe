@@ -53,7 +53,7 @@ public class OrganizationEditEndpoint : EndpointBaseAsync
         };
 
         var result = await organizationService.Edit(@new, cancellationToken);
-        if (result.Diagnostic is not null)
+        if (result.HasError)
         {
             return this.KafeErrResult(result);
         }

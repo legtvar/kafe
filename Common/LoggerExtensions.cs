@@ -7,9 +7,9 @@ public static class LoggerExtensions
 {
     public static void LogErr<T>(this ILogger self, Err<T> err, string? message, params object?[] args)
     {
-        if (err.HasDiagnostic)
+        if (err.Diagnostic.IsValid)
         {
-            LogDiagnostic(self, err.Diagnostic, message, args);
+            self.LogDiagnostic(err.Diagnostic, message, args);
         }
     }
 

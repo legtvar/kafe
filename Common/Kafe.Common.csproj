@@ -20,5 +20,11 @@
   <ItemGroup>
     <ProjectReference Include="../SourceGenerators/Kafe.SourceGenerators.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <Compile Remove="Tests/**/*" />
+    <Content Remove="Tests/**/*" />
+    <None Remove="Tests/**/*" />
+  </ItemGroup>
 
 </Project>

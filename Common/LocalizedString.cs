@@ -10,7 +10,7 @@ using System.Text.Json.Serialization;
 namespace Kafe;
 
 [JsonConverter(typeof(LocalizedStringJsonConverter))]
-public sealed partial class LocalizedString : IEquatable<LocalizedString>, IFormattable, IPropertyType
+public sealed partial class LocalizedString : IEquatable<LocalizedString>, IFormattable, IScalar
 {
     public static readonly LocalizedString Empty = new LocalizedString(
         ImmutableDictionary.CreateRange(

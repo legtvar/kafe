@@ -25,6 +25,11 @@ public record ArtifactInfo(
 {
     public static readonly ArtifactInfo Invalid = new();
 
+    static LocalizedString? IEntity.Title => LocalizedString.Create(
+        (Const.InvariantCulture, "Artifact"),
+        (Const.CzechCulture, "Artefakt")
+    );
+
     public ArtifactInfo() : this(
         Id: Hrib.InvalidValue,
         CreationMethod: CreationMethod.Unknown,

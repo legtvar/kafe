@@ -13,6 +13,7 @@
     "@types/react-copy-to-clipboard": "^5.0.7",
     "@vitejs/plugin-react": "^5.1.0",
     "axios": "^1.13.1",
+    "chakra-multiselect": "^0.4.13",
     "country-flag-icons": "^1.5.21",
     "crypto-js": "^4.2.0",
     "deepmerge": "^4.3.1",

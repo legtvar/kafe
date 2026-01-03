@@ -7,7 +7,7 @@ namespace Kafe.Core;
 [JsonConverter(typeof(DateTimePropertyJsonConverter))]
 public record DateTimeProperty(
     DateTimeOffset? Value
-) : IPropertyType
+) : IScalar
 {
     public static string Moniker { get; } = "date-time";
 }

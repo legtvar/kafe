@@ -8,7 +8,7 @@ namespace Kafe.Core;
 [JsonConverter(typeof(ShardReferencePropertyJsonConverter))]
 public record ShardReferenceProperty(
     Hrib ShardId
-) : IPropertyType
+) : IScalar
 {
     public static string Moniker { get; } = "shard-ref";
 }

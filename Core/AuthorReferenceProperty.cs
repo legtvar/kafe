@@ -8,7 +8,7 @@ public record AuthorReferenceProperty(
     Hrib? AuthorId,
     string? Name,
     string[] Roles
-) : IPropertyType
+) : IScalar
 {
     public static string Moniker { get; } = "author-ref";
 }

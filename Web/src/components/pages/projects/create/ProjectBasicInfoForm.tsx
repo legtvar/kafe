@@ -1,4 +1,4 @@
-import { Button, FormControl, FormLabel, HStack, Input, Stack } from '@chakra-ui/react';
+import { Button, FormControl, FormHelperText, FormLabel, HStack, Stack } from '@chakra-ui/react';
 import useForceUpdate from 'use-force-update';
 import { t } from 'i18next';
 import { Project } from '../../../../data/Project';
@@ -7,6 +7,8 @@ import { AuthorSelect } from '../../../utils/Authors/AuthorSelect';
 import { LocalizedInput } from '../../../utils/LocalizedInput';
 import { ProjectAuthorList } from '../../../utils/ProjectAuthorList';
 import { TextareaLimited } from '../../../utils/TextareaLimited';
+import { MultiSelect } from 'chakra-multiselect';
+import genreManager from '../../../../utils/managers/genreManager';
 
 interface ProjectBasicInfoFormProps {
     project: Project;
@@ -42,6 +44,18 @@ export function ProjectBasicInfoForm({ project, onSubmit, status, update, noSelf
             </FormControl>
             <FormControl>
                 <FormLabel>{t('createProject.fields.genre').toString()}</FormLabel>
+                {!project.genre || project.genre.tags ?
+                <>
+                    <FormHelperText mb={"1rem"}>
+                        {t(`createProject.fields.genreHelp`).toString()}
+                    </FormHelperText>
+                    <MultiSelect
+                        options={genreManager.getOptions()}
+                        value={genreManager.getValue(project)}
+                        onChange={value => genreManager.onChange(value, project, forceUpdate)}
+                        create
+                    />
+                </> :
                 <LocalizedInput
                     as={TextareaLimited}
                     min={project.validationSettings?.minGenreLength ?? undefined}
@@ -53,7 +67,7 @@ export function ProjectBasicInfoForm({ project, onSubmit, status, update, noSelf
                     placeholder={t('createProject.fields.genre').toString()}
                     value={project.genre}
                     onChange={(value) => forceUpdate(project.set('genre', value))}
-                />
+                />}
             </FormControl>
             <FormControl>
                 <FormLabel>{t('createProject.fields.description').toString()}</FormLabel>
@@ -71,6 +85,9 @@ export function ProjectBasicInfoForm({ project, onSubmit, status, update, noSelf
             </FormControl>
             <FormControl py={12}>
                 <FormLabel>{t('createProject.fields.crew').toString()}</FormLabel>
+                <FormHelperText mb={"1rem"}>
+                    {t(`createProject.fields.crewHelp`).toString()}
+                </FormHelperText>
                 <ProjectAuthorList
                     authors={project.crew || []}
                     editable
@@ -83,6 +100,7 @@ export function ProjectBasicInfoForm({ project, onSubmit, status, update, noSelf
                             ),
                         )
                     }
+                    isCrewList={project.genre === undefined || project.genre.tags !== undefined}
                 />
                 <AuthorSelect
                     onSelect={(id, roles) =>
@@ -96,6 +114,7 @@ export function ProjectBasicInfoForm({ project, onSubmit, status, update, noSelf
                             ]),
                         )
                     }
+                    isCrewSelect={project.genre === undefined || project.genre.tags !== undefined}
                 />
             </FormControl>
             <FormControl pb={12}>

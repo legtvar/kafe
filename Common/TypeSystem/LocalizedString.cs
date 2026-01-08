@@ -20,7 +20,7 @@ public sealed partial class LocalizedString : IEquatable<LocalizedString>, IForm
         )
     );
 
-    public static string Moniker { get; } = "localized-string";
+    public static string Moniker => "localized-string";
 
     private readonly ImmutableDictionary<string, string> data;
 

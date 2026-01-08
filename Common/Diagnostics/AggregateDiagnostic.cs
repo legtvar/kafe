@@ -1,14 +1,14 @@
 using System.Collections.Immutable;
 
-namespace Kafe.Core.Diagnostics;
+namespace Kafe;
 
 public record AggregateDiagnostic(
     ImmutableArray<Diagnostic> Inner
 ) : IDiagnosticPayload
 {
-    public static string Moniker { get; } = "aggregate";
+    public static string Moniker => "aggregate";
 
-    public static DiagnosticSeverity DefaultSeverity { get; } = DiagnosticSeverity.Error;
+    public static DiagnosticSeverity DefaultSeverity => DiagnosticSeverity.Error;
 
     public static LocalizedString Title { get; } = LocalizedString.Create(
         (Const.InvariantCulture, "Aggregate Diagnostic"),

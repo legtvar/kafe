@@ -10,7 +10,7 @@ namespace Kafe;
 /// Compared to exception messages, these must be localized as they are sent and may be displayed to the user through
 /// the client.
 /// </summary>
-public record struct Diagnostic : IFormattable, IInvalidable<Diagnostic>
+public partial record struct Diagnostic : IFormattable, IInvalidable<Diagnostic>
 {
     private LocalizedString? message = null;
 

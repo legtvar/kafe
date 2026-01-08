@@ -45,13 +45,13 @@ public record ProjectBlueprint
                                 Description = LocalizedString.Create(
                                     (
                                         Const.InvariantCulture,
-                                        "English subtitles if the film is in Czech, " +
-                                        "or Czech subtitles if the film is in English."
+                                        "English subtitles if the film is in Czech or Slovak, " +
+                                        "or Czech/Slovak subtitles if the film is in English."
                                     ),
                                     (
                                         Const.CzechCulture,
-                                        "Anglické titulky, pokud je film v češtině, " +
-                                        "nebo české titulky, pokud je film v angličtině)"
+                                        "Anglické titulky, pokud je film v češtině nebo slovenštine, " +
+                                        "nebo české/slovenské titulky, pokud je film v angličtině."
                                     )
                                 ),
                                 Arity = ArgumentArity.ExactlyOne
@@ -90,13 +90,13 @@ public record ProjectBlueprint
                                 Description = LocalizedString.Create(
                                     (
                                         Const.InvariantCulture,
-                                        "English subtitles if the film is in Czech, " +
-                                        "or Czech subtitles if the film is in English."
+                                        "English subtitles if the film is in Czech or Slovak, " +
+                                        "or Czech/Slovak subtitles if the film is in English."
                                     ),
                                     (
                                         Const.CzechCulture,
-                                        "Anglické titulky, pokud je film v češtině, " +
-                                        "nebo české titulky, pokud je film v angličtině)"
+                                        "Anglické titulky, pokud je film v češtině nebo slovenštine, " +
+                                        "nebo české/slovenské titulky, pokud je film v angličtině."
                                     )
                                 ),
                                 Arity = ArgumentArity.ExactlyOne
@@ -228,7 +228,7 @@ public record ProjectBlueprint
                 }
             )
     };
-        
+
 }
 
 public record ProjectArtifactBlueprint

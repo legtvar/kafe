@@ -96,7 +96,7 @@ public class ShardService
             FileLength: stream.Length,
             UploadFilename: uploadFilename,
             MimeType: analysis.MimeType ?? mimeType,
-            Metadata: kafeObjectFactory.Wrap(analysis.ShardMetadata)
+            Metadata: kafeObjectFactory.Wrap(analysis.Payload)
         );
         if (created.Metadata.Type != shardType)
         {
@@ -247,7 +247,7 @@ public class ShardService
         variant = SanitizeVariantName(variant);
         var shard = await Load(id, token)
             ?? throw new ArgumentException($"Shard {id} could not be found.");
-        if (!storageService.TryOpenShardStream(shard.Metadata.Type, id, variant, out var stream, out _))
+        if (!storageService.TryOpenShardStream(shard.Payload.Type, id, variant, out var stream, out _))
         {
             throw new ArgumentException($"A shard stream for the '{id}' shard could not be opened.");
         }

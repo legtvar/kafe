@@ -9,7 +9,7 @@ public record BlendInfo(
     string MimeType = Const.BlendMimeType,
     ImmutableArray<PigeonsTestInfo>? Tests = null,
     string? Error = null
-): IShardMetadata
+): IShardPayload
 {
     public static BlendInfo Invalid(string? errorMessage = null) => new(
         FileExtension: Const.InvalidFileExtension,

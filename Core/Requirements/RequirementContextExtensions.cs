@@ -38,11 +38,11 @@ public static class RequirementContextExtensions
             return null;
         }
 
-        if (shard.Metadata.Value is not TMetadata metadata)
+        if (shard.Payload.Value is not TMetadata metadata)
         {
             context.Report(new IncompatibleRequirementDiagnostic(
                 context.RequirementType,
-                shard.Metadata.Type
+                shard.Payload.Type
             ));
             return null;
         }
@@ -54,11 +54,11 @@ public static class RequirementContextExtensions
         this IShardRequirementContext<IRequirement> context
     )
     {
-        if (context.Shard.Metadata.Value is not TMetadata metadata)
+        if (context.Shard.Payload.Value is not TMetadata metadata)
         {
             context.Report(new IncompatibleRequirementDiagnostic(
                 context.RequirementType,
-                context.Shard.Metadata.Type
+                context.Shard.Payload.Type
             ));
             return default;
         }

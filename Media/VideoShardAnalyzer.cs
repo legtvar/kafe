@@ -29,7 +29,7 @@ public class VideoShardAnalyzer : IShardAnalyzer
         var mediaInfo = await mediaService.GetInfo(tempPath, token);
 
         return new(
-            shardMetadata: mediaInfo,
+            payload: mediaInfo,
             fileExtension: originalFileExtension
         );
     }

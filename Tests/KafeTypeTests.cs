@@ -19,8 +19,8 @@ public class KafeTypeTests
     {
         Assert.True(KafeType.TryParse(s, out var kafeType));
         Assert.Equal(mod, kafeType.Mod);
-        Assert.Equal(primary, kafeType.Primary);
-        Assert.Equal(secondary, kafeType.Secondary);
+        Assert.Equal(primary, kafeType.Category);
+        Assert.Equal(secondary, kafeType.Moniker);
         Assert.Equal(isArray, kafeType.IsArray);
     }
 

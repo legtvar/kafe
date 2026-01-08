@@ -6,58 +6,51 @@ using System.Text.RegularExpressions;
 namespace Kafe;
 
 [JsonConverter(typeof(KafeTypeJsonConverter))]
-public partial record struct KafeType : IParsable<KafeType>
+public readonly partial record struct KafeType(
+    string Mod,
+    string Category,
+    string Moniker,
+    bool IsArray = false,
+    LocalizedString? Name = null
+) : IParsable<KafeType>, IInvalidable<KafeType>
 {
-    public const char ModPrimarySeparator = ':';
-    public const char PrimarySecondarySeparator = '/';
+    public const char ModCategorySeparator = ':';
+    public const char CategoryMonikerSeparator = '/';
     public const string ArraySuffix = "[]";
 
     public static readonly Regex Regex = GetRegex();
 
-    [GeneratedRegex($@"^(?<{nameof(Mod)}>[\w-]+):(?<{nameof(Primary)}>[\w-]+)"
-        + $@"(?:\/(?<{nameof(Secondary)}>[\w-]+))?(?<{nameof(IsArray)}>\[\])?$")]
+    [GeneratedRegex(
+        $@"^(?<{nameof(Mod)}>[\w-]+):(?<{nameof(Category)}>[\w-]+)"
+        + $@"\/(?<{nameof(Moniker)}>[\w-]+)(?<{nameof(IsArray)}>\[\])?$"
+    )]
     private static partial Regex GetRegex();
 
-    public static readonly KafeType Invalid = new("invalid", "invalid", default, default);
+    public static KafeType Invalid { get; } = new(Const.InvalidId, Const.InvalidId, Const.InvalidId);
 
-    public KafeType(
-        string mod,
-        string primary,
-        string? secondary = null,
-        bool isArray = false,
-        LocalizedString? name = null
-    )
-    {
-        Mod = mod;
-        Primary = primary;
-        Secondary = secondary;
-        IsArray = isArray;
-        Name = name;
-    }
+    public bool IsValid => this != Invalid;
 
-    public string Mod { get; }
-    public string Primary { get; }
-    public string? Secondary { get; }
-    public bool IsArray { get; }
+    public string Mod { get; } = Mod;
+    public string Category { get; } = Category;
+    public string Moniker { get; } = Moniker;
+    public bool IsArray { get; } = IsArray;
 
     /// <summary>
     /// A human-readable name.
     /// Used in <see cref="ToString(string?, IFormatProvider?)"/> with <see cref="HumanReadableFormat"/>.
     /// </summary>
-    public LocalizedString? Name { get; init; }
+    public LocalizedString? Name { get; init; } = Name;
 
-    public readonly bool IsDefault => Mod == null && Primary == null && Secondary == null && IsArray == false;
+    public bool IsDefault => Mod == null && Category == null && Moniker == null && IsArray == false;
 
-    public readonly bool IsInvalid => this == Invalid;
-
-    public readonly KafeType GetElementType()
+    public KafeType GetElementType()
     {
         if (!IsArray)
         {
             throw new NotSupportedException("Only array KAFE types may have element type.");
         }
 
-        return new(Mod, Primary, Secondary, false);
+        return new KafeType(Mod, Category, Moniker, false);
     }
 
     public static bool TryParse(
@@ -78,11 +71,11 @@ public partial record struct KafeType : IParsable<KafeType>
             return false;
         }
 
-        kafeType = new(
-            mod: match.Groups[nameof(Mod)].Value,
-            primary: match.Groups[nameof(Primary)].Value,
-            secondary: match.Groups[nameof(Secondary)].Success ? match.Groups[nameof(Secondary)].Value : null,
-            isArray: match.Groups[nameof(IsArray)].Success
+        kafeType = new KafeType(
+            Mod: match.Groups[nameof(Mod)].Value,
+            Category: match.Groups[nameof(Category)].Value,
+            Moniker: match.Groups[nameof(Moniker)].Value,
+            IsArray: match.Groups[nameof(IsArray)].Success
         );
         return true;
     }
@@ -96,6 +89,7 @@ public partial record struct KafeType : IParsable<KafeType>
         {
             throw new ArgumentException($"Could not parse '{s}' as a KafeType.", nameof(s));
         }
+
         return kafeType;
     }
 

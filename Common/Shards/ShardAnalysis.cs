@@ -9,18 +9,18 @@ public record struct ShardAnalysis
         IsSuccessful = false
     };
 
-    public ShardAnalysis(object shardMetadata, string? fileExtension)
+    public ShardAnalysis(object payload, string? fileExtension)
     {
         IsSuccessful = true;
-        ShardMetadata = shardMetadata;
+        Payload = payload;
         FileExtension = fileExtension;
     }
 
     /// <summary>
     /// Whether or not the provided data could be analyzed as the required shard type.
-    /// If true, <see cref="ShardMetadata" /> contains appropriate metadata.
+    /// If true, <see cref="Payload" /> contains appropriate metadata.
     /// </summary>
-    [MemberNotNullWhen(true, nameof(ShardMetadata))]
+    [MemberNotNullWhen(true, nameof(Payload))]
     public bool IsSuccessful { get; init; }
 
     /// <summary>
@@ -35,7 +35,7 @@ public record struct ShardAnalysis
     /// </summary>
     public string? MimeType { get; init; }
 
-    public object? ShardMetadata { get; init; }
+    public object? Payload { get; init; }
 
     /// <summary>
     /// The shard analyzer that produced this analysis. When null, empty or whitespace, the full name of the shard analyzer type will be

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Kafe;
 
-public partial record struct KafeType : IFormattable
+public readonly partial record struct KafeType : IFormattable
 {
     /// <summary>
     /// The '{Mod}:{Primary}/{Secondary}[]' format.
@@ -24,14 +24,14 @@ public partial record struct KafeType : IFormattable
 
     public override readonly string ToString()
     {
-        var sb = new StringBuilder(Mod.Length + 1 + Primary.Length + 1 + Secondary?.Length ?? 0 + 2);
+        var sb = new StringBuilder(Mod.Length + 1 + Category.Length + 1 + Moniker?.Length ?? 0 + 2);
         sb.Append(Mod);
-        sb.Append(ModPrimarySeparator);
+        sb.Append(ModCategorySeparator);
 
-        if (Secondary != null)
+        if (Moniker != null)
         {
-            sb.Append(ModPrimarySeparator);
-            sb.Append(Primary);
+            sb.Append(ModCategorySeparator);
+            sb.Append(Category);
         }
 
         if (IsArray)

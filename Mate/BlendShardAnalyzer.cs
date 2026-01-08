@@ -14,7 +14,7 @@ public class BlendShardAnalyzer : IShardAnalyzer
             IsSuccessful = true,
             FileExtension = ".blend",
             MimeType = "application/x-blender",
-            ShardMetadata = new BlendInfo(
+            Payload = new BlendInfo(
                 FileExtension: ".blend",
                 MimeType: "application/x-blender"
             )

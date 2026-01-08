@@ -16,7 +16,7 @@ public class MediaShorterSideRequirementHandler : ShardRequirementHandlerBase<Me
 {
     public override ValueTask Handle(IShardRequirementContext<MediaShorterSideRequirement> context)
     {
-        if (context.Shard.Metadata.Value is ImageInfo imageInfo)
+        if (context.Shard.Payload.Value is ImageInfo imageInfo)
         {
             if (Math.Min(imageInfo.Width, imageInfo.Height) < context.Requirement.Min)
             {

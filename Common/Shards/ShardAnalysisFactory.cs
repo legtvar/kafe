@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -7,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Kafe;
 
 public class ShardAnalysisFactory(
-    ShardTypeRegistry shardTypes,
+    KafeTypeRegistry typeRegistry,
     IServiceProvider serviceProvider
 )
 {
@@ -18,17 +17,18 @@ public class ShardAnalysisFactory(
         CancellationToken ct = default
     )
     {
-        var shardTypeMetadata = shardTypes.Metadata.GetValueOrDefault(shardType)
-            ?? throw new ArgumentException($"Shard type '{shardType}' could not be recognized.");
-
+        var typeMetadata = typeRegistry.RequireMetadata(shardType);
+        var shardTypeMetadata = typeMetadata.RequireExtension<ShardPayloadTypeMetadata>();
         foreach (var analyzerType in shardTypeMetadata.AnalyzerTypes)
         {
             var analyzer = serviceProvider.GetService(analyzerType)
                 ?? ActivatorUtilities.CreateInstance(serviceProvider, analyzerType);
             if (analyzer is not IShardAnalyzer shardAnalyzer)
             {
-                throw new InvalidOperationException($"Could not obtain an instance of the "
-                    + $"'{analyzerType.FullName}' shard analyzer.");
+                throw new InvalidOperationException(
+                    $"Could not obtain an instance of the "
+                    + $"'{analyzerType.FullName}' shard analyzer."
+                );
             }
 
             var analysis = await shardAnalyzer.Analyze(filePath, mimeType, ct);
@@ -37,6 +37,16 @@ public class ShardAnalysisFactory(
                 if (string.IsNullOrWhiteSpace(analysis.ShardAnalyzerName))
                 {
                     analysis.ShardAnalyzerName = analyzerType.FullName;
+                }
+
+                if (analysis.Payload.GetType() != typeMetadata.DotnetType)
+                {
+                    throw new InvalidOperationException(
+                        $"The '{analyzer.GetType().FullName}' analyzer"
+                        + $" produced a shard of type '{analysis.Payload.GetType().FullName}' "
+                        + $"but '{typeMetadata.DotnetType.FullName}' was required. "
+                        + "The shard type's analyzers are likely misconfigured."
+                    );
                 }
 
                 return analysis;

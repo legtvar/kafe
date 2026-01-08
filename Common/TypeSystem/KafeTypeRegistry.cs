@@ -1,14 +1,13 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 
 namespace Kafe;
 
 public class KafeTypeRegistry : IFreezable
 {
-    private readonly ConcurrentDictionary<KafeType, KafeTypeMetadata> types = new();
+    private readonly Dictionary<KafeType, KafeTypeMetadata> types = new();
 
-    private readonly ConcurrentDictionary<Type, KafeType> dotnetTypeMap = new();
+    private readonly Dictionary<Type, KafeType> dotnetTypeMap = new();
 
     public bool IsFrozen { get; private set; }
 
@@ -16,13 +15,10 @@ public class KafeTypeRegistry : IFreezable
 
     public IReadOnlyDictionary<Type, KafeType> DotnetTypeMap { get; }
 
-    public IReadOnlyDictionary<Type, ISubtypeRegistry> SubtypeRegistries { get; }
-
-    public KafeTypeRegistry(IReadOnlyDictionary<Type, ISubtypeRegistry> subtypeRegistries)
+    public KafeTypeRegistry()
     {
         Types = types.AsReadOnly();
         DotnetTypeMap = dotnetTypeMap.AsReadOnly();
-        SubtypeRegistries = subtypeRegistries;
     }
 
     public void Freeze()
@@ -30,9 +26,14 @@ public class KafeTypeRegistry : IFreezable
         IsFrozen = true;
     }
 
-    public KafeTypeRegistry Register(KafeTypeMetadata metadata)
+    public void Register(KafeTypeMetadata metadata)
     {
         AssertUnfrozen();
+        if (!metadata.KafeType.IsValid)
+        {
+            throw new ArgumentException("Only valid KAFE types can be registered.");
+        }
+
         if (!types.TryAdd(metadata.KafeType, metadata))
         {
             throw new ArgumentException(
@@ -46,18 +47,19 @@ public class KafeTypeRegistry : IFreezable
             var existing = dotnetTypeMap[metadata.DotnetType];
             throw new ArgumentException(
                 $"KafeType '{metadata.KafeType}' cannot be mapped to .NET type '{metadata.DotnetType.FullName}' "
-                    + $"because that .NET type has already been registered by '{existing}'.",
+                + $"because that .NET type has already been registered by '{existing}'.",
                 nameof(metadata)
             );
         }
-        return this;
     }
 
     private void AssertUnfrozen()
     {
         if (IsFrozen)
         {
-            throw new InvalidOperationException("This KafeType registry is frozen and can no longer be modified.");
+            throw new InvalidOperationException(
+                $"This {nameof(KafeTypeRegistry)} is frozen and can no longer be modified."
+            );
         }
     }
 }

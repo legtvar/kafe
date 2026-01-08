@@ -52,9 +52,9 @@ public readonly record struct DiagnosticDescriptor : IInvalidable<DiagnosticDesc
         }
 
         var genericMethod = typeof(DiagnosticDescriptor).GetMethod(
-            nameof(FromPayloadType),
+            name: nameof(FromPayloadType),
             genericParameterCount: 1,
-            []
+            types: []
         );
         if (genericMethod is null)
         {

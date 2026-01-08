@@ -39,7 +39,7 @@ public class SubtitlesShardAnalyzer : IShardAnalyzer
             IsCorrupted: mediaInfo.IsCorrupted);
 
         return new(
-            shardMetadata: info,
+            payload: info,
             fileExtension: mediaInfo.FileExtension
         );
     }

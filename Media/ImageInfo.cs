@@ -13,7 +13,7 @@ public record ImageInfo(
     int Width,
     int Height,
     bool IsCorrupted = false
-) : IShardMetadata
+) : IShardPayload
 {
     public static ImageInfo Invalid { get; } = new(
         FileExtension: Const.InvalidFileExtension,

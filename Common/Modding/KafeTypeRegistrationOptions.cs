@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace Kafe;
 
-public record TypeRegistrationOptions
+public record KafeTypeRegistrationOptions
 {
     public KafeTypeAccessibility Accessibility { get; set; } = KafeTypeAccessibility.Public;
 
@@ -15,22 +15,22 @@ public record TypeRegistrationOptions
     public LocalizedString? Title { get; set; } = null;
 }
 
-public record ScalarRegistrationOptions : TypeRegistrationOptions
+public record ScalarRegistrationOptions : KafeTypeRegistrationOptions
 {
     public List<IRequirement> DefaultRequirements { get; set; } = [];
 }
 
-public record RequirementRegistrationOptions : TypeRegistrationOptions
+public record RequirementRegistrationOptions : KafeTypeRegistrationOptions
 {
     public List<Type> HandlerTypes { get; set; } = [];
 }
 
-public record DiagnosticPayloadRegistrationOptions : TypeRegistrationOptions
+public record DiagnosticPayloadRegistrationOptions : KafeTypeRegistrationOptions
 {
     public DiagnosticDescriptor? OverrideDescriptor { get; set; }
 }
 
-public record ShardPayloadRegistrationOptions : TypeRegistrationOptions
+public record ShardPayloadRegistrationOptions : KafeTypeRegistrationOptions
 {
     public List<Type> AnalyzerTypes { get; set; } = [];
 }

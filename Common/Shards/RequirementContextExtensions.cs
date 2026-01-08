@@ -6,13 +6,22 @@ namespace Kafe;
 
 public static class RequirementContextExtensions
 {
-    public static TContext Report<TContext>(
-        this TContext context,
-        Diagnostic diagnostic
-    )
+    extension<TContext>(TContext context)
         where TContext : IRequirementContext<IRequirement>
     {
-        context.Diagnostics.Add(diagnostic);
-        return context;
+        public TContext Report(
+            Diagnostic diagnostic
+        )
+        {
+            context.Diagnostics.Add(diagnostic);
+            return context;
+        }
+
+        public TContext Report(
+            IDiagnosticPayload diagnosticPayload
+        )
+        {
+            return context.Report(new Diagnostic(diagnosticPayload, skipFrames: 2));
+        }
     }
 }

@@ -102,7 +102,7 @@ public class ArtifactInfoProjection : SingleStreamProjection<ArtifactInfo, strin
 
             var newObject = setter.Object.Value;
 
-            if (newObject.Type.IsInvalid || newObject.Type.IsDefault)
+            if (!newObject.Type.IsValid || newObject.Type.IsDefault)
             {
                 throw new InvalidOperationException("An artifact property cannot be set without a valid KAFE type.");
             }

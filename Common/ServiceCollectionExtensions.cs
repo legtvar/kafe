@@ -18,10 +18,6 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<FileExtensionMimeMap>();
 
         var options = new KafeBrewingOptions(services);
-        options.AddSubtypeRegistry(new RequirementTypeRegistry());
-        options.AddSubtypeRegistry(new ShardTypeRegistry());
-        options.AddSubtypeRegistry(new PropertyTypeRegistry());
-        options.AddSubtypeRegistry(new ShardLinkTypeRegistry());
         options.AddFormatter(new FileLengthFormatter());
         options.AddFormatter(new BitrateFormatter());
 
@@ -32,7 +28,7 @@ public static class ServiceCollectionExtensions
             mod.ConfigureOptions(options);
         }
 
-        var typeRegistry = new KafeTypeRegistry(options.SubtypeRegistries);
+        var typeRegistry = new KafeTypeRegistry();
         var modRegistry = new ModRegistry(
             typeRegistry: typeRegistry,
             configuration: configuration,
@@ -53,10 +49,6 @@ public static class ServiceCollectionExtensions
             modRegistry.Register(mod, services);
         }
 
-        foreach (var subtypeRegistry in options.SubtypeRegistries.Values)
-        {
-            subtypeRegistry.Freeze();
-        }
         modRegistry.Freeze();
         typeRegistry.Freeze();
 

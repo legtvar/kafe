@@ -17,7 +17,7 @@ public record ShardInfo(
     string MimeType,
     long FileLength,
     string? UploadFilename,
-    KafeObject Metadata,
+    KafeObject Payload,
     ImmutableHashSet<ShardLink> Links
 ) : IShard
 {
@@ -31,7 +31,7 @@ public record ShardInfo(
         FileLength: -1,
         UploadFilename: null,
         MimeType: Const.InvalidMimeType,
-        Metadata: KafeObject.Invalid,
+        Payload: KafeObject.Invalid,
         Links: []
     )
     {
@@ -73,7 +73,7 @@ public class ShardInfoProjection : SingleStreamProjection<ShardInfo>
             FileLength: e.Data.FileLength ?? -1,
             UploadFilename: e.Data.UploadFilename,
             MimeType: e.Data.MimeType ?? Const.InvalidMimeType,
-            Metadata: e.Data.Metadata,
+            Payload: e.Data.Metadata,
             Links: []
         );
     }

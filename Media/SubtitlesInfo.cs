@@ -13,4 +13,4 @@ public record SubtitlesInfo(
     string Codec,
     long Bitrate,
     bool IsCorrupted
-) : IShardMetadata;
+) : IShardPayload;

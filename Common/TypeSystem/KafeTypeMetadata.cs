@@ -8,6 +8,8 @@ public record KafeTypeMetadata(
     KafeType KafeType,
     Type DotnetType,
     KafeTypeAccessibility Accessibility,
-    JsonConverter? Converter
+    LocalizedString? Title,
+    JsonConverter? Converter,
+    object? Extension
 // TODO: OpenAPI schema override
 );

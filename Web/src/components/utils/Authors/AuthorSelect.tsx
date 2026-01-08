@@ -29,9 +29,12 @@ import { AwaitAPI } from '../AwaitAPI';
 import { SendAPI } from '../SendAPI';
 import { TextareaLimited } from '../TextareaLimited';
 import { TagInput } from './TagInput';
+import { MultiSelect } from 'chakra-multiselect';
+import crewRolesManager from '../../../utils/managers/crewRolesManager';
 
 interface IAuthorSelectProps {
     onSelect: (id: HRIB, roles: string[]) => void;
+    isCrewSelect?: boolean;
 }
 
 export function AuthorSelect(props: IAuthorSelectProps) {
@@ -235,13 +238,19 @@ export function AuthorSelect(props: IAuthorSelectProps) {
                                                 </Heading>
                                                 <FormControl mt={6}>
                                                     <FormLabel>{t('authorSelect.selectRoles').toString()}</FormLabel>
+                                                    {props.isCrewSelect ?
+                                                    <MultiSelect
+                                                        options={crewRolesManager.getOptions()}
+                                                        value={crewRolesManager.getValue(roles)}
+                                                        onChange={value => crewRolesManager.onChange(value, setRoles)}
+                                                    /> :
                                                     <TagInput
                                                         placeholder={t('authorSelect.addRole').toString()}
                                                         tags={roles}
                                                         setTags={(tags) => setRoles(tags)}
                                                         value={roleString}
                                                         setValue={(str) => setRoleString(str)}
-                                                    />
+                                                    />}
                                                 </FormControl>
                                             </>
                                         )}

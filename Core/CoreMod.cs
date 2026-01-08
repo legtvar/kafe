@@ -1,49 +1,60 @@
-﻿using Kafe.Core.Requirements;
+﻿using System;
+using Kafe.Core.Requirements;
 
 namespace Kafe.Core;
 
 public sealed class CoreMod : IMod
 {
-    public static string Moniker { get; } = "core";
+    public static string Moniker => "core";
 
     public void Configure(ModContext c)
     {
-        AddArtifactProperties(c);
+        AddScalars(c);
         AddShards(c);
         AddRequirements(c);
         AddDiagnostics(c);
     }
 
-    private static void AddArtifactProperties(ModContext c)
+    private static void AddScalars(ModContext c)
     {
-        c.AddArtifactProperty<LocalizedString>(new()
+        c.AddScalar<LocalizedString>(new ScalarRegistrationOptions
         {
-            Moniker = "localized-string",
+            Title = LocalizedString.Create(
+                (Const.InvariantCulture, "Localized string"),
+                (Const.CzechCulture, "Lokalizovaný řetězec")
+            ),
             Converter = new LocalizedStringJsonConverter(),
         });
-        c.AddArtifactProperty<DateTimeProperty>(new()
+        c.AddScalar(typeof(DateTimeOffset?), new ScalarRegistrationOptions
         {
             Moniker = "date-time",
-            Converter = new DateTimePropertyJsonConverter(),
+            Title = LocalizedString.Create(
+                (Const.InvariantCulture, "Date-time"),
+                (Const.CzechCulture, "Datum/čas")
+            )
         });
-        c.AddArtifactProperty<KafeString>(new()
+        c.AddScalar(typeof(string), new ScalarRegistrationOptions
         {
             Moniker = "string",
-            Converter = new KafeStringJsonConverter(),
+            Title = LocalizedString.Create(
+                (Const.InvariantCulture, "String"),
+                (Const.CzechCulture, "Řetězec")
+            )
         });
-        c.AddArtifactProperty<NumberProperty>(new()
+        c.AddScalar(typeof(decimal?), new ScalarRegistrationOptions
         {
             Moniker = "number",
-            Converter = new NumberPropertyJsonConverter(),
+            Title = LocalizedString.Create(
+                (Const.InvariantCulture, "Number"),
+                (Const.CzechCulture, "Číslo")
+            )
         });
-        c.AddArtifactProperty<ShardReferenceProperty>(new()
+        c.AddScalar<ShardReference>(new ScalarRegistrationOptions
         {
-            Moniker = "shard-ref",
             Converter = new ShardReferencePropertyJsonConverter(),
         });
-        c.AddArtifactProperty<AuthorReferenceProperty>(new()
+        c.AddScalar<AuthorReference>(new ScalarRegistrationOptions
         {
-            Moniker = "author-ref",
             DefaultRequirements = [
                 new AuthorReferenceNameOrIdRequirement()
             ]
@@ -52,27 +63,21 @@ public sealed class CoreMod : IMod
 
     private static void AddShards(ModContext c)
     {
-        c.AddShard<BlobShard>(new()
-        {
-            Moniker = "blob"
-        });
-        c.AddShard<ArchiveShard>(new()
-        {
-            Moniker = "archive"
-        });
+        c.AddShardPayload<BlobShard>();
+        c.AddShardPayload<ArchiveShard>();
     }
 
     private static void AddRequirements(ModContext c)
     {
-        c.AddRequirement<AuthorReferenceNameOrIdRequirement>(new()
+        c.AddRequirement<AuthorReferenceNameOrIdRequirement>(new RequirementRegistrationOptions
         {
             HandlerTypes = [typeof(AuthorReferenceNameOrIdRequirementHandler)]
         });
-        c.AddRequirement<StringLengthRequirement>(new()
+        c.AddRequirement<StringLengthRequirement>(new RequirementRegistrationOptions
         {
             HandlerTypes = [typeof(StringLengthRequirementHandler)]
         });
-        c.AddRequirement<ShardFileLengthRequirement>(new()
+        c.AddRequirement<ShardFileLengthRequirement>(new RequirementRegistrationOptions
         {
             HandlerTypes = [typeof(ShardFileLengthRequirementHandler)]
         });

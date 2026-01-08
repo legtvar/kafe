@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 
 namespace Kafe;
 
@@ -7,7 +8,7 @@ public static class ModContextExtensions
     extension(ModContext ctx)
     {
         public KafeType AddScalar<T>(ScalarRegistrationOptions? options = null)
-            where T : IScalar
+            where T : IKafeTypeMetadata
         {
             options ??= new ScalarRegistrationOptions();
             PopulateRegistrationOptions<T>(options);
@@ -16,7 +17,26 @@ public static class ModContextExtensions
                 category: IScalar.TypeCategory,
                 options: options,
                 extension: new ScalarTypeMetadata(
-                    DefaultRequirements: [..options?.DefaultRequirements ?? []]
+                    DefaultRequirements: [..options.DefaultRequirements]
+                )
+            );
+        }
+
+        public KafeType AddScalar(Type type, ScalarRegistrationOptions? options = null)
+        {
+            options ??= new ScalarRegistrationOptions();
+
+            if (type.IsAssignableTo(typeof(IScalar)))
+            {
+                PopulateRegistrationOptions(type, options);
+            }
+
+            return ctx.AddTypeRaw(
+                type: type,
+                category: IScalar.TypeCategory,
+                options: options,
+                extension: new ScalarTypeMetadata(
+                    DefaultRequirements: [..options.DefaultRequirements]
                 )
             );
         }
@@ -67,7 +87,7 @@ public static class ModContextExtensions
         private KafeType AddTypeRaw(
             Type type,
             string category,
-            TypeRegistrationOptions options,
+            KafeTypeRegistrationOptions options,
             object extension
         )
         {
@@ -97,7 +117,26 @@ public static class ModContextExtensions
         }
     }
 
-    private static void PopulateRegistrationOptions<T>(TypeRegistrationOptions options)
+    private static void PopulateRegistrationOptions(Type type, KafeTypeRegistrationOptions options)
+    {
+        if (!type.IsAssignableTo(typeof(IKafeTypeMetadata)))
+        {
+            throw new ArgumentException(
+                "Cannot populate KafeType metadata from a type that does not implement "
+                + $"'{nameof(IKafeTypeMetadata)}'.",
+                nameof(type)
+            );
+        }
+
+        typeof(ModContextExtensions).GetMethod(
+            name: nameof(PopulateRegistrationOptions),
+            genericParameterCount: 1,
+            bindingAttr: BindingFlags.NonPublic | BindingFlags.Static,
+            types: [typeof(KafeTypeRegistrationOptions)]
+        )!.MakeGenericMethod(type).Invoke(null, [options]);
+    }
+
+    private static void PopulateRegistrationOptions<T>(KafeTypeRegistrationOptions options)
         where T : IKafeTypeMetadata
     {
         options.Moniker ??= T.Moniker;

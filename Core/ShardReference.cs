@@ -4,18 +4,22 @@ using System.Text.Json.Serialization;
 
 namespace Kafe.Core;
 
-
 [JsonConverter(typeof(ShardReferencePropertyJsonConverter))]
-public record ShardReferenceProperty(
+public record ShardReference(
     Hrib ShardId
 ) : IScalar
 {
     public static string Moniker { get; } = "shard-ref";
+
+    public static LocalizedString Title { get; } = LocalizedString.Create(
+        (Const.InvariantCulture, "Shard reference"),
+        (Const.CzechCulture, "Odkaz na střípek")
+    );
 }
 
-public class ShardReferencePropertyJsonConverter : JsonConverter<ShardReferenceProperty>
+public class ShardReferencePropertyJsonConverter : JsonConverter<ShardReference>
 {
-    public override ShardReferenceProperty Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    public override ShardReference Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         var hrib = JsonSerializer.Deserialize<Hrib?>(ref reader, options)
             ?? throw new JsonException("A shard reference may never be null.");
@@ -27,7 +31,7 @@ public class ShardReferencePropertyJsonConverter : JsonConverter<ShardReferenceP
         return new(hrib);
     }
 
-    public override void Write(Utf8JsonWriter writer, ShardReferenceProperty value, JsonSerializerOptions options)
+    public override void Write(Utf8JsonWriter writer, ShardReference value, JsonSerializerOptions options)
     {
         if (value.ShardId.IsInvalid || value.ShardId.IsEmpty)
         {

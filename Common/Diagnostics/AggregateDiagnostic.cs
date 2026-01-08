@@ -19,6 +19,4 @@ public record AggregateDiagnostic(
         (Const.InvariantCulture, "Several ({Count}) diagnostics were reported."),
         (Const.CzechCulture, "Je k dispozici {Count} hlášení.")
     );
-
-    public int Count => Inner.Length;
 }

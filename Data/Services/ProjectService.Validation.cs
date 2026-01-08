@@ -12,10 +12,6 @@ namespace Kafe.Data.Services;
 
 public partial class ProjectService
 {
-    public const int NameMaxLength = 42;
-    public const int DescriptionMinLength = 50;
-    public const int DescriptionMaxLength = 10000;
-    public const int GenreMaxLength = 134;
     public static readonly TimeSpan FilmMinLength = TimeSpan.FromSeconds(1);
     public static readonly TimeSpan FilmMaxLength = TimeSpan.FromMinutes(8);
     public static readonly TimeSpan VideoAnnotationMinLength = TimeSpan.FromSeconds(1);

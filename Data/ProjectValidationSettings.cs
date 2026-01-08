@@ -15,7 +15,7 @@ public record ProjectValidationSettings
         MaxDescriptionLength = 200,
         RequiredDescriptionCultures = [Const.EnglishCultureName, Const.CzechOrSlovakPseudoCultureName],
         MinGenreLength = 1,
-        MaxGenreLength = 32,
+        MaxGenreLength = 134,
         RequiredGenreCultures = [Const.EnglishCultureName, Const.CzechOrSlovakPseudoCultureName],
     };
 
@@ -70,7 +70,7 @@ public record ProjectValidationSettings
             MinDescriptionLength = left.MinDescriptionLength ?? right.MinDescriptionLength,
             MaxDescriptionLength = left.MaxDescriptionLength ?? right.MaxDescriptionLength,
             RequiredDescriptionCultures =
-                left.RequiredDescriptionCultures is null 
+                left.RequiredDescriptionCultures is null
                     ? right.RequiredDescriptionCultures
                     : left.RequiredDescriptionCultures,
             MinGenreLength = left.MinGenreLength ?? right.MinGenreLength,

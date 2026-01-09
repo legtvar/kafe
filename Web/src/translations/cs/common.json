@@ -167,6 +167,9 @@
   "homeFestival": {
     "title": "24. Filmový festival FI MU"
   },
+  "introText": {
+    "detailsTitle": "Podrobné informace pro"
+  },
   "layout": {
     "footer": {
       "copy": "Vytvořil LeGTVaR s <1>❤️</1> a ☕.",
@@ -272,7 +275,8 @@
   "projectStatus": {
     "dramaturgy": {
       "ok": "Projekt byl přijat na festival",
-      "nok": "Projekt nebyl přijat na festival"
+      "nok": "Projekt nebyl přijat na festival",
+      "unknown": "Projekt ještě nebyl posouzen"
     },
     "file": {
       "ok": "Soubory jsou nahrány a prošly automatizovanou kontrolou",
@@ -284,11 +288,13 @@
     },
     "tech": {
       "ok": "Projekt prošel kontrolou technikem",
-      "nok": "Projekt neprošel kontrolou technikem"
+      "nok": "Projekt neprošel kontrolou technikem",
+      "unknown": "Projekt ještě nebyl posouzen"
     },
     "visual": {
       "ok": "Projekt prošel kontrolou grafikem",
-      "nok": "Projekt neprošel kontrolou grafikem"
+      "nok": "Projekt neprošel kontrolou grafikem",
+      "unknown": "Projekt ještě nebyl posouzen"
     },
     "pigeons-test": {
       "ok": "Projekt prošel automatizovanými testy PIGEOnS",

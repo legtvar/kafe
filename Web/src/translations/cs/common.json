@@ -62,7 +62,7 @@
     "fields": {
       "cast": "Herci",
       "crew": "Štáb",
-      "crewHelp": "Přidejte osoby, které se podílely na filmu. U každé osoby vyberte jednu nebo více rolí z nabídky. Některé role musí být obsazeny (Režie, Námět, Scenář, Produkce).",
+      "crewHelp": "Přidejte osoby, které se podílely na filmu. U každé osoby vyberte jednu nebo více rolí z nabídky. Některé role musí být obsazeny (Režie, Námět, Scénář, Produkce).",
       "crewRoles": {
         "director": "Režie",
         "story": "Námět",

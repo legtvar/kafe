@@ -1,8 +1,12 @@
 import { extendTheme, StyleProps } from '@chakra-ui/react';
 import { mode } from '@chakra-ui/theme-tools';
+import { MultiSelectTheme } from 'chakra-multiselect';
 
 // see https://chakra-ui.com/docs/styled-system/theme
 const theme = extendTheme({
+    components: {
+        MultiSelect: MultiSelectTheme
+    },
     config: {
         initialColorMode: 'light',
         useSystemColorMode: false,

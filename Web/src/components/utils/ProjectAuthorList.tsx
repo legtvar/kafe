@@ -6,12 +6,14 @@ import { components } from '../../schemas/api';
 import { HRIB } from '../../schemas/generic';
 import { AwaitAPI } from './AwaitAPI';
 import { KafeAvatar } from './KafeAvatar';
+import { t } from 'i18next';
 
 interface IProjectAuthorListProps {
     authors: components['schemas']['ProjectAuthorDto'][];
     editable?: boolean;
     requestDetails?: boolean;
     onRemove?: (id: HRIB) => void;
+    isCrewList?: boolean
 }
 
 function ProjectAuthorListAwaiter(
@@ -41,6 +43,7 @@ function SimpleProjectAuthorList({
     author,
     onRemove,
     editable,
+    isCrewList
 }: { author: components['schemas']['ProjectAuthorDto'] } & Omit<IProjectAuthorListProps, 'authors'>) {
     return (
         // TODO: Uncomment when back-end is ready
@@ -49,7 +52,12 @@ function SimpleProjectAuthorList({
             <KafeAvatar size={'md'} person={author} />
             <VStack alignItems="start" pl={2} spacing={0}>
                 <Text fontWeight="bolder">{author.name}</Text>
-                <Text color="gray.500">{author.roles.join(', ')}</Text>
+                <Text color="gray.500">
+                    {(isCrewList ?
+                    author.roles.map(role => t(`createProject.fields.crewRoles.${role}`)) :
+                    author.roles)
+                    .join(', ')}
+                </Text>
             </VStack>
             {editable && <CloseButton onClick={() => onRemove && onRemove(author.id)} />}
         </HStack>

@@ -12,10 +12,6 @@ namespace Kafe.Data.Services;
 
 public partial class ProjectService
 {
-    public const int NameMaxLength = 42;
-    public const int DescriptionMinLength = 50;
-    public const int DescriptionMaxLength = 10000;
-    public const int GenreMaxLength = 32;
     public static readonly TimeSpan FilmMinLength = TimeSpan.FromSeconds(1);
     public static readonly TimeSpan FilmMaxLength = TimeSpan.FromMinutes(8);
     public static readonly TimeSpan VideoAnnotationMinLength = TimeSpan.FromSeconds(1);
@@ -73,7 +69,12 @@ public partial class ProjectService
     public const string TechReviewStage = "tech-review";
     public const string VisualReviewStage = "visual-review";
     public const string DramaturgyReviewStage = "dramaturgy-review";
-    public const string PigeonsTestStage = "pigeons-test"; 
+    public const string PigeonsTestStage = "pigeons-test";
+
+    public const string LemmaCurrentFilmFestivalProjectGroupId = "SA42xo3cf9y";
+    public static readonly HashSet<string> LemmaMandatoryCrewRoles = new(
+        new[] { "director", "story", "screenwriter", "producer" }
+    );
 
     public static readonly Diagnostic NameTooLong = new Diagnostic(
         Kind: DiagnosticKind.Error,
@@ -216,6 +217,24 @@ public partial class ProjectService
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "At least one crew member is required."),
             (Const.CzechCulture, "Je vyžadován alespoň jeden člen štábu.")
+        )
+    );
+
+    public static readonly Diagnostic MissingCrewRoles = new Diagnostic(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: InfoStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, "At least one crew member is missing crew roles."),
+            (Const.CzechCulture, "Každý člen štábu musí mít alespoň jednu roli.")
+        )
+    );
+
+    public static readonly Diagnostic MissingMandatoryRoles = new Diagnostic(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: InfoStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, "The project's crew is missing some of the mandatory roles: Director, Story, Screenwriter, Producer."),
+            (Const.CzechCulture, "Štábu projektu chybí některé z povinných rolí: Režisér, Námět, Scenárista, Producent.")
         )
     );
 
@@ -775,6 +794,24 @@ public partial class ProjectService
             GenreTooShort
         );
 
+        if (project.ProjectGroupId == LemmaCurrentFilmFestivalProjectGroupId)
+        {
+            if (project.Authors.Count(a => a.Kind == ProjectAuthorKind.Crew) < 1)
+            {
+                diagnostics.Add(MissingCrew);
+            }
+
+            if (project.Authors.Count(a => a.Kind == ProjectAuthorKind.Crew && a.Roles.IsEmpty) > 0)
+            {
+                diagnostics.Add(MissingCrewRoles);
+            }
+
+            if (!LemmaMandatoryCrewRoles.IsSubsetOf(project.Authors.Select(a => a.Roles.ToImmutableHashSet()).SelectMany(roles => roles).ToImmutableHashSet()))
+            {
+                diagnostics.Add(MissingMandatoryRoles);
+            }
+        }
+
         return new ProjectReport(
             ProjectId: project.Id,
             ValidatedOn: DateTimeOffset.UtcNow,
@@ -877,12 +914,25 @@ public partial class ProjectService
             diagnostics.Add(MissingDramaturgyReview);
         }
 
-        if ((project.Authors.Count(a => a.Kind == ProjectAuthorKind.Crew) < 1 && group.OrganizationId != "mate-fimuni") 
+        if ((project.Authors.Count(a => a.Kind == ProjectAuthorKind.Crew) < 1 && group.OrganizationId != "mate-fimuni")
             || (group.OrganizationId == "mate-fimuni" && project.OwnerId is null))
         {
             diagnostics.Add(MissingCrew);
         }
-        
+
+        if (group.OrganizationId == "lemmafimuni")
+        {
+            if (project.Authors.Count(a => a.Kind == ProjectAuthorKind.Crew && a.Roles.IsEmpty) > 0)
+            {
+                diagnostics.Add(MissingCrewRoles);
+            }
+
+            if (!LemmaMandatoryCrewRoles.IsSubsetOf(project.Authors.Select(a => a.Roles.ToImmutableHashSet()).SelectMany(roles => roles).ToImmutableHashSet()))
+            {
+                diagnostics.Add(MissingMandatoryRoles);
+            }
+        }
+
         var artifactBlueprints = projectBlueprint.ArtifactBlueprints;
 
         var artifactInfos = await db.LoadManyAsync<ArtifactDetail>(token, project.Artifacts.Select(a => a.Id));
@@ -892,7 +942,7 @@ public partial class ProjectService
 
         if (artifactBlueprints!.GetValueOrDefault(Const.FilmBlueprintSlot, null) is not null)
         {
-            var filmShardsBlueprints = artifactBlueprints[Const.FilmBlueprintSlot].ShardBlueprints; 
+            var filmShardsBlueprints = artifactBlueprints[Const.FilmBlueprintSlot].ShardBlueprints;
             var filmArtifacts = artifacts.Where(a => a.projectArtifact.BlueprintSlot == Const.FilmBlueprintSlot)
                 .ToImmutableArray();
 
@@ -906,7 +956,7 @@ public partial class ProjectService
             }
             else
             {
-                
+
                 if (filmShardsBlueprints!.GetValueOrDefault(ShardKind.Video, null) is not null)
                 {
                     var videoShards = filmArtifacts.Single().info.Shards.Where(s => s.Kind == ShardKind.Video)
@@ -984,7 +1034,7 @@ public partial class ProjectService
 
             if (artifactBlueprints!.GetValueOrDefault(Const.VideoAnnotationBlueprintSlot, null) is not null)
             {
-                var annotationsShardsBlueprints = artifactBlueprints[Const.VideoAnnotationBlueprintSlot].ShardBlueprints; 
+                var annotationsShardsBlueprints = artifactBlueprints[Const.VideoAnnotationBlueprintSlot].ShardBlueprints;
                 var videoAnnotationArtifacts = artifacts.Where(a => a.projectArtifact.BlueprintSlot == Const.VideoAnnotationBlueprintSlot)
                     .ToImmutableArray();
                 if (videoAnnotationArtifacts.Length > artifactBlueprints[Const.VideoAnnotationBlueprintSlot].Arity.Max)

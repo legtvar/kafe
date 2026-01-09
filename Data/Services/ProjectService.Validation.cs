@@ -81,7 +81,8 @@ public partial class ProjectService
         ValidationStage: InfoStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "The project name in the '{0}' language is too long. It may have at most {1} characters."),
-            (Const.CzechCulture, "Název projektu v jazyce '{0}' je příliš dlouhý. Může mít nanajevýš {1} znaků.")
+            (Const.CzechCulture, "Název projektu v jazyce '{0}' je příliš dlouhý. Může mít nanajevýš {1} znaků."),
+            (Const.SlovakCulture, "Názov projektu v jazyku '{0}' je príliš dlhý. Môže mať nanajvýš {1} znakov.")
         )
     );
 
@@ -90,7 +91,8 @@ public partial class ProjectService
         ValidationStage: InfoStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "The project name in the '{0}' language is too short. It must have at least {1} characters."),
-            (Const.CzechCulture, "Název projektu v jazyce '{0}' je příliš krátký. Musí míň alespoň {1} znaků.")
+            (Const.CzechCulture, "Název projektu v jazyce '{0}' je příliš krátký. Musí mít alespoň {1} znaků."),
+            (Const.SlovakCulture, "Názov projektu v jazyku '{0}' je príliš krátky. Musí mať aspoň {1} znakov.")
         )
     );
 
@@ -99,7 +101,8 @@ public partial class ProjectService
         ValidationStage: InfoStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "The project is missing a name."),
-            (Const.CzechCulture, "Projektu chybí název.")
+            (Const.CzechCulture, "Projektu chybí název."),
+            (Const.SlovakCulture, "Projektu chýba názov.")
         )
     );
 
@@ -108,7 +111,8 @@ public partial class ProjectService
         ValidationStage: InfoStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "The project is missing a name in the '{0}' language."),
-            (Const.CzechCulture, "Projektu chybí název v jazyce '{0}'.")
+            (Const.CzechCulture, "Projektu chybí název v jazyce '{0}'."),
+            (Const.SlovakCulture, "Projektu chýba názov v jazyku '{0}'.")
         )
     );
 
@@ -117,7 +121,8 @@ public partial class ProjectService
         ValidationStage: InfoStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "The project description in the '{0}' language is too long. It may have at most {1} characters."),
-            (Const.CzechCulture, "Popis projektu v jazyce '{0}' je příliš dlouhý. Může mít nanajevýš {1} znaků.")
+            (Const.CzechCulture, "Popis projektu v jazyce '{0}' je příliš dlouhý. Může mít nanajevýš {1} znaků."),
+            (Const.SlovakCulture, "Popis projektu v jazyku '{0}' je príliš dlhý. Môže mať nanajvýš {1} znakov.")
         )
     );
 
@@ -126,7 +131,8 @@ public partial class ProjectService
         ValidationStage: InfoStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "The project description in the '{0}' language is too short. It must have at least {1} characters."),
-            (Const.CzechCulture, "Popis projektu v jazyce '{0}' je příliš krátký. Musí míň alespoň {1} znaků.")
+            (Const.CzechCulture, "Popis projektu v jazyce '{0}' je příliš krátký. Musí mít alespoň {1} znaků."),
+            (Const.SlovakCulture, "Popis projektu v jazyku '{0}' je príliš krátky. Musí mať aspoň {1} znakov.")
         )
     );
 
@@ -135,7 +141,8 @@ public partial class ProjectService
         ValidationStage: InfoStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "The project is missing a description."),
-            (Const.CzechCulture, "Projektu chybí popis.")
+            (Const.CzechCulture, "Projektu chybí popis."),
+            (Const.SlovakCulture, "Projektu chýba popis.")
         )
     );
 
@@ -144,7 +151,8 @@ public partial class ProjectService
         ValidationStage: InfoStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "The project is missing a description in the '{0}' language."),
-            (Const.CzechCulture, "Projektu chybí popis v jazyce '{0}'.")
+            (Const.CzechCulture, "Projektu chybí popis v jazyce '{0}'."),
+            (Const.SlovakCulture, "Projektu chýba popis v jazyku '{0}'.")
         )
     );
 
@@ -153,7 +161,8 @@ public partial class ProjectService
         ValidationStage: InfoStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "The project genre in the '{0}' language is too long. It may have at most {1} characters."),
-            (Const.CzechCulture, "Žánr projektu v jazyce '{0}' je příliš dlouhý. Může mít nanajevýš {1} znaků.")
+            (Const.CzechCulture, "Žánr projektu v jazyce '{0}' je příliš dlouhý. Může mít nanajevýš {1} znaků."),
+            (Const.SlovakCulture, "Žáner projektu v jazyku '{0}' je príliš dlhý. Môže mať nanajvýš {1} znakov.")
         )
     );
 
@@ -162,7 +171,8 @@ public partial class ProjectService
         ValidationStage: InfoStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "The project genre in the '{0}' language is too short. It must have at least {1} characters."),
-            (Const.CzechCulture, "Žánr projektu v jazyce '{0}' je příliš krátký. Musí mít alespoň {1} znaků.")
+            (Const.CzechCulture, "Žánr projektu v jazyce '{0}' je příliš krátký. Musí mít alespoň {1} znaků."),
+            (Const.SlovakCulture, "Žáner projektu v jazyku '{0}' je príliš krátky. Musí mať aspoň {1} znakov.")
         )
     );
 
@@ -171,7 +181,8 @@ public partial class ProjectService
         ValidationStage: InfoStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "The project is missing a genre."),
-            (Const.CzechCulture, "Projektu chybí žánr.")
+            (Const.CzechCulture, "Projektu chybí žánr."),
+            (Const.SlovakCulture, "Projektu chýba žáner.")
         )
     );
 
@@ -180,7 +191,8 @@ public partial class ProjectService
         ValidationStage: InfoStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "The project is missing a genre in the '{0}' language."),
-            (Const.CzechCulture, "Projektu chybí žánr v jazyce '{0}'.")
+            (Const.CzechCulture, "Projektu chybí žánr v jazyce '{0}'."),
+            (Const.SlovakCulture, "Projektu chýba žáner v jazyku '{0}'.")
         )
     );
 
@@ -189,7 +201,8 @@ public partial class ProjectService
         ValidationStage: TechReviewStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "This project is yet to be accepted by a festival technician."),
-            (Const.CzechCulture, "Tento project ještě musí přijmout festivalový technik.")
+            (Const.CzechCulture, "Tento projekt ještě musí přijmout festivalový technik."),
+            (Const.SlovakCulture, "Tento projekt ešte musí prijať festivalový technik.")
         )
     );
 
@@ -198,7 +211,8 @@ public partial class ProjectService
         ValidationStage: VisualReviewStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "This project is yet to be accepted by a festival graphic designer."),
-            (Const.CzechCulture, "Tento project ještě musí přijmout festivalový grafik.")
+            (Const.CzechCulture, "Tento projekt ještě musí přijmout festivalový grafik."),
+            (Const.SlovakCulture, "Tento projekt ešte musí prijať festivalový grafik.")
         )
     );
 
@@ -207,7 +221,8 @@ public partial class ProjectService
         ValidationStage: DramaturgyReviewStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "This project is yet to be accepted by a festival jury."),
-            (Const.CzechCulture, "Tento project ještě musí přijmout festivalová porota.")
+            (Const.CzechCulture, "Tento projekt ještě musí přijmout festivalová porota."),
+            (Const.SlovakCulture, "Tento projekt ešte musí prijať festivalová porota.")
         )
     );
 
@@ -216,7 +231,8 @@ public partial class ProjectService
         ValidationStage: InfoStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "At least one crew member is required."),
-            (Const.CzechCulture, "Je vyžadován alespoň jeden člen štábu.")
+            (Const.CzechCulture, "Je vyžadován alespoň jeden člen štábu."),
+            (Const.SlovakCulture, "Je vyžadovaný aspoň jeden člen štábu.")
         )
     );
 
@@ -243,7 +259,8 @@ public partial class ProjectService
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "The film is required."),
-            (Const.CzechCulture, "Film je povinnou součástí přihlášky.")
+            (Const.CzechCulture, "Film je povinnou součástí přihlášky."),
+            (Const.SlovakCulture, "Film je povinnou súčasťou prihlášky.")
         )
     );
 
@@ -252,7 +269,8 @@ public partial class ProjectService
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "Only one film is permitted."),
-            (Const.CzechCulture, "Součástí přihlášky může být pouze jeden film.")
+            (Const.CzechCulture, "Součástí přihlášky může být pouze jeden film."),
+            (Const.SlovakCulture, "Súčasťou prihlášky môže byť iba jeden film.")
         )
     );
 
@@ -261,7 +279,8 @@ public partial class ProjectService
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "The video-annotation is missing the video file."),
-            (Const.CzechCulture, "Videoanotaci chybí soubor s videem.")
+            (Const.CzechCulture, "Videoanotaci chybí soubor s videem."),
+            (Const.SlovakCulture, "Videoanotácii chýba súbor s videom.")
         )
     );
 
@@ -270,7 +289,8 @@ public partial class ProjectService
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "Only one video-annotation is permitted."),
-            (Const.CzechCulture, "Součástí přihlášky může být pouze jedna videoanotace.")
+            (Const.CzechCulture, "Součástí přihlášky může být pouze jedna videoanotace."),
+            (Const.SlovakCulture, "Súčasťou prihlášky môže byť iba jedna videoanotácia.")
         )
     );
 
@@ -279,7 +299,8 @@ public partial class ProjectService
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "Subtitles for the film file are required."),
-            (Const.CzechCulture, "Titulky pro film jsou povinné.")
+            (Const.CzechCulture, "Titulky pro film jsou povinné."),
+            (Const.SlovakCulture, "Titulky pre film sú povinné.")
         )
     );
 
@@ -288,7 +309,8 @@ public partial class ProjectService
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "The video-annotation is missing subtitles."),
-            (Const.CzechCulture, "Videoanotaci chybí soubor s titulky.")
+            (Const.CzechCulture, "Videoanotaci chybí soubor s titulky."),
+            (Const.SlovakCulture, "Videoanotácii chýba súbor s titulkami.")
         )
     );
 
@@ -297,7 +319,8 @@ public partial class ProjectService
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "Only one file with subtitles for the film is permitted."),
-            (Const.CzechCulture, "Pouze jedny titulky k filmu mohou být součástí přihlášky.")
+            (Const.CzechCulture, "Součástí přihlášky mohou být pouze jedny titulky k filmu."),
+            (Const.SlovakCulture, "Súčasťou prihlášky môžu byť iba jedny titulky k filmu.")
         )
     );
 
@@ -306,7 +329,8 @@ public partial class ProjectService
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "Only one file with subtitles for the video-annotation is permitted."),
-            (Const.CzechCulture, "Pouze jedny titulky k videoanotaci mohou být součástí přihlášky.")
+            (Const.CzechCulture, "Součástí přihlášky mohou být pouze jedny titulky k videoanotaci."),
+            (Const.SlovakCulture, "Súčasťou prihlášky môžu byť iba jedny titulky k videoanotácii.")
         )
     );
 
@@ -315,7 +339,8 @@ public partial class ProjectService
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "At least one cover photo is required."),
-            (Const.CzechCulture, "Alespoň jedna titulní fotka je vyžadována.")
+            (Const.CzechCulture, "Je vyžadována alespoň jedna titulní fotografie."),
+            (Const.SlovakCulture, "Je vyžadovaná aspoň jedna titulná fotografia.")
         )
     );
 
@@ -324,7 +349,8 @@ public partial class ProjectService
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "Too many cover photos have been provided."),
-            (Const.CzechCulture, "Přihláška obsahuje příliš mnoho titulních fotek.")
+            (Const.CzechCulture, "Přihláška obsahuje příliš mnoho titulních fotografií."),
+            (Const.SlovakCulture, "Prihláška obsahuje príliš veľa titulných fotografií.")
         )
     );
 
@@ -333,7 +359,8 @@ public partial class ProjectService
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, $"The film is too short. Minimum length is '{FilmMinLength:c}'."),
-            (Const.CzechCulture, $"Film je příliš krátký. Minimální délka je '{FilmMinLength:c}'.")
+            (Const.CzechCulture, $"Film je příliš krátký. Minimální délka je '{FilmMinLength:c}'."),
+            (Const.SlovakCulture, $"Film je príliš krátky. Minimálna dĺžka je '{FilmMinLength:c}'.")
         )
     );
 
@@ -342,7 +369,8 @@ public partial class ProjectService
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, $"The film is too long. Maximum length is '{FilmMaxLength:c}'."),
-            (Const.CzechCulture, $"Film je příliš dlouhý. Maximální délka je '{FilmMaxLength:c}'.")
+            (Const.CzechCulture, $"Film je příliš dlouhý. Maximální délka je '{FilmMaxLength:c}'."),
+            (Const.SlovakCulture, $"Film je príliš dlhý. Maximálna dĺžka je '{FilmMaxLength:c}'.")
         )
     );
 
@@ -351,7 +379,8 @@ public partial class ProjectService
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, $"The video-annotation is too short. Minimum length is '{FilmMinLength:c}'."),
-            (Const.CzechCulture, $"Videoanotace je příliš krátká. Minimální délka je '{FilmMinLength:c}'.")
+            (Const.CzechCulture, $"Videoanotace je příliš krátká. Minimální délka je '{FilmMinLength:c}'."),
+            (Const.SlovakCulture, $"Videoanotácia je príliš krátka. Minimálna dĺžka je '{FilmMinLength:c}'.")
         )
     );
 
@@ -360,7 +389,8 @@ public partial class ProjectService
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, $"The video-annotation is too long. Maximum length is '{FilmMaxLength:c}'."),
-            (Const.CzechCulture, $"Videoanotace je příliš krátká. Maximální délka je '{FilmMaxLength:c}'.")
+            (Const.CzechCulture, $"Videoanotace je příliš dlouhá. Maximální délka je '{FilmMaxLength:c}'."),
+            (Const.SlovakCulture, $"Videoanotácia je príliš dlhá. Maximálna dĺžka je '{FilmMaxLength:c}'.")
         )
     );
 
@@ -369,7 +399,8 @@ public partial class ProjectService
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "The film file has zero file length."),
-            (Const.CzechCulture, "Soubor s filmem má nulovou velikost.")
+            (Const.CzechCulture, "Soubor s filmem má nulovou velikost."),
+            (Const.SlovakCulture, "Súbor s filmom má nulovú veľkosť.")
         )
     );
 
@@ -378,7 +409,8 @@ public partial class ProjectService
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, $"The film file is larger than {FilmMaxFileLengthDescription}."),
-            (Const.CzechCulture, $"Soubor s filmem je větší než {FilmMaxFileLengthDescription}.")
+            (Const.CzechCulture, $"Soubor s filmem je větší než {FilmMaxFileLengthDescription}."),
+            (Const.SlovakCulture, $"Súbor s filmom je väčší než {FilmMaxFileLengthDescription}.")
         )
     );
 
@@ -387,7 +419,8 @@ public partial class ProjectService
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "The video-annotation file has zero file length."),
-            (Const.CzechCulture, "Soubor s videoanotací má nulovou velikost.")
+            (Const.CzechCulture, "Soubor s videoanotací má nulovou velikost."),
+            (Const.SlovakCulture, "Súbor s videoanotáciou má nulovú veľkosť.")
         )
     );
 
@@ -396,7 +429,8 @@ public partial class ProjectService
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, $"The video-annotation file is larger than {VideoAnnotationMaxFileLengthDescription}."),
-            (Const.CzechCulture, $"Soubor s videoanotací je větší než {VideoAnnotationMaxFileLengthDescription}.")
+            (Const.CzechCulture, $"Soubor s videoanotací je větší než {VideoAnnotationMaxFileLengthDescription}."),
+            (Const.SlovakCulture, $"Súbor s videoanotáciou je väčší než {VideoAnnotationMaxFileLengthDescription}.")
         )
     );
 
@@ -405,7 +439,8 @@ public partial class ProjectService
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "The film file is corrupted."),
-            (Const.CzechCulture, "Soubor s filmem je poškozený.")
+            (Const.CzechCulture, "Soubor s filmem je poškozený."),
+            (Const.SlovakCulture, "Súbor s filmom je poškodený.")
         )
     );
 
@@ -414,7 +449,8 @@ public partial class ProjectService
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "The video-annotation file is corrupted."),
-            (Const.CzechCulture, "Soubor s videoanotací je poškozený.")
+            (Const.CzechCulture, "Soubor s videoanotací je poškozený."),
+            (Const.SlovakCulture, "Súbor s videoanotáciou je poškodený.")
         )
     );
 
@@ -423,7 +459,8 @@ public partial class ProjectService
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "A cover photo file is corrupted."),
-            (Const.CzechCulture, "Některá z titulních fotek je poškozená.")
+            (Const.CzechCulture, "Některá z titulních fotografií je poškozená."),
+            (Const.SlovakCulture, "Niektorá z titulných fotografií je poškodená.")
         )
     );
 
@@ -432,7 +469,8 @@ public partial class ProjectService
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "A subtitles file is corrupted."),
-            (Const.CzechCulture, "Některý ze souborů s titulky je poškozený.")
+            (Const.CzechCulture, "Některý ze souborů s titulky je poškozený."),
+            (Const.SlovakCulture, "Niektorý zo súborov s titulkami je poškodený.")
         )
     );
 
@@ -442,8 +480,10 @@ public partial class ProjectService
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "The film file uses an unsupported format. " +
                 "The supported formats are MP4, M4V, and MKV."),
-            (Const.CzechCulture, "Soubor s filmem použivá nepodporovaný kontejner. " +
-                "Podporovanými kontejnery jsou MP4, M4V a MKV.")
+            (Const.CzechCulture, "Soubor s filmem používá nepodporovaný kontejner. " +
+                "Podporovanými kontejnery jsou MP4, M4V a MKV."),
+            (Const.SlovakCulture, "Súbor s filmom používa nepodporovaný kontajner. " +
+                "Podporovanými kontajnermi sú MP4, M4V a MKV.")
         )
     );
 
@@ -453,8 +493,10 @@ public partial class ProjectService
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "The video-annotation file uses an unsupported format. " +
                 "The supported formats are MP4, M4V, and MKV."),
-            (Const.CzechCulture, "Soubor s videoanotací použivá nepodporovaný kontejner. " +
-                "Podporovanými kontejnery jsou MP4, M4V a MKV.")
+            (Const.CzechCulture, "Soubor s videoanotací používá nepodporovaný kontejner. " +
+                "Podporovanými kontejnery jsou MP4, M4V a MKV."),
+            (Const.SlovakCulture, "Súbor s videoanotáciou používa nepodporovaný kontajner. " +
+                "Podporovanými kontajnermi sú MP4, M4V a MKV.")
         )
     );
 
@@ -464,8 +506,10 @@ public partial class ProjectService
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "The film file uses an unsupported video codec. " +
                 "The supported video codecs are H.264 and MPEG-4 Part 2."),
-            (Const.CzechCulture, "Soubor s filmem použivá nepodporovaný video kodek. " +
+            (Const.CzechCulture, "Soubor s filmem používá nepodporovaný video kodek. " +
                 "Podporovanými video kodeky jsou H.264 a MPEG-4 Part 2.")
+            (Const.SlovakCulture, "Súbor s filmom používa nepodporovaný video kodek. " +
+                "Podporovanými video kodekmi sú H.264 a MPEG-4 Part 2.")
         )
     );
 
@@ -475,8 +519,10 @@ public partial class ProjectService
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "The video-annotation file uses an unsupported video codec. " +
                 "The supported video codecs are H.264 and MPEG-4 Part 2."),
-            (Const.CzechCulture, "Soubor s videoanotací použivá nepodporovaný video kodek. " +
-                "Podporovanými video kodeky jsou H.264 a MPEG-4 Part 2.")
+            (Const.CzechCulture, "Soubor s videoanotací používá nepodporovaný video kodek. " +
+                "Podporovanými video kodeky jsou H.264 a MPEG-4 Part 2."),
+            (Const.SlovakCulture, "Súbor s videoanotáciou používa nepodporovaný video kodek. " +
+                "Podporovanými video kodekmi sú H.264 a MPEG-4 Part 2.")
         )
     );
 
@@ -486,8 +532,10 @@ public partial class ProjectService
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "The film file uses an unsupported audio codec. " +
                 $"The supported audio codecs are AAC, FLAC, and MP3 with bitrate at least {Mp3MinBitrateDescription}."),
-            (Const.CzechCulture, "Soubor s filmem použivá nepodporovaný audio kodek. " +
-                $"Podporovanými audio kodeky jsou AAC, FLAC a MP3 s bitratem alespoň {Mp3MinBitrateDescription}.")
+            (Const.CzechCulture, "Soubor s filmem používá nepodporovaný audio kodek. " +
+                $"Podporovanými audio kodeky jsou AAC, FLAC a MP3 s bitratem alespoň {Mp3MinBitrateDescription}."),
+            (Const.SlovakCulture, "Súbor s filmom používa nepodporovaný audio kodek. " +
+                $"Podporovanými audio kodekmi sú AAC, FLAC a MP3 s bitratom aspoň {Mp3MinBitrateDescription}.")
         )
     );
 
@@ -497,8 +545,10 @@ public partial class ProjectService
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "The video-annotation file uses an unsupported audio codec. " +
                 $"The supported audio codecs are AAC, FLAC, and MP3 with bitrate at least {Mp3MinBitrateDescription}."),
-            (Const.CzechCulture, "Soubor s videoanotací použivá nepodporovaný audio kodek. " +
-                $"Podporovanými audio kodeky jsou AAC, FLAC a MP3 s bitratem alespoň {Mp3MinBitrateDescription}.")
+            (Const.CzechCulture, "Soubor s videoanotací používá nepodporovaný audio kodek. " +
+                $"Podporovanými audio kodeky jsou AAC, FLAC a MP3 s bitratem alespoň {Mp3MinBitrateDescription}."),
+            (Const.SlovakCulture, "Súbor s videoanotáciou používa nepodporovaný audio kodek. " +
+                $"Podporovanými audio kodekmi sú AAC, FLAC a MP3 s bitratom aspoň {Mp3MinBitrateDescription}.")
         )
     );
 
@@ -507,7 +557,8 @@ public partial class ProjectService
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, $"The bitrate of the MP3 audio in the film file must be at least {Mp3MinBitrateDescription}."),
-            (Const.CzechCulture, $"Bitrate MP3 audia v souboru s filmem musí být alespoň {Mp3MinBitrateDescription}.")
+            (Const.CzechCulture, $"Bitrate MP3 audia v souboru s filmem musí být alespoň {Mp3MinBitrateDescription}."),
+            (Const.SlovakCulture, $"Bitrate MP3 audia v súbore s filmom musí byť aspoň {Mp3MinBitrateDescription}.")
         )
     );
 
@@ -516,7 +567,8 @@ public partial class ProjectService
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, $"The bitrate of the MP3 audio in the video-annotation file must be at least {Mp3MinBitrateDescription}."),
-            (Const.CzechCulture, $"Bitrate MP3 audia v souboru s videoanotací musí být alespoň {Mp3MinBitrateDescription}.")
+            (Const.CzechCulture, $"Bitrate MP3 audia v souboru s videoanotací musí být alespoň {Mp3MinBitrateDescription}."),
+            (Const.SlovakCulture, $"Bitrate MP3 audia v súbore s videoanotáciou musí byť aspoň {Mp3MinBitrateDescription}.")
         )
     );
 
@@ -525,7 +577,8 @@ public partial class ProjectService
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, $"The film file has an unsupported framerate. The required framerate is {RequiredFramerateDescriptionEnglish}."),
-            (Const.CzechCulture, $"Soubor s filmem má nepodporovaný framerate. Vyžadovaný framerate je {RequiredFramerateDescriptionCzech}.")
+            (Const.CzechCulture, $"Soubor s filmem má nepodporovaný framerate. Vyžadovaný framerate je {RequiredFramerateDescriptionCzech}."),
+            (Const.SlovakCulture, $"Súbor s filmom má nepodporovaný framerate. Vyžadovaný framerate je {RequiredFramerateDescriptionCzech}.")
         )
     );
 
@@ -534,7 +587,8 @@ public partial class ProjectService
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, $"The video-annotation file has an unsupported framerate. The required framerate is {RequiredFramerateDescriptionEnglish}."),
-            (Const.CzechCulture, $"Soubor s videoanotací má nepodporovaný framerate. Vyžadovaný framerate je {RequiredFramerateDescriptionCzech}.")
+            (Const.CzechCulture, $"Soubor s videoanotací má nepodporovaný framerate. Vyžadovaný framerate je {RequiredFramerateDescriptionCzech}."),
+            (Const.SlovakCulture, $"Súbor s videoanotáciou má nepodporovaný framerate. Vyžadovaný framerate je {RequiredFramerateDescriptionCzech}.")
         )
     );
 
@@ -543,7 +597,8 @@ public partial class ProjectService
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "The film file must have only one video stream and one audio stream."),
-            (Const.CzechCulture, "Soubor s filmem musí mít pouze jeden video stream a jeden audio stream.")
+            (Const.CzechCulture, "Soubor s filmem musí mít pouze jeden video stream a jeden audio stream."),
+            (Const.SlovakCulture, "Súbor s filmom musí mať iba jeden video stream a jeden audio stream.")
         )
     );
 
@@ -552,7 +607,8 @@ public partial class ProjectService
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "The video-annotation file must have only one video stream and one audio stream."),
-            (Const.CzechCulture, "Soubor s videoanotací musí mít pouze jeden video stream a jeden audio stream.")
+            (Const.CzechCulture, "Soubor s videoanotací musí mít pouze jeden video stream a jeden audio stream."),
+            (Const.SlovakCulture, "Súbor s videoanotáciou musí mať iba jeden video stream a jeden audio stream.")
         )
     );
 
@@ -561,7 +617,8 @@ public partial class ProjectService
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, $"The film file must have a shorter-side resolution of at least {VideoShorterSideResolution} pixels."),
-            (Const.CzechCulture, $"Soubor s filmem musí mít na kratší straně rozlišení alespoň {VideoShorterSideResolution} pixelů.")
+            (Const.CzechCulture, $"Soubor s filmem musí mít na kratší straně rozlišení alespoň {VideoShorterSideResolution} pixelů."),
+            (Const.SlovakCulture, $"Súbor s filmom musí mať na kratšej strane rozlíšenie aspoň {VideoShorterSideResolution} pixelov.")
         )
     );
 
@@ -570,7 +627,8 @@ public partial class ProjectService
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, $"The video-annotation file must have a shorter-side resolution of at least {VideoShorterSideResolution} pixels."),
-            (Const.CzechCulture, $"Soubor s videoanotací musí mít na kratší straně rozlišení alespoň {VideoShorterSideResolution} pixelů.")
+            (Const.CzechCulture, $"Soubor s videoanotací musí mít na kratší straně rozlišení alespoň {VideoShorterSideResolution} pixelů."),
+            (Const.SlovakCulture, $"Súbor s videoanotáciou musí mať na kratšej strane rozlíšenie aspoň {VideoShorterSideResolution} pixelov.")
         )
     );
 
@@ -579,7 +637,8 @@ public partial class ProjectService
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, $"All cover photo images must have a shorter-side resolution of at least {CoverPhotoShorterSideResolution}."),
-            (Const.CzechCulture, $"Všechny titulní fotky musí mít na kratší straně rozlišení alespoň {CoverPhotoShorterSideResolution} pixelů.")
+            (Const.CzechCulture, $"Všechny titulní fotografie musí mít na kratší straně rozlišení alespoň {CoverPhotoShorterSideResolution} pixelů."),
+            (Const.SlovakCulture, $"Všetky titulné fotografie musia mať na kratšej strane rozlíšenie aspoň {CoverPhotoShorterSideResolution} pixelov.")
         )
     );
 
@@ -588,7 +647,8 @@ public partial class ProjectService
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, $"All cover photo images must be in the JPEG or PNG format."),
-            (Const.CzechCulture, $"Všechny titulní fotky musí být buď ve formátu JPEG, nebo PNG.")
+            (Const.CzechCulture, $"Všechny titulní fotografie musí být buď ve formátu JPEG, nebo PNG."),
+            (Const.SlovakCulture, $"Všetky titulné fotografie musia byť buď vo formáte JPEG, alebo PNG.")
         )
     );
 
@@ -597,7 +657,8 @@ public partial class ProjectService
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, $"All subtitles must be in the SRT or ASS format."),
-            (Const.CzechCulture, $"Všechny titulky musí být buď ve formátu SRT, nebo ASS.")
+            (Const.CzechCulture, $"Všechny titulky musí být buď ve formátu SRT, nebo ASS."),
+            (Const.SlovakCulture, $"Všetky titulky musia byť buď vo formáte SRT, alebo ASS.")
         )
     );
 
@@ -606,7 +667,8 @@ public partial class ProjectService
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, $"The film file must have a bitrate between {VideoMinBitrateDescription} and {VideoMaxBitrateDescription}."),
-            (Const.CzechCulture, $"Soubor s filmem musí mít bitrate mezi {VideoMinBitrateDescription} a {VideoMaxBitrateDescription}.")
+            (Const.CzechCulture, $"Soubor s filmem musí mít bitrate mezi {VideoMinBitrateDescription} a {VideoMaxBitrateDescription}."),
+            (Const.SlovakCulture, $"Súbor s filmom musí mať bitrate medzi {VideoMinBitrateDescription} a {VideoMaxBitrateDescription}.")
         )
     );
 
@@ -615,7 +677,8 @@ public partial class ProjectService
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, $"The video-annotation file must have a bitrate between {VideoMinBitrateDescription} and {VideoMaxBitrateDescription}."),
-            (Const.CzechCulture, $"Soubor s videoanotací musí mít bitrate mezi {VideoMinBitrateDescription} a {VideoMaxBitrateDescription}.")
+            (Const.CzechCulture, $"Soubor s videoanotací musí mít bitrate mezi {VideoMinBitrateDescription} a {VideoMaxBitrateDescription}."),
+            (Const.SlovakCulture, $"Súbor s videoanotáciou musí mať bitrate medzi {VideoMinBitrateDescription} a {VideoMaxBitrateDescription}.")
         )
     );
 
@@ -624,7 +687,8 @@ public partial class ProjectService
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, $"The film subtites have an unsupported format. The supported formats are SRT and ASS."),
-            (Const.CzechCulture, $"Titulky k filmu mají nepodporovaný formát. Podporovanými formáty jsou SRT a ASS.")
+            (Const.CzechCulture, $"Titulky k filmu mají nepodporovaný formát. Podporovanými formáty jsou SRT a ASS."),
+            (Const.SlovakCulture, $"Titulky k filmu majú nepodporovaný formát. Podporovanými formátmi sú SRT a ASS.")
         )
     );
 
@@ -633,7 +697,8 @@ public partial class ProjectService
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, $"The video-annotation subtites have an unsupported format. The supported formats are SRT and ASS."),
-            (Const.CzechCulture, $"Titulky k videoanotaci mají nepodporovaný formát. Podporovanými formáty jsou SRT a ASS.")
+            (Const.CzechCulture, $"Titulky k videoanotaci mají nepodporovaný formát. Podporovanými formáty jsou SRT a ASS."),
+            (Const.SlovakCulture, $"Titulky k videoanotácii majú nepodporovaný formát. Podporovanými formátmi sú SRT a ASS.")
         )
     );
 
@@ -642,7 +707,8 @@ public partial class ProjectService
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, $"A cover photo is missing the image file."),
-            (Const.CzechCulture, $"Některé z titulních fotek chybí obrazový soubor.")
+            (Const.CzechCulture, $"Některým z titulních fotografií chybí obrazový soubor."),
+            (Const.SlovakCulture, $"Niektorým z titulných fotografií chýba obrazový súbor.")
         )
     );
 
@@ -651,7 +717,8 @@ public partial class ProjectService
     ValidationStage: FileStage,
     Message: LocalizedString.Create(
         (Const.InvariantCulture, $"Some subtitles are missing the subtitles file."),
-        (Const.CzechCulture, $"Některým z titulků chybí soubor s titulky.")
+        (Const.CzechCulture, $"Některým z titulků chybí soubor s titulky."),
+        (Const.SlovakCulture, $"Niektorým z titulkiek chýba súbor s titulkami.")
     )
 );
 
@@ -661,7 +728,9 @@ public partial class ProjectService
         Message: LocalizedString.Create(
             (Const.InvariantCulture, $"All cover photos must have aspect ratio between " +
                 $"{CoverPhotoMinRatioDescription} and {CoverPhotoMaxRatioDescription}."),
-            (Const.CzechCulture, $"Všechny titulní fotky musí mít poměr stran mezi " +
+            (Const.CzechCulture, $"Všechny titulní fotografie musí mít poměr stran mezi " +
+                $"{CoverPhotoMinRatioDescription} a {CoverPhotoMaxRatioDescription}.")
+            (Const.SlovakCulture, $"Všetky titulné fotografie musia mať pomer strán medzi " +
                 $"{CoverPhotoMinRatioDescription} a {CoverPhotoMaxRatioDescription}.")
         )
     );
@@ -671,7 +740,8 @@ public partial class ProjectService
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "At least one blend file is required."),
-            (Const.CzechCulture, "Je vyžadován alespoň jeden blend soubor.")
+            (Const.CzechCulture, "Je vyžadován alespoň jeden blend soubor."),
+            (Const.SlovakCulture, "Je vyžadovaný aspoň jeden blend súbor.")
         )
     );
 
@@ -680,7 +750,8 @@ public partial class ProjectService
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "Too many blend files have been provided."),
-            (Const.CzechCulture, "Projekt obsahuje příliš mnoho blend souborů.")
+            (Const.CzechCulture, "Projekt obsahuje příliš mnoho blend souborů."),
+            (Const.SlovakCulture, "Projekt obsahuje príliš veľa blend súborov.")
         )
     );
 
@@ -689,7 +760,8 @@ public partial class ProjectService
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "At least one rendered image is required."),
-            (Const.CzechCulture, "Je vyžadován alespoň jeden renderovaný obrázek.")
+            (Const.CzechCulture, "Je vyžadován alespoň jeden renderovaný obrázek."),
+            (Const.SlovakCulture, "Je vyžadovaný aspoň jeden renderovaný obrázok.")
         )
     );
 
@@ -698,7 +770,8 @@ public partial class ProjectService
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "Too many rendered images have been provided."),
-            (Const.CzechCulture, "Projekt obsahuje příliš mnoho renderovaných obrázků.")
+            (Const.CzechCulture, "Projekt obsahuje příliš mnoho renderovaných obrázků."),
+            (Const.SlovakCulture, "Projekt obsahuje príliš veľa renderovaných obrázkov.")
         )
     );
 
@@ -707,7 +780,8 @@ public partial class ProjectService
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "At least one rendered animation is required."),
-            (Const.CzechCulture, "Je vyžadována alespoň jedna renderovaná animace.")
+            (Const.CzechCulture, "Je vyžadována alespoň jedna renderovaná animace."),
+            (Const.SlovakCulture, "Je vyžadovaná aspoň jedna renderovaná animácia.")
         )
     );
 
@@ -717,6 +791,7 @@ public partial class ProjectService
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "Too many rendered animations have been provided."),
             (Const.CzechCulture, "Projekt obsahuje příliš mnoho renderovaných animací.")
+            (Const.SlovakCulture, "Projekt obsahuje príliš veľa renderovaných animácií.")
         )
     );
 
@@ -725,7 +800,8 @@ public partial class ProjectService
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "At least one texture is required."),
-            (Const.CzechCulture, "Je vyžadována alespoň jedna textura.")
+            (Const.CzechCulture, "Je vyžadována alespoň jedna textura."),
+            (Const.SlovakCulture, "Je vyžadovaná aspoň jedna textúra.")
         )
     );
 
@@ -734,7 +810,8 @@ public partial class ProjectService
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "Too many textures have been provided."),
-            (Const.CzechCulture, "Projekt obsahuje příliš mnoho textur.")
+            (Const.CzechCulture, "Projekt obsahuje příliš mnoho textur."),
+            (Const.SlovakCulture, "Projekt obsahuje príliš veľa textúr.")
         )
     );
     public static readonly Diagnostic MissingPigeonsTestResult = new Diagnostic(
@@ -742,7 +819,8 @@ public partial class ProjectService
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "PIGEOnS test result cannot be found."),
-            (Const.CzechCulture, "Výsledek PIGEOnS testu nelze nalézt.")
+            (Const.CzechCulture, "Výsledek PIGEOnS testu nelze nalézt."),
+            (Const.SlovakCulture, "Výsledok PIGEOnS testu nemožno nájsť.")
         )
     );
 
@@ -751,7 +829,8 @@ public partial class ProjectService
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "PIGEOnS test result is of incorrect format."),
-            (Const.CzechCulture, "Výsledek PIGEOnS testu má nesprávný formát.")
+            (Const.CzechCulture, "Výsledek PIGEOnS testu má nesprávný formát."),
+            (Const.SlovakCulture, "Výsledok PIGEOnS testu má nesprávny formát.")
         )
     );
 
@@ -918,19 +997,6 @@ public partial class ProjectService
             || (group.OrganizationId == "mate-fimuni" && project.OwnerId is null))
         {
             diagnostics.Add(MissingCrew);
-        }
-
-        if (group.OrganizationId == "lemmafimuni")
-        {
-            if (project.Authors.Count(a => a.Kind == ProjectAuthorKind.Crew && a.Roles.IsEmpty) > 0)
-            {
-                diagnostics.Add(MissingCrewRoles);
-            }
-
-            if (!LemmaMandatoryCrewRoles.IsSubsetOf(project.Authors.Select(a => a.Roles.ToImmutableHashSet()).SelectMany(roles => roles).ToImmutableHashSet()))
-            {
-                diagnostics.Add(MissingMandatoryRoles);
-            }
         }
 
         var artifactBlueprints = projectBlueprint.ArtifactBlueprints;
@@ -1445,7 +1511,8 @@ public partial class ProjectService
                     ValidationStage: PigeonsTestStage,
                     Message: LocalizedString.Create(
                         (Const.InvariantCulture, $"PIGEOnS test could not be run: {variant.Error}"),
-                        (Const.CzechCulture, $"PIGEOnS test nemohl být spuštěn: {variant.Error}")
+                        (Const.CzechCulture, $"PIGEOnS test nemohl být spuštěn: {variant.Error}"),
+                        (Const.SlovakCulture, $"PIGEOnS test nemohol byť spustený: {variant.Error}")
                     )
                 );
                 yield break;

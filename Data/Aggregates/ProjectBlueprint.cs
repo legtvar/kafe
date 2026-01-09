@@ -19,7 +19,8 @@ public record ProjectBlueprint
                 {
                     Name = LocalizedString.Create(
                         (Const.InvariantCulture, "Film"),
-                        (Const.CzechCulture, "Film")
+                        (Const.CzechCulture, "Film"),
+                        (Const.SlovakCulture, "Film")
                     ),
                     Description = null,
                     Arity = ArgumentArity.ExactlyOne,
@@ -30,7 +31,8 @@ public record ProjectBlueprint
                             {
                                 Name = LocalizedString.Create(
                                     (Const.InvariantCulture, "Film file"),
-                                    (Const.CzechCulture, "Soubor s filmem")
+                                    (Const.CzechCulture, "Soubor s filmem"),
+                                    (Const.SlovakCulture, "Súbor s filmom")
                                 ),
                                 Description = null,
                                 Arity = ArgumentArity.ExactlyOne
@@ -40,7 +42,8 @@ public record ProjectBlueprint
                             {
                                 Name = LocalizedString.Create(
                                     (Const.InvariantCulture, "Subtitles"),
-                                    (Const.CzechCulture, "Titulky")
+                                    (Const.CzechCulture, "Titulky"),
+                                    (Const.SlovakCulture, "Titulky")
                                 ),
                                 Description = LocalizedString.Create(
                                     (
@@ -50,8 +53,13 @@ public record ProjectBlueprint
                                     ),
                                     (
                                         Const.CzechCulture,
-                                        "Anglické titulky, pokud je film v češtině nebo slovenštine, " +
+                                        "Anglické titulky, pokud je film v češtině nebo slovenštině, " +
                                         "nebo české/slovenské titulky, pokud je film v angličtině."
+                                    ),
+                                    (
+                                        Const.SlovakCulture,
+                                        "Anglické titulky, ak je film v češtine alebo slovenčine, " +
+                                        "alebo české/slovenské titulky, ak je film v angličtine."
                                     )
                                 ),
                                 Arity = ArgumentArity.ExactlyOne
@@ -64,7 +72,8 @@ public record ProjectBlueprint
                 {
                     Name = LocalizedString.Create(
                         (Const.InvariantCulture, "Video-annotation"),
-                        (Const.CzechCulture, "Videoanotace")
+                        (Const.CzechCulture, "Videoanotace"),
+                        (Const.SlovakCulture, "Videoanotácia")
                     ),
                     Description = null,
                     Arity = ArgumentArity.ZeroOrOne,
@@ -75,7 +84,8 @@ public record ProjectBlueprint
                             {
                                 Name = LocalizedString.Create(
                                     (Const.InvariantCulture, "Video-annotation file"),
-                                    (Const.CzechCulture, "Soubor s videoanotací")
+                                    (Const.CzechCulture, "Soubor s videoanotací"),
+                                    (Const.SlovakCulture, "Súbor s videoanotáciou")
                                 ),
                                 Description = null,
                                 Arity = ArgumentArity.ExactlyOne
@@ -85,7 +95,8 @@ public record ProjectBlueprint
                             {
                                 Name = LocalizedString.Create(
                                     (Const.InvariantCulture, "Subtitles"),
-                                    (Const.CzechCulture, "Titulky")
+                                    (Const.CzechCulture, "Titulky"),
+                                    (Const.SlovakCulture, "Titulky")
                                 ),
                                 Description = LocalizedString.Create(
                                     (
@@ -95,8 +106,13 @@ public record ProjectBlueprint
                                     ),
                                     (
                                         Const.CzechCulture,
-                                        "Anglické titulky, pokud je film v češtině nebo slovenštine, " +
+                                        "Anglické titulky, pokud je film v češtině nebo slovenštině, " +
                                         "nebo české/slovenské titulky, pokud je film v angličtině."
+                                    ),
+                                    (
+                                        Const.SlovakCulture,
+                                        "Anglické titulky, ak je film v češtine alebo slovenčine, " +
+                                        "alebo české/slovenské titulky, ak je film v angličtine."
                                     )
                                 ),
                                 Arity = ArgumentArity.ExactlyOne
@@ -109,7 +125,8 @@ public record ProjectBlueprint
                 {
                     Name = LocalizedString.Create(
                         (Const.InvariantCulture, "Cover photo"),
-                        (Const.CzechCulture, "Titulní fotografie")
+                        (Const.CzechCulture, "Titulní fotografie"),
+                        (Const.SlovakCulture, "Titulná fotografia")
                     ),
                     Description = null,
                     Arity = new ArgumentArity(Const.CoverPhotoMinCount, Const.CoverPhotoMaxCount),
@@ -119,7 +136,8 @@ public record ProjectBlueprint
                             {
                                 Name = LocalizedString.Create(
                                     (Const.InvariantCulture, "Cover photo file"),
-                                    (Const.CzechCulture, "Soubor s titulní fotografií")
+                                    (Const.CzechCulture, "Soubor s titulní fotografií"),
+                                    (Const.SlovakCulture, "Súbor s titulnou fotografiou")
                                 ),
                                 Description = null,
                                 Arity = ArgumentArity.ExactlyOne
@@ -138,7 +156,8 @@ public record ProjectBlueprint
                 {
                     Name = LocalizedString.Create(
                         (Const.InvariantCulture, "3D Model"),
-                        (Const.CzechCulture, "3D model")
+                        (Const.CzechCulture, "3D model"),
+                        (Const.SlovakCulture, "3D model")
                     ),
                     Description = null,
                     Arity = ArgumentArity.OneOrMore,
@@ -148,7 +167,8 @@ public record ProjectBlueprint
                             {
                                 Name = LocalizedString.Create(
                                     (Const.InvariantCulture, "Blend file"),
-                                    (Const.CzechCulture, "Blend soubor")
+                                    (Const.CzechCulture, "Blend soubor"),
+                                    (Const.SlovakCulture, "Blend súbor")
                                 ),
                                 Description = null,
                                 Arity = ArgumentArity.ExactlyOne
@@ -163,6 +183,7 @@ public record ProjectBlueprint
                     Name = LocalizedString.Create(
                         (Const.InvariantCulture, "Rendered images"),
                         (Const.CzechCulture, "Vyrenderované obrázky")
+                        (Const.SlovakCulture, "Vyrenderované obrázky")
                     ),
                     Description = null,
                     Arity = ArgumentArity.OneOrMore,
@@ -172,7 +193,8 @@ public record ProjectBlueprint
                             {
                                 Name = LocalizedString.Create(
                                     (Const.InvariantCulture, "Rendered image"),
-                                    (Const.CzechCulture, "Vyrenderovaný obrázek")
+                                    (Const.CzechCulture, "Vyrenderovaný obrázek"),
+                                    (Const.SlovakCulture, "Vyrenderovaný obrázok")
                                 ),
                                 Description = null,
                                 Arity = ArgumentArity.ExactlyOne
@@ -186,7 +208,8 @@ public record ProjectBlueprint
                 {
                     Name = LocalizedString.Create(
                         (Const.InvariantCulture, "Rendered animations"),
-                        (Const.CzechCulture, "Vyrenderované animace")
+                        (Const.CzechCulture, "Vyrenderované animace"),
+                        (Const.SlovakCulture, "Vyrenderované animácie")
                     ),
                     Description = null,
                     Arity = ArgumentArity.ZeroOrMore,
@@ -196,7 +219,8 @@ public record ProjectBlueprint
                             {
                                 Name = LocalizedString.Create(
                                     (Const.InvariantCulture, "Animation render"),
-                                    (Const.CzechCulture, "Vyrendrovaná animace")
+                                    (Const.CzechCulture, "Vyrendrovaná animace"),
+                                    (Const.SlovakCulture, "Vyrenderovaná animácia")
                                 ),
                                 Description = null,
                                 Arity = ArgumentArity.ExactlyOne
@@ -210,7 +234,8 @@ public record ProjectBlueprint
                 {
                     Name = LocalizedString.Create(
                         (Const.InvariantCulture, "Textures and other images"),
-                        (Const.CzechCulture, "Textury a ostatní obrázky")
+                        (Const.CzechCulture, "Textury a ostatní obrázky"),
+                        (Const.SlovakCulture, "Textúry a ostatné obrázky")
                     ),
                     Description = null,
                     Arity = ArgumentArity.ZeroOrMore,
@@ -220,7 +245,8 @@ public record ProjectBlueprint
                             {
                                 Name = LocalizedString.Create(
                                     (Const.InvariantCulture, "Texture/other image"),
-                                    (Const.CzechCulture, "Textura/ostatní obrázek")
+                                    (Const.CzechCulture, "Textura/ostatní obrázek"),
+                                    (Const.SlovakCulture, "Textúra/ostatný obrázok")
                                 ),
                                 Description = null,
                                 Arity = ArgumentArity.ExactlyOne

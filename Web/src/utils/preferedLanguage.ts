@@ -16,7 +16,7 @@ export function preferedLanguage() {
     switch (i18next.language) {
         case 'cs':
         case 'sk':
-            return 'cs';
+            return i18next.language;
         default:
             return 'en';
     }

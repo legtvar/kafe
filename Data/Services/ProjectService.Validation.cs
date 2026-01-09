@@ -241,16 +241,21 @@ public partial class ProjectService
         ValidationStage: InfoStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "At least one crew member is missing crew roles."),
-            (Const.CzechCulture, "Každý člen štábu musí mít alespoň jednu roli.")
+            (Const.CzechCulture, "Každý člen štábu musí mít alespoň jednu roli."),
+            (Const.SlovakCulture, "Každý člen štábu musí mať aspoň jednu rolu.")
         )
     );
 
-    public static readonly Diagnostic MissingMandatoryRoles = new Diagnostic(
+    public static readonly Diagnostic MissingMandatoryCrewRoles = new Diagnostic(
         Kind: DiagnosticKind.Error,
         ValidationStage: InfoStage,
         Message: LocalizedString.Create(
-            (Const.InvariantCulture, "The project's crew is missing some of the mandatory roles: Director, Story, Screenwriter, Producer."),
-            (Const.CzechCulture, "Štábu projektu chybí některé z povinných rolí: Režisér, Námět, Scenárista, Producent.")
+            (Const.InvariantCulture, "The project's crew is missing some of the mandatory roles: " +
+                "Director, Story, Screenwriter, Producer."),
+            (Const.CzechCulture, "Štábu projektu chybí některé z povinných rolí: " +
+                "Režie, Námět, Scénář, Produkce."),
+            (Const.SlovakCulture, "Štábu projektu chýbajú niektoré z povinných rolí: " +
+                "Réžia, Námet, Scenár, Produkcia.")
         )
     );
 
@@ -887,7 +892,7 @@ public partial class ProjectService
 
             if (!LemmaMandatoryCrewRoles.IsSubsetOf(project.Authors.Select(a => a.Roles.ToImmutableHashSet()).SelectMany(roles => roles).ToImmutableHashSet()))
             {
-                diagnostics.Add(MissingMandatoryRoles);
+                diagnostics.Add(MissingMandatoryCrewRoles);
             }
         }
 
@@ -997,6 +1002,19 @@ public partial class ProjectService
             || (group.OrganizationId == "mate-fimuni" && project.OwnerId is null))
         {
             diagnostics.Add(MissingCrew);
+        }
+
+        if (group.OrganizationId == "lemmafimuni")
+        {
+            if (project.Authors.Count(a => a.Kind == ProjectAuthorKind.Crew && a.Roles.IsEmpty) > 0)
+            {
+                diagnostics.Add(MissingCrewRoles);
+            }
+
+            if (!LemmaMandatoryCrewRoles.IsSubsetOf(project.Authors.Select(a => a.Roles.ToImmutableHashSet()).SelectMany(roles => roles).ToImmutableHashSet()))
+            {
+                diagnostics.Add(MissingMandatoryCrewRoles);
+            }
         }
 
         var artifactBlueprints = projectBlueprint.ArtifactBlueprints;

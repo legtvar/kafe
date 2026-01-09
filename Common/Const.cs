@@ -83,10 +83,12 @@ public static class Const
 
         UnknownAuthor = LocalizedString.Create(
             (InvariantCulture, "Unknown author"),
-            (CzechCulture, "Neznámý autor"));
+            (CzechCulture, "Neznámý autor"),
+            (SlovakCulture, "Neznámy autor"));
         UnknownProjectGroup = LocalizedString.Create(
             (InvariantCulture, "Unknown project group"),
-            (CzechCulture, "Neznámá skupina projektů"));
+            (CzechCulture, "Neznámá skupina projektů"),
+            (SlovakCulture, "Neznáma skupina projektov"));
         ConfirmationEmailSubject = LocalizedString.Create(
             (InvariantCulture, "Login Request"),
             (CzechCulture, "Přihlášení"),
@@ -200,7 +202,7 @@ Vaše KAFE
             LocalizedString.Create(
                 (InvariantCulture, "So long, and thanks for all the fish."),
                 (CzechCulture, "Sbohem a díky za všechny ryby."),
-                (SlovakCulture, "Zbohom a ďakujeme za ryby")),
+                (SlovakCulture, "Zbohom a ďakujeme za všetky ryby")),
             LocalizedString.Create(
                 (InvariantCulture, "To infinity and beyond!"),
                 (CzechCulture, "Do nekonečna a ještě dál!"),
@@ -213,22 +215,26 @@ Vaše KAFE
 
         CzechLanguageName = LocalizedString.Create(
             (InvariantCulture, "Czech"),
-            (CzechCulture, "čeština")
+            (CzechCulture, "čeština"),
+            (SlovakCulture, "čeština")
         );
 
         CzechOrSlovakLanguageName = LocalizedString.Create(
             (InvariantCulture, "Czech or Slovak"),
-            (CzechCulture, "čeština nebo slovenština")
+            (CzechCulture, "čeština nebo slovenština"),
+            (SlovakCulture, "čeština alebo slovenčina")
         );
 
         EnglishLanguageName = LocalizedString.Create(
             (InvariantCulture, "English"),
-            (CzechCulture, "angličtina")
+            (CzechCulture, "angličtina"),
+            (SlovakCulture, "angličtina")
         );
 
         InvariantLanguageName = LocalizedString.Create(
             (InvariantCulture, "international"),
-            (CzechCulture, "mezinárodní")
+            (CzechCulture, "mezinárodní"),
+            (SlovakCulture, "medzinárodný")
         );
     }
 

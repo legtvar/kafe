@@ -182,7 +182,7 @@ public record ProjectBlueprint
                 {
                     Name = LocalizedString.Create(
                         (Const.InvariantCulture, "Rendered images"),
-                        (Const.CzechCulture, "Vyrenderované obrázky")
+                        (Const.CzechCulture, "Vyrenderované obrázky"),
                         (Const.SlovakCulture, "Vyrenderované obrázky")
                     ),
                     Description = null,

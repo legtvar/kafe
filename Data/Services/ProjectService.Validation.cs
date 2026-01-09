@@ -507,7 +507,7 @@ public partial class ProjectService
             (Const.InvariantCulture, "The film file uses an unsupported video codec. " +
                 "The supported video codecs are H.264 and MPEG-4 Part 2."),
             (Const.CzechCulture, "Soubor s filmem používá nepodporovaný video kodek. " +
-                "Podporovanými video kodeky jsou H.264 a MPEG-4 Part 2.")
+                "Podporovanými video kodeky jsou H.264 a MPEG-4 Part 2."),
             (Const.SlovakCulture, "Súbor s filmom používa nepodporovaný video kodek. " +
                 "Podporovanými video kodekmi sú H.264 a MPEG-4 Part 2.")
         )
@@ -729,7 +729,7 @@ public partial class ProjectService
             (Const.InvariantCulture, $"All cover photos must have aspect ratio between " +
                 $"{CoverPhotoMinRatioDescription} and {CoverPhotoMaxRatioDescription}."),
             (Const.CzechCulture, $"Všechny titulní fotografie musí mít poměr stran mezi " +
-                $"{CoverPhotoMinRatioDescription} a {CoverPhotoMaxRatioDescription}.")
+                $"{CoverPhotoMinRatioDescription} a {CoverPhotoMaxRatioDescription}."),
             (Const.SlovakCulture, $"Všetky titulné fotografie musia mať pomer strán medzi " +
                 $"{CoverPhotoMinRatioDescription} a {CoverPhotoMaxRatioDescription}.")
         )
@@ -790,7 +790,7 @@ public partial class ProjectService
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "Too many rendered animations have been provided."),
-            (Const.CzechCulture, "Projekt obsahuje příliš mnoho renderovaných animací.")
+            (Const.CzechCulture, "Projekt obsahuje příliš mnoho renderovaných animací."),
             (Const.SlovakCulture, "Projekt obsahuje príliš veľa renderovaných animácií.")
         )
     );

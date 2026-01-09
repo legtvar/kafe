@@ -13,7 +13,7 @@ interface IProjectAuthorListProps {
     editable?: boolean;
     requestDetails?: boolean;
     onRemove?: (id: HRIB) => void;
-    isCrewList?: boolean
+    isDropdownCrewList?: boolean
 }
 
 function ProjectAuthorListAwaiter(
@@ -43,7 +43,7 @@ function SimpleProjectAuthorList({
     author,
     onRemove,
     editable,
-    isCrewList
+    isDropdownCrewList
 }: { author: components['schemas']['ProjectAuthorDto'] } & Omit<IProjectAuthorListProps, 'authors'>) {
     return (
         // TODO: Uncomment when back-end is ready
@@ -53,7 +53,7 @@ function SimpleProjectAuthorList({
             <VStack alignItems="start" pl={2} spacing={0}>
                 <Text fontWeight="bolder">{author.name}</Text>
                 <Text color="gray.500">
-                    {(isCrewList ?
+                    {(isDropdownCrewList ?
                     author.roles.map(role => t(`createProject.fields.crewRoles.${role}`)) :
                     author.roles)
                     .join(', ')}

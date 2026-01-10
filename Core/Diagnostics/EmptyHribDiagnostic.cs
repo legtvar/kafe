@@ -2,16 +2,16 @@ namespace Kafe.Core.Diagnostics;
 
 public record EmptyHribDiagnostic : IDiagnosticPayload
 {
-    public static string Moniker { get; } = "empty-hrib";
+    public static string Moniker => "empty-hrib";
 
-    public static DiagnosticSeverity DefaultSeverity { get; } = DiagnosticSeverity.Error;
+    public static DiagnosticSeverity Severity => DiagnosticSeverity.Error;
 
-    public static readonly LocalizedString Title = LocalizedString.Create(
+    public static LocalizedString Title { get; } = LocalizedString.Create(
         (Const.InvariantCulture, "Empty HRIB"),
         (Const.CzechCulture, "Prázdný HRIB")
     );
 
-    public static readonly LocalizedString MessageFormat = LocalizedString.Create(
+    public static LocalizedString MessageFormat { get; } = LocalizedString.Create(
         (Const.InvariantCulture, "This identifier must not be empty."),
         (Const.CzechCulture, "Tento identifikátor nesmí být prázdný.")
     );

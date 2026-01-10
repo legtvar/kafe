@@ -2,16 +2,16 @@ namespace Kafe.Core.Diagnostics;
 
 public record RequiredDiagnostic : IDiagnosticPayload
 {
-    public static string Moniker { get; } = "required";
+    public static string Moniker => "required";
 
-    public static DiagnosticSeverity DefaultSeverity { get; } = DiagnosticSeverity.Error;
+    public static DiagnosticSeverity Severity => DiagnosticSeverity.Error;
 
-    public static readonly LocalizedString Title = LocalizedString.Create(
+    public static LocalizedString Title { get; } = LocalizedString.Create(
         (Const.InvariantCulture, "Required Value"),
         (Const.CzechCulture, "Povinná hodnota")
     );
 
-    public static readonly LocalizedString MessageFormat = LocalizedString.Create(
+    public static LocalizedString MessageFormat { get; } = LocalizedString.Create(
         (Const.InvariantCulture, "This value must be provided as it is required."),
         (Const.CzechCulture, "Tato hodnota musí být vyplněna, jelikož je povinná.")
     );

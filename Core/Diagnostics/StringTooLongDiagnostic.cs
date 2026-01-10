@@ -5,15 +5,15 @@ public record StringTooLongDiagnostic(
     int MaxLength
 ) : IDiagnosticPayload
 {
-    public static string Moniker { get; } = "string-too-long";
-    public static DiagnosticSeverity DefaultSeverity { get; } = DiagnosticSeverity.Error;
+    public static string Moniker => "string-too-long";
+    public static DiagnosticSeverity Severity => DiagnosticSeverity.Error;
 
-    public static readonly LocalizedString Title = LocalizedString.Create(
+    public static LocalizedString Title { get; } = LocalizedString.Create(
         (Const.InvariantCulture, "String Too Long"),
         (Const.CzechCulture, "Příliš dlouhý řetězec")
     );
 
-    public static readonly LocalizedString MessageFormat = LocalizedString.Create(
+    public static LocalizedString MessageFormat { get; } = LocalizedString.Create(
         (
             Const.InvariantCulture,
             "String '{Value}' is too long. Maximum allowed length is {MaxLength} characters (inclusive)."

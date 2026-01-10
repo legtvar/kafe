@@ -9,15 +9,15 @@ public record MediaBitrateTooLowDiagnostic(
     int Min
 ) : IDiagnosticPayload
 {
-    public static string Moniker { get; } = "media-bitrate-too-low";
-    public static DiagnosticSeverity DefaultSeverity { get; } = DiagnosticSeverity.Error;
+    public static string Moniker => "media-bitrate-too-low";
+    public static DiagnosticSeverity Severity => DiagnosticSeverity.Error;
 
-    public static readonly LocalizedString Title = LocalizedString.Create(
+    public static LocalizedString Title { get; } = LocalizedString.Create(
         (Const.InvariantCulture, "Media Bitrate Too Low"),
         (Const.CzechCulture, "Médium má příliš nízký bitrate")
     );
 
-    public static readonly LocalizedString MessageFormat = LocalizedString.Create(
+    public static LocalizedString MessageFormat { get; } = LocalizedString.Create(
         (
             Const.InvariantCulture,
             "The total bitrate of shard '{ShardName}' is too low. Minimum required bitrate is {Min:bps}."

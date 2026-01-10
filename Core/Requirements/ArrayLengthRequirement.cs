@@ -7,5 +7,5 @@ public record ArrayLengthRequirement(
     int? Max
 ) : IRequirement
 {
-    public static string Moniker { get; } = "array-length";
+    public static string Moniker => "array-length";
 }

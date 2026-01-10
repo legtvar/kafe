@@ -10,16 +10,16 @@ public record SubtitleCodecNotAllowedDiagnostic(
     int StreamIndex
 ) : IDiagnosticPayload
 {
-    public static string Moniker { get; } = "subtitle-codec-not-allowed";
+    public static string Moniker => "subtitle-codec-not-allowed";
 
-    public static DiagnosticSeverity DefaultSeverity { get; } = DiagnosticSeverity.Error;
+    public static DiagnosticSeverity Severity => DiagnosticSeverity.Error;
 
-    public static readonly LocalizedString Title = LocalizedString.Create(
+    public static LocalizedString Title { get; } = LocalizedString.Create(
         (Const.InvariantCulture, "Subtitles Codec Not Allowed"),
         (Const.CzechCulture, "Nepovolený titulkový kodek")
     );
 
-    public static readonly LocalizedString MessageFormat = LocalizedString.Create(
+    public static LocalizedString MessageFormat { get; } = LocalizedString.Create(
         (
             Const.InvariantCulture,
             "Subtitles stream #{StreamIndex} of shard '{ShardName}' has the '{Codec}' subtitles codec. "

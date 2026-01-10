@@ -10,16 +10,16 @@ public record VideoFramerateNotAllowedDiagnostic(
     int StreamIndex
 ) : IDiagnosticPayload
 {
-    public static string Moniker { get; } = "video-framerate-not-allowed";
+    public static string Moniker => "video-framerate-not-allowed";
 
-    public static DiagnosticSeverity DefaultSeverity { get; } = DiagnosticSeverity.Error;
+    public static DiagnosticSeverity Severity => DiagnosticSeverity.Error;
 
-    public static readonly LocalizedString Title = LocalizedString.Create(
+    public static LocalizedString Title { get; } = LocalizedString.Create(
         (Const.InvariantCulture, "Video Framerate Not Allowed"),
         (Const.CzechCulture, "Nepovolená snímková frekvence videa")
     );
 
-    public static readonly LocalizedString MessageFormat = LocalizedString.Create(
+    public static LocalizedString MessageFormat { get; } = LocalizedString.Create(
         (
             Const.InvariantCulture,
             "Video stream #{StreamIndex} of shard '{ShardName}' has {Framerate:F3} FPS, "

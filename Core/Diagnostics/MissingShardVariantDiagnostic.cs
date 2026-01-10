@@ -7,9 +7,9 @@ public record MissingShardVariantDiagnostic(
     string Variant
 ) : IDiagnosticPayload
 {
-    public static string Moniker { get; } = "missing-shard-variant";
+    public static string Moniker => "missing-shard-variant";
 
-    public static DiagnosticSeverity DefaultSeverity { get; } = DiagnosticSeverity.Error;
+    public static DiagnosticSeverity Severity => DiagnosticSeverity.Error;
 
     public static LocalizedString Title { get; } = LocalizedString.Create(
         (Const.InvariantCulture, "Missing Shard Variant"),

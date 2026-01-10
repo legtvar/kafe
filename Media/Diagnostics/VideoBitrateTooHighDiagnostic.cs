@@ -11,15 +11,15 @@ public record VideoBitrateTooHighDiagnostic(
     long Max
 ) : IDiagnosticPayload
 {
-    public static string Moniker { get; } = "video-bitrate-too-high";
-    public static DiagnosticSeverity DefaultSeverity { get; } = DiagnosticSeverity.Error;
+    public static string Moniker => "video-bitrate-too-high";
+    public static DiagnosticSeverity Severity => DiagnosticSeverity.Error;
 
-    public static readonly LocalizedString Title = LocalizedString.Create(
+    public static LocalizedString Title { get; } = LocalizedString.Create(
         (Const.InvariantCulture, "Video Bitrate Too High"),
         (Const.CzechCulture, "Video má příliš vysoký bitrate")
     );
 
-    public static readonly LocalizedString MessageFormat = LocalizedString.Create(
+    public static LocalizedString MessageFormat { get; } = LocalizedString.Create(
         (
             Const.InvariantCulture,
             "The bitrate of video stream #{StreamIndex} of '{ShardName}' is too high. "

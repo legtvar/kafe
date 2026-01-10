@@ -9,7 +9,7 @@ public record KafeString(
     string? Value
 ) : IScalar
 {
-    public static string Moniker { get; } = "string";
+    public static string Moniker => "string";
 }
 
 public class KafeStringJsonConverter : JsonConverter<KafeString>

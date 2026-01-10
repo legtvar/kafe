@@ -9,15 +9,15 @@ public record MediaTooLongDiagnostic(
     TimeSpan MaxDuration
 ) : IDiagnosticPayload
 {
-    public static string Moniker { get; } = "media-too-long";
-    public static DiagnosticSeverity DefaultSeverity { get; } = DiagnosticSeverity.Error;
+    public static string Moniker => "media-too-long";
+    public static DiagnosticSeverity Severity => DiagnosticSeverity.Error;
 
-    public static readonly LocalizedString Title = LocalizedString.Create(
+    public static LocalizedString Title { get; } = LocalizedString.Create(
         (Const.InvariantCulture, "Media Too Long"),
         (Const.CzechCulture, "Příliš dluhé médium")
     );
 
-    public static readonly LocalizedString MessageFormat = LocalizedString.Create(
+    public static LocalizedString MessageFormat { get; } = LocalizedString.Create(
         (Const.InvariantCulture, "Shard '{ShardName}' is too long. Maximum allowed duration is '{MaxDuration:c}'."),
         (Const.CzechCulture, "Střípek '{ShardName}' je příliš dlouhý. Maximální povolená délka je '{MaxDuration:c}'.")
     );

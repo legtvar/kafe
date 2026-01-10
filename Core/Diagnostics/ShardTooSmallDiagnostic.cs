@@ -7,15 +7,15 @@ public record ShardTooSmallDiagnostic(
     string? Variant = null
 ) : IDiagnosticPayload
 {
-    public static string Moniker { get; } = "shard-too-small";
-    public static DiagnosticSeverity DefaultSeverity { get; } = DiagnosticSeverity.Error;
+    public static string Moniker => "shard-too-small";
+    public static DiagnosticSeverity Severity => DiagnosticSeverity.Error;
 
-    public static readonly LocalizedString Title = LocalizedString.Create(
+    public static LocalizedString Title { get; } = LocalizedString.Create(
         (Const.InvariantCulture, "Shard Too Small"),
         (Const.CzechCulture, "Příliš malý střípek")
     );
 
-    public static readonly LocalizedString MessageFormat = LocalizedString.Create(
+    public static LocalizedString MessageFormat { get; } = LocalizedString.Create(
         (
             Const.InvariantCulture,
             "Shard '{ShardName}' is too small. Its minimum required file length is {MinLength:FS F2}."

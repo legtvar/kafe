@@ -5,16 +5,16 @@ public record LockedDiagnostic(
     Hrib Id
 ) : IDiagnosticPayload
 {
-    public static string Moniker { get; } = "locked";
+    public static string Moniker => "locked";
 
-    public static DiagnosticSeverity DefaultSeverity { get; } = DiagnosticSeverity.Error;
+    public static DiagnosticSeverity Severity => DiagnosticSeverity.Error;
 
-    public static readonly LocalizedString Title = LocalizedString.Create(
+    public static LocalizedString Title { get; } = LocalizedString.Create(
         (Const.InvariantCulture, "Locked"),
         (Const.CzechCulture, "Zamčeno")
     );
 
-    public static readonly LocalizedString MessageFormat = LocalizedString.Create(
+    public static LocalizedString MessageFormat { get; } = LocalizedString.Create(
         (Const.InvariantCulture, "{EntityType:h} '{Id}' cannot be modified because it is locked."),
         (Const.CzechCulture, "{EntityType:h} '{Id}' nelze modifikovat, jelikož je zamknutý/á.")
     );

@@ -5,15 +5,15 @@ public record AlreadyExistsDiagnostic(
     Hrib Id
 ) : IDiagnosticPayload
 {
-    public static string Moniker { get; } = "already-exists";
-    public static DiagnosticSeverity DefaultSeverity { get; } = DiagnosticSeverity.Error;
+    public static string Moniker => "already-exists";
+    public static DiagnosticSeverity Severity => DiagnosticSeverity.Error;
 
-    public static readonly LocalizedString Title = LocalizedString.Create(
+    public static LocalizedString Title { get; } = LocalizedString.Create(
         (Const.InvariantCulture, "Entity Already Exists"),
         (Const.CzechCulture, "Entita již existuje")
     );
 
-    public static readonly LocalizedString MessageFormat = LocalizedString.Create(
+    public static LocalizedString MessageFormat { get; } = LocalizedString.Create(
         (Const.InvariantCulture, "{EntityType:H} with identifier '{Id}' already exists."),
         (Const.CzechCulture, "{EntityType:H} s identifikátorem '{Id}' již existuje.")
     );

@@ -34,7 +34,7 @@ import crewRolesManager from '../../../utils/managers/crewRolesManager';
 
 interface IAuthorSelectProps {
     onSelect: (id: HRIB, roles: string[]) => void;
-    isCrewSelect?: boolean;
+    isDropdownCrewSelect?: boolean;
 }
 
 export function AuthorSelect(props: IAuthorSelectProps) {
@@ -238,7 +238,7 @@ export function AuthorSelect(props: IAuthorSelectProps) {
                                                 </Heading>
                                                 <FormControl mt={6}>
                                                     <FormLabel>{t('authorSelect.selectRoles').toString()}</FormLabel>
-                                                    {props.isCrewSelect ?
+                                                    {props.isDropdownCrewSelect ?
                                                     <MultiSelect
                                                         options={crewRolesManager.getOptions()}
                                                         value={crewRolesManager.getValue(roles)}

@@ -25,6 +25,8 @@ export function ProjectBasicInfoForm({ project, onSubmit, status, update, noSelf
         fu();
     };
 
+    const isDropdownSelect = (project.genre === undefined || project.genre.tags !== undefined);
+
     return (
         <Stack spacing={8} direction="column" mb={8}>
             <FormControl>
@@ -44,7 +46,7 @@ export function ProjectBasicInfoForm({ project, onSubmit, status, update, noSelf
             </FormControl>
             <FormControl>
                 <FormLabel>{t('createProject.fields.genre').toString()}</FormLabel>
-                {!project.genre || project.genre.tags ?
+                {isDropdownSelect ?
                 <>
                     <FormHelperText mb={"1rem"}>
                         {t(`createProject.fields.genreHelp`).toString()}
@@ -100,7 +102,7 @@ export function ProjectBasicInfoForm({ project, onSubmit, status, update, noSelf
                             ),
                         )
                     }
-                    isCrewList={project.genre === undefined || project.genre.tags !== undefined}
+                    isDropdownCrewList={isDropdownSelect}
                 />
                 <AuthorSelect
                     onSelect={(id, roles) =>
@@ -114,7 +116,7 @@ export function ProjectBasicInfoForm({ project, onSubmit, status, update, noSelf
                             ]),
                         )
                     }
-                    isCrewSelect={project.genre === undefined || project.genre.tags !== undefined}
+                    isDropdownCrewSelect={isDropdownSelect}
                 />
             </FormControl>
             <FormControl pb={12}>

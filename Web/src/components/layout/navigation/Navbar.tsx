@@ -18,13 +18,15 @@ import {
 } from '@chakra-ui/react';
 import i18next, { t } from 'i18next';
 import { FiChevronDown, FiMenu } from 'react-icons/fi';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useApi, useAuth } from '../../../hooks/Caffeine';
 import { ColorModeToggle } from '../../utils/ColorModeToggle';
 import { KafeAvatar } from '../../utils/KafeAvatar';
 import { LanguageToggle } from '../../utils/LanguageToggle';
 import { Logo } from '../Logo';
 import { MessageButton } from '../MessageButton';
+import { useAuthLinkFunction } from '../../../hooks/useAuthLink';
+import { ConfirmExitLink } from '../../utils/ConfirmExitLink';
 
 export const NAVBAR_HEIGHT = 20;
 
@@ -36,7 +38,10 @@ interface INavbarProps extends FlexProps {
 export function Navbar({ onOpen, forceReload, signedIn, ...rest }: INavbarProps) {
     const { toggleColorMode } = useColorMode();
     const { user, setUser } = useAuth();
+    const location = useLocation();
     const navigate = useNavigate();
+    const authLink = useAuthLinkFunction();
+
     const api = useApi();
 
     const toggleLanguage = () => {
@@ -89,6 +94,18 @@ export function Navbar({ onOpen, forceReload, signedIn, ...rest }: INavbarProps)
                     descriptionKey="localhost.description"
                 />
             )}
+
+            {signedIn && <Spacer display={{ base: 'flex', md: 'none' }} />}
+
+            <Flex h="20" alignItems="center" ml={2} mr={8} justifyContent="space-between" key="heading">
+                <ConfirmExitLink
+                    alertCondition={location.pathname.endsWith("edit") || location.pathname.endsWith("create")}
+                    destPath={authLink("/")}
+                    handleConfirm={() => {}}
+                >
+                    <Logo />
+                </ConfirmExitLink>
+            </Flex>
 
             <Spacer />
 

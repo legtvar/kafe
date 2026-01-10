@@ -1,10 +1,18 @@
-import { BoxProps, CloseButton, Flex, IconButton, Spacer, useColorModeValue, VStack } from '@chakra-ui/react';
+import { 
+    BoxProps, 
+    CloseButton, 
+    Flex, 
+    IconButton, 
+    Spacer, 
+    useColorModeValue, 
+    VStack, 
+} from '@chakra-ui/react';
 import { Fragment } from 'react';
 import { useTranslation } from 'react-i18next';
 import { IoReader, IoReaderOutline, IoSettingsOutline } from 'react-icons/io5';
-import { Link, useMatches } from 'react-router-dom';
+import { useLocation, useMatches } from 'react-router-dom';
 import { useAuth, useOrganizations } from '../../../hooks/Caffeine';
-import { useAuthLink } from '../../../hooks/useAuthLink';
+import { useAuthLinkFunction } from '../../../hooks/useAuthLink';
 import { useColorScheme } from '../../../hooks/useColorScheme';
 import { AppRoute, authRoutes } from '../../../routes';
 import { Permission } from '../../../schemas/generic';
@@ -13,6 +21,7 @@ import { OrganizationAvatar } from '../../utils/OrganizationAvatar/OrganizationA
 import { Footer } from '../Footer';
 import { ReportButton } from '../ReportButton';
 import { NavItem } from './NavItem';
+import { ConfirmExitLink } from '../../utils/ConfirmExitLink';
 
 interface ISidebarProps extends BoxProps {
     onClose: () => void;
@@ -29,6 +38,8 @@ export function Sidebar({ onClose, forceReload, ...rest }: ISidebarProps) {
     const { user } = useAuth();
 
     const routeValues = authRoutes(i18next.t, user, useOrganizations().currentOrganization);
+    const location = useLocation();
+    const authLink = useAuthLinkFunction();
 
     const match = matches[matches.length - 1].id
         .split('-')
@@ -55,23 +66,27 @@ export function Sidebar({ onClose, forceReload, ...rest }: ISidebarProps) {
 
             return (
                 <Fragment key={i}>
-                    <Link to={useAuthLink(fullPath)}>
+                    <ConfirmExitLink 
+                        alertCondition={location.pathname.endsWith("edit") || location.pathname.endsWith("create")}
+                        destPath={authLink(fullPath)}
+                        handleConfirm={() => {}}
+                    >
                         <NavItem
-                            key={i}
-                            icon={
-                                !isChild
-                                    ? route.icon || {
-                                          default: IoReaderOutline,
-                                          selected: IoReader,
-                                      }
-                                    : undefined
-                            }
-                            small={isChild || undefined}
-                            selected={selected && (!children?.length || matchPathStripped === fullPathStripped)}
-                        >
-                            {route.title}
+                                key={i}
+                                icon={
+                                    !isChild
+                                        ? route.icon || {
+                                            default: IoReaderOutline,
+                                            selected: IoReader,
+                                        }
+                                        : undefined
+                                }
+                                small={isChild || undefined}
+                                selected={selected && (!children?.length || matchPathStripped === fullPathStripped)}
+                            >
+                                {route.title}
                         </NavItem>
-                    </Link>
+                    </ConfirmExitLink>
                     {selected && children && children.length > 0 && (
                         <Flex
                             direction="column"
@@ -128,24 +143,29 @@ export function Sidebar({ onClose, forceReload, ...rest }: ISidebarProps) {
                 h="full"
             >
                 {organizations.map((org, key) => (
-                    <Link
-                        to={useAuthLink(undefined, org.id)}
+                    <ConfirmExitLink 
                         key={key}
-                        onClick={() => {
+                        alertCondition={location.pathname.endsWith("edit") || location.pathname.endsWith("create")}
+                        destPath={authLink(`/`, org.id)} 
+                        handleConfirm={() => {
                             localStorage.setItem(LS_LATEST_ORG_KEY, org.id);
-                            forceReload();
-                        }}
+                            forceReload();}
+                        }
                     >
                         <OrganizationAvatar organization={org} size="sm" cursor="pointer" />
-                    </Link>
+                    </ConfirmExitLink>
                 ))}
                 <Spacer />
                 {(['read', 'append', 'inspect', 'write', 'all'] as Permission[]).some((perm) =>
                     user?.permissions['system']?.includes(perm),
                 ) && (
-                    <Link to={useAuthLink('/system')}>
+                    <ConfirmExitLink
+                        alertCondition={location.pathname.endsWith("edit") || location.pathname.endsWith("create")}
+                        destPath={authLink('/system')}  
+                        handleConfirm={() => {}}
+                    >
                         <IconButton aria-label="Settings" icon={<IoSettingsOutline />} borderRadius="full" />
-                    </Link>
+                    </ConfirmExitLink>
                 )}
             </VStack>
             <Flex
@@ -174,3 +194,4 @@ export function Sidebar({ onClose, forceReload, ...rest }: ISidebarProps) {
         </Flex>
     );
 }
+

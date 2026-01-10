@@ -53,7 +53,7 @@ export function ProjectEdit(props: IProjectEditProps) {
         <AwaitAPI
             request={useCallback((api) => api.projects.getById(id), [id])}
             error={(resp) => {
-                return <Status statusCode={resp.response.status} log={resp.response.detail} embeded />;
+                return <Status statusCode={resp.response?.status} log={resp.response?.detail} embeded />;
             }}
         >
             {observeAbstactType((project: Project) => (

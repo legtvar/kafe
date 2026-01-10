@@ -1,29 +1,40 @@
-import genres from './data/genres.json';
+import GENRES from './data/genres.json';
 import { getStandardOptions, TaggedOption, translateSingle, USER_DEFINED_ITEM_TAG } from "./common";
 import { Option } from 'chakra-multiselect';
 import { Project } from '../../data/Project';
 import { t } from 'i18next';
 import { localizedString } from '@/schemas/generic';
 
+const GENRE_TAGS = new Set(<string[]>GENRES);
+
 const MAX_GENRE_COUNT = 4;
 const MAX_GENRE_LENGTH = 32;
 
-const getOptions = (): TaggedOption[] => getStandardOptions('genres', genres)
+const getOptions = (): TaggedOption[] => getStandardOptions('genres', GENRES)
 
-const getValue = (project: Project): TaggedOption[] => {
+const getValue = (genres: localizedString | undefined): TaggedOption[] | undefined => {
 
-    const localizedString = project.genre;
-
-    if (!localizedString) {
+    if (!genres) {
         return [];
     }
+    
+    if (!genres.iv) {
+        return undefined;
+    }
 
-    const ivNames = localizedString.iv.split(',');
+    return genres['iv'].split(',').map((tag, i) => {
 
-    return localizedString.tags.split(',').map((tag, i) => {
-
-        const name = tag === USER_DEFINED_ITEM_TAG
-            ? ivNames[i] : t(`createProject.fields.genres.${tag}`).toString();
+        tag = tag.trim();
+        let name = tag;
+        if (GENRE_TAGS.has(tag))
+        {
+            name = t(`createProject.fields.genres.${tag}`).toString();
+        }
+        else
+        {
+            name = tag;
+            tag = USER_DEFINED_ITEM_TAG;
+        }
 
         return { label: name, value: name, tag: tag };
     });
@@ -60,28 +71,27 @@ const onChange = (value: Option | Option[], project: Project, fu: (x: any) => vo
     }
 
     const aux: { [key: string]: string[] } = {
-        tags: [], iv: [], en: [], cs: [], sk: []
+        iv: [], en: [], cs: [], sk: []
     };
 
     values.map(value => Object.keys(aux).map(key => aux[key].push(
-        key === 'tags'
+        key === 'iv'
             ? (!value.tag || value.tag === USER_DEFINED_ITEM_TAG
-                ? USER_DEFINED_ITEM_TAG : value.tag
+                ? value.label.trim() : value.tag
             )
             : (!value.tag || value.tag === USER_DEFINED_ITEM_TAG
                 ? value.label.trim() : translateSingle(
-                    (key === 'iv' ? 'en' : key), 'genres', value.tag
+                    key, 'genres', value.tag
                 )
             )
-    )
-    )
-    );
+    )));
 
     const result: localizedString = {};
 
     Object.keys(aux).map(key =>
-        result[key] = aux[key].join(key === 'tags' ? ',' : ', '));
+        result[key] = aux[key].join(', '));
 
+    fu(project.set('genreTags', values));
     fu(project.set('genre', result));
 }
 

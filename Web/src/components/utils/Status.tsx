@@ -21,6 +21,11 @@ export const Status: React.FC<IStatusProps> = (props: IStatusProps) => {
     if (props.statusCode) {
         statusCode = props.statusCode;
     }
+    
+    if (!statusCode)
+    {
+        statusCode = "Unknown error";
+    }
 
     routeError && console.error(routeError);
 

@@ -2,11 +2,11 @@ using System.Collections.Immutable;
 
 namespace Kafe.Core.Requirements;
 
-public record ShardMetadataTypeRequirement : IRequirement
+public record ShardPayloadTypeRequirement : IRequirement
 {
-    public static string Moniker => "shard-metadata-type";
+    public static string Moniker => "shard-payload-type";
 
-    public ShardMetadataTypeRequirement(
+    public ShardPayloadTypeRequirement(
         ImmutableArray<KafeType> include = default,
         ImmutableArray<KafeType> exclude = default
     )

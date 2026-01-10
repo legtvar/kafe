@@ -1,4 +1,5 @@
 ﻿using System;
+using Kafe.Core.Diagnostics;
 using Kafe.Core.Requirements;
 
 namespace Kafe.Core;
@@ -84,11 +85,36 @@ public sealed class CoreMod : IMod
         // TODO: Implement handlers
         c.AddRequirement<AllRequirement>();
         c.AddRequirement<ArrayLengthRequirement>();
-        c.AddRequirement<ShardMetadataTypeRequirement>();
+        c.AddRequirement<ShardPayloadTypeRequirement>();
     }
 
     private static void AddDiagnostics(ModContext c)
     {
-        c.AddDiagnosticFromAssembly(typeof(CoreMod).Assembly);
+        // NB: Diagnostic payload types from Kafe.Common.dll are registered in the `core` mod.
+        c.AddDiagnosticPayload<AggregateDiagnostic>();
+        c.AddDiagnosticPayload<GenericErrorDiagnostic>();
+
+        c.AddDiagnosticPayload<AlreadyExistsDiagnostic>();
+        c.AddDiagnosticPayload<BadEmailAddressDiagnostic>();
+        c.AddDiagnosticPayload<BadHribDiagnostic>();
+        c.AddDiagnosticPayload<BadKafeTypeDiagnostic>();
+        c.AddDiagnosticPayload<BadMimeTypeDiagnostic>();
+        c.AddDiagnosticPayload<CorruptedShardDiagnostic>();
+        c.AddDiagnosticPayload<EmptyHribDiagnostic>();
+        c.AddDiagnosticPayload<IncompatibleRequirementDiagnostic>();
+        c.AddDiagnosticPayload<InternalErrorDiagnostic>();
+        c.AddDiagnosticPayload<LockedDiagnostic>();
+        c.AddDiagnosticPayload<MissingAuthorNameOrIdDiagnostic>();
+        c.AddDiagnosticPayload<MissingShardVariantDiagnostic>();
+        c.AddDiagnosticPayload<NotFoundDiagnostic>();
+        c.AddDiagnosticPayload<ParameterDiagnostic>();
+        c.AddDiagnosticPayload<RequiredDiagnostic>();
+        c.AddDiagnosticPayload<ShardAnalysisFailureDiagnostic>();
+        c.AddDiagnosticPayload<ShardMimeTypeNotAllowedDiagnostic>();
+        c.AddDiagnosticPayload<ShardTooLargeDiagnostic>();
+        c.AddDiagnosticPayload<ShardTooSmallDiagnostic>();
+        c.AddDiagnosticPayload<StringTooLongDiagnostic>();
+        c.AddDiagnosticPayload<StringTooShortDiagnostic>();
+        c.AddDiagnosticPayload<UnmodifiedDiagnostic>();
     }
 }

@@ -183,7 +183,7 @@ public class FestivalFilmBlueprintCorrection : IEventCorrection
                         ),
                         new AllRequirement(
                             Requirements: [..kof.WrapMany(
-                                new ShardMetadataTypeRequirement([KafeType.Parse("media:shard/video")])
+                                new ShardPayloadTypeRequirement([KafeType.Parse("media:shard/video")])
                             )]
                         )
                     )]
@@ -271,7 +271,7 @@ public class FestivalFilmBlueprintCorrection : IEventCorrection
                         (Const.CzechCulture, "Soubor s filmem")
                     ),
                     requirements: [..kof.WrapMany(
-                        new ShardMetadataTypeRequirement(
+                        new ShardPayloadTypeRequirement(
                             [KafeType.Parse("media:shard/video")]
                         ),
                         new ShardMimeTypeRequirement(
@@ -329,7 +329,7 @@ public class FestivalFilmBlueprintCorrection : IEventCorrection
                         (Const.CzechCulture, "Videoanotace")
                     ),
                     requirements: [..kof.WrapMany(
-                        new ShardMetadataTypeRequirement(
+                        new ShardPayloadTypeRequirement(
                             [KafeType.Parse("media:shard/video")]
                         ),
                         new ShardMimeTypeRequirement(
@@ -382,7 +382,7 @@ public class FestivalFilmBlueprintCorrection : IEventCorrection
                         (Const.CzechCulture, "Titulní fotografie")
                     ),
                     requirements: [..kof.WrapMany(
-                        new ShardMetadataTypeRequirement(
+                        new ShardPayloadTypeRequirement(
                             [KafeType.Parse("core:shard-ref[]")]
                         ),
                         new ArrayLengthRequirement(
@@ -391,7 +391,7 @@ public class FestivalFilmBlueprintCorrection : IEventCorrection
                         ),
                         new AllRequirement(
                             Requirements: [..kof.WrapMany(
-                                new ShardMetadataTypeRequirement(
+                                new ShardPayloadTypeRequirement(
                                     [KafeType.Parse("media:shard/image")]
                                 ),
                                 new ShardMimeTypeRequirement(

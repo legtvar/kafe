@@ -25,7 +25,7 @@ export function ProjectBasicInfoForm({ project, onSubmit, status, update, noSelf
         fu();
     };
 
-    const isDropdownSelect = (project.genre === undefined || project.genre.tags !== undefined);
+    const isDropdownSelect = (project.genre === undefined || project.genreTags !== undefined);
 
     return (
         <Stack spacing={8} direction="column" mb={8}>
@@ -53,7 +53,7 @@ export function ProjectBasicInfoForm({ project, onSubmit, status, update, noSelf
                     </FormHelperText>
                     <MultiSelect
                         options={genreManager.getOptions()}
-                        value={genreManager.getValue(project)}
+                        value={project.genreTags}
                         onChange={value => genreManager.onChange(value, project, forceUpdate)}
                         create
                     />

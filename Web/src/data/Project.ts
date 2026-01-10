@@ -7,6 +7,8 @@ import { Artifact } from './Artifact';
 import { localizedMapper } from './serialize/localizedMapper';
 import { rolesMapper } from './serialize/rolesMapper';
 import { Serializer } from './serialize/Serializer';
+import { TaggedOption } from '@/utils/managers/common';
+import genreManager from '@/utils/managers/genreManager';
 
 export class Project extends AbstractType {
     // API object
@@ -15,6 +17,7 @@ export class Project extends AbstractType {
     public validationSettings?: components['schemas']['ProjectValidationSettings'];
     public name?: localizedString;
     public genre?: localizedString;
+    public genreTags?: TaggedOption[];
     public description?: localizedString;
     // public visibility!: components['schemas']['Visibility'];
     public releasedOn!: Date | null;
@@ -41,6 +44,8 @@ export class Project extends AbstractType {
         if (this.artifacts) {
             this.artifacts = this.artifacts.map((artifact: any) => new Artifact(artifact));
         }
+
+        this.genreTags = genreManager.getValue(this.genre);
 
         // Temporary
         // this.blueprint.artifactBlueprints = (

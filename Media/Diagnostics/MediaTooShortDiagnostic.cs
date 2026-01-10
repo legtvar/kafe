@@ -9,15 +9,15 @@ public record MediaTooShortDiagnostic(
     TimeSpan MinDuration
 ) : IDiagnosticPayload
 {
-    public static string Moniker { get; } = "media-too-short";
-    public static DiagnosticSeverity DefaultSeverity { get; } = DiagnosticSeverity.Error;
+    public static string Moniker => "media-too-short";
+    public static DiagnosticSeverity Severity => DiagnosticSeverity.Error;
 
-    public static readonly LocalizedString Title = LocalizedString.Create(
+    public static LocalizedString Title { get; } = LocalizedString.Create(
         (Const.InvariantCulture, "Media Too Short"),
         (Const.CzechCulture, "Příliš krátké médium")
     );
 
-    public static readonly LocalizedString MessageFormat = LocalizedString.Create(
+    public static LocalizedString MessageFormat { get; } = LocalizedString.Create(
         (Const.InvariantCulture, "Shard '{ShardName}' is too short. Minimum required duration is '{MinDuration:c}'."),
         (Const.CzechCulture, "Střípek '{ShardName}' je příliš krátký. Minimální požadovaná délka je '{MinDuration:c}'.")
     );

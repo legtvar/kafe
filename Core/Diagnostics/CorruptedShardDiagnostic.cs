@@ -7,9 +7,9 @@ public record CorruptedShardDiagnostic(
     string? Variant = null
 ) : IDiagnosticPayload
 {
-    public static string Moniker { get; } = "corrupted-shard";
+    public static string Moniker => "corrupted-shard";
 
-    public static DiagnosticSeverity DefaultSeverity { get; } = DiagnosticSeverity.Error;
+    public static DiagnosticSeverity Severity => DiagnosticSeverity.Error;
 
     public static LocalizedString Title { get; } = LocalizedString.Create(
         (Const.InvariantCulture, "Corrupted Shard"),

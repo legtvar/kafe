@@ -6,5 +6,5 @@ public record AllRequirement(
     ImmutableArray<KafeObject> Requirements
 ) : IRequirement
 {
-    public static string Moniker { get; } = "all";
+    public static string Moniker => "all";
 }

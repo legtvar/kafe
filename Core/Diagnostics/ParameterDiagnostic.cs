@@ -6,15 +6,15 @@ public record ParameterDiagnostic(
 ) : IDiagnosticPayload
 {
     public static string Moniker {get;} = "parameter";
-    
-    public static DiagnosticSeverity DefaultSeverity { get; } = DiagnosticSeverity.Error;
 
-    public static readonly LocalizedString Title = LocalizedString.Create(
+    public static DiagnosticSeverity Severity => DiagnosticSeverity.Error;
+
+    public static LocalizedString Title { get; } = LocalizedString.Create(
         (Const.InvariantCulture, "Parameter"),
         (Const.CzechCulture, "Parametr")
     );
 
-    public static readonly LocalizedString MessageFormat = LocalizedString.Create(
+    public static LocalizedString MessageFormat { get; } = LocalizedString.Create(
         (Const.InvariantCulture, "Parameter '{Parameter}' has diagnostics."),
         (Const.CzechCulture, "K parametru '{Parameter}' jsou k dispozici hlášení.")
     );

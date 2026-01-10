@@ -9,16 +9,16 @@ public record ShardMimeTypeNotAllowedDiagnostic(
     ImmutableArray<string> AllowedMimeTypes
 ) : IDiagnosticPayload
 {
-    public static string Moniker { get; } = "shard-mime-type-not-allowed";
+    public static string Moniker => "shard-mime-type-not-allowed";
 
-    public static DiagnosticSeverity DefaultSeverity { get; } = DiagnosticSeverity.Error;
+    public static DiagnosticSeverity Severity => DiagnosticSeverity.Error;
 
-    public static readonly LocalizedString Title = LocalizedString.Create(
+    public static LocalizedString Title { get; } = LocalizedString.Create(
         (Const.InvariantCulture, "Shard MIME Type Not Allowed"),
         (Const.CzechCulture, "Střípek má nepovolený MIME typ")
     );
 
-    public static readonly LocalizedString MessageFormat = LocalizedString.Create(
+    public static LocalizedString MessageFormat { get; } = LocalizedString.Create(
         (
             Const.InvariantCulture,
             "Shard '{ShardName}' has the '{MimeType}' MIME type. This type is not allowed. "

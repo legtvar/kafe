@@ -8,7 +8,7 @@ public record ShardFileLengthRequirement(
     int? Max
 ) : IRequirement
 {
-    public static string Moniker { get; } = "shard-file-length";
+    public static string Moniker => "shard-file-length";
 }
 
 public sealed class ShardFileLengthRequirementHandler : ShardRequirementHandlerBase<ShardFileLengthRequirement>
@@ -48,7 +48,7 @@ public sealed class ShardFileLengthRequirementHandler : ShardRequirementHandlerB
                 context.Requirement.Max.Value
             ));
         }
-        
+
         return ValueTask.CompletedTask;
     }
 }

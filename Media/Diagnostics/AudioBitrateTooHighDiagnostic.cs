@@ -11,15 +11,15 @@ public record AudioBitrateTooHighDiagnostic(
     long Max
 ) : IDiagnosticPayload
 {
-    public static string Moniker { get; } = "audio-bitrate-too-high";
-    public static DiagnosticSeverity DefaultSeverity { get; } = DiagnosticSeverity.Error;
+    public static string Moniker => "audio-bitrate-too-high";
+    public static DiagnosticSeverity Severity => DiagnosticSeverity.Error;
 
-    public static readonly LocalizedString Title = LocalizedString.Create(
+    public static LocalizedString Title { get; } = LocalizedString.Create(
         (Const.InvariantCulture, "Audio Bitrate Too High"),
         (Const.CzechCulture, "Audio má příliš vysoký bitrate")
     );
 
-    public static readonly LocalizedString MessageFormat = LocalizedString.Create(
+    public static LocalizedString MessageFormat { get; } = LocalizedString.Create(
         (
             Const.InvariantCulture,
             "The bitrate of audio stream #{StreamIndex} of '{ShardName}' is too high. "

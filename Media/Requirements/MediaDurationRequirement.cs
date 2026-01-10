@@ -10,7 +10,7 @@ public record MediaDurationRequirement(
     TimeSpan? Max
 ) : IRequirement
 {
-    public static string Moniker { get; } = "media-duration";
+    public static string Moniker => "media-duration";
 }
 
 public class MediaDurationRequirementHandler : ShardRequirementHandlerBase<MediaDurationRequirement>
@@ -52,7 +52,7 @@ public class MediaDurationRequirementHandler : ShardRequirementHandlerBase<Media
                 MaxDuration: context.Requirement.Max.Value
             ));
         }
-        
+
         return ValueTask.CompletedTask;
     }
 }

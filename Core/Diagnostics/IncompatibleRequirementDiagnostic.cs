@@ -5,16 +5,16 @@ public record IncompatibleRequirementDiagnostic(
     KafeType ObjectType
 ) : IDiagnosticPayload
 {
-    public static string Moniker { get; } = "incompatible-requirement";
+    public static string Moniker => "incompatible-requirement";
 
-    public static DiagnosticSeverity DefaultSeverity { get; } = DiagnosticSeverity.Error;
+    public static DiagnosticSeverity Severity => DiagnosticSeverity.Error;
 
-    public static readonly LocalizedString Title = LocalizedString.Create(
+    public static LocalizedString Title { get; } = LocalizedString.Create(
         (Const.InvariantCulture, "Incompatible Requirement"),
         (Const.CzechCulture, "Nekompatibilní požadavek")
     );
 
-    public static readonly LocalizedString MessageFormat = LocalizedString.Create(
+    public static LocalizedString MessageFormat { get; } = LocalizedString.Create(
         (Const.InvariantCulture, "Requirement '{RequirementType}' does not support '{ObjectType}' objects."),
         (Const.CzechCulture, "Požadavek '{RequirementType}' nelze použít na objekty typu '{ObjectType}'.")
     );

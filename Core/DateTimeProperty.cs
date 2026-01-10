@@ -9,7 +9,7 @@ public record DateTimeProperty(
     DateTimeOffset? Value
 ) : IScalar
 {
-    public static string Moniker { get; } = "date-time";
+    public static string Moniker => "date-time";
 }
 
 public class DateTimePropertyJsonConverter : JsonConverter<DateTimeProperty>

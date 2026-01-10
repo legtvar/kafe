@@ -10,7 +10,7 @@ public record ShardMimeTypeRequirement(
     ImmutableArray<string> Exclude
 ) : IRequirement
 {
-    public static string Moniker { get; } = "shard-mime-type";
+    public static string Moniker => "shard-mime-type";
 }
 
 public class ShardMimeTypeRequirementHandler : ShardRequirementHandlerBase<ShardMimeTypeRequirement>

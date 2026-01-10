@@ -10,7 +10,7 @@ public record MediaAspectRatioRequirement(
     string? Max
 ) : IRequirement
 {
-    public static string Moniker { get; } = "aspect-ratio";
+    public static string Moniker => "aspect-ratio";
 }
 
 public class MediaAspectRatioRequirementHandler : ShardRequirementHandlerBase<MediaAspectRatioRequirement>

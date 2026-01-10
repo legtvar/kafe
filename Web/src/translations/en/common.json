@@ -152,7 +152,8 @@
     "download": "Download",
     "file": "file",
     "lastUpdate": "Last update",
-    "addedOn": "Added on"
+    "addedOn": "Added on",
+    "allowMarkdown": "This field allows you to enter text formatted as Markdown"
   },
   "home": {
     "signin": "Sign in",
@@ -530,6 +531,11 @@
         "inspect": "View all projects in the project group",
         "append": "Create a new project in this group",
         "review": "Write reviews for all projects in the group"
+      },
+      "playlist": {
+        "read": "See this playlist",
+        "write": "Change playlist metadata and settings",
+        "inspect": "Show all files in the playlist"
       }
     }
   },

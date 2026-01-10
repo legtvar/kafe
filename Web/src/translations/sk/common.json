@@ -167,6 +167,9 @@
   "homeFestival": {
     "title": "24. Filmový festival FI MU"
   },
+  "introText": {
+    "detailsTitle": "Podrobné informácie pre"
+  },
   "layout": {
     "footer": {
       "copy": "Vytvoril LeGTVaR s <1>❤️</1> a ☕.",
@@ -272,7 +275,8 @@
   "projectStatus": {
     "dramaturgy": {
       "ok": "Projekt bol prijatý na festival",
-      "nok": "Projekt nebol prijatý na festival"
+      "nok": "Projekt nebol prijatý na festival",
+      "unknown": "Projekt ešte nebol posúdený"
     },
     "file": {
       "ok": "Súbory sú nahrané a prešli automatizovanou kontrolou",
@@ -284,11 +288,13 @@
     },
     "tech": {
       "ok": "Projekt prešiel kontrolou technikom",
-      "nok": "Projekt neprešiel kontrolou technikom"
+      "nok": "Projekt neprešiel kontrolou technikom",
+      "unknown": "Projekt ešte nebol posúdený"
     },
     "visual": {
       "ok": "Projekt prešiel kontrolou grafikom",
-      "nok": "Projekt neprešiel kontrolou grafikom"
+      "nok": "Projekt neprešiel kontrolou grafikom",
+      "unknown": "Projekt ešte nebol posúdený"
     },
     "pigeons-test": {
       "ok": "Projekt prešiel automatizovanými testami PIGEOnS",
@@ -442,7 +448,7 @@
     "uploading": "<0>Súbor sa nahráva</0><1></1>Nahrané {{progress}}%"
   },
   "visibility": {
-    "Internal": "Neveřejné",
+    "Internal": "Neverejné",
     "Private": "Súkromné",
     "Public": "Verejné",
     "Unknown": "Neznáma viditeľnosť"
@@ -493,14 +499,14 @@
     "special": {
       "anyone": {
         "title": "Ktokoľvek na internete",
-        "warning": "Pozor, akýkoľvek užívateľ bude mať tieto práva aj na zdedené položky!"
+        "warning": "Pozor, akýkoľvek používateľ bude mať tieto práva aj na zdedené položky!"
       },
       "new": {
-        "title": "Pridať užívateľa (email)"
+        "title": "Pridať používateľa (email)"
       }
     },
     "none": "Žiadne práva",
-    "editCsv": "Importovať užívateľov z IS MUNI",
+    "editCsv": "Importovať používateľov z IS MUNI",
     "uploadCsv": "Vyberte csv súbor",
     "noCsv": "Nie je vybraný žiadny csv súbor",
     "setPerms": "Nastaviť oprávnenia",
@@ -515,19 +521,20 @@
       },
       "project": {
         "append": "Pridávať nové súbory do projektu",
-        "read": "Zobraziť projekt, jeho metadata a súbory",
-        "write": "Upravovať metadata projektu"
+        "read": "Zobraziť projekt, jeho metadáta a súbory",
+        "write": "Upravovať metadáta projektu",
+        "inspect": "Zobraziť súbory projektu"
       },
       "group": {
         "read": "Vidieť túto skupinu projektov",
-        "write": "Meniť metadata a nastavenia skupiny",
+        "write": "Meniť metadáta a nastavenia skupiny",
         "inspect": "Zobraziť všetky projekty v skupine projektov",
         "append": "Vytvoriť nový projekt v tejto skupine",
         "review": "Hodnotiť projekty v skupine"
       },
       "playlist": {
         "read": "Vidieť tento playlist",
-        "write": "Meniť metadata a nastavenia playlistu",
+        "write": "Meniť metadáta a nastavenia playlistu",
         "inspect": "Zobraziť všetky súbory v playliste"
       }
     }

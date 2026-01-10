@@ -4,16 +4,16 @@ public record BadMimeTypeDiagnostic(
     string Value
 ) : IDiagnosticPayload
 {
-    public static string Moniker { get; } = "bad-mime-type";
+    public static string Moniker => "bad-mime-type";
 
-    public static DiagnosticSeverity DefaultSeverity { get; } = DiagnosticSeverity.Error;
+    public static DiagnosticSeverity Severity => DiagnosticSeverity.Error;
 
-    public static readonly LocalizedString Title = LocalizedString.Create(
+    public static LocalizedString Title { get; } = LocalizedString.Create(
         (Const.InvariantCulture, "Bad MIME Type"),
         (Const.CzechCulture, "Neplatný MIME typ")
     );
 
-    public static readonly LocalizedString MessageFormat = LocalizedString.Create(
+    public static LocalizedString MessageFormat { get; } = LocalizedString.Create(
         (Const.InvariantCulture, "String '{Value}' is not recognized as any known MIME type."),
         (Const.CzechCulture, "Řetězec '{Value}' nepatří mezi známé MIME typy.")
     );

@@ -4,7 +4,7 @@ namespace Kafe.Core.Requirements;
 
 public record ShardMetadataTypeRequirement : IRequirement
 {
-    public static string Moniker { get; } = "shard-metadata-type";
+    public static string Moniker => "shard-metadata-type";
 
     public ShardMetadataTypeRequirement(
         ImmutableArray<KafeType> include = default,

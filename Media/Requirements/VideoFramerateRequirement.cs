@@ -13,7 +13,7 @@ public record VideoFramerateRequirement(
     int? StreamIndex = null
 ) : IRequirement
 {
-    public static string Moniker { get; } = "video-framerate";
+    public static string Moniker => "video-framerate";
 }
 
 public class VideoFramerateRequirementHandler : ShardRequirementHandlerBase<VideoFramerateRequirement>

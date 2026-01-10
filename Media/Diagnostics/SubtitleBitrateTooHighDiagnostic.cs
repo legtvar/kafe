@@ -11,15 +11,15 @@ public record SubtitleBitrateTooHighDiagnostic(
     long Max
 ) : IDiagnosticPayload
 {
-    public static string Moniker { get; } = "subtitle-bitrate-too-high";
-    public static DiagnosticSeverity DefaultSeverity { get; } = DiagnosticSeverity.Error;
+    public static string Moniker => "subtitle-bitrate-too-high";
+    public static DiagnosticSeverity Severity => DiagnosticSeverity.Error;
 
-    public static readonly LocalizedString Title = LocalizedString.Create(
+    public static LocalizedString Title { get; } = LocalizedString.Create(
         (Const.InvariantCulture, "Subtitles Bitrate Too High"),
         (Const.CzechCulture, "Titulky mají příliš vysoký bitrate")
     );
 
-    public static readonly LocalizedString MessageFormat = LocalizedString.Create(
+    public static LocalizedString MessageFormat { get; } = LocalizedString.Create(
         (
             Const.InvariantCulture,
             "The bitrate of subtitles stream #{StreamIndex} of '{ShardName}' is too high. "

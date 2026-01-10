@@ -7,5 +7,5 @@ public record TypeRequirement(
     ImmutableArray<KafeType> Exclude
 ) : IRequirement
 {
-    public static string Moniker { get; } = "type";
+    public static string Moniker => "type";
 }

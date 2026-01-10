@@ -2,7 +2,7 @@ namespace Kafe.Media;
 
 public record VariantLinkMetadata : IShardLinkMetadata
 {
-    public static string Moniker { get; } = "variant";
+    public static string Moniker => "variant";
 
     public string? Preset { get; init; }
 }

@@ -10,16 +10,16 @@ public record AudioCodecNotAllowedDiagnostic(
     int StreamIndex
 ) : IDiagnosticPayload
 {
-    public static string Moniker { get; } = "audio-codec-not-allowed";
+    public static string Moniker => "audio-codec-not-allowed";
 
-    public static DiagnosticSeverity DefaultSeverity { get; } = DiagnosticSeverity.Error;
+    public static DiagnosticSeverity Severity => DiagnosticSeverity.Error;
 
-    public static readonly LocalizedString Title = LocalizedString.Create(
+    public static LocalizedString Title { get; } = LocalizedString.Create(
         (Const.InvariantCulture, "Audio Codec Not Allowed"),
         (Const.CzechCulture, "Nepovolený audio kodek")
     );
 
-    public static readonly LocalizedString MessageFormat = LocalizedString.Create(
+    public static LocalizedString MessageFormat { get; } = LocalizedString.Create(
         (
             Const.InvariantCulture,
             "Audio stream #{StreamIndex} of shard '{ShardName}' has the '{Codec}' audio codec. "

@@ -9,15 +9,15 @@ public record MissingAudioStreamDiagnostic(
     int StreamIndex
 ) : IDiagnosticPayload
 {
-    public static string Moniker { get; } = "missing-audio-stream";
-    public static DiagnosticSeverity DefaultSeverity { get; } = DiagnosticSeverity.Error;
+    public static string Moniker => "missing-audio-stream";
+    public static DiagnosticSeverity Severity => DiagnosticSeverity.Error;
 
-    public static readonly LocalizedString Title = LocalizedString.Create(
+    public static LocalizedString Title { get; } = LocalizedString.Create(
         (Const.InvariantCulture, "Missing Audio Stream"),
         (Const.CzechCulture, "Chybí audio proud")
     );
 
-    public static readonly LocalizedString MessageFormat = LocalizedString.Create(
+    public static LocalizedString MessageFormat { get; } = LocalizedString.Create(
         (
             Const.InvariantCulture,
             "Audio stream #{StreamIndex} of shard '{ShardName}' is required, but it is missing."

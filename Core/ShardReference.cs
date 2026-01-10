@@ -9,7 +9,7 @@ public record ShardReference(
     Hrib ShardId
 ) : IScalar
 {
-    public static string Moniker { get; } = "shard-ref";
+    public static string Moniker => "shard-ref";
 
     public static LocalizedString Title { get; } = LocalizedString.Create(
         (Const.InvariantCulture, "Shard reference"),

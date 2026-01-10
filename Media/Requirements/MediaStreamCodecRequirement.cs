@@ -14,7 +14,7 @@ public record MediaStreamCodecRequirement(
     int? StreamIndex = null
 ) : IRequirement
 {
-    public static string Moniker { get; } = "stream-codec";
+    public static string Moniker => "stream-codec";
 }
 
 public class MediaStreamCodecRequirementHandler : ShardRequirementHandlerBase<MediaStreamCodecRequirement>

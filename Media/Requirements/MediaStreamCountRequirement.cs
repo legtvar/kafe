@@ -13,7 +13,7 @@ public record MediaStreamCountRequirement(
     MediaStreamKind Kind
 ) : IRequirement
 {
-    public static string Moniker { get; } = "stream-count";
+    public static string Moniker => "stream-count";
 }
 
 public class MediaStreamCountRequirementHandler : ShardRequirementHandlerBase<MediaStreamCountRequirement>

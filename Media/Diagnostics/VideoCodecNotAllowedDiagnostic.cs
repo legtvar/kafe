@@ -10,16 +10,16 @@ public record VideoCodecNotAllowedDiagnostic(
     int StreamIndex
 ) : IDiagnosticPayload
 {
-    public static string Moniker { get; } = "video-codec-not-allowed";
+    public static string Moniker => "video-codec-not-allowed";
 
-    public static DiagnosticSeverity DefaultSeverity { get; } = DiagnosticSeverity.Error;
+    public static DiagnosticSeverity Severity => DiagnosticSeverity.Error;
 
-    public static readonly LocalizedString Title = LocalizedString.Create(
+    public static LocalizedString Title { get; } = LocalizedString.Create(
         (Const.InvariantCulture, "Video Codec Not Allowed"),
         (Const.CzechCulture, "Nepovolený video kodek")
     );
 
-    public static readonly LocalizedString MessageFormat = LocalizedString.Create(
+    public static LocalizedString MessageFormat { get; } = LocalizedString.Create(
         (
             Const.InvariantCulture,
             "Video stream #{StreamIndex} of shard '{ShardName}' has the '{Codec}' video codec. "

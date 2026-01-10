@@ -9,15 +9,15 @@ public record MediaShorterSideTooShortDiagnostic(
     int Min
 ) : IDiagnosticPayload
 {
-    public static string Moniker { get; } = "media-shorter-side-too-short";
-    public static DiagnosticSeverity DefaultSeverity { get; } = DiagnosticSeverity.Error;
+    public static string Moniker => "media-shorter-side-too-short";
+    public static DiagnosticSeverity Severity => DiagnosticSeverity.Error;
 
-    public static readonly LocalizedString Title = LocalizedString.Create(
+    public static LocalizedString Title { get; } = LocalizedString.Create(
         (Const.InvariantCulture, "Media Shorter Side Too Short"),
         (Const.CzechCulture, "Kratší strana média je příliš krátká")
     );
 
-    public static readonly LocalizedString MessageFormat = LocalizedString.Create(
+    public static LocalizedString MessageFormat { get; } = LocalizedString.Create(
         (
             Const.InvariantCulture,
             "The shorter side of media shard '{ShardName}' is too short. It must be at least {Min} pixels long."

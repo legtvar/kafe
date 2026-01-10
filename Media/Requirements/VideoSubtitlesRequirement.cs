@@ -11,7 +11,7 @@ public record VideoSubtitlesRequirement(
     string Language
 ) : IRequirement
 {
-    public static string Moniker { get; } = "video-subtitles";
+    public static string Moniker => "video-subtitles";
 }
 
 public class VideoSubtitlesRequirementHandler : ShardRequirementHandlerBase<VideoFramerateRequirement>

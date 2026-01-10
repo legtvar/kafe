@@ -9,15 +9,15 @@ public record MissingSubtitleStreamDiagnostic(
     int StreamIndex
 ) : IDiagnosticPayload
 {
-    public static string Moniker { get; } = "missing-subtitle-stream";
-    public static DiagnosticSeverity DefaultSeverity { get; } = DiagnosticSeverity.Error;
+    public static string Moniker => "missing-subtitle-stream";
+    public static DiagnosticSeverity Severity => DiagnosticSeverity.Error;
 
-    public static readonly LocalizedString Title = LocalizedString.Create(
+    public static LocalizedString Title { get; } = LocalizedString.Create(
         (Const.InvariantCulture, "Missing Subtitle Stream"),
         (Const.CzechCulture, "Chybí titulkový proud")
     );
 
-    public static readonly LocalizedString MessageFormat = LocalizedString.Create(
+    public static LocalizedString MessageFormat { get; } = LocalizedString.Create(
         (
             Const.InvariantCulture,
             "Subtitles stream #{StreamIndex} of shard '{ShardName}' is required, but it is missing."

@@ -7,16 +7,16 @@ public record UnmodifiedDiagnostic(
     Hrib Id
 ) : IDiagnosticPayload
 {
-    public static string Moniker { get; } = "unmodified";
+    public static string Moniker => "unmodified";
 
-    public static DiagnosticSeverity DefaultSeverity { get; } = DiagnosticSeverity.Warning;
+    public static DiagnosticSeverity Severity => DiagnosticSeverity.Warning;
 
-    public static readonly LocalizedString Title = LocalizedString.Create(
+    public static LocalizedString Title { get; } = LocalizedString.Create(
         (Const.InvariantCulture, "Unmodified"),
         (Const.CzechCulture, "Beze změny")
     );
 
-    public static readonly LocalizedString MessageFormat = LocalizedString.Create(
+    public static LocalizedString MessageFormat { get; } = LocalizedString.Create(
         (Const.InvariantCulture, "{EntityType:h} '{Id}' was not modified."),
         (Const.CzechCulture, "{EntityType:h} '{Id}' nebyl/a změněn/a.")
     );

@@ -9,7 +9,7 @@ public record NumberProperty(
     decimal? Value
 ) : IScalar
 {
-    public static string Moniker { get; } = "number";
+    public static string Moniker => "number";
 }
 
 public class NumberPropertyJsonConverter : JsonConverter<NumberProperty>

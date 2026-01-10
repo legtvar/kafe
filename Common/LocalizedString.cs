@@ -12,6 +12,15 @@ namespace Kafe;
 [JsonConverter(typeof(LocalizedStringJsonConverter))]
 public sealed partial class LocalizedString : IEquatable<LocalizedString>
 {
+    /// <summary>
+    /// All available ISO 639 Set 1 language codes (and "iv" for the special invariant culture).
+    /// </summary>
+    public static ImmutableHashSet<string> AvailableIso693Set1Codes = CultureInfo
+        .GetCultures(CultureTypes.AllCultures)
+        .Select(c => c.TwoLetterISOLanguageName)
+        .Where(c => c.Length == 2)
+        .ToImmutableHashSet();
+
     public static readonly LocalizedString Empty = new LocalizedString(
         ImmutableDictionary.CreateRange(
             [
@@ -35,7 +44,17 @@ public sealed partial class LocalizedString : IEquatable<LocalizedString>
     {
         if (data.Count == 0)
         {
-            throw new ArgumentException("Data must contain at least one localized string.");
+            throw new ArgumentException("A localized string must contain at least one language variant.");
+        }
+
+        foreach (var key in data.Keys)
+        {
+            if (!AvailableIso693Set1Codes.Contains(key))
+            {
+                throw new ArgumentException(
+                    $"'{key}' is not a valid ISO 693 two-letter language code or the invariant culture code."
+                );
+            }
         }
 
         this.data = data;
@@ -298,7 +317,14 @@ public class LocalizedStringJsonConverter : JsonConverter<LocalizedString>
             return null;
         }
 
-        return LocalizedString.Create((IDictionary<string, string>)dictionary);
+        try
+        {
+            return LocalizedString.Create((IDictionary<string, string>)dictionary);
+        }
+        catch (ArgumentException e)
+        {
+            throw new JsonException(e.Message);
+        }
     }
 
     public override void Write(Utf8JsonWriter writer, LocalizedString value, JsonSerializerOptions options)

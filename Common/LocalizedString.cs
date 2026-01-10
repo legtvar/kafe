@@ -15,7 +15,7 @@ public sealed partial class LocalizedString : IEquatable<LocalizedString>
     /// <summary>
     /// All available ISO 639 Set 1 language codes (and "iv" for the special invariant culture).
     /// </summary>
-    public static ImmutableHashSet<string> AvailableIso693Set1Codes = CultureInfo
+    public static ImmutableHashSet<string> AvailableIso639Set1Codes = CultureInfo
         .GetCultures(CultureTypes.AllCultures)
         .Select(c => c.TwoLetterISOLanguageName)
         .Where(c => c.Length == 2)
@@ -49,10 +49,10 @@ public sealed partial class LocalizedString : IEquatable<LocalizedString>
 
         foreach (var key in data.Keys)
         {
-            if (!AvailableIso693Set1Codes.Contains(key))
+            if (!AvailableIso639Set1Codes.Contains(key))
             {
                 throw new ArgumentException(
-                    $"'{key}' is not a valid ISO 693 two-letter language code or the invariant culture code."
+                    $"'{key}' is not a valid ISO 639 two-letter language code or the invariant culture code."
                 );
             }
         }

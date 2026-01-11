@@ -31,6 +31,9 @@ export function ProjectBasicInfoForm({ project, onSubmit, status, update, noSelf
         <Stack spacing={8} direction="column" mb={8}>
             <FormControl>
                 <FormLabel>{t('createProject.fields.name').toString()}</FormLabel>
+                <FormHelperText mb={"1rem"}>
+                    {t('createProject.fields.nameHelp').toString()}
+                </FormHelperText>
                 <LocalizedInput
                     as={TextareaLimited}
                     min={project.validationSettings?.minNameLength ?? undefined}
@@ -73,6 +76,9 @@ export function ProjectBasicInfoForm({ project, onSubmit, status, update, noSelf
             </FormControl>
             <FormControl>
                 <FormLabel>{t('createProject.fields.description').toString()}</FormLabel>
+                <FormHelperText mb={"1rem"}>
+                    {t('createProject.fields.descriptionHelp').toString()}
+                </FormHelperText>
                 <LocalizedInput
                     as={TextareaLimited}
                     min={project.validationSettings?.minDescriptionLength ?? undefined}
@@ -121,6 +127,9 @@ export function ProjectBasicInfoForm({ project, onSubmit, status, update, noSelf
             </FormControl>
             <FormControl pb={12}>
                 <FormLabel>{t('createProject.fields.cast').toString()}</FormLabel>
+                <FormHelperText mb={"1rem"}>
+                    {t('createProject.fields.castHelp').toString()}
+                </FormHelperText>
                 <ProjectAuthorList
                     authors={project.cast || []}
                     editable

@@ -61,8 +61,9 @@
     },
     "fields": {
       "cast": "Herci",
+      "castHelp": "Pridajte hercov, ktorí hrajú vo filme. Ku každej osobe pridajte jej meno a meno/rolu jej postavy (napr. majordomus, matka, Juraj).",
       "crew": "Štáb",
-      "crewHelp": "Pridajte osoby, ktoré sa podieľali na filme. Pri každej osobe vyberte jednu alebo viac rolí z ponuky. Niektoré role musia byť obsadené (Réžia, Námet, Scenár, Produkcia).",
+      "crewHelp": "Pridajte osoby, ktoré sa podieľali na filme. Ku každej osobe pridajte jej meno a vyberte jednu alebo viac rolí z ponuky. Niektoré role musia byť obsadené (Réžia, Námet, Scenár, Produkcia).",
       "crewRoles": {
         "director": "Réžia",
         "story": "Námet",
@@ -83,6 +84,7 @@
         "stunts": "Kaskadér/ka"
       },
       "description": "Anotácia",
+      "descriptionHelp": "Stručný popis vášho filmu, ktorý zaujme diváka, bez toho aby odhalil príliš veľa. Priložte anglickú, a českú alebo slovenskú verziu!",
       "genre": "Žáner",
       "genreHelp": "Vyberte aspoň 1 a maximálne 4 žánre alebo si definujte vlastné. Žánre, ktoré definujete, nesmú obsahovať čiarku a musia mať dĺžku aspoň 1 a maximálne 32 znakov.",
       "genres": {
@@ -112,6 +114,7 @@
       },
       "movie": "Film",
       "name": "Názov filmu",
+      "nameHelp": "Názov vášho filmu. Priložte anglickú, a českú alebo slovenskú verziu!",
       "videoannotation": "Videoanotácia",
       "nameMate": "Názov projektu"
     },
@@ -279,7 +282,7 @@
     "dramaturgy": {
       "ok": "Projekt bol prijatý na festival",
       "nok": "Projekt nebol prijatý na festival",
-      "unknown": "Projekt ešte nebol posúdený"
+      "unknown": "Projekt ešte nebol posúdený dramaturgickou porotou"
     },
     "file": {
       "ok": "Súbory sú nahrané a prešli automatizovanou kontrolou",
@@ -292,12 +295,12 @@
     "tech": {
       "ok": "Projekt prešiel kontrolou technikom",
       "nok": "Projekt neprešiel kontrolou technikom",
-      "unknown": "Projekt ešte nebol posúdený"
+      "unknown": "Projekt ešte nebol posúdený technikom"
     },
     "visual": {
       "ok": "Projekt prešiel kontrolou grafikom",
       "nok": "Projekt neprešiel kontrolou grafikom",
-      "unknown": "Projekt ešte nebol posúdený"
+      "unknown": "Projekt ešte nebol posúdený grafikom"
     },
     "pigeons-test": {
       "ok": "Projekt prešiel automatizovanými testami PIGEOnS",

@@ -61,8 +61,9 @@
     },
     "fields": {
       "cast": "Cast",
+      "castHelp": "Add the actors in the film. For each person, enter their name and the name/role of their character (e.g. butler, mom, George).",
       "crew": "Crew",
-      "crewHelp": "Add the people who worked on the film. For each person, select one or more roles from the list. Some roles must be assigned (Director, Story, Screenwriter, Producer).",
+      "crewHelp": "Add the people who worked on the film. For each person, enter their name and select one or more roles from the list. Some roles must be assigned (Director, Story, Screenwriter, Producer).",
       "crewRoles": {
         "director": "Director",
         "story": "Story",
@@ -83,6 +84,7 @@
         "stunts": "Stunt Performer"
       },
       "description": "Description",
+      "descriptionHelp": "A brief description of your film that intrigues the viewer without giving away too much. Provide an English and either a Czech or a Slovak version!",
       "genre": "Genre",
       "genreHelp": "Choose at least 1 and at most 4 genres, or define your own. Genres defined by you must not contain the comma character and must be at least 1 and at most 32 characters long.",
       "genres": {
@@ -111,7 +113,8 @@
         "western": "Western"
       },
       "movie": "Movie",
-      "name": "Name of the movie",
+      "name": "Title of the movie",
+      "nameHelp": "The title of your film. Provide an English and either a Czech or a Slovak version!",
       "videoannotation": "Video annotation",
       "nameMate": "Project name"
     },
@@ -279,7 +282,7 @@
     "dramaturgy": {
       "ok": "The project has been accepted to the festival",
       "nok": "The project has not been accepted to the festival",
-      "unknown": "The project has not yet received a review"
+      "unknown": "The project has not yet received a review from a dramaturgical jury"
     },
     "file": {
       "ok": "Files are uploaded and passed the automated check",
@@ -292,12 +295,12 @@
     "tech": {
       "ok": "The project passed the technician's check",
       "nok": "The project did not pass the technician's check",
-      "unknown": "The project has not yet received a review"
+      "unknown": "The project has not yet received a review from a technician"
     },
     "visual": {
       "ok": "The project passed the graphic designer's check",
       "nok": "The project did not pass the graphic designer's check",
-      "unknown": "The project has not yet received a review"
+      "unknown": "The project has not yet received a review from a designer"
     },
     "pigeons-test": {
       "ok": "The project passed the PIGEOnS automated tests",

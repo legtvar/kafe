@@ -72,7 +72,6 @@ public partial class ProjectService
     public const string DramaturgyReviewStage = "dramaturgy-review";
     public const string PigeonsTestStage = "pigeons-test";
 
-    public const string LemmaCurrentFilmFestivalProjectGroupId = "SA42xo3cf9y";
     public static readonly HashSet<string> LemmaMandatoryCrewRoles = new(
         new[] { "director", "story", "screenwriter", "producer" }
     );
@@ -919,7 +918,7 @@ public partial class ProjectService
             GenreTooShort
         );
 
-        if (project.ProjectGroupId == LemmaCurrentFilmFestivalProjectGroupId)
+        if (project.ProjectGroupId == Const.LemmaCurrentFilmFestivalProjectGroupId)
         {
             if (project.Authors.Count(a => a.Kind == ProjectAuthorKind.Crew) < 1)
             {
@@ -1015,7 +1014,15 @@ public partial class ProjectService
             throw new InvalidOperationException($"Project group '{project.ProjectGroupId}' could not be found.");
         }
         // TODO: Placeholder blueprints until the artifact overhaul is done.
-        var projectBlueprint = ProjectBlueprint.GetProjectBlueprintByOrgId(group.OrganizationId);
+        var projectBlueprint = ProjectBlueprint.TemporaryProjectBlueprint;
+        if (group.OrganizationId == "mate-fimuni")
+        {
+            projectBlueprint = ProjectBlueprint.TemporaryMateProjectBlueprint;
+        }
+        else if (project.ProjectGroupId == Const.LemmaCurrentFilmFestivalProjectGroupId)
+        {
+            projectBlueprint = ProjectBlueprint.TemporaryLemmaProjectBlueprint;
+        }
 
         var diagnostics = ImmutableArray.CreateBuilder<Diagnostic>();
 
@@ -1242,7 +1249,11 @@ public partial class ProjectService
                 .ToImmutableArray();
             if (coverPhotoArtifacts.Length < artifactBlueprints[Const.CoverPhotoBlueprintSlot].Arity.Min)
             {
-                diagnostics.Add(group.OrganizationId == "lemmafimuni" ? LemmaTooFewCoverPhotos : TooFewCoverPhotos);
+                diagnostics.Add(
+                    project.ProjectGroupId == Const.LemmaCurrentFilmFestivalProjectGroupId
+                    ? LemmaTooFewCoverPhotos
+                    : TooFewCoverPhotos
+                );
             }
             else if (coverPhotoArtifacts.Length > artifactBlueprints[Const.CoverPhotoBlueprintSlot].Arity.Max)
             {

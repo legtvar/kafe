@@ -437,19 +437,6 @@ public record ProjectBlueprint
                 }
             )
     };
-
-    public static ProjectBlueprint GetProjectBlueprintByOrgId(string id)
-    {
-        switch (id)
-        {
-            case "mate-fimuni":
-                return ProjectBlueprint.TemporaryMateProjectBlueprint;
-            case "lemmafimuni":
-                return ProjectBlueprint.TemporaryLemmaProjectBlueprint;
-            default:
-                return ProjectBlueprint.TemporaryProjectBlueprint;
-        }
-    }
 }
 
 public record ProjectArtifactBlueprint

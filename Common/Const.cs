@@ -5,6 +5,8 @@ namespace Kafe;
 
 public static class Const
 {
+    public const string LemmaCurrentFilmFestivalProjectGroupId = "SA42xo3cf9y";
+
     public const string OriginalShardVariant = "original";
     public const string InvalidPath = "invalid";
     public const string InvalidFileExtension = ".invalid";

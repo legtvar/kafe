@@ -33,19 +33,6 @@ public static class TransferMaps
         );
     }
 
-    public static ProjectBlueprintDto GetProjectBlueprintDtoByOrgId(string id)
-    {
-        switch (id)
-        {
-            case "mate-fimuni":
-                return TemporaryMateProjectBlueprintMockup;
-            case "lemmafimuni":
-                return TemporaryLemmaProjectBlueprintMockup;
-            default:
-                return TemporaryProjectBlueprintMockup;
-        }
-    }
-
     public static readonly ProjectBlueprintDto TemporaryProjectBlueprintMockup =
         ToProjectBlueprintDto(ProjectBlueprint.TemporaryProjectBlueprint);
 

@@ -61,7 +61,7 @@ export function ProjectDetail(props: IProjectDetailProps) {
                                     <Button leftIcon={<AiOutlineEdit />}>{t('generic.edit').toString()}</Button>
                                 </Link>
                             </Flex>
-                            
+
                             {project.ownerId && (
                                 <AwaitAPI
                                     request={(api) => api.accounts.info.getById(project.ownerId!)}
@@ -83,7 +83,12 @@ export function ProjectDetail(props: IProjectDetailProps) {
                                     <Heading as="h3" size="md" pt={12} pb={4}>
                                         {t('project.crew')}
                                     </Heading>
-                                    <ProjectAuthorList authors={project.crew} />
+                                    <ProjectAuthorList
+                                        authors={project.crew}
+                                        isDropdownCrewList={
+                                            (project.genre === undefined || project.genreTags !== undefined)
+                                        }
+                                    />
                                 </>
                             )}
                             {project.cast.length > 0 && (
@@ -129,9 +134,9 @@ export function ProjectDetail(props: IProjectDetailProps) {
                                 </Box>
                             }
                         </Box>
-                        
+
                     );
-                    
+
                 }}
             </AwaitAPI>
         </OutletOrChildren>

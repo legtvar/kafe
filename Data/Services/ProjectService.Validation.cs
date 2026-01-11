@@ -60,6 +60,7 @@ public partial class ProjectService
     public static readonly double[] RequiredFramerate = [24.0, 25.0];
     public const string RequiredFramerateDescriptionEnglish = "24 or 25 fps";
     public const string RequiredFramerateDescriptionCzech = "24 nebo 25 fps";
+    public const string RequiredFramerateDescriptionSlovak = "24 alebo 25 fps";
 
     public static long VideoAnnotationMaxFileLength = 512 << 20; // 512 MiB
     public static string VideoAnnotationMaxFileLengthDescription = "512 GiB";
@@ -343,9 +344,19 @@ public partial class ProjectService
         Kind: DiagnosticKind.Error,
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
-            (Const.InvariantCulture, "At least one cover photo is required."),
-            (Const.CzechCulture, "Je vyžadována alespoň jedna titulní fotografie."),
-            (Const.SlovakCulture, "Je vyžadovaná aspoň jedna titulná fotografia.")
+            (Const.InvariantCulture, "At least one annotation photograph is required."),
+            (Const.CzechCulture, "Je vyžadována alespoň jedna anotační fotografie."),
+            (Const.SlovakCulture, "Je vyžadovaná aspoň jedna anotačná fotografia.")
+        )
+    );
+
+    public static readonly Diagnostic LemmaTooFewCoverPhotos = new Diagnostic(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: FileStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, "At least two annotation photographs are required."),
+            (Const.CzechCulture, "Jsou vyžadovány alespoň dvě anotační fotografie."),
+            (Const.SlovakCulture, "Sú vyžadované aspoň dve anotačné fotografie.")
         )
     );
 
@@ -353,9 +364,9 @@ public partial class ProjectService
         Kind: DiagnosticKind.Error,
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
-            (Const.InvariantCulture, "Too many cover photos have been provided."),
-            (Const.CzechCulture, "Přihláška obsahuje příliš mnoho titulních fotografií."),
-            (Const.SlovakCulture, "Prihláška obsahuje príliš veľa titulných fotografií.")
+            (Const.InvariantCulture, "Too many annotation photographs have been provided."),
+            (Const.CzechCulture, "Přihláška obsahuje příliš mnoho anotačních fotografií."),
+            (Const.SlovakCulture, "Prihláška obsahuje príliš veľa anotačných fotografií.")
         )
     );
 
@@ -463,9 +474,9 @@ public partial class ProjectService
         Kind: DiagnosticKind.Error,
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
-            (Const.InvariantCulture, "A cover photo file is corrupted."),
-            (Const.CzechCulture, "Některá z titulních fotografií je poškozená."),
-            (Const.SlovakCulture, "Niektorá z titulných fotografií je poškodená.")
+            (Const.InvariantCulture, "An annotation photograph file is corrupted."),
+            (Const.CzechCulture, "Některá z anotačních fotografií je poškozená."),
+            (Const.SlovakCulture, "Niektorá z anotačných fotografií je poškodená.")
         )
     );
 
@@ -476,6 +487,16 @@ public partial class ProjectService
             (Const.InvariantCulture, "A subtitles file is corrupted."),
             (Const.CzechCulture, "Některý ze souborů s titulky je poškozený."),
             (Const.SlovakCulture, "Niektorý zo súborov s titulkami je poškodený.")
+        )
+    );
+
+    public static readonly Diagnostic LemmaSubtitlesCorrupted = new Diagnostic(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: FileStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, "The subtitles file is corrupted."),
+            (Const.CzechCulture, "Soubor s titulky je poškozený."),
+            (Const.SlovakCulture, "Súbor s titulkami je poškodený.")
         )
     );
 
@@ -583,7 +604,7 @@ public partial class ProjectService
         Message: LocalizedString.Create(
             (Const.InvariantCulture, $"The film file has an unsupported framerate. The required framerate is {RequiredFramerateDescriptionEnglish}."),
             (Const.CzechCulture, $"Soubor s filmem má nepodporovaný framerate. Vyžadovaný framerate je {RequiredFramerateDescriptionCzech}."),
-            (Const.SlovakCulture, $"Súbor s filmom má nepodporovaný framerate. Vyžadovaný framerate je {RequiredFramerateDescriptionCzech}.")
+            (Const.SlovakCulture, $"Súbor s filmom má nepodporovaný framerate. Vyžadovaný framerate je {RequiredFramerateDescriptionSlovak}.")
         )
     );
 
@@ -593,7 +614,7 @@ public partial class ProjectService
         Message: LocalizedString.Create(
             (Const.InvariantCulture, $"The video-annotation file has an unsupported framerate. The required framerate is {RequiredFramerateDescriptionEnglish}."),
             (Const.CzechCulture, $"Soubor s videoanotací má nepodporovaný framerate. Vyžadovaný framerate je {RequiredFramerateDescriptionCzech}."),
-            (Const.SlovakCulture, $"Súbor s videoanotáciou má nepodporovaný framerate. Vyžadovaný framerate je {RequiredFramerateDescriptionCzech}.")
+            (Const.SlovakCulture, $"Súbor s videoanotáciou má nepodporovaný framerate. Vyžadovaný framerate je {RequiredFramerateDescriptionSlovak}.")
         )
     );
 
@@ -641,9 +662,9 @@ public partial class ProjectService
         Kind: DiagnosticKind.Error,
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
-            (Const.InvariantCulture, $"All cover photo images must have a shorter-side resolution of at least {CoverPhotoShorterSideResolution}."),
-            (Const.CzechCulture, $"Všechny titulní fotografie musí mít na kratší straně rozlišení alespoň {CoverPhotoShorterSideResolution} pixelů."),
-            (Const.SlovakCulture, $"Všetky titulné fotografie musia mať na kratšej strane rozlíšenie aspoň {CoverPhotoShorterSideResolution} pixelov.")
+            (Const.InvariantCulture, $"All annotation photographs must have a shorter-side resolution of at least {CoverPhotoShorterSideResolution}."),
+            (Const.CzechCulture, $"Všechny anotační fotografie musí mít na kratší straně rozlišení alespoň {CoverPhotoShorterSideResolution} pixelů."),
+            (Const.SlovakCulture, $"Všetky anotačné fotografie musia mať na kratšej strane rozlíšenie aspoň {CoverPhotoShorterSideResolution} pixelov.")
         )
     );
 
@@ -651,9 +672,9 @@ public partial class ProjectService
         Kind: DiagnosticKind.Error,
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
-            (Const.InvariantCulture, $"All cover photo images must be in the JPEG or PNG format."),
-            (Const.CzechCulture, $"Všechny titulní fotografie musí být buď ve formátu JPEG, nebo PNG."),
-            (Const.SlovakCulture, $"Všetky titulné fotografie musia byť buď vo formáte JPEG, alebo PNG.")
+            (Const.InvariantCulture, $"All annotation photographs must be in the JPEG or PNG format."),
+            (Const.CzechCulture, $"Všechny anotační fotografie musí být buď ve formátu JPEG, nebo PNG."),
+            (Const.SlovakCulture, $"Všetky anotačné fotografie musia byť buď vo formáte JPEG, alebo PNG.")
         )
     );
 
@@ -664,6 +685,16 @@ public partial class ProjectService
             (Const.InvariantCulture, $"All subtitles must be in the SRT or ASS format."),
             (Const.CzechCulture, $"Všechny titulky musí být buď ve formátu SRT, nebo ASS."),
             (Const.SlovakCulture, $"Všetky titulky musia byť buď vo formáte SRT, alebo ASS.")
+        )
+    );
+
+    public static readonly Diagnostic LemmaSubtitlesWrongFormat = new Diagnostic(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: FileStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, $"The subtitles must be in the SRT format."),
+            (Const.CzechCulture, $"Titulky musí být ve formátu SRT."),
+            (Const.SlovakCulture, $"Titulky musia byť vo formáte SRT.")
         )
     );
 
@@ -711,31 +742,41 @@ public partial class ProjectService
         Kind: DiagnosticKind.Error,
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
-            (Const.InvariantCulture, $"A cover photo is missing the image file."),
-            (Const.CzechCulture, $"Některým z titulních fotografií chybí obrazový soubor."),
-            (Const.SlovakCulture, $"Niektorým z titulných fotografií chýba obrazový súbor.")
+            (Const.InvariantCulture, $"An annotation photograph is missing the image file."),
+            (Const.CzechCulture, $"Některým z anotačních fotografií chybí obrazový soubor."),
+            (Const.SlovakCulture, $"Niektorým z anotačných fotografií chýba obrazový súbor.")
         )
     );
 
     public static readonly Diagnostic MissingSubtitlesFile = new Diagnostic(
-    Kind: DiagnosticKind.Error,
-    ValidationStage: FileStage,
-    Message: LocalizedString.Create(
-        (Const.InvariantCulture, $"Some subtitles are missing the subtitles file."),
-        (Const.CzechCulture, $"Některým z titulků chybí soubor s titulky."),
-        (Const.SlovakCulture, $"Niektorým z titulkiek chýba súbor s titulkami.")
-    )
-);
+        Kind: DiagnosticKind.Error,
+        ValidationStage: FileStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, $"Some subtitles are missing the subtitles file."),
+            (Const.CzechCulture, $"Některým z titulků chybí soubor s titulky."),
+            (Const.SlovakCulture, $"Niektorým z titulkiek chýba súbor s titulkami.")
+        )
+    );
+
+    public static readonly Diagnostic LemmaMissingSubtitlesFile = new Diagnostic(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: FileStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, $"The subtitles are missing the subtitles file."),
+            (Const.CzechCulture, $"Titulkům chybí soubor s titulky."),
+            (Const.SlovakCulture, $"Titulkám chýba súbor s titulkami.")
+        )
+    );
 
     public static readonly Diagnostic CoverPhotoWrongRatio = new Diagnostic(
         Kind: DiagnosticKind.Error,
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
-            (Const.InvariantCulture, $"All cover photos must have aspect ratio between " +
+            (Const.InvariantCulture, $"All annotation photographs must have aspect ratio between " +
                 $"{CoverPhotoMinRatioDescription} and {CoverPhotoMaxRatioDescription}."),
-            (Const.CzechCulture, $"Všechny titulní fotografie musí mít poměr stran mezi " +
+            (Const.CzechCulture, $"Všechny anotační fotografie musí mít poměr stran mezi " +
                 $"{CoverPhotoMinRatioDescription} a {CoverPhotoMaxRatioDescription}."),
-            (Const.SlovakCulture, $"Všetky titulné fotografie musia mať pomer strán medzi " +
+            (Const.SlovakCulture, $"Všetky anotačné fotografie musia mať pomer strán medzi " +
                 $"{CoverPhotoMinRatioDescription} a {CoverPhotoMaxRatioDescription}.")
         )
     );
@@ -974,9 +1015,7 @@ public partial class ProjectService
             throw new InvalidOperationException($"Project group '{project.ProjectGroupId}' could not be found.");
         }
         // TODO: Placeholder blueprints until the artifact overhaul is done.
-        var projectBlueprint = group.OrganizationId == "mate-fimuni"
-        ? ProjectBlueprint.TemporaryMateProjectBlueprint
-        : ProjectBlueprint.TemporaryProjectBlueprint;
+        var projectBlueprint = ProjectBlueprint.GetProjectBlueprintByOrgId(group.OrganizationId);
 
         var diagnostics = ImmutableArray.CreateBuilder<Diagnostic>();
 
@@ -1111,7 +1150,7 @@ public partial class ProjectService
                     }
                     else
                     {
-                        diagnostics.AddRange(ValidateSubtitles(subtitleShard));
+                        diagnostics.AddRange(ValidateSubtitles(subtitleShard, group.OrganizationId));
                     }
                 }
             }
@@ -1203,7 +1242,7 @@ public partial class ProjectService
                 .ToImmutableArray();
             if (coverPhotoArtifacts.Length < artifactBlueprints[Const.CoverPhotoBlueprintSlot].Arity.Min)
             {
-                diagnostics.Add(TooFewCoverPhotos);
+                diagnostics.Add(group.OrganizationId == "lemmafimuni" ? LemmaTooFewCoverPhotos : TooFewCoverPhotos);
             }
             else if (coverPhotoArtifacts.Length > artifactBlueprints[Const.CoverPhotoBlueprintSlot].Arity.Max)
             {
@@ -1471,23 +1510,23 @@ public partial class ProjectService
         }
     }
 
-    private static IEnumerable<Diagnostic> ValidateSubtitles(SubtitlesShardInfo subtitles)
+    private static IEnumerable<Diagnostic> ValidateSubtitles(SubtitlesShardInfo subtitles, string? orgId = null)
     {
         if (!subtitles.Variants.ContainsKey(Const.OriginalShardVariant))
         {
-            yield return MissingSubtitlesFile;
+            yield return orgId == "lemmafimuni" ? LemmaMissingSubtitlesFile : MissingSubtitlesFile;
         }
 
         var originalVariant = subtitles.Variants[Const.OriginalShardVariant];
 
         if (originalVariant.IsCorrupted)
         {
-            yield return SubtitlesCorrupted;
+            yield return orgId == "lemmafimuni" ? LemmaSubtitlesCorrupted : SubtitlesCorrupted;
         }
 
         if (!AllowedSubtitleCodecs.Contains(originalVariant.Codec))
         {
-            yield return SubtitlesWrongFormat;
+            yield return orgId == "lemmafimuni" ? LemmaSubtitlesWrongFormat : SubtitlesWrongFormat;
         }
     }
 

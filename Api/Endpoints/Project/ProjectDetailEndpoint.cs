@@ -84,9 +84,8 @@ public class ProjectDetailEndpoint : EndpointBaseAsync
                 group.ValidationSettings,
                 ProjectValidationSettings.Default
             ),
-            Blueprint = group.OrganizationId == "mate-fimuni"
-            ? TransferMaps.TemporaryMateProjectBlueprintMockup
-            : TransferMaps.TemporaryProjectBlueprintMockup // TODO: temporary workaround until artifact blueprints are implemented
+            Blueprint = TransferMaps.GetProjectBlueprintDtoByOrgId(group.OrganizationId)
+            // TODO: temporary workaround until artifact blueprints are implemented
         };
 
         var artifactDetails = await artifactService.LoadDetailMany(

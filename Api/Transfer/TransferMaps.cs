@@ -33,10 +33,26 @@ public static class TransferMaps
         );
     }
 
-    public static readonly ProjectBlueprintDto TemporaryProjectBlueprintMockup = 
+    public static ProjectBlueprintDto GetProjectBlueprintDtoByOrgId(string id)
+    {
+        switch (id)
+        {
+            case "mate-fimuni":
+                return TemporaryMateProjectBlueprintMockup;
+            case "lemmafimuni":
+                return TemporaryLemmaProjectBlueprintMockup;
+            default:
+                return TemporaryProjectBlueprintMockup;
+        }
+    }
+
+    public static readonly ProjectBlueprintDto TemporaryProjectBlueprintMockup =
         ToProjectBlueprintDto(ProjectBlueprint.TemporaryProjectBlueprint);
-        
-    public static ProjectBlueprintDto TemporaryMateProjectBlueprintMockup = 
+
+    public static ProjectBlueprintDto TemporaryLemmaProjectBlueprintMockup =
+        ToProjectBlueprintDto(ProjectBlueprint.TemporaryLemmaProjectBlueprint);
+
+    public static ProjectBlueprintDto TemporaryMateProjectBlueprintMockup =
         ToProjectBlueprintDto(ProjectBlueprint.TemporaryMateProjectBlueprint);
 
     public static ProjectListDto ToProjectListDto(ProjectInfo data, Permission userPermission = Permission.None)
@@ -318,7 +334,7 @@ public static class TransferMaps
             Message: data.Message,
             Traceback: data.Traceback);
     }
-                
+
 
     public static TemporaryAccountInfoDto ToTemporaryAccountInfoDto(AccountInfo data)
     {

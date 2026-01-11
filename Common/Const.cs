@@ -22,8 +22,12 @@ public static class Const
     public const string FilmBlueprintSlot = "film";
     public const string VideoAnnotationBlueprintSlot = "video-annotation";
     public const string CoverPhotoBlueprintSlot = "cover-photo";
+    public const string BTSPhotoBlueprintSlot = "bts-photo";
     public const int CoverPhotoMinCount = 1;
     public const int CoverPhotoMaxCount = 5;
+    public const int LemmaCoverPhotoMinCount = 2;
+    public const int BTSPhotoMinCount = 0;
+    public const int BTSPhotoMaxCount = 5;
 
     public const string SystemName = "System";
 

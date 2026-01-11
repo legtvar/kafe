@@ -7,6 +7,7 @@ import { HRIB } from '../../schemas/generic';
 import { AwaitAPI } from './AwaitAPI';
 import { KafeAvatar } from './KafeAvatar';
 import { t } from 'i18next';
+import crewRoleManager from '@/utils/managers/crewRolesManager';
 
 interface IProjectAuthorListProps {
     authors: components['schemas']['ProjectAuthorDto'][];
@@ -53,9 +54,9 @@ function SimpleProjectAuthorList({
             <VStack alignItems="start" pl={2} spacing={0}>
                 <Text fontWeight="bolder">{author.name}</Text>
                 <Text color="gray.500">
-                    {(isDropdownCrewList ?
-                    author.roles.map(role => t(`createProject.fields.crewRoles.${role}`)) :
-                    author.roles)
+                    {(isDropdownCrewList && author.roles.every(role => crewRoleManager.tags.has(role))
+                    ? author.roles.map(role => t(`createProject.fields.crewRoles.${role}`))
+                    : author.roles)
                     .join(', ')}
                 </Text>
             </VStack>

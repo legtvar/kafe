@@ -52,11 +52,11 @@ export function ArtifactGroupUpload(props: IArtifactGroupUploadProps) {
                     <FormLabel>{getPrefered(toLocalizedString(name))}</FormLabel>
                     <FormHelperText mb={6}>
                         {getPrefered(toLocalizedString(description))}{' '}
-                        {arity.min === arity.max
+                        <b>{arity.min === arity.max
                             ? `(${arity.min}x)`
                             : arity.max < 10000 // maximum arity
-                            ? `(${arity.min} - ${arity.max}×)`
-                            : `(${arity.min}+)`}
+                            ? `(${arity.min} - ${arity.max}x)`
+                            : `(${arity.min}+)`}</b>
                     </FormHelperText>
 
                     {artifactsInSlot.map((artifact, key) => (

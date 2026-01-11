@@ -12,7 +12,7 @@ public record ProjectValidationSettings
         MaxNameLength = 42,
         RequiredNameCultures = [Const.EnglishCultureName, Const.CzechOrSlovakPseudoCultureName],
         MinDescriptionLength = 50,
-        MaxDescriptionLength = 200,
+        MaxDescriptionLength = 300,
         RequiredDescriptionCultures = [Const.EnglishCultureName, Const.CzechOrSlovakPseudoCultureName],
         MinGenreLength = 1,
         MaxGenreLength = 134,

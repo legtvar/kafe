@@ -6,63 +6,66 @@ namespace Kafe.Core.Requirements;
 
 public static class RequirementContextExtensions
 {
-    public static async Task<IShard?> RequireShard(this IRequirementContext<IRequirement> context)
+    extension(IRequirementContext<IRequirement> ctx)
     {
-        if (context.Target.Value is not ShardReference shardRef)
+        public void ReportIncompatible()
         {
-            context.Report(new IncompatibleRequirementDiagnostic(
-                context.RequirementType,
-                context.Target.Type
-            ));
-            return null;
+            ctx.Report(
+                new IncompatibleRequirementDiagnostic(
+                    ctx.Requirement.GetType(),
+                    ctx.Target.GetType()
+                )
+            );
         }
 
-        var repo = context.ServiceProvider.GetRequiredService<IRepository<IShard>>();
-        var shard = await repo.Read(shardRef.ShardId, context.CancellationToken);
-        if (shard.HasDiagnostic)
+        public async Task<IShard?> RequireShard()
         {
-            context.Report(shard.Diagnostic);
-            return shard.Value;
+            if (ctx.Target is not ShardReference shardRef)
+            {
+                ctx.ReportIncompatible();
+                return null;
+            }
+
+            var readOp = ctx.ServiceProvider.GetRequiredService<IReadById<IShard>>();
+            var shard = await readOp.Read(shardRef.ShardId, ctx.CancellationToken);
+            if (shard is null)
+            {
+                ctx.Report(new NotFoundDiagnostic(typeof(IShard), shardRef.ShardId));
+                return null;
+            }
+
+            return shard;
         }
 
-        return shard.Value;
+        public async Task<(IShard shard, TPayload payload)?> RequireShardPayload<TPayload>()
+        {
+            var shard = await ctx.RequireShard();
+            if (shard is null)
+            {
+                return null;
+            }
+
+            if (shard.Payload.Value is not TPayload payload)
+            {
+                ctx.ReportIncompatible();
+                return null;
+            }
+
+            return (shard, payload);
+        }
     }
 
-    public static async Task<(IShard shard, TMetadata metadata)?> RequireShardMetadata<TMetadata>(
-        this IRequirementContext<IRequirement> context
-    )
+    extension(IShardRequirementContext<IRequirement> shardCtx)
     {
-        var shard = await context.RequireShard();
-        if (shard is null)
+        public TPayload? RequireShardPayload<TPayload>()
         {
-            return null;
+            if (shardCtx.Shard.Payload.Value is not TPayload payload)
+            {
+                shardCtx.ReportIncompatible();
+                return default;
+            }
+
+            return payload;
         }
-
-        if (shard.Payload.Value is not TMetadata metadata)
-        {
-            context.Report(new IncompatibleRequirementDiagnostic(
-                context.RequirementType,
-                shard.Payload.Type
-            ));
-            return null;
-        }
-
-        return (shard, metadata);
-    }
-
-    public static TMetadata? RequireShardMetadata<TMetadata>(
-        this IShardRequirementContext<IRequirement> context
-    )
-    {
-        if (context.Shard.Payload.Value is not TMetadata metadata)
-        {
-            context.Report(new IncompatibleRequirementDiagnostic(
-                context.RequirementType,
-                context.Shard.Payload.Type
-            ));
-            return default;
-        }
-
-        return metadata;
     }
 }

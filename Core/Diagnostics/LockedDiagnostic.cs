@@ -1,7 +1,9 @@
+using System;
+
 namespace Kafe.Core.Diagnostics;
 
 public record LockedDiagnostic(
-    KafeType EntityType,
+    Type EntityType,
     Hrib Id
 ) : IDiagnosticPayload
 {

@@ -10,8 +10,8 @@ public static class RequirementContextExtensions
         this IRequirementContext<IRequirement> context
     )
     {
-        var pair = await context.RequireShardMetadata<MediaInfo>();
-        if (pair.HasValue && pair.Value.metadata.IsCorrupted == true)
+        var pair = await context.RequireShardPayload<MediaInfo>();
+        if (pair.HasValue && pair.Value.payload.IsCorrupted == true)
         {
             context.Report(new CorruptedShardDiagnostic(
                 ShardName: pair.Value.shard.Name,
@@ -28,7 +28,7 @@ public static class RequirementContextExtensions
         this IShardRequirementContext<IRequirement> context
     )
     {
-        var metadata = context.RequireShardMetadata<MediaInfo>();
+        var metadata = context.RequireShardPayload<MediaInfo>();
         if (metadata is not null && metadata.IsCorrupted)
         {
             context.Report(new CorruptedShardDiagnostic(

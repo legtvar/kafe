@@ -3,7 +3,7 @@ using System;
 namespace Kafe.Core.Diagnostics;
 
 public record UnmodifiedDiagnostic(
-    KafeType EntityType,
+    Type EntityType,
     Hrib Id
 ) : IDiagnosticPayload
 {

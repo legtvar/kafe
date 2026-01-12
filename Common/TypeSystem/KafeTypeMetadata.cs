@@ -7,6 +7,7 @@ namespace Kafe;
 public record KafeTypeMetadata(
     KafeType KafeType,
     Type DotnetType,
+    ImmutableHashSet<Type> DotnetTypeAliases,
     KafeTypeAccessibility Accessibility,
     LocalizedString? Title,
     JsonConverter? Converter,

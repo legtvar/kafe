@@ -1,7 +1,9 @@
+using System;
+
 namespace Kafe.Core.Diagnostics;
 
 public record ShardAnalysisFailureDiagnostic(
-    KafeType ShardType
+    Type ShardType
 ) : IDiagnosticPayload
 {
     public static string Moniker => "shard-analysis-failure";

@@ -1,8 +1,10 @@
+using System;
+
 namespace Kafe.Core.Diagnostics;
 
 public record IncompatibleRequirementDiagnostic(
-    KafeType RequirementType,
-    KafeType ObjectType
+    Type RequirementType,
+    Type ObjectType
 ) : IDiagnosticPayload
 {
     public static string Moniker => "incompatible-requirement";

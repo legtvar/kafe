@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Text.Json.Serialization;
 
 namespace Kafe;
@@ -13,16 +14,18 @@ public record KafeTypeRegistrationOptions
     public string? Moniker { get; set; } = null;
 
     public LocalizedString? Title { get; set; } = null;
+
+    public ISet<Type> Aliases { get; set; } = ImmutableHashSet.CreateBuilder<Type>();
 }
 
 public record ScalarRegistrationOptions : KafeTypeRegistrationOptions
 {
-    public List<IRequirement> DefaultRequirements { get; set; } = [];
+    public IList<IRequirement> DefaultRequirements { get; set; } = ImmutableArray.CreateBuilder<IRequirement>();
 }
 
 public record RequirementRegistrationOptions : KafeTypeRegistrationOptions
 {
-    public List<Type> HandlerTypes { get; set; } = [];
+    public IList<Type> HandlerTypes { get; set; } = ImmutableArray.CreateBuilder<Type>();
 }
 
 public record DiagnosticPayloadRegistrationOptions : KafeTypeRegistrationOptions
@@ -32,5 +35,5 @@ public record DiagnosticPayloadRegistrationOptions : KafeTypeRegistrationOptions
 
 public record ShardPayloadRegistrationOptions : KafeTypeRegistrationOptions
 {
-    public List<Type> AnalyzerTypes { get; set; } = [];
+    public IList<Type> AnalyzerTypes { get; set; } = ImmutableArray.CreateBuilder<Type>();
 }

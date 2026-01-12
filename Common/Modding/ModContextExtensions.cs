@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Immutable;
 using System.Reflection;
 
 namespace Kafe;
@@ -107,6 +108,9 @@ public static class ModContextExtensions
                 new KafeTypeMetadata(
                     KafeType: kafeType,
                     DotnetType: type,
+                    DotnetTypeAliases: options.Aliases is ImmutableHashSet<Type>.Builder builder
+                        ? builder.ToImmutable()
+                        : options.Aliases.ToImmutableHashSet(),
                     Accessibility: options.Accessibility,
                     Title: options.Title,
                     Converter: options.Converter,

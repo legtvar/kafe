@@ -75,9 +75,13 @@ export function Navbar({ onOpen, forceReload, signedIn, ...rest }: INavbarProps)
             {signedIn && <Spacer display={{ base: 'flex', md: 'none' }} />}
 
             <Flex h="20" alignItems="center" ml={2} mr={8} justifyContent="space-between" key="heading">
-                <Link to="/">
+                <ConfirmExitLink
+                    alertCondition={location.pathname.endsWith("edit") || location.pathname.endsWith("create")}
+                    destPath={authLink("/")}
+                    handleConfirm={() => {}}
+                >
                     <Logo />
-                </Link>
+                </ConfirmExitLink>
             </Flex>
             
             {api.isStaging && (
@@ -97,15 +101,6 @@ export function Navbar({ onOpen, forceReload, signedIn, ...rest }: INavbarProps)
 
             {signedIn && <Spacer display={{ base: 'flex', md: 'none' }} />}
 
-            <Flex h="20" alignItems="center" ml={2} mr={8} justifyContent="space-between" key="heading">
-                <ConfirmExitLink
-                    alertCondition={location.pathname.endsWith("edit") || location.pathname.endsWith("create")}
-                    destPath={authLink("/")}
-                    handleConfirm={() => {}}
-                >
-                    <Logo />
-                </ConfirmExitLink>
-            </Flex>
 
             <Spacer />
 

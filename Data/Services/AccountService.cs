@@ -25,7 +25,6 @@ public class AccountService(
     IDocumentSession db,
     EntityMetadataProvider entityMetadataProvider,
     IDataProtectionProvider dataProtectionProvider,
-    DiagnosticFactory diagnosticFactory,
     ILogger<AccountService> logger
 )
 {

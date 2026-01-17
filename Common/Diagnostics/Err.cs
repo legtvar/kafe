@@ -7,12 +7,17 @@ namespace Kafe;
 /// <summary>
 /// An error type. Can contain a <see cref="Diagnostic "/>, a value of <typeparamref name="T"/> or both.
 /// </summary>
+/// <remarks>
+/// Guarantees that if <see cref="HasError"/> is false then <see cref="Value"/> is not null nor
+/// <see cref="IInvalidable{T}.Invalid"/>.
+/// Also, if <see cref="HasValue"/> is false then <see cref="HasError"/> is true.
+/// However, if <see cref="HasValue"/> is true, then <see cref="HasError"/> MAY still be true and there MAY
+/// be an error <see cref="Diagnostic"/>.
+/// </remarks>
 // Inspired in part by: https://stackoverflow.com/questions/3151702/discriminated-union-in-c-sharp
 // And: https://ziglang.org/documentation/master/#while-with-Error-Unions
 public readonly record struct Err<T>
 {
-    private static readonly Diagnostic FallbackDiagnostic = new Diagnostic(new GenericErrorDiagnostic());
-
     [MaybeNull]
     private readonly T value = default!;
 
@@ -63,7 +68,7 @@ public readonly record struct Err<T>
     /// Is there an error diagnostic? If yes, <see cref="Value"/> is undefined.
     /// </summary>
     [MemberNotNullWhen(false, nameof(Value))]
-    public bool HasError => !HasValue;
+    public bool HasError => Diagnostic is { IsValid: true, Severity: DiagnosticSeverity.Error };
 
     [MemberNotNullWhen(true, nameof(Value))]
     public bool HasValue => value is not null
@@ -121,11 +126,6 @@ public readonly record struct Err<T>
         if (err.HasError)
         {
             throw new KafeErrorException(err.Diagnostic);
-        }
-
-        if (!err.HasValue)
-        {
-            throw new InvalidOperationException("This Err<T> has no valid Value or Diagnostic to unwrap.");
         }
 
         return err.Value;

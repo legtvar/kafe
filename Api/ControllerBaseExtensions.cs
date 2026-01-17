@@ -6,41 +6,43 @@ namespace Kafe.Api;
 
 public static class ControllerBaseExtensions
 {
-    public static ActionResult KafeErrResult<T>(this ControllerBase controller, Err<T> err)
+    extension(ControllerBase controller)
     {
-        if (err.HasValue)
+        public ActionResult KafeErrResult<T>(Err<T> err)
         {
+            if (err.HasError)
+            {
+                var pd = KafeProblemDetails.Create(
+                    httpContext: controller.HttpContext,
+                    modelState: controller.ModelState,
+                    skipFrames: 2
+                );
+                pd.Errors = pd.Errors.AddRange(err.Diagnostic);
+
+                return new ObjectResult(pd)
+                {
+                    StatusCode = pd.Status
+                };
+            }
+
             return new OkObjectResult(err.Value);
         }
 
-        var pd = KafeProblemDetails.Create(
-            httpContext: controller.HttpContext,
-            modelState: controller.ModelState,
-            skipFrames: 2
-        );
-        pd.Errors = pd.Errors.AddRange(err.Diagnostic);
-
-        return new ObjectResult(pd)
+        public ActionResult KafeErrorResult(
+            params IEnumerable<Diagnostic> diagnostics
+        )
         {
-            StatusCode = pd.Status
-        };
-    }
+            var pd = KafeProblemDetails.Create(
+                httpContext: controller.HttpContext,
+                modelState: controller.ModelState,
+                skipFrames: 2
+            );
+            pd.Errors = pd.Errors.AddRange(diagnostics);
 
-    public static ActionResult KafeErrorResult(
-        this ControllerBase controller,
-        params IEnumerable<Diagnostic> diagnostics
-    )
-    {
-        var pd = KafeProblemDetails.Create(
-            httpContext: controller.HttpContext,
-            modelState: controller.ModelState,
-            skipFrames: 2
-        );
-        pd.Errors = pd.Errors.AddRange(diagnostics);
-
-        return new ObjectResult(pd)
-        {
-            StatusCode = pd.Status
-        };
+            return new ObjectResult(pd)
+            {
+                StatusCode = pd.Status
+            };
+        }
     }
 }

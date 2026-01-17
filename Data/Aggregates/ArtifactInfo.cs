@@ -21,14 +21,9 @@ public record ArtifactInfo(
     DateTimeOffset AddedOn,
 
     ImmutableDictionary<string, KafeObject> Properties
-) : IArtifact
+) : IArtifact, IInvalidable<ArtifactInfo>
 {
-    public static readonly ArtifactInfo Invalid = new();
-
-    static LocalizedString? IEntity.Title => LocalizedString.Create(
-        (Const.InvariantCulture, "Artifact"),
-        (Const.CzechCulture, "Artefakt")
-    );
+    public static ArtifactInfo Invalid { get; } = new();
 
     public ArtifactInfo() : this(
         Id: Hrib.InvalidValue,
@@ -46,17 +41,15 @@ public record ArtifactInfo(
 
     LocalizedString IArtifact.Name => Name;
 
+    public bool IsValid => ((IEntity)this).Id.IsValid;
+
     /// <summary>
     /// Creates a bare-bones but valid <see cref="ArtifactInfo"/>.
     /// </summary>
     [MartenIgnore]
     public static ArtifactInfo Create(LocalizedString name)
     {
-        return new ArtifactInfo() with
-        {
-            Id = Hrib.EmptyValue,
-            Name = name
-        };
+        return new ArtifactInfo { Id = Hrib.EmptyValue, Name = name };
     }
 }
 

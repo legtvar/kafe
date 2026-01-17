@@ -10,7 +10,7 @@ public interface IInvalidable
     }
 }
 
-public interface IInvalidable<T> : IInvalidable
+public interface IInvalidable<out T> : IInvalidable
     where T : IInvalidable<T>
 {
     static abstract T Invalid { get; }

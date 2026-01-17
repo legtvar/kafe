@@ -54,6 +54,8 @@ public record InviteInfo(
 
     [JsonIgnore]
     public DateTimeOffset? DeletedAt { get; set; }
+
+    Hrib IEntity.Id => Id;
 }
 
 public record InvitePermissionEntry(

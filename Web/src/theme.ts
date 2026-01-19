@@ -5,7 +5,13 @@ import { MultiSelectTheme } from 'chakra-multiselect';
 // see https://chakra-ui.com/docs/styled-system/theme
 const theme = extendTheme({
     components: {
-        MultiSelect: MultiSelectTheme
+        MultiSelect: {
+            ...MultiSelectTheme,
+            baseStyle: (props: Record<string, any>) => {
+                const bs = MultiSelectTheme.baseStyle(props);
+                return { ...bs, input: { ...bs.input, bgColor: mode('white', 'gray.900')(props) } }
+            }
+        }
     },
     config: {
         initialColorMode: 'light',

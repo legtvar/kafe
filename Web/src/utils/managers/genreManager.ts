@@ -17,7 +17,7 @@ const getValue = (genres: localizedString | undefined): TaggedOption[] | undefin
     if (!genres) {
         return [];
     }
-    
+
     if (!genres.iv) {
         return undefined;
     }
@@ -26,12 +26,10 @@ const getValue = (genres: localizedString | undefined): TaggedOption[] | undefin
 
         tag = tag.trim();
         let name = tag;
-        if (GENRE_TAGS.has(tag))
-        {
+        if (GENRE_TAGS.has(tag)) {
             name = t(`createProject.fields.genres.${tag}`).toString();
         }
-        else
-        {
+        else {
             name = tag;
             tag = USER_DEFINED_ITEM_TAG;
         }
@@ -46,6 +44,7 @@ const onChange = (value: Option | Option[], project: Project, fu: (x: any) => vo
 
     // Can not have no genres!
     if (values.length === 0) {
+        fu(project.set('genreTags', []));
         fu(project.set('genre', undefined));
         return;
     }

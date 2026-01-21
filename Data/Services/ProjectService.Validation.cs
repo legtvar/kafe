@@ -907,6 +907,7 @@ public partial class ProjectService
             DescriptionTooLong,
             DescriptionTooShort
         );
+
         ValidateLocalizedString(
             diagnostics,
             project.Genre,

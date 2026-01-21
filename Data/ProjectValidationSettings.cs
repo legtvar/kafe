@@ -16,7 +16,7 @@ public record ProjectValidationSettings
         RequiredDescriptionCultures = [Const.EnglishCultureName, Const.CzechOrSlovakPseudoCultureName],
         MinGenreLength = 1,
         MaxGenreLength = 134,
-        RequiredGenreCultures = [Const.EnglishCultureName, Const.CzechOrSlovakPseudoCultureName],
+        RequiredGenreCultures = [],
     };
 
     public static readonly ProjectValidationSettings MateValidationSettings = new ProjectValidationSettings

@@ -908,8 +908,6 @@ public partial class ProjectService
             DescriptionTooShort
         );
 
-        Diagnostic? check_missing_genre_culture = (project.ProjectGroupId == LemmaCurrentFilmFestivalProjectGroupId) ? null : MissingGenreCulture;
-
         ValidateLocalizedString(
             diagnostics,
             project.Genre,
@@ -917,7 +915,7 @@ public partial class ProjectService
             settings.MaxGenreLength,
             settings.RequiredGenreCultures,
             MissingGenre,
-            check_missing_genre_culture,
+            MissingGenreCulture,
             GenreTooLong,
             GenreTooShort
         );
@@ -954,7 +952,7 @@ public partial class ProjectService
         int? maxLength,
         ImmutableHashSet<string>? requiredCultures,
         Diagnostic missing,
-        Diagnostic? missingCulture,
+        Diagnostic missingCulture,
         Diagnostic tooLong,
         Diagnostic tooShort
     )
@@ -964,7 +962,7 @@ public partial class ProjectService
             diagnostics.Add(missing);
         }
 
-        if (requiredCultures is not null && !requiredCultures.IsEmpty && missingCulture is not null)
+        if (requiredCultures is not null && !requiredCultures.IsEmpty)
         {
             foreach (var culture in requiredCultures)
             {

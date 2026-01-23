@@ -7,12 +7,12 @@ public record ShardCreated(
     long? FileLength,
     string? UploadFilename,
     string? MimeType,
-    KafeObject Metadata
+    KafeObject Payload
 );
 
 public record ShardMetadataSet(
     [Hrib] string ShardId,
-    KafeObject Metadata,
+    KafeObject Payload,
     ExistingKafeObjectHandling ExistingValueHandling
 );
 

@@ -150,7 +150,7 @@ namespace Kafe.Data.Events.Upcasts
                 FileLength: oldEvent.OriginalVariantInfo.FileLength,
                 UploadFilename: $"{oldEvent.ShardId}{oldEvent.OriginalVariantInfo.FileExtension}",
                 MimeType: oldEvent.OriginalVariantInfo.MimeType,
-                Metadata: new KafeObject(
+                Payload: new KafeObject(
                     Type: new KafeType("media", "shard", "video", false),
                     oldEvent.OriginalVariantInfo
                 )
@@ -196,7 +196,7 @@ namespace Kafe.Data.Events.Upcasts
                 FileLength: null,
                 UploadFilename: $"{oldEvent.ShardId}{oldEvent.OriginalVariantInfo.FileExtension}",
                 MimeType: oldEvent.OriginalVariantInfo.MimeType,
-                Metadata: new KafeObject(
+                Payload: new KafeObject(
                     Type: new KafeType("media", "shard", "image", false),
                     oldEvent.OriginalVariantInfo
                 )
@@ -242,7 +242,7 @@ namespace Kafe.Data.Events.Upcasts
                 FileLength: null,
                 UploadFilename: $"{oldEvent.ShardId}{oldEvent.OriginalVariantInfo.FileExtension}",
                 MimeType: oldEvent.OriginalVariantInfo.MimeType,
-                Metadata: new KafeObject(
+                Payload: new KafeObject(
                     Type: new KafeType("media", "shard", "subtitles", false),
                     oldEvent.OriginalVariantInfo
                 )
@@ -289,7 +289,7 @@ namespace Kafe.Data.Events.Upcasts
                 FileLength: null,
                 UploadFilename: $"{oldEvent.ShardId}{oldEvent.OriginalVariantInfo.FileExtension}",
                 MimeType: oldEvent.OriginalVariantInfo.MimeType,
-                Metadata: new KafeObject(
+                Payload: new KafeObject(
                     Type: new KafeType("media", "shard", "blend", false),
                     oldEvent.OriginalVariantInfo
                 )

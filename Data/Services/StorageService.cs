@@ -11,18 +11,13 @@ using Microsoft.Extensions.Logging;
 namespace Kafe.Data.Services;
 
 // TODO: This class should either throw more exceptions or return Err<T>
-public class StorageService
+public class StorageService(
+    IOptions<StorageOptions> options,
+    KafeTypeRegistry typeRegistry
+)
 {
-    private readonly IOptions<StorageOptions> options;
-
-    public StorageService(IOptions<StorageOptions> options, ILogger<StorageOptions> logger)
-    {
-        this.options = options;
-        logger.LogInformation("Archive set to '{ArchivePath}.'", options.Value.ArchiveDirectory);
-    }
-
     public async Task<bool> TryStoreShard(
-        KafeType shardType,
+        Type shardType,
         Hrib id,
         Stream stream,
         string? variant,
@@ -53,7 +48,7 @@ public class StorageService
     }
 
     public bool TryOpenShardStream(
-        KafeType shardType,
+        Type shardType,
         Hrib id,
         string? variant,
         [NotNullWhen(true)] out Stream? stream,
@@ -82,7 +77,7 @@ public class StorageService
     }
 
     public bool TryGetShardFilePath(
-        KafeType shardType,
+        Type shardType,
         Hrib id,
         string? variant,
         [NotNullWhen(true)] out string? filePath,
@@ -212,7 +207,7 @@ public class StorageService
 
     public Task MoveTemporaryShard(
         Hrib id,
-        KafeType shardType,
+        Type shardType,
         string fileExtension,
         string variant = Const.OriginalShardVariant,
         CancellationToken ct = default
@@ -242,7 +237,7 @@ public class StorageService
     }
 
     public DirectoryInfo GetShardTypeDirectory(
-        KafeType shardType,
+        Type shardType,
         string variant = Const.OriginalShardVariant,
         bool create = true)
     {
@@ -250,7 +245,8 @@ public class StorageService
             ? options.Value.ArchiveDirectory
             : options.Value.GeneratedDirectory;
 
-        if (!options.Value.ShardDirectories.TryGetValue(shardType, out var shardDir))
+        var shardKafeType = typeRegistry.RequireType(shardType);
+        if (!options.Value.ShardDirectories.TryGetValue(shardKafeType, out var shardDir))
         {
             throw new ArgumentNullException($"The storage directory for the '{shardType}' shard type is not set.");
         }

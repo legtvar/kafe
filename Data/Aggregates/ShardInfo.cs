@@ -74,7 +74,7 @@ public class ShardInfoProjection : SingleStreamProjection<ShardInfo, string>
             FileLength: e.Data.FileLength ?? -1,
             UploadFilename: e.Data.UploadFilename,
             MimeType: e.Data.MimeType ?? Const.InvalidMimeType,
-            Payload: e.Data.Metadata,
+            Payload: e.Data.Payload,
             Links: []
         );
     }

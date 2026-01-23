@@ -8,7 +8,7 @@ public record ProjectCreated(
     [Hrib] string? OwnerId,
     CreationMethod CreationMethod,
     [Hrib] string ProjectGroupId,
-    [Hrib] string ArtifactId
+    [Hrib] string? ArtifactId
 );
 
 public record ProjectArtifactSet(

@@ -3,7 +3,8 @@ using System.Threading.Tasks;
 
 namespace Kafe.Mate;
 
-public class BlendShardAnalyzer : IShardAnalyzer
+public class BlendShardAnalyzer
+    : IShardAnalyzer
 {
     public ValueTask<ShardAnalysis> Analyze(string tempPath, string? mimeType, CancellationToken token = default)
     {
@@ -12,11 +13,13 @@ public class BlendShardAnalyzer : IShardAnalyzer
         return ValueTask.FromResult(new ShardAnalysis()
         {
             IsSuccessful = true,
-            FileExtension = ".blend",
-            MimeType = "application/x-blender",
+            FileExtension = Const.BlendFileExtension,
+            MimeType = Const.BlendMimeType,
             Payload = new BlendInfo(
-                FileExtension: ".blend",
-                MimeType: "application/x-blender"
+                FileExtension: Const.BlendFileExtension,
+                MimeType: Const.BlendMimeType,
+                Tests: null,
+                Error: null
             )
         });
     }

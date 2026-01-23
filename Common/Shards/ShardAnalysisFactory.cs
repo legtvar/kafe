@@ -11,13 +11,14 @@ public class ShardAnalysisFactory(
 )
 {
     public async ValueTask<ShardAnalysis> Create(
-        KafeType shardType,
+        Type shardType,
         string filePath,
         string? mimeType,
         CancellationToken ct = default
     )
     {
-        var typeMetadata = typeRegistry.RequireMetadata(shardType);
+        var kafeType = typeRegistry.RequireType(shardType);
+        var typeMetadata = typeRegistry.RequireMetadata(kafeType);
         var shardTypeMetadata = typeMetadata.RequireExtension<ShardPayloadTypeMetadata>();
         foreach (var analyzerType in shardTypeMetadata.AnalyzerTypes)
         {

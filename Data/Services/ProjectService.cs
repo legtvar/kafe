@@ -15,149 +15,136 @@ using System.Threading.Tasks;
 
 namespace Kafe.Data.Services;
 
-public partial class ProjectService
+public class ProjectService(
+    IDocumentSession db,
+    AccountService accountService,
+    ArtifactService artifactService,
+    EntityMetadataProvider entityMetadataProvider
+)
 {
-    private readonly IDocumentSession db;
-    private readonly AccountService accountService;
-    private readonly ArtifactService artifactService;
-    private readonly AuthorService authorService;
-    private readonly EntityMetadataProvider entityMetadataProvider;
-
-    public ProjectService(
-        IDocumentSession db,
-        AccountService accountService,
-        ArtifactService artifactService,
-        AuthorService authorService,
-        EntityMetadataProvider entityMetadataProvider
-    )
-    {
-        this.db = db;
-        this.accountService = accountService;
-        this.artifactService = artifactService;
-        this.authorService = authorService;
-        this.entityMetadataProvider = entityMetadataProvider;
-    }
-
     public async Task<Err<ProjectInfo>> Upsert(
         ProjectInfo project,
         Hrib? ownerId = null,
         ExistingEntityHandling existingEntityHandling = ExistingEntityHandling.Upsert,
         bool shouldOverrideLock = false,
-        string? preferredCulture = null,
         bool shouldSkipValidation = false,
         CancellationToken token = default
     )
     {
-        if (!Hrib.TryParse(project.Id, out var id, out _))
+        var idErr = Hrib.TryParseValid(project.Id);
+        if (idErr.HasError)
         {
-            return Err.Fail(new BadHribDiagnostic(project.Id));
+            return idErr.Diagnostic.ForParameter(nameof(project.Id));
         }
+
+        var id = idErr.Value;
 
         if (id.IsEmpty)
         {
             id = Hrib.Create();
         }
 
-        var existing = await Load(id, token);
-        if (existing is null && existingEntityHandling == ExistingEntityHandling.Update)
+        var existingErr = await Load(id, token);
+        switch (existingEntityHandling)
         {
-            return Err.Fail(new NotFoundDiagnostic(typeof(ProjectInfo), id));
-        }
-        else if (existing is not null && existingEntityHandling == ExistingEntityHandling.Insert)
-        {
-            return Err.Fail(new AlreadyExistsDiagnostic(typeof(ProjectInfo), id));
+            case ExistingEntityHandling.Update:
+                if (existingErr.HasError)
+                {
+                    return existingErr;
+                }
+
+                break;
+            case ExistingEntityHandling.Insert:
+                if (existingErr.HasValue)
+                {
+                    return Err.Fail(new AlreadyExistsDiagnostic(typeof(ProjectInfo), id));
+                }
+
+                break;
         }
 
-        if (existing?.IsLocked == true && !shouldOverrideLock)
+        var groupErr = await db.KafeLoadAsync<ProjectGroupInfo>(project.ProjectGroupId, token);
+        if (groupErr.HasError)
+        {
+            return groupErr.Diagnostic;
+        }
+
+        var group = groupErr.Value;
+
+        var artifactIdErr = Hrib.TryParseValid(project.ArtifactId);
+        if (artifactIdErr.HasError)
+        {
+            return artifactIdErr.Diagnostic.ForParameter(nameof(project.ArtifactId));
+        }
+
+        var artifactId = artifactIdErr.Value;
+
+        Err<ArtifactInfo> artifactErr;
+        if (artifactId.IsEmpty)
+        {
+            artifactErr = await artifactService.Create(ArtifactInfo.Create(LocalizedString.Empty), token);
+        }
+        else
+        {
+            artifactErr = await artifactService.Load(artifactId, token);
+        }
+
+        if (artifactErr.HasError)
+        {
+            return artifactErr.Diagnostic.ForParameter(nameof(project.ArtifactId));
+        }
+
+        var artifact = artifactErr.Value;
+
+        if (existingErr is { HasError: true, Diagnostic.Payload: NotFoundDiagnostic })
+        {
+            var created = new ProjectCreated(
+                ProjectId: id.ToString(),
+                ArtifactId: artifactId.ToString(),
+                OwnerId: ownerId?.ToString(),
+                CreationMethod: CreationMethod.Api,
+                ProjectGroupId: group.Id
+            );
+            db.Events.KafeStartStream<ProjectInfo>(id, created);
+            await db.SaveChangesAsync(token);
+            existingErr = await db.Events.KafeAggregateStream<ProjectInfo>(id, token: token);
+        }
+
+        if (existingErr.HasError)
+        {
+            return existingErr.Diagnostic;
+        }
+
+        var existing = existingErr.Value;
+
+        if (existing.IsLocked && !shouldOverrideLock)
         {
             return Err.Fail(new LockedDiagnostic(typeof(ProjectInfo), id));
         }
 
-        var group = await db.KafeLoadAsync<ProjectGroupInfo>(project.ProjectGroupId, token);
-        if (group.HasErrors)
-        {
-            return group.Errors;
-        }
-
         if (!shouldSkipValidation)
         {
-            var report = ValidateBasicInfo(project, group.Value.ValidationSettings);
-            if (report.Diagnostics.Any(d => d.Kind == DiagnosticKind.Error))
-            {
-                return report.Diagnostics
-                    .Where(d => d.Kind == DiagnosticKind.Error)
-                    .Select(d => Error.ValidationError(d.Message.ToString(preferredCulture)))
-                    .ToImmutableArray();
-            }
+            // TODO: Implement project validation based on its blueprint (or rather implement that in
+            //       ArtifactService and call it from here).
         }
 
-        if (existing is null)
-        {
-            var created = new ProjectCreated(
-                ProjectId: id.ToString(),
-                OwnerId: ownerId?.ToString(),
-                CreationMethod: CreationMethod.Api,
-                ProjectGroupId: project.ProjectGroupId,
-                Name: project.Name);
-            db.Events.KafeStartStream<ProjectInfo>(id, created);
-            await db.SaveChangesAsync(token);
-        }
-
-        existing = await db.Events.KafeAggregateRequiredStream<ProjectInfo>(id, token: token);
         var eventStream = await db.Events.FetchForExclusiveWriting<ProjectInfo>(id.ToString(), token);
-
-        var infoChanged = new ProjectInfoChanged(
-            ProjectId: id.ToString(),
-            Name: LocalizedString.MakeOverride(existing.Name, project.Name),
-            Description: LocalizedString.MakeOverride(existing.Description, project.Description),
-            Genre: LocalizedString.MakeOverride(existing.Genre, project.Genre)
-        );
-        if (infoChanged.Name is not null || infoChanged.Description is not null || infoChanged.Genre is not null)
-        {
-            eventStream.AppendOne(infoChanged);
-        }
 
         if (project.IsLocked != existing.IsLocked)
         {
-            eventStream.AppendOne(project.IsLocked
-                ? new ProjectLocked(id.ToString())
-                : new ProjectUnlocked(id.ToString()));
+            eventStream.AppendOne(
+                project.IsLocked
+                    ? new ProjectLocked(id.ToString())
+                    : new ProjectUnlocked(id.ToString())
+            );
         }
 
-        var authorsRemoved = existing.Authors.Except(project.Authors)
-            .Select(a => new ProjectAuthorRemoved(id.ToString(), a.Id, a.Kind, a.Roles));
-        eventStream.AppendMany(authorsRemoved);
-
-        var authorsAdded = project.Authors.Except(existing.Authors)
-            .Select(a => new ProjectAuthorAdded(id.ToString(), a.Id, a.Kind, a.Roles));
-        // TODO: Check the authors not only exist but also the current user may Read them.
-        var authorsAddedInfos = await db.LoadManyAsync<AuthorInfo>(
-            [.. authorsAdded.Select(a => (Hrib)a.AuthorId)],
-            token
-        );
-        if (authorsAddedInfos.HasError)
+        if (existing.ArtifactId != artifactId.ToString())
         {
-            return authorsAddedInfos.Diagnostic;
+            eventStream.AppendOne(
+                new ProjectArtifactSet(id.ToString(), artifactId.ToString())
+            );
         }
-
-        eventStream.AppendMany(authorsAdded);
-
-        var artifactsRemoved = existing.Artifacts.Except(project.Artifacts)
-            .Select(a => new ProjectArtifactRemoved(id.ToString(), a.Id));
-        eventStream.AppendMany(artifactsRemoved);
-
-        var artifactsAdded = project.Artifacts.Except(existing.Artifacts)
-            .Select(a => new ProjectArtifactAdded(id.ToString(), a.Id, a.BlueprintSlot));
-        // TODO: Check the artifacts not only exist but also the current user may Read them.
-        var artifactsAddedInfos = await db.LoadManyAsync<ArtifactInfo>(
-            [.. artifactsAdded.Select(a => (Hrib)a.ArtifactId)],
-            token
-        );
-        if (artifactsAddedInfos.HasError)
-        {
-            return artifactsAddedInfos.Diagnostic;
-        }
-        eventStream.AppendMany(artifactsAdded);
 
         await db.SaveChangesAsync(token);
 
@@ -166,10 +153,11 @@ public partial class ProjectService
             await accountService.AddPermissions(
                 ownerId,
                 [(id, Permission.Read | Permission.Write | Permission.Append | Permission.Inspect)],
-                token);
+                token
+            );
         }
 
-        return await db.Events.KafeAggregateRequiredStream<ProjectInfo>(id, token: token);
+        return await db.Events.KafeAggregateStream<ProjectInfo>(id, token: token);
     }
 
     /// <summary>
@@ -194,7 +182,8 @@ public partial class ProjectService
     public async Task<ImmutableArray<ProjectInfo>> List(
         ProjectFilter? filter = null,
         string? sort = null,
-        CancellationToken token = default)
+        CancellationToken token = default
+    )
     {
         filter ??= new ProjectFilter();
 
@@ -206,7 +195,8 @@ public partial class ProjectService
                 .WhereAccountHasPermission(
                     db.DocumentStore.Options.Schema,
                     Permission.Read,
-                    filter.AccessingAccountId);
+                    filter.AccessingAccountId
+                );
         }
 
         if (filter.ProjectGroupId is not null)
@@ -218,13 +208,13 @@ public partial class ProjectService
         if (filter.OrganizationId is not null)
         {
             var sql =
-            $"""
-            (
-                SELECT g.data ->> 'OrganizationId'
-                FROM {db.DocumentStore.Options.Schema.For<ProjectGroupInfo>()} AS g
-                WHERE g.id = d.data ->> 'ProjectGroupId'
-            ) = ?
-            """;
+                $"""
+                 (
+                     SELECT g.data ->> 'OrganizationId'
+                     FROM {db.DocumentStore.Options.Schema.For<ProjectGroupInfo>()} AS g
+                     WHERE g.id = d.data ->> 'ProjectGroupId'
+                 ) = ?
+                 """;
             query = (IMartenQueryable<ProjectInfo>)query
                 .Where(p => p.MatchesSql(sql, filter.OrganizationId.ToString()));
         }
@@ -238,9 +228,9 @@ public partial class ProjectService
         return results;
     }
 
-    public async Task<ProjectInfo?> Load(Hrib id, CancellationToken token = default)
+    public async Task<Err<ProjectInfo>> Load(Hrib id, CancellationToken token = default)
     {
-        return (await db.LoadAsync<ProjectInfo>(id, token)).GetValueOrDefault();
+        return await db.KafeLoadAsync<ProjectInfo>(id, token);
     }
 
     public async Task<ImmutableArray<ProjectInfo>> LoadMany(IEnumerable<Hrib> ids, CancellationToken token = default)
@@ -248,95 +238,22 @@ public partial class ProjectService
         return (await db.KafeLoadManyAsync<ProjectInfo>([.. ids], token)).Unwrap();
     }
 
-    // private async Task<ImmutableArray<ProjectAuthorInfo>> GetProjectAuthors(
-    //     IEnumerable<ProjectCreationAuthorDto> crew,
-    //     IEnumerable<ProjectCreationAuthorDto> cast,
-    //     CancellationToken token = default)
-    // {
-    //     var authors = crew.Select(c => new ProjectAuthorInfo(
-    //         Id: c.Id,
-    //         Kind: ProjectAuthorKind.Crew,
-    //         Roles: c.Roles.IsDefaultOrEmpty
-    //             ? ImmutableArray<string>.Empty
-    //             : c.Roles))
-    //         .Concat(cast.Select(c => new ProjectAuthorInfo(
-    //             Id: c.Id,
-    //             Kind: ProjectAuthorKind.Cast,
-    //             Roles: c.Roles.IsDefaultOrEmpty
-    //                 ? ImmutableArray<string>.Empty
-    //                 : c.Roles)))
-    //         .ToImmutableArray();
-
-    //     var ids = authors.Select(d => d.Id).ToImmutableArray();
-
-    //     var infos = (await db.Query<AuthorInfo>()
-    //         .WhereCanRead(userProvider)
-    //         .Where(a => ids.Contains(a.Id))
-    //         .ToListAsync(token))
-    //         .ToImmutableDictionary(a => a.Id);
-
-    //     foreach (var author in authors)
-    //     {
-    //         if (!infos.TryGetValue(author.Id, out _))
-    //         {
-    //             throw new IndexOutOfRangeException($"Author '{author.Id}' either doesn't exist or is not accessible.");
-    //         }
-    //     }
-
-    //     return authors;
-    // }
-
-    public async Task<Err<ProjectInfo>> AddArtifacts(
-        Hrib projectId,
-        ImmutableArray<(Hrib id, string? blueprintSlot)> artifacts,
-        CancellationToken token = default)
-    {
-        var project = await Load(projectId, token);
-        if (project is null)
-        {
-            return diagnosticFactory.NotFound<ProjectInfo>(projectId);
-        }
-
-        var existingArtifactIds = (await artifactService.LoadMany(artifacts.Select(a => a.id), token))
-            .Select(a => a.Id)
-            .ToImmutableHashSet();
-        if (existingArtifactIds.Count != artifacts.Length)
-        {
-            return diagnosticFactory.Aggregate(
-                artifacts.Where(a => !existingArtifactIds.Contains(a.id.ToString()))
-                    .Select(a => diagnosticFactory.NotFound<ArtifactInfo>(a.id))
-                );
-        }
-
-        var projectStream = await db.Events.FetchForWriting<ProjectInfo>(projectId.ToString(), token);
-        foreach (var artifact in artifacts)
-        {
-            var artifactAdded = new ProjectArtifactAdded(
-                ProjectId: projectId.ToString(),
-                ArtifactId: artifact.id.ToString(),
-                BlueprintSlot: artifact.blueprintSlot?.ToString());
-            projectStream.AppendOne(artifactAdded);
-        }
-        await db.SaveChangesAsync(token);
-        return await db.Events.KafeAggregateRequiredStream<ProjectInfo>(projectId, token: token);
-    }
-
     public Task<Err<bool>> Lock(Hrib projectId, CancellationToken token = default)
     {
-        return LockUnlock(projectId: projectId, shouldLock: true, token: token);
+        return SetLockStatus(projectId: projectId, shouldLock: true, token: token);
     }
 
     public Task<Err<bool>> Unlock(Hrib projectId, CancellationToken token = default)
     {
-        return LockUnlock(projectId: projectId, shouldLock: false, token: token);
+        return SetLockStatus(projectId: projectId, shouldLock: false, token: token);
     }
 
-    private async Task<Err<bool>> LockUnlock(Hrib projectId, bool shouldLock, CancellationToken token = default)
+    private async Task<Err<bool>> SetLockStatus(Hrib projectId, bool shouldLock, CancellationToken token = default)
     {
         var stream = await db.Events.FetchForExclusiveWriting<ProjectInfo>(projectId.ToString(), token);
-        if (stream is null || stream.Aggregate is null)
+        if (stream.Aggregate is null)
         {
-            return diagnosticFactory.NotFound<ProjectInfo>(projectId);
+            return Err.Fail(new NotFoundDiagnostic(typeof(ProjectInfo), projectId));
         }
 
         if (shouldLock && !stream.Aggregate.IsLocked)
@@ -347,6 +264,36 @@ public partial class ProjectService
         {
             stream.AppendOne(new ProjectUnlocked(projectId.ToString()));
         }
+
+        await db.SaveChangesAsync(token);
+        return true;
+    }
+
+    public async Task<Err<bool>> AddReview(
+        Hrib projectId,
+        Hrib? reviewerId,
+        ReviewKind kind,
+        string reviewerRole,
+        LocalizedString? comment,
+        CancellationToken token = default
+    )
+    {
+        var projectErr = await Load(projectId, token);
+        if (projectErr.HasError)
+        {
+            return projectErr.Diagnostic;
+        }
+
+        db.Events.KafeAppend(
+            projectId,
+            new ProjectReviewAdded(
+                ProjectId: projectId.ToString(),
+                ReviewerId: reviewerId?.ToString(),
+                Kind: kind,
+                ReviewerRole: reviewerRole,
+                Comment: comment
+            )
+        );
         await db.SaveChangesAsync(token);
         return true;
     }

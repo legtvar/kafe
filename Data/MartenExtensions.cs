@@ -55,7 +55,7 @@ public static class MartenExtensions
 
     extension(IQueryEventStore store)
     {
-        public Task<T?> KafeAggregateStream<T>(
+        public async Task<Err<T>> KafeAggregateStream<T>(
             Hrib id,
             long version = 0L,
             DateTimeOffset? timestamp = null,
@@ -65,7 +65,7 @@ public static class MartenExtensions
         )
             where T : class, IEntity
         {
-            return store.AggregateStreamAsync(
+            var aggregate = await store.AggregateStreamAsync(
                 streamKey: id.ToString(),
                 version: version,
                 timestamp: timestamp,
@@ -73,6 +73,12 @@ public static class MartenExtensions
                 fromVersion: fromVersion,
                 token: token
             );
+            if (aggregate is null)
+            {
+                return Err.Fail(new NotFoundDiagnostic(typeof(T), id));
+            }
+
+            return aggregate;
         }
 
         public async Task<T> KafeAggregateRequiredStream<T>(
@@ -85,15 +91,14 @@ public static class MartenExtensions
         )
             where T : class, IEntity
         {
-            return await store.KafeAggregateStream(
+            return (await store.KafeAggregateStream(
                     id: id,
                     version: version,
                     timestamp: timestamp,
                     state: state,
                     fromVersion: fromVersion,
                     token: token
-                )
-                ?? throw new InvalidOperationException($"{typeof(T).Name} '{id}' could not be live-aggregated.");
+                )).Unwrap();
         }
     }
 

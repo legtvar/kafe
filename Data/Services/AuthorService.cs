@@ -13,23 +13,12 @@ using System.Threading.Tasks;
 
 namespace Kafe.Data.Services;
 
-public class AuthorService
-{
-    private readonly IKafeDocumentSession db;
-    private readonly AccountService accountService;
-    private readonly EntityMetadataProvider entityMetadataProvider;
-
-    public AuthorService(
-        IKafeDocumentSession db,
-        AccountService accountService,
-        EntityMetadataProvider entityMetadataProvider
+public class AuthorService(
+    IDocumentSession db,
+    AccountService accountService,
+    EntityMetadataProvider entityMetadataProvider
     )
-    {
-        this.db = db;
-        this.accountService = accountService;
-        this.entityMetadataProvider = entityMetadataProvider;
-    }
-
+{
     public async Task<Err<AuthorInfo>> Create(
         AuthorInfo @new,
         Hrib? ownerId = null,
@@ -88,11 +77,13 @@ public class AuthorService
 
     public async Task<Err<AuthorInfo>> Edit(AuthorInfo modified, CancellationToken token = default)
     {
-        var @old = await Load(modified.Id, token);
-        if (@old is null)
+        var oldErr = await Load(modified.Id, token);
+        if (oldErr.HasError)
         {
-            return Err.Fail<AuthorInfo>(new NotFoundDiagnostic(typeof(AuthorInfo), modified.Id));
+            return oldErr;
         }
+
+        var @old = oldErr.Value;
 
         if (@old.Uco != modified.Uco
             || @old.Bio != modified.Bio
@@ -188,13 +179,16 @@ public class AuthorService
         return (await query.ToListAsync(token)).ToImmutableArray();
     }
 
-    public async Task<AuthorInfo?> Load(Hrib id, CancellationToken token = default)
+    public async Task<Err<AuthorInfo>> Load(Hrib id, CancellationToken token = default)
     {
-        return (await db.LoadAsync<AuthorInfo>(id, token)).GetValueOrDefault();
+        return await db.KafeLoadAsync<AuthorInfo>(id, token);
     }
 
-    public async Task<ImmutableArray<AuthorInfo>> LoadMany(IEnumerable<Hrib> ids, CancellationToken token = default)
+    public async Task<Err<ImmutableArray<AuthorInfo>>> LoadMany(
+        IReadOnlyList<Hrib> ids,
+        CancellationToken token = default
+    )
     {
-        return (await db.LoadManyAsync<AuthorInfo>([.. ids], token)).Unwrap();
+        return await db.KafeLoadManyAsync<AuthorInfo>(ids, token);
     }
 }

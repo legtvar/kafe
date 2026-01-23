@@ -1,5 +1,4 @@
-﻿using Kafe.Core.Diagnostics;
-using Kafe.Data.Aggregates;
+﻿using Kafe.Data.Aggregates;
 using Kafe.Data.Events;
 using Kafe.Data.Metadata;
 using Marten;
@@ -13,32 +12,13 @@ using System.Threading.Tasks;
 
 namespace Kafe.Data.Services;
 
-public class PlaylistService
+public class PlaylistService(
+    IDocumentSession db,
+    OrganizationService organizationService,
+    AccountService accountService,
+    EntityMetadataProvider entityMetadataProvider
+)
 {
-    private readonly IKafeDocumentSession db;
-    private readonly OrganizationService organizationService;
-    private readonly ArtifactService artifactService;
-    private readonly AccountService accountService;
-    private readonly EntityMetadataProvider entityMetadataProvider;
-    private readonly DiagnosticFactory diagnosticFactory;
-
-    public PlaylistService(
-        IKafeDocumentSession db,
-        OrganizationService organizationService,
-        ArtifactService artifactService,
-        AccountService accountService,
-        EntityMetadataProvider entityMetadataProvider,
-        DiagnosticFactory diagnosticFactory
-    )
-    {
-        this.db = db;
-        this.organizationService = organizationService;
-        this.artifactService = artifactService;
-        this.accountService = accountService;
-        this.entityMetadataProvider = entityMetadataProvider;
-        this.diagnosticFactory = diagnosticFactory;
-    }
-
     /// <summary>
     /// Filter of playlists.
     /// </summary>
@@ -87,16 +67,16 @@ public class PlaylistService
         return result;
     }
 
-    public async Task<PlaylistInfo?> Load(Hrib id, CancellationToken token = default)
+    public async Task<Err<PlaylistInfo>> Load(Hrib id, CancellationToken token = default)
     {
-        return (await db.LoadAsync<PlaylistInfo>(id, token)).GetValueOrDefault();
+        return await db.KafeLoadAsync<PlaylistInfo>(id, token);
     }
 
-    public async Task<ImmutableArray<PlaylistInfo>> LoadMany(
-        IEnumerable<Hrib> ids,
+    public async Task<Err<ImmutableArray<PlaylistInfo>>> LoadMany(
+        IReadOnlyList<Hrib> ids,
         CancellationToken token = default)
     {
-        return (await db.LoadManyAsync<PlaylistInfo>([.. ids], token)).Unwrap();
+        return await db.KafeLoadManyAsync<PlaylistInfo>(ids, token);
     }
 
     public async Task<Err<PlaylistInfo>> Create(
@@ -106,13 +86,13 @@ public class PlaylistService
     {
         if (!Hrib.TryParse(@new.Id, out var id, out _))
         {
-            return diagnosticFactory.FromPayload(new BadHribDiagnostic(@new.Id));
+            return Err.Fail<PlaylistInfo>(new BadHribDiagnostic(@new.Id));
         }
 
-        var organization = await organizationService.Load(@new.OrganizationId, token);
-        if (organization is null)
+        var organizationErr = await organizationService.Load(@new.OrganizationId, token);
+        if (organizationErr.HasError)
         {
-            return diagnosticFactory.NotFound<OrganizationInfo>(@new.OrganizationId);
+            return organizationErr.Diagnostic;
         }
 
         if (id == Hrib.Empty)
@@ -181,11 +161,12 @@ public class PlaylistService
         PlaylistInfo @new,
         CancellationToken token = default)
     {
-        var old = await Load(@new.Id, token);
-        if (old is null)
+        var oldErr = await Load(@new.Id, token);
+        if (oldErr.HasError)
         {
-            return diagnosticFactory.NotFound<PlaylistInfo>(@new.Id);
+            return oldErr.Diagnostic;
         }
+        var old = oldErr.Value;
 
         var eventStream = await db.Events.FetchForExclusiveWriting<PlaylistInfo>(@new.Id, token);
         var infoChanged = new PlaylistInfoChanged(
@@ -228,10 +209,8 @@ public class PlaylistService
             if (!Hrib.TryParse(@new.OrganizationId, out var organizationId, out _)
                 || !organizationId.IsValidNonEmpty)
             {
-                return diagnosticFactory.ForParameter(
-                    nameof(PlaylistInfo.OrganizationId),
-                    new BadHribDiagnostic(@new.OrganizationId)
-                );
+                return Err.Fail<PlaylistInfo>(new BadHribDiagnostic(@new.OrganizationId))
+                    .ForParameter(nameof(PlaylistInfo.OrganizationId));
             }
 
             eventStream.AppendOne(new PlaylistMovedToOrganization(
@@ -249,7 +228,7 @@ public class PlaylistService
         CancellationToken token = default
     )
     {
-        var artifacts = await db.LoadManyAsync<ArtifactInfo>(artifactIds, token);
+        var artifacts = await db.KafeLoadManyAsync<ArtifactInfo>(artifactIds, token);
         if (artifacts.HasError)
         {
             return artifacts.Diagnostic;

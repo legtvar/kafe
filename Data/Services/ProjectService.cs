@@ -17,20 +17,18 @@ namespace Kafe.Data.Services;
 
 public partial class ProjectService
 {
-    private readonly IKafeDocumentSession db;
+    private readonly IDocumentSession db;
     private readonly AccountService accountService;
     private readonly ArtifactService artifactService;
     private readonly AuthorService authorService;
     private readonly EntityMetadataProvider entityMetadataProvider;
-    private readonly DiagnosticFactory diagnosticFactory;
 
     public ProjectService(
-        IKafeDocumentSession db,
+        IDocumentSession db,
         AccountService accountService,
         ArtifactService artifactService,
         AuthorService authorService,
-        EntityMetadataProvider entityMetadataProvider,
-        DiagnosticFactory diagnosticFactory
+        EntityMetadataProvider entityMetadataProvider
     )
     {
         this.db = db;
@@ -38,7 +36,6 @@ public partial class ProjectService
         this.artifactService = artifactService;
         this.authorService = authorService;
         this.entityMetadataProvider = entityMetadataProvider;
-        this.diagnosticFactory = diagnosticFactory;
     }
 
     public async Task<Err<ProjectInfo>> Upsert(
@@ -53,7 +50,7 @@ public partial class ProjectService
     {
         if (!Hrib.TryParse(project.Id, out var id, out _))
         {
-            return diagnosticFactory.FromPayload(new BadHribDiagnostic(project.Id));
+            return Err.Fail(new BadHribDiagnostic(project.Id));
         }
 
         if (id.IsEmpty)
@@ -64,16 +61,16 @@ public partial class ProjectService
         var existing = await Load(id, token);
         if (existing is null && existingEntityHandling == ExistingEntityHandling.Update)
         {
-            return diagnosticFactory.NotFound<ProjectInfo>(id);
+            return Err.Fail(new NotFoundDiagnostic(typeof(ProjectInfo), id));
         }
         else if (existing is not null && existingEntityHandling == ExistingEntityHandling.Insert)
         {
-            return diagnosticFactory.AlreadyExists<ProjectInfo>(id);
+            return Err.Fail(new AlreadyExistsDiagnostic(typeof(ProjectInfo), id));
         }
 
         if (existing?.IsLocked == true && !shouldOverrideLock)
         {
-            return diagnosticFactory.Locked<ProjectInfo>(id);
+            return Err.Fail(new LockedDiagnostic(typeof(ProjectInfo), id));
         }
 
         var group = await db.KafeLoadAsync<ProjectGroupInfo>(project.ProjectGroupId, token);
@@ -248,7 +245,7 @@ public partial class ProjectService
 
     public async Task<ImmutableArray<ProjectInfo>> LoadMany(IEnumerable<Hrib> ids, CancellationToken token = default)
     {
-        return (await db.LoadManyAsync<ProjectInfo>([.. ids], token)).Unwrap();
+        return (await db.KafeLoadManyAsync<ProjectInfo>([.. ids], token)).Unwrap();
     }
 
     // private async Task<ImmutableArray<ProjectAuthorInfo>> GetProjectAuthors(

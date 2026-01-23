@@ -140,6 +140,30 @@ public record Hrib : IParsable<Hrib>, IInvalidable<Hrib>
         return true;
     }
 
+    public static Err<Hrib> TryParse(string? value)
+    {
+        if (TryParse(value, out var hrib, out var error))
+        {
+            return hrib;
+        }
+
+        return Err.Fail(new BadHribDiagnostic(value ?? string.Empty, error));
+    }
+
+    public static Err<Hrib> TryParseValid(
+        string? value,
+        bool shouldReplaceEmpty = false,
+        bool shouldDisallowSystem = true
+    )
+    {
+        if (TryParseValid(value, out var hrib, out var error, shouldReplaceEmpty, shouldDisallowSystem))
+        {
+            return hrib;
+        }
+
+        return Err.Fail(new BadHribDiagnostic(value ?? string.Empty, error));
+    }
+
     public static Hrib Parse(string value)
     {
         if (!TryParse(value, out var hrib, out var error))
@@ -173,7 +197,7 @@ public record Hrib : IParsable<Hrib>, IInvalidable<Hrib>
     /// <param name="shouldDisallowSystem">Disallow parsing the system HRIB</param>
     /// <returns>A valid HRIB or an error</returns>
     public static bool TryParseValid(
-        string value,
+        string? value,
         [NotNullWhen(true)] out Hrib? hrib,
         out HribParsingError error,
         bool shouldReplaceEmpty = false,
@@ -255,6 +279,7 @@ public record Hrib : IParsable<Hrib>, IInvalidable<Hrib>
         BadCharacter,
         InvalidDisallowed,
         EmptyDisallowed,
-        SystemDisallowed
+        SystemDisallowed,
+        Unknown = int.MaxValue
     }
 }

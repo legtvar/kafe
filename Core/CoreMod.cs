@@ -93,10 +93,11 @@ public sealed class CoreMod : IMod
         // NB: Diagnostic payload types from Kafe.Common.dll are registered in the `core` mod.
         c.AddDiagnosticPayload<AggregateDiagnostic>();
         c.AddDiagnosticPayload<GenericErrorDiagnostic>();
+        c.AddDiagnosticPayload<ParameterDiagnostic>();
+        c.AddDiagnosticPayload<BadHribDiagnostic>();
 
         c.AddDiagnosticPayload<AlreadyExistsDiagnostic>();
         c.AddDiagnosticPayload<BadEmailAddressDiagnostic>();
-        c.AddDiagnosticPayload<BadHribDiagnostic>();
         c.AddDiagnosticPayload<BadKafeTypeDiagnostic>();
         c.AddDiagnosticPayload<BadMimeTypeDiagnostic>();
         c.AddDiagnosticPayload<CorruptedShardDiagnostic>();
@@ -107,7 +108,6 @@ public sealed class CoreMod : IMod
         c.AddDiagnosticPayload<MissingAuthorNameOrIdDiagnostic>();
         c.AddDiagnosticPayload<MissingShardVariantDiagnostic>();
         c.AddDiagnosticPayload<NotFoundDiagnostic>();
-        c.AddDiagnosticPayload<ParameterDiagnostic>();
         c.AddDiagnosticPayload<RequiredDiagnostic>();
         c.AddDiagnosticPayload<ShardAnalysisFailureDiagnostic>();
         c.AddDiagnosticPayload<ShardMimeTypeNotAllowedDiagnostic>();

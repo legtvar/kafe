@@ -117,7 +117,7 @@ public static class MartenExtensions
             }
         }
 
-        public async Task<Err<T>> LoadAsync<T>(
+        public async Task<Err<T>> KafeLoadAsync<T>(
             Hrib id,
             CancellationToken token = default
         )
@@ -145,7 +145,7 @@ public static class MartenExtensions
         /// Returns an <see cref="Kafe.Diagnostic"/>, if any of the ids cannot be found.
         /// Even in case of error, returns the entities that were found.
         /// </remarks>
-        public async Task<Err<ImmutableArray<T>>> LoadManyAsync<T>(
+        public async Task<Err<ImmutableArray<T>>> KafeLoadManyAsync<T>(
             IReadOnlyList<Hrib> ids,
             CancellationToken token = default
         ) where T : notnull, IEntity

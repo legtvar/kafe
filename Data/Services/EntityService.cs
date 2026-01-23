@@ -13,15 +13,8 @@ using Marten;
 
 namespace Kafe.Data.Services;
 
-public class EntityService
+public class EntityService(IDocumentSession db)
 {
-    private readonly IKafeDocumentSession db;
-
-    public EntityService(IKafeDocumentSession db)
-    {
-        this.db = db;
-    }
-
     public async Task<IEntity?> Load(Hrib id, CancellationToken token = default)
     {
         var parentState = await db.Events.FetchStreamStateAsync(id.ToString(), token);
@@ -39,26 +32,20 @@ public class EntityService
                 .FirstOrDefault();
     }
 
-    // public async Task<ImmutableArray<bool>> AllExist<TEntity>(IEnumerable<Hrib> ids, CancellationToken token = default)
-    // {
-    //     var tableName = await db.Database.ExistingTableFor(typeof(TEntity));
-    //     if (tableName )
-    // }
-
     public async Task<Err<EntityPermissionInfo>> LoadPermissionInfo(
         Hrib entityId,
         CancellationToken token = default
     )
     {
-        return await db.LoadAsync<EntityPermissionInfo>(entityId, token);
+        return await db.KafeLoadAsync<EntityPermissionInfo>(entityId, token);
     }
 
     public async Task<Err<ImmutableArray<EntityPermissionInfo>>> LoadPermissionInfoMany(
-        IEnumerable<Hrib> entityIds,
+        IReadOnlyList<Hrib> entityIds,
         CancellationToken token = default
     )
     {
-        return await db.LoadManyAsync<EntityPermissionInfo>([.. entityIds], token);
+        return await db.KafeLoadManyAsync<EntityPermissionInfo>(entityIds, token);
     }
 
     public async Task<Permission> GetPermission(
@@ -72,9 +59,9 @@ public class EntityService
         //     the account itself.
         if (perms.HasError)
         {
-            if (perms.Diagnostic.Payload.Value is NotFoundDiagnostic)
+            if (perms.Diagnostic.Payload is NotFoundDiagnostic)
             {
-                var accessingAccount = (await db.LoadAsync<AccountInfo>(accessingAccountId, token)).Unwrap();
+                var accessingAccount = (await db.KafeLoadAsync<AccountInfo>(accessingAccountId, token)).Unwrap();
                 return accessingAccount.Permissions.GetValueOrDefault(entityId.ToString());
             }
 
@@ -87,14 +74,14 @@ public class EntityService
     }
 
     public async Task<ImmutableArray<Permission>> GetPermissions(
-        IEnumerable<Hrib> entityIds,
+        IReadOnlyList<Hrib> entityIds,
         Hrib accessingAccountId,
         CancellationToken token = default
     )
     {
         if (entityIds.IsEmpty())
         {
-            return ImmutableArray<Permission>.Empty;
+            return [];
         }
 
         var manyPerms = (await LoadPermissionInfoMany(entityIds, token)).Unwrap();
@@ -144,7 +131,7 @@ public class EntityService
         }
         else
         {
-            var account = (await db.LoadAsync<AccountInfo>(accessingAccountId, token)).Unwrap();
+            var account = (await db.KafeLoadAsync<AccountInfo>(accessingAccountId, token)).Unwrap();
 
             if (entityId != Hrib.System)
             {

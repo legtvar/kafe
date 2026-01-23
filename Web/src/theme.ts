@@ -9,7 +9,12 @@ const theme = extendTheme({
             ...MultiSelectTheme,
             baseStyle: (props: Record<string, any>) => {
                 const bs = MultiSelectTheme.baseStyle(props);
-                return { ...bs, input: { ...bs.input, bgColor: mode('white', 'gray.900')(props) } }
+                return {
+                    ...bs,
+                    control: {
+                        ...bs.control, bgColor: mode('white', 'gray.900')(props)
+                    }
+                }
             }
         }
     },

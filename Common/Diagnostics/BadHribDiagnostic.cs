@@ -1,7 +1,8 @@
-namespace Kafe.Core.Diagnostics;
+namespace Kafe;
 
 public record BadHribDiagnostic(
-    string Value
+    string Value,
+    Hrib.HribParsingError ParsingError = Hrib.HribParsingError.Unknown
 ) : IDiagnosticPayload
 {
     public static string Moniker => "bad-hrib";

@@ -13,55 +13,39 @@ using Marten.Linq;
 
 namespace Kafe.Data.Services;
 
-public class RoleService
+public class RoleService(
+    IDocumentSession db,
+    OrganizationService organizationService,
+    EntityMetadataProvider entityMetadataProvider
+)
 {
-    private readonly IKafeDocumentSession db;
-    private readonly OrganizationService organizationService;
-    private readonly EntityMetadataProvider entityMetadataProvider;
-    private readonly DiagnosticFactory diagnosticFactory;
 
-    public RoleService(
-        IKafeDocumentSession db,
-        OrganizationService organizationService,
-        EntityMetadataProvider entityMetadataProvider,
-        DiagnosticFactory diagnosticFactory
+    public async Task<Err<RoleInfo>> Load(Hrib id, CancellationToken token = default)
+    {
+        return await db.KafeLoadAsync<RoleInfo>(id, token);
+    }
+
+    public async Task<Err<ImmutableArray<RoleInfo>>> LoadMany(
+        IReadOnlyList<Hrib> ids,
+        CancellationToken token = default
     )
     {
-        this.db = db;
-        this.organizationService = organizationService;
-        this.entityMetadataProvider = entityMetadataProvider;
-        this.diagnosticFactory = diagnosticFactory;
-    }
-
-    public async Task<RoleInfo?> Load(Hrib id, CancellationToken token = default)
-    {
-        return (await db.LoadAsync<RoleInfo>(id, token: token)).GetValueOrDefault();
-    }
-
-    public async Task<ImmutableArray<RoleInfo>> LoadMany(
-        IEnumerable<Hrib> ids,
-        CancellationToken token = default)
-    {
-        return (await db.LoadManyAsync<RoleInfo>([.. ids], token)).Unwrap();
+        return await db.KafeLoadManyAsync<RoleInfo>(ids, token);
     }
 
     public async Task<Err<RoleInfo>> Create(RoleInfo @new, CancellationToken token = default)
     {
-        if (!Hrib.TryParse(@new.Id, out var id, out _))
+        var idErr = Hrib.TryParseValid(@new.Id, shouldReplaceEmpty: true);
+        if (idErr.HasError)
         {
-            return diagnosticFactory.FromPayload(new BadHribDiagnostic(@new.Id));
+            return idErr.Diagnostic;
         }
+        var id = idErr.Value;
 
-        var organization = await organizationService.Load(@new.OrganizationId, token);
-        if (organization is null)
+        var organizationErr = await organizationService.Load(@new.OrganizationId, token);
+        if (organizationErr.HasError)
         {
-            return diagnosticFactory.NotFound<OrganizationInfo>(@new.OrganizationId);
-        }
-
-
-        if (id == Hrib.Empty)
-        {
-            id = Hrib.Create();
+            return organizationErr.Diagnostic;
         }
 
         var created = new RoleCreated(
@@ -91,11 +75,12 @@ public class RoleService
 
     public async Task<Err<RoleInfo>> Edit(RoleInfo modified, CancellationToken token = default)
     {
-        var @old = await Load(modified.Id, token);
-        if (@old is null)
+        var oldErr = await Load(modified.Id, token);
+        if (oldErr.HasError)
         {
-            return diagnosticFactory.NotFound<RoleInfo>(modified.Id);
+            return oldErr.Diagnostic;
         }
+        var @old = oldErr.Value;
 
         var hasChanged = false;
         if ((LocalizedString)@old.Name != modified.Name
@@ -133,7 +118,7 @@ public class RoleService
 
         if (!hasChanged)
         {
-            return diagnosticFactory.Unmodified<RoleInfo>(modified.Id);
+            return Err.Warn(old, new UnmodifiedDiagnostic(typeof(RoleInfo), old.Id));
         }
 
         await db.SaveChangesAsync(token);
@@ -149,11 +134,12 @@ public class RoleService
         CancellationToken token = default)
     {
         // TODO: Find a cheaper way of knowing that an account exists.
-        var role = await Load(roleId, token);
-        if (role is null)
+        var roleErr = await Load(roleId, token);
+        if (roleErr.HasError)
         {
-            return diagnosticFactory.NotFound<RoleInfo>(roleId);
+            return roleErr.Diagnostic;
         }
+        var role = roleErr.Value;
 
         foreach (var permissionPair in permissions)
         {

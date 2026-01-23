@@ -23,6 +23,7 @@ using JasperFx.Events.Daemon;
 using JasperFx.Events.Projections;
 using Weasel.Postgresql;
 using Weasel.Postgresql.Functions;
+using Kafe.Data.Diagnostics;
 
 namespace Kafe.Data;
 
@@ -113,7 +114,7 @@ public class DataMod : IMod
             }
         });
 
-        context.AddDiagnosticFromAssembly(typeof(DataMod).Assembly);
+        context.AddDiagnosticPayload<BadLoginTicketDiagnostic>();
     }
 
     private static void ConfigureServices(IServiceCollection services)

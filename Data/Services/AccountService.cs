@@ -18,6 +18,8 @@ using Marten.Events;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+using Marten.Linq.SoftDeletes;
+using Kafe.Data.Diagnostics;
 
 namespace Kafe.Data.Services;
 
@@ -33,12 +35,12 @@ public class AccountService(
     public const string NameClaim = "name";
     public const string PreferredUsernameClaim = "preferred_username";
 
-    public async Task<AccountInfo?> Load(
+    public async Task<Err<AccountInfo>> Load(
         Hrib id,
         CancellationToken token = default
     )
     {
-        return (await db.LoadAsync<AccountInfo>(id, token: token)).GetValueOrDefault();
+        return await db.KafeLoadAsync<AccountInfo>(id, token);
     }
 
     public async Task<AccountInfo?> FindByEmail(string emailAddress, CancellationToken token = default)
@@ -77,7 +79,7 @@ public class AccountService(
     {
         if (!Hrib.TryParse(@new.Id, out var id, out _))
         {
-            return diagnosticFactory.FromPayload(new BadHribDiagnostic(@new.Id));
+            return Err.Fail(new BadHribDiagnostic(@new.Id));
         }
 
         if (id == Hrib.Empty)
@@ -101,12 +103,7 @@ public class AccountService(
             case AccountKind.External:
                 if (string.IsNullOrEmpty(@new.IdentityProvider))
                 {
-                    return diagnosticFactory.FromPayload(
-                        payload: new ParameterDiagnostic(
-                            nameof(@new.IdentityProvider),
-                            diagnosticFactory.FromPayload(new RequiredDiagnostic())),
-                        severityOverride: DiagnosticSeverity.Error
-                    );
+                    return Err.Fail(new RequiredDiagnostic()).ForParameter(nameof(@new.IdentityProvider));
                 }
 
                 var associated = new ExternalAccountAssociated(
@@ -162,12 +159,13 @@ public class AccountService(
 
     public async Task<Err<AccountInfo>> Edit(AccountInfo modified, CancellationToken token = default)
     {
-        var old = await Load(modified.Id, token);
-        if (old is null)
+        var oldErr = await Load(modified.Id, token);
+        if (oldErr.HasError)
         {
-            return diagnosticFactory.NotFound<AccountInfo>(modified.Id);
+            return oldErr;
         }
 
+        var old = oldErr.Value;
         var infoChanged = new AccountInfoChanged(
             AccountId: modified.Id,
             PreferredCulture: modified.PreferredCulture != old.PreferredCulture
@@ -250,7 +248,7 @@ public class AccountService(
 
         if (!hasChanged)
         {
-            return diagnosticFactory.Unmodified<AccountInfo>(old.Id);
+            return Err.Warn<AccountInfo>(old, new UnmodifiedDiagnostic(typeof(AccountInfo), old.Id));
         }
 
         await db.SaveChangesAsync(token);
@@ -344,12 +342,13 @@ public class AccountService(
     )
     {
         // TODO: Find a cheaper way of knowing that an account exists.
-        var account = await Load(accountId, token);
-        if (account is null)
+        var accountErr = await Load(accountId, token);
+        if (accountErr.HasError)
         {
-            return diagnosticFactory.NotFound<AccountInfo>(accountId);
+            return accountErr.Diagnostic;
         }
 
+        var account = accountErr.Value;
         foreach (var permissionPair in permissions)
         {
             if (!account.Permissions.TryGetValue(permissionPair.entityId.ToString(), out var existingPermission)
@@ -385,12 +384,13 @@ public class AccountService(
         CancellationToken token = default
     )
     {
-        var account = await Load(accountId, token);
-        if (account is null)
+        var accountErr = await Load(accountId, token);
+        if (accountErr.HasError)
         {
-            return diagnosticFactory.NotFound<AccountInfo>(accountId);
+            return accountErr.Diagnostic;
         }
 
+        var account = accountErr.Value;
         foreach (var roleId in roleIds)
         {
             if (!account.RoleIds.Contains(roleId.ToString()))
@@ -426,7 +426,7 @@ public class AccountService(
         var emailClaim = principal.FindFirst(ClaimTypes.Email);
         if (emailClaim is null || string.IsNullOrEmpty(emailClaim.Value))
         {
-            return diagnosticFactory.ForParameter(ClaimTypes.Email, new RequiredDiagnostic());
+            return Err.Fail(new RequiredDiagnostic()).ForParameter(ClaimTypes.Email);
         }
 
         var name = principal.FindFirst(ClaimTypes.Name)?.Value ?? principal.FindFirst(NameClaim)?.Value;
@@ -481,7 +481,7 @@ public class AccountService(
 
         if (string.IsNullOrEmpty(emailAddress) || !IsValidEmailAddress(emailAddress))
         {
-            return Error.InvalidValue("The email address is invalid.", nameof(emailAddress));
+            return Err.Fail(new BadEmailAddressDiagnostic(emailAddress)).ForParameter(nameof(emailAddress));
         }
 
         var existingAccount = await FindByEmail(emailAddress, ct);
@@ -512,14 +512,9 @@ public class AccountService(
     )
     {
         var ticket = await db.LoadAsync<LoginTicketInfo>(loginTicketId, ct);
-        if (ticket is null)
+        if (ticket is null || ticket.Deleted)
         {
-            return Error.NotFound("The login ticket does not exist.");
-        }
-
-        if (ticket.Deleted)
-        {
-            return Error.InvalidValue("The login ticket is no longer valid.");
+            return Err.Fail(new BadLoginTicketDiagnostic());
         }
 
         ticket = ticket with { Deleted = true };
@@ -528,22 +523,24 @@ public class AccountService(
 
         if (ticket.CreatedAt + ConfirmationTokenExpiration < DateTimeOffset.UtcNow)
         {
-            return Error.InvalidValue("The login ticket has expired.");
+            return Err.Fail(new BadLoginTicketDiagnostic());
         }
 
         AccountInfo? account = null;
 
         if (ticket.AccountId is not null)
         {
-            account = await Load(ticket.AccountId, ct);
-            if (account is null)
+            var accountErr = await Load(ticket.AccountId, ct);
+            if (accountErr.HasError)
             {
-                return Error.NotFound("The account referred to by the login ticket does not exist.");
+                return accountErr;
             }
+
+            account = accountErr.Value;
         }
         else
         {
-            var errAccount = await Create(
+            var accountErr = await Create(
                 AccountInfo.Create(ticket.EmailAddress, ticket.PreferredCulture) with
                 {
                     Kind = AccountKind.Temporary
@@ -551,34 +548,40 @@ public class AccountService(
                 ct
             );
 
-            if (errAccount.HasErrors)
+            if (accountErr.HasError)
             {
-                return errAccount;
+                return accountErr;
             }
 
-            account = errAccount.Value;
+            account = accountErr.Value;
         }
 
-        var accountId = Hrib.Parse(account.Id).Unwrap();
+        var accountIdErr = Hrib.TryParse(account.Id);
+        if (accountIdErr.HasError)
+        {
+            return accountIdErr.Diagnostic.ForParameter(nameof(account.Id));
+        }
+
+        var accountId = accountIdErr.Value;
         if (ticket.InviteId is not null)
         {
             var invite = await LoadInvite(ticket.InviteId, ct);
             if (invite is null)
             {
-                return Error.NotFound(ticket.InviteId, "Invite");
+                return Err.Fail(new NotFoundDiagnostic(typeof(InviteInfo), ticket.InviteId));
             }
 
             if (!invite.Deleted)
             {
                 var err = await AddPermissions(
                     accountId,
-                    invite.Permissions.Select(p => (Hrib.Parse(p.Key).Unwrap(), p.Value.Permission)),
+                    invite.Permissions.Select(p => (Hrib.Parse(p.Key), p.Value.Permission)),
                     ct
                 );
 
-                if (err.HasErrors)
+                if (err.HasError)
                 {
-                    return err.Errors;
+                    return err.Diagnostic;
                 }
 
                 db.Events.KafeAppend(invite.Id, new InviteAccepted(invite.Id));
@@ -597,7 +600,7 @@ public class AccountService(
         account = await db.Events.KafeAggregateStream<AccountInfo>(accountId, token: ct);
         if (account is null)
         {
-            return Error.NotFound(accountId);
+            return Err.Fail(new NotFoundDiagnostic(typeof(AccountInfo), accountId));
         }
 
         return account;
@@ -609,21 +612,16 @@ public class AccountService(
         CancellationToken ct = default
     )
     {
-        var idResult = Hrib.Parse(invite.Id);
-        if (idResult.HasErrors)
+        var idErr = Hrib.TryParseValid(invite.Id);
+        if (idErr.HasError)
         {
-            return idResult.Errors;
+            return idErr.Diagnostic;
         }
-
-        var id = idResult.Value;
-        if (id.IsInvalid)
-        {
-            return Error.InvalidValue("The invite ID");
-        }
+        var id = idErr.Value;
 
         if (!IsValidEmailAddress(invite.EmailAddress))
         {
-            return Error.InvalidValue("The email address is invalid.");
+            return Err.Fail(new BadEmailAddressDiagnostic(invite.Id));
         }
 
         db.LastModifiedBy = inviterAccountId.ToString();
@@ -634,7 +632,7 @@ public class AccountService(
             IEventStream<InviteInfo>? eventStream = null;
             if (existing is not null)
             {
-                id = Hrib.Parse(existing.Id).Unwrap();
+                id = Hrib.Parse(existing.Id);
                 eventStream = await db.Events.FetchForExclusiveWriting<InviteInfo>(id.ToString(), ct);
             }
 

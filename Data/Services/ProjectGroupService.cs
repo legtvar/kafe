@@ -1,5 +1,4 @@
-﻿using Kafe.Core.Diagnostics;
-using Kafe.Data.Aggregates;
+﻿using Kafe.Data.Aggregates;
 using Kafe.Data.Events;
 using Kafe.Data.Metadata;
 using Marten;
@@ -9,27 +8,14 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Kafe.Data.Documents;
 
 namespace Kafe.Data.Services;
 
-public class ProjectGroupService
+public class ProjectGroupService(
+    IDocumentSession db,
+    EntityMetadataProvider entityMetadataProvider
+)
 {
-    private readonly IKafeDocumentSession db;
-    private readonly OrganizationService organizationService;
-    private readonly EntityMetadataProvider entityMetadataProvider;
-
-    public ProjectGroupService(
-        IKafeDocumentSession db,
-        OrganizationService organizationService,
-        EntityMetadataProvider entityMetadataProvider
-    )
-    {
-        this.db = db;
-        this.organizationService = organizationService;
-        this.entityMetadataProvider = entityMetadataProvider;
-    }
-
     public async Task<Err<ProjectGroupInfo>> Create(
         ProjectGroupInfo @new,
         bool shouldWaitForDaemon = true,
@@ -46,7 +32,7 @@ public class ProjectGroupService
             return Err.Fail<ProjectGroupInfo>(new BadHribDiagnostic(@new.OrganizationId));
         }
 
-        var orgErr = await db.LoadAsync<OrganizationInfo>(organizationId, token);
+        var orgErr = await db.KafeLoadAsync<OrganizationInfo>(organizationId, token);
         if (orgErr.HasError)
         {
             return orgErr.Diagnostic;
@@ -170,9 +156,9 @@ public class ProjectGroupService
     //         .Select(TransferMaps.ToProjectGroupListDto).ToImmutableArray();
     // }
 
-    public async Task<ProjectGroupInfo?> Load(Hrib id, CancellationToken token = default)
+    public async Task<Err<ProjectGroupInfo>> Load(Hrib id, CancellationToken token = default)
     {
-        return (await db.LoadAsync<ProjectGroupInfo>(id, token)).GetValueOrDefault();
+        return await db.KafeLoadAsync<ProjectGroupInfo>(id, token);
     }
 
     public async Task<Err<ProjectGroupInfo>> Edit(ProjectGroupInfo @new, CancellationToken token = default)
@@ -182,7 +168,7 @@ public class ProjectGroupService
             return Err.Fail<ProjectGroupInfo>(new BadHribDiagnostic(@new.Id));
         }
 
-        var oldErr = await db.LoadAsync<ProjectGroupInfo>(id, token);
+        var oldErr = await db.KafeLoadAsync<ProjectGroupInfo>(id, token);
         if (oldErr.HasError)
         {
             return oldErr;
@@ -213,13 +199,10 @@ public class ProjectGroupService
 
         if (@old.OrganizationId != @new.OrganizationId)
         {
-            if (!Hrib.TryParse(@new.OrganizationId, out var organizationId, out _)
-                || !organizationId.IsValidNonEmpty)
+            var organizationIdErr = Hrib.TryParseValid(@new.OrganizationId);
+            if (organizationIdErr.HasError)
             {
-                return diagnosticFactory.ForParameter(
-                    nameof(ProjectGroupInfo.OrganizationId),
-                    new BadHribDiagnostic(@new.OrganizationId)
-                );
+                return organizationIdErr.Diagnostic.ForParameter(nameof(@new.OrganizationId));
             }
 
             eventStream.AppendOne(new ProjectGroupMovedToOrganization(
@@ -240,18 +223,5 @@ public class ProjectGroupService
         return await db.Events.AggregateStreamAsync<ProjectGroupInfo>(@old.Id, token: token)
                ?? throw new InvalidOperationException($"The project group is no longer present in the database. "
                                                       + "This should never happen.");
-    }
-
-    public async Task<Err<ProjectGroupInfo>> CreateOrEdit(
-        ProjectGroupInfo info,
-        bool shouldWaitForDaemon = true,
-        CancellationToken token = default
-    )
-    {
-        // TODO: Get rid of the unnecessary trip to DB (by calling Load twice).
-        var existing = info.Id == Hrib.InvalidValue ? null : await Load(info.Id, token);
-        return existing is null
-            ? await Create(info, shouldWaitForDaemon: shouldWaitForDaemon, token: token)
-            : await Edit(info, token);
     }
 }

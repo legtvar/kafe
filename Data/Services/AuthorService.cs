@@ -18,19 +18,16 @@ public class AuthorService
     private readonly IKafeDocumentSession db;
     private readonly AccountService accountService;
     private readonly EntityMetadataProvider entityMetadataProvider;
-    private readonly DiagnosticFactory diagnosticFactory;
 
     public AuthorService(
         IKafeDocumentSession db,
         AccountService accountService,
-        EntityMetadataProvider entityMetadataProvider,
-        DiagnosticFactory diagnosticFactory
+        EntityMetadataProvider entityMetadataProvider
     )
     {
         this.db = db;
         this.accountService = accountService;
         this.entityMetadataProvider = entityMetadataProvider;
-        this.diagnosticFactory = diagnosticFactory;
     }
 
     public async Task<Err<AuthorInfo>> Create(
@@ -40,7 +37,7 @@ public class AuthorService
     {
         if (!Hrib.TryParse(@new.Id, out var id, out _))
         {
-            return diagnosticFactory.FromPayload(new BadHribDiagnostic(@new.Id));
+            return Err.Fail<AuthorInfo>(new BadHribDiagnostic(@new.Id));
         }
 
         if (id == Hrib.Empty)
@@ -94,7 +91,7 @@ public class AuthorService
         var @old = await Load(modified.Id, token);
         if (@old is null)
         {
-            return diagnosticFactory.NotFound<AuthorInfo>(modified.Id);
+            return Err.Fail<AuthorInfo>(new NotFoundDiagnostic(typeof(AuthorInfo), modified.Id));
         }
 
         if (@old.Uco != modified.Uco
@@ -120,7 +117,7 @@ public class AuthorService
                     + "This should never happen.");
         }
 
-        return diagnosticFactory.Unmodified<AuthorInfo>(@old.Id);
+        return Err.Warn(modified, new UnmodifiedDiagnostic(typeof(AuthorInfo), modified.Id));
     }
 
     /// <summary>

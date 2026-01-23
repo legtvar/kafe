@@ -18,19 +18,16 @@ public class ProjectGroupService
     private readonly IKafeDocumentSession db;
     private readonly OrganizationService organizationService;
     private readonly EntityMetadataProvider entityMetadataProvider;
-    private readonly DiagnosticFactory diagnosticFactory;
 
     public ProjectGroupService(
         IKafeDocumentSession db,
         OrganizationService organizationService,
-        EntityMetadataProvider entityMetadataProvider,
-        DiagnosticFactory diagnosticFactory
+        EntityMetadataProvider entityMetadataProvider
     )
     {
         this.db = db;
         this.organizationService = organizationService;
         this.entityMetadataProvider = entityMetadataProvider;
-        this.diagnosticFactory = diagnosticFactory;
     }
 
     public async Task<Err<ProjectGroupInfo>> Create(
@@ -41,12 +38,12 @@ public class ProjectGroupService
     {
         if (!Hrib.TryParse(@new.Id, out var id, out _))
         {
-            return diagnosticFactory.FromPayload(new BadHribDiagnostic(@new.Id));
+            return Err.Fail<ProjectGroupInfo>(new BadHribDiagnostic(@new.Id));
         }
 
         if (!Hrib.TryParse(@new.OrganizationId, out var organizationId, out _))
         {
-            return diagnosticFactory.FromPayload(new BadHribDiagnostic(@new.OrganizationId));
+            return Err.Fail<ProjectGroupInfo>(new BadHribDiagnostic(@new.OrganizationId));
         }
 
         var orgErr = await db.LoadAsync<OrganizationInfo>(organizationId, token);
@@ -182,7 +179,7 @@ public class ProjectGroupService
     {
         if (!Hrib.TryParse(@new.Id, out var id, out _))
         {
-            return diagnosticFactory.FromPayload(new BadHribDiagnostic(@new.Id));
+            return Err.Fail<ProjectGroupInfo>(new BadHribDiagnostic(@new.Id));
         }
 
         var oldErr = await db.LoadAsync<ProjectGroupInfo>(id, token);

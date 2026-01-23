@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Text.Json.Serialization;
+using JasperFx.Events;
 using Kafe.Data.Events;
 using Marten.Events;
 using Marten.Events.Aggregation;
@@ -54,7 +55,7 @@ public readonly record struct ShardLink(
     Hrib IShardLink.Id => Id;
 }
 
-public class ShardInfoProjection : SingleStreamProjection<ShardInfo>
+public class ShardInfoProjection : SingleStreamProjection<ShardInfo, string>
 {
     private readonly KafeObjectFactory factory;
 

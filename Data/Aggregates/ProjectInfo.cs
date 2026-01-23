@@ -52,9 +52,11 @@ public record ProjectInfo(
 {
     public static readonly ProjectInfo Invalid = new();
 
-    static LocalizedString IEntity.Title { get; } = LocalizedString.Create(
-        (Const.InvariantCulture, "project"),
-        (Const.CzechCulture, "projekt")
+    static string IKafeTypeMetadata.Moniker => "project";
+
+    static LocalizedString IKafeTypeMetadata.Title { get; } = LocalizedString.Create(
+        (Const.InvariantCulture, "Project"),
+        (Const.CzechCulture, "Projekt")
     );
 
     Hrib IEntity.Id => Id;
@@ -124,11 +126,13 @@ public class ProjectInfoProjection : SingleStreamProjection<ProjectInfo, string>
             Id: e.ProjectId,
             CreationMethod: e.CreationMethod,
             ProjectGroupId: e.ProjectGroupId,
+            ArtifactId:
             Authors: ImmutableArray<ProjectAuthorInfo>.Empty,
             Artifacts: ImmutableArray<ProjectArtifactInfo>.Empty,
             Reviews: ImmutableArray<ProjectReviewInfo>.Empty,
             Name: e.Name,
-            OwnerId: e.OwnerId);
+            OwnerId: e.OwnerId
+        );
     }
 
     public ProjectInfo Apply(ProjectInfoChanged e, ProjectInfo p)

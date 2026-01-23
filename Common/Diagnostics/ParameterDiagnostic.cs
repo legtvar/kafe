@@ -1,11 +1,11 @@
-namespace Kafe.Core.Diagnostics;
+namespace Kafe;
 
 public record ParameterDiagnostic(
     string Parameter,
     Diagnostic Inner
 ) : IDiagnosticPayload
 {
-    public static string Moniker {get;} = "parameter";
+    public static string Moniker { get; } = "parameter";
 
     public static DiagnosticSeverity Severity => DiagnosticSeverity.Error;
 

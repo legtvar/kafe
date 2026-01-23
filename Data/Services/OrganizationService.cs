@@ -14,20 +14,20 @@ using Marten.Linq;
 namespace Kafe.Data.Services;
 
 public class OrganizationService(
-    IKafeDocumentSession db,
+    IDocumentSession db,
     EntityMetadataProvider entityMetadataProvider
 )
 {
-    public async Task<OrganizationInfo?> Load(Hrib id, CancellationToken token = default)
+    public async Task<Err<OrganizationInfo>> Load(Hrib id, CancellationToken token = default)
     {
-        return (await db.LoadAsync<OrganizationInfo>(id, token: token)).GetValueOrDefault();
+        return await db.KafeLoadAsync<OrganizationInfo>(id, token);
     }
 
-    public async Task<ImmutableArray<OrganizationInfo>> LoadMany(
-        IEnumerable<Hrib> ids,
+    public async Task<Err<ImmutableArray<OrganizationInfo>>> LoadMany(
+        IReadOnlyList<Hrib> ids,
         CancellationToken token = default)
     {
-        return (await db.LoadManyAsync<OrganizationInfo>([.. ids], token)).Unwrap();
+        return await db.KafeLoadManyAsync<OrganizationInfo>(ids, token);
     }
 
     public async Task<Err<OrganizationInfo>> Create(OrganizationInfo @new, CancellationToken token = default)
@@ -57,11 +57,12 @@ public class OrganizationService(
 
     public async Task<Err<OrganizationInfo>> Edit(OrganizationInfo modified, CancellationToken token = default)
     {
-        var @old = await Load(modified.Id, token);
-        if (@old is null)
+        var oldErr = await Load(modified.Id, token);
+        if (oldErr.HasError)
         {
-            return Err.Fail<OrganizationInfo>(new NotFoundDiagnostic(typeof(OrganizationInfo), @modified.Id));
+            return oldErr.Diagnostic;
         }
+        var @old = oldErr.Value;
 
         if ((LocalizedString)@old.Name != modified.Name)
         {

@@ -40,4 +40,18 @@ public partial record struct Diagnostic
 
         return Aggregate(diagnostics.ToImmutable());
     }
+
+    public static Diagnostic Fail(
+        IDiagnosticPayload diagnosticPayload,
+        DiagnosticDescriptor? descriptorOverride = null,
+        int skipFrames = 1
+    )
+    {
+        return new Diagnostic(
+            payload: diagnosticPayload,
+            descriptorOverride: descriptorOverride,
+            severityOverride: DiagnosticSeverity.Error,
+            skipFrames: skipFrames + 1
+        );
+    }
 }

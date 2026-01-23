@@ -145,19 +145,39 @@ public readonly record struct Err<T>
 
 public static class Err
 {
-    public static Err<T> Fail<T>(
+    public static Err<T> Wrap<T>(
+        T value,
         IDiagnosticPayload diagnosticPayload,
         DiagnosticSeverity? severityOverride = null,
-        DiagnosticDescriptor? descriptorOverride = null
+        DiagnosticDescriptor? descriptorOverride = null,
+        int skipFrames = 2
     )
     {
         return new Err<T>(
+            value,
             new Diagnostic(
                 diagnosticPayload,
-                skipFrames: 2,
+                skipFrames: skipFrames,
                 descriptorOverride: descriptorOverride,
                 severityOverride: severityOverride
             )
         );
+    }
+
+    public static Err<T> Fail<T>(
+        IDiagnosticPayload diagnosticPayload,
+        DiagnosticDescriptor? descriptorOverride = null
+    )
+    {
+        return Wrap<T>(default!, diagnosticPayload, DiagnosticSeverity.Error, descriptorOverride, skipFrames: 3);
+    }
+
+    public static Err<T> Warn<T>(
+        T value,
+        IDiagnosticPayload diagnosticPayload,
+        DiagnosticDescriptor? descriptorOverride = null
+    )
+    {
+        return Wrap<T>(value, diagnosticPayload, DiagnosticSeverity.Warning, descriptorOverride, skipFrames: 3);
     }
 }

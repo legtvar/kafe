@@ -13,23 +13,11 @@ using Marten.Linq;
 
 namespace Kafe.Data.Services;
 
-public class OrganizationService
+public class OrganizationService(
+    IKafeDocumentSession db,
+    EntityMetadataProvider entityMetadataProvider
+)
 {
-    private readonly IKafeDocumentSession db;
-    private readonly EntityMetadataProvider entityMetadataProvider;
-    private readonly DiagnosticFactory diagnosticFactory;
-
-    public OrganizationService(
-        IKafeDocumentSession db,
-        EntityMetadataProvider entityMetadataProvider,
-        DiagnosticFactory diagnosticFactory
-    )
-    {
-        this.db = db;
-        this.entityMetadataProvider = entityMetadataProvider;
-        this.diagnosticFactory = diagnosticFactory;
-    }
-
     public async Task<OrganizationInfo?> Load(Hrib id, CancellationToken token = default)
     {
         return (await db.LoadAsync<OrganizationInfo>(id, token: token)).GetValueOrDefault();
@@ -46,7 +34,7 @@ public class OrganizationService
     {
         if (!Hrib.TryParse(@new.Id, out var id, out _))
         {
-            return diagnosticFactory.FromPayload(new BadHribDiagnostic(@new.Id));
+            return Err.Fail<OrganizationInfo>(new BadHribDiagnostic(@new.Id));
         }
 
         if (id == Hrib.Empty)
@@ -72,7 +60,7 @@ public class OrganizationService
         var @old = await Load(modified.Id, token);
         if (@old is null)
         {
-            return diagnosticFactory.NotFound<OrganizationInfo>(@modified.Id);
+            return Err.Fail<OrganizationInfo>(new NotFoundDiagnostic(typeof(OrganizationInfo), @modified.Id));
         }
 
         if ((LocalizedString)@old.Name != modified.Name)
@@ -87,7 +75,7 @@ public class OrganizationService
                     + "This should never happen.");
         }
 
-        return diagnosticFactory.Unmodified<OrganizationInfo>(modified.Id);
+        return Err.Warn(modified, new UnmodifiedDiagnostic(typeof(OrganizationInfo), modified.Id));
     }
 
     /// <summary>

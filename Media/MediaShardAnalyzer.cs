@@ -5,15 +5,10 @@ using Kafe.Media.Services;
 
 namespace Kafe.Media;
 
-public class VideoShardAnalyzer : IShardAnalyzer
+public class MediaShardAnalyzer(
+    IMediaService mediaService
+) : IShardAnalyzer
 {
-    private readonly IMediaService mediaService;
-
-    public VideoShardAnalyzer(IMediaService mediaService)
-    {
-        this.mediaService = mediaService;
-    }
-
     public async ValueTask<ShardAnalysis> Analyze(string tempPath, string? mimeType, CancellationToken token = default)
     {
         if (mimeType != Const.MatroskaMimeType && mimeType != Const.Mp4MimeType)

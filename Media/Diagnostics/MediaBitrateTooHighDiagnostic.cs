@@ -24,7 +24,7 @@ public record MediaBitrateTooHighDiagnostic(
         ),
         (
             Const.CzechCulture,
-            "Celkový itrate střípku '{ShardName}' je příliš vysoký. Maximální povolený bitrate je {Max:bps}."
+            "Celkový bitrate střípku '{ShardName}' je příliš vysoký. Maximální povolený bitrate je {Max:bps}."
         )
     );
 }

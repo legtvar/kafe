@@ -44,12 +44,12 @@ public record ShardInfo(
 
     [JsonIgnore]
     public ImmutableDictionary<KafeType, ImmutableHashSet<ShardLink>> LinksByType { get; }
-        = Links.GroupBy(l => l.Metadata.Type).ToImmutableDictionary(g => g.Key, g => g.ToImmutableHashSet());
+        = Links.GroupBy(l => l.Payload.Type).ToImmutableDictionary(g => g.Key, g => g.ToImmutableHashSet());
 }
 
 public readonly record struct ShardLink(
     [Hrib] string Id,
-    KafeObject Metadata
+    KafeObject Payload
 ) : IShardLink
 {
     Hrib IShardLink.Id => Id;
@@ -104,7 +104,7 @@ public class ShardInfoProjection(
         }
         if (e.Metadata is not null)
         {
-            links.ExceptWith(links.Where(l => l.Metadata == e.Metadata));
+            links.ExceptWith(links.Where(l => l.Payload == e.Metadata));
         }
         else
         {

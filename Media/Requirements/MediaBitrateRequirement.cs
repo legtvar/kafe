@@ -149,7 +149,7 @@ public class MediaBitrateRequirementHandler : ShardRequirementHandlerBase<MediaB
 
     // NB: I have opted NOT to add something like IBitrateTooLowDiagnostic because I intend to source-generate the
     //     diagnostic types from a JSON file later on.
-    private static object CreateBitrateTooLowDiagnostic<T>(
+    private static IDiagnosticPayload CreateBitrateTooLowDiagnostic<T>(
         IShard shard,
         string? variant,
         T mediaStream,
@@ -188,7 +188,7 @@ public class MediaBitrateRequirementHandler : ShardRequirementHandlerBase<MediaB
         };
     }
 
-    private static object CreateBitrateTooHighDiagnostic<T>(
+    private static IDiagnosticPayload CreateBitrateTooHighDiagnostic<T>(
         IShard shard,
         string? variant,
         T mediaStream,

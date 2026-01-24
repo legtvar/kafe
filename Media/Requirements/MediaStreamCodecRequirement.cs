@@ -146,7 +146,7 @@ public class MediaStreamCodecRequirementHandler : ShardRequirementHandlerBase<Me
             VideoStreamInfo v =>
             (
                 v.Codec,
-                new Lazy<object>(() => new VideoCodecNotAllowedDiagnostic(
+                new Lazy<IDiagnosticPayload>(() => new VideoCodecNotAllowedDiagnostic(
                     context.Shard.Id,
                     context.Shard.Name,
                     v.Codec,
@@ -157,7 +157,7 @@ public class MediaStreamCodecRequirementHandler : ShardRequirementHandlerBase<Me
             AudioStreamInfo a =>
             (
                 a.Codec,
-                new Lazy<object>(() => new AudioCodecNotAllowedDiagnostic(
+                new Lazy<IDiagnosticPayload>(() => new AudioCodecNotAllowedDiagnostic(
                     context.Shard.Id,
                     context.Shard.Name,
                     a.Codec,
@@ -168,7 +168,7 @@ public class MediaStreamCodecRequirementHandler : ShardRequirementHandlerBase<Me
             SubtitleStreamInfo s =>
             (
                 s.Codec,
-                new Lazy<object>(() => new SubtitleCodecNotAllowedDiagnostic(
+                new Lazy<IDiagnosticPayload>(() => new SubtitleCodecNotAllowedDiagnostic(
                     context.Shard.Id,
                     context.Shard.Name,
                     s.Codec,

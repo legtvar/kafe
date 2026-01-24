@@ -85,7 +85,7 @@ public static class ModContextExtensions
             );
         }
 
-        public KafeType AddEntityType<T>(EntityRegistrationOptions? options = null)
+        public KafeType AddEntity<T>(EntityRegistrationOptions? options = null)
             where T : IEntity
         {
             options ??= new EntityRegistrationOptions();
@@ -93,6 +93,19 @@ public static class ModContextExtensions
             return ctx.AddTypeRaw(
                 type: typeof(T),
                 category: IEntity.TypeCategory,
+                options: options,
+                extension: null
+            );
+        }
+
+        public KafeType AddShardLinkPayload<T>(ShardLinkRegistrationOptions? options = null)
+            where T : IShardLinkPayload
+        {
+            options ??= new ShardLinkRegistrationOptions();
+            PopulateRegistrationOptions<T>(options);
+            return ctx.AddTypeRaw(
+                type: typeof(T),
+                category: IShardLinkPayload.TypeCategory,
                 options: options,
                 extension: null
             );

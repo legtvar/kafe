@@ -13,7 +13,7 @@ public static class MediaConst
             new(MediaStreamKind.Subtitles, typeof(SubtitleStreamInfo)),
         ]);
 
-    public static object CreateMissingMediaStreamDiagnostic(
+    public static IDiagnosticPayload CreateMissingMediaStreamDiagnostic(
         Type mediaStreamType,
         Hrib shardId,
         LocalizedString shardName,

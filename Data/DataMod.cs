@@ -35,19 +35,19 @@ public class DataMod : IMod
     {
         ConfigureServices(context.Services);
 
-        context.AddEntityType<ProjectInfo>();
-        context.AddEntityType<ProjectGroupInfo>();
-        context.AddEntityType<AuthorInfo>();
-        context.AddEntityType<NotificationInfo>();
-        context.AddEntityType<PlaylistInfo>();
-        context.AddEntityType<VideoConversionInfo>();
-        context.AddEntityType<AccountInfo>();
-        context.AddEntityType<OrganizationInfo>();
-        context.AddEntityType<RoleInfo>();
-        context.AddEntityType<ArtifactInfo>();
-        context.AddEntityType<ShardInfo>();
-        context.AddEntityType<EntityPermissionInfo>();
-        context.AddEntityType<RoleMembersInfo>();
+        context.AddEntity<ProjectInfo>();
+        context.AddEntity<ProjectGroupInfo>();
+        context.AddEntity<AuthorInfo>();
+        context.AddEntity<NotificationInfo>();
+        context.AddEntity<PlaylistInfo>();
+        context.AddEntity<VideoConversionInfo>();
+        context.AddEntity<AccountInfo>();
+        context.AddEntity<OrganizationInfo>();
+        context.AddEntity<RoleInfo>();
+        context.AddEntity<ArtifactInfo>();
+        context.AddEntity<ShardInfo>();
+        context.AddEntity<EntityPermissionInfo>();
+        context.AddEntity<RoleMembersInfo>();
 
         context.AddDiagnosticPayload<BadLoginTicketDiagnostic>();
     }

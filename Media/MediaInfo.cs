@@ -17,6 +17,8 @@ public record MediaInfo(
     string? Error = null
 ) : IShardPayload
 {
+    public static string? Moniker => "media";
+
     public static MediaInfo Invalid { get; } = new(
         FileExtension: Const.InvalidFileExtension,
         FormatName: Const.InvalidFormatName,

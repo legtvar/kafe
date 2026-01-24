@@ -12,6 +12,7 @@ using Kafe.Data.Aggregates;
 using Kafe.Data.Events;
 using Kafe.Data.Options;
 using Kafe.Data.Services;
+using Kafe.Media.Diagnostics;
 using Marten;
 using Marten.Linq;
 using Marten.Linq.MatchesSql;
@@ -47,39 +48,45 @@ public class VideoConversionService(
 
     public async Task<Err<VideoConversionInfo>> Upsert(VideoConversionInfo conversion, CancellationToken ct = default)
     {
-        if (!Hrib.TryParseValid(conversion.Id, out var id, out var idError, shouldReplaceEmpty: true))
+        var idErr = Hrib.TryParseValid(conversion.Id, shouldReplaceEmpty: true);
+        if (idErr.HasError)
         {
-            // TODO: pass the error to BadHribDiagnostic
-            return diagnosticFactory.FromPayload(new BadHribDiagnostic(conversion.Id));
+            return idErr.Diagnostic.ForParameter(nameof(conversion.Id));
         }
 
-        if (!Hrib.TryParseValid(conversion.VideoId, out var videoId, out _ , shouldReplaceEmpty: false))
+        var videoIdErr = Hrib.TryParseValid(conversion.VideoId);
+        if (videoIdErr.HasError)
         {
-            return diagnosticFactory.FromPayload(new BadHribDiagnostic(conversion.VideoId));
+            return idErr.Diagnostic.ForParameter(nameof(conversion.VideoId));
         }
 
-        var shard = await shardService.Load(videoId, ct);
-        if (shard is null)
+        var id = idErr.Value;
+        var videoId = videoIdErr.Value;
+
+        var shardErr = await shardService.Load(videoId, ct);
+        if (shardErr.HasError)
         {
-            return JSType.Error.NotFound("The referenced video");
+            return shardErr.Diagnostic;
         }
 
-        if (shard.Kind != ShardKind.Video)
+        var shard = shardErr.Value;
+
+        if (shard.Payload.Value is not MediaInfo mediaInfo)
         {
-            return JSType.Error.InvalidValue("The video HRIB points to a non-video shard.");
+            return Err.Fail(new MediaConversionBadShardTypeDiagnostic(videoId, shard.Payload.GetType()));
         }
 
-        var stream = await db.Events.FetchForWriting<VideoConversionInfo>(id.Value.ToString(), cancellation: ct);
+        var stream = await db.Events.FetchForWriting<VideoConversionInfo>(id.ToString(), cancellation: ct);
         if (stream.Aggregate is null)
         {
             var created = new VideoConversionCreated(
-                ConversionId: id.Value.ToString(),
-                VideoId: videoId.Value.ToString(),
+                ConversionId: id.ToString(),
+                VideoId: videoId.ToString(),
                 Variant: conversion.Variant
             );
-            db.Events.KafeStartStream<VideoConversionInfo>((Hrib)id, created);
+            db.Events.KafeStartStream<VideoConversionInfo>(id, created);
             await db.SaveChangesAsync(ct);
-            stream = await db.Events.FetchForWriting<VideoConversionInfo>(id.Value.ToString(), cancellation: ct);
+            stream = await db.Events.FetchForWriting<VideoConversionInfo>(id.ToString(), cancellation: ct);
             if (stream.Aggregate is null)
             {
                 throw new InvalidOperationException("Failed to create a new video conversion.");
@@ -88,18 +95,18 @@ public class VideoConversionService(
 
         if (conversion is { IsCompleted: true, HasFailed: true })
         {
-            return JSType.Error.InvalidValue("The video conversion cannot succeed and fail at the same time.");
+            throw new InvalidOperationException("The video conversion cannot succeed and fail at the same time.");
         }
 
         if (conversion.IsCompleted && !stream.Aggregate.IsCompleted)
         {
             if (stream.Aggregate.HasFailed)
             {
-                return JSType.Error.AlreadyFailed("The video conversion");
+                return Err.Fail(new MediaConversionAlreadyFailed(id));
             }
 
             stream.AppendOne(
-                new VideoConversionCompleted(id.Value.ToString())
+                new VideoConversionCompleted(id.ToString())
             );
         }
 
@@ -108,7 +115,7 @@ public class VideoConversionService(
             && conversion.Error != (LocalizedString?)stream.Aggregate.Error
            )
         {
-            return JSType.Error.AlreadyFailed("The video conversion");
+            return Err.Fail(new MediaConversionAlreadyCompleted(id));
         }
 
         if ((conversion.HasFailed || !LocalizedString.IsNullOrEmpty(conversion.Error))
@@ -117,14 +124,14 @@ public class VideoConversionService(
         {
             if (stream.Aggregate.IsCompleted)
             {
-                return JSType.Error.AlreadyCompleted("The video conversion");
+                return Err.Fail(new MediaConversionAlreadyCompleted(id));
             }
 
-            stream.AppendOne(new VideoConversionFailed(id.Value.ToString(), conversion.Error));
+            stream.AppendOne(new VideoConversionFailed(id.ToString(), conversion.Error));
         }
 
         await db.SaveChangesAsync(ct);
-        return await db.Events.RequireLatest<VideoConversionInfo>((Hrib)id, ct);
+        return await db.Events.RequireLatest<VideoConversionInfo>(id, ct);
     }
 
     public record VideoConversionFilter(
@@ -289,9 +296,9 @@ public class VideoConversionService(
         }
 
         var err = await Upsert(conversion, ct);
-        if (err.HasErrors)
+        if (err.HasError)
         {
-            logger.LogError(err, "Could not persist the video conversion result in the database.");
+            logger.LogErr(err, "Could not persist the video conversion result in the database.");
             return;
         }
 
@@ -448,9 +455,9 @@ public class VideoConversionService(
                 ),
                 ct
             );
-            if (err.HasErrors)
+            if (err.HasError)
             {
-                logger.LogError(err, "One or more errors occurred while creating a video conversion.");
+                logger.LogErr(err, "One or more errors occurred while creating a video conversion.");
                 continue;
             }
 
@@ -492,9 +499,9 @@ public class VideoConversionService(
                 ),
                 ct
             );
-            if (err.HasErrors)
+            if (err.HasError)
             {
-                return err.Errors;
+                return err.Diagnostic;
             }
         }
 

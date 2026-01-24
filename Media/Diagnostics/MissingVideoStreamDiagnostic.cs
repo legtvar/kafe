@@ -13,8 +13,8 @@ public record MissingVideoStreamDiagnostic(
     public static DiagnosticSeverity Severity => DiagnosticSeverity.Error;
 
     public static LocalizedString Title { get; } = LocalizedString.Create(
-        (Const.InvariantCulture, "Missing Video Stream"),
-        (Const.CzechCulture, "Chybí video proud")
+        (Const.InvariantCulture, "Missing a Required Video Stream"),
+        (Const.CzechCulture, "Povinný video proud chybí")
     );
 
     public static LocalizedString MessageFormat { get; } = LocalizedString.Create(

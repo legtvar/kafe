@@ -40,5 +40,10 @@ public record ShardPayloadRegistrationOptions : KafeTypeRegistrationOptions
 
 public record EntityRegistrationOptions : KafeTypeRegistrationOptions
 {
-    // Kept empty for possible future use.
+    // Kept for possible future use.
+}
+
+public record ShardLinkRegistrationOptions : KafeTypeRegistrationOptions
+{
+    // Kept for possible future use.
 }

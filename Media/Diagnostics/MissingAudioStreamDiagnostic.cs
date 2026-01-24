@@ -13,8 +13,8 @@ public record MissingAudioStreamDiagnostic(
     public static DiagnosticSeverity Severity => DiagnosticSeverity.Error;
 
     public static LocalizedString Title { get; } = LocalizedString.Create(
-        (Const.InvariantCulture, "Missing Audio Stream"),
-        (Const.CzechCulture, "Chybí audio proud")
+        (Const.InvariantCulture, "Missing a Required Audio Stream"),
+        (Const.CzechCulture, "Povinný audio proud chybí")
     );
 
     public static LocalizedString MessageFormat { get; } = LocalizedString.Create(

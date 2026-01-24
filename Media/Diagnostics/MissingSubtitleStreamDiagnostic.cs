@@ -13,8 +13,8 @@ public record MissingSubtitleStreamDiagnostic(
     public static DiagnosticSeverity Severity => DiagnosticSeverity.Error;
 
     public static LocalizedString Title { get; } = LocalizedString.Create(
-        (Const.InvariantCulture, "Missing Subtitle Stream"),
-        (Const.CzechCulture, "Chybí titulkový proud")
+        (Const.InvariantCulture, "Missing a Required Subtitle Stream"),
+        (Const.CzechCulture, "Povinný titulkový proud chybí")
     );
 
     public static LocalizedString MessageFormat { get; } = LocalizedString.Create(

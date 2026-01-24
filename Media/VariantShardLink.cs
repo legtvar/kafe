@@ -1,6 +1,6 @@
 namespace Kafe.Media;
 
-public record VariantLinkMetadata : IShardLinkMetadata
+public record VariantShardLink : IShardLinkPayload
 {
     public static string Moniker => "variant";
 

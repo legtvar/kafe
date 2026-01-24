@@ -53,15 +53,10 @@ public record ArtifactInfo(
     }
 }
 
-public class ArtifactInfoProjection : SingleStreamProjection<ArtifactInfo, string>
+public class ArtifactInfoProjection(
+    KafeObjectFactory kafeObjectFactory
+) : SingleStreamProjection<ArtifactInfo, string>
 {
-    private readonly KafeObjectFactory kafeObjectFactory;
-
-    public ArtifactInfoProjection(KafeObjectFactory kafeObjectFactory)
-    {
-        this.kafeObjectFactory = kafeObjectFactory;
-    }
-
     public static ArtifactInfo Create(ArtifactCreated e)
     {
         return new ArtifactInfo(

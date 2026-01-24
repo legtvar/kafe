@@ -302,16 +302,18 @@ public class EntityPermissionEventProjection : EventProjection
 
     public async Task Project(ProjectGroupMovedToOrganization e, IEvent metadata, IDocumentOperations ops)
     {
-        var entitySoFar = await ops.Events.KafeAggregateStream<ProjectGroupInfo>(
+        var entityErr = await ops.Events.KafeAggregateStream<ProjectGroupInfo>(
             id: e.ProjectGroupId,
             version: metadata.Version - 1
         );
-        if (entitySoFar is null)
+        if (entityErr.HasError)
         {
             throw new InvalidOperationException(
                 $"Project group '{e.ProjectGroupId}' could not be aggregated to a point before the event."
             );
         }
+
+        var entitySoFar = entityErr.Value;
 
         var perms = await RequireEntityPermissionInfo(ops, e.ProjectGroupId);
         if (((Hrib)entitySoFar.OrganizationId).IsValidNonEmpty)
@@ -325,16 +327,18 @@ public class EntityPermissionEventProjection : EventProjection
 
     public async Task Project(PlaylistMovedToOrganization e, IEvent metadata, IDocumentOperations ops)
     {
-        var entitySoFar = await ops.Events.KafeAggregateStream<PlaylistInfo>(
+        var entityErr = await ops.Events.KafeAggregateStream<PlaylistInfo>(
             id: e.PlaylistId,
             version: metadata.Version - 1
         );
-        if (entitySoFar is null)
+        if (entityErr.HasError)
         {
             throw new InvalidOperationException(
                 $"Playlist '{e.PlaylistId}' could not be aggregated to a point before the event."
             );
         }
+
+        var entitySoFar = entityErr.Value;
 
         var perms = await RequireEntityPermissionInfo(ops, e.PlaylistId);
         if (((Hrib)entitySoFar.OrganizationId).IsValidNonEmpty)
@@ -431,9 +435,12 @@ public class EntityPermissionEventProjection : EventProjection
                 return EntityPermissionInfo.Create(entityId);
             }
 
-            throw new InvalidOperationException($"No permission info exists for '{entityId}'. "
-                + "Either the events are out of order or the permission info projection is broken.");
+            throw new InvalidOperationException(
+                $"No permission info exists for '{entityId}'. "
+                + "Either the events are out of order or the permission info projection is broken."
+            );
         }
+
         return entityPerms;
     }
 
@@ -445,9 +452,12 @@ public class EntityPermissionEventProjection : EventProjection
         var roleInfo = await ops.LoadAsync<RoleMembersInfo>(roleId.ToString());
         if (roleInfo is null)
         {
-            throw new InvalidOperationException($"No role members info exists for '{roleId}'. "
-                + "Either the events are out of order or the permission info projection is broken.");
+            throw new InvalidOperationException(
+                $"No role members info exists for '{roleId}'. "
+                + "Either the events are out of order or the permission info projection is broken."
+            );
         }
+
         return roleInfo;
     }
 
@@ -471,7 +481,8 @@ public class EntityPermissionEventProjection : EventProjection
         {
             AccountEntries = MergeManyEntries(
                 perms.AccountEntries,
-                InheritEntries(systemPerms.AccountEntries)),
+                InheritEntries(systemPerms.AccountEntries)
+            ),
             // NB: We ignore RoleEntries and GlobalPermission, since `system` can have neither.
             DependencyGraph = perms.DependencyGraph.SetItem(Hrib.SystemValue, [Hrib.SystemValue])
         };

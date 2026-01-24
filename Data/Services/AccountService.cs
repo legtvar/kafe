@@ -526,11 +526,12 @@ public class AccountService(
             return Err.Fail(new BadLoginTicketDiagnostic());
         }
 
+        Err<AccountInfo> accountErr;
         AccountInfo? account = null;
 
         if (ticket.AccountId is not null)
         {
-            var accountErr = await Load(ticket.AccountId, ct);
+            accountErr = await Load(ticket.AccountId, ct);
             if (accountErr.HasError)
             {
                 return accountErr;
@@ -540,7 +541,7 @@ public class AccountService(
         }
         else
         {
-            var accountErr = await Create(
+            accountErr = await Create(
                 AccountInfo.Create(ticket.EmailAddress, ticket.PreferredCulture) with
                 {
                     Kind = AccountKind.Temporary
@@ -597,10 +598,10 @@ public class AccountService(
             }
         }
 
-        account = await db.Events.KafeAggregateStream<AccountInfo>(accountId, token: ct);
-        if (account is null)
+        accountErr  = await db.Events.KafeAggregateStream<AccountInfo>(accountId, token: ct);
+        if (accountErr.HasError)
         {
-            return Err.Fail(new NotFoundDiagnostic(typeof(AccountInfo), accountId));
+            return accountErr.Diagnostic;
         }
 
         return account;

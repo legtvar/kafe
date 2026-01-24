@@ -55,14 +55,11 @@ public readonly record struct ShardLink(
     Hrib IShardLink.Id => Id;
 }
 
-public class ShardInfoProjection : SingleStreamProjection<ShardInfo, string>
+public class ShardInfoProjection(
+    KafeObjectFactory factory
+) : SingleStreamProjection<ShardInfo, string>
 {
-    private readonly KafeObjectFactory factory;
-
-    public ShardInfoProjection(KafeObjectFactory factory)
-    {
-        this.factory = factory;
-    }
+    private readonly KafeObjectFactory factory = factory;
 
     public static ShardInfo Create(IEvent<ShardCreated> e)
     {

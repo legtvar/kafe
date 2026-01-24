@@ -37,3 +37,8 @@ public record ShardPayloadRegistrationOptions : KafeTypeRegistrationOptions
 {
     public IList<Type> AnalyzerTypes { get; set; } = ImmutableArray.CreateBuilder<Type>();
 }
+
+public record EntityRegistrationOptions : KafeTypeRegistrationOptions
+{
+    // Kept empty for possible future use.
+}

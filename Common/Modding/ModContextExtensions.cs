@@ -85,11 +85,24 @@ public static class ModContextExtensions
             );
         }
 
+        public KafeType AddEntityType<T>(EntityRegistrationOptions? options = null)
+            where T : IEntity
+        {
+            options ??= new EntityRegistrationOptions();
+            PopulateRegistrationOptions<T>(options);
+            return ctx.AddTypeRaw(
+                type: typeof(T),
+                category: IEntity.TypeCategory,
+                options: options,
+                extension: null
+            );
+        }
+
         private KafeType AddTypeRaw(
             Type type,
             string category,
             KafeTypeRegistrationOptions options,
-            object extension
+            object? extension
         )
         {
             var typeName = options.Moniker;

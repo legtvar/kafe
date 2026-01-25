@@ -6,19 +6,21 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Net.Http;
 using System.Net.Http.Json;
+using Marten.Linq;
 
 namespace Kafe.Data.Services;
 
 public class ShardService(
     IDocumentSession db,
     StorageService storageService,
-    IHttpClientFactory httpClientFactory,
     ShardAnalysisFactory analysisFactory,
     FileExtensionMimeMap extMimeMap,
+    KafeTypeRegistry typeRegistry,
     KafeObjectFactory kafeObjectFactory
 )
 {
@@ -97,6 +99,30 @@ public class ShardService(
         }
 
         return stream;
+    }
+
+    public record ShardFilter(
+        Type? ShardPayloadType = null,
+        TimeSpan? Age = null
+    );
+
+    public IMartenQueryable<ShardInfo> Query(ShardFilter? filter = null)
+    {
+        filter ??= new ShardFilter();
+        var query = db.Query<ShardInfo>();
+        if (filter.ShardPayloadType is not null)
+        {
+            var payloadKafeType = typeRegistry.RequireType(filter.ShardPayloadType);
+            query = (IMartenQueryable<ShardInfo>)query.Where(s => s.Payload.Type == payloadKafeType);
+        }
+
+        if (filter.Age is not null)
+        {
+            var rangeStart = DateTimeOffset.UtcNow - filter.Age.Value;
+            query = (IMartenQueryable<ShardInfo>)query.Where(v => v.CreatedAt > rangeStart);
+        }
+
+        return query;
     }
 
     private static string SanitizeVariantName(string? variant)

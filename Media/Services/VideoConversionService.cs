@@ -25,6 +25,7 @@ public class VideoConversionService(
     IDocumentSession db,
     ILogger<VideoConversionService> logger,
     IOptions<VideoConversionOptions> options,
+    KafeTypeRegistry typeRegistry,
     ShardService shardService,
     IMediaService mediaService,
     StorageService storageService
@@ -193,38 +194,39 @@ public class VideoConversionService(
     }
 
     public record VideoShardFilter(
-        TimeSpan? Range = null,
-        bool? HasOriginalVariant = true,
+        TimeSpan? Age = null,
         bool? IsCorrupted = false,
         bool? HasAnyCompletedOrFailedConversions = false
     );
 
-    public IMartenQueryable<VideoShardInfo> QueryVideoShards(VideoShardFilter? filter = null)
+    public IMartenQueryable<ShardInfo> QueryVideoShards(VideoShardFilter? filter = null)
     {
         filter ??= new VideoShardFilter();
 
-        var query = db.Query<VideoShardInfo>();
-        if (filter.Range is not null)
-        {
-            var rangeStart = DateTimeOffset.UtcNow - filter.Range.Value;
-            query = (IMartenQueryable<VideoShardInfo>)query.Where(v => v.CreatedAt > rangeStart);
-        }
+        var query = shardService.Query(
+            new ShardService.ShardFilter(
+                ShardPayloadType: typeof(MediaInfo),
+                Age: filter.Age
+            )
+        );
 
-        if (filter.HasOriginalVariant is not null)
-        {
-            var hasOriginal = filter.HasOriginalVariant.Value;
-            query = (IMartenQueryable<VideoShardInfo>)query.Where(v => v.MatchesSql(
-                    $"d.data -> '{nameof(VideoShardInfo.Variants)}' "
-                    + $"-> '{Const.OriginalShardVariant}' IS {(hasOriginal ? "NOT" : "")} NULL"
-                )
-            );
-        }
+        var originalLinkType = typeRegistry.RequireType<OriginalShardLink>();
+        // NB: Filter out generated video shards.
+        query = (IMartenQueryable<ShardInfo>)query.Where(s => s.MatchesSql(
+                $"""
+                 NOT jsonb_path_exists(
+                    d.data,
+                    '$.{nameof(ShardInfo.Links)}[*] ? (@.{nameof(KafeObject.Type)} == \"{originalLinkType.ToString()}\")'
+                 )
+                 """
+            )
+        );
 
         if (filter.IsCorrupted is not null)
         {
             var isCorrupted = filter.IsCorrupted.Value;
-            query = (IMartenQueryable<VideoShardInfo>)query.Where(v => v.MatchesSql(
-                    $"(d.data -> '{nameof(VideoShardInfo.Variants)}' -> '{Const.OriginalShardVariant}' "
+            query = (IMartenQueryable<ShardInfo>)query.Where(v => v.MatchesSql(
+                    $"(d.data -> '{nameof(ShardInfo.Payload)}' -> '{nameof(KafeObject.Value)}' "
                     + $"->> '{nameof(MediaInfo.IsCorrupted)}')::boolean = ?",
                     isCorrupted
                 )
@@ -234,7 +236,7 @@ public class VideoConversionService(
         if (filter.HasAnyCompletedOrFailedConversions is not null)
         {
             var hasCompletedOrFailedConversions = filter.HasAnyCompletedOrFailedConversions.Value;
-            query = (IMartenQueryable<VideoShardInfo>)query.Where(v => v.MatchesSql(
+            query = (IMartenQueryable<ShardInfo>)query.Where(v => v.MatchesSql(
                     $"""
                      {(hasCompletedOrFailedConversions ? "" : "NOT")} EXISTS (
                          SELECT a.*  FROM {db.DocumentStore.Options.Schema.For<VideoConversionInfo>(true)} AS a
@@ -252,7 +254,7 @@ public class VideoConversionService(
             );
         }
 
-        query = (IMartenQueryable<VideoShardInfo>)query.OrderByDescending(v => v.CreatedAt);
+        query = (IMartenQueryable<ShardInfo>)query.OrderByDescending(v => v.CreatedAt);
         return query;
     }
 
@@ -583,7 +585,7 @@ public class VideoConversionService(
     {
         var query = QueryVideoShards(
             new VideoShardFilter(
-                Range: range,
+                Age: range,
                 HasOriginalVariant: true,
                 IsCorrupted: false,
                 HasAnyCompletedOrFailedConversions: false

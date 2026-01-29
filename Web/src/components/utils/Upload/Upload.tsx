@@ -25,7 +25,6 @@ export function Upload(props: IUploadProps) {
     const api = useApi();
 
     async function reset() {
-        await forTime(2000);
         setStatus('ready');
         setProgress(0);
     }
@@ -46,23 +45,13 @@ export function Upload(props: IUploadProps) {
             if (response.status === 200) {
                 props.onUploaded && props.onUploaded(response.data);
                 setStatus('uploaded');
-
-                if (props.repeatable) {
-                    reset();
-                }
             } else {
                 setStatus('error');
                 console.warn(response);
-                if (props.repeatable) {
-                    reset();
-                }
             }
         } catch (e) {
             setStatus('error');
             console.warn(e);
-            if (props.repeatable) {
-                reset();
-            }
         }
     }
 
@@ -127,7 +116,11 @@ export function Upload(props: IUploadProps) {
 
     if (status === 'error') {
         return (
-            <Center py={8}>
+            <Center
+                py={8}
+                onClick={reset}
+                cursor="pointer"
+            >
                 <Flex direction="column" alignItems="center">
                     <Box fontSize={96} color="red.500">
                         <BsCloudSlashFill />

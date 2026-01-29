@@ -459,7 +459,7 @@
   "upload": {
     "ready": "Sem přetáhněte <1>{{title}}</1><2></2>nebo klikněte pro výběr z počítače<4></4>",
     "uploaded": "<0>Úspěšně nahráno</0><1></1>Formulář už můžete odeslat",
-    "failed": "<0>Nahrávání se nezdařilo</0><1></1>Nahráváte správný typ souboru?",
+    "failed": "<0>Nahrávání se nezdařilo</0><1></1>Zkontrolujte, že soubor splňuje technické požadavky (zejména velikost).",
     "uploading": "<0>Soubor se nahrává</0><1></1>Nahráno {{progress}}%"
   },
   "visibility": {

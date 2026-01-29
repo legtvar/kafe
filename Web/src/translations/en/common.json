@@ -459,7 +459,7 @@
   "upload": {
     "ready": "Drag the <1>{{title}}</1> here<2></2>or click to select the file from your computer<4></4>",
     "uploaded": "<0>Successfully uploaded</0><1></1>You can now submit the form",
-    "failed": "<0>Upload failed</0><1></1>Are you uploading the correct file type?",
+    "failed": "<0>Upload failed</0><1></1>Check that the file fulfills all technical requirements (especially file size).",
     "uploading": "<0>Uploading the file</0><1></1>{{progress}}% uploaded"
   },
   "visibility": {

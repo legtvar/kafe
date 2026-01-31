@@ -301,6 +301,24 @@ public sealed partial class LocalizedString : IEquatable<LocalizedString>, IForm
         return new LocalizedString(formatted);
     }
 
+    public static LocalizedString Concat(params IReadOnlyList<LocalizedString> strings)
+    {
+        var builder = ImmutableDictionary.CreateBuilder<string, string>();
+        var cultures = strings.SelectMany(s => s.Keys).Distinct();
+        foreach (var culture in cultures)
+        {
+            var sb = new StringBuilder();
+            foreach (var str in strings)
+            {
+                sb.Append(str[culture]);
+            }
+
+            builder[culture] = sb.ToString();
+        }
+
+        return new LocalizedString(builder.ToImmutable());
+    }
+
     string IFormattable.ToString(string? _, IFormatProvider? formatProvider)
     {
         formatProvider ??= CultureInfo.InvariantCulture;

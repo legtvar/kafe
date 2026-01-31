@@ -24,7 +24,7 @@ public static class MartenExtensions
     {
         public StreamAction KafeStartStream<TAggregate>(
             Hrib id,
-            IEnumerable<object> events
+            params IEnumerable<object> events
         ) where TAggregate : class, IEntity
         {
             return ops.StartStream<TAggregate>(streamKey: id.ToString(), events: events);
@@ -40,7 +40,7 @@ public static class MartenExtensions
 
         public StreamAction KafeAppend(
             Hrib streamId,
-            IEnumerable<object> events
+            params IEnumerable<object> events
         )
         {
             return ops.Append(streamId.ToString(), events);

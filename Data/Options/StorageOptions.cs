@@ -34,7 +34,7 @@ public record StorageOptions
     public Dictionary<KafeType, string> ShardDirectories { get; init; } = new()
     {
         [new KafeType("media", "shard", "image")] = "images",
-        [new KafeType("media", "shard", "video")] = "videos",
+        [new KafeType("media", "shard", "media")] = "videos",
         [new KafeType("media", "shard", "subtitles")] = "subtitles",
         [new KafeType("mate", "shard", "blend")] = "blends"
     };

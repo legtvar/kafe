@@ -9,16 +9,17 @@ namespace Kafe;
 /// <remarks>
 /// Guarantees that if <see cref="HasError"/> is false then <see cref="Value"/> is not null nor
 /// <see cref="IInvalidable{T}.Invalid"/>.
-/// Also, if <see cref="HasValue"/> is false then <see cref="HasError"/> is true.
+/// Also, if <see cref="HasValue"/> is false then <see cref="HasError"/> must be true.
 /// However, if <see cref="HasValue"/> is true, then <see cref="HasError"/> MAY still be true and there MAY
 /// be an error <see cref="Diagnostic"/>.
+/// In other words, <see cref="Value"/> may be null, but when it is, there must be an error <see cref="Diagnostic"/>
+/// explaining why.
 /// </remarks>
 // Inspired in part by: https://stackoverflow.com/questions/3151702/discriminated-union-in-c-sharp
 // And: https://ziglang.org/documentation/master/#while-with-Error-Unions
 public readonly record struct Err<T>
 {
-    [MaybeNull]
-    private readonly T value = default!;
+    private readonly T? value = default;
 
     private readonly Diagnostic diagnostic = Diagnostic.Invalid;
 
@@ -28,7 +29,7 @@ public readonly record struct Err<T>
         diagnostic = default;
     }
 
-    public Err(T value, Diagnostic diagnostic)
+    public Err(T? value, Diagnostic diagnostic)
     {
         if (value is null && !diagnostic.IsValid)
         {
@@ -56,8 +57,7 @@ public readonly record struct Err<T>
     {
     }
 
-    [MaybeNull]
-    public T Value => value;
+    public T? Value => value;
 
     public Diagnostic Diagnostic => !HasValue && diagnostic is not { IsValid: true, Severity: DiagnosticSeverity.Error }
         ? new Diagnostic(new GenericErrorDiagnostic(), skipFrames: 2)
@@ -135,8 +135,7 @@ public readonly record struct Err<T>
         return Unwrap(this);
     }
 
-    [return: MaybeNull]
-    public T GetValueOrDefault()
+    public T? GetValueOrDefault()
     {
         return HasValue ? Value : default;
     }

@@ -84,7 +84,7 @@ public class TestSeedData(IServiceProvider services, ILogger<TestSeedData> logge
 
         var projectService = scope.ServiceProvider.GetRequiredService<ProjectService>();
         (await projectService.Upsert(
-            project: ProjectInfo.Create(Group1Hrib, (LocalizedString)"Test Project 1") with
+            project: ProjectInfo.Create(Group1Hrib) with
             {
                 Id = Project1Hrib
             },
@@ -93,7 +93,7 @@ public class TestSeedData(IServiceProvider services, ILogger<TestSeedData> logge
             token: ct
         )).Unwrap();
         (await projectService.Upsert(
-            project: ProjectInfo.Create(Group2Hrib, (LocalizedString)"Test Project 2") with
+            project: ProjectInfo.Create(Group2Hrib) with
             {
                 Id = Project2Hrib
             },

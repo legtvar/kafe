@@ -23,8 +23,9 @@ public class PermissionTests(ApiFixture fixture, ITestOutputHelper testOutput) :
     {
         await WaitForProjections();
         await using var query = Store.QuerySession();
-        var systemPerms = await MartenExtensions.LoadAsync<EntityPermissionInfo>(query, Hrib.System);
-        Assert.False(systemPerms.HasErrors);
+
+        var systemPerms = await query.KafeLoadAsync<EntityPermissionInfo>(Hrib.System);
+        Assert.False(systemPerms.HasError);
         Assert.NotNull(systemPerms.Value);
     }
 
@@ -33,7 +34,7 @@ public class PermissionTests(ApiFixture fixture, ITestOutputHelper testOutput) :
     {
         await WaitForProjections();
         await using var query = Store.QuerySession();
-        var systemPerms = (await MartenExtensions.LoadAsync<EntityPermissionInfo>(query, Hrib.System)).Unwrap();
+        var systemPerms = (await query.KafeLoadAsync<EntityPermissionInfo>(Hrib.System)).Unwrap();
         AssertAccountPermission(
             perms: systemPerms,
             accountHrib: TestSeedData.AdminHrib,
@@ -64,7 +65,7 @@ public class PermissionTests(ApiFixture fixture, ITestOutputHelper testOutput) :
     [Fact]
     public async Task EntityPermissionInfo_RoleAssignment_ShouldSetAccountPerms()
     {
-        var roleHrib = Hrib.Parse("testrole000").Unwrap().ToString();
+        var roleHrib = Hrib.Parse("testrole000").ToString();
         var expectedPerm = Permission.Read | Permission.Write | Permission.Administer;
         await using (var session = Store.LightweightSession())
         {
@@ -98,7 +99,7 @@ public class PermissionTests(ApiFixture fixture, ITestOutputHelper testOutput) :
         Assert.NotEmpty(membersInfo.MemberIds);
         Assert.Contains(TestSeedData.UserHrib, membersInfo.MemberIds);
 
-        var projectPerms = (await MartenExtensions.LoadAsync<EntityPermissionInfo>(query, TestSeedData.Project1Hrib)).Unwrap();
+        var projectPerms = (await query.KafeLoadAsync<EntityPermissionInfo>(TestSeedData.Project1Hrib)).Unwrap();
 
         // NB: Check the explicit role permission exists
         Assert.NotEmpty(projectPerms.RoleEntries);
@@ -121,7 +122,7 @@ public class PermissionTests(ApiFixture fixture, ITestOutputHelper testOutput) :
     {
         await EntityPermissionInfo_RoleAssignment_ShouldSetAccountPerms();
 
-        var roleHrib = Hrib.Parse("testrole000").Unwrap().ToString();
+        var roleHrib = Hrib.Parse("testrole000").ToString();
         await using (var session = Store.LightweightSession())
         {
             session.Events.Append(
@@ -138,84 +139,84 @@ public class PermissionTests(ApiFixture fixture, ITestOutputHelper testOutput) :
         var membersInfo = (await query.KafeLoadAsync<RoleMembersInfo>(roleHrib)).Unwrap();
         Assert.DoesNotContain(TestSeedData.UserHrib, membersInfo.MemberIds);
 
-        var projectPerms = (await MartenExtensions.LoadAsync<EntityPermissionInfo>(query, TestSeedData.Project1Hrib)).Unwrap();
+        var projectPerms = (await query.KafeLoadAsync<EntityPermissionInfo>(TestSeedData.Project1Hrib)).Unwrap();
         Assert.DoesNotContain(TestSeedData.UserHrib, projectPerms.AccountEntries.Keys);
     }
 
     public static readonly TheoryData<string, Type, object> CreateEvents = new() {
         {
-            Hrib.Parse("createtst-o").Unwrap().ToString(),
+            Hrib.Parse("createtst-o").ToString(),
             typeof(OrganizationInfo),
             new OrganizationCreated(
-                Hrib.Parse("createtst-o").Unwrap().ToString(),
+                Hrib.Parse("createtst-o").ToString(),
                 CreationMethod.Manual,
                 LocalizedString.CreateInvariant("CreateEventTest organization"))
         },
         {
-            Hrib.Parse("createtst-g").Unwrap().ToString(),
+            Hrib.Parse("createtst-g").ToString(),
             typeof(ProjectGroupInfo),
             new ProjectGroupCreated(
-                Hrib.Parse("createtst-g").Unwrap().ToString(),
+                Hrib.Parse("createtst-g").ToString(),
                 CreationMethod.Manual,
                 TestSeedData.Org1Hrib,
                 LocalizedString.CreateInvariant("CreateEventTest project group")
             )
         },
         {
-            Hrib.Parse("createtst-p").Unwrap().ToString(),
+            Hrib.Parse("createtst-p").ToString(),
             typeof(ProjectInfo),
             new ProjectCreated(
-                Hrib.Parse("createtst-p").Unwrap().ToString(),
+                Hrib.Parse("createtst-p").ToString(),
                 TestSeedData.AdminHrib,
                 CreationMethod.Manual,
                 TestSeedData.Group1Hrib,
-                LocalizedString.CreateInvariant("CreateEventTest project")
+                null
             )
         },
         {
-            Hrib.Parse("createtst-a").Unwrap().ToString(),
+            Hrib.Parse("createtst-a").ToString(),
             typeof(ArtifactInfo),
             new ArtifactCreated(
-                Hrib.Parse("createtst-a").Unwrap().ToString(),
+                Hrib.Parse("createtst-a").ToString(),
                 CreationMethod.Manual,
                 LocalizedString.CreateInvariant("CreateEventTest artifact"),
                 default
             )
         },
         {
-            Hrib.Parse("createtst-c").Unwrap().ToString(),
+            Hrib.Parse("createtst-c").ToString(),
             typeof(AccountInfo),
             new AccountCreated(
-                Hrib.Parse("createtst-c").Unwrap().ToString(),
+                Hrib.Parse("createtst-c").ToString(),
                 CreationMethod.Manual,
                 "account@example.com",
                 Kafe.Const.InvariantCultureCode
             )
         },
         {
-            Hrib.Parse("createtst-u").Unwrap().ToString(),
+            Hrib.Parse("createtst-u").ToString(),
             typeof(AuthorInfo),
             new AuthorCreated(
-                Hrib.Parse("createtst-u").Unwrap().ToString(),
+                Hrib.Parse("createtst-u").ToString(),
                 CreationMethod.Manual,
                 "Author Authorson"
             )
         },
         {
-            Hrib.Parse("createtst-l").Unwrap().ToString(),
+            Hrib.Parse("createtst-l").ToString(),
             typeof(PlaylistInfo),
             new PlaylistCreated(
-                Hrib.Parse("createtst-l").Unwrap().ToString(),
+                Hrib.Parse("createtst-l").ToString(),
                 CreationMethod.Manual,
                 TestSeedData.Org1Hrib,
                 LocalizedString.CreateInvariant("CreateEventTest playlist")
             )
         },
         {
-            Hrib.Parse("createtst-r").Unwrap().ToString(),
+            Hrib.Parse("createtst-r").ToString(),
             typeof(RoleInfo),
             new RoleCreated(
-                Hrib.Parse("createtst-r").Unwrap().ToString(),
+                Hrib.Parse("createtst-r").ToString(),
                 CreationMethod.Manual,
                 TestSeedData.Org1Hrib,
                 LocalizedString.CreateInvariant("CreateEventTest role")
@@ -241,7 +242,7 @@ public class PermissionTests(ApiFixture fixture, ITestOutputHelper testOutput) :
 
         await WaitForProjections();
         await using var query = Store.QuerySession();
-        var perms = (await MartenExtensions.LoadAsync<EntityPermissionInfo>(query, hrib)).Unwrap();
+        var perms = (await query.KafeLoadAsync<EntityPermissionInfo>(hrib)).Unwrap();
         AssertAccountPermission(
             perms: perms,
             accountHrib: TestSeedData.AdminHrib,
@@ -253,7 +254,7 @@ public class PermissionTests(ApiFixture fixture, ITestOutputHelper testOutput) :
     [Fact]
     public async Task EntityPermissionInfo_AccountSetPermission_ShouldSetPermission()
     {
-        var testHrib = Hrib.Parse("setpermtest").Unwrap().ToString();
+        var testHrib = Hrib.Parse("setpermtest").ToString();
         await using (var session = Store.LightweightSession())
         {
             session.Events.StartStream<ProjectInfo>(
@@ -263,7 +264,8 @@ public class PermissionTests(ApiFixture fixture, ITestOutputHelper testOutput) :
                     TestSeedData.AdminHrib,
                     CreationMethod.Manual,
                     TestSeedData.Org1Hrib,
-                    LocalizedString.CreateInvariant("SetPermissionTest project"))
+                    null
+                )
             );
             await session.SaveChangesAsync();
 
@@ -313,7 +315,7 @@ public class PermissionTests(ApiFixture fixture, ITestOutputHelper testOutput) :
 
         await WaitForProjections();
         await using var query = Store.QuerySession();
-        var perms = (await MartenExtensions.LoadAsync<EntityPermissionInfo>(query, TestSeedData.Artifact1Hrib)).Unwrap();
+        var perms = (await query.KafeLoadAsync<EntityPermissionInfo>(TestSeedData.Artifact1Hrib)).Unwrap();
 
         Assert.Equal([TestSeedData.Project1Hrib], perms.GetParents());
         Assert.Equal(
@@ -353,7 +355,7 @@ public class PermissionTests(ApiFixture fixture, ITestOutputHelper testOutput) :
 
         await WaitForProjections();
         await using var query = Store.QuerySession();
-        var perms = (await MartenExtensions.LoadAsync<EntityPermissionInfo>(query, TestSeedData.Artifact1Hrib)).Unwrap();
+        var perms = (await query.KafeLoadAsync<EntityPermissionInfo>(TestSeedData.Artifact1Hrib)).Unwrap();
         Assert.Equal([], perms.GetParents());
         Assert.Equal([Hrib.SystemValue, TestSeedData.Artifact1Hrib], perms.GetGrantors());
         AssertAccountPermission(
@@ -380,11 +382,11 @@ public class PermissionTests(ApiFixture fixture, ITestOutputHelper testOutput) :
 
         await WaitForProjections();
         await using var query = Store.QuerySession();
-        var groupPerms = (await MartenExtensions.LoadAsync<EntityPermissionInfo>(query, TestSeedData.Group1Hrib)).Unwrap();
+        var groupPerms = (await query.KafeLoadAsync<EntityPermissionInfo>(TestSeedData.Group1Hrib)).Unwrap();
         Assert.Equal([TestSeedData.Org2Hrib], groupPerms.GetParents());
         Assert.Equal([TestSeedData.Org2Hrib, Hrib.SystemValue, TestSeedData.Group1Hrib], groupPerms.GetGrantors());
 
-        var projectPerms = (await MartenExtensions.LoadAsync<EntityPermissionInfo>(query, TestSeedData.Project1Hrib)).Unwrap();
+        var projectPerms = (await query.KafeLoadAsync<EntityPermissionInfo>(TestSeedData.Project1Hrib)).Unwrap();
     }
 
     [Fact]
@@ -404,13 +406,13 @@ public class PermissionTests(ApiFixture fixture, ITestOutputHelper testOutput) :
 
         await WaitForProjections();
         await using var query = Store.QuerySession();
-        var groupPerms = (await MartenExtensions.LoadAsync<EntityPermissionInfo>(query, TestSeedData.Group1Hrib)).Unwrap();
+        var groupPerms = (await query.KafeLoadAsync<EntityPermissionInfo>(TestSeedData.Group1Hrib)).Unwrap();
         Assert.Equal(Permission.Inspect, groupPerms.GlobalPermission.EffectivePermission);
         Assert.Single(groupPerms.GlobalPermission.Sources);
         Assert.True(groupPerms.GlobalPermission.Sources.ContainsKey(TestSeedData.Group1Hrib));
         Assert.Equal(Permission.Inspect, groupPerms.GlobalPermission.Sources[TestSeedData.Group1Hrib].Permission);
 
-        var projPerms = (await MartenExtensions.LoadAsync<EntityPermissionInfo>(query, TestSeedData.Project1Hrib)).Unwrap();
+        var projPerms = (await query.KafeLoadAsync<EntityPermissionInfo>(TestSeedData.Project1Hrib)).Unwrap();
         Assert.Equal(Permission.Inspect | Permission.Read, projPerms.GlobalPermission.EffectivePermission);
         Assert.True(projPerms.GlobalPermission.Sources.ContainsKey(TestSeedData.Group1Hrib));
         Assert.Equal(

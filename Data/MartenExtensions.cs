@@ -7,9 +7,11 @@ using System.Threading.Tasks;
 using JasperFx.Events;
 using Kafe.Core.Diagnostics;
 using Kafe.Data.Aggregates;
+using Kafe.Data.Diagnostics;
 using Kafe.Data.Documents;
 using Marten;
 using Marten.Events;
+using Marten.Exceptions;
 
 namespace Kafe.Data;
 
@@ -153,7 +155,7 @@ public static class MartenExtensions
         public async Task<Err<ImmutableArray<T>>> KafeLoadManyAsync<T>(
             IReadOnlyList<Hrib> ids,
             CancellationToken token = default
-        ) where T : notnull, IEntity
+        ) where T : IEntity
         {
             var stringIds = ids.Select(i => (string)i).ToImmutableArray();
 
@@ -163,7 +165,6 @@ public static class MartenExtensions
                 ))
                 .ToImmutableArray()
                 .SortEntitiesBy(ids);
-            var errors = ImmutableArray.CreateBuilder<Diagnostic>();
             if (entities.Length != ids.Count)
             {
                 var missingIds = ids.Except(entities.Select(e => e.Id)).ToImmutableArray();
@@ -183,16 +184,65 @@ public static class MartenExtensions
 
     extension(IEventStoreOperations db)
     {
+        public async Task<Err<T>> KafeFetchLatest<T>(
+            Hrib entityId,
+            CancellationToken ct = default
+        )
+            where T : class, IEntity
+        {
+            var entity = await db.FetchLatest<T>(entityId.ToString(), ct);
+            if (entity is null)
+            {
+                return Err.Fail(new NotFoundDiagnostic(typeof(T), entityId));
+            }
+
+            return entity;
+        }
+
         public async Task<T> RequireLatest<T>(
             Hrib entityId,
             CancellationToken ct = default
         )
             where T : class, IEntity
         {
-            return await db.FetchLatest<T>(entityId.ToString(), ct)
-                ?? throw new InvalidOperationException(
-                    $"The latest version of {typeof(T).Name} '{entityId}' could not be fetched."
-                );
+            return (await db.KafeFetchLatest<T>(entityId, ct)).Unwrap();
+        }
+
+        public async Task<Err<IEventStream<T>>> KafeFetchForWriting<T>(
+            Hrib entityId,
+            CancellationToken ct = default
+        )
+            where T : class, IEntity
+        {
+            var eventStream = await db.FetchForWriting<T>(entityId.ToString(), ct);
+            if (eventStream.Aggregate is null)
+            {
+                return Err.Fail(new NotFoundDiagnostic(typeof(T), entityId));
+            }
+
+            return new Err<IEventStream<T>>(eventStream);
+        }
+
+        public async Task<Err<IEventStream<T>>> KafeFetchForExclusiveWriting<T>(
+            Hrib entityId,
+            CancellationToken ct = default
+        )
+            where T : class, IEntity
+        {
+            try
+            {
+                var eventStream = await db.FetchForExclusiveWriting<T>(entityId.ToString(), ct);
+                if (eventStream.Aggregate is null)
+                {
+                    return Err.Fail(new NotFoundDiagnostic(typeof(T), entityId));
+                }
+
+                return new Err<IEventStream<T>>(eventStream);
+            }
+            catch (StreamLockedException)
+            {
+                return Err.Fail(new EntityBusyDiagnostic(typeof(T), entityId));
+            }
         }
     }
 }

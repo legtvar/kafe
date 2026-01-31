@@ -40,13 +40,13 @@ public sealed class StringLengthRequirementHandler : RequirementHandlerBase<Stri
         }
 
         if (context.Requirement.Min is not null
-            && LocalizedString.IsTooShort(value, context.Requirement.Min.Value))
+            && value.MinLength < context.Requirement.Min.Value)
         {
             context.Report(new StringTooShortDiagnostic(value, context.Requirement.Min.Value));
         }
 
         if (context.Requirement.Max is not null
-            && LocalizedString.IsTooLong(value, context.Requirement.Max.Value))
+            && value.MaxLength < context.Requirement.Max.Value)
         {
             context.Report(new StringTooLongDiagnostic(value, context.Requirement.Max.Value));
         }

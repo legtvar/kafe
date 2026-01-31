@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -33,6 +34,10 @@ public sealed partial class LocalizedString : IEquatable<LocalizedString>, IForm
 
     public ImmutableDictionary<string, string> GetRaw() => data;
 
+    public int MaxLength { get; }
+
+    public int MinLength { get; }
+
     private LocalizedString(ImmutableDictionary<string, string> data)
     {
         if (data.Count == 0)
@@ -41,6 +46,8 @@ public sealed partial class LocalizedString : IEquatable<LocalizedString>, IForm
         }
 
         this.data = data;
+        MaxLength = this.data.Values.Max(v => v.Length);
+        MinLength = this.data.Values.Min(v => v.Length);
     }
 
     public static LocalizedString Create(IDictionary<string, string> data)
@@ -82,21 +89,6 @@ public sealed partial class LocalizedString : IEquatable<LocalizedString>, IForm
     public static bool IsNullOrEmpty([NotNullWhen(false)] LocalizedString? value)
     {
         return value is null || value.data.Values.All(string.IsNullOrEmpty);
-    }
-
-    public static bool IsTooLong(LocalizedString? value, int maxLength = 8 << 10)
-    {
-        return value is not null && value.Values.Any(v => v.Length > maxLength);
-    }
-
-    public static bool IsTooShort(LocalizedString? value, int minLength = 1)
-    {
-        return value is not null && value.Values.Any(v => v.Length < minLength);
-    }
-
-    public static bool IsNullEmptyOrLong([NotNullWhen(false)] LocalizedString? value, int maxLength = 8 << 10)
-    {
-        return IsNullOrEmpty(value) || IsTooLong(value, maxLength);
     }
 
     public static LocalizedString Format(LocalizedString value, params IEnumerable<object?> args)

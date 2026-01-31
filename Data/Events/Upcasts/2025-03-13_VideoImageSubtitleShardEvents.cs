@@ -165,7 +165,7 @@ namespace Kafe.Data.Events.Upcasts
             return new ShardVariantAdded(
                 ShardId: oldEvent.ShardId,
                 Name: oldEvent.Name,
-                ExistingValueHandling: ExistingKafeObjectHandling.MergeOrKeep,
+                ExistingValueHandling: ExistingValueHandling.MergeOrKeep,
                 Metadata: new KafeObject(
                     Type: new KafeType("media", "shard", "video", false),
                     oldEvent.Info
@@ -211,7 +211,7 @@ namespace Kafe.Data.Events.Upcasts
             return new ShardVariantAdded(
                 ShardId: oldEvent.ShardId,
                 Name: oldEvent.Name,
-                ExistingValueHandling: ExistingKafeObjectHandling.MergeOrKeep,
+                ExistingValueHandling: ExistingValueHandling.MergeOrKeep,
                 Metadata: new KafeObject(
                     Type: new KafeType("media", "shard", "image", false),
                     oldEvent.Info
@@ -257,7 +257,7 @@ namespace Kafe.Data.Events.Upcasts
             return new ShardVariantAdded(
                 ShardId: oldEvent.ShardId,
                 Name: oldEvent.Name,
-                ExistingValueHandling: ExistingKafeObjectHandling.MergeOrKeep,
+                ExistingValueHandling: ExistingValueHandling.MergeOrKeep,
                 Metadata: new KafeObject(
                     Type: new KafeType("media", "shard", "subtitles", false),
                     oldEvent.Info
@@ -304,7 +304,7 @@ namespace Kafe.Data.Events.Upcasts
             return new ShardVariantAdded(
                 ShardId: oldEvent.ShardId,
                 Name: oldEvent.Name,
-                ExistingValueHandling: ExistingKafeObjectHandling.MergeOrKeep,
+                ExistingValueHandling: ExistingValueHandling.MergeOrKeep,
                 Metadata: new KafeObject(
                     Type: new KafeType("media", "shard", "Blend", false),
                     oldEvent.Info

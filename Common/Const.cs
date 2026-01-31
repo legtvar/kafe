@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 
 namespace Kafe;
 
@@ -256,5 +257,25 @@ Vaše KAFE
         }
 
         return LocalizedString.CreateInvariant(cultureCode);
+    }
+
+    /// <summary>
+    /// Returns <see cref="@new"/> if it's different from <see cref="old"/>, otherwise returns null.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static T? PreferNew<T>(T? old, T? @new)
+        where T : IEquatable<T>
+    {
+        if (old is null && @new is null)
+        {
+            return default;
+        }
+
+        if (old?.Equals(@new) == true || @new?.Equals(old) == true)
+        {
+            return default;
+        }
+
+        return @new;
     }
 }

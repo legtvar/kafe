@@ -50,6 +50,7 @@ public class DataMod : IMod
         context.AddEntity<RoleMembersInfo>();
 
         context.AddDiagnosticPayload<BadLoginTicketDiagnostic>();
+        context.AddDiagnosticPayload<EntityBusyDiagnostic>();
     }
 
     private static void ConfigureServices(IServiceCollection services)

@@ -1,3 +1,4 @@
+using Kafe.Media.Diagnostics;
 using Kafe.Media.Services;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -25,6 +26,29 @@ public sealed class MediaMod : IMod
         });
         context.AddShardLinkPayload<VariantShardLink>();
         context.AddShardLinkPayload<GeneratedFromShardLink>();
+
+        context.AddDiagnosticPayload<AudioBitrateTooHighDiagnostic>();
+        context.AddDiagnosticPayload<AudioBitrateTooLowDiagnostic>();
+        context.AddDiagnosticPayload<AudioCodecNotAllowedDiagnostic>();
+        context.AddDiagnosticPayload<MediaBitrateTooHighDiagnostic>();
+        context.AddDiagnosticPayload<MediaBitrateTooLowDiagnostic>();
+        context.AddDiagnosticPayload<MediaConversionAlreadyCompleted>();
+        context.AddDiagnosticPayload<MediaConversionAlreadyFailed>();
+        context.AddDiagnosticPayload<MediaConversionBadShardTypeDiagnostic>();
+        context.AddDiagnosticPayload<MediaConversionFailedDiagnostic>();
+        context.AddDiagnosticPayload<MediaShorterSideTooShortDiagnostic>();
+        context.AddDiagnosticPayload<MediaTooLongDiagnostic>();
+        context.AddDiagnosticPayload<MediaTooShortDiagnostic>();
+        context.AddDiagnosticPayload<MissingAudioStreamDiagnostic>();
+        context.AddDiagnosticPayload<MissingSubtitleStreamDiagnostic>();
+        context.AddDiagnosticPayload<MissingVideoStreamDiagnostic>();
+        context.AddDiagnosticPayload<SubtitleBitrateTooHighDiagnostic>();
+        context.AddDiagnosticPayload<SubtitleBitrateTooLowDiagnostic>();
+        context.AddDiagnosticPayload<SubtitleCodecNotAllowedDiagnostic>();
+        context.AddDiagnosticPayload<VideoBitrateTooHighDiagnostic>();
+        context.AddDiagnosticPayload<VideoBitrateTooLowDiagnostic>();
+        context.AddDiagnosticPayload<VideoCodecNotAllowedDiagnostic>();
+        context.AddDiagnosticPayload<VideoFramerateNotAllowedDiagnostic>();
     }
 
     private static void ConfigureServices(IServiceCollection services)

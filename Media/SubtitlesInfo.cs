@@ -13,4 +13,12 @@ public record SubtitlesInfo(
     string Codec,
     long Bitrate,
     bool IsCorrupted
-) : IShardPayload;
+) : IShardPayload
+{
+    public static string Moniker => "subtitles";
+
+    public static LocalizedString Title { get; } = LocalizedString.Create(
+        (Const.InvariantCulture, "Subtitles"),
+        (Const.CzechCulture, "Titulky")
+    );
+}

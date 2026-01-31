@@ -19,6 +19,11 @@ public record MediaInfo(
 {
     public static string Moniker => "media";
 
+    public static LocalizedString Title { get; } = LocalizedString.Create(
+        (Const.InvariantCulture, "Audiovisual file"),
+        (Const.CzechCulture, "Audiovizuální soubor")
+    );
+
     public static MediaInfo Invalid { get; } = new(
         FileExtension: Const.InvalidFileExtension,
         FormatName: Const.InvalidFormatName,

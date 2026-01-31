@@ -15,6 +15,13 @@ public record ImageInfo(
     bool IsCorrupted = false
 ) : IShardPayload
 {
+    public static string Moniker => "image";
+
+    public static LocalizedString Title { get; } = LocalizedString.Create(
+        (Const.InvariantCulture, "Image"),
+        (Const.CzechCulture, "Obrázek")
+    );
+
     public static ImageInfo Invalid { get; } = new(
         FileExtension: Const.InvalidFileExtension,
         MimeType: Const.InvalidMimeType,

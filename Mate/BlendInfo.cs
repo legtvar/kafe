@@ -11,6 +11,13 @@ public record BlendInfo(
     string? Error = null
 ): IShardPayload
 {
+    public static string Moniker => "blend";
+
+    public static LocalizedString Title { get; } = LocalizedString.Create(
+        (Const.InvariantCulture, "Blender scene"),
+        (Const.CzechCulture, "Blender scéna")
+    );
+
     public static BlendInfo Invalid(string? errorMessage = null) => new(
         FileExtension: Const.InvalidFileExtension,
         MimeType: Const.InvalidMimeType,

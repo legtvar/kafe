@@ -1,6 +1,6 @@
 namespace Kafe;
 
-public enum ExistingKafeObjectHandling
+public enum ExistingValueHandling
 {
     /// <summary>
     /// Always set the new value, overwriting any previously existing value.
@@ -22,8 +22,8 @@ public enum ExistingKafeObjectHandling
     /// May cause:
     ///     <list type="bullet">
     ///         <item>Items to be appended or prepended to arrays.</item>
-    ///         <item>Arrays to be concatened, with existing items first, new items later.</item>
-    ///         <item>Invokation of <see cref="IMergeable{T}.MergeWith(T)"/>.</item>
+    ///         <item>Arrays to be concatenated, with existing items first, new items later.</item>
+    ///         <item>Invocation of <see cref="IMergeable{T}.MergeWith(T)"/>.</item>
     ///     </list>
     /// </remarks>
     MergeOrOverwrite,

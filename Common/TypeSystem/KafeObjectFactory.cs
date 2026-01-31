@@ -36,7 +36,7 @@ public class KafeObjectFactory
     public KafeObject? Set(
         KafeObject? existing,
         KafeObject? @new,
-        ExistingKafeObjectHandling existingValueHandling,
+        ExistingValueHandling existingValueHandling,
         out LocalizedString? error
     )
     {
@@ -44,14 +44,14 @@ public class KafeObjectFactory
 
         switch (existingValueHandling)
         {
-            case ExistingKafeObjectHandling.OverwriteExisting:
+            case ExistingValueHandling.OverwriteExisting:
                 return @new;
 
-            case ExistingKafeObjectHandling.KeepExisting:
+            case ExistingValueHandling.KeepExisting:
                 return existing is null || !existing.Value.IsValid ? @new : existing;
 
-            case ExistingKafeObjectHandling.MergeOrOverwrite:
-            case ExistingKafeObjectHandling.MergeOrKeep:
+            case ExistingValueHandling.MergeOrOverwrite:
+            case ExistingValueHandling.MergeOrKeep:
                 if (existing is null)
                 {
                     return @new;
@@ -68,7 +68,7 @@ public class KafeObjectFactory
                     if (result is null)
                     {
                         // error happened, fallback to either Keep or Overwrite
-                        return existingValueHandling == ExistingKafeObjectHandling.MergeOrOverwrite ? @new : existing;
+                        return existingValueHandling == ExistingValueHandling.MergeOrOverwrite ? @new : existing;
                     }
                     return result;
                 }
@@ -92,10 +92,10 @@ public class KafeObjectFactory
                 error = LocalizedString.CreateInvariant(
                     $"Cannot merge '{existing.Value.Type}' with '{@new.Value.Type}'."
                 );
-                return existingValueHandling == ExistingKafeObjectHandling.MergeOrOverwrite ? @new : existing;
+                return existingValueHandling == ExistingValueHandling.MergeOrOverwrite ? @new : existing;
             default:
                 throw new NotImplementedException(
-                    $"{nameof(ExistingKafeObjectHandling)} '{existingValueHandling}' is not implemented.");
+                    $"{nameof(ExistingValueHandling)} '{existingValueHandling}' is not implemented.");
         }
     }
 

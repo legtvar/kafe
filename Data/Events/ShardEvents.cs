@@ -13,7 +13,7 @@ public record ShardCreated(
 public record ShardMetadataSet(
     [Hrib] string ShardId,
     KafeObject Payload,
-    ExistingKafeObjectHandling ExistingValueHandling
+    ExistingValueHandling ExistingValueHandling
 );
 
 public record ShardInfoChanged(
@@ -28,7 +28,7 @@ public record ShardVariantAdded(
     [Hrib] string ShardId,
     string Name,
     KafeObject Metadata,
-    ExistingKafeObjectHandling ExistingValueHandling
+    ExistingValueHandling ExistingValueHandling
 );
 
 public record ShardVariantRemoved(

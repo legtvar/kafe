@@ -7,11 +7,13 @@ using JasperFx.Events;
 using Kafe.Data.Events;
 using Marten.Events;
 using Marten.Events.Aggregation;
+using Marten.Events.CodeGeneration;
 
 namespace Kafe.Data.Aggregates;
 
 public record ShardInfo(
-    [Hrib] string Id,
+    [Hrib]
+    string Id,
     LocalizedString Name,
     CreationMethod CreationMethod,
     DateTimeOffset CreatedAt,
@@ -38,21 +40,35 @@ public record ShardInfo(
     {
     }
 
+    [MartenIgnore]
+    public static ShardInfo Create(LocalizedString name)
+    {
+        return new ShardInfo()
+        {
+            Id = Hrib.EmptyValue,
+            Name = name
+        };
+    }
+
     Hrib IEntity.Id => Id;
 
     IReadOnlySet<IShardLink> IShard.Links => Links.Cast<IShardLink>().ToImmutableHashSet();
 
     [JsonIgnore]
-    public ImmutableDictionary<KafeType, ImmutableHashSet<ShardLink>> LinksByType { get; }
-        = Links.GroupBy(l => l.Payload.Type).ToImmutableDictionary(g => g.Key, g => g.ToImmutableHashSet());
+    public ImmutableDictionary<KafeType, ImmutableHashSet<IShardLinkPayload>> LinksByType { get; }
+        = Links.GroupBy(l => l.Payload.Type).ToImmutableDictionary(
+            g => g.Key,
+            g => g.Select(l => (IShardLinkPayload)l.Payload.Value).ToImmutableHashSet()
+        );
 }
 
 public readonly record struct ShardLink(
-    [Hrib] string Id,
+    [Hrib]
+    string DestinationId,
     KafeObject Payload
 ) : IShardLink
 {
-    Hrib IShardLink.Id => Id;
+    Hrib IShardLink.DestinationId => DestinationId;
 }
 
 public class ShardInfoProjection(
@@ -91,24 +107,25 @@ public class ShardInfoProjection(
     {
         return s with
         {
-            Links = s.Links.Add(new(e.Id, e.Metadata))
+            Links = s.Links.Add(new ShardLink(e.DestinationShardId, e.LinkPayload))
         };
     }
 
     public ShardInfo Apply(ShardLinkRemoved e, ShardInfo s)
     {
         var links = s.Links.ToBuilder();
-        if (e.Id is not null && e.Metadata is not null)
+        if (e.DestinationShardId is not null && e.LinkPayload is not null)
         {
-            links.Remove(new ShardLink(e.Id, e.Metadata.Value));
+            links.Remove(new ShardLink(e.DestinationShardId, e.LinkPayload.Value));
         }
-        if (e.Metadata is not null)
+
+        if (e.LinkPayload is not null)
         {
-            links.ExceptWith(links.Where(l => l.Payload == e.Metadata));
+            links.ExceptWith(links.Where(l => l.Payload == e.LinkPayload));
         }
-        else
+        else if (e.DestinationShardId is not null)
         {
-            links.ExceptWith(links.Where(l => l.Id == e.Id));
+            links.ExceptWith(links.Where(l => l.DestinationId == e.DestinationShardId));
         }
 
         return s with
@@ -116,5 +133,4 @@ public class ShardInfoProjection(
             Links = links.ToImmutable()
         };
     }
-
 }

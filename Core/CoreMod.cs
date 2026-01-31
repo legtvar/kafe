@@ -109,7 +109,7 @@ public sealed class CoreMod : IMod
         c.AddDiagnosticPayload<MissingShardVariantDiagnostic>();
         c.AddDiagnosticPayload<NotFoundDiagnostic>();
         c.AddDiagnosticPayload<RequiredDiagnostic>();
-        c.AddDiagnosticPayload<ShardAnalysisFailureDiagnostic>();
+        c.AddDiagnosticPayload<ShardAnalysisFailedDiagnostic>();
         c.AddDiagnosticPayload<ShardMimeTypeNotAllowedDiagnostic>();
         c.AddDiagnosticPayload<ShardTooLargeDiagnostic>();
         c.AddDiagnosticPayload<ShardTooSmallDiagnostic>();

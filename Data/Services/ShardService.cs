@@ -57,7 +57,7 @@ public class ShardService(
         if (!analysis.IsSuccessful)
         {
             await storageService.DeleteTemporaryShard(shardId, token);
-            return Err.Fail(new ShardAnalysisFailureDiagnostic(shardType));
+            return Err.Fail(new ShardAnalysisFailedDiagnostic(shardType));
         }
 
         var created = new ShardCreated(
@@ -80,6 +80,166 @@ public class ShardService(
             ct: token
         );
         return await db.Events.KafeAggregateRequiredStream<ShardInfo>(shardId, token: token);
+    }
+
+    public async Task<Err<ShardInfo>> Upsert(
+        ShardInfo shard,
+        ExistingEntityHandling existingEntityHandling = ExistingEntityHandling.Upsert,
+        CancellationToken ct = default
+    )
+    {
+        var idErr = Hrib.TryParseValid(shard.Id, shouldReplaceEmpty: true);
+        if (idErr.HasError)
+        {
+            return idErr.Diagnostic.ForParameter(nameof(shard.Id));
+        }
+
+        var id = idErr.Value;
+
+        var shardErr = (await Load(id, ct)).HandleExistingEntity(existingEntityHandling);
+        if (shardErr is { HasError: true, Diagnostic.Payload: NotCreatedDiagnostic })
+        {
+            var created = new ShardCreated(
+                ShardId: id.ToString(),
+                Name: shard.Name,
+                CreationMethod: CreationMethod.Api,
+                FileLength: shard.FileLength,
+                UploadFilename: shard.UploadFilename,
+                MimeType: shard.MimeType,
+                Payload: shard.Payload
+            );
+            db.Events.KafeStartStream<ShardInfo>(id, created);
+            await db.SaveChangesAsync(ct);
+            shardErr = await db.Events.KafeAggregateStream<ShardInfo>(id, token: ct);
+        }
+
+        // NB: This is now only the Update path.
+        if (shardErr.HasError)
+        {
+            return shardErr;
+        }
+
+        var existing = shardErr.Value;
+
+        var eventStream = await db.Events.FetchForExclusiveWriting<ShardInfo>(id.ToString(), ct);
+
+        var infoChanged = new ShardInfoChanged(
+            ShardId: id.ToString(),
+            Name: Const.PreferNew<LocalizedString>(existing.Name, shard.Name),
+            FileLength: Const.PreferNew(existing.FileLength, shard.FileLength),
+            UploadFilename: Const.PreferNew(existing.UploadFilename, shard.UploadFilename),
+            MimeType: Const.PreferNew(existing.MimeType, shard.MimeType)
+        );
+
+        if (infoChanged.Name != null || infoChanged.FileLength != null || infoChanged.UploadFilename != null
+            || infoChanged.MimeType != null)
+        {
+            eventStream.AppendOne(infoChanged);
+        }
+
+        if (existing.Payload != shard.Payload)
+        {
+            eventStream.AppendOne(
+                new ShardPayloadSet(
+                    ShardId: id.ToString(),
+                    Payload: shard.Payload,
+                    ExistingValueHandling: ExistingValueHandling.OverwriteExisting
+                )
+            );
+        }
+
+        foreach (var removedLink in existing.Links.Except(shard.Links))
+        {
+            eventStream.AppendOne(
+                new ShardLinkRemoved(
+                    SourceShardId: id.ToString(),
+                    DestinationShardId: removedLink.DestinationId,
+                    LinkPayload: removedLink.Payload
+                )
+            );
+        }
+
+        var linksErr = new Err<bool>();
+
+        foreach (var addedLink in shard.Links.Except(existing.Links))
+        {
+            var destinationShardErr = await Load(addedLink.DestinationId, ct);
+            if (destinationShardErr.HasError)
+            {
+                linksErr.Combine(destinationShardErr.Diagnostic);
+                continue;
+            }
+
+            eventStream.AppendOne(
+                new ShardLinkAdded(
+                    SourceShardId: id.ToString(),
+                    DestinationShardId: addedLink.DestinationId,
+                    LinkPayload: addedLink.Payload
+                )
+            );
+        }
+
+        if (linksErr.HasError)
+        {
+            linksErr = linksErr.Diagnostic.ForParameter(nameof(shard.Links));
+        }
+
+        await db.SaveChangesAsync(ct);
+
+        shardErr = await db.Events.KafeAggregateStream<ShardInfo>(id, token: ct);
+        return shardErr.Combine(linksErr.Diagnostic);
+    }
+
+    public async Task<Err<bool>> AddShardLink(
+        Hrib sourceShardId,
+        Hrib destinationShardId,
+        IShardLinkPayload payload,
+        CancellationToken ct = default
+    )
+    {
+        var dstShardErr = await Load(destinationShardId, ct);
+        if (dstShardErr.HasError)
+        {
+            return dstShardErr.Diagnostic.ForParameter(nameof(dstShardErr));
+        }
+
+        var srcShardEventStream = await db.Events.KafeFetchForExclusiveWriting<ShardInfo>(sourceShardId, ct);
+        if (srcShardEventStream.HasError)
+        {
+            return srcShardEventStream.Diagnostic;
+        }
+
+        srcShardEventStream.Value.AppendOne(
+            new ShardLinkAdded(
+                SourceShardId: sourceShardId.ToString(),
+                DestinationShardId: destinationShardId.ToString(),
+                LinkPayload: kafeObjectFactory.Wrap(payload)
+            )
+        );
+
+        await db.SaveChangesAsync(ct);
+        return true;
+    }
+
+    public async Task<Err<bool>> SetShardPayload(
+        Hrib shardId,
+        IShardPayload payload,
+        CancellationToken ct = default
+    )
+    {
+        var shardStream = await db.Events.KafeFetchForExclusiveWriting<ShardInfo>(shardId, ct);
+        if (shardStream.HasError)
+        {
+            return shardStream.Diagnostic;
+        }
+
+        shardStream.Value.AppendOne(new ShardPayloadSet(
+            ShardId: shardId.ToString(),
+            Payload: kafeObjectFactory.Wrap(payload),
+            ExistingValueHandling: ExistingValueHandling.OverwriteExisting
+        ));
+        await db.SaveChangesAsync(ct);
+        return true;
     }
 
     public async Task<Err<Stream>> OpenStream(Hrib id, string? variant, CancellationToken token = default)

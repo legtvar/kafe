@@ -78,7 +78,7 @@ public class FFmpegCoreService(ILogger<FFmpegCoreService>? logger = null) : IMed
         CancellationToken token = default
     )
     {
-        var name = preset.ToFileName()
+        var name = preset.ToFilename()
             ?? throw new ArgumentException($"Preset '{preset}' is not valid.");
 
         if (preset == VideoQualityPreset.Invalid || preset == VideoQualityPreset.Original)

@@ -6,20 +6,23 @@ namespace Kafe;
 
 public static class KafeObjectFactoryExtensions
 {
-    public static KafeObject Wrap<T>(this KafeObjectFactory f, T value)
-        where T : notnull
+    extension(KafeObjectFactory f)
     {
-        return f.Wrap(typeof(T), value);
-    }
+        public KafeObject Wrap<T>(T value)
+            where T : notnull
+        {
+            return f.Wrap(typeof(T), value);
+        }
 
-    public static KafeObject Wrap(this KafeObjectFactory f, object value)
-    {
-        return f.Wrap(value.GetType(), value);
-    }
+        public KafeObject Wrap(object value)
+        {
+            return f.Wrap(value.GetType(), value);
+        }
 
-    public static ImmutableArray<KafeObject> WrapMany(this KafeObjectFactory f, params IEnumerable<object> values)
-    {
-        return [.. values.Select(f.Wrap)];
+        public ImmutableArray<KafeObject> WrapMany(params IEnumerable<object> values)
+        {
+            return [.. values.Select(f.Wrap)];
+        }
     }
 }
 

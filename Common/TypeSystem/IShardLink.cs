@@ -2,6 +2,6 @@ namespace Kafe;
 
 public interface IShardLink
 {
-    Hrib Id { get; }
+    Hrib DestinationId { get; }
     KafeObject Payload { get; }
 }

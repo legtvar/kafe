@@ -17,37 +17,40 @@ public enum VideoQualityPreset
 
 public static class VideoQualityPresetExtensions
 {
-    public static string? ToFileName(this VideoQualityPreset preset)
+    extension(VideoQualityPreset preset)
     {
-        return preset switch
+        public string? ToFilename()
         {
-            VideoQualityPreset.Original => "original",
-            VideoQualityPreset.Sd => "sd",
-            VideoQualityPreset.Hd => "hd",
-            VideoQualityPreset.FullHd => "fullhd",
-            _ => null
-        };
-    }
+            return preset switch
+            {
+                VideoQualityPreset.Original => "original",
+                VideoQualityPreset.Sd => "sd",
+                VideoQualityPreset.Hd => "hd",
+                VideoQualityPreset.FullHd => "fullhd",
+                _ => null
+            };
+        }
 
-    public static int ToHeight(this VideoQualityPreset preset)
-    {
-        return preset switch
+        public int ToHeight()
         {
-            VideoQualityPreset.Sd => 480,
-            VideoQualityPreset.Hd => 720,
-            VideoQualityPreset.FullHd => 1080,
-            _ => -1
-        };
-    }
+            return preset switch
+            {
+                VideoQualityPreset.Sd => 480,
+                VideoQualityPreset.Hd => 720,
+                VideoQualityPreset.FullHd => 1080,
+                _ => -1
+            };
+        }
 
-    public static int ToWidth(this VideoQualityPreset preset)
-    {
-        return preset switch
+        public int ToWidth()
         {
-            VideoQualityPreset.Sd => 854, // FWVGA
-            VideoQualityPreset.Hd => 1280,
-            VideoQualityPreset.FullHd => 1920,
-            _ => -1
-        };
+            return preset switch
+            {
+                VideoQualityPreset.Sd => 854, // FWVGA
+                VideoQualityPreset.Hd => 1280,
+                VideoQualityPreset.FullHd => 1920,
+                _ => -1
+            };
+        }
     }
 }

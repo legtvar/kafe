@@ -44,23 +44,10 @@ public class ProjectService(
             id = Hrib.Create();
         }
 
-        var existingErr = await Load(id, token);
-        switch (existingEntityHandling)
+        var existingErr = (await Load(id, token)).HandleExistingEntity(existingEntityHandling);
+        if (existingErr is { HasError: true, Diagnostic.Payload: not NotCreatedDiagnostic })
         {
-            case ExistingEntityHandling.Update:
-                if (existingErr.HasError)
-                {
-                    return existingErr;
-                }
-
-                break;
-            case ExistingEntityHandling.Insert:
-                if (existingErr.HasValue)
-                {
-                    return Err.Fail(new AlreadyExistsDiagnostic(typeof(ProjectInfo), id));
-                }
-
-                break;
+            return existingErr;
         }
 
         var groupErr = await db.KafeLoadAsync<ProjectGroupInfo>(project.ProjectGroupId, token);
@@ -94,9 +81,7 @@ public class ProjectService(
             return artifactErr.Diagnostic.ForParameter(nameof(project.ArtifactId));
         }
 
-        var artifact = artifactErr.Value;
-
-        if (existingErr is { HasError: true, Diagnostic.Payload: NotFoundDiagnostic })
+        if (existingErr is { HasError: true, Diagnostic.Payload: NotCreatedDiagnostic })
         {
             var created = new ProjectCreated(
                 ProjectId: id.ToString(),

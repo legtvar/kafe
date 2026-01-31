@@ -26,6 +26,7 @@ public class VideoConversionService(
     ILogger<VideoConversionService> logger,
     IOptions<VideoConversionOptions> options,
     KafeTypeRegistry typeRegistry,
+    KafeObjectFactory kafeObjectFactory,
     ShardService shardService,
     IMediaService mediaService,
     StorageService storageService
@@ -72,7 +73,7 @@ public class VideoConversionService(
 
         var shard = shardErr.Value;
 
-        if (shard.Payload.Value is not MediaInfo mediaInfo)
+        if (shard.Payload.Value is not MediaInfo)
         {
             return Err.Fail(new MediaConversionBadShardTypeDiagnostic(videoId, shard.Payload.GetType()));
         }
@@ -210,7 +211,7 @@ public class VideoConversionService(
             )
         );
 
-        var originalLinkType = typeRegistry.RequireType<OriginalShardLink>();
+        var originalLinkType = typeRegistry.RequireType<GeneratedFromShardLink>();
         // NB: Filter out generated video shards.
         query = (IMartenQueryable<ShardInfo>)query.Where(s => s.MatchesSql(
                 $"""
@@ -258,7 +259,13 @@ public class VideoConversionService(
         return query;
     }
 
-    public async Task ConvertVideoPersist(VideoConversionInfo conversion, CancellationToken ct)
+    /// <summary>
+    /// Performs the video conversion and persists the result in the database.
+    /// </summary>
+    public async Task<Err<VideoConversionInfo>> ConvertVideoPersist(
+        VideoConversionInfo conversion,
+        CancellationToken ct
+    )
     {
         using var logScope = logger.BeginScope(
             "Conversion '{ConversionId}' of '{VideoShardId}' ({Variant})",
@@ -267,6 +274,12 @@ public class VideoConversionService(
             conversion.Variant
         );
         logger.LogInformation("Started.");
+
+        var shardErr = await shardService.Load(conversion.VideoId, ct);
+        if (shardErr.HasError)
+        {
+            return shardErr.Diagnostic.ForParameter(nameof(conversion.VideoId));
+        }
 
         var mediaInfo = MediaInfo.Invalid;
         try
@@ -301,31 +314,66 @@ public class VideoConversionService(
         if (err.HasError)
         {
             logger.LogErr(err, "Could not persist the video conversion result in the database.");
-            return;
+            return err;
         }
 
-        if (conversion.IsCompleted)
+        if (!conversion.IsCompleted)
         {
-            await db.Events.AppendExclusive(
-                conversion.VideoId,
-                ct,
-                new VideoShardVariantAdded(
-                    conversion.VideoId,
-                    conversion.Variant,
-                    mediaInfo
-                )
-            );
-            await db.SaveChangesAsync(ct);
-            logger.LogInformation("Succeeded.");
+            return conversion;
         }
+
+        logger.LogInformation("Succeeded.");
+
+        var generatedShardName = LocalizedString.Concat(
+            shardErr.Value.Name,
+            LocalizedString.CreateInvariant($"({conversion.Variant})")
+        );
+
+        var generatedShardErr = await shardService.Upsert(
+            ShardInfo.Create(generatedShardName) with
+            {
+                FileLength = mediaInfo.FileLength,
+                MimeType = mediaInfo.MimeType,
+                Payload = kafeObjectFactory.Wrap(mediaInfo),
+                Links =
+                [
+                    new ShardLink(shardErr.Value.Id, kafeObjectFactory.Wrap(new GeneratedFromShardLink(conversion.Id)))
+                ]
+            },
+            ct: ct
+        );
+        if (generatedShardErr.HasError)
+        {
+            logger.LogErr(generatedShardErr, "Failed to persist the generated shard.");
+            return generatedShardErr.Diagnostic;
+        }
+
+        var linkErr = await shardService.AddShardLink(
+            sourceShardId: shardErr.Value.Id,
+            destinationShardId: generatedShardErr.Value.Id,
+            payload: new VariantShardLink
+            {
+                Preset = conversion.Variant
+            },
+            ct: ct
+        );
+        if (linkErr.HasError)
+        {
+            logger.LogErr(linkErr, "Failed to persist a shard from the original shard to the generated one.");
+            return linkErr.Diagnostic;
+        }
+
+        logger.LogInformation("Persisted.");
+
+        return conversion;
     }
 
     public async Task<MediaInfo> ConvertVideo(VideoConversionInfo conversion, CancellationToken ct = default)
     {
         var result = MediaInfo.Invalid;
         // Check for `original` first. Without it, we can just quit.
-        if (!storageService.TryGetFilePath(
-                ShardKind.Video,
+        if (!storageService.TryGetShardFilePath(
+                typeof(MediaInfo),
                 conversion.VideoId,
                 Const.OriginalShardVariant,
                 out var originalPath
@@ -337,8 +385,8 @@ public class VideoConversionService(
 
         // Then check if the job was already done but for some reason the DB does not know it.
         // (This is here because I accidentally dropped the DB once.)
-        if (storageService.TryGetFilePath(
-                ShardKind.Video,
+        if (storageService.TryGetShardFilePath(
+                typeof(MediaInfo),
                 conversion.VideoId,
                 conversion.Variant,
                 out var variantPath
@@ -363,7 +411,7 @@ public class VideoConversionService(
         if (result.IsCorrupted)
         {
             logger.LogInformation("Converting.");
-            var videosDir = storageService.GetShardKindDirectory(ShardKind.Video, conversion.Variant);
+            var videosDir = storageService.GetShardTypeDirectory(typeof(MediaInfo), conversion.Variant);
             if (videosDir is null || !videosDir.Exists)
             {
                 throw new InvalidOperationException(
@@ -427,7 +475,7 @@ public class VideoConversionService(
         }
 
         var sortedRanges = options.Value.FilterRanges.Order().ToImmutableArray();
-        VideoShardInfo? video = null;
+        ShardInfo? video = null;
         foreach (var range in sortedRanges)
         {
             video = await FindVideoInRange(range, ct);
@@ -511,14 +559,20 @@ public class VideoConversionService(
     }
 
     public async Task<Err<bool>> RetryOriginalAnalysis(
-        IEnumerable<Hrib>? shardIds = null,
+        IReadOnlyList<Hrib>? shardIds = null,
         CancellationToken ct = default
     )
     {
-        ImmutableArray<VideoShardInfo> videos;
+        ImmutableArray<ShardInfo> videos;
         if (shardIds is not null)
         {
-            videos = await shardService.LoadMany<VideoShardInfo>(shardIds, ct);
+            var videosErr = await shardService.LoadMany(shardIds, ct);
+            if (videosErr.HasError)
+            {
+                return videosErr.Diagnostic;
+            }
+
+            videos = videosErr.Value;
         }
         else
         {
@@ -526,7 +580,6 @@ public class VideoConversionService(
             [
                 ..await QueryVideoShards(
                         new VideoShardFilter(
-                            HasOriginalVariant: true,
                             IsCorrupted: true,
                             HasAnyCompletedOrFailedConversions: null
                         )
@@ -541,16 +594,16 @@ public class VideoConversionService(
 
         foreach (var video in videos)
         {
-            if (!storageService.TryGetFilePath(
-                    ShardKind.Video,
+            if (!storageService.TryGetShardFilePath(
+                    typeof(MediaInfo),
                     video.Id,
                     Const.OriginalShardVariant,
                     out var shardFilePath
                 ))
             {
                 logger.LogError("Cound not find original variant of video shard {VideoShardId}.", video.Id);
-                result = result.WithErrors(
-                    JSType.Error.NotFound($"Original variant of shard '{video.Id}' could not be found.")
+                result = result.Combine(
+                    Err.Fail(new MissingShardVariantDiagnostic(video.Name, video.Id, Const.OriginalShardVariant))
                 );
                 continue;
             }
@@ -558,27 +611,33 @@ public class VideoConversionService(
             var mediaInfo = await mediaService.GetInfo(shardFilePath, ct);
             if (mediaInfo.IsCorrupted)
             {
-                var error = JSType.Error.AnalysisFailed(video.Id, mediaInfo.Error);
-                result = result.WithErrors(error);
-                logger.LogError(error, "Retry of media analysis of video shard {VideoShardId} failed.");
+                result = result.Combine(
+                    Err.Fail(
+                        new ShardAnalysisFailedDiagnostic(typeof(MediaInfo))
+                        {
+                            Reason = mediaInfo.Error
+                        }
+                    )
+                );
+                logger.LogError(
+                    "Retry of media analysis of video shard {VideoShardId} failed:\n{Error}",
+                    video.Id,
+                    mediaInfo.Error
+                );
                 continue;
             }
 
-            db.Events.Append(
-                video.Id,
-                new VideoShardVariantAdded(
-                    ShardId: video.Id,
-                    Name: Const.OriginalShardVariant,
-                    Info: mediaInfo
-                )
-            );
-            await db.SaveChangesAsync(ct);
+            var setErr = await shardService.SetShardPayload(video.Id, mediaInfo, ct);
+            if (setErr.HasError)
+            {
+                result.Combine(setErr.Diagnostic);
+            }
         }
 
         return result;
     }
 
-    private async Task<VideoShardInfo?> FindVideoInRange(
+    private async Task<ShardInfo?> FindVideoInRange(
         TimeSpan? range,
         CancellationToken ct = default
     )
@@ -586,7 +645,6 @@ public class VideoConversionService(
         var query = QueryVideoShards(
             new VideoShardFilter(
                 Age: range,
-                HasOriginalVariant: true,
                 IsCorrupted: false,
                 HasAnyCompletedOrFailedConversions: false
             )
@@ -600,17 +658,21 @@ public class VideoConversionService(
         return video;
     }
 
-    private static ImmutableArray<string> GetMissingVariants(VideoShardInfo video)
+    private ImmutableArray<string> GetMissingVariants(ShardInfo video)
     {
-        if (!video.Variants.TryGetValue(Const.OriginalShardVariant, out var originalVariant))
+        if (video.Payload is not { Value: MediaInfo mediaInfo })
         {
-            throw new ArgumentException($"VideoShard '{video.Id}' is missing the 'original' variant.");
+            throw new ArgumentException($"Shard '{video.Id}' does not have a media payload. Is it really a video?");
         }
 
-        var desiredVariants = Video.GetApplicablePresets(originalVariant);
-        var missingVariants = desiredVariants.Select(p => p.ToFileName())
-            .Where(v => v is not null)
-            .Except(video.Variants.Keys);
-        return [..missingVariants!];
+        var existingVariants = (video.LinksByType.GetValueOrDefault(typeRegistry.RequireType<VariantShardLink>()) ?? [])
+            .Select(l => ((VariantShardLink)l).Preset)
+            .OfType<string>()
+            .ToImmutableArray();
+        var desiredVariants = Video.GetApplicablePresets(mediaInfo);
+        var missingVariants = desiredVariants.Select(p => p.ToFilename())
+            .OfType<string>()
+            .Except(existingVariants);
+        return [..missingVariants];
     }
 }

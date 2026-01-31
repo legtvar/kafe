@@ -24,6 +24,7 @@ public sealed class MediaMod : IMod
             AnalyzerTypes = [typeof(SubtitlesShardAnalyzer)]
         });
         context.AddShardLinkPayload<VariantShardLink>();
+        context.AddShardLinkPayload<GeneratedFromShardLink>();
     }
 
     private static void ConfigureServices(IServiceCollection services)

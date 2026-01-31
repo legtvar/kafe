@@ -1,4 +1,6 @@
-﻿namespace Kafe.Data.Events;
+﻿using System;
+
+namespace Kafe.Data.Events;
 
 public record ShardCreated(
     [Hrib] string ShardId,
@@ -10,7 +12,7 @@ public record ShardCreated(
     KafeObject Payload
 );
 
-public record ShardMetadataSet(
+public record ShardPayloadSet(
     [Hrib] string ShardId,
     KafeObject Payload,
     ExistingValueHandling ExistingValueHandling
@@ -24,6 +26,7 @@ public record ShardInfoChanged(
     string? MimeType
 );
 
+[Obsolete("Use shard links instead.")]
 public record ShardVariantAdded(
     [Hrib] string ShardId,
     string Name,
@@ -31,17 +34,24 @@ public record ShardVariantAdded(
     ExistingValueHandling ExistingValueHandling
 );
 
+[Obsolete("Use shard links instead.")]
 public record ShardVariantRemoved(
     [Hrib] string ShardId,
     string Name
 );
 
 public record ShardLinkAdded(
-    [Hrib] string Id,
-    KafeObject Metadata
+    [Hrib] string SourceShardId,
+    [Hrib] string DestinationShardId,
+    KafeObject LinkPayload
 );
 
+/// <summary>
+/// Removes a shard link. <see cref="DestinationShardId"/> and <see cref="LinkPayload"/> can be used to specify which
+/// links will be removed.
+/// </summary>
 public record ShardLinkRemoved(
-    [Hrib] string? Id,
-    KafeObject? Metadata
+    [Hrib] string SourceShardId,
+    [Hrib] string? DestinationShardId,
+    KafeObject? LinkPayload
 );

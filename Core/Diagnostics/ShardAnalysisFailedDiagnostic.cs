@@ -2,17 +2,17 @@ using System;
 
 namespace Kafe.Core.Diagnostics;
 
-public record ShardAnalysisFailureDiagnostic(
+public record ShardAnalysisFailedDiagnostic(
     Type ShardType
 ) : IDiagnosticPayload
 {
-    public static string Moniker => "shard-analysis-failure";
+    public static string Moniker => "shard-analysis-failed";
 
     public static DiagnosticSeverity Severity => DiagnosticSeverity.Error;
 
     public static LocalizedString Title { get; } = LocalizedString.Create(
-        (Const.InvariantCulture, "Shard Analysis Failure"),
-        (Const.CzechCulture, "Selhání analýzy střípku")
+        (Const.InvariantCulture, "Shard Analysis Failed"),
+        (Const.CzechCulture, "Analýza střípku selhala")
     );
 
     public static LocalizedString MessageFormat { get; } = LocalizedString.Create(
@@ -20,4 +20,6 @@ public record ShardAnalysisFailureDiagnostic(
             + "Is the file correct and uncorrupted?"),
         (Const.CzechCulture, "{ShardType:H} se nepodařilo zanalyzovat. Je soubor správný a nepoškozený?")
     );
+
+    public string? Reason { get; init; }
 }

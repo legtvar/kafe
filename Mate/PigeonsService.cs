@@ -1,88 +1,26 @@
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using Kafe.Data;
+using Kafe.Data.Aggregates;
+using Kafe.Data.Services;
+
 namespace Kafe.Mate;
 
-public class PigeonsService
+public class PigeonsService(
+    StorageService storageService,
+    ArtifactService artifactService,
+    ShardService shardService
+)
 {
-    private async Task<Hrib?> CreateBlend(
-        Hrib artifactId,
-        string? fileName,
-        Stream blendStream,
-        Hrib? shardId = null,
-        CancellationToken token = default
-    )
-    {
-        blendStream.Seek(0, SeekOrigin.Begin);
-        shardId ??= Hrib.Create();
-
-        if (!await storageService.TryStoreShard(
-                ShardKind.Blend,
-                shardId,
-                blendStream,
-                Const.OriginalShardVariant,
-                Const.BlendFileExtension,
-                token
-            ))
-        {
-            throw new InvalidOperationException("The .blend file could not be stored.");
-        }
-
-        if (!storageService.TryGetFilePath(
-                ShardKind.Blend,
-                shardId,
-                Const.OriginalShardVariant,
-                out var shardFilePath
-            ))
-        {
-            throw new ArgumentException("The shard stream could not be opened just after being saved.");
-        }
-
-        var artifactService = new ArtifactService(db);
-        var projectGroupNames = await artifactService.GetArtifactProjectGroupNames(artifactId.ToString(), token);
-        if (projectGroupNames.Length != 1)
-        {
-            throw new InvalidOperationException(
-                $"A blend shard must belong to exactly one project group. Found {projectGroupNames.Length}."
-            );
-        }
-
-        var blendInfo = new BlendInfo(
-            FileExtension: Const.BlendFileExtension,
-            MimeType: Const.BlendMimeType,
-            Tests: null,
-            Error: null
-        );
-
-        var created = new BlendShardCreated(
-            ShardId: shardId.ToString(),
-            FileName: fileName,
-            CreationMethod: CreationMethod.Api,
-            ArtifactId: artifactId.ToString(),
-            OriginalVariantInfo: blendInfo
-        );
-
-        db.Events.KafeStartStream<BlendShardInfo>(created.ShardId, created);
-        await db.SaveChangesAsync(token);
-
-        await pigeonsQueue.EnqueueAsync(shardId);
-
-        return created.ShardId;
-    }
-
-    public async Task<BlendShardInfo> UpdateBlend(
+    public Task<Err<bool>> UpdateBlend(
         Hrib shardId,
         BlendInfo blendInfo,
         CancellationToken token = default
     )
     {
-        var changed = new BlendShardVariantAdded(
-            ShardId: shardId.ToString(),
-            Name: Const.OriginalShardVariant,
-            Info: blendInfo
-        );
-        db.Events.KafeAppend(changed.ShardId, changed);
-
-        await db.SaveChangesAsync(token);
-
-        return await db.Events.KafeAggregateRequiredStream<BlendShardInfo>(shardId, token: token);
+        return shardService.SetShardPayload(shardId, blendInfo, token);
     }
 
     public async Task<List<Hrib>> GetMissingTestBlends(CancellationToken ct)
@@ -99,15 +37,14 @@ public class PigeonsService
         return missingTestShards.ToList();
     }
 
-    public async Task<BlendShardInfo?> TestBlend(Hrib shardId, CancellationToken ct)
+    public async Task<Err<BlendInfo>> TestBlend(Hrib shardId, CancellationToken ct)
     {
-        var shard = await Load(shardId, ct);
-        if (shard == null)
+        var shard = await shardService.Load(shardId, ct);
+        if (shard.HasError)
         {
-            return null;
+            return shard.Diagnostic;
         }
 
-        var artifactService = new ArtifactService(db);
         var projectGroupNames = await artifactService.GetArtifactProjectGroupNames(shard.ArtifactId.ToString(), ct);
         if (projectGroupNames.Length < 1)
         {
@@ -140,24 +77,24 @@ public class PigeonsService
         return await UpdateBlend(shardId, content.ToBlendInfo(), ct);
     }
 
-    private static DiagnosticKind StatusToDiagnosticKind(string status)
+    private static DiagnosticSeverity StatusToDiagnosticKind(string status)
     {
         switch (status)
         {
             case "INIT":
-                return DiagnosticKind.Info;
+                return DiagnosticSeverity.Info;
             case "OK":
-                return DiagnosticKind.Info;
+                return DiagnosticSeverity.Info;
             case "SKIPPED":
-                return DiagnosticKind.Info;
+                return DiagnosticSeverity.Info;
             case "WARNING":
-                return DiagnosticKind.Warning;
+                return DiagnosticSeverity.Warning;
             case "ERROR":
-                return DiagnosticKind.Error;
+                return DiagnosticSeverity.Error;
             case "CRASHED":
-                return DiagnosticKind.Error;
+                return DiagnosticSeverity.Error;
             default:
-                return DiagnosticKind.Info;
+                return DiagnosticSeverity.Info;
         }
     }
 

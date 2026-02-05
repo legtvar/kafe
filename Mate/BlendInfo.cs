@@ -18,28 +18,31 @@ public record BlendInfo(
         (Const.CzechCulture, "Blender scéna")
     );
 
-    public static BlendInfo Invalid(string? errorMessage = null) => new(
-        FileExtension: Const.InvalidFileExtension,
-        MimeType: Const.InvalidMimeType,
-        Tests: null,
-        Error: errorMessage ?? "This BlendInfo is Invalid."
-    );
+    public static BlendInfo CreateInvalid(string? errorMessage = null)
+    {
+        return new BlendInfo(
+            FileExtension: Const.InvalidFileExtension,
+            MimeType: Const.InvalidMimeType,
+            Tests: null,
+            Error: errorMessage ?? "This BlendInfo is Invalid."
+        );
+    }
 }
 
 public class BlendInfoJsonFormat
 {
-    public string FileExtension { get; set; }
-    public string MimeType { get; set; }
+    public string? FileExtension { get; set; }
+    public string? MimeType { get; set; }
     public List<PigeonsTestInfoJsonFormat>? Tests { get; set; }
     public string? Error { get; set; }
 
     public BlendInfo ToBlendInfo()
     {
         return new BlendInfo(
-            FileExtension,
-            MimeType,
+            FileExtension ?? Const.BlendFileExtension,
+            MimeType ?? Const.BlendMimeType,
             Tests != null
-                ? Tests.Select(dto => dto.ToPigeonsTestInfo()).ToImmutableArray()
+                ? [..Tests.Select(dto => dto.ToPigeonsTestInfo())]
                 : ImmutableArray<PigeonsTestInfo>.Empty,
             Error
         );

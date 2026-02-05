@@ -3,38 +3,30 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Kafe.Media;
-using System.Net.Http;
-using System.Net.Http.Json;
-using Kafe.Media.Services;
-using Kafe.Data.Services;
 using Microsoft.Extensions.DependencyInjection;
-using Kafe.Data;
 
-namespace Kafe.Api.Daemons;
+namespace Kafe.Mate;
 
 public class PigeonsTestQueueDaemon(
     IServiceProvider serviceProvider,
-    IPigeonsTestQueue PigeonsTestQueue,
+    PigeonsTestQueue pigeonsQueue,
     ILogger<PigeonsTestQueueDaemon> logger
 ) : BackgroundService
 {
-    private const int retryMaxAttempts = 3;
-    private const int retryDelaySeconds = 10;
+    private const int RetryMaxAttempts = 3;
+    private const int RetryDelaySeconds = 10;
 
     public override async Task StartAsync(CancellationToken ct)
     {
         await using var scope = serviceProvider.CreateAsyncScope();
-        var artifactService = scope.ServiceProvider.GetRequiredService<ArtifactService>();
-        var shardService = scope.ServiceProvider.GetRequiredService<ShardService>();
-        var storageService = scope.ServiceProvider.GetRequiredService<StorageService>();
+        var pigeonsService = scope.ServiceProvider.GetRequiredService<PigeonsService>();
 
-        var missingTestShardIds = await shardService.GetMissingTestBlends(ct);
+        var missingTestShardIds = await pigeonsService.GetMissingTestBlends(ct);
         foreach (var shardId in missingTestShardIds)
         {
             try
             {
-                await PigeonsTestQueue.EnqueueAsync(shardId);
+                await pigeonsQueue.EnqueueAsync(shardId);
                 logger.LogInformation("Re-enqueued Pigeons test request for shard {ShardId}", shardId);
             }
             catch (Exception ex)
@@ -45,47 +37,59 @@ public class PigeonsTestQueueDaemon(
                     Tests: null,
                     Error: $"{ex?.Message}"
                 );
-                await shardService.UpdateBlend(shardId, blendInfo, ct);
+                await pigeonsService.UpdateBlend(shardId, blendInfo, ct);
             }
         }
+
         logger.LogInformation("Pigeons test daemon: Pigeons test queue daemon started.");
         await base.StartAsync(ct);
     }
+
     protected override async Task ExecuteAsync(CancellationToken ct)
     {
         await using var scope = serviceProvider.CreateAsyncScope();
-        var shardService = scope.ServiceProvider.GetRequiredService<ShardService>();
+        var pigeonsService = scope.ServiceProvider.GetRequiredService<PigeonsService>();
         while (!ct.IsCancellationRequested)
         {
-            var shardId = await PigeonsTestQueue.DequeueAsync(ct);
+            var shardId = pigeonsQueue.Dequeue();
             if (shardId is null)
             {
                 logger.LogInformation("Pigeons test daemon: No Pigeons test requests in queue. Waiting.");
+                await pigeonsQueue.Wait(ct);
                 return;
             }
-            int attempt = 0;
-            bool success = false;
 
-            while (attempt < retryMaxAttempts && !success && !ct.IsCancellationRequested)
+            var attempt = 0;
+            var success = false;
+
+            while (attempt < RetryMaxAttempts && !success && !ct.IsCancellationRequested)
             {
                 try
                 {
-                    var testResult = await shardService.TestBlend(shardId, ct);
+                    var testResult = await pigeonsService.TestBlend(shardId, ct);
                     if (testResult is null)
                     {
-                        attempt = retryMaxAttempts;
+                        attempt = RetryMaxAttempts;
                         throw new InvalidOperationException($"Failed to create Pigeons test for shard {shardId}.");
                     }
+
                     logger.LogInformation("Pigeons test daemon: Processed Pigeons test for shard {ShardId}", shardId);
                     success = true;
                 }
                 catch (Exception ex)
                 {
                     attempt++;
-                    if (attempt < retryMaxAttempts)
+                    if (attempt < RetryMaxAttempts)
                     {
-                        logger.LogWarning(ex, "Pigeons test daemon: Attempt {Attempt}/{MaxAttempts} failed for shard {ShardId}. Retrying in {Delay}s...", attempt, retryMaxAttempts, shardId, retryDelaySeconds);
-                        await Task.Delay(TimeSpan.FromSeconds(retryDelaySeconds), ct);
+                        logger.LogWarning(
+                            ex,
+                            "Pigeons test daemon: Attempt {Attempt}/{MaxAttempts} failed for shard {ShardId}. Retrying in {Delay}s...",
+                            attempt,
+                            RetryMaxAttempts,
+                            shardId,
+                            RetryDelaySeconds
+                        );
+                        await Task.Delay(TimeSpan.FromSeconds(RetryDelaySeconds), ct);
                     }
                     else
                     {
@@ -95,8 +99,13 @@ public class PigeonsTestQueueDaemon(
                             Tests: null,
                             Error: $"{ex?.Message}"
                         );
-                        await shardService.UpdateBlend(shardId, blendInfo, ct);
-                        logger.LogError(ex, "Pigeons test daemon: All {MaxAttempts} attempts failed for shard {ShardId}. Giving up.", retryMaxAttempts, shardId);
+                        await pigeonsService.UpdateBlend(shardId, blendInfo, ct);
+                        logger.LogError(
+                            ex,
+                            "Pigeons test daemon: All {MaxAttempts} attempts failed for shard {ShardId}. Giving up.",
+                            RetryMaxAttempts,
+                            shardId
+                        );
                     }
                 }
             }

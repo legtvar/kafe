@@ -6,10 +6,9 @@ public record PigeonsTestInfo(
     string? Datablock,
     string? Message,
     string? Traceback
-)
-{ }
+);
 
-public class PigeonsTestInfoJsonFormat
+public record PigeonsTestInfoJsonFormat
 {
     public string? Label { get; set; }
     public string? State { get; set; }
@@ -24,8 +23,8 @@ public class PigeonsTestInfoJsonFormat
 }
 
 public record PigeonsTestRequest(
-    [Hrib] string ShardId,
+    [Hrib]
+    string ShardId,
     string HomeworkType,
     string Path
-)
-{ }
+);

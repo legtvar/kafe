@@ -19,5 +19,7 @@ public class MateMod : IMod
     private static void ConfigureServices(IServiceCollection services)
     {
         services.AddSingleton<BlendShardAnalyzer>();
+        services.AddSingleton<PigeonsTestQueue>();
+        services.AddScoped<PigeonsService>();
     }
 }

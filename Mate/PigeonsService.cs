@@ -1,17 +1,23 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Kafe.Data;
 using Kafe.Data.Aggregates;
 using Kafe.Data.Services;
+using Marten;
+using Marten.Linq;
 
 namespace Kafe.Mate;
 
 public class PigeonsService(
     StorageService storageService,
     ArtifactService artifactService,
-    ShardService shardService
+    ShardService shardService,
+    IHttpClientFactory httpClientFactory
 )
 {
     public Task<Err<bool>> UpdateBlend(
@@ -23,32 +29,25 @@ public class PigeonsService(
         return shardService.SetShardPayload(shardId, blendInfo, token);
     }
 
-    public async Task<List<Hrib>> GetMissingTestBlends(CancellationToken ct)
+    public async Task<ImmutableArray<ShardInfo>> GetUntestedBlends(CancellationToken ct)
     {
-        // Fetch all shard IDs that were queued for testing but have not yet been tested
-        var blendShards = await db.Query<BlendShardInfo>().ToListAsync();
-        var missingTestShards = blendShards
-            .Where(s => s.Variants.ContainsKey(Const.OriginalShardVariant)
-                && s.Variants[Const.OriginalShardVariant].Tests == null
-                && s.Variants[Const.OriginalShardVariant].Error == null
+        var query = shardService.Query(
+            new ShardService.ShardFilter(
+                ShardPayloadType: typeof(BlendInfo)
             )
-            .Select(s => (Hrib)s.Id);
-
-        return missingTestShards.ToList();
+        );
+        query = (IMartenQueryable<ShardInfo>)query.Where(s =>
+            ((BlendInfo)s.Payload.Value).Error == null && ((BlendInfo)s.Payload.Value).Tests == null
+        );
+        return [..await query.ToListAsync(ct)];
     }
 
-    public async Task<Err<BlendInfo>> TestBlend(Hrib shardId, CancellationToken ct)
+    public async Task<Err<BlendInfo>> TestBlend(Hrib shardId, string? homeworkType, CancellationToken ct)
     {
         var shard = await shardService.Load(shardId, ct);
         if (shard.HasError)
         {
             return shard.Diagnostic;
-        }
-
-        var projectGroupNames = await artifactService.GetArtifactProjectGroupNames(shard.ArtifactId.ToString(), ct);
-        if (projectGroupNames.Length < 1)
-        {
-            return null;
         }
 
         if (!storageService.TryGetFilePath(
@@ -63,7 +62,7 @@ public class PigeonsService(
 
         var request = new PigeonsTestRequest(
             ShardId: shardId.ToString(),
-            HomeworkType: projectGroupNames[0]["iv"] ?? string.Empty,
+            HomeworkType: homeworkType ?? string.Empty,
             Path: shardFilePath
         );
         var client = httpClientFactory.CreateClient("Pigeons");

@@ -37,6 +37,11 @@ public static class Err
         return Diagnostic.Fail(diagnosticPayload, descriptorOverride, skipFrames: 2);
     }
 
+    public static Err<T> Succeed<T>(T value)
+    {
+        return new Err<T>(value);
+    }
+
     public static Err<T> Warn<T>(
         T value,
         IDiagnosticPayload diagnosticPayload,

@@ -65,6 +65,7 @@ public class DataMod : IMod
             .AddAsyncDaemon(DaemonMode.Solo);
 
         services.AddSingleton<StorageService>();
+        services.AddSingleton<IFindShardFile, LocalFindShardFile>();
         services.AddSingleton<EntityMetadataProvider>();
 
         services.AddScoped<AccountService>();

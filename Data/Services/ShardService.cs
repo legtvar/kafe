@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using System.Net.Http;
 using System.Net.Http.Json;
 using Marten.Linq;
+using Marten.Linq.MatchesSql;
 
 namespace Kafe.Data.Services;
 
@@ -73,8 +74,8 @@ public class ShardService(
 
         db.Events.KafeStartStream<ShardInfo>(created.ShardId, created);
         await db.SaveChangesAsync(token);
-        await storageService.MoveTemporaryShard(
-            id: shardId,
+        await storageService.MoveTemporaryToArchive(
+            tmpShardId: shardId,
             shardType: shardType,
             fileExtension: analysis.FileExtension ?? fileExtension,
             ct: token
@@ -284,6 +285,43 @@ public class ShardService(
 
         return query;
     }
+
+    public record ContainingProjectGroupInfo(
+        Hrib Id,
+        LocalizedString Name
+    );
+
+    public async Task<Err<ImmutableArray<ContainingProjectGroupInfo>>> GetContainingProjectGroups(
+        Hrib id,
+        CancellationToken ct = default
+    )
+    {
+        var artifactErr = await Load(id, ct);
+        if (artifactErr.HasError)
+        {
+            return artifactErr.Diagnostic;
+        }
+
+        var containingProjectGroups = await db.Query<ProjectGroupInfo>()
+            .Where(g => g.MatchesSql(
+                    $"""
+                     EXISTS(
+                        SELECT a.* FROM {db.DocumentStore.Options.Schema.For<ProjectInfo>(true)} AS a
+                        WHERE a.data ->> '{nameof(ProjectInfo.ProjectGroupId)}' = d.id
+                            AND a.data ->> '{nameof(ProjectInfo.ArtifactId)}' = ?
+                     """,
+                    id.ToString()
+                )
+            )
+            .ToListAsync(ct);
+
+        return containingProjectGroups.DistinctBy(g => g.Id).Select(g => new ContainingProjectGroupInfo(
+                Id: Hrib.Parse(g.Id),
+                Name: g.Name
+            )
+        ).ToImmutableArray();
+    }
+
 
     private static string SanitizeVariantName(string? variant)
     {

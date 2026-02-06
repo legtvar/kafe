@@ -21,7 +21,7 @@ public class PigeonsTestQueueDaemon(
         await using var scope = serviceProvider.CreateAsyncScope();
         var pigeonsService = scope.ServiceProvider.GetRequiredService<PigeonsService>();
 
-        var missingTestShardIds = await pigeonsService.GetMissingTestBlends(ct);
+        var missingTestShardIds = await pigeonsService.GetUntestedBlends(ct);
         foreach (var shardId in missingTestShardIds)
         {
             try

@@ -77,6 +77,10 @@ public static class Const
     public static readonly LocalizedString InvariantLanguageName;
     public static readonly LocalizedString EnglishLanguageName;
 
+    public const string TempFileScheme = "temp";
+    public const string ArchiveFileScheme = "archive";
+    public const string GeneratedFileScheme = "generated";
+
     static Const()
     {
         EnglishCulture = CultureInfo.CreateSpecificCulture(EnglishCultureName);

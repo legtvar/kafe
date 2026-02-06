@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Kafe.Core.Diagnostics;
 using Kafe.Data.Diagnostics;
+using System.Collections.Immutable;
 
 namespace Kafe.Data.Services;
 
@@ -25,39 +26,51 @@ public class StorageService(
         CancellationToken token = default
     )
     {
-        string? filePath = null;
+        string? fullShardPath = null;
         try
         {
             variant ??= Const.OriginalShardVariant;
-            var storageDir = GetShardTypeDirectory(shardType, create: true);
-            storageDir.EnumerateDirectories()
-            var shardDir = storageDir.CreateSubdirectory(id.ToString());
-            filePath = Path.Combine(shardDir.FullName, $"{variant}{fileExtension}");
-            using var originalStream = new FileStream(filePath, FileMode.Create, FileAccess.Write);
+            var storageDirUri = GetShardTypeDirectory(shardType, ensureExists: true);
+            var subdirPath = Path.Combine(GetAbsolutePath(storageDirUri), id.ToString());
+            var shardDir = new DirectoryInfo(subdirPath);
+            if (!shardDir.Exists)
+            {
+                shardDir.Create();
+            }
+
+            var filename = $"{variant}{fileExtension}";
+            fullShardPath = Path.Combine(shardDir.FullName, filename);
+            if (File.Exists(fullShardPath))
+            {
+                return Err.Fail(new ShardFileAlreadyExists(id));
+            }
+
+            using var originalStream = new FileStream(fullShardPath, FileMode.Create, FileAccess.Write);
             await stream.CopyToAsync(originalStream, token);
+            var relativePath = Path.Combine(storageDirUri.AbsolutePath, id.ToString(), filename);
+            return new Uri($"{storageDirUri.Scheme}://{relativePath}");
         }
         catch (IOException)
         {
-            if (filePath is not null && File.Exists(filePath))
+            if (fullShardPath is not null && File.Exists(fullShardPath))
             {
-                File.Delete(filePath);
+                File.Delete(fullShardPath);
             }
 
-            return false;
+            throw;
         }
-
-        return true;
     }
 
     public bool TryOpenShardStream(
-        Type shardType,
         Hrib id,
+        Type? shardType,
         string? variant,
         [NotNullWhen(true)] out Stream? stream,
         [NotNullWhen(true)] out string? fileExtension
     )
     {
-        if (!TryGetShardFilePath(shardType, id, variant, out var filePath))
+        var shardUri = GetShardUri(id, shardType, variant);
+        if (shardUri.HasError)
         {
             stream = null;
             fileExtension = null;
@@ -66,6 +79,7 @@ public class StorageService(
 
         try
         {
+            var filePath = GetAbsolutePath(shardUri.Value);
             var info = new FileInfo(filePath);
             stream = info.OpenRead();
             fileExtension = info.Extension;
@@ -81,48 +95,73 @@ public class StorageService(
 
     public Err<Uri> GetShardUri(
         Hrib id,
-        Type? shardType,
-        string? variant
+        Type? shardType = null,
+        string? variant = Const.OriginalShardVariant
     )
     {
         variant ??= Const.OriginalShardVariant;
 
+        DirectoryInfo? shardDir = null;
+        Uri? shardDirUri = null;
 
+        if (shardType is not null)
+        {
+            var storageDirUri = GetShardTypeDirectory(shardType, variant, ensureExists: false);
+            var storageDir = new DirectoryInfo(GetAbsolutePath(storageDirUri));
+            if (!storageDir.Exists)
+            {
+                return Err.Fail(new ShardFileNotFoundDiagnostic(id));
+            }
 
-        var storageDir = GetShardTypeDirectory(
-            shardType: shardType,
-            variant: variant ?? Const.OriginalShardVariant,
-            create: false
-        );
+            shardDir = new DirectoryInfo(Path.Combine(storageDir.FullName, id.ToString()));
+            shardDirUri = new Uri(
+                $"{storageDirUri.Scheme}://{Path.Combine(storageDirUri.AbsolutePath, id.ToString())}"
+            );
+        }
+        else
+        {
+            var baseScheme = variant == Const.OriginalShardVariant
+                ? Const.ArchiveFileScheme
+                : Const.GeneratedFileScheme;
+            var baseDir = variant == Const.OriginalShardVariant
+                ? new DirectoryInfo(options.Value.ArchiveDirectory)
+                : new DirectoryInfo(options.Value.GeneratedDirectory);
+            var shardDirCandidates = baseDir.EnumerateDirectories($"*/{id}").ToImmutableArray();
+            if (shardDirCandidates.Length == 0)
+            {
+                return Err.Fail(new ShardFileNotFoundDiagnostic(id));
+            }
 
-        var shardDir = new DirectoryInfo(Path.Combine(storageDir.FullName, id.ToString()));
+            if (shardDirCandidates.Length > 1)
+            {
+                throw new InvalidOperationException(
+                    $"File for shard '{id}' has been located in multiple subdirectories. This is likely a bug."
+                );
+            }
+
+            shardDir = shardDirCandidates[0];
+            shardDirUri = new Uri($"{baseScheme}://{Path.GetRelativePath(baseDir.FullName, shardDir.FullName)}");
+        }
+
         if (!shardDir.Exists)
         {
-            return shouldThrow
-                ? throw new ArgumentException($"Shard directory '{id}' could not be found.")
-                : false;
+            return Err.Fail(new ShardFileNotFoundDiagnostic(id));
         }
 
         var variantFiles = shardDir.GetFiles($"{variant}.*");
         if (variantFiles.Length == 0)
         {
-            return shouldThrow
-                ? throw new ArgumentException($"The '{variant}' variant of shard '{id}' could not be found.")
-                : false;
+            return Err.Fail(new ShardFileNotFoundDiagnostic(id));
         }
         else if (variantFiles.Length > 1)
         {
-            return shouldThrow
-                ? throw new ArgumentException(
-                    $"The '{variant}' variant of shard '{id}' has multiple source " +
-                    "files. This is probably a bug."
-                )
-                : false;
+            throw new ArgumentException(
+                $"The '{variant}' variant of shard '{id}' has multiple source files. This is probably a bug."
+            );
         }
 
-        var variantFile = variantFiles.Single();
-        filePath = variantFile.FullName;
-        return true;
+        var variantFile = variantFiles[0];
+        return new Uri($"{shardDirUri.Scheme}://{Path.Combine(shardDirUri.AbsolutePath, variantFile.Name)}");
     }
 
     public async Task<Err<Uri>> StoreTemporaryShard(
@@ -147,7 +186,7 @@ public class StorageService(
             }
 
             var existingPath = GetTemporaryShardUri(id);
-            if (existingPath is { HasError: true, Diagnostic.Payload: TemporaryShardNotFoundDiagnostic })
+            if (existingPath is { HasError: true, Diagnostic.Payload: ShardFileNotFoundDiagnostic })
             {
                 throw new InvalidOperationException(
                     $"Temporary shard '{id}' has already been stored. This is likely a bug."
@@ -180,13 +219,13 @@ public class StorageService(
         var tmpDir = new DirectoryInfo(options.Value.TempDirectory);
         if (!tmpDir.Exists)
         {
-            return Err.Fail(new TemporaryShardNotFoundDiagnostic(id));
+            return Err.Fail(new ShardFileNotFoundDiagnostic(id));
         }
 
         var variantFiles = tmpDir.GetFiles($"{id}.*");
         if (variantFiles.Length == 0)
         {
-            return Err.Fail(new TemporaryShardNotFoundDiagnostic(id));
+            return Err.Fail(new ShardFileNotFoundDiagnostic(id));
         }
 
         if (variantFiles.Length > 1)
@@ -221,7 +260,7 @@ public class StorageService(
         var tmpPath = Path.Combine(options.Value.TempDirectory, tmpUri.Value.AbsolutePath);
         if (!File.Exists(tmpPath))
         {
-            return Err.Fail(new TemporaryShardNotFoundDiagnostic(id));
+            return Err.Fail(new ShardFileNotFoundDiagnostic(id));
         }
 
         File.Delete(tmpPath);
@@ -254,7 +293,8 @@ public class StorageService(
         var tmpPath = tmpUri.Value.AbsolutePath;
         fileExtension ??= Path.GetExtension(tmpUri.Value.AbsolutePath);
         variant ??= Const.OriginalShardVariant;
-        var storageDir = GetShardTypeDirectory(shardType, create: true);
+        var storageDirUri = GetShardTypeDirectory(shardType, ensureExists: true);
+        var storageDir = new DirectoryInfo(GetAbsolutePath(storageDirUri));
         var shardDir = storageDir.CreateSubdirectory(tmpShardId.ToString());
         var newPath = Path.Combine(shardDir.FullName, $"{variant}{fileExtension}");
         try
@@ -277,40 +317,47 @@ public class StorageService(
         return new Uri($"{Const.ArchiveFileScheme}://{newPath}");
     }
 
-    public DirectoryInfo GetShardTypeDirectory(
+    public Uri GetShardTypeDirectory(
         Type shardType,
         string variant = Const.OriginalShardVariant,
-        bool create = true
+        bool ensureExists = true
     )
     {
-        var baseDir = variant == Const.OriginalShardVariant
-            ? options.Value.ArchiveDirectory
-            : options.Value.GeneratedDirectory;
+        var scheme = variant == Const.OriginalShardVariant
+            ? Const.ArchiveFileScheme
+            : Const.GeneratedFileScheme;
 
         var shardKafeType = typeRegistry.RequireType(shardType);
         if (!options.Value.ShardDirectories.TryGetValue(shardKafeType, out var shardDir))
         {
+            // TODO: Merge the per-type directories. It's more pain than it's worth. (Issue #273)
             throw new ArgumentNullException($"The storage directory for the '{shardType}' shard type is not set.");
         }
 
-        var fullDir = Path.Combine(baseDir, shardDir);
+        var uri = new Uri($"{scheme}://{shardDir}");
 
-        var info = new DirectoryInfo(fullDir);
-        if (!info.Exists)
+        if (ensureExists)
         {
-            if (create)
+            var dirPath = GetAbsolutePath(uri);
+            if (!Directory.Exists(dirPath))
             {
-                info.Create();
-            }
-            else
-            {
-                throw new ArgumentException(
-                    $"The '{shardType}' shard storage directory does not exist at "
-                    + $"'{fullDir}'."
-                );
+                Directory.CreateDirectory(dirPath);
             }
         }
 
-        return info;
+        return uri;
+    }
+
+    public string GetAbsolutePath(Uri shardUri)
+    {
+        return shardUri.Scheme switch
+        {
+            Const.ArchiveFileScheme => Path.Combine(options.Value.ArchiveDirectory, shardUri.AbsolutePath),
+            Const.GeneratedFileScheme => Path.Combine(options.Value.GeneratedDirectory, shardUri.AbsolutePath),
+            Const.TempFileScheme => Path.Combine(options.Value.TempDirectory, shardUri.AbsolutePath),
+            _ => throw new NotSupportedException(
+                $"There is no storage directory defined for URI scheme '{shardUri.Scheme}'."
+            )
+        };
     }
 }

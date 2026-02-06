@@ -1,27 +1,30 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Kafe.Data.Services;
 using Kafe.Media.Services;
 
 namespace Kafe.Media;
 
 public class MediaShardAnalyzer(
-    IMediaService mediaService
+    IMediaService mediaService,
+    StorageService storageService
 ) : IShardAnalyzer
 {
-    public async ValueTask<ShardAnalysis> Analyze(string tempPath, string? mimeType, CancellationToken token = default)
+    public async ValueTask<ShardAnalysis> Analyze(ShardAnalyzerContext context, CancellationToken token = default)
     {
-        if (mimeType != Const.MatroskaMimeType && mimeType != Const.Mp4MimeType)
+        if (context.MimeType != Const.MatroskaMimeType && context.MimeType != Const.Mp4MimeType)
         {
             throw new ArgumentException($"Only '{Const.MatroskaMimeType}' and '{Const.Mp4MimeType}' video container " +
                 $"formats are supported.");
         }
 
-        var originalFileExtension = mimeType == Const.MatroskaMimeType
+        var originalFileExtension = context.MimeType == Const.MatroskaMimeType
             ? Const.MatroskaFileExtension
             : Const.Mp4FileExtension;
 
-        var mediaInfo = await mediaService.GetInfo(tempPath, token);
+        var shardPath = storageService.GetAbsolutePath(context.ShardUri);
+        var mediaInfo = await mediaService.GetInfo(shardPath, token);
 
         return new(
             payload: mediaInfo,

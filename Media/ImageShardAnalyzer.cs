@@ -1,21 +1,20 @@
 using System.Threading;
 using System.Threading.Tasks;
+using Kafe.Data.Services;
 using Kafe.Media.Services;
 
 namespace Kafe.Media;
 
-public class ImageShardAnalyzer : IShardAnalyzer
+public class ImageShardAnalyzer(
+    IImageService imageService,
+    StorageService storageService
+) : IShardAnalyzer
 {
-    private readonly IImageService imageService;
 
-    public ImageShardAnalyzer(IImageService imageService)
+    public async ValueTask<ShardAnalysis> Analyze(ShardAnalyzerContext context, CancellationToken token = default)
     {
-        this.imageService = imageService;
-    }
-
-    public async ValueTask<ShardAnalysis> Analyze(string tempPath, string? mimeType, CancellationToken token = default)
-    {
-        var imageInfo = await imageService.GetInfo(tempPath, token);
+        var shardPath = storageService.GetAbsolutePath(context.ShardUri);
+        var imageInfo = await imageService.GetInfo(shardPath, token);
 
         return new(
             payload: imageInfo,

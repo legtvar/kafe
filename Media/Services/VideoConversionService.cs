@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.JavaScript;
 using System.Text;
@@ -45,7 +46,7 @@ public class VideoConversionService(
         CancellationToken ct = default
     )
     {
-        return (await db.KafeLoadManyAsync<VideoConversionInfo>([..ids], ct)).Unwrap();
+        return (await db.KafeLoadManyAsync<VideoConversionInfo>([.. ids], ct)).Unwrap();
     }
 
     public async Task<Err<VideoConversionInfo>> Upsert(VideoConversionInfo conversion, CancellationToken ct = default)
@@ -164,7 +165,7 @@ public class VideoConversionService(
                 query = (IMartenQueryable<VideoConversionInfo>)query.Where(v => v.HasFailed == hasFailed);
             }
 
-            return [..await query.ToListAsync(ct)];
+            return [.. await query.ToListAsync(ct)];
         }
 
         var sb = new StringBuilder();
@@ -191,7 +192,7 @@ public class VideoConversionService(
             sb.Append($" AND ((a.data ->> '{nameof(VideoConversionInfo.HasFailed)}')::boolean = {hasFailed})");
         }
 
-        return [..await db.AdvancedSql.QueryAsync<VideoConversionInfo>(sb.ToString(), ct)];
+        return [.. await db.AdvancedSql.QueryAsync<VideoConversionInfo>(sb.ToString(), ct)];
     }
 
     public record VideoShardFilter(
@@ -372,26 +373,28 @@ public class VideoConversionService(
     {
         var result = MediaInfo.Invalid;
         // Check for `original` first. Without it, we can just quit.
-        if (!storageService.TryGetShardFilePath(
-                typeof(MediaInfo),
-                conversion.VideoId,
-                Const.OriginalShardVariant,
-                out var originalPath
-            ))
+        var originalShardUri = storageService.GetShardUri(
+            id: conversion.VideoId,
+            shardType: typeof(MediaInfo),
+            variant: Const.OriginalShardVariant
+        );
+        if (originalShardUri.HasError)
         {
+            // TODO: pass the error to the MediaInfo
             result = result with { IsCorrupted = true, Error = "No original variant found." };
             return result;
         }
 
         // Then check if the job was already done but for some reason the DB does not know it.
         // (This is here because I accidentally dropped the DB once.)
-        if (storageService.TryGetShardFilePath(
-                typeof(MediaInfo),
-                conversion.VideoId,
-                conversion.Variant,
-                out var variantPath
-            ))
+        var variantShardUri = storageService.GetShardUri(
+            id: conversion.VideoId,
+            shardType: typeof(MediaInfo),
+            variant: conversion.Variant
+        );
+        if (variantShardUri.HasValue)
         {
+            var variantPath = storageService.GetAbsolutePath(variantShardUri.Value);
             result = await mediaService.GetInfo(variantPath, ct);
             if (result.IsCorrupted)
             {
@@ -411,16 +414,22 @@ public class VideoConversionService(
         if (result.IsCorrupted)
         {
             logger.LogInformation("Converting.");
-            var videosDir = storageService.GetShardTypeDirectory(typeof(MediaInfo), conversion.Variant);
-            if (videosDir is null || !videosDir.Exists)
+            var videosDirUri = storageService.GetShardTypeDirectory(
+                typeof(MediaInfo),
+                conversion.Variant,
+                ensureExists: false
+            );
+            if (videosDirUri is null)
             {
                 throw new InvalidOperationException(
                     $"Directory for '{conversion.Variant}' videos could not be found."
                 );
             }
 
+            var videosDir = new DirectoryInfo(storageService.GetAbsolutePath(videosDirUri));
             var shardDir = videosDir.CreateSubdirectory(conversion.VideoId);
 
+            var originalPath = storageService.GetAbsolutePath(originalShardUri.Value);
             result = await mediaService.CreateVariant(
                 filePath: originalPath,
                 preset: Video.GetPresetFromFileName(conversion.Variant),
@@ -594,20 +603,25 @@ public class VideoConversionService(
 
         foreach (var video in videos)
         {
-            if (!storageService.TryGetShardFilePath(
-                    typeof(MediaInfo),
-                    video.Id,
-                    Const.OriginalShardVariant,
-                    out var shardFilePath
-                ))
+            var shardUri = storageService.GetShardUri(
+                id: video.Id,
+                shardType: typeof(MediaInfo),
+                variant: Const.OriginalShardVariant
+            );
+            if (shardUri.HasError)
             {
-                logger.LogError("Cound not find original variant of video shard {VideoShardId}.", video.Id);
+                logger.LogErr(
+                    shardUri,
+                    "Cound not find original variant of video shard {VideoShardId} because of the following error.",
+                    video.Id
+                );
                 result = result.Combine(
                     Err.Fail(new MissingShardVariantDiagnostic(video.Name, video.Id, Const.OriginalShardVariant))
                 );
                 continue;
             }
 
+            var shardFilePath = storageService.GetAbsolutePath(shardUri.Value);
             var mediaInfo = await mediaService.GetInfo(shardFilePath, ct);
             if (mediaInfo.IsCorrupted)
             {
@@ -673,6 +687,6 @@ public class VideoConversionService(
         var missingVariants = desiredVariants.Select(p => p.ToFilename())
             .OfType<string>()
             .Except(existingVariants);
-        return [..missingVariants];
+        return [.. missingVariants];
     }
 }

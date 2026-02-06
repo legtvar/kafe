@@ -10,16 +10,23 @@ public class ShardAnalysisFactory(
     IServiceProvider serviceProvider
 )
 {
-    public async ValueTask<ShardAnalysis> Create(
+    public async ValueTask<ShardAnalysis> Analyze(
         Type shardType,
-        string filePath,
+        Uri shardUri,
         string? mimeType,
+        string? uploadFilename,
         CancellationToken ct = default
     )
     {
         var kafeType = typeRegistry.RequireType(shardType);
         var typeMetadata = typeRegistry.RequireMetadata(kafeType);
         var shardTypeMetadata = typeMetadata.RequireExtension<ShardPayloadTypeMetadata>();
+        var analysisContext = new ShardAnalyzerContext(
+            ShardType: shardType,
+            ShardUri: shardUri,
+            MimeType: mimeType,
+            UploadFilename: uploadFilename
+        );
         foreach (var analyzerType in shardTypeMetadata.AnalyzerTypes)
         {
             var analyzer = serviceProvider.GetService(analyzerType)
@@ -32,7 +39,7 @@ public class ShardAnalysisFactory(
                 );
             }
 
-            var analysis = await shardAnalyzer.Analyze(filePath, mimeType, ct);
+            var analysis = await shardAnalyzer.Analyze(analysisContext, ct);
             if (analysis.IsSuccessful)
             {
                 if (string.IsNullOrWhiteSpace(analysis.ShardAnalyzerName))

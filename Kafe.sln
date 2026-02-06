@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.1.32421.90
+# Visual Studio Version 18
+VisualStudioVersion = 18.2.11415.280 d18.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kafe.Api", "Api\Kafe.Api.csproj", "{B2EB6382-1064-4AD8-B56F-B26B9F61BD7B}"
 EndProject
@@ -23,19 +23,19 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.gitattributes = .gitattributes
 		.gitignore = .gitignore
 		.gitlab-ci.yml = .gitlab-ci.yml
-		Api.Dockerfile = Api.Dockerfile
-		Directory.Build.props = Directory.Build.props
-		NuGet.config = NuGet.config
-		docker-compose.local.yml = docker-compose.local.yml
 		Announcer.Dockerfile = Announcer.Dockerfile
+		Api.Dockerfile = Api.Dockerfile
+		Blender.Dockerfile = Blender.Dockerfile
+		Directory.Build.props = Directory.Build.props
+		Directory.Packages.props = Directory.Packages.props
+		docker-compose.base.yml = docker-compose.base.yml
+		docker-compose.docs.yml = docker-compose.docs.yml
+		docker-compose.local.yml = docker-compose.local.yml
+		docker-compose.production.yml = docker-compose.production.yml
+		docker-compose.staging.yml = docker-compose.staging.yml
+		NuGet.config = NuGet.config
 		README.md = README.md
 		Web.Dockerfile = Web.Dockerfile
-		docker-compose.staging.yml = docker-compose.staging.yml
-		docker-compose.docs.yml = docker-compose.docs.yml
-		docker-compose.base.yml = docker-compose.base.yml
-		docker-compose.production.yml = docker-compose.production.yml
-		Blender.Dockerfile = Blender.Dockerfile
-		Directory.Packages.props = Directory.Packages.props
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kafe.MockIdentity", "MockIdentity\Kafe.MockIdentity.csproj", "{3A0F9596-06EC-4B5B-AA12-DB5B28D351DA}"
@@ -174,8 +174,16 @@ Global
 		{02C5E470-3ABC-471B-BB9C-36E279E2917A}.Release|x86.Build.0 = Release|Any CPU
 		{0471CCDE-174B-4396-A2C8-93F041044C2B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0471CCDE-174B-4396-A2C8-93F041044C2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0471CCDE-174B-4396-A2C8-93F041044C2B}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{0471CCDE-174B-4396-A2C8-93F041044C2B}.Debug|x64.Build.0 = Debug|Any CPU
+		{0471CCDE-174B-4396-A2C8-93F041044C2B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{0471CCDE-174B-4396-A2C8-93F041044C2B}.Debug|x86.Build.0 = Debug|Any CPU
 		{0471CCDE-174B-4396-A2C8-93F041044C2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0471CCDE-174B-4396-A2C8-93F041044C2B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0471CCDE-174B-4396-A2C8-93F041044C2B}.Release|x64.ActiveCfg = Release|Any CPU
+		{0471CCDE-174B-4396-A2C8-93F041044C2B}.Release|x64.Build.0 = Release|Any CPU
+		{0471CCDE-174B-4396-A2C8-93F041044C2B}.Release|x86.ActiveCfg = Release|Any CPU
+		{0471CCDE-174B-4396-A2C8-93F041044C2B}.Release|x86.Build.0 = Release|Any CPU
 		{C836E570-A4B6-4CD5-B95C-B84442425D19}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C836E570-A4B6-4CD5-B95C-B84442425D19}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C836E570-A4B6-4CD5-B95C-B84442425D19}.Debug|x64.ActiveCfg = Debug|Any CPU

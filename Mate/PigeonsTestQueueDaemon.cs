@@ -22,12 +22,12 @@ public class PigeonsTestQueueDaemon(
         var pigeonsService = scope.ServiceProvider.GetRequiredService<PigeonsService>();
 
         var missingTestShardIds = await pigeonsService.GetUntestedBlends(ct);
-        foreach (var shardId in missingTestShardIds)
+        foreach (var shard in missingTestShardIds)
         {
             try
             {
-                await pigeonsQueue.EnqueueAsync(shardId);
-                logger.LogInformation("Re-enqueued Pigeons test request for shard {ShardId}", shardId);
+                await pigeonsQueue.EnqueueAsync(shard.Id);
+                logger.LogInformation("Re-enqueued Pigeons test request for shard {ShardId}", shard.Id);
             }
             catch (Exception ex)
             {
@@ -37,7 +37,7 @@ public class PigeonsTestQueueDaemon(
                     Tests: null,
                     Error: $"{ex?.Message}"
                 );
-                await pigeonsService.UpdateBlend(shardId, blendInfo, ct);
+                await pigeonsService.UpdateBlend(shard.Id, blendInfo, ct);
             }
         }
 

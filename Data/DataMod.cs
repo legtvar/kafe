@@ -51,6 +51,8 @@ public class DataMod : IMod
 
         context.AddDiagnosticPayload<BadLoginTicketDiagnostic>();
         context.AddDiagnosticPayload<EntityBusyDiagnostic>();
+        context.AddDiagnosticPayload<ShardFileAlreadyExists>();
+        context.AddDiagnosticPayload<ShardFileNotFoundDiagnostic>();
     }
 
     private static void ConfigureServices(IServiceCollection services)

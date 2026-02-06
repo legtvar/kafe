@@ -53,11 +53,16 @@ public class ShardService(
             return Err.Fail(new BadMimeTypeDiagnostic(mimeType));
         }
 
-        var tmpPath = await storageService.StoreTemporaryShard(shardId, stream, fileExtension, token);
-        var analysis = await analysisFactory.Create(shardType, tmpPath, mimeType, token);
+        var tmpUri = await storageService.StoreTemporaryShard(shardId, stream, fileExtension, token);
+        if (tmpUri.HasError)
+        {
+            return tmpUri.Diagnostic;
+        }
+
+        var analysis = await analysisFactory.Analyze(shardType, tmpUri.Value, mimeType, uploadFilename, token);
         if (!analysis.IsSuccessful)
         {
-            await storageService.DeleteTemporaryShard(shardId, token);
+            storageService.DeleteTemporaryShard(shardId, token);
             return Err.Fail(new ShardAnalysisFailedDiagnostic(shardType));
         }
 
@@ -74,11 +79,10 @@ public class ShardService(
 
         db.Events.KafeStartStream<ShardInfo>(created.ShardId, created);
         await db.SaveChangesAsync(token);
-        await storageService.MoveTemporaryToArchive(
+        storageService.MoveTemporaryToArchive(
             tmpShardId: shardId,
             shardType: shardType,
-            fileExtension: analysis.FileExtension ?? fileExtension,
-            ct: token
+            fileExtension: analysis.FileExtension ?? fileExtension
         );
         return await db.Events.KafeAggregateRequiredStream<ShardInfo>(shardId, token: token);
     }
@@ -254,7 +258,7 @@ public class ShardService(
 
         var shard = shardErr.Value;
 
-        if (!storageService.TryOpenShardStream(shard.Payload.GetType(), id, variant, out var stream, out _))
+        if (!storageService.TryOpenShardStream(id, shard.Payload.GetType(), variant, out var stream, out _))
         {
             throw new ArgumentException($"A shard stream for the '{id}' shard could not be opened.");
         }

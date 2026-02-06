@@ -2,22 +2,21 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Kafe.Data.Services;
 using Kafe.Media.Services;
 
 namespace Kafe.Media;
 
-public class SubtitlesShardAnalyzer : IShardAnalyzer
+public class SubtitlesShardAnalyzer(
+    IMediaService mediaService,
+    StorageService storageService
+) : IShardAnalyzer
 {
-    private readonly IMediaService mediaService;
 
-    public SubtitlesShardAnalyzer(IMediaService mediaService)
+    public async ValueTask<ShardAnalysis> Analyze(ShardAnalyzerContext context, CancellationToken token = default)
     {
-        this.mediaService = mediaService;
-    }
-
-    public async ValueTask<ShardAnalysis> Analyze(string tempPath, string? mimeType, CancellationToken token = default)
-    {
-        var mediaInfo = await mediaService.GetInfo(tempPath, token);
+        var path = storageService.GetAbsolutePath(context.ShardUri);
+        var mediaInfo = await mediaService.GetInfo(path, token);
 
         if (mediaInfo.SubtitleStreams.IsDefaultOrEmpty)
         {

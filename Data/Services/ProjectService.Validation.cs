@@ -1080,16 +1080,15 @@ public partial class ProjectService
             }
             else
             {
-
                 if (filmShardsBlueprints!.GetValueOrDefault(ShardKind.Video, null) is not null)
                 {
                     var videoShards = filmArtifacts.Single().info.Shards.Where(s => s.Kind == ShardKind.Video)
                         .ToImmutableArray();
-                    if (filmArtifacts.Length < filmShardsBlueprints[ShardKind.Video].Arity.Min)
+                    if (videoShards.Length < filmShardsBlueprints[ShardKind.Video].Arity.Min)
                     {
                         diagnostics.Add(MissingFilm);
                     }
-                    else if (filmArtifacts.Length > filmShardsBlueprints[ShardKind.Video].Arity.Max)
+                    else if (videoShards.Length > filmShardsBlueprints[ShardKind.Video].Arity.Max)
                     {
                         diagnostics.Add(TooManyFilms);
                     }

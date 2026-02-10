@@ -34,5 +34,10 @@ public static class ErrExtensions
                 _ => new Err<T>(err.Value, Diagnostic.Aggregate([err.Diagnostic, diagnostic]))
             };
         }
+
+        public Err<TInner> Select<TInner>(Func<T,TInner> selector)
+        {
+            return err.HasError ? err.Diagnostic : Err.Succeed(selector(err.Value));
+        }
     }
 }

@@ -1,8 +1,13 @@
+using Kafe.Data.Options;
+using Kafe.Pigeons;
 using Kafe.Pigeons.Endpoints;
+using Kafe.Pigeons.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSingleton<PigeonsService>();
+builder.Services.AddOptions<StorageOptions>();
 builder.WebHost.UseKestrel();
 
 var app = builder.Build();

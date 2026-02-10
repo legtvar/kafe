@@ -9,7 +9,7 @@ public class PigeonsTestQueue
 {
     public const int QueueMaxCapacity = 300;
 
-    private readonly Channel<Hrib> queue;
+    private readonly Channel<PigeonsTestRequest> queue;
 
     public PigeonsTestQueue()
     {
@@ -19,20 +19,20 @@ public class PigeonsTestQueue
             SingleReader = true,
             SingleWriter = false,
         };
-        queue = Channel.CreateBounded<Hrib>(options);
+        queue = Channel.CreateBounded<PigeonsTestRequest>(options);
     }
 
-    public async ValueTask EnqueueAsync(Hrib shardId)
+    public async ValueTask EnqueueAsync(Uri shardUri, string homeworkType)
     {
-        ArgumentNullException.ThrowIfNull(shardId);
-        await queue.Writer.WriteAsync(shardId);
+        ArgumentNullException.ThrowIfNull(shardUri);
+        await queue.Writer.WriteAsync(new PigeonsTestRequest(shardUri, homeworkType));
     }
 
-    public Hrib? Dequeue()
+    public PigeonsTestRequest? Dequeue()
     {
-        if (queue.Reader.TryRead(out var hrib))
+        if (queue.Reader.TryRead(out var request))
         {
-            return hrib;
+            return request;
         }
 
         return null;

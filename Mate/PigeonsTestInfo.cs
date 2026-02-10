@@ -1,3 +1,5 @@
+using System;
+
 namespace Kafe.Mate;
 
 public record PigeonsTestInfo(
@@ -23,8 +25,6 @@ public record PigeonsTestInfoJsonFormat
 }
 
 public record PigeonsTestRequest(
-    [Hrib]
-    string ShardId,
-    string HomeworkType,
-    string Path
+    Uri ShardUri,
+    string HomeworkType
 );

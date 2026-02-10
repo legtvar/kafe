@@ -1,30 +1,29 @@
 using System;
-using System.IO;
-using System.Threading.Tasks;
 using System.Runtime.InteropServices;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 using System.Collections.Immutable;
-using System.Collections.Generic;
-using System.Linq;
-using Kafe.Pigeons;
+using System.Text.Json;
+using Kafe.Data.Options;
+using Kafe.Mate;
+using Microsoft.Extensions.Options;
 
 namespace Kafe.Pigeons.Services;
 
-public class PigeonsService(string tempDirectory, ILogger logger)
+public class PigeonsService(
+    ILogger<PigeonsService> logger,
+    IOptions<StorageOptions> options,
+    IFindShardFile findShardFile
+)
 {
-    public string TempDirectory { get; } = tempDirectory;
+    private static readonly ImmutableArray<string> SupportedHomeworkTypes =
+    [
+        "Homework 2 - Composition",
+        "Homework 3 - Chair",
+        "Homework 3 - Your own model",
+        "Homework 4 - Retopology",
+        "Homework 5 - Materials"
+    ];
 
-    private static readonly ImmutableArray<string> supportedHomeworkTypes =
-        ImmutableArray.Create(
-            "Homework 2 - Composition",
-            "Homework 3 - Chair",
-            "Homework 3 - Your own model",
-            "Homework 4 - Retopology",
-            "Homework 5 - Materials"
-        );
-
-    private const int pigeonsTestTimeoutMs = 100000;
+    private const int PigeonsTestTimeoutMs = 100_000;
 
     public static string? FindPigeonsManagerPath()
     {
@@ -65,7 +64,7 @@ public class PigeonsService(string tempDirectory, ILogger logger)
 
     public string? GetHomeworkType(string projectGroupName)
     {
-        if (!supportedHomeworkTypes.Contains(projectGroupName))
+        if (!SupportedHomeworkTypes.Contains(projectGroupName))
         {
             return null;
         }
@@ -73,7 +72,7 @@ public class PigeonsService(string tempDirectory, ILogger logger)
     }
 
 
-    public static string GetPigeonsTestCommand(string id, string filePath, string outputPath, string type)
+    public static string GetPigeonsTestCommand(string filePath, string outputPath, string type)
     {
         string args = string.Join(" ", new[]
         {
@@ -105,68 +104,89 @@ public class PigeonsService(string tempDirectory, ILogger logger)
         return args;
     }
 
-    public async Task<BlendInfo> RunPigeonsTest(string id, string shardPath, string projectGroupName)
+    public async Task<PigeonsTestResponse> RunPigeonsTest(PigeonsTestRequest request, CancellationToken ct = default)
     {
-        string? homeworkType = GetHomeworkType(projectGroupName);
+        var shardPathErr = await findShardFile.Find(request.ShardUri, ct);
+        if (shardPathErr.HasError)
+        {
+            return new PigeonsTestResponse(
+                Tests: [],
+                Error: shardPathErr.Diagnostic.ToString(Kafe.Const.InvariantCulture)
+            );
+        }
+
+        var shardPath = shardPathErr.Value;
+        var homeworkType = GetHomeworkType(request.HomeworkType);
         if (homeworkType is null)
         {
-            return BlendInfo.Invalid("No valid homework type found for the provided project group.");
+            return new PigeonsTestResponse(
+                Tests: [],
+                Error: "No valid homework type found for the provided project group."
+            );
         }
 
-        FileInfo shardFile = new FileInfo(shardPath);
+        var shardFile = new FileInfo(shardPath);
         if (!shardFile.Exists || shardFile.DirectoryName is null)
         {
-            return BlendInfo.Invalid("Shard file was not found");
+            return new PigeonsTestResponse(
+                Tests: [],
+                Error: "Shard file was not found."
+            );
         }
 
-        DirectoryInfo shardDir = new DirectoryInfo(shardFile.DirectoryName);
+        var shardDir = new DirectoryInfo(shardFile.DirectoryName);
         if (!shardDir.Exists)
         {
-            return BlendInfo.Invalid("Shard file directory was not found");
+            return new PigeonsTestResponse(
+                Tests: [],
+                Error: "Shard file directory was not found."
+            );
         }
 
         var hash = DateTime.UtcNow.ToString("yyyy-MM-dd_HH-mm-ss");
-        var outputDir = new DirectoryInfo(Path.Combine(TempDirectory, shardDir.Name));
+        var tmpName = Path.GetTempFileName();
+        var outputDir = new DirectoryInfo(Path.Combine(options.Value.TempDirectory, tmpName));
         if (!outputDir.Exists)
         {
             outputDir.Create();
         }
 
         var outputPath = Path.Combine(
-            TempDirectory,
-            shardDir.Name,
+            outputDir.FullName,
             $"{Const.PigeonsTestOutputName}_{hash}.{Const.PigeonsTestOutputExtension}"
         );
 
-        string arguments = GetPigeonsTestCommand(id, shardPath, outputPath, homeworkType);
+        var arguments = GetPigeonsTestCommand(shardPath, outputPath, homeworkType);
         logger.LogInformation("Running Blender with the following arguments:\n\t{Arguments}", arguments);
-        BlenderProcessOutput output = await Blender.RunBlenderCommand(arguments, pigeonsTestTimeoutMs);
+        var output = await Blender.RunBlenderCommand(arguments, PigeonsTestTimeoutMs);
         if (!output.Success)
         {
             logger.LogInformation("Pigeons tests for shard '{ShardId}' failed.", shardDir.Name);
-            return BlendInfo.Invalid(output.Message);
+            return new PigeonsTestResponse(
+                Tests: [],
+                Error: output.Message
+            );
         }
 
-        string jsonContent = File.ReadAllText(outputPath);
-        List<PigeonsTestInfo> tests = new List<PigeonsTestInfo>();
-        PigeonsTestResultsSerializable? pigeonsResult = System.Text.Json.JsonSerializer.Deserialize<PigeonsTestResultsSerializable>(jsonContent);
+        var jsonContent = await File.ReadAllTextAsync(outputPath, ct);
+        var tests = ImmutableArray.CreateBuilder<PigeonsTestInfo>();
+        var pigeonsResult = JsonSerializer.Deserialize<Dictionary<int, PigeonsTestResultJson>>(jsonContent);
         if (pigeonsResult != null)
         {
-            foreach (var result in pigeonsResult.Values)
-            {
-                tests.Add(new PigeonsTestInfo(
-                    result.label,
-                    result.state,
-                    result.datablock,
-                    result.message,
-                    result.traceback
-                ));
-            }
+            tests.AddRange(
+                pigeonsResult.Values.Select(result => new PigeonsTestInfo(
+                        result.Label,
+                        result.State,
+                        result.Datablock,
+                        result.Message,
+                        result.Traceback
+                    )
+                )
+            );
         }
-        return new BlendInfo(
-            Const.BlendFileExtension,
-            Const.BlendMimeType,
-            tests.ToImmutableArray()
+        return new PigeonsTestResponse(
+            Tests: tests.ToImmutable(),
+            Error: null
         );
     }
 }

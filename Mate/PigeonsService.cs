@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Kafe.Data;
@@ -20,6 +21,8 @@ public class PigeonsService(
     IHttpClientFactory httpClientFactory
 )
 {
+    public const string TestEndpoint = "/test";
+
     public Task<Err<bool>> UpdateBlend(
         Hrib shardId,
         BlendInfo blendInfo,
@@ -50,30 +53,31 @@ public class PigeonsService(
             return shard.Diagnostic;
         }
 
-        if (!storageService.TryGetFilePath(
-                ShardKind.Blend,
-                shard.Id,
-                Const.OriginalShardVariant,
-                out var shardFilePath
-            ))
+        var shardUri = storageService.GetShardUri(shardId, typeof(BlendInfo));
+        if (shardUri.HasError)
         {
-            return null;
+            return shardUri.Diagnostic;
         }
 
         var request = new PigeonsTestRequest(
-            ShardId: shardId.ToString(),
-            HomeworkType: homeworkType ?? string.Empty,
-            Path: shardFilePath
+            ShardUri: shardUri.Value,
+            HomeworkType: homeworkType ?? string.Empty
         );
         var client = httpClientFactory.CreateClient("Pigeons");
-        var response = await client.PostAsJsonAsync("/test", request, cancellationToken: ct);
-        var content = await response.Content.ReadFromJsonAsync<BlendInfoJsonFormat>(cancellationToken: ct);
+        var response = await client.PostAsJsonAsync(TestEndpoint, request, cancellationToken: ct);
+        var content = await response.Content.ReadFromJsonAsync<BlendInfo>(cancellationToken: ct);
         if (content is null)
         {
-            throw new InvalidOperationException("Failed to get pigeons test info from pigeons service.");
+            throw new InvalidOperationException("Failed to get PIGEOnS test results from the service.");
         }
 
-        return await UpdateBlend(shardId, content.ToBlendInfo(), ct);
+        var updateErr = await UpdateBlend(shardId, content, ct);
+        if (updateErr.HasError)
+        {
+            return updateErr.Diagnostic;
+        }
+
+        return (await shardService.Load(shardId, ct)).Select(s => (BlendInfo)s.Payload.Value);
     }
 
     private static DiagnosticSeverity StatusToDiagnosticKind(string status)

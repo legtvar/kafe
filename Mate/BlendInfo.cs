@@ -28,23 +28,3 @@ public record BlendInfo(
         );
     }
 }
-
-public class BlendInfoJsonFormat
-{
-    public string? FileExtension { get; set; }
-    public string? MimeType { get; set; }
-    public List<PigeonsTestInfoJsonFormat>? Tests { get; set; }
-    public string? Error { get; set; }
-
-    public BlendInfo ToBlendInfo()
-    {
-        return new BlendInfo(
-            FileExtension ?? Const.BlendFileExtension,
-            MimeType ?? Const.BlendMimeType,
-            Tests != null
-                ? [..Tests.Select(dto => dto.ToPigeonsTestInfo())]
-                : ImmutableArray<PigeonsTestInfo>.Empty,
-            Error
-        );
-    }
-}

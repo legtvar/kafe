@@ -1,4 +1,7 @@
 using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
 
 namespace Kafe;
 
@@ -18,9 +21,10 @@ public static class ErrExtensions
             return err.Diagnostic.ForParameter(parameterName, skipFrames + 1);
         }
 
-        public Err<T> Combine(Diagnostic diagnostic)
+        public Err<T> Combine(params IEnumerable<Diagnostic> diagnostics)
         {
-            if (!diagnostic.IsValid)
+            var validDiagnostics = diagnostics.Where(d => d.IsValid).ToImmutableArray();
+            if (!validDiagnostics.Any())
             {
                 return err;
             }
@@ -28,10 +32,10 @@ public static class ErrExtensions
             return err.Diagnostic switch
             {
                 { IsValid: false } or { Payload: GenericErrorDiagnostic }
-                    => new Err<T>(err.Value, diagnostic),
+                    => new Err<T>(err.Value, Diagnostic.Aggregate(validDiagnostics)),
                 { Payload: AggregateDiagnostic agg }
-                    => new Err<T>(err.Value, Diagnostic.Aggregate(agg.Inner.Add(diagnostic))),
-                _ => new Err<T>(err.Value, Diagnostic.Aggregate([err.Diagnostic, diagnostic]))
+                    => new Err<T>(err.Value, Diagnostic.Aggregate(agg.Inner.AddRange(validDiagnostics))),
+                _ => new Err<T>(err.Value, Diagnostic.Aggregate([err.Diagnostic, ..validDiagnostics]))
             };
         }
 

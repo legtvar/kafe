@@ -20,6 +20,6 @@ public class MateMod : IMod
     {
         services.AddSingleton<BlendShardAnalyzer>();
         services.AddSingleton<PigeonsTestQueue>();
-        services.AddScoped<PigeonsService>();
+        services.AddScoped<BlendService>();
     }
 }

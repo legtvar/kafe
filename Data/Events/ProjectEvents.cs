@@ -37,7 +37,9 @@ public record ProjectInfoChanged(
     [LocalizedString] ImmutableDictionary<string, string>? Name = null,
     [LocalizedString] ImmutableDictionary<string, string>? Description = null,
     DateTimeOffset? ReleasedOn = null,
-    [LocalizedString] ImmutableDictionary<string, string>? Genre = null
+    [LocalizedString] ImmutableDictionary<string, string>? Genre = null,
+    string? AIUsageDeclaration = null,
+    string? HearAboutUs = null
 );
 
 public record ProjectArtifactAdded(

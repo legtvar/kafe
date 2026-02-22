@@ -1,4 +1,4 @@
-import { Button, FormControl, FormHelperText, FormLabel, HStack, Stack } from '@chakra-ui/react';
+import { Button, FormControl, FormHelperText, FormLabel, HStack, Input, Stack, Textarea } from '@chakra-ui/react';
 import useForceUpdate from 'use-force-update';
 import { t } from 'i18next';
 import { Project } from '../../../../data/Project';
@@ -157,6 +157,41 @@ export function ProjectBasicInfoForm({ project, onSubmit, status, update, noSelf
                     }
                 />
             </FormControl>
+
+            <FormControl>
+                <FormLabel>{t('createProject.fields.aiUsageDeclaration').toString()}</FormLabel>
+                <FormHelperText mb={"1rem"}>
+                    {t('createProject.fields.aiUsageDeclarationHelp').toString()}
+                </FormHelperText>
+                <Textarea
+                    as={TextareaLimited}
+                    min={50}
+                    max={200}
+                    borderColor={border}
+                    bg={bg}
+                    placeholder={t('createProject.fields.aiUsageDeclaration').toString()}
+                    value={project.aiUsageDeclaration}
+                    onChange={(value) => forceUpdate(project.set('aiUsageDeclaration', value.target.value))}
+                />
+            </FormControl>
+
+            <FormControl>
+                <FormLabel>{t('createProject.fields.hearAboutUs').toString()}</FormLabel>
+                <FormHelperText mb={"1rem"}>
+                    {t('createProject.fields.hearAboutUsHelp').toString()}
+                </FormHelperText>
+                <Textarea
+                    as={TextareaLimited}
+                    min={50}
+                    max={200}
+                    borderColor={border}
+                    bg={bg}
+                    placeholder={t('createProject.fields.hearAboutUs').toString()}
+                    value={project.aiUsageDeclaration}
+                    onChange={(value) => forceUpdate(project.set('hearAboutUs', value.target.value))}
+                />
+            </FormControl>
+
             {!noSelfSubmit && (
                 <HStack w="100%">
                     <Button

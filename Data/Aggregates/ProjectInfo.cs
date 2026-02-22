@@ -36,6 +36,10 @@ public record ProjectInfo(
     [property:LocalizedString]
     ImmutableDictionary<string, string>? Genre = null,
 
+    string? AIUsageDeclaration = null,
+
+    string? HearAboutUs = null,
+
     Permission GlobalPermissions = Permission.None,
 
     [property:Sortable]
@@ -57,6 +61,8 @@ public record ProjectInfo(
         Name: LocalizedString.CreateInvariant(Const.InvalidName),
         Description: null,
         Genre: null,
+        AIUsageDeclaration: null,
+        HearAboutUs: null,
         GlobalPermissions: Permission.None,
         ReleasedOn: default,
         IsLocked: false,
@@ -125,7 +131,9 @@ public class ProjectInfoProjection : SingleStreamProjection<ProjectInfo, string>
             Name = e.Name ?? p.Name,
             Description = e.Description ?? p.Description,
             ReleasedOn = e.ReleasedOn ?? p.ReleasedOn,
-            Genre = e.Genre ?? p.Genre
+            Genre = e.Genre ?? p.Genre,
+            AIUsageDeclaration = e.AIUsageDeclaration ?? p.AIUsageDeclaration,
+            HearAboutUs = e.HearAboutUs ?? p.HearAboutUs
         };
     }
 

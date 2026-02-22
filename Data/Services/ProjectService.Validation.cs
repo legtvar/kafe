@@ -260,6 +260,26 @@ public partial class ProjectService
         )
     );
 
+    public static readonly Diagnostic MissingAIUsageDeclaration = new Diagnostic(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: InfoStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, "The project is missing an AI usage declaration."),
+            (Const.CzechCulture, "Projektu chybí prohlášení o použití umělé inteligence."),
+            (Const.SlovakCulture, "Projektu chýba vyhlásenie o použití umelej inteligencie.")
+        )
+    );
+
+    public static readonly Diagnostic MissingHearAboutUs = new Diagnostic(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: InfoStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, "The project is missing a \"Where did you hear about us?\" statement."),
+            (Const.CzechCulture, "Projektu chybí oznámení v kolonce \"Kde ste o nás slyšeli?\"."),
+            (Const.SlovakCulture, "Projektu chýba oznámenie v kolónke \"Kde ste o nás počuli?\".")
+        )
+    );
+
     public static readonly Diagnostic MissingFilm = new Diagnostic(
         Kind: DiagnosticKind.Error,
         ValidationStage: FileStage,
@@ -920,7 +940,7 @@ public partial class ProjectService
             GenreTooShort
         );
 
-        if (project.ProjectGroupId == LemmaCurrentFilmFestivalProjectGroupId)
+        if (true || project.ProjectGroupId == LemmaCurrentFilmFestivalProjectGroupId)
         {
             if (project.Authors.Count(a => a.Kind == ProjectAuthorKind.Crew) < 1)
             {
@@ -935,6 +955,16 @@ public partial class ProjectService
             if (!LemmaMandatoryCrewRoles.IsSubsetOf(project.Authors.Select(a => a.Roles.ToImmutableHashSet()).SelectMany(roles => roles).ToImmutableHashSet()))
             {
                 diagnostics.Add(MissingMandatoryCrewRoles);
+            }
+
+            if (string.IsNullOrEmpty(project.AIUsageDeclaration))
+            {
+                diagnostics.Add(MissingAIUsageDeclaration);
+            }
+
+            if (string.IsNullOrEmpty(project.HearAboutUs))
+            {
+                diagnostics.Add(MissingHearAboutUs);
             }
         }
 

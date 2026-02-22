@@ -56,6 +56,8 @@ public class ProjectCreationEndpoint : EndpointBaseAsync
             {
                 Description = request.Description,
                 Genre = request.Genre,
+                AIUsageDeclaration = request.AIUsageDeclaration,
+                HearAboutUs = request.HearAboutUs,
                 Authors = request.Cast
                     .Select(c => new ProjectAuthorInfo(c.Id.ToString(), ProjectAuthorKind.Cast, c.Roles))
                     .Concat(request.Crew

@@ -19,6 +19,8 @@ export class Project extends AbstractType {
     public genre?: localizedString;
     public genreTags?: TaggedOption[];
     public description?: localizedString;
+    public aiUsageDeclaration?: string;
+    public hearAboutUs?: string;
     // public visibility!: components['schemas']['Visibility'];
     public releasedOn!: Date | null;
 
@@ -90,6 +92,8 @@ export class Project extends AbstractType {
             .add('name', localizedMapper)
             .add('genre', localizedMapper)
             .add('description', localizedMapper)
+            .add('aiUsageDeclaration')
+            .add('hearAboutUs')
             .add('artifacts', (artifacts: Artifact[]) =>
                 artifacts ? artifacts.map((artifact) => artifact.serialize(false)) : undefined,
             )

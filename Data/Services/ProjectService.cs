@@ -111,7 +111,9 @@ public partial class ProjectService
             ProjectId: id.ToString(),
             Name: LocalizedString.MakeOverride(existing.Name, project.Name),
             Description: LocalizedString.MakeOverride(existing.Description, project.Description),
-            Genre: LocalizedString.MakeOverride(existing.Genre, project.Genre)
+            Genre: LocalizedString.MakeOverride(existing.Genre, project.Genre),
+            AIUsageDeclaration: project.AIUsageDeclaration,
+            HearAboutUs: project.HearAboutUs
         );
         if (infoChanged.Name is not null || infoChanged.Description is not null || infoChanged.Genre is not null)
         {

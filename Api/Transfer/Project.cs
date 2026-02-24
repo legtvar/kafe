@@ -99,7 +99,7 @@ public record ProjectCreationDto(
     LocalizedString Name,
     LocalizedString? Description,
     LocalizedString? Genre,
-    string? AIUsageDeclaration,
+    string? AiUsageDeclaration,
     string? HearAboutUs,
     ImmutableArray<ProjectCreationAuthorDto> Crew,
     ImmutableArray<ProjectCreationAuthorDto> Cast,

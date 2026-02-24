@@ -260,7 +260,7 @@ public partial class ProjectService
         )
     );
 
-    public static readonly Diagnostic MissingAIUsageDeclaration = new Diagnostic(
+    public static readonly Diagnostic MissingAiUsageDeclaration = new Diagnostic(
         Kind: DiagnosticKind.Error,
         ValidationStage: InfoStage,
         Message: LocalizedString.Create(
@@ -957,9 +957,9 @@ public partial class ProjectService
                 diagnostics.Add(MissingMandatoryCrewRoles);
             }
 
-            if (string.IsNullOrEmpty(project.AIUsageDeclaration))
+            if (string.IsNullOrEmpty(project.AiUsageDeclaration))
             {
-                diagnostics.Add(MissingAIUsageDeclaration);
+                diagnostics.Add(MissingAiUsageDeclaration);
             }
 
             if (string.IsNullOrEmpty(project.HearAboutUs))

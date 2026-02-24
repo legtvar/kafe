@@ -82,7 +82,7 @@ public static class TransferMaps
             Genre: data.Genre,
             Name: data.Name,
             Description: data.Description,
-            AIUsageDeclaration: data.AIUsageDeclaration,
+            AiUsageDeclaration: data.AiUsageDeclaration,
             HearAboutUs: data.HearAboutUs,
             GlobalPermissions: ToPermissionArray(data.GlobalPermissions),
             UserPermissions: ToPermissionArray(data.GlobalPermissions | userPermission),

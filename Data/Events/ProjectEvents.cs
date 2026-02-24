@@ -38,7 +38,7 @@ public record ProjectInfoChanged(
     [LocalizedString] ImmutableDictionary<string, string>? Description = null,
     DateTimeOffset? ReleasedOn = null,
     [LocalizedString] ImmutableDictionary<string, string>? Genre = null,
-    string? AIUsageDeclaration = null,
+    string? AiUsageDeclaration = null,
     string? HearAboutUs = null
 );
 

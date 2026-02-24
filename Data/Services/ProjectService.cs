@@ -99,7 +99,8 @@ public partial class ProjectService
                 OwnerId: ownerId?.ToString(),
                 CreationMethod: CreationMethod.Api,
                 ProjectGroupId: project.ProjectGroupId,
-                Name: project.Name);
+                Name: project.Name
+            );
             db.Events.KafeStartStream<ProjectInfo>(id, created);
             await db.SaveChangesAsync(token);
         }
@@ -112,19 +113,22 @@ public partial class ProjectService
             Name: LocalizedString.MakeOverride(existing.Name, project.Name),
             Description: LocalizedString.MakeOverride(existing.Description, project.Description),
             Genre: LocalizedString.MakeOverride(existing.Genre, project.Genre),
-            AiUsageDeclaration: project.AiUsageDeclaration,
-            HearAboutUs: project.HearAboutUs
+            AiUsageDeclaration: Const.MakeOverride(existing.AiUsageDeclaration, project.AiUsageDeclaration),
+            HearAboutUs: Const.MakeOverride(existing.HearAboutUs, project.HearAboutUs)
         );
-        if (infoChanged.Name is not null || infoChanged.Description is not null || infoChanged.Genre is not null)
+        if (infoChanged.Name is not null || infoChanged.Description is not null || infoChanged.Genre is not null
+            || infoChanged.AiUsageDeclaration is not null || infoChanged.HearAboutUs is not null)
         {
             eventStream.AppendOne(infoChanged);
         }
 
         if (project.IsLocked != existing.IsLocked)
         {
-            eventStream.AppendOne(project.IsLocked
-                ? new ProjectLocked(id.ToString())
-                : new ProjectUnlocked(id.ToString()));
+            eventStream.AppendOne(
+                project.IsLocked
+                    ? new ProjectLocked(id.ToString())
+                    : new ProjectUnlocked(id.ToString())
+            );
         }
 
         var authorsRemoved = existing.Authors.Except(project.Authors)
@@ -160,6 +164,7 @@ public partial class ProjectService
         {
             return artifactsAddedInfos.Errors;
         }
+
         eventStream.AppendMany(artifactsAdded);
 
         await db.SaveChangesAsync(token);
@@ -169,7 +174,8 @@ public partial class ProjectService
             await accountService.AddPermissions(
                 ownerId,
                 [(id, Permission.Read | Permission.Write | Permission.Append | Permission.Inspect)],
-                token);
+                token
+            );
         }
 
         return await db.Events.KafeAggregateRequiredStream<ProjectInfo>(id, token: token);
@@ -197,7 +203,8 @@ public partial class ProjectService
     public async Task<ImmutableArray<ProjectInfo>> List(
         ProjectFilter? filter = null,
         string? sort = null,
-        CancellationToken token = default)
+        CancellationToken token = default
+    )
     {
         filter ??= new ProjectFilter();
 
@@ -209,7 +216,8 @@ public partial class ProjectService
                 .WhereAccountHasPermission(
                     db.DocumentStore.Options.Schema,
                     Permission.Read,
-                    filter.AccessingAccountId);
+                    filter.AccessingAccountId
+                );
         }
 
         if (filter.ProjectGroupId is not null)
@@ -221,13 +229,13 @@ public partial class ProjectService
         if (filter.OrganizationId is not null)
         {
             var sql =
-            $"""
-            (
-                SELECT g.data ->> 'OrganizationId'
-                FROM {db.DocumentStore.Options.Schema.For<ProjectGroupInfo>()} AS g
-                WHERE g.id = d.data ->> 'ProjectGroupId'
-            ) = ?
-            """;
+                $"""
+                 (
+                     SELECT g.data ->> 'OrganizationId'
+                     FROM {db.DocumentStore.Options.Schema.For<ProjectGroupInfo>()} AS g
+                     WHERE g.id = d.data ->> 'ProjectGroupId'
+                 ) = ?
+                 """;
             query = (IMartenQueryable<ProjectInfo>)query
                 .Where(p => p.MatchesSql(sql, filter.OrganizationId.ToString()));
         }
@@ -292,7 +300,8 @@ public partial class ProjectService
     public async Task<Err<ProjectInfo>> AddArtifacts(
         Hrib projectId,
         ImmutableArray<(Hrib id, string? blueprintSlot)> artifacts,
-        CancellationToken token = default)
+        CancellationToken token = default
+    )
     {
         var project = await Load(projectId, token);
         if (project is null)
@@ -316,9 +325,11 @@ public partial class ProjectService
             var artifactAdded = new ProjectArtifactAdded(
                 ProjectId: projectId.ToString(),
                 ArtifactId: artifact.id.ToString(),
-                BlueprintSlot: artifact.blueprintSlot?.ToString());
+                BlueprintSlot: artifact.blueprintSlot?.ToString()
+            );
             projectStream.AppendOne(artifactAdded);
         }
+
         await db.SaveChangesAsync(token);
         return await db.Events.KafeAggregateRequiredStream<ProjectInfo>(projectId, token: token);
     }
@@ -349,6 +360,7 @@ public partial class ProjectService
         {
             stream.AppendOne(new ProjectUnlocked(projectId.ToString()));
         }
+
         await db.SaveChangesAsync(token);
         return true;
     }

@@ -1,4 +1,4 @@
-import { Button, FormControl, FormHelperText, FormLabel, HStack, Input, Stack, Textarea } from '@chakra-ui/react';
+import { Button, FormControl, FormHelperText, FormLabel, HStack, Input, RadioGroup, Radio, Stack, Textarea } from '@chakra-ui/react';
 import useForceUpdate from 'use-force-update';
 import { t } from 'i18next';
 import { Project } from '../../../../data/Project';
@@ -159,20 +159,34 @@ export function ProjectBasicInfoForm({ project, onSubmit, status, update, noSelf
             </FormControl>
 
             <FormControl>
-                <FormLabel>{t('createProject.fields.aiUsageDeclaration').toString()}</FormLabel>
+                <FormLabel>{t('createProject.fields.aiUsageDeclaration.label').toString()}</FormLabel>
                 <FormHelperText mb={"1rem"}>
-                    {t('createProject.fields.aiUsageDeclarationHelp').toString()}
+                    {t('createProject.fields.aiUsageDeclaration.help').toString()}
                 </FormHelperText>
-                <Textarea
-                    as={TextareaLimited}
-                    min={50}
-                    max={200}
-                    borderColor={border}
-                    bg={bg}
-                    placeholder={t('createProject.fields.aiUsageDeclaration').toString()}
-                    value={project.aiUsageDeclaration}
-                    onChange={(value) => forceUpdate(project.set('aiUsageDeclaration', value.target.value))}
-                />
+                <RadioGroup
+                    onChange={(value) => forceUpdate(project.set('aiUsageDeclaration', value))}
+                    value={project.aiUsageDeclaration?.slice(0, 1)}>
+                    <Stack direction='column'>
+                        <Radio value='Y'>
+                            <i>{t('createProject.fields.aiUsageDeclaration.yes').toString()}</i>
+                        </Radio>
+                        <Radio value='N'>
+                            <i>{t('createProject.fields.aiUsageDeclaration.no').toString()}</i>
+                        </Radio>
+                    </Stack>
+                </RadioGroup>
+                {project.aiUsageDeclaration?.startsWith('Y') &&
+                    <TextareaLimited
+                        min={0}
+                        max={200}
+                        borderColor={border}
+                        bg={bg}
+                        mt={'1rem'}
+                        placeholder={t('createProject.fields.aiUsageDeclaration.text').toString()}
+                        value={project.aiUsageDeclaration?.slice(2)}
+                        onChange={(event) => forceUpdate(project.set('aiUsageDeclaration', "Y: " + event.target.value.trim()))}
+                    />
+                }
             </FormControl>
 
             <FormControl>
@@ -180,15 +194,14 @@ export function ProjectBasicInfoForm({ project, onSubmit, status, update, noSelf
                 <FormHelperText mb={"1rem"}>
                     {t('createProject.fields.hearAboutUsHelp').toString()}
                 </FormHelperText>
-                <Textarea
-                    as={TextareaLimited}
-                    min={50}
-                    max={200}
+                <TextareaLimited
+                    min={0}
+                    max={120}
                     borderColor={border}
                     bg={bg}
                     placeholder={t('createProject.fields.hearAboutUs').toString()}
-                    value={project.aiUsageDeclaration}
-                    onChange={(value) => forceUpdate(project.set('hearAboutUs', value.target.value))}
+                    value={project.hearAboutUs}
+                    onChange={(event) => forceUpdate(project.set('hearAboutUs', event.target.value.trim()))}
                 />
             </FormControl>
 

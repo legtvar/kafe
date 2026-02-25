@@ -60,6 +60,15 @@
       "update": "Uložit projekt"
     },
     "fields": {
+      "aiUsageDeclaration": {
+        "label": "Prohlášení o použití generativní umělé inteligence",
+        "help": "Dle bodu 2.10 propozic Filmového festivalu Fakulty informatiky Masarykovy univerzity je autor filmového díla (osoba odpovědná za jeho přihlašování) povinen (povinna) uvést, zda a jak byly nástroje umělé inteligence využity při jeho tvorbě, a to zejména pokud nahrazovaly tvůrčí činnost.",
+        "text": "Uveďte prosím, jaký obsah byl vygenerován pomocí umělé inteligence.",
+        "yes": "Prohlašuji, že při tvorbě tohoto filmového díla byl(y) použit(y) nástroj(e) umělé inteligence pro generování příběhu, scénáře, dabingu, titulků, nebo obrazové, či zvukové složky.",
+        "no": "Prohlašuji, že při tvorbě tohoto filmového díla NEbyl(y) použit(y) nástroj(e) umělé inteligence pro generování příběhu, scénáře, dabingu, titulků, nebo obrazové, či zvukové složky."
+      },
+      "hearAboutUs": "Jak jste se o nás dozvědeli?",
+      "hearAboutUsHelp": "Prosím, uveďte, jak jste se o nás dozvědeli. Můžete uvést sociální sítě, lidi, předměty laboratoře LEMMA, nebo další možné zdroje. Příklad: \"Před pár lety u vás byl kamarád kamaráda, a také jsem viděl/a příspěvek na Facebooku.\"",
       "cast": "Herci",
       "castHelp": "Přidejte herce, kteří hrají ve filmu. Ke každé osobě přidejte její jméno a jméno/roli její postavy (např. majordomus, matka, Jiří).",
       "crew": "Štáb",

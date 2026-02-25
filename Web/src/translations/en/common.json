@@ -60,6 +60,15 @@
       "update": "Save project"
     },
     "fields": {
+      "aiUsageDeclaration": {
+        "label": "Generative AI usage declaration",
+        "help": "According to the point 2.10 of the propositions of the Film Festival of the Faculty of Informatics of Masaryk University, the author of the film (the person responsible for its submission) is obligated to state whether and how were artificial intelligence tools used in its creation, especially if they replaced any creative activity.",
+        "text": "Please indicate what content was generated using artificial intelligence.",
+        "yes": "I declare that an artificial intelligence tool(s) was (were) used in the creation of this film work for generating a story, script, dubbing, subtitles, or an image or audio component.",
+        "no": "I declare that an artificial intelligence tool(s) was (were) NOT used in the creation of this film work for generating a story, script, dubbing, subtitles, or an image or audio component."
+      },
+      "hearAboutUs": "How did you find out about us?",
+      "hearAboutUsHelp": "Please indicate how did you find out about us. You can list social media, people, LEMMA laboratory courses, or other possible sources. Example: \"A friend of a friend attended few years ago, and I also saw a post on Facebook.\"",
       "cast": "Cast",
       "castHelp": "Add the actors in the film. For each person, enter their name and the name/role of their character (e.g. butler, mom, George).",
       "crew": "Crew",

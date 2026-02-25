@@ -264,9 +264,19 @@ public partial class ProjectService
         Kind: DiagnosticKind.Error,
         ValidationStage: InfoStage,
         Message: LocalizedString.Create(
-            (Const.InvariantCulture, "The project is missing an AI usage declaration."),
-            (Const.CzechCulture, "Projektu chybí prohlášení o použití umělé inteligence."),
-            (Const.SlovakCulture, "Projektu chýba vyhlásenie o použití umelej inteligencie.")
+            (Const.InvariantCulture, "The project is missing an generative AI usage declaration."),
+            (Const.CzechCulture, "Projektu chybí prohlášení o použití generativní umělé inteligence."),
+            (Const.SlovakCulture, "Projektu chýba vyhlásenie o použití generatívnej umelej inteligencie.")
+        )
+    );
+
+    public static readonly Diagnostic MissingAiUsageDeclarationText = new Diagnostic(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: InfoStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, "The project is missing a list of content in the generative AI usage declaration."),
+            (Const.CzechCulture, "Projektu chybí seznam obsahu v prohlášení o použití generativní umělé inteligence."),
+            (Const.SlovakCulture, "Projektu chýba zoznam obsahu vo vyhlásení o použití generatívnej umelej inteligencie.")
         )
     );
 
@@ -274,9 +284,9 @@ public partial class ProjectService
         Kind: DiagnosticKind.Error,
         ValidationStage: InfoStage,
         Message: LocalizedString.Create(
-            (Const.InvariantCulture, "The project is missing a \"Where did you hear about us?\" statement."),
-            (Const.CzechCulture, "Projektu chybí oznámení v kolonce \"Kde ste o nás slyšeli?\"."),
-            (Const.SlovakCulture, "Projektu chýba oznámenie v kolónke \"Kde ste o nás počuli?\".")
+            (Const.InvariantCulture, "The project is missing a \"How did you find out about us?\" statement."),
+            (Const.CzechCulture, "Projektu chybí oznámení v kolonce \"Jak jste se o nás dozvědeli?\"."),
+            (Const.SlovakCulture, "Projektu chýba oznámenie v kolónke \"Ako ste sa o nás dozvedeli?\".")
         )
     );
 
@@ -960,6 +970,10 @@ public partial class ProjectService
             if (string.IsNullOrEmpty(project.AiUsageDeclaration))
             {
                 diagnostics.Add(MissingAiUsageDeclaration);
+            }
+            else if (project.AiUsageDeclaration[0] == 'Y' && project.AiUsageDeclaration.Split(' ', StringSplitOptions.RemoveEmptyEntries).Length <= 1)
+            {
+                diagnostics.Add(MissingAiUsageDeclarationText);
             }
 
             if (string.IsNullOrEmpty(project.HearAboutUs))

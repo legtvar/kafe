@@ -950,7 +950,7 @@ public partial class ProjectService
             GenreTooShort
         );
 
-        if (true || project.ProjectGroupId == LemmaCurrentFilmFestivalProjectGroupId)
+        if (project.ProjectGroupId == LemmaCurrentFilmFestivalProjectGroupId)
         {
             if (project.Authors.Count(a => a.Kind == ProjectAuthorKind.Crew) < 1)
             {

@@ -183,7 +183,7 @@ export function ProjectBasicInfoForm({ project, onSubmit, status, update, noSelf
                         bg={bg}
                         mt={'1rem'}
                         placeholder={t('createProject.fields.aiUsageDeclaration.text').toString()}
-                        value={project.aiUsageDeclaration?.slice(2)}
+                        value={project.aiUsageDeclaration?.slice(3)}
                         onChange={(event) => forceUpdate(project.set('aiUsageDeclaration', "Y: " + event.target.value.trim()))}
                     />
                 }

@@ -10,7 +10,7 @@ interface ITextareaLimitedProps extends TextareaProps {
 export function TextareaLimited({ min, max, onChange, value, defaultValue, ...rest }: ITextareaLimitedProps) {
     const [stateValue, setvalue] = useState(defaultValue || value || '');
 
-    const tooLittle = min && (stateValue || '').toString().length < min;
+    const tooLittle = min !== undefined && (stateValue || '').toString().length < min;
 
     return (
         <>

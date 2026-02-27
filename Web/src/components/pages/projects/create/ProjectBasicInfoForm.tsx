@@ -167,10 +167,10 @@ export function ProjectBasicInfoForm({ project, onSubmit, status, update, noSelf
                     onChange={(value) => forceUpdate(project.set('aiUsageDeclaration', value))}
                     value={project.aiUsageDeclaration?.slice(0, 1)}>
                     <Stack direction='column'>
-                        <Radio value='Y'>
+                        <Radio value='Y' borderColor="gray.500">
                             <i>{t('createProject.fields.aiUsageDeclaration.yes').toString()}</i>
                         </Radio>
-                        <Radio value='N'>
+                        <Radio value='N' borderColor="gray.500">
                             <i>{t('createProject.fields.aiUsageDeclaration.no').toString()}</i>
                         </Radio>
                     </Stack>

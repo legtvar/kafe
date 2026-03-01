@@ -2873,7 +2873,7 @@
           },
           "arguments": {
             "type": "object",
-            "additionalProperties": { }
+            "additionalProperties": {}
           },
           "stackTrace": {
             "type": "string"
@@ -2968,7 +2968,7 @@
             "nullable": true
           }
         },
-        "additionalProperties": { }
+        "additionalProperties": {}
       },
       "LockRequestData": {
         "required": [
@@ -3973,6 +3973,14 @@
             },
             "nullable": true
           },
+          "aiUsageDeclaration": {
+            "type": "string",
+            "nullable": true
+          },
+          "hearAboutUs": {
+            "type": "string",
+            "nullable": true
+          },
           "crew": {
             "type": "array",
             "items": {
@@ -4121,6 +4129,14 @@
                 "nullable": true
               }
             },
+            "nullable": true
+          },
+          "aiUsageDeclaration": {
+            "type": "string",
+            "nullable": true
+          },
+          "hearAboutUs": {
+            "type": "string",
             "nullable": true
           },
           "globalPermissions": {
@@ -4305,6 +4321,14 @@
                 "nullable": true
               }
             },
+            "nullable": true
+          },
+          "aiUsageDeclaration": {
+            "type": "string",
+            "nullable": true
+          },
+          "hearAboutUs": {
+            "type": "string",
             "nullable": true
           },
           "crew": {

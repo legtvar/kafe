@@ -260,6 +260,36 @@ public partial class ProjectService
         )
     );
 
+    public static readonly Diagnostic MissingAiUsageDeclaration = new Diagnostic(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: InfoStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, "The project is missing an generative AI usage declaration."),
+            (Const.CzechCulture, "Projektu chybí prohlášení o použití generativní umělé inteligence."),
+            (Const.SlovakCulture, "Projektu chýba vyhlásenie o použití generatívnej umelej inteligencie.")
+        )
+    );
+
+    public static readonly Diagnostic MissingAiUsageDeclarationText = new Diagnostic(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: InfoStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, "The project is missing a list of content in the generative AI usage declaration."),
+            (Const.CzechCulture, "Projektu chybí seznam obsahu v prohlášení o použití generativní umělé inteligence."),
+            (Const.SlovakCulture, "Projektu chýba zoznam obsahu vo vyhlásení o použití generatívnej umelej inteligencie.")
+        )
+    );
+
+    public static readonly Diagnostic MissingHearAboutUs = new Diagnostic(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: InfoStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, "The project is missing a \"How did you find out about us?\" statement."),
+            (Const.CzechCulture, "Projektu chybí oznámení v kolonce \"Jak jste se o nás dozvědeli?\"."),
+            (Const.SlovakCulture, "Projektu chýba oznámenie v kolónke \"Ako ste sa o nás dozvedeli?\".")
+        )
+    );
+
     public static readonly Diagnostic MissingFilm = new Diagnostic(
         Kind: DiagnosticKind.Error,
         ValidationStage: FileStage,
@@ -935,6 +965,20 @@ public partial class ProjectService
             if (!LemmaMandatoryCrewRoles.IsSubsetOf(project.Authors.Select(a => a.Roles.ToImmutableHashSet()).SelectMany(roles => roles).ToImmutableHashSet()))
             {
                 diagnostics.Add(MissingMandatoryCrewRoles);
+            }
+
+            if (string.IsNullOrEmpty(project.AiUsageDeclaration))
+            {
+                diagnostics.Add(MissingAiUsageDeclaration);
+            }
+            else if (project.AiUsageDeclaration[0] == 'Y' && project.AiUsageDeclaration.Split(' ', StringSplitOptions.RemoveEmptyEntries).Length <= 1)
+            {
+                diagnostics.Add(MissingAiUsageDeclarationText);
+            }
+
+            if (string.IsNullOrEmpty(project.HearAboutUs))
+            {
+                diagnostics.Add(MissingHearAboutUs);
             }
         }
 

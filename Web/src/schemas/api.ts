@@ -1145,16 +1145,6 @@ export interface components {
       emailAddress?: string | null;
       permissions: components["schemas"]["Permission"][];
     };
-    EntityPermissionsEditFromCsvDto: {
-      /**
-       * Format: hrib
-       * @description Human-Readable Identifier Ballast
-       * @example AAAAbadf00d
-       */
-      id: string;
-      permissions?: components["schemas"]["Permission"][] | null;
-      csvFile: File;
-    };
     EntityPermissionsAccountListDto: {
       /**
        * Format: hrib
@@ -1555,6 +1545,8 @@ export interface components {
         cs?: string | null;
         sk?: string | null;
       }) | null;
+      aiUsageDeclaration?: string | null;
+      hearAboutUs?: string | null;
       crew: components["schemas"]["ProjectCreationAuthorDto"][];
       cast: components["schemas"]["ProjectCreationAuthorDto"][];
       isLocked: boolean;
@@ -1601,6 +1593,8 @@ export interface components {
         cs?: string | null;
         sk?: string | null;
       }) | null;
+      aiUsageDeclaration?: string | null;
+      hearAboutUs?: string | null;
       globalPermissions: components["schemas"]["Permission"][];
       userPermissions: components["schemas"]["Permission"][];
       /** Format: date-time */
@@ -1657,6 +1651,8 @@ export interface components {
         cs?: string | null;
         sk?: string | null;
       }) | null;
+      aiUsageDeclaration?: string | null;
+      hearAboutUs?: string | null;
       crew?: components["schemas"]["ProjectCreationAuthorDto"][] | null;
       cast?: components["schemas"]["ProjectCreationAuthorDto"][] | null;
       artifacts?: components["schemas"]["ProjectArtifactAdditionDto"][] | null;
@@ -1890,7 +1886,7 @@ export interface components {
       requiredGenreCultures?: string[] | null;
     };
     /** @enum {string} */
-    ReviewKind: "notReviewed" | "accepted" | "rejected" | "needsRevision";
+    ReviewKind: "notReviewed" | "accepted" | "rejected";
     RoleCreationDto: {
       /**
        * Format: hrib

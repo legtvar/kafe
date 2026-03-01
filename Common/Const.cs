@@ -266,4 +266,20 @@ Vaše KAFE
 
         return LocalizedString.CreateInvariant(cultureCode);
     }
+
+    public static T? MakeOverride<T>(T? @old, T? @new)
+    {
+        if (@old is null)
+        {
+            return @new;
+        }
+
+        if (@old.Equals(@new))
+        {
+            return default;
+        }
+
+        return @new;
+    }
+
 }

@@ -7,33 +7,25 @@ using System.Threading;
 using System.Threading.Tasks;
 using Swashbuckle.AspNetCore.Annotations;
 using Kafe.Data.Services;
-using System.Linq;
 
 namespace Kafe.Api.Endpoints.Role;
 
 [ApiVersion("1")]
 [Route("role")]
 [Authorize]
-public class RoleEditEndpoint : EndpointBaseAsync
+public class RoleEditEndpoint(
+    RoleService roleService,
+    IAuthorizationService authorizationService
+) : EndpointBaseAsync
     .WithRequest<RoleEditDto>
     .WithActionResult<Hrib>
 {
-    private readonly RoleService roleService;
-    private readonly IAuthorizationService authorizationService;
-
-    public RoleEditEndpoint(
-        RoleService roleService,
-        IAuthorizationService authorizationService)
-    {
-        this.roleService = roleService;
-        this.authorizationService = authorizationService;
-    }
-
     [HttpPatch]
-    [SwaggerOperation(Tags = new[] { EndpointArea.Role })]
+    [SwaggerOperation(Tags = [EndpointArea.Role])]
     public override async Task<ActionResult<Hrib>> HandleAsync(
         RoleEditDto dto,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         var auth = await authorizationService.AuthorizeAsync(User, dto.Id, EndpointPolicy.Write);
         if (!auth.Succeeded)
@@ -41,12 +33,13 @@ public class RoleEditEndpoint : EndpointBaseAsync
             return Unauthorized();
         }
 
-        var old = await roleService.Load(dto.Id, cancellationToken);
-        if (old is null)
+        var oldErr = await roleService.Load(dto.Id, cancellationToken);
+        if (oldErr.HasError)
         {
-            return NotFound();
+            return this.KafeErrorResult(oldErr.Diagnostic);
         }
 
+        var old = oldErr.Value;
         var @new = old with
         {
             Name = dto.Name ?? old.Name,

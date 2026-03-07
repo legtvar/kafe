@@ -168,7 +168,7 @@ public static class MartenExtensions
             if (entities.Length != ids.Count)
             {
                 var missingIds = ids.Except(entities.Select(e => e.Id)).ToImmutableArray();
-                var notFoundErrors = Kafe.Diagnostic.Aggregate(
+                var notFoundErrors = Diagnostic.Aggregate(
                     missingIds.Select(id => new NotFoundDiagnostic(
                             EntityType: typeof(T),
                             Id: id

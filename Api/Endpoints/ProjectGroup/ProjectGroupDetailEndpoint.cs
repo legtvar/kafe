@@ -1,7 +1,6 @@
 using Ardalis.ApiEndpoints;
 using Asp.Versioning;
 using Kafe.Api.Transfer;
-using Marten;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading;
@@ -16,37 +15,26 @@ namespace Kafe.Api.Endpoints.ProjectGroup;
 
 [ApiVersion("1")]
 [Route("project-group/{id}")]
-public class ProjectGroupDetailEndpoint : EndpointBaseAsync
-    .WithRequest<string>
-    .WithActionResult<ProjectGroupDetailDto>
+public class ProjectGroupDetailEndpoint(
+    ProjectGroupService projectGroupService,
+    ProjectService projectService,
+    ArtifactService artifactService,
+    IAuthorizationService authorizationService,
+    UserProvider userProvider,
+    EntityService entityService
+)
+    : EndpointBaseAsync
+        .WithRequest<string>
+        .WithActionResult<ProjectGroupDetailDto>
 {
-    private readonly ProjectGroupService projectGroupService;
-    private readonly ProjectService projectService;
-    private readonly IAuthorizationService authorizationService;
-    private readonly UserProvider userProvider;
-    private readonly EntityService entityService;
-
-    public ProjectGroupDetailEndpoint(
-        ProjectGroupService projectGroupService,
-        ProjectService projectService,
-        IAuthorizationService authorizationService,
-        UserProvider userProvider,
-        EntityService entityService)
-    {
-        this.projectGroupService = projectGroupService;
-        this.projectService = projectService;
-        this.authorizationService = authorizationService;
-        this.userProvider = userProvider;
-        this.entityService = entityService;
-    }
-
     [HttpGet]
-    [SwaggerOperation(Tags = new[] { EndpointArea.ProjectGroup })]
+    [SwaggerOperation(Tags = [EndpointArea.ProjectGroup])]
     [ProducesResponseType(typeof(ProjectGroupDetailDto), 200)]
     [ProducesResponseType(404)]
     public override async Task<ActionResult<ProjectGroupDetailDto>> HandleAsync(
         string id,
-        CancellationToken cancellationToken = default)
+        CancellationToken ct = default
+    )
     {
         var auth = await authorizationService.AuthorizeAsync(User, id, EndpointPolicy.Read);
         if (!auth.Succeeded)
@@ -54,30 +42,55 @@ public class ProjectGroupDetailEndpoint : EndpointBaseAsync
             return Unauthorized();
         }
 
-        var projectGroup = await projectGroupService.Load(id, cancellationToken);
-        if (projectGroup is null)
+        var projectGroupErr = await projectGroupService.Load(id, ct);
+        if (projectGroupErr.HasError)
         {
-            return NotFound();
+            return this.KafeErrResult(projectGroupErr);
         }
 
+        var projectGroup = projectGroupErr.Value;
         var dto = TransferMaps.ToProjectGroupDetailDto(projectGroup);
 
         if (auth.Succeeded)
         {
             var projects = await projectService.List(
-                new(ProjectGroupId: projectGroup.Id, AccessingAccountId: userProvider.AccountId),
-                token: cancellationToken);
+                new ProjectService.ProjectFilter(
+                    ProjectGroupId: projectGroup.Id,
+                    AccessingAccountId: userProvider.AccountId
+                ),
+                token: ct
+            );
             var projectPerms = await entityService.GetPermissions(
-                projects.Select(p => (Hrib)p.Id),
+                [..projects.Select(p => (Hrib)p.Id)],
                 userProvider.AccountId,
-                cancellationToken);
+                ct
+            );
+            var artifactsErr = await artifactService.LoadMany(
+                [..projects.Select(p => p.ArtifactId).OfType<string>()],
+                ct
+            );
+            if (artifactsErr.HasError)
+            {
+                return this.KafeErrResult(artifactsErr);
+            }
+
+            var artifacts = artifactsErr.Value.ToImmutableDictionary(a => a.Id);
             var preferredCulture = userProvider.Account?.PreferredCulture ?? Const.InvariantCultureCode;
             dto = dto with
             {
-                Projects = projects.Zip(projectPerms)
-                    .OrderBy(p => ((LocalizedString)p.First.Name)[preferredCulture])
-                    .Select(p => TransferMaps.ToProjectListDto(p.First, p.Second))
-                    .ToImmutableArray()
+                Projects =
+                [
+                    ..projects.Zip(projectPerms)
+                        .Select(p => TransferMaps.ToProjectListDto(
+                                data: p.First,
+                                artifact: p.First.ArtifactId is not null
+                                    ? artifacts[p.First.ArtifactId]
+                                    : null,
+                                userPermission: p.Second
+                            )
+                        )
+                        .OrderBy(p => p.Name[preferredCulture])
+                ]
             };
         }
 

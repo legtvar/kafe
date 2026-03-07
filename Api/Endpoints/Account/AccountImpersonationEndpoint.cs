@@ -14,33 +14,24 @@ namespace Kafe.Api.Endpoints.Account;
 [Route("account/impersonate/{id}")]
 [Authorize(EndpointPolicy.Write)]
 
-public class AccountImpersonationEndpoint : EndpointBaseAsync
-    .WithRequest<string>
-    .WithActionResult
+public class AccountImpersonationEndpoint(
+    AccountService accountService,
+    UserProvider userProvider
+) : EndpointBaseAsync
+        .WithRequest<string>
+        .WithActionResult
 {
-    private readonly AccountService accountService;
-    private readonly UserProvider userProvider;
-
-    public AccountImpersonationEndpoint(
-        AccountService accountService,
-        UserProvider userProvider
-    )
-    {
-        this.accountService = accountService;
-        this.userProvider = userProvider;
-    }
-
     [HttpGet]
-    [SwaggerOperation(Tags = new[] { EndpointArea.Account })]
+    [SwaggerOperation(Tags = [EndpointArea.Account])]
     public override async Task<ActionResult> HandleAsync(string id, CancellationToken token = default)
     {
-        var account = await accountService.Load((Hrib)id, token);
-        if (account is null)
+        var account = await accountService.Load(id, token);
+        if (account.HasError)
         {
             return NotFound();
         }
 
-        await userProvider.SignIn(account);
+        await userProvider.SignIn(account.Value);
         return Ok();
     }
 }

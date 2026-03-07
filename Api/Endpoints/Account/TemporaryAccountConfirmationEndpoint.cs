@@ -1,21 +1,10 @@
 ﻿using Ardalis.ApiEndpoints;
 using Asp.Versioning;
-using Kafe.Api.Options;
 using Kafe.Api.Services;
-using Kafe.Api.Transfer;
 using Kafe.Data.Services;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.Annotations;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Security.Claims;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -23,25 +12,16 @@ namespace Kafe.Api.Endpoints.Account;
 
 [ApiVersion("1")]
 [Route("tmp-account/{token}")]
-public class TemporaryAccountConfirmationEndpoint : EndpointBaseAsync
-    .WithRequest<string>
-    .WithActionResult
+public class TemporaryAccountConfirmationEndpoint(
+    AccountService accountService,
+    UserProvider userProvider,
+    IDataProtectionProvider dataProtectionProvider
+) : EndpointBaseAsync
+        .WithRequest<string>
+        .WithActionResult
 {
-    private readonly AccountService accountService;
-    private readonly UserProvider userProvider;
-    private readonly IDataProtector dataProtector;
+    private readonly IDataProtector dataProtector = dataProtectionProvider.CreateProtector(Const.TemporaryAccountPurpose);
 
-
-    public TemporaryAccountConfirmationEndpoint(
-        AccountService accountService,
-        UserProvider userProvider,
-        IDataProtectionProvider dataProtectionProvider
-    )
-    {
-        this.accountService = accountService;
-        this.userProvider = userProvider;
-        this.dataProtector = dataProtectionProvider.CreateProtector(Const.TemporaryAccountPurpose);
-    }
 
     [HttpGet]
     [SwaggerOperation(Tags = [EndpointArea.Account])]
@@ -63,7 +43,7 @@ public class TemporaryAccountConfirmationEndpoint : EndpointBaseAsync
             ticketId.Value,
             ct: ct
         );
-        if (account.HasErrors)
+        if (account.HasError)
         {
             // NB: we disregard any specific information about the errors for security reasons
             return Unauthorized();

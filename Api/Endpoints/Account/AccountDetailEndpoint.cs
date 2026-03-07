@@ -15,26 +15,16 @@ namespace Kafe.Api.Endpoints.Account;
 [Route("account")]
 [Route("account/{id}")]
 [Authorize]
-public class AccountDetailEndpoint : EndpointBaseAsync
-    .WithRequest<string?>
-    .WithActionResult<AccountDetailDto?>
+public class AccountDetailEndpoint(
+    AccountService accounts,
+    IAuthorizationService authorization,
+    UserProvider userProvider
+) : EndpointBaseAsync
+        .WithRequest<string?>
+        .WithActionResult<AccountDetailDto?>
 {
-    private readonly AccountService accountService;
-    private readonly IAuthorizationService authorization;
-    private readonly UserProvider userProvider;
-
-    public AccountDetailEndpoint(
-        AccountService accounts,
-        IAuthorizationService authorization,
-        UserProvider userProvider)
-    {
-        this.accountService = accounts;
-        this.authorization = authorization;
-        this.userProvider = userProvider;
-    }
-
     [HttpGet]
-    [SwaggerOperation(Tags = new[] { EndpointArea.Account })]
+    [SwaggerOperation(Tags = [EndpointArea.Account])]
     [ProducesResponseType(200)]
     [ProducesResponseType(400)]
     [ProducesResponseType(404)]
@@ -44,13 +34,13 @@ public class AccountDetailEndpoint : EndpointBaseAsync
     {
         id ??= userProvider.AccountId.ToString();
 
-        if (id is null)
+        if (id == Hrib.EmptyValue)
         {
             return NotFound();
         }
 
-        var account = await accountService.Load((Hrib)id, token);
-        if (account is null)
+        var account = await accounts.Load(id, token);
+        if (account.HasError)
         {
             return NotFound();
         }
@@ -61,6 +51,6 @@ public class AccountDetailEndpoint : EndpointBaseAsync
             return Unauthorized();
         }
 
-        return TransferMaps.ToAccountDetailDto(account);
+        return TransferMaps.ToAccountDetailDto(account.Value);
     }
 }

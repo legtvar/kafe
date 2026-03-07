@@ -7,7 +7,8 @@ namespace Kafe.Api.Transfer;
 public record ShardListDto(
     Hrib Id,
     ShardKind Kind,
-    ImmutableArray<string> Variants);
+    ImmutableArray<string> Variants
+);
 
 [SwaggerDiscriminator("kind")]
 [SwaggerSubType(typeof(VideoShardDetailDto), DiscriminatorValue = nameof(ShardKind.Video))]
@@ -15,7 +16,8 @@ public record ShardListDto(
 public abstract record ShardDetailBaseDto(
     Hrib Id,
     ShardKind Kind,
-    Hrib ArtifactId);
+    Hrib ArtifactId
+);
 
 public record VideoShardDetailDto(
     Hrib Id,
@@ -48,7 +50,8 @@ public record BlendShardDetailDto(
 
 public record ShardCreationDto(
     ShardKind Kind,
-    Hrib ArtifactId);
+    Hrib ArtifactId
+);
 
 public record ShardVariantMediaTypeDto(
     Hrib ShardId,

@@ -179,34 +179,39 @@ public static class TransferMaps
         );
     }
 
-    public static ArtifactDetailDto ToArtifactDetailDto(ArtifactDetail data)
+    public static ArtifactDetailDto ToArtifactDetailDto(ArtifactInfo data)
     {
         return new ArtifactDetailDto(
             Id: data.Id,
             Name: data.Name,
-            Shards: [..data.Shards.Select(ToShardListDto)],
-            ContainingProjectIds: [..data.ContainingProjectIds.Select(i => (Hrib)i)],
+            Shards: [],
+            ContainingProjectIds: [],
             AddedOn: data.AddedOn
         );
     }
 
-    public static ProjectArtifactDto ToProjectArtifactDto(ArtifactDetail data)
+    public static ProjectArtifactDto ToProjectArtifactDto(ArtifactInfo data)
     {
         return new ProjectArtifactDto(
             Id: data.Id,
             Name: data.Name,
             AddedOn: data.AddedOn,
             BlueprintSlot: null,
-            Shards: data.Shards.Select(ToShardListDto).ToImmutableArray()
+            Shards: []
         );
     }
 
-    public static ShardListDto ToShardListDto(ArtifactShardInfo data)
+    public static ShardListDto ToShardListDto(ShardInfo data)
     {
         return new ShardListDto(
-            Id: data.ShardId,
-            Kind: data.Kind,
-            Variants: data.Variants.ToImmutableArray());
+            Id: data.Id,
+            Kind: ShardCompat.ToShardKind(data.Payload.Value.GetType()),
+            Variants: [..data.Links.Select(l => l.Payload.Value)
+                .OfType<VariantShardLink>()
+                .Select(v => v.Preset)
+                .OfType<string>()
+            ]
+        );
     }
 
     public static VideoShardDetailDto ToVideoShardDetailDto(VideoShardInfo data)

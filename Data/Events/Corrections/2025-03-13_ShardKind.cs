@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Immutable;
+using Kafe.Data.Aggregates;
 using Kafe.Media.Deprecated;
 
 namespace Kafe.Data
@@ -14,6 +15,25 @@ namespace Kafe.Data
         Image = 2,
         Subtitles = 3,
         Blend = 4
+    }
+
+    [Obsolete("Use the new universal shard events instead.")]
+    public static class ShardCompat
+    {
+        public static ShardKind ToShardKind(Type shardPayloadType)
+        {
+            // NB: Switch on FullName because Data doesn't (and shouldn't) reference Data and Mate.
+            return shardPayloadType.FullName switch
+            {
+                "Kafe.Media.MediaInfo" => ShardKind.Video,
+                "Kafe.Media.ImageInfo" => ShardKind.Image,
+                "Kafe.Media.SubtitlesInfo" => ShardKind.Subtitles,
+                "Kafe.Mate.BlendInfo" => ShardKind.Blend,
+                _ => throw new NotSupportedException(
+                    $"Cannot convert '{shardPayloadType.FullName}' cannot be converted to ShardKind."
+                )
+            };
+        }
     }
 }
 
@@ -32,20 +52,23 @@ namespace Kafe.Media.Deprecated
         long Bitrate,
         int Width,
         int Height,
-        double Framerate);
+        double Framerate
+    );
 
     [Obsolete("Use `Kafe.Media.AudioStreamInfo` instead.")]
     public record AudioStreamInfo(
         string Codec,
         long Bitrate,
         int Channels,
-        int SampleRate);
+        int SampleRate
+    );
 
     [Obsolete("Use `Kafe.Media.SubtitleStreamInfo` instead.")]
     public record SubtitleStreamInfo(
         string? Language,
         string Codec,
-        long Bitrate);
+        long Bitrate
+    );
 
     [Obsolete("Use `Kafe.Media.MediaInfo` instead.")]
     public record MediaInfo(
@@ -79,7 +102,8 @@ namespace Kafe.Media.Deprecated
         string? Language,
         string Codec,
         long Bitrate,
-        bool IsCorrupted);
+        bool IsCorrupted
+    );
 }
 
 namespace Kafe.Data.Aggregates
@@ -95,10 +119,13 @@ namespace Kafe.Data.Aggregates
 
     [Obsolete("Use the new universal ShardInfo projection instead.")]
     public abstract record ShardInfoBase(
-        [Hrib] string Id,
+        [Hrib]
+        string Id,
         CreationMethod CreationMethod,
-        [Hrib] string ArtifactId,
-        DateTimeOffset CreatedAt) : IShardEntity
+        [Hrib]
+        string ArtifactId,
+        DateTimeOffset CreatedAt
+    ) : IShardEntity
     {
         public abstract ShardKind Kind { get; }
 
@@ -107,10 +134,12 @@ namespace Kafe.Data.Aggregates
 
     [Obsolete("Use the new universal ShardInfo projection instead.")]
     public record VideoShardInfo(
-        [Hrib] string Id,
+        [Hrib]
+        string Id,
         CreationMethod CreationMethod,
         DateTimeOffset CreatedAt,
-        [Hrib] string ArtifactId,
+        [Hrib]
+        string ArtifactId,
         ImmutableDictionary<string, MediaInfo> Variants
     ) : ShardInfoBase(Id, CreationMethod, ArtifactId, CreatedAt)
     {
@@ -119,9 +148,11 @@ namespace Kafe.Data.Aggregates
 
     [Obsolete("Use the new universal ShardInfo projection instead.")]
     public record ImageShardInfo(
-        [Hrib] string Id,
+        [Hrib]
+        string Id,
         CreationMethod CreationMethod,
-        [Hrib] string ArtifactId,
+        [Hrib]
+        string ArtifactId,
         DateTimeOffset CreatedAt,
         ImmutableDictionary<string, ImageInfo> Variants
     ) : ShardInfoBase(Id, CreationMethod, ArtifactId, CreatedAt)
@@ -131,9 +162,11 @@ namespace Kafe.Data.Aggregates
 
     [Obsolete("Use the new universal ShardInfo projection instead.")]
     public record SubtitlesShardInfo(
-        [Hrib] string Id,
+        [Hrib]
+        string Id,
         CreationMethod CreationMethod,
-        [Hrib] string ArtifactId,
+        [Hrib]
+        string ArtifactId,
         DateTimeOffset CreatedAt,
         ImmutableDictionary<string, SubtitlesInfo> Variants
     ) : ShardInfoBase(Id, CreationMethod, ArtifactId, CreatedAt)
@@ -143,11 +176,13 @@ namespace Kafe.Data.Aggregates
 
     [Obsolete("Use the new universal ShardInfo projection instead.")]
     public record BlendShardInfo(
-        [Hrib] string Id,
+        [Hrib]
+        string Id,
         string? FileName,
         CreationMethod CreationMethod,
         DateTimeOffset CreatedAt,
-        [Hrib] string ArtifactId,
+        [Hrib]
+        string ArtifactId,
         ImmutableDictionary<string, BlendInfo> Variants
     ) : ShardInfoBase(Id, CreationMethod, ArtifactId, CreatedAt)
     {

@@ -38,10 +38,10 @@ public class UserSeedData(
 
         foreach (var account in options.Value.Accounts)
         {
-            var data = await accountService.FindByEmail(account.EmailAddress, token);
-            if (data is null)
+            var dataErr = await accountService.FindByEmail(account.EmailAddress, token);
+            if (dataErr.HasError)
             {
-                data = (await accountService.Create(
+                dataErr = (await accountService.Create(
                     AccountInfo.Create(account.EmailAddress, account.PreferredCulture),
                     token: token
                 )).Unwrap();
@@ -49,6 +49,7 @@ public class UserSeedData(
                 logger.LogInformation("Seed account '{AccountEmailAddress}' created.", account.EmailAddress);
             }
 
+            var data = dataErr.Value;
             if (account.Permissions is not null)
             {
                 var missingPermissions = account.Permissions

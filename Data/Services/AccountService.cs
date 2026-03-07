@@ -18,7 +18,6 @@ using Marten.Events;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
-using Marten.Linq.SoftDeletes;
 using Kafe.Data.Diagnostics;
 
 namespace Kafe.Data.Services;
@@ -43,11 +42,22 @@ public class AccountService(
         return await db.KafeLoadAsync<AccountInfo>(id, token);
     }
 
-    public async Task<AccountInfo?> FindByEmail(string emailAddress, CancellationToken token = default)
+    public async Task<Err<AccountInfo>> FindByEmail(string emailAddress, CancellationToken ct = default)
     {
-        return await db.Query<AccountInfo>()
+        if (!IsValidEmailAddress(emailAddress))
+        {
+            return Err.Fail(new BadEmailAddressDiagnostic(emailAddress));
+        }
+
+        var account = await db.Query<AccountInfo>()
             .Where(a => a.EmailAddress == emailAddress)
-            .SingleOrDefaultAsync(token: token);
+            .SingleOrDefaultAsync(ct);
+        if (account is null)
+        {
+            return Err.Fail(new AccountEmailNotFoundDiagnostic(emailAddress));
+        }
+
+        return account;
     }
 
     public async Task<AccountInfo?> FindByUco(string uco, CancellationToken token = default)
@@ -433,9 +443,14 @@ public class AccountService(
         var uco = principal.FindFirst(PreferredUsernameClaim)?.Value;
         var identityProvider = emailClaim.Issuer;
 
-        var existing = await FindByEmail(emailClaim.Value, token);
-        if (existing is not null
-            && existing.Kind == AccountKind.External
+        var existingErr = await FindByEmail(emailClaim.Value, token);
+        if (existingErr.HasError)
+        {
+            return existingErr;
+        }
+
+        var existing = existingErr.Value;
+        if (existing.Kind == AccountKind.External
             && existing.IdentityProvider == identityProvider
             && existing.Name == name
             && existing.Uco == uco
@@ -484,7 +499,13 @@ public class AccountService(
             return Err.Fail(new BadEmailAddressDiagnostic(emailAddress)).ForParameter(nameof(emailAddress));
         }
 
-        var existingAccount = await FindByEmail(emailAddress, ct);
+        var existingErr = await FindByEmail(emailAddress, ct);
+        if (existingErr.HasError)
+        {
+            return existingErr.Diagnostic;
+        }
+
+        var existingAccount = existingErr.Value;
         var existingInvite = await FindInviteByEmail(emailAddress, ct);
 
         preferredCulture ??= existingAccount?.PreferredCulture

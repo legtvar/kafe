@@ -1,5 +1,4 @@
-﻿using Kafe.Api.Transfer;
-using Kafe.Data;
+﻿using Kafe.Data;
 using Kafe.Data.Aggregates;
 using Kafe.Data.Services;
 using Marten;
@@ -9,7 +8,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,8 +18,7 @@ public class UserProvider(
     IHttpContextAccessor contextAccessor,
     EntityService entityService,
     AccountService accountService,
-    ILogger<UserProvider> logger,
-    IQuerySession query
+    ILogger<UserProvider> logger
 )
 {
     public AccountInfo? Account { get; private set; }
@@ -40,19 +37,22 @@ public class UserProvider(
     public async Task<bool> HasPermission(
         Hrib entityId,
         Permission permission,
-        CancellationToken token = default)
+        CancellationToken token = default
+    )
     {
         var effectivePermission = await entityService.GetPermission(
             entityId,
             AccountId,
-            token);
+            token
+        );
         return (effectivePermission & permission) == permission;
     }
 
     public Task<bool> HasPermission(
         IEntity entity,
         Permission permission,
-        CancellationToken token = default)
+        CancellationToken token = default
+    )
     {
         return HasPermission(entity.Id, permission, token);
     }
@@ -73,14 +73,8 @@ public class UserProvider(
             return;
         }
 
-        var account = await accountService.Load(id, token: token);
-        if (account is null)
-        {
-            throw new IndexOutOfRangeException($"Account with id '{id}' does not exist.");
-        }
-
+        var account = (await accountService.Load(id, token: token)).Unwrap();
         logger.LogDebug("Account '{AccountEmailAddress}' ({AccountId}) found.", account.EmailAddress, account.Id);
-
         Account = account;
     }
 
@@ -105,7 +99,8 @@ public class UserProvider(
         await contextAccessor.HttpContext.SignInAsync(
             CookieAuthenticationDefaults.AuthenticationScheme,
             principal,
-            authProperties);
+            authProperties
+        );
         Account = account;
     }
 

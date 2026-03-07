@@ -8,12 +8,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using Ardalis.ApiEndpoints;
 using Asp.Versioning;
+using Kafe.Api.Diagnostics;
 using Kafe.Api.Options;
 using Kafe.Api.Services;
 using Kafe.Api.Transfer;
+using Kafe.Core.Diagnostics;
 using Kafe.Data.Aggregates;
 using Kafe.Data.Services;
-using Kafe.Data; // Add this to import Permission type
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -78,9 +79,7 @@ public class EntityPermissionsEditFromCsvEndpoint(
         var ucoList = GetUcosFromCsv(dto.CsvFile);
         if (ucoList is null)
         {
-            return this.KafeErrorResult(
-                Error.InvalidValue("CSV file is not in the correct format.")
-            );
+            return this.KafeErrorResult(Diagnostic.Fail(new BadCsvDiagnostic()));
         }
 
         // NB: Npgsql does not allow multiple queries per connection.
@@ -91,7 +90,7 @@ public class EntityPermissionsEditFromCsvEndpoint(
             var account = await accountService.FindByUco(uco, ct);
             if (account is null)
             {
-                if (dto.Permissions != null && dto.Permissions.Count > 0)
+                if (dto.Permissions is { Count: > 0 })
                 {
                     var possibleEmailAddress = $"{uco}@mail.muni.cz";
                     notFoundAccounts.Add(possibleEmailAddress);
@@ -99,23 +98,21 @@ public class EntityPermissionsEditFromCsvEndpoint(
             }
             else
             {
-                EntityPermissionsAccountEditDto accountPermissions = new(
+                var accountPermissions = new EntityPermissionsAccountEditDto(
                     Id: account.Id,
                     EmailAddress: account.EmailAddress,
-                    Permissions: dto.Permissions != null ? dto.Permissions.ToImmutableArray() : ImmutableArray<Permission>.Empty
+                    Permissions: [..dto.Permissions ?? []]
                 );
                 accounts.Add((dto: accountPermissions, entity: account));
             }
         }
-        
+
         foreach (var emailAddress in notFoundAccounts)
         {
             if (string.IsNullOrWhiteSpace(emailAddress)
                 || !AccountService.IsValidEmailAddress(emailAddress))
             {
-                return this.KafeErrorResult(
-                    Error.InvalidValue($"String '{emailAddress}' is not a valid email address.")
-                );
+                return this.KafeErrorResult(Diagnostic.Fail(new AccountEmailNotFoundDiagnostic(emailAddress)));
             }
         }
 
@@ -149,12 +146,10 @@ public class EntityPermissionsEditFromCsvEndpoint(
                 inviterAccountId: userProvider.AccountId,
                 ct: ct
             );
-            if (invite.HasErrors)
+            if (invite.HasError)
             {
-                return this.KafeErrorResult(invite.Errors);
+                return this.KafeErrorResult(invite.Diagnostic);
             }
-
-            
 
             var externalLoginUrl = linkGenerator.GetUriByAction(
                 httpContext: HttpContext,
@@ -166,10 +161,16 @@ public class EntityPermissionsEditFromCsvEndpoint(
                     version = "1"
                 }
             );
-            var inviter = await accountService.Load(userProvider.AccountId, ct);
-            var invitation = inviter?.Name != null
-            ? string.Format(Const.InvitationTemplate[Const.InvariantCulture], inviter.Name) 
-            : Const.InvitationGenericTemplate[Const.InvariantCulture];
+            var inviterErr = await accountService.Load(userProvider.AccountId, ct);
+            if (inviterErr.HasError)
+            {
+                return this.KafeErrorResult(inviterErr.Diagnostic);
+            }
+
+            var inviter = inviterErr.Value;
+            var invitation = inviter.Name != null
+                ? string.Format(Const.InvitationTemplate[Const.InvariantCulture], inviter.Name)
+                : Const.InvitationGenericTemplate[Const.InvariantCulture];
             var emailSubject = Const.InvitationEmailSubject[Const.InvariantCulture]!;
             var emailMessage = string.Format(
                 Const.InvitationEmailMessageTemplate[Const.InvariantCulture]!,
@@ -214,7 +215,7 @@ public class EntityPermissionsEditFromCsvEndpoint(
                 }
                 else
                 {
-                    return null;        
+                    return null;
                 }
             }
 

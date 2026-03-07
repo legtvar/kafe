@@ -10,6 +10,7 @@ using Asp.Versioning;
 using Kafe.Api.Options;
 using Kafe.Api.Services;
 using Kafe.Api.Transfer;
+using Kafe.Core.Diagnostics;
 using Kafe.Data.Aggregates;
 using Kafe.Data.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -79,7 +80,8 @@ public class EntityPermissionsEditEndpoint(
         }
 
         // NB: Npgsql does not allow multiple queries per connection.
-        var accounts = new List<(EntityPermissionsAccountEditDto dto, AccountInfo? entity)>(accountPermissions.Length);
+        var accounts =
+            new List<(EntityPermissionsAccountEditDto dto, Err<AccountInfo> entity)>(accountPermissions.Length);
         foreach (var accountPerm in accountPermissions)
         {
             var account = accountPerm.Id is not null
@@ -88,24 +90,23 @@ public class EntityPermissionsEditEndpoint(
             accounts.Add((dto: accountPerm, entity: account));
         }
 
-        var notFoundAccounts = accounts.Where(a => a.entity is null).ToImmutableArray();
-        foreach (var account in notFoundAccounts)
+        var unrecoverableErrors = accounts
+            .Where(a => a.entity is { HasError: true, Diagnostic.Payload: not NotFoundDiagnostic })
+            .Select(a => a.entity.Diagnostic)
+            .ToImmutableArray();
+        if (unrecoverableErrors.Length > 0)
         {
-            if (string.IsNullOrWhiteSpace(account.dto.EmailAddress)
-                || !AccountService.IsValidEmailAddress(account.dto.EmailAddress))
-            {
-                return this.KafeErrorResult(
-                    Error.InvalidValue($"String '{account.dto.EmailAddress}' is not a valid email address.")
-                );
-            }
+            return this.KafeErrorResult(Diagnostic.Aggregate(unrecoverableErrors));
         }
 
-        foreach (var account in accounts.Where(a => a.entity is not null))
+        // set permissions for found accounts
+        foreach (var account in accounts.Where(a => a.entity is { HasError: false }))
         {
             await entityService.SetPermissions(
                 dto.Id,
                 TransferMaps.FromPermissionArray(account.dto.Permissions),
-                account.entity!.Id,
+                // NB: Must be non-null because they were all found.
+                account.entity.Value!.Id,
                 ct
             );
         }
@@ -113,14 +114,17 @@ public class EntityPermissionsEditEndpoint(
         if (dto.GlobalPermissions is not null)
         {
             await entityService.SetPermissions(
-                entityId: (Hrib)dto.Id,
+                entityId: dto.Id,
                 permissions: TransferMaps.FromPermissionArray(dto.GlobalPermissions),
                 accessingAccountId: Hrib.Empty, // sets global permissions
                 token: ct
             );
         }
 
-        foreach (var account in notFoundAccounts)
+        // set invites for nonexistent accounts
+        foreach (var account in accounts.Where(a => a.entity is
+                { HasError: true, Diagnostic.Payload: NotFoundDiagnostic }
+            ))
         {
             if (account.dto.EmailAddress is null)
             {
@@ -130,8 +134,9 @@ public class EntityPermissionsEditEndpoint(
             var invite = await accountService.UpsertInvite(
                 invite: InviteInfo.Create(account.dto.EmailAddress.Trim()) with
                 {
-                    Permissions = ImmutableDictionary.CreateRange<string, InvitePermissionEntry>([
-                            new(
+                    Permissions = ImmutableDictionary.CreateRange<string, InvitePermissionEntry>(
+                        [
+                            new KeyValuePair<string, InvitePermissionEntry>(
                                 dto.Id.ToString(),
                                 new InvitePermissionEntry(
                                     EntityId: dto.Id.ToString(),
@@ -145,9 +150,9 @@ public class EntityPermissionsEditEndpoint(
                 inviterAccountId: userProvider.AccountId,
                 ct: ct
             );
-            if (invite.HasErrors)
+            if (invite.HasError)
             {
-                return this.KafeErrorResult(invite.Errors);
+                return this.KafeErrorResult(invite.Diagnostic);
             }
 
             // TODO: allow inviting users with a specific culture
@@ -156,9 +161,9 @@ public class EntityPermissionsEditEndpoint(
                 preferredCulture: null,
                 ct: ct
             );
-            if (ticket.HasErrors)
+            if (ticket.HasError)
             {
-                return this.KafeErrorResult(ticket.Errors);
+                return this.KafeErrorResult(ticket.Diagnostic);
             }
 
             var confirmationToken = accountService.EncodeLoginTicketId(ticket.Value.Id);

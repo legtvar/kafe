@@ -96,6 +96,7 @@ public sealed class CoreMod : IMod
         c.AddDiagnosticPayload<ParameterDiagnostic>();
         c.AddDiagnosticPayload<BadHribDiagnostic>();
 
+        c.AddDiagnosticPayload<AccountEmailNotFoundDiagnostic>();
         c.AddDiagnosticPayload<AlreadyExistsDiagnostic>();
         c.AddDiagnosticPayload<BadEmailAddressDiagnostic>();
         c.AddDiagnosticPayload<BadKafeTypeDiagnostic>();

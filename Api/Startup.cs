@@ -362,6 +362,7 @@ public partial class Startup
                 o.AddMod<DataMod>();
                 o.AddMod<MediaMod>();
                 o.AddMod<MateMod>();
+                o.AddMod<ApiMod>();
             }
         );
 

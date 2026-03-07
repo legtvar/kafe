@@ -2,7 +2,6 @@
 using Asp.Versioning;
 using Kafe.Api.Services;
 using Kafe.Data.Services;
-using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Threading;
@@ -14,14 +13,9 @@ namespace Kafe.Api.Endpoints.Account;
 [Route("tmp-account/{token}")]
 public class TemporaryAccountConfirmationEndpoint(
     AccountService accountService,
-    UserProvider userProvider,
-    IDataProtectionProvider dataProtectionProvider
-) : EndpointBaseAsync
-        .WithRequest<string>
-        .WithActionResult
+    UserProvider userProvider
+) : EndpointBaseAsync.WithRequest<string>.WithActionResult
 {
-    private readonly IDataProtector dataProtector = dataProtectionProvider.CreateProtector(Const.TemporaryAccountPurpose);
-
 
     [HttpGet]
     [SwaggerOperation(Tags = [EndpointArea.Account])]

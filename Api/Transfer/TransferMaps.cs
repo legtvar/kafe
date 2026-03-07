@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using Kafe.Data;
 using Kafe.Data.Aggregates;
+using Kafe.Mate;
 using Kafe.Media;
 
 namespace Kafe.Api.Transfer;
@@ -342,15 +343,6 @@ public static class TransferMaps
             Traceback: data.Traceback);
     }
 
-
-    public static TemporaryAccountInfoDto ToTemporaryAccountInfoDto(AccountInfo data)
-    {
-        return new TemporaryAccountInfoDto(
-            Id: data.Id,
-            EmailAddress: data.EmailAddress,
-            PreferredCulture: data.PreferredCulture);
-    }
-
     public static AccountDetailDto ToAccountDetailDto(
         AccountInfo data)
     {
@@ -426,18 +418,19 @@ public static class TransferMaps
             return [];
         }
 
-        return Enum.GetValues<Permission>()
-            .Where(v => v != Permission.None
-                && v != Permission.All
-                && v != Permission.Inheritable
-                && v != Permission.Publishable
-                && (value & v) == v)
-            .ToImmutableArray();
+        return [
+            ..Enum.GetValues<Permission>()
+                .Where(v => v != Permission.None
+                    && v != Permission.All
+                    && v != Permission.Inheritable
+                    && v != Permission.Publishable
+                    && (value & v) == v)
+        ];
     }
 
     public static OrganizationDetailDto ToOrganizationDetailDto(OrganizationInfo data)
     {
-        return new(
+        return new OrganizationDetailDto(
             Id: data.Id,
             Name: data.Name,
             CreatedOn: data.CreatedOn
@@ -446,7 +439,7 @@ public static class TransferMaps
 
     public static OrganizationListDto ToOrganizationListDto(OrganizationInfo data)
     {
-        return new(
+        return new OrganizationListDto(
             Id: data.Id,
             Name: data.Name
         );
@@ -454,7 +447,7 @@ public static class TransferMaps
 
     public static RoleDetailDto ToRoleDetailDto(RoleInfo data)
     {
-        return new(
+        return new RoleDetailDto(
             Id: data.Id,
             OrganizationId: data.OrganizationId,
             Name: data.Name,
@@ -467,7 +460,7 @@ public static class TransferMaps
 
     public static RoleListDto ToRoleListDto(RoleInfo data)
     {
-        return new(
+        return new RoleListDto(
             Id: data.Id,
             OrganizationId: data.OrganizationId,
             Name: data.Name

@@ -28,21 +28,21 @@ public class VideoConversionStatsEndpoint(
         var dto = new VideoConversionStatsDto(
             TotalVideoShardCount: await conversionService.QueryVideoShards(
                 new VideoConversionService.VideoShardFilter(
-                    HasOriginalVariant: null,
+                    IsOriginal: true,
                     IsCorrupted: null,
                     HasAnyCompletedOrFailedConversions: null
                 )
             ).CountAsync(ct),
             CorruptedVideoShardCount: await conversionService.QueryVideoShards(
                 new VideoConversionService.VideoShardFilter(
-                    HasOriginalVariant: null,
+                    IsOriginal: true,
                     IsCorrupted: true,
                     HasAnyCompletedOrFailedConversions: null
                 )
             ).CountAsync(ct),
             PendingVideoConversionCount: await conversionService.QueryVideoShards(
                 new VideoConversionService.VideoShardFilter(
-                    HasOriginalVariant: true,
+                    IsOriginal: false,
                     IsCorrupted: false,
                     HasAnyCompletedOrFailedConversions: false
                 )

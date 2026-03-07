@@ -12,41 +12,33 @@ namespace Kafe.Api.Endpoints.Author;
 
 [ApiVersion("1")]
 [Route("author/{id}")]
-public class AuthorDetailEndpoint : EndpointBaseAsync
-    .WithRequest<string>
-    .WithActionResult<AuthorDetailDto?>
+public class AuthorDetailEndpoint(
+    AuthorService authorService,
+    IAuthorizationService authorizationService
+) : EndpointBaseAsync
+        .WithRequest<string>
+        .WithActionResult<AuthorDetailDto?>
 {
-    private readonly AuthorService authorService;
-    private readonly IAuthorizationService authorizationService;
-
-    public AuthorDetailEndpoint(
-        AuthorService authorService,
-        IAuthorizationService authorizationService)
-    {
-        this.authorService = authorService;
-        this.authorizationService = authorizationService;
-    }
-
     [HttpGet]
-    [SwaggerOperation(Tags = new[] { EndpointArea.Author })]
+    [SwaggerOperation(Tags = [EndpointArea.Author])]
     [ProducesResponseType(typeof(AuthorDetailDto), 200)]
     [ProducesResponseType(404)]
     public override async Task<ActionResult<AuthorDetailDto?>> HandleAsync(
         string id,
-        CancellationToken cancellationToken = default)
+        CancellationToken ct = default)
     {
         var auth = await authorizationService.AuthorizeAsync(User, id, EndpointPolicy.Read);
         if (!auth.Succeeded)
         {
             return Unauthorized();
         }
-        
-        var data = await authorService.Load(id, cancellationToken);
-        if (data is null)
+
+        var authorErr = await authorService.Load(id, ct);
+        if (authorErr.HasError)
         {
             return NotFound();
         }
 
-        return Ok(TransferMaps.ToAuthorDetailDto(data));
+        return Ok(TransferMaps.ToAuthorDetailDto(authorErr.Value));
     }
 }

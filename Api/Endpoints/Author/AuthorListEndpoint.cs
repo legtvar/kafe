@@ -14,21 +14,13 @@ namespace Kafe.Api.Endpoints.Author;
 
 [ApiVersion("1")]
 [Route("authors")]
-public class AuthorListEndpoint : EndpointBaseAsync
+public class AuthorListEndpoint(
+    AuthorService authorService,
+    UserProvider userProvider
+) : EndpointBaseAsync
     .WithRequest<AuthorListEndpoint.RequestData>
     .WithActionResult<ImmutableArray<AuthorListDto>>
 {
-    private readonly AuthorService authorService;
-    private readonly UserProvider userProvider;
-
-    public AuthorListEndpoint(
-        AuthorService authorService,
-        UserProvider userProvider)
-    {
-        this.authorService = authorService;
-        this.userProvider = userProvider;
-    }
-
     [HttpGet]
     [SwaggerOperation(Tags = [EndpointArea.Author])]
     public override async Task<ActionResult<ImmutableArray<AuthorListDto>>> HandleAsync(

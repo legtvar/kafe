@@ -196,6 +196,7 @@ public class VideoConversionService(
     }
 
     public record VideoShardFilter(
+        bool? IsOriginal = true,
         TimeSpan? Age = null,
         bool? IsCorrupted = false,
         bool? HasAnyCompletedOrFailedConversions = false
@@ -212,17 +213,20 @@ public class VideoConversionService(
             )
         );
 
-        var originalLinkType = typeRegistry.RequireType<GeneratedFromShardLink>();
-        // NB: Filter out generated video shards.
-        query = (IMartenQueryable<ShardInfo>)query.Where(s => s.MatchesSql(
-                $"""
-                 NOT jsonb_path_exists(
-                    d.data,
-                    '$.{nameof(ShardInfo.Links)}[*] ? (@.{nameof(KafeObject.Type)} == \"{originalLinkType.ToString()}\")'
-                 )
-                 """
-            )
-        );
+        if (filter.IsOriginal is not null)
+        {
+            var originalLinkType = typeRegistry.RequireType<GeneratedFromShardLink>();
+            // NB: Filter out generated video shards.
+            query = (IMartenQueryable<ShardInfo>)query.Where(s => s.MatchesSql(
+                    $"""
+                     {(filter.IsOriginal == true ? "NOT" : "")} jsonb_path_exists(
+                        d.data,
+                        '$.{nameof(ShardInfo.Links)}[*] ? (@.{nameof(KafeObject.Type)} == \"{originalLinkType.ToString()}\")'
+                     )
+                     """
+                )
+            );
+        }
 
         if (filter.IsCorrupted is not null)
         {

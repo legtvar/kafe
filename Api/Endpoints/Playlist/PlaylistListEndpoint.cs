@@ -1,7 +1,6 @@
 using Ardalis.ApiEndpoints;
 using Asp.Versioning;
 using Kafe.Api.Transfer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading;
@@ -16,29 +15,19 @@ namespace Kafe.Api.Endpoints.Playlist;
 
 [ApiVersion("1")]
 [Route("playlists")]
-public class PlaylistListEndpoint : EndpointBaseAsync
+public class PlaylistListEndpoint(
+    PlaylistService playlistService,
+    UserProvider userProvider
+) : EndpointBaseAsync
     .WithRequest<PlaylistListEndpoint.RequestData>
     .WithActionResult<List<PlaylistListDto>>
 {
-    private readonly PlaylistService playlistService;
-    private readonly IAuthorizationService authorization;
-    private readonly UserProvider userProvider;
-
-    public PlaylistListEndpoint(
-        PlaylistService playlistService,
-        IAuthorizationService authorization,
-        UserProvider userProvider)
-    {
-        this.playlistService = playlistService;
-        this.authorization = authorization;
-        this.userProvider = userProvider;
-    }
-
     [HttpGet]
-    [SwaggerOperation(Tags = new[] { EndpointArea.Playlist })]
+    [SwaggerOperation(Tags = [EndpointArea.Playlist])]
     public override async Task<ActionResult<List<PlaylistListDto>>> HandleAsync(
         RequestData requestData,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         var filter = new PlaylistService.PlaylistFilter(
             AccessingAccountId: userProvider.AccountId,

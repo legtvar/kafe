@@ -7,41 +7,26 @@ using System.Threading;
 using System.Threading.Tasks;
 using Swashbuckle.AspNetCore.Annotations;
 using Kafe.Data.Services;
-using System.Linq;
-using System.Collections.Immutable;
-using Kafe.Data.Aggregates;
-using Kafe.Data;
-using Microsoft.AspNetCore.Mvc.Formatters;
-using System.Net.Mime;
 
 namespace Kafe.Api.Endpoints.Playlist;
 
 [ApiVersion("1")]
 [Route("playlist")]
 [Authorize]
-public class PlaylistEditEndpoint : EndpointBaseAsync
-    .WithRequest<PlaylistEditDto>
-    .WithActionResult<Hrib>
+public class PlaylistEditEndpoint(
+    PlaylistService playlistService,
+    IAuthorizationService authorizationService
+)
+    : EndpointBaseAsync
+        .WithRequest<PlaylistEditDto>
+        .WithActionResult<Hrib>
 {
-    private readonly PlaylistService playlistService;
-    private readonly ArtifactService artifactService;
-    private readonly IAuthorizationService authorizationService;
-
-    public PlaylistEditEndpoint(
-        PlaylistService playlistService,
-        ArtifactService artifactService,
-        IAuthorizationService authorizationService)
-    {
-        this.playlistService = playlistService;
-        this.artifactService = artifactService;
-        this.authorizationService = authorizationService;
-    }
-
     [HttpPatch]
     [SwaggerOperation(Tags = [EndpointArea.Playlist])]
     public override async Task<ActionResult<Hrib>> HandleAsync(
         PlaylistEditDto dto,
-        CancellationToken cancellationToken = default)
+        CancellationToken ct = default
+    )
     {
         var auth = await authorizationService.AuthorizeAsync(User, dto.Id, EndpointPolicy.Write);
         if (!auth.Succeeded)
@@ -49,12 +34,13 @@ public class PlaylistEditEndpoint : EndpointBaseAsync
             return Unauthorized();
         }
 
-        var old = await playlistService.Load(dto.Id, cancellationToken);
-        if (old is null)
+        var oldErr = await playlistService.Load(dto.Id, ct);
+        if (oldErr.HasError)
         {
-            return NotFound();
+            return this.KafeErrResult(oldErr);
         }
 
+        var old = oldErr.Value;
         var @new = old with
         {
             Name = dto.Name ?? old.Name,
@@ -81,7 +67,7 @@ public class PlaylistEditEndpoint : EndpointBaseAsync
             }
         }
 
-        var result = await playlistService.Edit(@new, cancellationToken);
+        var result = await playlistService.Edit(@new, ct);
         if (result.HasError)
         {
             return this.KafeErrResult(result);

@@ -7,33 +7,25 @@ using System.Threading;
 using System.Threading.Tasks;
 using Swashbuckle.AspNetCore.Annotations;
 using Kafe.Data.Services;
-using System.Linq;
 
 namespace Kafe.Api.Endpoints.Organization;
 
 [ApiVersion("1")]
 [Route("organization")]
 [Authorize]
-public class OrganizationEditEndpoint : EndpointBaseAsync
+public class OrganizationEditEndpoint(
+    OrganizationService organizationService,
+    IAuthorizationService authorizationService
+) : EndpointBaseAsync
     .WithRequest<OrganizationEditDto>
     .WithActionResult<Hrib>
 {
-    private readonly OrganizationService organizationService;
-    private readonly IAuthorizationService authorizationService;
-
-    public OrganizationEditEndpoint(
-        OrganizationService organizationService,
-        IAuthorizationService authorizationService)
-    {
-        this.organizationService = organizationService;
-        this.authorizationService = authorizationService;
-    }
-
     [HttpPatch]
-    [SwaggerOperation(Tags = new[] { EndpointArea.Organization })]
+    [SwaggerOperation(Tags = [EndpointArea.Organization])]
     public override async Task<ActionResult<Hrib>> HandleAsync(
         OrganizationEditDto dto,
-        CancellationToken cancellationToken = default)
+        CancellationToken ct = default
+    )
     {
         var auth = await authorizationService.AuthorizeAsync(User, dto.Id, EndpointPolicy.Write);
         if (!auth.Succeeded)
@@ -41,18 +33,19 @@ public class OrganizationEditEndpoint : EndpointBaseAsync
             return Unauthorized();
         }
 
-        var old = await organizationService.Load(dto.Id, cancellationToken);
-        if (old is null)
+        var oldErr = await organizationService.Load(dto.Id, ct);
+        if (oldErr.HasError)
         {
-            return NotFound();
+            return this.KafeErrResult(oldErr);
         }
 
+        var old = oldErr.Value;
         var @new = old with
         {
             Name = dto.Name ?? old.Name
         };
 
-        var result = await organizationService.Edit(@new, cancellationToken);
+        var result = await organizationService.Edit(@new, ct);
         if (result.HasError)
         {
             return this.KafeErrResult(result);

@@ -12,28 +12,21 @@ namespace Kafe.Api.Endpoints.Organization;
 
 [ApiVersion("1")]
 [Route("organization/{id}")]
-public class OrganizationDetailEndpoint : EndpointBaseAsync
+public class OrganizationDetailEndpoint(
+    OrganizationService organizationService,
+    IAuthorizationService authorizationService
+) : EndpointBaseAsync
     .WithRequest<string>
     .WithActionResult<OrganizationDetailDto?>
 {
-    private readonly OrganizationService organizationService;
-    private readonly IAuthorizationService authorizationService;
-
-    public OrganizationDetailEndpoint(
-        OrganizationService organizationService,
-        IAuthorizationService authorizationService)
-    {
-        this.organizationService = organizationService;
-        this.authorizationService = authorizationService;
-    }
-
     [HttpGet]
-    [SwaggerOperation(Tags = new[] { EndpointArea.Organization })]
+    [SwaggerOperation(Tags = [EndpointArea.Organization])]
     [ProducesResponseType(typeof(OrganizationDetailDto), 200)]
     [ProducesResponseType(404)]
     public override async Task<ActionResult<OrganizationDetailDto?>> HandleAsync(
         string id,
-        CancellationToken cancellationToken = default)
+        CancellationToken ct = default
+    )
     {
         var auth = await authorizationService.AuthorizeAsync(User, id, EndpointPolicy.Read);
         if (!auth.Succeeded)
@@ -41,12 +34,12 @@ public class OrganizationDetailEndpoint : EndpointBaseAsync
             return Unauthorized();
         }
 
-        var data = await organizationService.Load(id, cancellationToken);
-        if (data is null)
+        var data = await organizationService.Load(id, ct);
+        if (data.HasError)
         {
             return NotFound();
         }
 
-        return Ok(TransferMaps.ToOrganizationDetailDto(data));
+        return Ok(TransferMaps.ToOrganizationDetailDto(data.Value));
     }
 }

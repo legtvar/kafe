@@ -1,15 +1,13 @@
-﻿using Ardalis.ApiEndpoints;
+﻿using System;
+using Ardalis.ApiEndpoints;
 using Asp.Versioning;
 using Kafe.Api.Transfer;
 using Kafe.Data;
 using Kafe.Data.Aggregates;
 using Kafe.Data.Services;
-using Marten.Linq.SoftDeletes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
-using System.ComponentModel;
-using System.Net.Mime;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -18,31 +16,23 @@ namespace Kafe.Api.Endpoints.Artifact;
 [ApiVersion("1")]
 [Route("artifact")]
 [Authorize]
-public class ArtifactCreationEndpoint : EndpointBaseAsync
-    .WithRequest<ArtifactCreationDto>
-    .WithActionResult<Hrib>
+[Obsolete("This endpoint is part of the old artifact abstraction and will soon be replaced.")]
+public class ArtifactCreationEndpoint(
+    ArtifactService artifacts,
+    IAuthorizationService authorization
+)
+    : EndpointBaseAsync
+        .WithRequest<ArtifactCreationDto>
+        .WithActionResult<Hrib>
 {
-    private readonly ArtifactService artifacts;
-    private readonly ProjectService projectService;
-    private readonly IAuthorizationService authorization;
-
-    public ArtifactCreationEndpoint(
-        ArtifactService artifacts,
-        ProjectService projectService,
-        IAuthorizationService authorization)
-    {
-        this.artifacts = artifacts;
-        this.projectService = projectService;
-        this.authorization = authorization;
-    }
-
     [HttpPost]
-    [SwaggerOperation(Tags = new[] { EndpointArea.Artifact })]
+    [SwaggerOperation(Tags = [EndpointArea.Artifact])]
     [ProducesResponseType(typeof(Hrib), 200)]
     [ProducesResponseType(400)]
     public override async Task<ActionResult<Hrib>> HandleAsync(
         ArtifactCreationDto request,
-        CancellationToken cancellationToken = default)
+        CancellationToken ct = default
+    )
     {
         var auth = await authorization.AuthorizeAsync(User, request.ContainingProject, EndpointPolicy.Append);
         if (!auth.Succeeded)
@@ -50,29 +40,29 @@ public class ArtifactCreationEndpoint : EndpointBaseAsync
             return Unauthorized();
         }
 
-        var createResult = await artifacts.Create(ArtifactInfo.Create(name: request.Name) with
-        {
-            AddedOn = request.AddedOn ?? default,
-            CreationMethod = CreationMethod.Api
-        },
-            cancellationToken);
+        var artifactErr = await artifacts.Create(
+            ArtifactInfo.Create(name: request.Name) with
+            {
+                AddedOn = request.AddedOn ?? default,
+                CreationMethod = CreationMethod.Api
+            },
+            ct
+        );
 
-        if (createResult.HasError)
+        if (artifactErr.HasError)
         {
-            return this.KafeErrResult(createResult);
+            return this.KafeErrResult(artifactErr);
         }
 
         if (request.ContainingProject is not null)
         {
-            var addArtifactsResult = await projectService.AddArtifacts(
-                request.ContainingProject,
-                [(createResult.Value.Id, request.BlueprintSlot)]);
-            if (addArtifactsResult.HasError)
-            {
-                return this.KafeErrResult(addArtifactsResult);
-            }
+            throw new NotSupportedException(
+                "This endpoint can no longer be used to append a newly created artifact onto a project. "
+                + "Each project has its own, automatically created artifact. "
+                + "To nest artifacts, use the new properties interface."
+            );
         }
 
-        return Ok((Hrib)createResult.Value.Id);
+        return Ok((Hrib)artifactErr.Value.Id);
     }
 }

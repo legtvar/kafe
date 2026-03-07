@@ -4,10 +4,8 @@ using Kafe.Api.Options;
 using Kafe.Api.Services;
 using Kafe.Api.Transfer;
 using Kafe.Data.Services;
-using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.Annotations;
@@ -15,7 +13,6 @@ using System;
 using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication;
 
 namespace Kafe.Api.Endpoints.Account;
 
@@ -26,8 +23,7 @@ public class TemporaryAccountCreationEndpoint(
     IEmailService emailService,
     IOptions<ApiOptions> apiOptions,
     ILogger<TemporaryAccountCreationEndpoint> logger
-)
-    : EndpointBaseAsync
+) : EndpointBaseAsync
         .WithRequest<TemporaryAccountCreationDto>
         .WithActionResult
 {
@@ -43,9 +39,9 @@ public class TemporaryAccountCreationEndpoint(
         dto = dto with { EmailAddress = dto.EmailAddress.Trim() };
 
         var ticket = await accountService.IssueLoginTicket(dto.EmailAddress, dto.PreferredCulture, ct);
-        if (ticket.HasErrors)
+        if (ticket.HasError)
         {
-            return this.KafeErrorResult(ticket.Errors);
+            return this.KafeErrorResult(ticket.Diagnostic);
         }
 
         var confirmationToken = accountService.EncodeLoginTicketId(ticket.Value.Id);

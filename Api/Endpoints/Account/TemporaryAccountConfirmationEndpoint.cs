@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.Annotations;
-using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -15,24 +14,17 @@ namespace Kafe.Api.Endpoints.Account;
 
 [ApiVersion("1")]
 [Route("tmp-account/{token}")]
-public class TemporaryAccountConfirmationEndpoint : EndpointBaseAsync
-    .WithRequest<TemporaryAccountConfirmationEndpoint.RequestData>
-    .WithActionResult
+public class TemporaryAccountConfirmationEndpoint(
+    AccountService accountService,
+    UserProvider userProvider,
+    IDataProtectionProvider dataProtectionProvider,
+    IOptions<ApiOptions> apiOptions
+) : EndpointBaseAsync
+        .WithRequest<TemporaryAccountConfirmationEndpoint.RequestData>
+        .WithActionResult
 {
-    private readonly AccountService accountService;
-    private readonly UserProvider userProvider;
-    private readonly IOptions<ApiOptions> apiOptions;
+    private readonly IDataProtector dataProtector = dataProtectionProvider.CreateProtector(Const.TemporaryAccountPurpose);
 
-    public TemporaryAccountConfirmationEndpoint(
-        AccountService accountService,
-        UserProvider userProvider,
-        IOptions<ApiOptions> apiOptions
-    )
-    {
-        this.accountService = accountService;
-        this.userProvider = userProvider;
-        this.apiOptions = apiOptions;
-    }
 
     [HttpGet]
     [SwaggerOperation(Tags = [EndpointArea.Account])]
@@ -54,7 +46,7 @@ public class TemporaryAccountConfirmationEndpoint : EndpointBaseAsync
             ticketId.Value,
             ct: ct
         );
-        if (account.HasErrors)
+        if (account.HasError)
         {
             // NB: we disregard any specific information about the errors for security reasons
             return Unauthorized();

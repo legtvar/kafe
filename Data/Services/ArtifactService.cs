@@ -54,6 +54,31 @@ public class ArtifactService(
         return await db.Events.KafeAggregateRequiredStream<ArtifactInfo>(id, token: token);
     }
 
+    public async Task<Err<ImmutableArray<ProjectInfo>>> GetContainingProjects(
+        Hrib id,
+        CancellationToken ct = default
+    )
+    {
+        var artifactErr = await Load(id, ct);
+        if (artifactErr.HasError)
+        {
+            return artifactErr.Diagnostic;
+        }
+
+        var containingProjects = await db.Query<ProjectInfo>()
+            .Where(g => g.MatchesSql(
+                    $"""
+                     EXISTS(
+                        SELECT a.* FROM {db.DocumentStore.Options.Schema.For<ProjectInfo>(true)} AS a
+                        WHERE a.data ->> '{nameof(ProjectInfo.ArtifactId)}' = ?
+                     """,
+                    id.ToString()
+                )
+            )
+            .ToListAsync(ct);
+        return containingProjects.ToImmutableArray();
+    }
+
     public record ContainingProjectGroupInfo(
         Hrib Id,
         LocalizedString Name

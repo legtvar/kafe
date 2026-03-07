@@ -8,7 +8,8 @@ public record ArtifactDetailDto(
     LocalizedString Name,
     DateTimeOffset AddedOn,
     ImmutableArray<ShardListDto> Shards,
-    ImmutableArray<Hrib> ContainingProjectIds);
+    ImmutableArray<Hrib> ContainingProjectIds
+);
 
 public record ArtifactCreationDto(
     LocalizedString Name,

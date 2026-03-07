@@ -1,41 +1,38 @@
-﻿using Ardalis.ApiEndpoints;
+﻿using System;
+using System.Collections.Immutable;
+using System.Linq;
+using Ardalis.ApiEndpoints;
 using Asp.Versioning;
-using Kafe.Api.Services;
 using Kafe.Api.Transfer;
 using Kafe.Data.Services;
-using Marten;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Threading;
 using System.Threading.Tasks;
+using Kafe.Core;
 
 namespace Kafe.Api.Endpoints.Artifact;
 
 [ApiVersion("1")]
 [Route("artifact/{id}")]
-public class ArtifactDetailEndpoint : EndpointBaseAsync
+[Obsolete("This endpoint is part of the old artifact abstraction and will soon be replaced.")]
+public class ArtifactDetailEndpoint(
+    ArtifactService artifacts,
+    ShardService shards,
+    IAuthorizationService authorization
+) : EndpointBaseAsync
     .WithRequest<string>
     .WithActionResult<ArtifactDetailDto>
 {
-    private readonly ArtifactService artifacts;
-    private readonly IAuthorizationService authorization;
-
-    public ArtifactDetailEndpoint(
-        ArtifactService artifacts,
-        IAuthorizationService authorization)
-    {
-        this.artifacts = artifacts;
-        this.authorization = authorization;
-    }
-
     [HttpGet]
-    [SwaggerOperation(Tags = new[] { EndpointArea.Artifact })]
+    [SwaggerOperation(Tags = [EndpointArea.Artifact])]
     [ProducesResponseType(typeof(Hrib), 200)]
     [ProducesResponseType(400)]
     public override async Task<ActionResult<ArtifactDetailDto>> HandleAsync(
         string id,
-        CancellationToken cancellationToken = default)
+        CancellationToken ct = default
+    )
     {
         var auth = await authorization.AuthorizeAsync(User, id, EndpointPolicy.Read);
         if (!auth.Succeeded)
@@ -43,7 +40,33 @@ public class ArtifactDetailEndpoint : EndpointBaseAsync
             return Unauthorized();
         }
 
-        var artifact = await artifacts.LoadDetail(id, cancellationToken);
-        return artifact is null ? NotFound() : Ok(TransferMaps.ToArtifactDetailDto(artifact));
+        var artifactErr = await artifacts.Load(id, ct);
+        if (artifactErr.HasError)
+        {
+            return this.KafeErrResult(artifactErr);
+        }
+
+        var containingProjectsErr = await artifacts.GetContainingProjects(id, ct);
+        if (containingProjectsErr.HasError)
+        {
+            return this.KafeErrResult(containingProjectsErr);
+        }
+
+        var shardIds = artifactErr.Value.Properties.Values.Select(p => p.Value)
+            .OfType<ShardReference>()
+            .Select(s => s.ShardId)
+            .ToImmutableArray();
+        var shardsErr = await shards.LoadMany(shardIds, ct);
+        if (shardsErr.HasError)
+        {
+            return this.KafeErrResult(shardsErr);
+        }
+
+        var result = TransferMaps.ToArtifactDetailDto(artifactErr.Value) with
+        {
+            Shards = [..shardsErr.Value.Select(TransferMaps.ToShardListDto)],
+            ContainingProjectIds = [..containingProjectsErr.Value.Select(p => p.Id)]
+        };
+        return result;
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Kafe.Data.Options;
+namespace Kafe.Media;
 
 public record VideoConversionOptions
 {

@@ -131,7 +131,7 @@ public record ProjectValidationDto(
 );
 
 public record ProjectDiagnosticDto(
-    DiagnosticKind Kind,
+    DiagnosticSeverity Kind,
     LocalizedString Message,
     string ValidationStage
 );

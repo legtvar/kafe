@@ -8,18 +8,12 @@ using Microsoft.Extensions.Logging;
 
 namespace Kafe.Api;
 
-public class KafeProblemDetailsExceptionHandler : IExceptionHandler
+public class KafeProblemDetailsExceptionHandler(
+    IProblemDetailsService problemDetailsService,
+    ILogger<KafeProblemDetailsExceptionHandler> logger
+) : IExceptionHandler
 {
-    private readonly IProblemDetailsService problemDetailsService;
-    private readonly ILogger<KafeProblemDetailsExceptionHandler> logger;
-
-    public KafeProblemDetailsExceptionHandler(
-        IProblemDetailsService problemDetailsService,
-        ILogger<KafeProblemDetailsExceptionHandler> logger)
-    {
-        this.problemDetailsService = problemDetailsService;
-        this.logger = logger;
-    }
+    private readonly ILogger<KafeProblemDetailsExceptionHandler> logger = logger;
 
     public async ValueTask<bool> TryHandleAsync(
         HttpContext httpContext,
@@ -31,19 +25,19 @@ public class KafeProblemDetailsExceptionHandler : IExceptionHandler
             statusCode: 500
         );
         pd.Errors = [exception];
-        
+
         var feature = httpContext.Features.GetRequiredFeature<IExceptionHandlerFeature>();
-        
-        await problemDetailsService.WriteAsync(new()
+
+        await problemDetailsService.WriteAsync(new ProblemDetailsContext
         {
             HttpContext = httpContext,
             Exception = exception,
             ProblemDetails = pd,
             AdditionalMetadata = feature.Endpoint?.Metadata
         });
-        
+
         // No need to do logging, since the ExceptionHandlerMiddleware and RequestLoggingMiddleware already doe it.
-        
+
         return true;
     }
 }

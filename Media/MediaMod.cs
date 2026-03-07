@@ -58,6 +58,12 @@ public sealed class MediaMod : IMod
         services.AddSingleton<MediaShardAnalyzer>();
         services.AddSingleton<SubtitlesShardAnalyzer>();
         services.AddSingleton<ImageShardAnalyzer>();
-        services.AddHostedService<VideoConversionDaemon>();
+        services.AddSingleton<VideoConversionDaemon>();
+        services.AddHostedService<VideoConversionDaemon>(s => s.GetRequiredService<VideoConversionDaemon>());
+
+        services.AddOptions<VideoConversionOptions>()
+            .BindConfiguration("VideoConversion")
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
     }
 }

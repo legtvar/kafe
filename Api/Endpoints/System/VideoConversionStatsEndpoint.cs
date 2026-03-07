@@ -4,6 +4,7 @@ using Ardalis.ApiEndpoints;
 using Asp.Versioning;
 using Kafe.Api.Transfer;
 using Kafe.Data.Services;
+using Kafe.Media.Services;
 using Marten;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

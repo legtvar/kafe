@@ -327,7 +327,7 @@ public partial class Startup
                 {
                     var result = await ctx.RequestServices.GetRequiredService<AccountService>()
                         .AssociateExternalAccount(ctx.User);
-                    if (result.HasErrors)
+                    if (result.HasError)
                     {
                         await ctx.ForbidAsync();
                         return;
@@ -386,7 +386,7 @@ public partial class Startup
             .ValidateOnStart()
             .Configure(o =>
                 {
-                    o.Languages = o.Languages.Select(o => o.ToLower()).ToList();
+                    o.Languages = o.Languages.Select(l => l.ToLower()).ToList();
 
                     if (!o.Languages.Contains(Const.InvariantCultureCode))
                     {
@@ -407,17 +407,6 @@ public partial class Startup
                     }
                 }
             );
-        services.AddOptions<VideoConversionOptions>()
-            .BindConfiguration("VideoConversion")
-            .ValidateDataAnnotations()
-            .ValidateOnStart();
-
-        services.AddSingleton<VideoConversionDaemon>();
-        services.AddHostedService<VideoConversionDaemon>(s => s.GetRequiredService<VideoConversionDaemon>());
-
-        services.AddSingleton<IPigeonsTestQueue, PigeonsTestQueue>();
-        services.AddSingleton<PigeonsTestQueueDaemon>();
-        services.AddHostedService<PigeonsTestQueueDaemon>(s => s.GetRequiredService<PigeonsTestQueueDaemon>());
 
         var emailServiceType = Configuration.GetSection("Email").Get<EmailOptions>()?.ServiceType
             ?? EmailOptions.EmailServiceType.Default;

@@ -4,6 +4,7 @@ using Ardalis.ApiEndpoints;
 using Asp.Versioning;
 using Kafe.Api.Transfer;
 using Kafe.Data.Services;
+using Kafe.Media.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -29,7 +30,7 @@ public class VideoConversionRetryEndpoint(
         if (request.ShouldRetryConversion)
         {
             var result = await conversionService.RetryConversions(request.Ids, ct);
-            if (result.HasErrors)
+            if (result.HasError)
             {
                 return this.KafeErrResult(result);
             }
@@ -38,7 +39,7 @@ public class VideoConversionRetryEndpoint(
         if (request.ShouldRetryOriginalAnalysis)
         {
             var result = await conversionService.RetryOriginalAnalysis(request.Ids, ct);
-            if (result.HasErrors)
+            if (result.HasError)
             {
                 return this.KafeErrResult(result);
             }

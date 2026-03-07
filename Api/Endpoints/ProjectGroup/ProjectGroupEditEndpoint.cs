@@ -1,43 +1,31 @@
 using Ardalis.ApiEndpoints;
 using Asp.Versioning;
-using Kafe.Api.Services;
 using Kafe.Api.Transfer;
-using Kafe.Data;
-using Kafe.Data.Aggregates;
 using Kafe.Data.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
-using System.Collections.Immutable;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Kafe.Api.Endpoints.Project;
+namespace Kafe.Api.Endpoints.ProjectGroup;
 
 [ApiVersion("1")]
 [Route("project-group")]
 [Authorize]
-public class ProjectGroupEditEndpoint : EndpointBaseAsync
+public class ProjectGroupEditEndpoint(
+    ProjectGroupService projectGroupService,
+    IAuthorizationService authorizationService
+) : EndpointBaseAsync
     .WithRequest<ProjectGroupEditDto>
     .WithActionResult<Hrib>
 {
-    private readonly ProjectGroupService projectGroupService;
-    private readonly IAuthorizationService authorizationService;
-
-    public ProjectGroupEditEndpoint(
-        ProjectGroupService projectGroupService,
-        IAuthorizationService authorizationService)
-    {
-        this.projectGroupService = projectGroupService;
-        this.authorizationService = authorizationService;
-    }
-
     [HttpPatch]
     [SwaggerOperation(Tags = [EndpointArea.ProjectGroup])]
     public override async Task<ActionResult<Hrib>> HandleAsync(
         ProjectGroupEditDto request,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         // TODO: Add project group permission to edit child project permissions. Right now it's disabled globally.
         // NB: Remove this segment once you fix this.
@@ -47,13 +35,14 @@ public class ProjectGroupEditEndpoint : EndpointBaseAsync
             return Unauthorized();
         }
 
-        var @old = await projectGroupService.Load(request.Id, token: cancellationToken);
-        if (@old is null)
+        var oldErr = await projectGroupService.Load(request.Id, token: cancellationToken);
+        if (oldErr.HasError)
         {
-            return NotFound();
+            return this.KafeErrResult(oldErr);
         }
 
-        var @new = @old with
+        var old = oldErr.Value;
+        var @new = old with
         {
             Name = request.Name ?? @old.Name,
             Description = request.Description ?? @old.Description,

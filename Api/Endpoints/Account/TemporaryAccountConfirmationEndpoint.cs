@@ -3,7 +3,6 @@ using Asp.Versioning;
 using Kafe.Api.Options;
 using Kafe.Api.Services;
 using Kafe.Data.Services;
-using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.Annotations;
@@ -17,14 +16,11 @@ namespace Kafe.Api.Endpoints.Account;
 public class TemporaryAccountConfirmationEndpoint(
     AccountService accountService,
     UserProvider userProvider,
-    IDataProtectionProvider dataProtectionProvider,
     IOptions<ApiOptions> apiOptions
 ) : EndpointBaseAsync
         .WithRequest<TemporaryAccountConfirmationEndpoint.RequestData>
         .WithActionResult
 {
-    private readonly IDataProtector dataProtector = dataProtectionProvider.CreateProtector(Const.TemporaryAccountPurpose);
-
 
     [HttpGet]
     [SwaggerOperation(Tags = [EndpointArea.Account])]

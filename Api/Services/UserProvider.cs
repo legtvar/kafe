@@ -1,5 +1,4 @@
-﻿using Kafe.Api.Transfer;
-using Kafe.Data;
+﻿using Kafe.Data;
 using Kafe.Data.Aggregates;
 using Kafe.Data.Services;
 using Marten;
@@ -10,7 +9,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
@@ -97,14 +95,8 @@ public class UserProvider(
             return;
         }
 
-        var account = await accountService.Load(id, token: token);
-        if (account is null)
-        {
-            throw new IndexOutOfRangeException($"Account with id '{id}' does not exist.");
-        }
-
+        var account = (await accountService.Load(id, token: token)).Unwrap();
         logger.LogDebug("Account '{AccountEmailAddress}' ({AccountId}) found.", account.EmailAddress, account.Id);
-
         Account = account;
     }
 

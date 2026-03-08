@@ -34,6 +34,25 @@ namespace Kafe.Data
                 )
             };
         }
+
+        public static Type ToType(ShardKind kind)
+        {
+            var result = kind switch
+            {
+                ShardKind.Video => Type.GetType("Kafe.Media.MediaInfo"),
+                ShardKind.Image => Type.GetType("Kafe.Media.ImageInfo"),
+                ShardKind.Subtitles => Type.GetType("Kafe.Media.SubtitlesInfo"),
+                ShardKind.Blend => Type.GetType("Kafe.Mate.Blend"),
+                _ => null
+            };
+
+            if (result is null)
+            {
+                throw new NotSupportedException($"Could not obtain a System.Type for the '{kind}' shard kind.");
+            }
+
+            return result;
+        }
     }
 }
 

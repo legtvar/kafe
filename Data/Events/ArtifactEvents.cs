@@ -21,6 +21,10 @@ public record ArtifactPropertiesSet(
     ImmutableDictionary<string, ArtifactPropertySetter> Properties
 );
 
+/// <summary>
+/// Sets (or unsets) an artifact property.
+/// </summary>
+/// <param name="Object">Object or null. If null, unsets the property.</param>
 public record ArtifactPropertySetter(
     KafeObject? Object,
     ExistingValueHandling ExistingValueHandling

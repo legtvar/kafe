@@ -40,7 +40,7 @@ public class ArtifactCreationEndpoint(
             return Unauthorized();
         }
 
-        var artifactErr = await artifacts.Create(
+        var artifactErr = await artifacts.Upsert(
             ArtifactInfo.Create(name: request.Name) with
             {
                 AddedOn = request.AddedOn ?? default,

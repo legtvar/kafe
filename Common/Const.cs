@@ -67,6 +67,7 @@ public static class Const
     public const string CzechOrSlovakPseudoCultureName = $"{CzechCultureName}|{SlovakCultureName}";
 
     public static readonly LocalizedString UnknownAuthor;
+    public static readonly LocalizedString UnnamedProjectName;
     public static readonly LocalizedString UnknownProjectGroup;
     public static readonly LocalizedString ConfirmationEmailSubject;
     public static readonly LocalizedString InvitationEmailSubject;
@@ -95,6 +96,9 @@ public static class Const
             (InvariantCulture, "Unknown author"),
             (CzechCulture, "Neznámý autor"),
             (SlovakCulture, "Neznámy autor"));
+        UnnamedProjectName = LocalizedString.Create(
+            (InvariantCulture, "Unknown project"),
+            (CzechCulture, "Neznámý projekt"));
         UnknownProjectGroup = LocalizedString.Create(
             (InvariantCulture, "Unknown project group"),
             (CzechCulture, "Neznámá skupina projektů"),

@@ -1,6 +1,6 @@
-﻿using Ardalis.ApiEndpoints;
+﻿using System;
+using Ardalis.ApiEndpoints;
 using Asp.Versioning;
-using Kafe.Api.Services;
 using Kafe.Api.Transfer;
 using Kafe.Data.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -13,43 +13,38 @@ namespace Kafe.Api.Endpoints.Shard;
 
 [ApiVersion("1")]
 [Route("shard/{id}")]
-public class ShardDetailEndpoint : EndpointBaseAsync
+[Obsolete("This endpoint is part of the old artifact abstraction and will soon be replaced.")]
+public class ShardDetailEndpoint(
+    ShardService shardService,
+    ArtifactService artifactService,
+    IAuthorizationService authorizationService
+) : EndpointBaseAsync
     .WithRequest<string>
     .WithActionResult<ShardDetailBaseDto?>
 {
-    private readonly ShardService shardService;
-    private readonly IAuthorizationService authorizationService;
-
-    public ShardDetailEndpoint(
-        ShardService shardService,
-        ArtifactService artifactService,
-        IAuthorizationService authorizationService)
-    {
-        this.shardService = shardService;
-        this.authorizationService = authorizationService;
-    }
-
     [HttpGet]
-    [SwaggerOperation(Tags = new[] { EndpointArea.Shard })]
+    [SwaggerOperation(Tags = [EndpointArea.Shard])]
     [ProducesResponseType(typeof(ShardDetailBaseDto), 200)]
     [ProducesResponseType(403)]
     [ProducesResponseType(404)]
     public override async Task<ActionResult<ShardDetailBaseDto?>> HandleAsync(
         string id,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
-        var detail = await shardService.Load(id, cancellationToken);
-        if (detail is null)
+        var shardErr = await shardService.Load(id, cancellationToken);
+        if (shardErr.HasError)
         {
-            return NotFound();
+            return this.KafeErrResult(shardErr);
         }
-        
-        var auth = await authorizationService.AuthorizeAsync(User, detail.ArtifactId, EndpointPolicy.Read);
+
+        var shard = shardErr.Value;
+        var auth = await authorizationService.AuthorizeAsync(User, shard.Id, EndpointPolicy.Read);
         if (!auth.Succeeded)
         {
             return Unauthorized();
         }
 
-        return Ok(TransferMaps.ToShardDetailDto(detail));
+        return Ok(TransferMaps.ToShardDetailDto(shard));
     }
 }

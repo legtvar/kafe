@@ -1,11 +1,9 @@
 ﻿using Ardalis.ApiEndpoints;
 using Asp.Versioning;
-using Kafe.Data.Aggregates;
 using Kafe.Data.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -16,61 +14,46 @@ namespace Kafe.Api.Endpoints.Shard;
 [Route("shard-download/{id}/{variant}")]
 public class ShardDownloadEndpoint(
     ShardService shardService,
-    ArtifactService artifactService,
-    ProjectService projectService,
-    AccountService accountService,
+    FileExtensionMimeMap mimeMap,
     IAuthorizationService authorizationService
 ) : EndpointBaseAsync
     .WithRequest<ShardDownloadEndpoint.RequestData>
     .WithActionResult
 {
     [HttpGet]
-    [SwaggerOperation(Tags = new[] { EndpointArea.Shard })]
+    [SwaggerOperation(Tags = [EndpointArea.Shard])]
     [Produces(typeof(FileStreamResult))]
     public override async Task<ActionResult> HandleAsync(
         RequestData data,
-        CancellationToken cancellationToken = default)
+        CancellationToken ct = default
+    )
     {
-        var detail = await shardService.Load(data.Id, cancellationToken);
-        if (detail is null)
+        var shardErr = await shardService.Load(data.Id, ct);
+        if (shardErr.HasError)
         {
-            return NotFound();
+            return this.KafeErrResult(shardErr);
         }
 
-        var auth = await authorizationService.AuthorizeAsync(User, (Hrib)detail.ArtifactId, EndpointPolicy.Read);
+        var shard = shardErr.Value;
+        var auth = await authorizationService.AuthorizeAsync(User, (Hrib)shard.Id, EndpointPolicy.Read);
         if (!auth.Succeeded)
         {
             return Unauthorized();
         }
 
-        var mediaType = await shardService.GetShardVariantMediaType(data.Id, data.Variant, cancellationToken);
-        if (mediaType is null || mediaType.MimeType is null)
+        var extension = mimeMap.GetFirstFileExtensionFor(shard.MimeType);
+        var streamErr = await shardService.OpenStream(data.Id, data.Variant, ct);
+        if (streamErr.HasError)
         {
-            return NotFound();
+            return this.KafeErrResult(streamErr);
         }
 
-        var account = await GetProjectOwner((Hrib)detail.ArtifactId, cancellationToken);
-        string userPrefix = account != null && account.Uco != null
-            ? account.Uco + "_"
-            : "";
-
-        var stream = await shardService.OpenStream(data.Id, data.Variant, cancellationToken);
-        return File(stream, mediaType.MimeType, $"{userPrefix}{data.Id}_{mediaType.Variant}.{mediaType.FileExtension}", true);
-    }
-
-    private async Task<AccountInfo?> GetProjectOwner(Hrib artifactId, CancellationToken cancellationToken)
-    {
-        var artifact = await artifactService.LoadDetail(artifactId, cancellationToken);
-        var containingProjectId = artifact?.ContainingProjectIds.FirstOrDefault();
-        if (containingProjectId is null)
-            return null;
-
-        var project = await projectService.Load((Hrib)containingProjectId, cancellationToken);
-        var ownerId = project?.OwnerId;
-        if (ownerId is null)
-            return null;
-
-        return await accountService.Load(ownerId, cancellationToken);
+        return File(
+            fileStream: streamErr.Value,
+            contentType: shard.MimeType,
+            fileDownloadName: $"{shard.Id}{extension}",
+            enableRangeProcessing: true
+        );
     }
 
     public record RequestData

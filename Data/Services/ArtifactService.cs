@@ -7,6 +7,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Kafe.Core.Diagnostics;
 using Marten.Linq.MatchesSql;
 
 namespace Kafe.Data.Services;
@@ -28,30 +29,73 @@ public class ArtifactService(
         return await db.KafeLoadManyAsync<ArtifactInfo>(ids, token);
     }
 
-    public async Task<Err<ArtifactInfo>> Create(ArtifactInfo @new, CancellationToken token = default)
+    public async Task<Err<ArtifactInfo>> Upsert(
+        ArtifactInfo artifact,
+        CancellationToken ct = default
+    )
     {
-        if (!Hrib.TryParse(@new.Id, out var id, out _))
+        var idErr = Hrib.TryParseValid(artifact.Id, shouldReplaceEmpty: true);
+        if (idErr.HasError)
         {
-            return Err.Fail<ArtifactInfo>(new BadHribDiagnostic(@new.Id));
+            return idErr.Diagnostic;
         }
 
-        if (id == Hrib.Empty)
+        var id = idErr.Value;
+        var existingErr = await db.Events.KafeFetchForWriting<ArtifactInfo>(id, ct);
+        if (existingErr is { HasError: true, Diagnostic.Payload: not NotFoundDiagnostic })
         {
-            id = Hrib.Create();
+            return existingErr.Diagnostic;
         }
 
-        var created = new ArtifactCreated(
-            ArtifactId: id.ToString(),
-            CreationMethod: @new.CreationMethod is not CreationMethod.Unknown
-                ? @new.CreationMethod
-                : CreationMethod.Api,
-            Name: @new.Name,
-            AddedOn: @new.AddedOn != default ? @new.AddedOn.ToUniversalTime() : DateTimeOffset.UtcNow
-        );
-        db.Events.KafeStartStream<ArtifactInfo>(created.ArtifactId, created);
+        if (existingErr is { HasError: true, Diagnostic.Payload: NotFoundDiagnostic })
+        {
+            var created = new ArtifactCreated(
+                ArtifactId: id.ToString(),
+                CreationMethod: artifact.CreationMethod is not CreationMethod.Unknown
+                    ? artifact.CreationMethod
+                    : CreationMethod.Api,
+                Name: artifact.Name,
+                AddedOn: artifact.AddedOn != default ? artifact.AddedOn.ToUniversalTime() : DateTimeOffset.UtcNow
+            );
+            db.Events.KafeStartStream<ArtifactInfo>(created.ArtifactId, created);
+            await db.SaveChangesAsync(ct);
+            existingErr = await db.Events.KafeFetchForWriting<ArtifactInfo>(id, ct);
+        }
 
-        await db.SaveChangesAsync(token);
-        return await db.Events.KafeAggregateRequiredStream<ArtifactInfo>(id, token: token);
+        if (existingErr.HasError)
+        {
+            return existingErr.Diagnostic;
+        }
+
+        var existing = existingErr.Value;
+        // TODO: Add some mechanism to change
+        var changedProperties = artifact.Properties
+            .Where(p =>
+                !existing.Aggregate!.Properties.ContainsKey(p.Key)
+                || existing.Aggregate.Properties[p.Key] != artifact.Properties[p.Key]
+            )
+            .Select(p => new KeyValuePair<string, ArtifactPropertySetter>(
+                    p.Key,
+                    new ArtifactPropertySetter(p.Value, ExistingValueHandling.OverwriteExisting)
+                )
+            )
+            .Concat(
+                existing.Aggregate!.Properties
+                    .Where(p => !artifact.Properties.ContainsKey(p.Key))
+                    .Select(p => new KeyValuePair<string, ArtifactPropertySetter>(
+                            p.Key,
+                            new ArtifactPropertySetter(null, ExistingValueHandling.OverwriteExisting)
+                        )
+                    )
+            )
+            .ToImmutableDictionary();
+        if (changedProperties.Count > 0)
+        {
+            existing.AppendOne(new ArtifactPropertiesSet(id.ToString(), changedProperties));
+        }
+
+        await db.SaveChangesAsync(ct);
+        return await db.Events.KafeAggregateRequiredStream<ArtifactInfo>(id, token: ct);
     }
 
     public async Task<Err<ImmutableArray<ProjectInfo>>> GetContainingProjects(

@@ -103,7 +103,7 @@ public class TestSeedData(IServiceProvider services, ILogger<TestSeedData> logge
         )).Unwrap();
 
         var artifactService = scope.ServiceProvider.GetRequiredService<ArtifactService>();
-        await artifactService.Create(
+        await artifactService.Upsert(
             ArtifactInfo.Create(LocalizedString.CreateInvariant("Test Artifact 1")) with
             {
                 Id = Artifact1Hrib

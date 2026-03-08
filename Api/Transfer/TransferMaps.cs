@@ -16,20 +16,22 @@ public static class TransferMaps
         return new ProjectBlueprintDto(
             RequiredReviewers: projectBlueprint.RequiredReviewers,
             ArtifactBlueprints: projectBlueprint.ArtifactBlueprints.ToDictionary(
-                kvp => kvp.Key,
-                kvp => new ProjectArtifactBlueprintDto(
-                    Name: kvp.Value.Name,
-                    Description: kvp.Value.Description,
-                    Arity: kvp.Value.Arity,
-                    ShardBlueprints: kvp.Value.ShardBlueprints.ToDictionary(
-                        skvp => skvp.Key,
-                        skvp => new ProjectArtifactShardBlueprintDto(
-                            Name: skvp.Value.Name,
-                            Description: skvp.Value.Description,
-                            Arity: skvp.Value.Arity
-                        ))
-                        .ToImmutableDictionary()
-                ))
+                    kvp => kvp.Key,
+                    kvp => new ProjectArtifactBlueprintDto(
+                        Name: kvp.Value.Name,
+                        Description: kvp.Value.Description,
+                        Arity: kvp.Value.Arity,
+                        ShardBlueprints: kvp.Value.ShardBlueprints.ToDictionary(
+                                skvp => skvp.Key,
+                                skvp => new ProjectArtifactShardBlueprintDto(
+                                    Name: skvp.Value.Name,
+                                    Description: skvp.Value.Description,
+                                    Arity: skvp.Value.Arity
+                                )
+                            )
+                            .ToImmutableDictionary()
+                    )
+                )
                 .ToImmutableDictionary()
         );
     }
@@ -53,24 +55,29 @@ public static class TransferMaps
     public static ProjectBlueprintDto TemporaryLemmaProjectBlueprintMockup =
         ToProjectBlueprintDto(ProjectBlueprint.TemporaryLemmaProjectBlueprint);
 
-    public static ProjectBlueprintDto TemporaryMateProjectBlueprintMockup =
+    public static readonly ProjectBlueprintDto TemporaryMateProjectBlueprintMockup =
         ToProjectBlueprintDto(ProjectBlueprint.TemporaryMateProjectBlueprint);
 
-    public static ProjectListDto ToProjectListDto(ProjectInfo data, Permission userPermission = Permission.None)
+    public static ProjectListDto ToProjectListDto(
+        ProjectInfo data,
+        ArtifactInfo? artifact,
+        Permission userPermission = Permission.None
+    )
     {
         return new ProjectListDto(
             Id: data.Id,
             ProjectGroupId: data.ProjectGroupId,
-            Name: (LocalizedString)data.Name,
+            Name: artifact?.Name ?? Const.UnnamedProjectName,
             Description: data.Description,
             GlobalPermissions: ToPermissionArray(data.GlobalPermissions),
             UserPermissions: ToPermissionArray(data.GlobalPermissions | userPermission),
             ReleasedOn: data.ReleasedOn,
             IsLocked: data.IsLocked,
             LatestReviewKind: data.Reviews != null && !data.Reviews.IsDefaultOrEmpty
-            ? data.Reviews.OrderByDescending(r => r.AddedOn).First().Kind
-            : ReviewKind.NotReviewed,
-            OwnerId: data.OwnerId);
+                ? data.Reviews.OrderByDescending(r => r.AddedOn).First().Kind
+                : ReviewKind.NotReviewed,
+            OwnerId: data.OwnerId
+        );
     }
 
     public static ProjectDetailDto ToProjectDetailDto(ProjectInfo data, Permission userPermission = Permission.None)
@@ -116,7 +123,8 @@ public static class TransferMaps
         return new AuthorListDto(
             Id: data.Id,
             Name: data.Name,
-            GlobalPermissions: data.GlobalPermissions);
+            GlobalPermissions: data.GlobalPermissions
+        );
     }
 
     public static AuthorDetailDto ToAuthorDetailDto(AuthorInfo data)
@@ -128,7 +136,8 @@ public static class TransferMaps
             Bio: data.Bio,
             Uco: data.Uco,
             Email: data.Email,
-            Phone: data.Phone);
+            Phone: data.Phone
+        );
     }
 
     public static PlaylistListDto ToPlaylistListDto(PlaylistInfo data)
@@ -138,7 +147,8 @@ public static class TransferMaps
             OrganizationId: data.OrganizationId,
             Name: data.Name,
             Description: data.Description,
-            GlobalPermissions: ToPermissionArray(data.GlobalPermissions));
+            GlobalPermissions: ToPermissionArray(data.GlobalPermissions)
+        );
     }
 
     public static PlaylistDetailDto ToPlaylistDetailDto(PlaylistInfo data)
@@ -149,7 +159,8 @@ public static class TransferMaps
             Name: data.Name,
             Description: data.Description,
             GlobalPermissions: ToPermissionArray(data.GlobalPermissions),
-            Entries: []);
+            Entries: []
+        );
     }
 
     public static ProjectGroupListDto ToProjectGroupListDto(ProjectGroupInfo data)
@@ -160,7 +171,8 @@ public static class TransferMaps
             Name: data.Name,
             Description: data.Description,
             Deadline: data.Deadline,
-            IsOpen: data.IsOpen);
+            IsOpen: data.IsOpen
+        );
     }
 
     public static ProjectGroupDetailDto ToProjectGroupDetailDto(ProjectGroupInfo data)
@@ -207,21 +219,14 @@ public static class TransferMaps
         return new ShardListDto(
             Id: data.Id,
             Kind: ShardCompat.ToShardKind(data.Payload.Value.GetType()),
-            Variants: [..data.Links.Select(l => l.Payload.Value)
-                .OfType<VariantShardLink>()
-                .Select(v => v.Preset)
-                .OfType<string>()
+            Variants:
+            [
+                ..data.Links.Select(l => l.Payload.Value)
+                    .OfType<VariantShardLink>()
+                    .Select(v => v.Preset)
+                    .OfType<string>()
             ]
         );
-    }
-
-    public static VideoShardDetailDto ToVideoShardDetailDto(VideoShardInfo data)
-    {
-        return new VideoShardDetailDto(
-            Id: data.Id,
-            Kind: data.Kind,
-            ArtifactId: data.ArtifactId,
-            Variants: data.Variants.ToImmutableDictionary(v => v.Key, v => ToMediaInfoDto(v.Value)));
     }
 
     public static MediaDto ToMediaInfoDto(MediaInfo data)
@@ -235,7 +240,8 @@ public static class TransferMaps
             AudioStreams: [.. data.AudioStreams.Select(ToAudioStreamDto)],
             SubtitleStreams: [.. data.SubtitleStreams.Select(ToSubtitleStreamDto)],
             IsCorrupted: data.IsCorrupted,
-            Error: data.Error);
+            Error: data.Error
+        );
     }
 
     public static VideoStreamDto ToVideoStreamDto(VideoStreamInfo data)
@@ -245,7 +251,8 @@ public static class TransferMaps
             Bitrate: data.Bitrate,
             Width: data.Width,
             Height: data.Height,
-            Framerate: data.Framerate);
+            Framerate: data.Framerate
+        );
     }
 
     public static AudioStreamDto ToAudioStreamDto(AudioStreamInfo data)
@@ -254,23 +261,16 @@ public static class TransferMaps
             Codec: data.Codec,
             Bitrate: data.Bitrate,
             Channels: data.Channels,
-            SampleRate: data.SampleRate);
+            SampleRate: data.SampleRate
+        );
     }
 
     public static SubtitleStreamDto ToSubtitleStreamDto(SubtitleStreamInfo data)
     {
         return new SubtitleStreamDto(
             Codec: data.Codec,
-            Bitrate: data.Bitrate);
-    }
-
-    public static ImageShardDetailDto ToImageShardDetailDto(ImageShardInfo data)
-    {
-        return new ImageShardDetailDto(
-            Id: data.Id,
-            Kind: data.Kind,
-            ArtifactId: data.ArtifactId,
-            Variants: data.Variants.ToImmutableDictionary(v => v.Key, v => ToImageDto(v.Value)));
+            Bitrate: data.Bitrate
+        );
     }
 
     public static ImageDto ToImageDto(ImageInfo data)
@@ -280,28 +280,71 @@ public static class TransferMaps
             MimeType: data.MimeType,
             Width: data.Width,
             Height: data.Height,
-            IsCorrupted: data.IsCorrupted);
+            IsCorrupted: data.IsCorrupted
+        );
     }
 
-    public static ShardDetailBaseDto ToShardDetailDto(IShardEntity data)
+    [Obsolete("Use the new artifact abstraction instead.")]
+    public static ShardDetailBaseDto ToShardDetailDto(ShardInfo data)
     {
-        return data switch
+        var kind = ShardCompat.ToShardKind(data.Payload.Value.GetType());
+        return kind switch
         {
-            VideoShardInfo v => ToVideoShardDetailDto(v),
-            ImageShardInfo i => ToImageShardDetailDto(i),
-            SubtitlesShardInfo s => ToSubtitlesShardDetailDto(s),
-            BlendShardInfo b => ToBlendShardDetailDto(b),
+            ShardKind.Video => new VideoShardDetailDto(
+                Id: data.Id,
+                Kind: ShardKind.Video,
+                ArtifactId: Hrib.Empty,
+                Variants: ImmutableDictionary.CreateRange(
+                    [
+                        new KeyValuePair<string, MediaDto>(
+                            Const.OriginalShardVariant,
+                            ToMediaInfoDto((MediaInfo)data.Payload.Value)
+                        )
+                    ]
+                )
+            ),
+            ShardKind.Image => new ImageShardDetailDto(
+                Id: data.Id,
+                Kind: ShardKind.Image,
+                ArtifactId: Hrib.Empty,
+                Variants: ImmutableDictionary.CreateRange(
+                    [
+                        new KeyValuePair<string, ImageDto>(
+                            Const.OriginalShardVariant,
+                            ToImageDto((ImageInfo)data.Payload.Value)
+                        )
+                    ]
+                )
+            ),
+            ShardKind.Subtitles => new SubtitlesShardDetailDto(
+                Id: data.Id,
+                Kind: ShardKind.Subtitles,
+                ArtifactId: Hrib.Empty,
+                Variants: ImmutableDictionary.CreateRange(
+                    [
+                        new KeyValuePair<string, SubtitlesDto>(
+                            Const.OriginalShardVariant,
+                            ToSubtitlesDto((SubtitlesInfo)data.Payload.Value)
+                        )
+                    ]
+                )
+            ),
+            ShardKind.Blend => new BlendShardDetailDto(
+                Id: data.Id,
+                Kind: ShardKind.Blend,
+                ArtifactId: Hrib.Empty,
+                FileName: data.UploadFilename,
+                Variants: ImmutableDictionary.CreateRange(
+                    [
+                        new KeyValuePair<string, BlendDto>(
+                            Const.OriginalShardVariant,
+                            ToBlendDto((BlendInfo)data.Payload.Value)
+                        )
+                    ]
+                )
+            ),
             _ => throw new NotSupportedException($"Shards of '{data.GetType()}' are not supported.")
         };
-    }
-
-    public static SubtitlesShardDetailDto ToSubtitlesShardDetailDto(SubtitlesShardInfo data)
-    {
-        return new SubtitlesShardDetailDto(
-            Id: data.Id,
-            Kind: data.Kind,
-            ArtifactId: data.ArtifactId,
-            Variants: data.Variants.ToImmutableDictionary(p => p.Key, p => ToSubtitlesDto(p.Value)));
     }
 
     public static SubtitlesDto ToSubtitlesDto(SubtitlesInfo data)
@@ -311,17 +354,8 @@ public static class TransferMaps
             MimeType: data.MimeType,
             Language: data.Language,
             Codec: data.Codec,
-            Bitrate: data.Bitrate);
-    }
-
-    public static BlendShardDetailDto ToBlendShardDetailDto(BlendShardInfo data)
-    {
-        return new BlendShardDetailDto(
-            Id: data.Id,
-            FileName: data.FileName,
-            Kind: data.Kind,
-            ArtifactId: data.ArtifactId,
-            Variants: data.Variants.ToImmutableDictionary(p => p.Key, p => ToBlendDto(p.Value)));
+            Bitrate: data.Bitrate
+        );
     }
 
     public static BlendDto ToBlendDto(BlendInfo data)
@@ -330,7 +364,8 @@ public static class TransferMaps
             FileExtension: data.FileExtension,
             MimeType: data.MimeType,
             Tests: data.Tests?.Select(ToBlendTestResponseDto).ToImmutableArray(),
-            Error: data.Error);
+            Error: data.Error
+        );
     }
 
     public static PigeonsTestInfoDto ToBlendTestResponseDto(PigeonsTestInfo data)
@@ -340,11 +375,13 @@ public static class TransferMaps
             State: data.State,
             Datablock: data.Datablock,
             Message: data.Message,
-            Traceback: data.Traceback);
+            Traceback: data.Traceback
+        );
     }
 
     public static AccountDetailDto ToAccountDetailDto(
-        AccountInfo data)
+        AccountInfo data
+    )
     {
         return new AccountDetailDto(
             Id: data.Id,
@@ -353,19 +390,20 @@ public static class TransferMaps
             EmailAddress: data.EmailAddress,
             PreferredCulture: data.PreferredCulture,
             Permissions: data.Permissions?.ToImmutableDictionary(p => (Hrib)p.Key, p => ToPermissionArray(p.Value))
-                ?? ImmutableDictionary<Hrib, ImmutableArray<Permission>>.Empty
+            ?? ImmutableDictionary<Hrib, ImmutableArray<Permission>>.Empty
         );
     }
 
     public static AccountListDto ToAccountListDto(
-        AccountInfo data)
+        AccountInfo data
+    )
     {
         return new AccountListDto(
             Id: data.Id,
             EmailAddress: data.EmailAddress,
             PreferredCulture: data.PreferredCulture,
             Permissions: data?.Permissions?.ToImmutableDictionary(p => (Hrib)p.Key, p => ToPermissionArray(p.Value))
-                ?? ImmutableDictionary<Hrib, ImmutableArray<Permission>>.Empty
+            ?? ImmutableDictionary<Hrib, ImmutableArray<Permission>>.Empty
         );
     }
 
@@ -383,19 +421,28 @@ public static class TransferMaps
             EntityType: entityType,
             GlobalPermissions: globalPermissions is null ? null : ToPermissionArray(globalPermissions.Value),
             UserPermissions: userPermissions is null ? null : ToPermissionArray(userPermissions.Value),
-            AccountPermissions: [
+            AccountPermissions:
+            [
                 ..accounts.Select(a => new EntityPermissionsAccountListDto(
-                    Id: a.Id,
-                    EmailAddress: a.EmailAddress,
-                    Name: a.Name,
-                    Permissions: ToPermissionArray(a.Permissions?.GetValueOrDefault(id.ToString()) ?? Permission.None)
-                )).Concat(invites.Select(i => new EntityPermissionsAccountListDto(
-                    Id: null,
-                    EmailAddress: i.EmailAddress,
-                    Name: null,
-                    Permissions: ToPermissionArray(i.Permissions?.GetValueOrDefault(id.ToString())?.Permission
-                        ?? Permission.None)
-                    )))
+                            Id: a.Id,
+                            EmailAddress: a.EmailAddress,
+                            Name: a.Name,
+                            Permissions: ToPermissionArray(
+                                a.Permissions?.GetValueOrDefault(id.ToString()) ?? Permission.None
+                            )
+                        )
+                    ).Concat(
+                        invites.Select(i => new EntityPermissionsAccountListDto(
+                                Id: null,
+                                EmailAddress: i.EmailAddress,
+                                Name: null,
+                                Permissions: ToPermissionArray(
+                                    i.Permissions?.GetValueOrDefault(id.ToString())?.Permission
+                                    ?? Permission.None
+                                )
+                            )
+                        )
+                    )
                     .OrderBy(e => e.EmailAddress)
             ]
         );
@@ -418,13 +465,15 @@ public static class TransferMaps
             return [];
         }
 
-        return [
+        return
+        [
             ..Enum.GetValues<Permission>()
                 .Where(v => v != Permission.None
                     && v != Permission.All
                     && v != Permission.Inheritable
                     && v != Permission.Publishable
-                    && (value & v) == v)
+                    && (value & v) == v
+                )
         ];
     }
 
@@ -454,7 +503,7 @@ public static class TransferMaps
             Description: data.Description,
             CreatedOn: data.CreatedOn,
             Permissions: data.Permissions?.ToImmutableDictionary(p => (Hrib)p.Key, p => ToPermissionArray(p.Value))
-                ?? ImmutableDictionary<Hrib, ImmutableArray<Permission>>.Empty
+            ?? ImmutableDictionary<Hrib, ImmutableArray<Permission>>.Empty
         );
     }
 

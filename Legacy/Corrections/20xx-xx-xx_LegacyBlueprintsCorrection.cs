@@ -74,8 +74,8 @@ Review:
 
 // TODO: Uncomment once correction is ready
 // [AutoCorrection("2025-04-21")]
-public class LemmaBlueprintsCorrection(
-    ILogger<LemmaBlueprintsCorrection> logger
+public class LegacyBlueprintsCorrection(
+    ILogger<LegacyBlueprintsCorrection> logger
 ) : IEventCorrection
 {
     public static readonly Hrib WmaBlueprintId = Hrib.Parse("lgc-wma-proj");

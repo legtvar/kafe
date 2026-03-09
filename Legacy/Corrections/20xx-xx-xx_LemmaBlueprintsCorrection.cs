@@ -74,23 +74,24 @@ Review:
 
 // TODO: Uncomment once correction is ready
 // [AutoCorrection("2025-04-21")]
-public class LemmaBlueprintsCorrection : IEventCorrection
+public class LemmaBlueprintsCorrection(
+    ILogger<LemmaBlueprintsCorrection> logger
+) : IEventCorrection
 {
-    private readonly ILogger<LemmaBlueprintsCorrection> logger;
-    private readonly KafeObjectFactory objectFactory;
-
-    public LemmaBlueprintsCorrection(
-        ILogger<LemmaBlueprintsCorrection> logger,
-        KafeObjectFactory objectFactory
-    )
-    {
-        this.logger = logger;
-        this.objectFactory = objectFactory;
-    }
-
     public static readonly Hrib WmaBlueprintId = Hrib.Parse("lgc-wma-proj");
 
     public static readonly Hrib FestivalRegistrationBlueprintId = Hrib.Parse("lgc-bp-freg");
+
+    public const string NameProp = "Name";
+    public const string DescriptionProp = "Description";
+    public const string GenreProp = "Genre";
+    public const string CastProp = "Cast";
+    public const string CrewProp = "Crew";
+    public const string VideosProp = "Videos";
+    public const string FilmProp = "Film";
+    public const string VideoAnnotationProp = "VideoAnnotation";
+    public const string CoverPhotosProp = "CoverPhotos";
+
 
     public async Task Apply(IDocumentSession db, CancellationToken ct = default)
     {
@@ -106,12 +107,12 @@ public class LemmaBlueprintsCorrection : IEventCorrection
 
     public static BlueprintInfo GetWmaProjectBlueprint(KafeObjectFactory kof)
     {
-        return new(
+        return new BlueprintInfo(
             id: WmaBlueprintId.ToString(),
             name: LocalizedString.CreateInvariant("WMA Project (legacy)"),
             properties: new Dictionary<string, BlueprintProperty>
             {
-                ["name"] = new(
+                [NameProp] = new(
                     name: LocalizedString.Create(
                         (Const.InvariantCulture, "Project name"),
                         (Const.CzechCulture, "Název projektu")
@@ -123,7 +124,7 @@ public class LemmaBlueprintsCorrection : IEventCorrection
                         )
                     )]
                 ),
-                ["description"] = new(
+                [DescriptionProp] = new(
                     name: LocalizedString.Create(
                         (Const.InvariantCulture, "Project description"),
                         (Const.CzechCulture, "Popis projektu")
@@ -135,7 +136,7 @@ public class LemmaBlueprintsCorrection : IEventCorrection
                         )
                     )]
                 ),
-                ["genre"] = new(
+                [GenreProp] = new(
                     name: LocalizedString.Create(
                         (Const.InvariantCulture, "Genre"),
                         (Const.CzechCulture, "Žánr")
@@ -147,7 +148,7 @@ public class LemmaBlueprintsCorrection : IEventCorrection
                         )
                     )]
                 ),
-                ["cast"] = new(
+                [CastProp] = new(
                     name: LocalizedString.Create(
                         (Const.InvariantCulture, "Cast"),
                         (Const.CzechCulture, "Herci")
@@ -159,7 +160,7 @@ public class LemmaBlueprintsCorrection : IEventCorrection
                         )
                     )]
                 ),
-                ["crew"] = new(
+                [CrewProp] = new(
                     name: LocalizedString.Create(
                         (Const.InvariantCulture, "Crew"),
                         (Const.CzechCulture, "Štáb")
@@ -171,7 +172,7 @@ public class LemmaBlueprintsCorrection : IEventCorrection
                         )
                     )]
                 ),
-                ["videos"] = new(
+                [VideosProp] = new(
                     name: LocalizedString.Create(
                         (Const.InvariantCulture, "Video files"),
                         (Const.CzechCulture, "Video soubory")
@@ -194,7 +195,7 @@ public class LemmaBlueprintsCorrection : IEventCorrection
 
     public static BlueprintInfo GetFestivalProjectBlueprint(KafeObjectFactory kof)
     {
-        return new(
+        return new BlueprintInfo(
             id: FestivalRegistrationBlueprintId.ToString(),
             name: LocalizedString.Create(
                 (Const.InvariantCulture, "Film Festival Registration (legacy)"),
@@ -202,7 +203,7 @@ public class LemmaBlueprintsCorrection : IEventCorrection
             ),
             properties: new Dictionary<string, BlueprintProperty>
             {
-                ["name"] = new(
+                [NameProp] = new(
                     name: LocalizedString.Create(
                         (Const.InvariantCulture, "Film title"),
                         (Const.CzechCulture, "Název filmu")
@@ -215,7 +216,7 @@ public class LemmaBlueprintsCorrection : IEventCorrection
                         new StringLengthRequirement(1, 42)
                     )]
                 ),
-                ["description"] = new(
+                [DescriptionProp] = new(
                     name: LocalizedString.Create(
                         (Const.InvariantCulture, "Film description"),
                         (Const.CzechCulture, "Popis filmu")
@@ -228,7 +229,7 @@ public class LemmaBlueprintsCorrection : IEventCorrection
                         new StringLengthRequirement(50, 200)
                     )]
                 ),
-                ["genre"] = new(
+                [GenreProp] = new(
                     name: LocalizedString.Create(
                         (Const.InvariantCulture, "Genre"),
                         (Const.CzechCulture, "Žánr")
@@ -241,7 +242,7 @@ public class LemmaBlueprintsCorrection : IEventCorrection
                         new StringLengthRequirement(1, 32)
                     )]
                 ),
-                ["cast"] = new(
+                [CastProp] = new(
                     name: LocalizedString.Create(
                         (Const.InvariantCulture, "Cast"),
                         (Const.CzechCulture, "Herci")
@@ -253,7 +254,7 @@ public class LemmaBlueprintsCorrection : IEventCorrection
                         )
                     )]
                 ),
-                ["crew"] = new(
+                [CrewProp] = new(
                     name: LocalizedString.Create(
                         (Const.InvariantCulture, "Crew"),
                         (Const.CzechCulture, "Štáb")
@@ -265,7 +266,7 @@ public class LemmaBlueprintsCorrection : IEventCorrection
                         )
                     )]
                 ),
-                ["film"] = new(
+                [FilmProp] = new(
                     name: LocalizedString.Create(
                         (Const.InvariantCulture, "Film file"),
                         (Const.CzechCulture, "Soubor s filmem")
@@ -323,7 +324,7 @@ public class LemmaBlueprintsCorrection : IEventCorrection
                         new MediaStreamCountRequirement(1, 1, MediaStreamKind.Audio)
                     )]
                 ),
-                ["video-annotation"] = new(
+                [VideoAnnotationProp] = new(
                     name: LocalizedString.Create(
                         (Const.InvariantCulture, "Video-Annotation"),
                         (Const.CzechCulture, "Videoanotace")
@@ -376,7 +377,7 @@ public class LemmaBlueprintsCorrection : IEventCorrection
                         new MediaStreamCountRequirement(1, 1, MediaStreamKind.Audio)
                     )]
                 ),
-                ["cover-photos"] = new(
+                [CoverPhotosProp] = new(
                     name: LocalizedString.Create(
                         (Const.InvariantCulture, "Cover photos"),
                         (Const.CzechCulture, "Titulní fotografie")

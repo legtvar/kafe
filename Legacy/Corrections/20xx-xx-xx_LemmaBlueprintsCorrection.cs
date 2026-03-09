@@ -74,13 +74,13 @@ Review:
 
 // TODO: Uncomment once correction is ready
 // [AutoCorrection("2025-04-21")]
-public class FestivalFilmBlueprintCorrection : IEventCorrection
+public class LemmaBlueprintsCorrection : IEventCorrection
 {
-    private readonly ILogger<FestivalFilmBlueprintCorrection> logger;
+    private readonly ILogger<LemmaBlueprintsCorrection> logger;
     private readonly KafeObjectFactory objectFactory;
 
-    public FestivalFilmBlueprintCorrection(
-        ILogger<FestivalFilmBlueprintCorrection> logger,
+    public LemmaBlueprintsCorrection(
+        ILogger<LemmaBlueprintsCorrection> logger,
         KafeObjectFactory objectFactory
     )
     {

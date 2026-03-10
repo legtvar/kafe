@@ -14,13 +14,15 @@ public record ProjectGroupCreated(
     [Hrib] string ProjectGroupId,
     CreationMethod CreationMethod,
     [Hrib] string? OrganizationId,
-    [LocalizedString] ImmutableDictionary<string, string> Name
+    [LocalizedString] ImmutableDictionary<string, string> Name,
+    [Hrib] string? BlueprintId
 );
 
 public record ProjectGroupInfoChanged(
     [Hrib] string ProjectGroupId,
     [LocalizedString] ImmutableDictionary<string, string>? Name = null,
     [LocalizedString] ImmutableDictionary<string, string>? Description = null,
+    [Hrib] string? BlueprintId = null,
     DateTimeOffset? Deadline = null
 );
 

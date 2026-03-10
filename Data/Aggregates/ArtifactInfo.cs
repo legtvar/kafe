@@ -34,9 +34,7 @@ public record ArtifactInfo(
 
     IReadOnlyDictionary<string, KafeObject> IArtifact.Properties => Properties;
 
-    public LocalizedString Name => (Properties.TryGetValue(nameof(Name), out var name)
-        ? name.Value as LocalizedString
-        : null) ?? Const.UnnamedArtifactName;
+    public LocalizedString Name => this.GetProperty<LocalizedString>(nameof(Name)) ?? Const.UnnamedArtifactName;
 
     public bool IsValid => ((IEntity)this).Id.IsValid;
 

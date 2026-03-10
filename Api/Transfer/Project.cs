@@ -18,7 +18,7 @@ public record ProjectListDto(
     LocalizedString? Description,
     ImmutableArray<Permission> GlobalPermissions,
     ImmutableArray<Permission> UserPermissions,
-    DateTimeOffset ReleasedOn,
+    DateTimeOffset? ReleasedOn,
     ReviewKind LatestReviewKind,
     bool IsLocked,
     Hrib? OwnerId
@@ -37,7 +37,7 @@ public record ProjectDetailDto(
     string? HearAboutUs,
     ImmutableArray<Permission> GlobalPermissions,
     ImmutableArray<Permission> UserPermissions,
-    DateTimeOffset ReleasedOn,
+    DateTimeOffset? ReleasedOn,
     ImmutableArray<ProjectAuthorDto> Crew,
     ImmutableArray<ProjectAuthorDto> Cast,
     Hrib? OwnerId,
@@ -58,7 +58,7 @@ public record ProjectArtifactDto(
     LocalizedString Name,
     DateTimeOffset AddedOn,
     string? BlueprintSlot,
-    ImmutableArray<ShardListDto> Shards
+    ImmutableArray<ShardListDto > Shards
 );
 
 public record ProjectReviewDto(

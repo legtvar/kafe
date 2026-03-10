@@ -45,7 +45,7 @@ public class ProjectCreationEndpoint(
         }
 
         var artifactErr = await artifactService.Upsert(
-            artifact: ArtifactInfo.Create(request.Name) with
+            artifact: ArtifactInfo.Create() with
             {
                 Properties = objectFactory.WrapProperties(
                     (LegacyBlueprintsCorrection.NameProp, request.Name),

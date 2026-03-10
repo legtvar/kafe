@@ -52,14 +52,15 @@ public partial record struct Diagnostic : IFormattable, IInvalidable<Diagnostic>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string StackTrace { get; init; }
 
+    public LocalizedString GetMessage()
+    {
+        message ??= Descriptor.GetMessage(Payload);
+        return message;
+    }
+
     public string ToString(CultureInfo culture)
     {
-        if (message is null)
-        {
-            message = Descriptor.GetMessage(Payload);
-        }
-
-        return message[culture];
+        return GetMessage()[culture];
     }
 
     public override string ToString()

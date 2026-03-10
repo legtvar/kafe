@@ -23,26 +23,51 @@ public class RequirementValidator(
         var validationStarted = DateTimeOffset.UtcNow;
         var diagnosticsBuilder = ImmutableArray.CreateBuilder<Diagnostic>();
 
+        foreach (var (propertyName, target) in artifact.Properties)
+        {
+            var scalarMetadata = typeRegistry.RequireMetadata(target.Type).RequireExtension<ScalarTypeMetadata>();
+            var propertyDiagnostics = ImmutableArray.CreateBuilder<Diagnostic>();
+            foreach (var requirement in scalarMetadata.DefaultRequirements)
+            {
+                propertyDiagnostics.AddRange(await ValidateRequirement(requirement, target, ct));
+            }
+
+            diagnosticsBuilder.Add(Diagnostic.Aggregate(propertyDiagnostics.ToImmutable()).ForParameter(propertyName));
+        }
+
         // TODO: Parallelize
         foreach (var property in blueprint.Properties)
         {
             KafeObject? target = artifact.Properties.ContainsKey(property.Key)
                 ? artifact.Properties[property.Key]
                 : null;
+            var propertyDiagnostics = ImmutableArray.CreateBuilder<Diagnostic>();
             foreach (var requirement in property.Value.Requirements)
             {
-                diagnosticsBuilder.AddRange(await ValidateRequirement((IRequirement)requirement.Value, target, ct));
+                propertyDiagnostics.AddRange(await ValidateRequirement((IRequirement)requirement.Value, target, ct));
             }
-        }
 
-        // TODO: handle default requirements for scalar types
+            diagnosticsBuilder.Add(Diagnostic.Aggregate(propertyDiagnostics.ToImmutable()).ForParameter(property.Key));
+        }
 
         if (!blueprint.AllowAdditionalProperties)
         {
-            // TODO
+            var additionalProperties = artifact.Properties.Keys.Except(blueprint.Properties.Keys)
+                .Order(StringComparer.InvariantCulture).ToImmutableArray();
+            if (additionalProperties.Length > 0)
+            {
+                diagnosticsBuilder.Add(
+                    Diagnostic.Fail(new AdditionalPropertiesNotAllowedDiagnostic(artifact.Id, additionalProperties))
+                );
+            }
         }
 
-        return new ArtifactValidationReport(artifact.Id, blueprint.Id, validationStarted, diagnosticsBuilder.ToImmutable());
+        return new ArtifactValidationReport(
+            artifact.Id,
+            blueprint.Id,
+            validationStarted,
+            diagnosticsBuilder.ToImmutable()
+        );
     }
 
     public async Task<ImmutableArray<Diagnostic>> ValidateRequirement(

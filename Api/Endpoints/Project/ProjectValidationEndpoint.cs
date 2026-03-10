@@ -1,12 +1,10 @@
 ﻿using Ardalis.ApiEndpoints;
 using Asp.Versioning;
-using Kafe.Api.Services;
 using Kafe.Api.Transfer;
 using Kafe.Data.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
-using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -23,14 +21,12 @@ public class ProjectValidationEndpoint(
     .WithRequest<string>
     .WithActionResult<ProjectValidationDto>
 {
-    private readonly ProjectService projectService = projectService;
-    private readonly IAuthorizationService authorizationService = authorizationService;
-
     [HttpGet]
-    [SwaggerOperation(Tags = new[] { EndpointArea.Project })]
+    [SwaggerOperation(Tags = [EndpointArea.Project])]
     public override async Task<ActionResult<ProjectValidationDto>> HandleAsync(
         string id,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         // NB: Only project owners (i.e. account with Write on the project) can validate projects since only they
         //     can make changes to them anyway.
@@ -39,17 +35,25 @@ public class ProjectValidationEndpoint(
         {
             return Unauthorized();
         }
-        
-        var report = await projectService.Validate(id, cancellationToken);
+
+        var reportErr = await projectService.Validate(id, cancellationToken);
+        if (reportErr.HasError)
+        {
+            return this.KafeErrorResult(reportErr.Diagnostic);
+        }
+
+        var report = reportErr.Value;
         return Ok(new ProjectValidationDto(
             ProjectId: id,
             ValidatedOn: report.ValidatedOn,
-            Diagnostics: report.Diagnostics.Select(d => new ProjectDiagnosticDto(
-                Kind: d.Kind,
-                Message: d.Message,
-                ValidationStage: d.ValidationStage
-            ))
-            .ToImmutableArray()
+            Diagnostics: [
+                ..report.Diagnostics.Select(d => new ProjectDiagnosticDto(
+                    Kind: d.Severity,
+                    Message: d.GetMessage(),
+                    // TODO: Reimplement the notion of stages somehow.
+                    ValidationStage: null
+                ))
+            ]
         ));
     }
 }

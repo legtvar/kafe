@@ -69,7 +69,7 @@ public class ProjectService(
         Err<ArtifactInfo> artifactErr;
         if (artifactId.IsEmpty)
         {
-            artifactErr = await artifactService.Upsert(ArtifactInfo.Create(LocalizedString.Empty), token);
+            artifactErr = await artifactService.Upsert(ArtifactInfo.Create(), token);
         }
         else
         {

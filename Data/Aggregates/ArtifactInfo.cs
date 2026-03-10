@@ -14,10 +14,6 @@ public record ArtifactInfo(
     CreationMethod CreationMethod,
 
     [property:Sortable]
-    [property:LocalizedString]
-    ImmutableDictionary<string, string> Name,
-
-    [property:Sortable]
     DateTimeOffset AddedOn,
 
     ImmutableDictionary<string, KafeObject> Properties
@@ -28,7 +24,6 @@ public record ArtifactInfo(
     public ArtifactInfo() : this(
         Id: Hrib.InvalidValue,
         CreationMethod: CreationMethod.Unknown,
-        Name: LocalizedString.CreateInvariant(Const.InvalidName),
         AddedOn: default,
         Properties: ImmutableDictionary<string, KafeObject>.Empty
     )
@@ -39,7 +34,9 @@ public record ArtifactInfo(
 
     IReadOnlyDictionary<string, KafeObject> IArtifact.Properties => Properties;
 
-    LocalizedString IArtifact.Name => Name;
+    public LocalizedString Name => (Properties.TryGetValue(nameof(Name), out var name)
+        ? name.Value as LocalizedString
+        : null) ?? Const.UnnamedArtifactName;
 
     public bool IsValid => ((IEntity)this).Id.IsValid;
 
@@ -47,24 +44,23 @@ public record ArtifactInfo(
     /// Creates a bare-bones but valid <see cref="ArtifactInfo"/>.
     /// </summary>
     [MartenIgnore]
-    public static ArtifactInfo Create(LocalizedString name)
+    public static ArtifactInfo Create()
     {
-        return new ArtifactInfo { Id = Hrib.EmptyValue, Name = name };
+        return new ArtifactInfo { Id = Hrib.EmptyValue };
     }
 }
 
 public class ArtifactInfoProjection(
-    KafeObjectFactory kafeObjectFactory
+    KafeObjectFactory objectFactory
 ) : SingleStreamProjection<ArtifactInfo, string>
 {
-    public static ArtifactInfo Create(ArtifactCreated e)
+    public ArtifactInfo Create(ArtifactCreated e)
     {
         return new ArtifactInfo(
             Id: e.ArtifactId,
             CreationMethod: e.CreationMethod,
-            Name: e.Name,
             AddedOn: e.AddedOn,
-            Properties: ImmutableDictionary<string, KafeObject>.Empty
+            Properties: objectFactory.WrapProperties((nameof(Name), e.Name))
         );
     }
 
@@ -72,8 +68,10 @@ public class ArtifactInfoProjection(
     {
         return a with
         {
-            Name = e.Name ?? a.Name,
-            AddedOn = e.AddedOn ?? a.AddedOn
+            AddedOn = e.AddedOn ?? a.AddedOn,
+            Properties = e.Name is null
+                ? a.Properties
+                : a.Properties.SetItem(nameof(Name), objectFactory.Wrap(e.Name))
         };
     }
 
@@ -98,7 +96,7 @@ public class ArtifactInfoProjection(
             var oldObject = builder.GetValueOrDefault(key);
 
             // TODO: Report the error... somewhere.
-            var setValue = kafeObjectFactory.Set(oldObject, newObject, setter.ExistingValueHandling, out var _);
+            var setValue = objectFactory.Set(oldObject, newObject, setter.ExistingValueHandling, out var _);
             if (setValue is null)
             {
                 builder.Remove(key);

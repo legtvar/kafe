@@ -21,6 +21,8 @@ public record ProjectGroupInfo(
     [property:LocalizedString]
     ImmutableDictionary<string, string>? Description = null,
 
+    [Hrib] string? BlueprintId = null,
+
     [property:Sortable]
     DateTimeOffset Deadline = default,
 
@@ -73,7 +75,8 @@ public class ProjectGroupInfoProjection : SingleStreamProjection<ProjectGroupInf
             Id: e.ProjectGroupId,
             CreationMethod: e.CreationMethod,
             OrganizationId: e.OrganizationId ?? Hrib.InvalidValue,
-            Name: e.Name
+            Name: e.Name,
+            BlueprintId: e.BlueprintId
         );
     }
 
@@ -83,6 +86,7 @@ public class ProjectGroupInfoProjection : SingleStreamProjection<ProjectGroupInf
         {
             Name = e.Name ?? g.Name,
             Description = e.Description ?? g.Description,
+            BlueprintId = e.BlueprintId ?? g.BlueprintId,
             Deadline = e.Deadline ?? g.Deadline,
         };
     }

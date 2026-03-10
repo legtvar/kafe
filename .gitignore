@@ -7,3 +7,4 @@ artifacts/
 *.DotSettings.user
 **/node_modules/
 .pnpm-store/
+*.user

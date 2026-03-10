@@ -17,7 +17,7 @@ public static class ControllerBaseExtensions
                     modelState: controller.ModelState,
                     skipFrames: 2
                 );
-                pd.Errors = pd.Errors.AddRange(err.Diagnostic);
+                pd.Diagnostics = pd.Diagnostics.AddRange(err.Diagnostic);
 
                 return new ObjectResult(pd)
                 {
@@ -37,7 +37,7 @@ public static class ControllerBaseExtensions
                 modelState: controller.ModelState,
                 skipFrames: 2
             );
-            pd.Errors = pd.Errors.AddRange(diagnostics);
+            pd.Diagnostics = pd.Diagnostics.AddRange(diagnostics);
 
             return new ObjectResult(pd)
             {

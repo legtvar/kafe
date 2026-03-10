@@ -233,6 +233,7 @@ public static class TransferMaps
             Kind: ShardCompat.ToShardKind(data.Payload.Value.GetType()),
             Variants:
             [
+                Const.OriginalShardVariant,
                 ..data.Links.Select(l => l.Payload.Value)
                     .OfType<VariantShardLink>()
                     .Select(v => v.Preset)

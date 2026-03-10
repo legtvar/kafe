@@ -54,4 +54,16 @@ public partial record struct Diagnostic
             skipFrames: skipFrames + 1
         );
     }
+
+    public static Diagnostic FromException(
+        Exception exception,
+        DiagnosticDescriptor? descriptorOverride = null
+    )
+    {
+        return new Diagnostic(
+            payload: new InternalErrorDiagnostic(exception.GetType(), exception.Message),
+            descriptorOverride: descriptorOverride,
+            stackTrace: exception.StackTrace
+        );
+    }
 }

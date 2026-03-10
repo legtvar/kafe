@@ -55,10 +55,10 @@ public record ShardInfo(
     IReadOnlySet<IShardLink> IShard.Links => Links.Cast<IShardLink>().ToImmutableHashSet();
 
     [JsonIgnore]
-    public ImmutableDictionary<KafeType, ImmutableHashSet<IShardLinkPayload>> LinksByType { get; }
-        = Links.GroupBy(l => l.Payload.Type).ToImmutableDictionary(
+    public ImmutableDictionary<Type, ImmutableArray<IShardLink>> LinksByType { get; }
+        = Links.GroupBy(l => l.Payload.Value.GetType()).ToImmutableDictionary(
             g => g.Key,
-            g => g.Select(l => (IShardLinkPayload)l.Payload.Value).ToImmutableHashSet()
+            g => g.Cast<IShardLink>().ToImmutableArray()
         );
 }
 

@@ -56,7 +56,7 @@ public record ProjectAuthorDto(
 public record ProjectArtifactDto(
     Hrib Id,
     LocalizedString Name,
-    DateTimeOffset AddedOn,
+    DateTimeOffset? AddedOn,
     string? BlueprintSlot,
     ImmutableArray<ShardListDto > Shards
 );

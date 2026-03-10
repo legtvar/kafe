@@ -29,7 +29,6 @@ public class ProjectService(
         Hrib? ownerId = null,
         ExistingEntityHandling existingEntityHandling = ExistingEntityHandling.Upsert,
         bool shouldOverrideLock = false,
-        bool shouldSkipValidation = false,
         CancellationToken token = default
     )
     {
@@ -107,12 +106,6 @@ public class ProjectService(
         if (existing.IsLocked && !shouldOverrideLock)
         {
             return Err.Fail(new LockedDiagnostic(typeof(ProjectInfo), id));
-        }
-
-        if (!shouldSkipValidation)
-        {
-            // TODO: Implement project validation based on its blueprint (or rather implement that in
-            //       ArtifactService and call it from here).
         }
 
         var eventStream = await db.Events.FetchForExclusiveWriting<ProjectInfo>(id.ToString(), token);

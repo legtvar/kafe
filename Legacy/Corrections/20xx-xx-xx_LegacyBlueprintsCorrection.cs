@@ -92,6 +92,7 @@ public class LegacyBlueprintsCorrection(
     public const string FilmProp = "Film";
     public const string VideoAnnotationProp = "VideoAnnotation";
     public const string CoverPhotosProp = "CoverPhotos";
+    public const string BtsPhotosProp = "BtsPhotos";
 
 
     public async Task Apply(IDocumentSession db, CancellationToken ct = default)
@@ -429,7 +430,35 @@ public class LegacyBlueprintsCorrection(
                             )]
                         )
                     )]
-                )
+                ),
+                [BtsPhotosProp] = new(
+                    name: LocalizedString.Create(
+                        (Const.InvariantCulture, "Behind-the-scenes photos"),
+                        (Const.CzechCulture, "Fotografie ze zákusilí")
+                    ),
+                    requirements: [..kof.WrapMany(
+                        new ShardPayloadTypeRequirement(
+                            [KafeType.Parse("core:shard-ref[]")]
+                        ),
+                        new ArrayLengthRequirement(
+                            Min: 1,
+                            Max: 5
+                        ),
+                        new AllRequirement(
+                            Requirements: [..kof.WrapMany(
+                                new ShardPayloadTypeRequirement(
+                                    [KafeType.Parse("media:shard/image")]
+                                ),
+                                new ShardMimeTypeRequirement(
+                                    Include: ["image/jpeg", "image/png"],
+                                    Exclude: []
+                                ),
+                                new MediaShorterSideRequirement(1080),
+                                new MediaAspectRatioRequirement("4:3", "16:9")
+                            )]
+                        )
+                    )]
+                ),
             }.ToImmutableDictionary()
         );
     }

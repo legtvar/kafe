@@ -8,7 +8,9 @@ public static class DiagnosticExtensions
         {
             return new Diagnostic(
                 payload: new ParameterDiagnostic(
-                    Parameter: parameterName,
+                    ParameterName: parameterName,
+                    // TODO: Use json-everything's implementation of JSON pointers.
+                    ParameterPointer: null!,
                     Inner: diagnostic
                 ),
                 severityOverride: diagnostic.Severity,

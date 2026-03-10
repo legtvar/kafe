@@ -14,7 +14,9 @@ using Kafe.Api.Services;
 using Kafe.Data.Services;
 using System;
 using Kafe.Core;
+using Kafe.Core.Diagnostics;
 using Kafe.Legacy.Corrections;
+using Kafe.Media;
 
 namespace Kafe.Api.Endpoints.Project;
 
@@ -35,7 +37,7 @@ public class ProjectDetailEndpoint(
     .WithActionResult<ProjectDetailDto>
 {
     [HttpGet]
-    [SwaggerOperation(Tags = new[] { EndpointArea.Project })]
+    [SwaggerOperation(Tags = [EndpointArea.Project])]
     [ProducesResponseType(typeof(ProjectDetailDto), 200)]
     [ProducesResponseType(404)]
     public override async Task<ActionResult<ProjectDetailDto>> HandleAsync(
@@ -85,26 +87,42 @@ public class ProjectDetailEndpoint(
             Blueprint = TransferMaps.GetProjectBlueprintDtoByOrgId(group.OrganizationId)
         };
 
-        var shardProps = artifact?.Properties.Where(p => p.Value.Value is ShardReference).ToImmutableArray() ?? [];
-        var shardsErr = await shardService.LoadMany(
-            [.. shardProps.Select(p => ((ShardReference)p.Value.Value).ShardId)],
-            ct
-        );
-        if (shardsErr.HasError)
+        var compatArtifacts = ImmutableArray.CreateBuilder<ProjectArtifactDto>();
+
+        async Task<Err<bool>> AddCompatArtifacts(string propertyKey, string blueprintSlot)
         {
-            return this.KafeErrorResult(shardsErr.Diagnostic);
+            var compatArtifactErr = await GetCompatArtifacts(
+                artifact,
+                propertyKey, blueprintSlot, ct
+            );
+            if (compatArtifactErr is { HasError: true, Diagnostic.Payload: not PropertyNotFoundDiagnostic })
+            {
+                return compatArtifactErr.Diagnostic;
+            }
+            else if (compatArtifactErr.HasValue)
+            {
+                compatArtifacts.AddRange(compatArtifactErr.Value);
+            }
+
+            return true;
         }
 
-        var compatArtifacts = shardProps.Zip(shardsErr.Value).Select(p => new ProjectArtifactDto(
-            Id: p.Second.Id,
-            Name: p.Second.Name,
-            // NB: CreatedAt and AddedOn are not semantically the same, but until we deprecate these old endpoints,
-            //     it might do.
-            AddedOn: p.Second.CreatedAt,
-            BlueprintSlot: p.First.Key,
-            // TODO: Currently doesn't return subtitles, because those will be linked through a ShardLink.
-            Shards: [TransferMaps.ToShardListDto(p.Second)]
-        )).ToImmutableArray();
+        Task<Err<bool>>[] compatArtifactTasks =
+        [
+            AddCompatArtifacts(LegacyBlueprintsCorrection.FilmProp, Const.FilmBlueprintSlot),
+            AddCompatArtifacts(LegacyBlueprintsCorrection.VideoAnnotationProp, Const.VideoAnnotationBlueprintSlot),
+            AddCompatArtifacts(LegacyBlueprintsCorrection.CoverPhotosProp, Const.CoverPhotoBlueprintSlot),
+            AddCompatArtifacts(LegacyBlueprintsCorrection.BtsPhotosProp, "bts-photo")
+        ];
+
+        foreach (var compatArtifactTask in compatArtifactTasks)
+        {
+            var err = await compatArtifactTask;
+            if (err.HasError)
+            {
+                return this.KafeErrorResult(err.Diagnostic);
+            }
+        }
 
         var cast = artifact?.GetProperty<ImmutableArray<AuthorReference>>(LegacyBlueprintsCorrection.CastProp) ?? [];
         var castAuthors = await authorService.LoadMany([.. cast.Select(a => a.AuthorId).OfType<Hrib>()], ct);
@@ -123,19 +141,94 @@ public class ProjectDetailEndpoint(
         dto = dto with
         {
             ProjectGroupName = group?.Name ?? Const.UnknownProjectGroup,
-            Artifacts = compatArtifacts,
-            Cast = [.. cast.Zip(castAuthors.Value).Select(p => new ProjectAuthorDto(
-                Id: p.Second.Id,
-                Name: p.Second.Name,
-                Roles: p.First.Roles
-            ))],
-            Crew = [.. crew.Zip(crewAuthors.Value).Select(p => new ProjectAuthorDto(
-                Id: p.Second.Id,
-                Name: p.Second.Name,
-                Roles: p.First.Roles
-            ))],
+            Artifacts = compatArtifacts.ToImmutable(),
+            Cast =
+            [
+                .. cast.Zip(castAuthors.Value).Select(p => new ProjectAuthorDto(
+                        Id: p.Second.Id,
+                        Name: p.Second.Name,
+                        Roles: p.First.Roles
+                    )
+                )
+            ],
+            Crew =
+            [
+                .. crew.Zip(crewAuthors.Value).Select(p => new ProjectAuthorDto(
+                        Id: p.Second.Id,
+                        Name: p.Second.Name,
+                        Roles: p.First.Roles
+                    )
+                )
+            ],
         };
 
         return Ok(dto);
+    }
+
+    private async Task<Err<ImmutableArray<ProjectArtifactDto>>> GetCompatArtifacts(
+        ArtifactInfo artifact,
+        string propertyKey,
+        string blueprintSlot,
+        CancellationToken ct = default
+    )
+    {
+        var prop = artifact.GetProperty(propertyKey);
+        if (prop is not null)
+        {
+            ImmutableArray<ShardInfo> shards;
+            if (prop is ShardReference shardRef)
+            {
+                var shardErr = await shardService.Load(shardRef.ShardId, ct);
+                if (shardErr.HasError)
+                {
+                    return shardErr.Diagnostic;
+                }
+
+                shards = [shardErr.Value];
+            }
+            else if (prop is ImmutableArray<ShardReference> shardRefArray)
+            {
+                var shardsErr = await shardService.LoadMany([..shardRefArray.Select(s => s.ShardId)], ct);
+                if (shardsErr.HasError)
+                {
+                    return shardsErr.Diagnostic;
+                }
+
+                shards = shardsErr.Value;
+            }
+            else
+            {
+                throw new InvalidOperationException(
+                    $"Expected a shard-ref of shard-ref[] property, got '{prop.GetType()}'."
+                );
+            }
+
+            var compatShards = ImmutableArray.CreateBuilder<ProjectArtifactDto>();
+            foreach (var shard in shards)
+            {
+                var mockShards = ImmutableArray.CreateBuilder<ShardListDto>();
+                mockShards.Add(TransferMaps.ToShardListDto(shard));
+                foreach (var link in shard.LinksByType.GetValueOrDefault(typeof(SubtitlesShardLink)))
+                {
+                    mockShards.Add(
+                        new ShardListDto(link.DestinationId, ShardKind.Subtitles, [Const.OriginalShardVariant])
+                    );
+                }
+
+                compatShards.Add(
+                    new ProjectArtifactDto(
+                        Id: shard.Id,
+                        Name: shard.Name,
+                        AddedOn: null,
+                        BlueprintSlot: blueprintSlot,
+                        Shards: mockShards.ToImmutable()
+                    )
+                );
+            }
+
+            return compatShards.ToImmutable();
+        }
+
+        return Err.Fail(new PropertyNotFoundDiagnostic(artifact.Id, propertyKey));
     }
 }

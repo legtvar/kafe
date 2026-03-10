@@ -26,6 +26,7 @@ public sealed class MediaMod : IMod
         });
         context.AddShardLinkPayload<VariantShardLink>();
         context.AddShardLinkPayload<GeneratedFromShardLink>();
+        context.AddShardLinkPayload<SubtitlesShardLink>();
 
         context.AddDiagnosticPayload<AudioBitrateTooHighDiagnostic>();
         context.AddDiagnosticPayload<AudioBitrateTooLowDiagnostic>();

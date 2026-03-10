@@ -70,7 +70,7 @@ public class TestSeedData(IServiceProvider services, ILogger<TestSeedData> logge
                 IsOpen = true
             },
             shouldWaitForDaemon: false,
-            token: ct
+            ct: ct
         );
         await projectGroupService.Create(
             ProjectGroupInfo.Create(Org2Hrib, (LocalizedString)"Test Group 2") with
@@ -79,7 +79,7 @@ public class TestSeedData(IServiceProvider services, ILogger<TestSeedData> logge
                 IsOpen = true
             },
             shouldWaitForDaemon: false,
-            token: ct
+            ct: ct
         );
 
         var projectService = scope.ServiceProvider.GetRequiredService<ProjectService>();

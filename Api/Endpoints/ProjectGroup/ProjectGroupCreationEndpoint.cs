@@ -46,7 +46,7 @@ public class ProjectGroupCreationEndpoint(
                     ? ProjectValidationSettings.MateValidationSettings
                     : null // TODO: temporary workaround until artifact blueprints are implemented
             },
-            token: cancellationToken
+            ct: cancellationToken
         );
         if (group.HasError)
         {

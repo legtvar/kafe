@@ -1,7 +1,8 @@
 namespace Kafe;
 
 public record ParameterDiagnostic(
-    string Parameter,
+    string ParameterName,
+    string ParameterPointer,
     Diagnostic Inner
 ) : IDiagnosticPayload
 {
@@ -15,7 +16,7 @@ public record ParameterDiagnostic(
     );
 
     public static LocalizedString MessageFormat { get; } = LocalizedString.Create(
-        (Const.InvariantCulture, "Parameter '{Parameter}' has diagnostics."),
-        (Const.CzechCulture, "K parametru '{Parameter}' jsou k dispozici hlášení.")
+        (Const.InvariantCulture, "Parameter '{ParameterName}' has diagnostics."),
+        (Const.CzechCulture, "K parametru '{ParameterName}' jsou k dispozici hlášení.")
     );
 }

@@ -89,7 +89,6 @@ public class TestSeedData(IServiceProvider services, ILogger<TestSeedData> logge
                 Id = Project1Hrib
             },
             existingEntityHandling: ExistingEntityHandling.Insert,
-            shouldSkipValidation: true,
             token: ct
         )).Unwrap();
         (await projectService.Upsert(
@@ -98,7 +97,6 @@ public class TestSeedData(IServiceProvider services, ILogger<TestSeedData> logge
                 Id = Project2Hrib
             },
             existingEntityHandling: ExistingEntityHandling.Insert,
-            shouldSkipValidation: true,
             token: ct
         )).Unwrap();
 

@@ -683,8 +683,8 @@ public class VideoConversionService(
             throw new ArgumentException($"Shard '{video.Id}' does not have a media payload. Is it really a video?");
         }
 
-        var existingVariants = (video.LinksByType.GetValueOrDefault(typeRegistry.RequireType<VariantShardLink>()) ?? [])
-            .Select(l => ((VariantShardLink)l).Preset)
+        var existingVariants = (video.LinksByType.TryGetValue(typeof(VariantShardLink), out var links) ? links : [])
+            .Select(l => ((VariantShardLink)l.Payload.Value).Preset)
             .OfType<string>()
             .ToImmutableArray();
         var desiredVariants = Video.GetApplicablePresets(mediaInfo);

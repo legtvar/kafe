@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Text.Json.Serialization;
+using Kafe.Api.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -13,8 +14,8 @@ namespace Kafe.Api;
 public class KafeProblemDetails : ProblemDetails
 {
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    [JsonPropertyName("errors")]
-    public ImmutableArray<Diagnostic> Errors { get; set; } = [];
+    [JsonPropertyName("diagnostics")]
+    public ImmutableArray<Diagnostic> Diagnostics { get; set; } = [];
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("traceId")]
@@ -43,41 +44,37 @@ public class KafeProblemDetails : ProblemDetails
             TraceId = Activity.Current?.Id ?? httpContext?.TraceIdentifier
         };
 
-        if (httpContext is not null)
+        var apiBehaviorOptions = httpContext?.RequestServices.GetService<IOptions<ApiBehaviorOptions>>();
+        if (apiBehaviorOptions is not null
+            && apiBehaviorOptions.Value.ClientErrorMapping.TryGetValue(statusCode.Value, out var clientErrorData)
+        )
         {
-            var apiBehaviorOptions = httpContext.RequestServices
-                .GetService<IOptions<ApiBehaviorOptions>>();
-            if (apiBehaviorOptions is not null
-                && apiBehaviorOptions.Value.ClientErrorMapping.TryGetValue(statusCode.Value, out var clientErrorData))
-            {
-                pd.Title ??= clientErrorData.Title;
-                pd.Type ??= clientErrorData.Link;
-            }
+            pd.Title ??= clientErrorData.Title;
+            pd.Type ??= clientErrorData.Link;
         }
 
         var errors = ImmutableArray.CreateBuilder<Diagnostic>();
         if (modelState is not null)
         {
+            // TODO: Handle nested errors with JSON pointers.
             foreach (var (parameter, entry) in modelState)
             {
+                var entryErrors = ImmutableArray.CreateBuilder<Diagnostic>();
                 foreach (var validationError in entry.Errors)
                 {
-                    errors.Add(new Diagnostic(
-                        id: Diagnostic.InvalidValueId,
-                        message: validationError.ErrorMessage,
-                        arguments: ImmutableDictionary.CreateRange(
-                            [
-                                new KeyValuePair<string, object>(
-                                    Diagnostic.ParameterArgument,
-                                    parameter)
-                            ]),
-                        skipFrames: skipFrames + 1 // NB: The plus one account for the ctor itself.
-                    ));
+                    entryErrors.Add(
+                        new Diagnostic(
+                            new MvcModelDiagnostic(validationError.ErrorMessage),
+                            stackTrace: validationError.Exception?.StackTrace,
+                            skipFrames: skipFrames + 1 // NB: The plus one account for the ctor itself.
+                        ).ForParameter(parameter)
+                    );
                 }
+                errors.Add(Diagnostic.Aggregate(entryErrors.ToImmutable()).ForParameter(parameter));
             }
         }
 
-        pd.Errors = errors.ToImmutable();
+        pd.Diagnostics = errors.ToImmutable();
         return pd;
     }
 

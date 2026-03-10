@@ -19,11 +19,11 @@ namespace Kafe.Api.Endpoints.Artifact;
 [Obsolete("This endpoint is part of the old artifact abstraction and will soon be replaced.")]
 public class ArtifactCreationEndpoint(
     ArtifactService artifacts,
+    KafeObjectFactory objectFactory,
     IAuthorizationService authorization
-)
-    : EndpointBaseAsync
-        .WithRequest<ArtifactCreationDto>
-        .WithActionResult<Hrib>
+) : EndpointBaseAsync
+    .WithRequest<ArtifactCreationDto>
+    .WithActionResult<Hrib>
 {
     [HttpPost]
     [SwaggerOperation(Tags = [EndpointArea.Artifact])]
@@ -41,10 +41,11 @@ public class ArtifactCreationEndpoint(
         }
 
         var artifactErr = await artifacts.Upsert(
-            ArtifactInfo.Create(name: request.Name) with
+            ArtifactInfo.Create() with
             {
                 AddedOn = request.AddedOn ?? default,
-                CreationMethod = CreationMethod.Api
+                CreationMethod = CreationMethod.Api,
+                Properties = objectFactory.WrapProperties((Const.ArtifactNameProperty, request.Name))
             },
             ct
         );

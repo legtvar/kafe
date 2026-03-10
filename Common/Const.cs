@@ -87,6 +87,8 @@ public static class Const
     public const string ArchiveFileScheme = "archive";
     public const string GeneratedFileScheme = "generated";
 
+    public const string ArtifactNameProperty = "Name";
+
     static Const()
     {
         EnglishCulture = CultureInfo.CreateSpecificCulture(EnglishCultureName);

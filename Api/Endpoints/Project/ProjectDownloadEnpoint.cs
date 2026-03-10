@@ -1,10 +1,11 @@
 using Ardalis.ApiEndpoints;
 using Asp.Versioning;
+using Kafe.Core;
 using Kafe.Data.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
-using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -20,7 +21,8 @@ public class ProjectDownloadEndpoint(
     ShardService shardService,
     ArtifactService artifactService,
     AccountService accountService,
-    IAuthorizationService authorizationService
+    IAuthorizationService authorizationService,
+    FileExtensionMimeMap mimeMap
 ) : EndpointBaseAsync
     .WithRequest<ProjectDownloadEndpoint.RequestData>
     .WithActionResult
@@ -30,54 +32,77 @@ public class ProjectDownloadEndpoint(
     [Produces(typeof(FileStreamResult))]
     public override async Task<ActionResult> HandleAsync(
         RequestData data,
-        CancellationToken cancellationToken = default)
+        CancellationToken ct = default
+    )
     {
-        var project = await projectService.Load(data.Id, cancellationToken);
-        if (project is null)
-            return NotFound();
+        var projectErr = await projectService.Load(data.Id, ct);
+        if (projectErr.HasError)
+        {
+            return this.KafeErrorResult(projectErr.Diagnostic);
+        }
 
+        var project = projectErr.Value;
         var auth = await authorizationService.AuthorizeAsync(User, project.Id, EndpointPolicy.Review);
         if (!auth.Succeeded)
+        {
             return Unauthorized();
+        }
+
+        if (project.ArtifactId is null)
+        {
+            return BadRequest("This project has no inner artifact and therefore cannot be downloaded.");
+        }
+
+        var artifactErr = await artifactService.Load(project.ArtifactId, ct);
+        if (artifactErr.HasError)
+        {
+            return this.KafeErrorResult(artifactErr.Diagnostic);
+        }
+
+        var artifact = artifactErr.Value;
 
         var zipStream = new MemoryStream();
         using (var archive = new ZipArchive(zipStream, ZipArchiveMode.Create, true))
         {
-            var artifactDetails = await artifactService.LoadDetailMany(
-                project.Artifacts.Select(a => (Hrib)a.Id).Distinct(),
-                cancellationToken);
-            foreach (var artifact in artifactDetails)
+            var shardProps = artifact?.Properties.Where(p => p.Value.Value is ShardReference).ToImmutableArray() ?? [];
+            var shardsErr = await shardService.LoadMany(
+                [.. shardProps.Select(p => ((ShardReference)p.Value.Value).ShardId)],
+                ct
+            );
+            if (shardsErr.HasError)
             {
-                foreach (var shard in artifact.Shards)
+                return this.KafeErrorResult(shardsErr.Diagnostic);
+            }
+
+            foreach (var shard in shardsErr.Value)
+            {
+                var shardStreamErr = await shardService.OpenStream(shard.Id, Const.OriginalShardVariant, ct);
+                if (shardStreamErr.HasError)
                 {
-                    var shardDetail = await shardService.Load(shard.ShardId, cancellationToken);
-                    if (shardDetail is null) continue;
-
-                    foreach (var variant in shard.Variants)
-                    {
-                        var mediaType = await shardService.GetShardVariantMediaType(shard.ShardId, variant, cancellationToken);
-                        if (mediaType?.FileExtension == null) continue;
-
-                        var shardStream = await shardService.OpenStream(shard.ShardId, variant, cancellationToken);
-
-                        var entryName = $"{shard.ShardId}/{variant}{mediaType.FileExtension}";
-                        var entry = archive.CreateEntry(entryName, CompressionLevel.Fastest);
-                        using var entryStream = entry.Open();
-                        await shardStream.CopyToAsync(entryStream, cancellationToken);
-                    }
+                    return this.KafeErrorResult(shardStreamErr.Diagnostic);
                 }
+
+                var shardStream = shardStreamErr.Value;
+                var extension = mimeMap.GetFirstFileExtensionFor(shard.MimeType);
+                var entryName = $"{shard.Id}{extension}";
+                var entry = archive.CreateEntry(entryName, CompressionLevel.Fastest);
+                using var entryStream = entry.Open();
+                await shardStream.CopyToAsync(entryStream, ct);
             }
         }
 
-        var fileName = $"{project.Name.GetValueOrDefault("iv", project.Id)}.zip";
+        var fileName = $"{artifact?.Name["iv"] ?? project.Id}.zip";
         if (project.OwnerId != null)
         {
-            var owner = await accountService.Load(project.OwnerId, cancellationToken);
-            if (owner != null)
+            var ownerErr = await accountService.Load(project.OwnerId, ct);
+            if (ownerErr.HasError)
             {
-                fileName = owner.Name != null ? $"{owner.Name}_{fileName}" : fileName;
-                fileName = owner.Uco != null ? $"{owner.Uco}_{fileName}" : fileName;
+                return this.KafeErrorResult(ownerErr.Diagnostic);
             }
+
+            var owner = ownerErr.Value;
+            fileName = owner.Name != null ? $"{owner.Name}_{fileName}" : fileName;
+            fileName = owner.Uco != null ? $"{owner.Uco}_{fileName}" : fileName;
         }
         zipStream.Position = 0;
         return File(zipStream, "application/zip", fileName, true);

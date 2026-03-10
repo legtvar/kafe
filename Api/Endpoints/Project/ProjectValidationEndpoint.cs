@@ -16,20 +16,15 @@ namespace Kafe.Api.Endpoints.Project;
 [ApiVersion("1")]
 [Route("project-validation/{id}")]
 [Authorize]
-public class ProjectValidationEndpoint : EndpointBaseAsync
+public class ProjectValidationEndpoint(
+    ProjectService projectService,
+    IAuthorizationService authorizationService
+) : EndpointBaseAsync
     .WithRequest<string>
     .WithActionResult<ProjectValidationDto>
 {
-    private readonly ProjectService projectService;
-    private readonly IAuthorizationService authorizationService;
-
-    public ProjectValidationEndpoint(
-        ProjectService projectService,
-        IAuthorizationService authorizationService)
-    {
-        this.projectService = projectService;
-        this.authorizationService = authorizationService;
-    }
+    private readonly ProjectService projectService = projectService;
+    private readonly IAuthorizationService authorizationService = authorizationService;
 
     [HttpGet]
     [SwaggerOperation(Tags = new[] { EndpointArea.Project })]

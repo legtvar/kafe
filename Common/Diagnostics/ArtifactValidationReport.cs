@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Immutable;
 
-namespace Kafe.Data;
+namespace Kafe.Diagnostics;
 
-public record ProjectReport(
-    Hrib ProjectId,
+public record ArtifactValidationReport(
+    Hrib ArtifactId,
+    Hrib BlueprintId,
     DateTimeOffset ValidatedOn,
     ImmutableArray<Diagnostic> Diagnostics
 );

@@ -1,6 +1,6 @@
 namespace Kafe.Mate.Requirements;
 
-public class HomeworkTypeRequirement(
+public record HomeworkTypeRequirement(
     string HomeworkType
 ) : IRequirement
 {

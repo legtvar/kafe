@@ -9,7 +9,7 @@ public record AuthorReference(
     Hrib? AuthorId,
     string? Name,
     // TODO: Replace/add Tags once implemented.
-    ImmutableArray<LocalizedString> Roles
+    ImmutableArray<string> Roles
 ) : IScalar
 {
     public static string Moniker => "author-ref";

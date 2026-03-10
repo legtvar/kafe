@@ -4,15 +4,10 @@ using System.Reflection;
 
 namespace Kafe;
 
-public class KafeObjectFactory
+public class KafeObjectFactory(
+    KafeTypeRegistry typeRegistry
+)
 {
-    private readonly KafeTypeRegistry typeRegistry;
-
-    public KafeObjectFactory(KafeTypeRegistry typeRegistry)
-    {
-        this.typeRegistry = typeRegistry;
-    }
-
     public KafeObject Wrap(Type type, object value)
     {
         var valueType = value.GetType();

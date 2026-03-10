@@ -17,29 +17,21 @@ namespace Kafe.Api.Endpoints.Project;
 [ApiVersion("1")]
 [Route("project-review")]
 [Authorize]
-public class ProjectReviewEndpoint : EndpointBaseAsync
+public class ProjectReviewEndpoint(
+    ProjectService projectService,
+    IEmailService emailService,
+    AccountService accountService,
+    UserProvider userProvider,
+    IAuthorizationService authorizationService
+) : EndpointBaseAsync
     .WithRequest<ProjectReviewCreationDto>
     .WithActionResult
 {
-    private readonly ProjectService projectService;
-    private readonly IEmailService emailService;
-    private readonly AccountService accountService;
-    private readonly UserProvider userProvider;
-    private readonly IAuthorizationService authorizationService;
-
-    public ProjectReviewEndpoint(
-        ProjectService projectService,
-        IEmailService emailService,
-        AccountService accountService,
-        UserProvider userProvider,
-        IAuthorizationService authorizationService)
-    {
-        this.projectService = projectService;
-        this.emailService = emailService;
-        this.accountService = accountService;
-        this.userProvider = userProvider;
-        this.authorizationService = authorizationService;
-    }
+    private readonly ProjectService projectService = projectService;
+    private readonly IEmailService emailService = emailService;
+    private readonly AccountService accountService = accountService;
+    private readonly UserProvider userProvider = userProvider;
+    private readonly IAuthorizationService authorizationService = authorizationService;
 
     [HttpPost]
     [SwaggerOperation(Tags = new[] { EndpointArea.Project })]
@@ -47,12 +39,13 @@ public class ProjectReviewEndpoint : EndpointBaseAsync
         ProjectReviewCreationDto dto,
         CancellationToken cancellationToken = default)
     {
-        var project = await projectService.Load(dto.ProjectId, cancellationToken);
-        if (project is null)
+        var projectErr = await projectService.Load(dto.ProjectId, cancellationToken);
+        if (projectErr.HasError)
         {
-            return NotFound();
+            return this.KafeErrorResult(projectErr.Diagnostic);
         }
 
+        var project = projectErr.Value;
         var auth = await authorizationService.AuthorizeAsync(User, project.ProjectGroupId, EndpointPolicy.Review);
         if (!auth.Succeeded)
         {
@@ -74,10 +67,9 @@ public class ProjectReviewEndpoint : EndpointBaseAsync
 
         var owners = await accountService.List(
             filter: new(
-                Permissions: ImmutableDictionary.CreateRange(new[]
-                    {
-                        new KeyValuePair<string, Permission>(dto.ProjectId.ToString(), Permission.Write)
-                    })
+                Permissions: ImmutableDictionary.CreateRange([
+                    new KeyValuePair<string, Permission>(dto.ProjectId.ToString(), Permission.Write)
+                ])
             ),
             token: cancellationToken);
 

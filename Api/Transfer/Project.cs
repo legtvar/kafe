@@ -133,7 +133,7 @@ public record ProjectValidationDto(
 public record ProjectDiagnosticDto(
     DiagnosticSeverity Kind,
     LocalizedString Message,
-    string ValidationStage
+    string? ValidationStage
 );
 
 public record ProjectArtifactAdditionDto(

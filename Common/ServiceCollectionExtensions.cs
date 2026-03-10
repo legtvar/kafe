@@ -1,4 +1,5 @@
 using System;
+using Kafe.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -16,6 +17,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddSingleton<ShardAnalysisFactory>();
         services.AddSingleton<FileExtensionMimeMap>();
+        services.AddSingleton<RequirementValidator>();
 
         var options = new KafeBrewingOptions(services);
         options.AddFormatter(new FileLengthFormatter());

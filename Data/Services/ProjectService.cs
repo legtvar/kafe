@@ -12,6 +12,8 @@ using System.Data;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Kafe.Data.Diagnostics;
+using Kafe.Diagnostics;
 
 namespace Kafe.Data.Services;
 
@@ -281,5 +283,37 @@ public class ProjectService(
         );
         await db.SaveChangesAsync(token);
         return true;
+    }
+
+    public async Task<Err<ArtifactValidationReport>> Validate(
+        Hrib id,
+        CancellationToken ct = default
+    )
+    {
+        var projectErr = await Load(id, ct);
+        if (projectErr.HasError)
+        {
+            return projectErr.Diagnostic;
+        }
+
+        var project = projectErr.Value;
+        if (project.ArtifactId is null)
+        {
+            return Err.Fail(new MissingProjectArtifactDiagnostic(project.Id));
+        }
+
+        var projectGroupErr = await db.KafeLoadAsync<ProjectGroupInfo>(project.ProjectGroupId, ct);
+        if (projectGroupErr.HasError)
+        {
+            return projectGroupErr.Diagnostic;
+        }
+
+        var projectGroup = projectGroupErr.Value;
+        if (projectGroup.BlueprintId is null)
+        {
+            return Err.Fail(new MissingBlueprintDiagnostic(projectGroup.Id));
+        }
+
+        return await artifactService.Validate(project.ArtifactId, projectGroup.BlueprintId, ct);
     }
 }

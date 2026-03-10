@@ -13,13 +13,14 @@ namespace Kafe.Data.Services;
 
 public class ProjectGroupService(
     IDocumentSession db,
+    BlueprintService blueprintService,
     EntityMetadataProvider entityMetadataProvider
 )
 {
     public async Task<Err<ProjectGroupInfo>> Create(
         ProjectGroupInfo @new,
         bool shouldWaitForDaemon = true,
-        CancellationToken token = default
+        CancellationToken ct = default
     )
     {
         if (!Hrib.TryParse(@new.Id, out var id, out _))
@@ -32,10 +33,22 @@ public class ProjectGroupService(
             return Err.Fail<ProjectGroupInfo>(new BadHribDiagnostic(@new.OrganizationId));
         }
 
-        var orgErr = await db.KafeLoadAsync<OrganizationInfo>(organizationId, token);
+        var orgErr = await db.KafeLoadAsync<OrganizationInfo>(organizationId, ct);
         if (orgErr.HasError)
         {
             return orgErr.Diagnostic;
+        }
+
+        BlueprintInfo? blueprint = null;
+        if (@new.BlueprintId is not null)
+        {
+            var blueprintErr = await blueprintService.Load(@new.BlueprintId, ct);
+            if (blueprintErr.HasError)
+            {
+                return blueprintErr.Diagnostic;
+            }
+
+            blueprint = blueprintErr.Value;
         }
 
         if (id == Hrib.Empty)
@@ -49,7 +62,9 @@ public class ProjectGroupService(
                 ? @new.CreationMethod
                 : CreationMethod.Api,
             OrganizationId: @new.OrganizationId,
-            Name: @new.Name);
+            Name: @new.Name,
+            BlueprintId: blueprint?.Id
+        );
         db.Events.KafeStartStream<ProjectGroupInfo>(id, created);
 
         if (@new.Description is not null
@@ -78,14 +93,14 @@ public class ProjectGroupService(
             db.Events.KafeAppend(id, validationSettingsChanged);
         }
 
-        await db.SaveChangesAsync(token);
+        await db.SaveChangesAsync(ct);
 
         if (shouldWaitForDaemon)
         {
-            await db.TryWaitForEntityPermissions(id, token);
+            await db.TryWaitForEntityPermissions(id, ct);
         }
 
-        return await db.Events.KafeAggregateRequiredStream<ProjectGroupInfo>(id, token: token);
+        return await db.Events.KafeAggregateRequiredStream<ProjectGroupInfo>(id, token: ct);
     }
 
     /// <summary>
@@ -161,14 +176,14 @@ public class ProjectGroupService(
         return await db.KafeLoadAsync<ProjectGroupInfo>(id, token);
     }
 
-    public async Task<Err<ProjectGroupInfo>> Edit(ProjectGroupInfo @new, CancellationToken token = default)
+    public async Task<Err<ProjectGroupInfo>> Edit(ProjectGroupInfo @new, CancellationToken ct = default)
     {
         if (!Hrib.TryParse(@new.Id, out var id, out _))
         {
             return Err.Fail<ProjectGroupInfo>(new BadHribDiagnostic(@new.Id));
         }
 
-        var oldErr = await db.KafeLoadAsync<ProjectGroupInfo>(id, token);
+        var oldErr = await db.KafeLoadAsync<ProjectGroupInfo>(id, ct);
         if (oldErr.HasError)
         {
             return oldErr;
@@ -176,16 +191,32 @@ public class ProjectGroupService(
 
         var @old = oldErr.Value;
 
-        var eventStream = await db.Events.FetchForExclusiveWriting<ProjectGroupInfo>(@new.Id, token);
+        BlueprintInfo? blueprint = null;
+        if (@new.BlueprintId is not null)
+        {
+            var blueprintErr = await blueprintService.Load(@new.BlueprintId, ct);
+            if (blueprintErr.HasError)
+            {
+                return blueprintErr.Diagnostic;
+            }
+
+            blueprint = blueprintErr.Value;
+        }
+
+        var eventStream = await db.Events.FetchForExclusiveWriting<ProjectGroupInfo>(@new.Id, ct);
 
         var infoChanged = new ProjectGroupInfoChanged(
             ProjectGroupId: @new.Id,
             Name: (LocalizedString)@old.Name != @new.Name ? @new.Name : null,
             Description: (LocalizedString?)@old.Description != @new.Description ? @new.Description : null,
-            Deadline: @old.Deadline != @new.Deadline ? @new.Deadline : null);
+            Deadline: @old.Deadline != @new.Deadline ? @new.Deadline : null,
+            BlueprintId: @old.BlueprintId != @new.BlueprintId ? @new.BlueprintId : null
+        );
         if (infoChanged.Name is not null
             || infoChanged.Description is not null
-            || infoChanged.Deadline is not null)
+            || infoChanged.Deadline is not null
+            || infoChanged.BlueprintId is not null
+        )
         {
             eventStream.AppendOne(infoChanged);
         }
@@ -219,8 +250,8 @@ public class ProjectGroupService(
             ));
         }
 
-        await db.SaveChangesAsync(token);
-        return await db.Events.AggregateStreamAsync<ProjectGroupInfo>(@old.Id, token: token)
+        await db.SaveChangesAsync(ct);
+        return await db.Events.AggregateStreamAsync<ProjectGroupInfo>(@old.Id, token: ct)
                ?? throw new InvalidOperationException($"The project group is no longer present in the database. "
                                                       + "This should never happen.");
     }

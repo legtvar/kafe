@@ -17,7 +17,7 @@ public class AuthorService(
     IDocumentSession db,
     AccountService accountService,
     EntityMetadataProvider entityMetadataProvider
-    )
+)
 {
     public async Task<Err<AuthorInfo>> Create(
         AuthorInfo @new,
@@ -179,16 +179,16 @@ public class AuthorService(
         return (await query.ToListAsync(token)).ToImmutableArray();
     }
 
-    public async Task<Err<AuthorInfo>> Load(Hrib id, CancellationToken token = default)
+    public async Task<Err<AuthorInfo>> Load(Hrib id, CancellationToken ct = default)
     {
-        return await db.KafeLoadAsync<AuthorInfo>(id, token);
+        return await db.KafeLoadAsync<AuthorInfo>(id, ct);
     }
 
     public async Task<Err<ImmutableArray<AuthorInfo>>> LoadMany(
         IReadOnlyList<Hrib> ids,
-        CancellationToken token = default
+        CancellationToken ct = default
     )
     {
-        return await db.KafeLoadManyAsync<AuthorInfo>(ids, token);
+        return await db.KafeLoadManyAsync<AuthorInfo>(ids, ct);
     }
 }

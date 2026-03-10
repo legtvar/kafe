@@ -3,10 +3,8 @@ using Asp.Versioning;
 using Kafe.Data;
 using Kafe.Data.Aggregates;
 using Kafe.Api.Transfer;
-using Marten;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
@@ -14,48 +12,36 @@ using System.Threading.Tasks;
 using Swashbuckle.AspNetCore.Annotations;
 using Kafe.Api.Services;
 using Kafe.Data.Services;
+using System;
+using Kafe.Core;
+using Kafe.Legacy.Corrections;
 
 namespace Kafe.Api.Endpoints.Project;
 
 [ApiVersion("1")]
 [Route("project/{id}")]
-public class ProjectDetailEndpoint : EndpointBaseAsync
+[Obsolete("This endpoint is part of the old artifact abstraction and will soon be replaced.")]
+public class ProjectDetailEndpoint(
+    ProjectService projectService,
+    ProjectGroupService projectGroupService,
+    EntityService entityService,
+    ArtifactService artifactService,
+    AuthorService authorService,
+    ShardService shardService,
+    UserProvider userProvider,
+    IAuthorizationService authorizationService
+) : EndpointBaseAsync
     .WithRequest<string>
     .WithActionResult<ProjectDetailDto>
 {
-    private readonly ProjectService projectService;
-    private readonly ProjectGroupService projectGroupService;
-    private readonly EntityService entityService;
-    private readonly ArtifactService artifactService;
-    private readonly AuthorService authorService;
-    private readonly UserProvider userProvider;
-    private readonly IAuthorizationService authorizationService;
-
-    public ProjectDetailEndpoint(
-        ProjectService projectService,
-        ProjectGroupService projectGroupService,
-        EntityService entityService,
-        ArtifactService artifactService,
-        AuthorService authorService,
-        UserProvider userProvider,
-        IAuthorizationService authorizationService)
-    {
-        this.projectService = projectService;
-        this.projectGroupService = projectGroupService;
-        this.entityService = entityService;
-        this.artifactService = artifactService;
-        this.authorService = authorService;
-        this.userProvider = userProvider;
-        this.authorizationService = authorizationService;
-    }
-
     [HttpGet]
     [SwaggerOperation(Tags = new[] { EndpointArea.Project })]
     [ProducesResponseType(typeof(ProjectDetailDto), 200)]
     [ProducesResponseType(404)]
     public override async Task<ActionResult<ProjectDetailDto>> HandleAsync(
         string id,
-        CancellationToken cancellationToken = default)
+        CancellationToken ct = default
+    )
     {
         var auth = await authorizationService.AuthorizeAsync(User, id, EndpointPolicy.Read);
         if (!auth.Succeeded)
@@ -63,58 +49,91 @@ public class ProjectDetailEndpoint : EndpointBaseAsync
             return Unauthorized();
         }
 
-        var project = await projectService.Load(id, cancellationToken);
-        if (project is null)
+        var projectErr = await projectService.Load(id, ct);
+        if (projectErr.HasError)
         {
-            return NotFound();
+            return this.KafeErrResult(projectErr);
         }
 
-        var group = await projectGroupService.Load(project.ProjectGroupId, cancellationToken);
-        if (group is null)
+        var project = projectErr.Value;
+        var artifactErr = project.ArtifactId is null
+            ? ArtifactInfo.Create()
+            : await artifactService.Load(project.ArtifactId, ct);
+        if (artifactErr.HasError)
         {
-            return NotFound();
+            return this.KafeErrResult(artifactErr);
         }
 
-        var userPerms = await entityService.GetPermission(project.Id, userProvider.AccountId, cancellationToken);
+        var artifact = artifactErr.Value;
+        var groupErr = await projectGroupService.Load(project.ProjectGroupId, ct);
+        if (groupErr.HasError)
+        {
+            return this.KafeErrResult(groupErr);
+        }
 
-        var dto = TransferMaps.ToProjectDetailDto(project, userPerms) with
+        var group = groupErr.Value;
+        var userPerms = await entityService.GetPermission(project.Id, userProvider.AccountId, ct);
+
+        var dto = TransferMaps.ToProjectDetailDto(project, artifact, userPerms) with
         {
             ProjectGroupName = group.Name,
             ValidationSettings = ProjectValidationSettings.Merge(
                 group.ValidationSettings,
                 ProjectValidationSettings.Default
             ),
-            Blueprint = TransferMaps.GetProjectBlueprintDtoByOrgId(group.OrganizationId)
             // TODO: temporary workaround until artifact blueprints are implemented
+            Blueprint = TransferMaps.GetProjectBlueprintDtoByOrgId(group.OrganizationId)
         };
 
-        var artifactDetails = await artifactService.LoadDetailMany(
-            project.Artifacts.Select(a => (Hrib)a.Id).Distinct(),
-            cancellationToken);
-        var authors = await authorService.LoadMany(
-            project.Authors.Select(a => (Hrib)a.Id).Distinct(),
-            cancellationToken);
+        var shardProps = artifact?.Properties.Where(p => p.Value.Value is ShardReference).ToImmutableArray() ?? [];
+        var shardsErr = await shardService.LoadMany(
+            [.. shardProps.Select(p => ((ShardReference)p.Value.Value).ShardId)],
+            ct
+        );
+        if (shardsErr.HasError)
+        {
+            return this.KafeErrorResult(shardsErr.Diagnostic);
+        }
+
+        var compatArtifacts = shardProps.Zip(shardsErr.Value).Select(p => new ProjectArtifactDto(
+            Id: p.Second.Id,
+            Name: p.Second.Name,
+            // NB: CreatedAt and AddedOn are not semantically the same, but until we deprecate these old endpoints,
+            //     it might do.
+            AddedOn: p.Second.CreatedAt,
+            BlueprintSlot: p.First.Key,
+            // TODO: Currently doesn't return subtitles, because those will be linked through a ShardLink.
+            Shards: [TransferMaps.ToShardListDto(p.Second)]
+        )).ToImmutableArray();
+
+        var cast = artifact?.GetProperty<ImmutableArray<AuthorReference>>(LegacyBlueprintsCorrection.CastProp) ?? [];
+        var castAuthors = await authorService.LoadMany([.. cast.Select(a => a.AuthorId).OfType<Hrib>()], ct);
+        if (castAuthors.HasError)
+        {
+            return this.KafeErrorResult(castAuthors.Diagnostic);
+        }
+
+        var crew = artifact?.GetProperty<ImmutableArray<AuthorReference>>(LegacyBlueprintsCorrection.CrewProp) ?? [];
+        var crewAuthors = await authorService.LoadMany([.. crew.Select(a => a.AuthorId).OfType<Hrib>()], ct);
+        if (crewAuthors.HasError)
+        {
+            return this.KafeErrorResult(crewAuthors.Diagnostic);
+        }
 
         dto = dto with
         {
             ProjectGroupName = group?.Name ?? Const.UnknownProjectGroup,
-            Artifacts = artifactDetails
-                .Select(a => TransferMaps.ToProjectArtifactDto(a) with {
-                    BlueprintSlot = project.Artifacts.FirstOrDefault(b => b.Id == a.Id)?.BlueprintSlot
-                })
-                .ToImmutableArray(),
-            Cast = project.Authors.Where(a => a.Kind == ProjectAuthorKind.Cast)
-                    .Select(a => new ProjectAuthorDto(
-                        Id: a.Id,
-                        Name: authors.SingleOrDefault(e => e?.Id == a.Id)?.Name ?? (string)Const.UnknownAuthor,
-                        Roles: a.Roles))
-                    .ToImmutableArray(),
-            Crew = project.Authors.Where(a => a.Kind == ProjectAuthorKind.Crew)
-                    .Select(a => new ProjectAuthorDto(
-                        Id: a.Id,
-                        Name: authors.SingleOrDefault(e => e?.Id == a.Id)?.Name ?? (string)Const.UnknownAuthor,
-                        Roles: a.Roles))
-                    .ToImmutableArray()
+            Artifacts = compatArtifacts,
+            Cast = [.. cast.Zip(castAuthors.Value).Select(p => new ProjectAuthorDto(
+                Id: p.Second.Id,
+                Name: p.Second.Name,
+                Roles: p.First.Roles
+            ))],
+            Crew = [.. crew.Zip(crewAuthors.Value).Select(p => new ProjectAuthorDto(
+                Id: p.Second.Id,
+                Name: p.Second.Name,
+                Roles: p.First.Roles
+            ))],
         };
 
         return Ok(dto);

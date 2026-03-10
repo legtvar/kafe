@@ -85,6 +85,7 @@ public class LegacyBlueprintsCorrection(
     public const string NameProp = "Name";
     public const string DescriptionProp = "Description";
     public const string GenreProp = "Genre";
+    public const string ReleasedOnProp = "ReleasedOn";
     public const string CastProp = "Cast";
     public const string CrewProp = "Crew";
     public const string VideosProp = "Videos";
@@ -144,6 +145,18 @@ public class LegacyBlueprintsCorrection(
                     requirements: [..kof.WrapMany(
                         new TypeRequirement(
                             Include: [KafeType.Parse("core:localized-string")],
+                            Exclude: []
+                        )
+                    )]
+                ),
+                [ReleasedOnProp] = new(
+                    name: LocalizedString.Create(
+                        (Const.InvariantCulture, "Release date"),
+                        (Const.CzechCulture, "Datum vydání")
+                    ),
+                    requirements: [..kof.WrapMany(
+                        new TypeRequirement(
+                            Include: [KafeType.Parse("core:date-time")],
                             Exclude: []
                         )
                     )]
@@ -240,6 +253,18 @@ public class LegacyBlueprintsCorrection(
                             Exclude: []
                         ),
                         new StringLengthRequirement(1, 32)
+                    )]
+                ),
+                [ReleasedOnProp] = new(
+                    name: LocalizedString.Create(
+                        (Const.InvariantCulture, "Release date"),
+                        (Const.CzechCulture, "Datum vydání")
+                    ),
+                    requirements: [..kof.WrapMany(
+                        new TypeRequirement(
+                            Include: [KafeType.Parse("core:date-time")],
+                            Exclude: []
+                        )
                     )]
                 ),
                 [CastProp] = new(

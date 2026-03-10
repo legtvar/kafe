@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using Kafe.Data;
 using Kafe.Data.Aggregates;
+using Kafe.Legacy.Corrections;
 using Kafe.Mate;
 using Kafe.Media;
 
@@ -11,6 +12,7 @@ namespace Kafe.Api.Transfer;
 
 public static class TransferMaps
 {
+    [Obsolete("Use the new artifact abstraction instead.")]
     public static ProjectBlueprintDto ToProjectBlueprintDto(ProjectBlueprint projectBlueprint)
     {
         return new ProjectBlueprintDto(
@@ -36,6 +38,8 @@ public static class TransferMaps
         );
     }
 
+
+    [Obsolete("Use the new artifact abstraction instead.")]
     public static ProjectBlueprintDto GetProjectBlueprintDtoByOrgId(string id)
     {
         switch (id)
@@ -49,14 +53,18 @@ public static class TransferMaps
         }
     }
 
-    public static readonly ProjectBlueprintDto TemporaryProjectBlueprintMockup =
-        ToProjectBlueprintDto(ProjectBlueprint.TemporaryProjectBlueprint);
+    [Obsolete("Use the new artifact abstraction instead.")]
+    public static readonly ProjectBlueprintDto TemporaryProjectBlueprintMockup
+        = ToProjectBlueprintDto(ProjectBlueprint.TemporaryProjectBlueprint);
 
-    public static ProjectBlueprintDto TemporaryLemmaProjectBlueprintMockup =
-        ToProjectBlueprintDto(ProjectBlueprint.TemporaryLemmaProjectBlueprint);
+    [Obsolete("Use the new artifact abstraction instead.")]
+    public static ProjectBlueprintDto TemporaryLemmaProjectBlueprintMockup
+        = ToProjectBlueprintDto(ProjectBlueprint.TemporaryLemmaProjectBlueprint);
 
-    public static readonly ProjectBlueprintDto TemporaryMateProjectBlueprintMockup =
-        ToProjectBlueprintDto(ProjectBlueprint.TemporaryMateProjectBlueprint);
+    [Obsolete("Use the new artifact abstraction instead.")]
+    public static readonly ProjectBlueprintDto TemporaryMateProjectBlueprintMockup
+        = ToProjectBlueprintDto(ProjectBlueprint.TemporaryMateProjectBlueprint);
+
 
     public static ProjectListDto ToProjectListDto(
         ProjectInfo data,
@@ -68,10 +76,10 @@ public static class TransferMaps
             Id: data.Id,
             ProjectGroupId: data.ProjectGroupId,
             Name: artifact?.Name ?? Const.UnnamedProjectName,
-            Description: data.Description,
+            Description: artifact?.GetProperty<LocalizedString>(LegacyBlueprintsCorrection.DescriptionProp),
             GlobalPermissions: ToPermissionArray(data.GlobalPermissions),
             UserPermissions: ToPermissionArray(data.GlobalPermissions | userPermission),
-            ReleasedOn: data.ReleasedOn,
+            ReleasedOn: artifact?.GetProperty<DateTimeOffset>(LegacyBlueprintsCorrection.ReleasedOnProp),
             IsLocked: data.IsLocked,
             LatestReviewKind: data.Reviews != null && !data.Reviews.IsDefaultOrEmpty
                 ? data.Reviews.OrderByDescending(r => r.AddedOn).First().Kind
@@ -80,21 +88,24 @@ public static class TransferMaps
         );
     }
 
-    public static ProjectDetailDto ToProjectDetailDto(ProjectInfo data, Permission userPermission = Permission.None)
+    [Obsolete("Use the new artifact abstraction instead.")]
+    public static ProjectDetailDto ToProjectDetailDto(
+        ProjectInfo data,
+        ArtifactInfo? artifact,
+        Permission userPermission = Permission.None
+    )
     {
         return new ProjectDetailDto(
             Id: data.Id,
             ProjectGroupId: data.ProjectGroupId,
             ProjectGroupName: null,
             ValidationSettings: ProjectValidationSettings.Default,
-            Genre: data.Genre,
-            Name: data.Name,
-            Description: data.Description,
-            AiUsageDeclaration: data.AiUsageDeclaration,
-            HearAboutUs: data.HearAboutUs,
+            Genre: artifact?.GetProperty<LocalizedString>(LegacyBlueprintsCorrection.GenreProp),
+            Name: artifact?.Name ?? Const.UnnamedProjectName,
+            Description: artifact?.GetProperty<LocalizedString>(LegacyBlueprintsCorrection.DescriptionProp),
             GlobalPermissions: ToPermissionArray(data.GlobalPermissions),
             UserPermissions: ToPermissionArray(data.GlobalPermissions | userPermission),
-            ReleasedOn: data.ReleasedOn,
+            ReleasedOn: artifact?.GetProperty<DateTimeOffset>(LegacyBlueprintsCorrection.ReleasedOnProp),
             Crew: [],
             Cast: [],
             OwnerId: data.OwnerId,
@@ -214,6 +225,7 @@ public static class TransferMaps
         );
     }
 
+    [Obsolete("Use the new artifact abstraction instead.")]
     public static ShardListDto ToShardListDto(ShardInfo data)
     {
         return new ShardListDto(

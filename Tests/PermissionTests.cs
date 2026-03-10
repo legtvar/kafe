@@ -159,7 +159,8 @@ public class PermissionTests(ApiFixture fixture, ITestOutputHelper testOutput) :
                 Hrib.Parse("createtst-g").ToString(),
                 CreationMethod.Manual,
                 TestSeedData.Org1Hrib,
-                LocalizedString.CreateInvariant("CreateEventTest project group")
+                LocalizedString.CreateInvariant("CreateEventTest project group"),
+                null
             )
         },
         {

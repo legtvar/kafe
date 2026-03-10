@@ -5,12 +5,12 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Kafe;
 
-public sealed class RequirementContext<T> : IRequirementContext<T>
+public sealed record class RequirementContext<T> : IRequirementContext<T>
     where T : IRequirement
 {
     public RequirementContext(
         T requirement,
-        KafeObject target,
+        KafeObject? target,
         IServiceProvider serviceProvider,
         CancellationToken cancellationToken
     )
@@ -19,17 +19,23 @@ public sealed class RequirementContext<T> : IRequirementContext<T>
         TypeRegistry = serviceProvider.GetRequiredService<KafeTypeRegistry>();
         Requirement = requirement;
         RequirementType = TypeRegistry.RequireType<T>();
-        Target = target.Value;
-        TargetType = target.Type;
+        RawTarget = target;
         CancellationToken = cancellationToken;
     }
 
     public IServiceProvider ServiceProvider { get; }
+
     public KafeTypeRegistry TypeRegistry { get; }
-    public List<Diagnostic> Diagnostics { get; } = [];
+
+    public List<Diagnostic> Diagnostics { get; init; } = [];
+
     public T Requirement { get; }
+
     public KafeType RequirementType { get; }
+
     public CancellationToken CancellationToken { get; }
-    public object Target { get; }
-    public KafeType TargetType { get; }
+
+    public KafeObject? RawTarget { get; }
+
+    public object? Target => RawTarget?.Value;
 }

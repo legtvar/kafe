@@ -9,10 +9,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using Kafe.Core.Diagnostics;
 using Marten.Linq.MatchesSql;
+using Kafe.Diagnostics;
 
 namespace Kafe.Data.Services;
 
 public class ArtifactService(
+    BlueprintService blueprintService,
+    RequirementValidator requirementValidator,
     IDocumentSession db
 )
 {
@@ -157,5 +160,25 @@ public class ArtifactService(
                 Name: g.Name
             )
         ).ToImmutableArray();
+    }
+
+    public async Task<Err<ArtifactValidationReport>> Validate(Hrib id, Hrib blueprintId, CancellationToken ct = default)
+    {
+        var artifactErr = await Load(id, ct);
+        if (artifactErr.HasError)
+        {
+            return artifactErr.Diagnostic;
+        }
+
+        var artifact = artifactErr.Value;
+        var blueprintErr = await blueprintService.Load(blueprintId, ct);
+        if (blueprintErr.HasError)
+        {
+            return blueprintErr.Diagnostic;
+        }
+
+        var blueprint = blueprintErr.Value;
+
+        return await requirementValidator.ValidateArtifact(artifact, blueprint, ct);
     }
 }

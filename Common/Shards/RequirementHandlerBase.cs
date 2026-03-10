@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 
 namespace Kafe;
@@ -14,6 +15,27 @@ public abstract class RequirementHandlerBase<T> : IRequirementHandler
 
     ValueTask IRequirementHandler.Handle(IRequirementContext<IRequirement> context)
     {
-        return Handle((IRequirementContext<T>)context);
+        if (context is not IRequirementContext<T> concreteContext)
+        {
+            if (context.Requirement is not T concreteRequirement)
+            {
+                throw new InvalidOperationException(
+                    "This requirement handler cannot be given a context for "
+                    + $@"a requirement of type '{context.Requirement.GetType()}'."
+                );
+            }
+
+            concreteContext = new RequirementContext<T>(
+                requirement: concreteRequirement,
+                target: context.RawTarget,
+                serviceProvider: context.ServiceProvider,
+                cancellationToken: context.CancellationToken
+            )
+            {
+                Diagnostics = context.Diagnostics
+            };
+        }
+
+        return Handle(concreteContext);
     }
 }

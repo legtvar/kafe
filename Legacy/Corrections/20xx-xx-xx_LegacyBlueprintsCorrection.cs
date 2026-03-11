@@ -93,6 +93,8 @@ public class LegacyBlueprintsCorrection(
     public const string VideoAnnotationProp = "VideoAnnotation";
     public const string CoverPhotosProp = "CoverPhotos";
     public const string BtsPhotosProp = "BtsPhotos";
+    public const string AiUsageDeclarationProp = "AiUsageDeclaration";
+    public const string HearAboutUsProp = "HearAboutUsProp";
 
 
     public async Task Apply(IDocumentSession db, CancellationToken ct = default)
@@ -254,6 +256,32 @@ public class LegacyBlueprintsCorrection(
                             Exclude: []
                         ),
                         new StringLengthRequirement(1, 32)
+                    )]
+                ),
+                [AiUsageDeclarationProp] = new(
+                    name: LocalizedString.Create(
+                        (Const.InvariantCulture, "Generative AI usage declaration"),
+                        (Const.CzechCulture, "Prohlášení o použití generativní umělé inteligence"),
+                        (Const.SlovakCulture, "Vyhlásenie o použití generatívnej umelej inteligencie")
+                    ),
+                    requirements: [..kof.WrapMany(
+                        new TypeRequirement(
+                            Include: [KafeType.Parse("core:string")],
+                            Exclude: []
+                        )
+                    )]
+                ),
+                [HearAboutUsProp] = new(
+                    name: LocalizedString.Create(
+                        (Const.InvariantCulture, "How did you find out about us?"),
+                        (Const.CzechCulture, "Jak jste se o nás dozvědeli?"),
+                        (Const.SlovakCulture, "Ako ste sa o nás dozvedeli?")
+                    ),
+                    requirements: [..kof.WrapMany(
+                        new TypeRequirement(
+                            Include: [KafeType.Parse("core:string")],
+                            Exclude: []
+                        )
                     )]
                 ),
                 [ReleasedOnProp] = new(

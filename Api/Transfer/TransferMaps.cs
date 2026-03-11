@@ -106,6 +106,8 @@ public static class TransferMaps
             GlobalPermissions: ToPermissionArray(data.GlobalPermissions),
             UserPermissions: ToPermissionArray(data.GlobalPermissions | userPermission),
             ReleasedOn: artifact?.GetProperty<DateTimeOffset>(LegacyBlueprintsCorrection.ReleasedOnProp),
+            AiUsageDeclaration: artifact?.GetProperty<string>(LegacyBlueprintsCorrection.AiUsageDeclarationProp),
+            HearAboutUs: artifact?.GetProperty<string>(LegacyBlueprintsCorrection.HearAboutUsProp),
             Crew: [],
             Cast: [],
             OwnerId: data.OwnerId,

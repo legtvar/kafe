@@ -71,7 +71,6 @@ public partial class ProjectService
     public const string VisualReviewStage = "visual-review";
     public const string DramaturgyReviewStage = "dramaturgy-review";
     public const string PigeonsTestStage = "pigeons-test";
-
     public const string LemmaCurrentFilmFestivalProjectGroupId = "SA42xo3cf9y";
     public static readonly HashSet<string> LemmaMandatoryCrewRoles = new(
         new[] { "director", "story", "screenwriter", "producer" }

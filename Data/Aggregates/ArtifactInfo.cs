@@ -8,10 +8,18 @@ using System.Collections.Immutable;
 namespace Kafe.Data.Aggregates;
 
 public record ArtifactInfo(
-    [Hrib] string Id,
+    [property:Hrib]
+    string Id,
+
     CreationMethod CreationMethod,
-    [LocalizedString] ImmutableDictionary<string, string> Name,
+
+    [property:Sortable]
+    [property:LocalizedString]
+    ImmutableDictionary<string, string> Name,
+
+    [property:Sortable]
     DateTimeOffset AddedOn,
+
     ImmutableDictionary<string, KafeObject> Properties
 ) : IArtifact
 {

@@ -6,7 +6,8 @@
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <NoWarn>$(NoWarn);CS1591;CS1573;NU1608</NoWarn>
+  <!-- NB: For the time being, CS8620 is ignored because of https://github.com/dotnet/roslyn/issues/80024. -->
+    <NoWarn>$(NoWarn);CS1591;CS1573;NU1608;CS8620</NoWarn>
     <PackageOutputPath>$(MSBuildThisFileDirectory)artifacts</PackageOutputPath>
     <DebugType>embedded</DebugType>
     <EmbedAllSources>true</EmbedAllSources>

@@ -17,11 +17,13 @@ public static class Naming
         sb.Append(char.ToLower(name[0]));
         for (int i = 1; i < name.Length; ++i)
         {
+            sb.Append(char.ToLower(name[i]));
             if (char.IsUpper(name[i]) != char.IsUpper(name[i - 1]))
             {
                 sb.Append('-');
             }
         }
+
         return sb.ToString();
     }
 
@@ -29,7 +31,7 @@ public static class Naming
     {
         if (name.EndsWith(suffix))
         {
-            return name[0..(name.Length - suffix.Length)];
+            return name[..^suffix.Length];
         }
 
         return name;

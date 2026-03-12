@@ -19,6 +19,7 @@ namespace Kafe.Api.Endpoints.Shard;
 [ApiVersion("1")]
 [Route("shard")]
 [Authorize]
+[Obsolete("This endpoint is part of the old artifact abstraction and will soon be replaced.")]
 public class ShardCreationEndpoint(
     ShardService shardService,
     ArtifactService artifactService,

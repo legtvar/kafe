@@ -1,14 +1,10 @@
 #pragma warning disable 0618
 
-using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using JasperFx.Core.Reflection;
 using Kafe.Data.Aggregates;
 using Marten;
-using Marten.Events;
-using Microsoft.Extensions.Logging;
 
 namespace Kafe.Data.Events.Corrections;
 
@@ -19,16 +15,9 @@ namespace Kafe.Data.Events.Corrections;
 [AutoCorrection("2024-07-02")]
 internal class LegacyOrganizationCorrection : IEventCorrection
 {
-    private readonly ILogger logger;
-
     public static readonly Hrib LegacyOrganizationId = (Hrib)"legacy--org";
     public static readonly LocalizedString LegacyOrganizationName
         = LocalizedString.CreateInvariant("Legacy Organization");
-
-    public LegacyOrganizationCorrection(ILogger<LegacyOrganizationCorrection> logger)
-    {
-        this.logger = logger;
-    }
 
     public async Task Apply(IDocumentSession db, CancellationToken ct = default)
     {
@@ -47,14 +36,14 @@ internal class LegacyOrganizationCorrection : IEventCorrection
         {
             if (@event.EventType == typeof(PlaylistCreated))
             {
-                db.Events.Append(@event.StreamKey, new PlaylistMovedToOrganization(
+                db.Events.Append(@event.StreamKey!, new PlaylistMovedToOrganization(
                     PlaylistId: @event.StreamKey!,
                     OrganizationId: LegacyOrganizationId.ToString()
                 ));
             }
             else if (@event.EventType == typeof(ProjectGroupCreated))
             {
-                db.Events.Append(@event.StreamKey, new ProjectGroupMovedToOrganization(
+                db.Events.Append(@event.StreamKey!, new ProjectGroupMovedToOrganization(
                     ProjectGroupId: @event.StreamKey!,
                     OrganizationId: LegacyOrganizationId.ToString()
                 ));

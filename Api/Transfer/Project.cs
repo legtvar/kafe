@@ -25,6 +25,7 @@ public record ProjectListDto(
     // TODO: Thumbnail
 );
 
+[Obsolete("This type is part of the old artifact abstraction and will soon be replaced.")]
 public record ProjectDetailDto(
     Hrib Id,
     Hrib ProjectGroupId,
@@ -53,12 +54,13 @@ public record ProjectAuthorDto(
     ImmutableArray<string> Roles
 );
 
+[Obsolete("This type is part of the old artifact abstraction and will soon be replaced.")]
 public record ProjectArtifactDto(
     Hrib Id,
     LocalizedString Name,
     DateTimeOffset? AddedOn,
     string? BlueprintSlot,
-    ImmutableArray<ShardListDto > Shards
+    ImmutableArray<ShardListDto> Shards
 );
 
 public record ProjectReviewDto(
@@ -76,11 +78,13 @@ public record ProjectReviewCreationDto(
     LocalizedString? Comment
 );
 
+[Obsolete("This type is part of the old artifact abstraction and will soon be replaced.")]
 public record ProjectBlueprintDto(
     ImmutableArray<string> RequiredReviewers,
     ImmutableDictionary<string, ProjectArtifactBlueprintDto> ArtifactBlueprints
 );
 
+[Obsolete("This type is part of the old artifact abstraction and will soon be replaced.")]
 public record ProjectArtifactBlueprintDto(
     LocalizedString Name,
     LocalizedString? Description,

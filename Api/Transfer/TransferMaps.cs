@@ -205,6 +205,7 @@ public static class TransferMaps
         );
     }
 
+    [Obsolete("Use the new artifact abstraction instead.")]
     public static ArtifactDetailDto ToArtifactDetailDto(ArtifactInfo data)
     {
         return new ArtifactDetailDto(
@@ -216,6 +217,7 @@ public static class TransferMaps
         );
     }
 
+    [Obsolete("Use the new artifact abstraction instead.")]
     public static ProjectArtifactDto ToProjectArtifactDto(ArtifactInfo data)
     {
         return new ProjectArtifactDto(

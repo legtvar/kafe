@@ -21,8 +21,7 @@ namespace Kafe.Api.Endpoints.Account;
 public class TemporaryAccountCreationEndpoint(
     AccountService accountService,
     IEmailService emailService,
-    IOptions<ApiOptions> apiOptions,
-    ILogger<TemporaryAccountCreationEndpoint> logger
+    IOptions<ApiOptions> apiOptions
 ) : EndpointBaseAsync
         .WithRequest<TemporaryAccountCreationDto>
         .WithActionResult

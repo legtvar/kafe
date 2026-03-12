@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using ImTools;
 using Kafe.Data.Aggregates;
 using Kafe.Data.Options;
 using Kafe.Data.Services;
@@ -41,10 +42,15 @@ public class UserSeedData(
             var dataErr = await accountService.FindByEmail(account.EmailAddress, token);
             if (dataErr.HasError)
             {
-                dataErr = (await accountService.Create(
+                dataErr = await accountService.Create(
                     AccountInfo.Create(account.EmailAddress, account.PreferredCulture),
                     token: token
-                )).Unwrap();
+                );
+                if (dataErr.HasError)
+                {
+                    logger.LogErr(dataErr);
+                    continue;
+                }
 
                 logger.LogInformation("Seed account '{AccountEmailAddress}' created.", account.EmailAddress);
             }
@@ -53,9 +59,8 @@ public class UserSeedData(
             if (account.Permissions is not null)
             {
                 var missingPermissions = account.Permissions
-                    .ToDictionary(p => p.Key, p => p.Value)
-                    .Except(data.Permissions)
-                    .Select(kv => ((Hrib)kv.Key, kv.Value))
+                    .Where(p => !data.Permissions.Contains(p))
+                    .Select(kv => (id: (Hrib)kv.Key, permissions: kv.Value))
                     .ToImmutableArray();
 
                 if (missingPermissions.Length > 0)
@@ -91,16 +96,17 @@ public class UserSeedData(
                 continue;
             }
 
-            var createResult = await organizationService.Create(
+            var createErr = await organizationService.Create(
                 OrganizationInfo.Create(name) with
                 {
                     Id = organization.Id,
                     CreationMethod = CreationMethod.Seed
                 },
-                token);
-            if (createResult.HasError)
+                token
+            );
+            if (createErr.HasError)
             {
-                throw createResult.AsException()!;
+                throw createErr.AsException();
             }
 
             logger.LogInformation("Seed organization '{OrganizationId}' created.", organization.Id);
@@ -114,7 +120,6 @@ public class UserSeedData(
                 continue;
             }
 
-            var name = LocalizedString.CreateInvariant(group.Name);
             var existingErr = await projectGroupService.Load(group.Id, token);
             if (existingErr.HasError)
             {
@@ -126,17 +131,20 @@ public class UserSeedData(
             }
 
             var deadline = group.Deadline is null ? default : DateTimeOffset.Parse(group.Deadline);
-            var createResult = await projectGroupService.Create(new ProjectGroupInfo(
-                Id: group.Id,
-                CreationMethod: CreationMethod.Seed,
-                OrganizationId: group.OrganizationId,
-                Name: LocalizedString.CreateInvariant(group.Name),
-                Description: null,
-                Deadline: deadline
-            ));
-            if (createResult.HasError)
+            var createErr = await projectGroupService.Create(
+                new ProjectGroupInfo(
+                    Id: group.Id,
+                    CreationMethod: CreationMethod.Seed,
+                    OrganizationId: group.OrganizationId,
+                    Name: LocalizedString.CreateInvariant(group.Name),
+                    Description: null,
+                    Deadline: deadline
+                ),
+                ct: token
+            );
+            if (createErr.HasError)
             {
-                throw createResult.AsException()!;
+                throw createErr.AsException();
             }
 
             logger.LogInformation("Seed project group '{ProjectGroupId}' created.", group.Id);

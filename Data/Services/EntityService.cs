@@ -18,18 +18,19 @@ public class EntityService(IDocumentSession db)
     public async Task<IEntity?> Load(Hrib id, CancellationToken token = default)
     {
         var parentState = await db.Events.FetchStreamStateAsync(id.ToString(), token);
-        if (parentState?.AggregateType is null)
+        if (parentState?.AggregateType is null || parentState.Key is null)
         {
             return null;
         }
 
         return (await db.QueryAsync(
-            parentState.AggregateType,
-            "WHERE data ->> 'Id' = ?",
-            token,
-            parentState.Key))
-                .Cast<IEntity>()
-                .FirstOrDefault();
+                parentState.AggregateType,
+                "WHERE data ->> 'Id' = ?",
+                token,
+                parentState.Key
+            ))
+            .Cast<IEntity>()
+            .FirstOrDefault();
     }
 
     public async Task<Err<EntityPermissionInfo>> LoadPermissionInfo(
@@ -87,7 +88,8 @@ public class EntityService(IDocumentSession db)
         var manyPerms = (await LoadPermissionInfoMany(entityIds, token)).Unwrap();
         return manyPerms.Select(p => accessingAccountId.IsEmpty
                 ? p.GlobalPermission.EffectivePermission
-                : p.GetAccountPermission(accessingAccountId) | p.GlobalPermission.EffectivePermission)
+                : p.GetAccountPermission(accessingAccountId) | p.GlobalPermission.EffectivePermission
+            )
             .ToImmutableArray();
     }
 
@@ -97,7 +99,8 @@ public class EntityService(IDocumentSession db)
         Hrib entityId,
         Permission permissions,
         Hrib accessingAccountId,
-        CancellationToken token = default)
+        CancellationToken token = default
+    )
     {
         if (accessingAccountId.IsEmpty)
         {
@@ -127,7 +130,6 @@ public class EntityService(IDocumentSession db)
 
                 db.Events.Append(entityId.ToString(), newEvent);
             }
-
         }
         else
         {
@@ -141,15 +143,14 @@ public class EntityService(IDocumentSession db)
             if ((account.Permissions?.GetValueOrDefault(entityId.ToString()) ?? Permission.None) != permissions)
             {
                 object @event = new AccountPermissionSet(
-                        AccountId: accessingAccountId.ToString(),
-                        EntityId: entityId.ToString(),
-                        Permission: permissions);
+                    AccountId: accessingAccountId.ToString(),
+                    EntityId: entityId.ToString(),
+                    Permission: permissions
+                );
                 db.Events.Append(accessingAccountId.ToString(), @event);
             }
-
         }
 
         await db.SaveChangesAsync(token);
     }
-
 }

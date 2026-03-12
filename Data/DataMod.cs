@@ -78,6 +78,7 @@ public class DataMod : IMod
         services.AddScoped<EntityService>();
         services.AddScoped<OrganizationService>();
         services.AddScoped<RoleService>();
+        services.AddScoped<BlueprintService>();
 
         services.AddOptions<StorageOptions>()
             .BindConfiguration("Storage")

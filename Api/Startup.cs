@@ -226,10 +226,7 @@ public partial class Startup
 
         var pigeonsEndpoint = Configuration.GetValue<string>("Pigeons:Endpoint") ?? "http://localhost:8042";
         Log.Logger.Information("Pigeons: Endpoint={PigeonsEndpoint}", pigeonsEndpoint);
-        services.AddHttpClient("Pigeons", client =>
-        {
-            client.BaseAddress = new Uri(pigeonsEndpoint);
-        });
+        services.AddHttpClient("Pigeons", client => { client.BaseAddress = new Uri(pigeonsEndpoint); });
 
         services.AddHttpClient();
 
@@ -271,7 +268,7 @@ public partial class Startup
     {
         PopulateMimeTypes(
             app.ApplicationServices.GetRequiredService<FileExtensionMimeMap>(),
-            app.ApplicationServices.GetRequiredService<FileExtensionContentTypeProvider>()
+            new FileExtensionContentTypeProvider()
         );
 
         app.UseMiddleware<ClacksMiddleware>();
@@ -287,11 +284,12 @@ public partial class Startup
         );
 
         app.UseRequestLocalization(o =>
-        {
-            var dataOptions = app.ApplicationServices.GetRequiredService<IOptions<DataOptions>>();
-            o.AddSupportedCultures([.. dataOptions.Value.Languages]);
-            o.DefaultRequestCulture = new RequestCulture(Const.InvariantCulture);
-        });
+            {
+                var dataOptions = app.ApplicationServices.GetRequiredService<IOptions<DataOptions>>();
+                o.AddSupportedCultures([.. dataOptions.Value.Languages]);
+                o.DefaultRequestCulture = new RequestCulture(Const.InvariantCulture);
+            }
+        );
 
         app.UseRouting();
 
@@ -459,5 +457,4 @@ public partial class Startup
 
     [GeneratedRegex(@"^https?:\/\/localhost(?::\d+)?$")]
     private static partial Regex GetLocalhostRegex();
-
 }

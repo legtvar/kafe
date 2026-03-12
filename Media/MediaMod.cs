@@ -60,6 +60,7 @@ public sealed class MediaMod : IMod
         services.AddSingleton<SubtitlesShardAnalyzer>();
         services.AddSingleton<ImageShardAnalyzer>();
         services.AddSingleton<VideoConversionDaemon>();
+        services.AddScoped<VideoConversionService>();
         services.AddHostedService<VideoConversionDaemon>(s => s.GetRequiredService<VideoConversionDaemon>());
 
         services.AddOptions<VideoConversionOptions>()

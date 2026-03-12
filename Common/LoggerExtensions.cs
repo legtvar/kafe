@@ -15,6 +15,11 @@ public static class LoggerExtensions
             }
         }
 
+        public void LogErr<T>(Err<T> err)
+        {
+            self.LogErr(err, message: null);
+        }
+
         public void LogDiagnostic(Diagnostic diagnostic, string? message, params object?[] args)
         {
             var level = diagnostic.Severity switch

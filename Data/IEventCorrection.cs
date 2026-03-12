@@ -14,14 +14,14 @@ public interface IEventCorrection
     /// <summary>
     /// Apply a series of corrective events.
     /// </summary>
-    /// 
+    ///
     /// <remarks>
-    /// This method should never call <see cref="IDocumentSession.SaveChanges"/>, so that the appended events can be
-    /// recorded in <see cref="EventCorrectionInfo"/>.
+    /// This method should never call <see cref="Marten.IDocumentSession.SaveChangesAsync"/>,
+    /// so that the appended events can be recorded in <see cref="EventCorrectionInfo"/>.
     /// </remarks>
-    /// 
+    ///
     /// <param name="db">The DB.</param>
-    /// 
+    ///
     /// <returns>A JSON-serializable object that will be included in the EventCorrectionInfo document.</returns>
     Task Apply(IDocumentSession db, CancellationToken ct = default);
 }

@@ -16,7 +16,6 @@ namespace Kafe.Api.Endpoints.Shard;
 [Obsolete("This endpoint is part of the old artifact abstraction and will soon be replaced.")]
 public class ShardDetailEndpoint(
     ShardService shardService,
-    ArtifactService artifactService,
     IAuthorizationService authorizationService
 ) : EndpointBaseAsync
     .WithRequest<string>

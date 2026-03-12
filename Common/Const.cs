@@ -299,7 +299,7 @@ Vaše KAFE
     }
 
     /// <summary>
-    /// Returns <paramref cref="@new"/> if it's different from <see cref="old"/>, otherwise returns null.
+    /// Returns <paramref name="new"/> if it's different from <paramref name="old"/>, otherwise returns null.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T? PreferNew<T>(T? old, T? @new)

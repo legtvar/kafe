@@ -10,7 +10,7 @@ public sealed record class RequirementContext<T> : IRequirementContext<T>
 {
     public RequirementContext(
         T requirement,
-        KafeObject? target,
+        KafeObject target,
         IServiceProvider serviceProvider,
         CancellationToken cancellationToken
     )
@@ -35,7 +35,7 @@ public sealed record class RequirementContext<T> : IRequirementContext<T>
 
     public CancellationToken CancellationToken { get; }
 
-    public KafeObject? RawTarget { get; }
+    public KafeObject RawTarget { get; }
 
-    public object? Target => RawTarget?.Value;
+    public object Target => RawTarget.Value;
 }

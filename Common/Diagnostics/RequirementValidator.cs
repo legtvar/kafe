@@ -1,9 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -38,13 +36,27 @@ public class RequirementValidator(
         // TODO: Parallelize
         foreach (var property in blueprint.Properties)
         {
-            KafeObject? target = artifact.Properties.ContainsKey(property.Key)
-                ? artifact.Properties[property.Key]
-                : null;
             var propertyDiagnostics = ImmutableArray.CreateBuilder<Diagnostic>();
-            foreach (var requirement in property.Value.Requirements)
+            if (!artifact.Properties.TryGetValue(property.Key, out var target))
             {
-                propertyDiagnostics.AddRange(await ValidateRequirement((IRequirement)requirement.Value, target, ct));
+                propertyDiagnostics.Add(
+                    Diagnostic.Fail(
+                        new MissingArtifactPropertyDiagnostic(
+                            PropertyKey: property.Key,
+                            ArtifactId: artifact.Id,
+                            BlueprintId: blueprint.Id
+                        )
+                    )
+                );
+            }
+            else
+            {
+                foreach (var requirement in property.Value.Requirements)
+                {
+                    propertyDiagnostics.AddRange(
+                        await ValidateRequirement((IRequirement)requirement.Value, target, ct)
+                    );
+                }
             }
 
             diagnosticsBuilder.Add(Diagnostic.Aggregate(propertyDiagnostics.ToImmutable()).ForParameter(property.Key));
@@ -72,7 +84,7 @@ public class RequirementValidator(
 
     public async Task<ImmutableArray<Diagnostic>> ValidateRequirement(
         IRequirement requirement,
-        KafeObject? target,
+        KafeObject target,
         CancellationToken ct = default
     )
     {

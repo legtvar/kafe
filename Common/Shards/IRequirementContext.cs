@@ -14,9 +14,9 @@ public interface IRequirementContext<out T>
     /// <summary>
     /// The object upon which the requirement is imposed.
     /// </summary>
-    object? Target { get; }
+    object Target { get; }
 
-    KafeObject? RawTarget { get; }
+    KafeObject RawTarget { get; }
 
     IServiceProvider ServiceProvider { get; }
 

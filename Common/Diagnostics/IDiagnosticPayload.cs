@@ -3,7 +3,7 @@ using System;
 namespace Kafe;
 
 /// <summary>
-/// The type and arguments of an <see cref="IDiagnostic"/>.
+/// The type and arguments of an <see cref="Diagnostic"/> payload.
 /// </summary>
 public interface IDiagnosticPayload : IKafeTypeMetadata
 {

@@ -41,7 +41,7 @@ public sealed record ModContext
     public IServiceCollection Services { get; }
 
     /// <summary>
-    /// Types that were registered by this mod through the <see cref="AddType"/> subtype registration methods.
+    /// Types that were registered by this mod through the `Add*` registration methods.
     /// </summary>
     public IReadOnlySet<KafeType> Types { get; }
 }

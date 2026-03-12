@@ -309,7 +309,7 @@ public partial class Startup
     {
         PopulateMimeTypes(
             app.ApplicationServices.GetRequiredService<FileExtensionMimeMap>(),
-            app.ApplicationServices.GetRequiredService<FileExtensionContentTypeProvider>()
+            new FileExtensionContentTypeProvider()
         );
 
         app.UseMiddleware<ClacksMiddleware>();
@@ -483,5 +483,4 @@ public partial class Startup
 
     [GeneratedRegex(@"^https?:\/\/localhost(?::\d+)?$")]
     private static partial Regex GetLocalhostRegex();
-
 }

@@ -175,7 +175,7 @@ public class DataMod : IMod
         mo.Events.Upcast<BlendShardCreatedUpcaster>();
         mo.Events.Upcast<BlendShardVariantAddedUpcaster>();
         mo.Events.Upcast<BlendShardVariantRemovedUpcaster>();
-        mo.UseNewtonsoftForSerialization();
+        mo.UseSystemTextJsonForSerialization();
 
         RegisterEmbeddedSql(mo);
 

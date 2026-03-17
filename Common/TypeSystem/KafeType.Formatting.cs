@@ -17,12 +17,14 @@ public readonly partial record struct KafeType : IFormattable
     /// </summary>
     public const string HumanReadableFormat = "h";
 
+    internal string RawValue => ToString();
+
     public static readonly LocalizedString FallbackName = LocalizedString.Create(
         (Const.InvariantCulture, "object of type '{0}'"),
         (Const.CzechCulture, "objekt typu '{0}'")
     );
 
-    public override readonly string ToString()
+    public override string ToString()
     {
         var sb = new StringBuilder(Mod.Length + 1 + Category.Length + 1 + Moniker?.Length ?? 0 + 2);
         sb.Append(Mod);
@@ -42,7 +44,7 @@ public readonly partial record struct KafeType : IFormattable
         return sb.ToString();
     }
 
-    public readonly string ToString(string? format, IFormatProvider? formatProvider)
+    public string ToString(string? format, IFormatProvider? formatProvider)
     {
         formatProvider ??= CultureInfo.InvariantCulture;
         if (formatProvider is not CultureInfo culture)

@@ -26,5 +26,9 @@
     <Content Remove="Tests/**/*" />
     <None Remove="Tests/**/*" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <InternalsVisibleTo Include="Kafe.Data" />
+  </ItemGroup>
 
 </Project>

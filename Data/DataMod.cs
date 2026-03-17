@@ -175,7 +175,16 @@ public class DataMod : IMod
         mo.Events.Upcast<BlendShardCreatedUpcaster>();
         mo.Events.Upcast<BlendShardVariantAddedUpcaster>();
         mo.Events.Upcast<BlendShardVariantRemovedUpcaster>();
-        mo.UseSystemTextJsonForSerialization();
+
+        var typeRegistry = services.GetRequiredService<KafeTypeRegistry>();
+        mo.UseSystemTextJsonForSerialization(configure: o =>
+        {
+            o.Converters.Add(new HribJsonConverter());
+            o.Converters.Add(new LocalizedStringJsonConverter());
+            o.Converters.Add(new KafeTypeJsonConverter(typeRegistry));
+        });
+
+        mo.Linq.MemberSources.Add(new KafeTypeMemberSource());
 
         RegisterEmbeddedSql(mo);
 

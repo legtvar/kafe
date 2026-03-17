@@ -42,6 +42,23 @@ public class KafeTypeRegistry : IFreezable
             );
         }
 
+        if (metadata.KafeType.DotnetType is null)
+        {
+            metadata = metadata with
+            {
+                KafeType = metadata.KafeType with { DotnetType = metadata.DotnetType }
+            };
+        }
+
+        if (metadata.KafeType.DotnetType != metadata.DotnetType)
+        {
+            throw new ArgumentException(
+                $"{nameof(KafeType)}.{nameof(KafeType.DotnetType)} must be null or "
+                + $"match the {nameof(metadata.DotnetType)} in the metadata.",
+                nameof(metadata)
+            );
+        }
+
         if (!dotnetTypeMap.TryAdd(metadata.DotnetType, metadata.KafeType))
         {
             var existing = dotnetTypeMap[metadata.DotnetType];
@@ -50,6 +67,19 @@ public class KafeTypeRegistry : IFreezable
                 + $"because that .NET type has already been registered by '{existing}'.",
                 nameof(metadata)
             );
+        }
+
+        foreach (var alias in metadata.DotnetTypeAliases)
+        {
+            if (!dotnetTypeMap.TryAdd(alias, metadata.KafeType))
+            {
+                var existing = dotnetTypeMap[alias];
+                throw new ArgumentException(
+                    $"Cannot assign '{alias}' as an alias to '{metadata.KafeType}' because that .NET type has already "
+                    + $"been registered by '{existing}'.",
+                    nameof(metadata)
+                );
+            }
         }
     }
 

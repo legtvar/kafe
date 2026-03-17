@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace Kafe;
 
-public class KafeTypeJsonConverter : JsonConverter<KafeType>
+public class KafeTypeJsonConverter(KafeTypeRegistry typeRegistry) : JsonConverter<KafeType>
 {
     public override KafeType Read(
         ref Utf8JsonReader reader,
@@ -18,7 +18,9 @@ public class KafeTypeJsonConverter : JsonConverter<KafeType>
             throw new JsonException("Could not parse into a KafeType.");
         }
 
-        return kafeType;
+        return !typeRegistry.Types.TryGetValue(kafeType, out var metadata)
+            ? throw new JsonException("This type is not registered.")
+            : metadata.KafeType;
     }
 
     public override void Write(

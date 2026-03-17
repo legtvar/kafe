@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Kafe;
 
-public sealed record class RequirementContext<T> : IRequirementContext<T>
+public sealed record RequirementContext<T> : IRequirementContext<T>
     where T : IRequirement
 {
     public RequirementContext(

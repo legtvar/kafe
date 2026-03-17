@@ -5,13 +5,13 @@ using System.Text.RegularExpressions;
 
 namespace Kafe;
 
-[JsonConverter(typeof(KafeTypeJsonConverter))]
 public readonly partial record struct KafeType(
     string Mod,
     string Category,
     string Moniker,
     bool IsArray = false,
-    LocalizedString? Name = null
+    LocalizedString? Name = null,
+    Type? DotnetType = null
 ) : IParsable<KafeType>, IInvalidable<KafeType>
 {
     public const char ModCategorySeparator = ':';
@@ -40,6 +40,15 @@ public readonly partial record struct KafeType(
     /// Used in <see cref="ToString(string?, IFormatProvider?)"/> with <see cref="HumanReadableFormat"/>.
     /// </summary>
     public LocalizedString? Name { get; init; } = Name;
+
+    /// <summary>
+    /// The .NET type that is mapped onto this KAFE type.
+    /// </summary>
+    /// <remarks>
+    /// This is convenience property populated in APIs that have access to <see cref="KafeTypeRegistry"/>.
+    /// Consequently, the static parsing methods (<see cref="Parse"/>) will NOT set it.
+    /// </remarks>
+    public Type? DotnetType { get; init; } = DotnetType;
 
     public bool IsDefault => Mod == null && Category == null && Moniker == null && IsArray == false;
 

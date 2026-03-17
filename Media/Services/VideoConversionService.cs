@@ -116,14 +116,14 @@ public class VideoConversionService(
         if (conversion.HasFailed
             && stream.Aggregate.HasFailed
             && conversion.Error != (LocalizedString?)stream.Aggregate.Error
-           )
+        )
         {
             return Err.Fail(new MediaConversionAlreadyCompleted(id));
         }
 
         if ((conversion.HasFailed || !LocalizedString.IsNullOrEmpty(conversion.Error))
             && !stream.Aggregate.HasFailed
-           )
+        )
         {
             if (stream.Aggregate.IsCompleted)
             {
@@ -216,48 +216,48 @@ public class VideoConversionService(
         if (filter.IsOriginal is not null)
         {
             var originalLinkType = typeRegistry.RequireType<GeneratedFromShardLink>();
+            var originalWhereSql
+                = $"""
+                   {(filter.IsOriginal == true ? "NOT" : "")} jsonb_path_exists(
+                      d.data,
+                      '$.{nameof(ShardInfo.Links)}[*] ? (@.{nameof(KafeObject.Type)} == "{originalLinkType.ToString()}")'
+                   )
+                   """;
             // NB: Filter out generated video shards.
-            query = (IMartenQueryable<ShardInfo>)query.Where(s => s.MatchesSql(
-                    $"""
-                     {(filter.IsOriginal == true ? "NOT" : "")} jsonb_path_exists(
-                        d.data,
-                        '$.{nameof(ShardInfo.Links)}[*] ? (@.{nameof(KafeObject.Type)} == \"{originalLinkType.ToString()}\")'
-                     )
-                     """
-                )
-            );
+            query = (IMartenQueryable<ShardInfo>)query.Where(s => s.MatchesSql('^', originalWhereSql));
         }
 
         if (filter.IsCorrupted is not null)
         {
             var isCorrupted = filter.IsCorrupted.Value;
-            query = (IMartenQueryable<ShardInfo>)query.Where(v => v.MatchesSql(
-                    $"(d.data -> '{nameof(ShardInfo.Payload)}' -> '{nameof(KafeObject.Value)}' "
-                    + $"->> '{nameof(MediaInfo.IsCorrupted)}')::boolean = ?",
-                    isCorrupted
-                )
-            );
+            var isCorruptedSql
+                = $"""
+                   (d.data -> '{nameof(ShardInfo.Payload)}'
+                        -> '{nameof(KafeObject.Value)}'
+                        ->> '{nameof(MediaInfo.IsCorrupted)}'
+                    )::boolean = ?
+                   """;
+            query = (IMartenQueryable<ShardInfo>)query.Where(v => v.MatchesSql(isCorruptedSql, isCorrupted));
         }
 
         if (filter.HasAnyCompletedOrFailedConversions is not null)
         {
             var hasCompletedOrFailedConversions = filter.HasAnyCompletedOrFailedConversions.Value;
-            query = (IMartenQueryable<ShardInfo>)query.Where(v => v.MatchesSql(
-                    $"""
-                     {(hasCompletedOrFailedConversions ? "" : "NOT")} EXISTS (
-                         SELECT a.*  FROM {db.DocumentStore.Options.Schema.For<VideoConversionInfo>(true)} AS a
-                         LEFT OUTER JOIN {db.DocumentStore.Options.Schema.For<VideoConversionInfo>(true)} AS b
-                     	    ON a.data ->> '{nameof(VideoConversionInfo.VideoId)}' = b.data ->> '{nameof(VideoConversionInfo.VideoId)}'
-                     		    AND a.data ->> '{nameof(VideoConversionInfo.Variant)}' = b.data ->> '{nameof(VideoConversionInfo.Variant)}'
-                     		    AND (a.data ->> '{nameof(VideoConversionInfo.CreatedAt)}')::timestamptz < (b.data ->> '{nameof(VideoConversionInfo.CreatedAt)}')::timestamptz
-                         WHERE b.id is null AND a.data ->> '{nameof(VideoConversionInfo.VideoId)}' = d.id AND (
-                            (a.data ->> '{nameof(VideoConversionInfo.IsCompleted)}')::boolean
-                            OR (a.data ->> '{nameof(VideoConversionInfo.HasFailed)}')::boolean
-                         )
-                     )
-                     """
-                )
-            );
+            var hasCompletedOrFailedConversionsSql
+                = $"""
+                   {(hasCompletedOrFailedConversions ? "" : "NOT")} EXISTS (
+                       SELECT a.*  FROM {db.DocumentStore.Options.Schema.For<VideoConversionInfo>(true)} AS a
+                       LEFT OUTER JOIN {db.DocumentStore.Options.Schema.For<VideoConversionInfo>(true)} AS b
+                   	    ON a.data ->> '{nameof(VideoConversionInfo.VideoId)}' = b.data ->> '{nameof(VideoConversionInfo.VideoId)}'
+                   		    AND a.data ->> '{nameof(VideoConversionInfo.Variant)}' = b.data ->> '{nameof(VideoConversionInfo.Variant)}'
+                   		    AND (a.data ->> '{nameof(VideoConversionInfo.CreatedAt)}')::timestamptz < (b.data ->> '{nameof(VideoConversionInfo.CreatedAt)}')::timestamptz
+                       WHERE b.id is null AND a.data ->> '{nameof(VideoConversionInfo.VideoId)}' = d.id AND (
+                          (a.data ->> '{nameof(VideoConversionInfo.IsCompleted)}')::boolean
+                          OR (a.data ->> '{nameof(VideoConversionInfo.HasFailed)}')::boolean
+                       )
+                   )
+                   """;
+            query = (IMartenQueryable<ShardInfo>)query.Where(v => v.MatchesSql(hasCompletedOrFailedConversionsSql));
         }
 
         query = (IMartenQueryable<ShardInfo>)query.OrderByDescending(v => v.CreatedAt);

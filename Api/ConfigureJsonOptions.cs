@@ -11,24 +11,22 @@ using Microsoft.Extensions.Options;
 
 namespace Kafe.Api;
 
-public class ConfigureJsonOptions : IConfigureOptions<JsonOptions>
+public class ConfigureJsonOptions(
+    IHostEnvironment environment,
+    KafeTypeRegistry typeRegistry
+): IConfigureOptions<JsonOptions>
 {
-    private readonly IHostEnvironment environment;
-
-    public ConfigureJsonOptions(IHostEnvironment environment)
-    {
-        this.environment = environment;
-    }
-
     public void Configure(JsonOptions o)
     {
         o.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
         o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
         o.JsonSerializerOptions.Converters.Add(new LocalizedStringJsonConverter());
         o.JsonSerializerOptions.Converters.Add(new HribJsonConverter());
+        o.JsonSerializerOptions.Converters.Add(new KafeTypeJsonConverter(typeRegistry));
 
         var typeInfoResolver = (o.JsonSerializerOptions.TypeInfoResolver ?? new DefaultJsonTypeInfoResolver())
-            .WithAddedModifier(InitializeImmutableArrayProperties);
+            .WithAddedModifier(InitializeImmutableArrayProperties)
+            .WithAddedModifier(RemoveDotnetType);
         if (environment.IsProduction())
         {
             typeInfoResolver = typeInfoResolver.WithAddedModifier(RemoveErrorStackTraces);
@@ -113,5 +111,16 @@ public class ConfigureJsonOptions : IConfigureOptions<JsonOptions>
 
         var stackTraceProp = type.Properties.Single(p => p.Name == nameof(Diagnostic.StackTrace));
         type.Properties.Remove(stackTraceProp);
+    }
+
+    private static void RemoveDotnetType(JsonTypeInfo type)
+    {
+        if (type.Type != typeof(KafeObject))
+        {
+            return;
+        }
+
+        var dotnetTypeProp = type.Properties.Single(p => p.Name == nameof(KafeObject.DotnetType));
+        type.Properties.Remove(dotnetTypeProp);
     }
 }

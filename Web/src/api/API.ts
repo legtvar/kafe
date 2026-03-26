@@ -264,7 +264,7 @@ export class API {
                 },
             },
             async logout() {
-                return api.getSimple(`account/logout`);
+                window.location.href = `${api.apiUrl}account/logout`;
             },
             async impersonate(id: string) {
                 return api.getSimple(`account/impersonate/${id}`);

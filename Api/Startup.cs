@@ -116,6 +116,7 @@ public partial class Startup
                 o =>
                 {
                     o.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                    o.SignOutScheme = CookieAuthenticationDefaults.AuthenticationScheme;
 
                     var oidcConfig = Configuration.GetRequiredSection("Oidc").Get<OidcOptions>()
                         ?? throw new ArgumentException("OIDC is not configured well.");
@@ -128,8 +129,13 @@ public partial class Startup
                     o.Scope.Add("profile");
                     o.Scope.Add("email");
                     o.CallbackPath = new PathString("/signin-oidc");
+                    o.SignedOutCallbackPath = new PathString("/signout-oidc");
+                    o.SignedOutRedirectUri = "/";
+                    o.RemoteSignOutPath = new PathString("/force-oidc-signout");
+                    o.UsePkce = true;
+                    // o.Prompt = "login";
                     // o.GetClaimsFromUserInfoEndpoint = true;
-                    // o.SaveTokens = true;
+                    o.SaveTokens = true;
 
                     o.Events.OnRemoteFailure += c =>
                     {
@@ -141,6 +147,24 @@ public partial class Startup
                         );
                         c.HandleResponse();
                         return Task.CompletedTask;
+                    };
+
+                    o.Events.OnTokenValidated += async c =>
+                    {
+                        if (c.Principal is null)
+                        {
+                            return;
+                        }
+
+                        var result = await c.HttpContext.RequestServices.GetRequiredService<AccountService>()
+                            .AssociateExternalAccount(c.Principal);
+                        if (result.HasErrors)
+                        {
+                            c.Fail(result.AsException());
+                            return;
+                        }
+
+                        c.Principal = UserProvider.GetClaimsPrincipal(result.Value, c.Scheme.Name, c.Principal);
                     };
                 }
             );
@@ -223,10 +247,7 @@ public partial class Startup
 
         var pigeonsEndpoint = Configuration.GetValue<string>("Pigeons:Endpoint") ?? "http://localhost:8042";
         Log.Logger.Information("Pigeons: Endpoint={PigeonsEndpoint}", pigeonsEndpoint);
-        services.AddHttpClient("Pigeons", client =>
-        {
-            client.BaseAddress = new Uri(pigeonsEndpoint);
-        });
+        services.AddHttpClient("Pigeons", client => { client.BaseAddress = new Uri(pigeonsEndpoint); });
 
         services.AddHttpClient();
 
@@ -279,11 +300,12 @@ public partial class Startup
         );
 
         app.UseRequestLocalization(o =>
-        {
-            var dataOptions = app.ApplicationServices.GetRequiredService<IOptions<DataOptions>>();
-            o.AddSupportedCultures([.. dataOptions.Value.Languages]);
-            o.DefaultRequestCulture = new RequestCulture(Const.InvariantCulture);
-        });
+            {
+                var dataOptions = app.ApplicationServices.GetRequiredService<IOptions<DataOptions>>();
+                o.AddSupportedCultures([.. dataOptions.Value.Languages]);
+                o.DefaultRequestCulture = new RequestCulture(Const.InvariantCulture);
+            }
+        );
 
         app.UseRouting();
 
@@ -310,22 +332,6 @@ public partial class Startup
                 {
                     await next();
                     return;
-                }
-
-                var oidcConfig = Configuration.GetRequiredSection("Oidc").Get<OidcOptions>()
-                    ?? throw new ArgumentException("OIDC is not configured well.");
-
-                if (emailClaim.Issuer.StartsWith(oidcConfig.Authority))
-                {
-                    var result = await ctx.RequestServices.GetRequiredService<AccountService>()
-                        .AssociateExternalAccount(ctx.User);
-                    if (result.HasErrors)
-                    {
-                        await ctx.ForbidAsync();
-                        return;
-                    }
-
-                    await ctx.RequestServices.GetRequiredService<UserProvider>().SignIn(result.Value);
                 }
 
                 await ctx.RequestServices.GetRequiredService<UserProvider>().RefreshAccount();

@@ -11,6 +11,8 @@ services:
             || PathPrefix(`/swagger`)
             || PathPrefix(`/confirm`)
             || PathPrefix(`/signin-oidc`)
+            || PathPrefix(`/signout-oidc`)
+            || PathPrefix(`/force-oidc-signout`)
           )"
       - "traefik.http.routers.kafe-staging-api.priority=100"
       - "traefik.http.routers.kafe-staging-api.tls=true"

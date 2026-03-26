@@ -24,10 +24,10 @@ public class ExternalAccountLoginEndpoint : EndpointBaseSync
         return Challenge(
             new AuthenticationProperties
             {
-                // RedirectUri = new Uri(new Uri(HttpContext.Request.Host.Value), RedirectUri).ToString()
-                RedirectUri = request.Redirect ?? "/"
+                RedirectUri = request.Redirect ?? RedirectUri
             },
-            OpenIdConnectDefaults.AuthenticationScheme);
+            OpenIdConnectDefaults.AuthenticationScheme
+        );
     }
 
     public record RequestData

@@ -40,19 +40,22 @@ public class UserProvider(
     public async Task<bool> HasPermission(
         Hrib entityId,
         Permission permission,
-        CancellationToken token = default)
+        CancellationToken token = default
+    )
     {
         var effectivePermission = await entityService.GetPermission(
             entityId,
             AccountId,
-            token);
+            token
+        );
         return (effectivePermission & permission) == permission;
     }
 
     public Task<bool> HasPermission(
         IEntity entity,
         Permission permission,
-        CancellationToken token = default)
+        CancellationToken token = default
+    )
     {
         return HasPermission(entity.Id, permission, token);
     }
@@ -92,7 +95,7 @@ public class UserProvider(
             IssuedUtc = DateTimeOffset.UtcNow,
             ExpiresUtc = DateTimeOffset.UtcNow.Add(Const.AuthenticationCookieExpirationTime),
             IsPersistent = true
-            //RedirectUri = options.Value.AccountConfirmRedirectPath
+            // RedirectUri = options.Value.AccountConfirmRedirectPath
         };
 
         if (contextAccessor.HttpContext is null)
@@ -100,22 +103,41 @@ public class UserProvider(
             throw new InvalidOperationException("Cannot sign in outside of a request.");
         }
 
-        var principal = GetClaimsPrincipal(account, CookieAuthenticationDefaults.AuthenticationScheme);
+        var user = contextAccessor.HttpContext.User;
+        var principal = GetClaimsPrincipal(account, CookieAuthenticationDefaults.AuthenticationScheme, user);
         contextAccessor.HttpContext.User = principal;
         await contextAccessor.HttpContext.SignInAsync(
             CookieAuthenticationDefaults.AuthenticationScheme,
             principal,
-            authProperties);
+            authProperties
+        );
         Account = account;
     }
 
-    public static ClaimsPrincipal GetClaimsPrincipal(AccountInfo account, string? authenticationScheme = null)
+    public static ClaimsPrincipal GetClaimsPrincipal(
+        AccountInfo account,
+        string? authenticationScheme = null,
+        ClaimsPrincipal? existing = null
+    )
     {
-        var claims = new List<Claim>()
+        var claims = new List<Claim>();
+        if (existing is not null)
         {
-            new Claim(ClaimTypes.NameIdentifier, account.Id),
-            new Claim(ClaimTypes.Email, account.EmailAddress)
-        };
+            foreach (var claim in existing.Claims)
+            {
+                if (claim.Type == ClaimTypes.NameIdentifier
+                    || claim.Type == ClaimTypes.Email
+                )
+                {
+                    continue;
+                }
+
+                claims.Add(claim);
+            }
+        }
+
+        claims.Add(new Claim(ClaimTypes.NameIdentifier, account.Id));
+        claims.Add(new Claim(ClaimTypes.Email, account.EmailAddress));
 
         if (account.PreferredCulture != Const.InvariantCultureCode)
         {
@@ -126,18 +148,15 @@ public class UserProvider(
         {
             claims.Add(new Claim(ClaimTypes.Name, account.Name));
         }
+        else
+        {
+            claims.Add(new Claim(ClaimTypes.Name, account.EmailAddress));
+        }
 
         if (!string.IsNullOrEmpty(account.Uco))
         {
             claims.Add(new Claim(AccountService.PreferredUsernameClaim, account.Uco));
         }
-
-        // TODO: Let accounts have Name
-        // if (!string.IsNullOrEmpty(account.Name))
-        // {
-        //     claims.Add(new Claim(ClaimTypes.Name, Name));
-        // }
-        claims.Add(new Claim(ClaimTypes.Name, account.EmailAddress));
 
         var claimsIdentity = new ClaimsIdentity(claims, authenticationScheme);
         return new ClaimsPrincipal(claimsIdentity);

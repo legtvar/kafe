@@ -34,8 +34,11 @@ export type ApiResponse<T> =
 export class API {
     private apiUrl = '/api/v1/';
     private client: Axios;
-    private static Production = 'https://kafe.fi.muni.cz';
-    private static Staging = 'https://kafe-stage.fi.muni.cz';
+    public static UmamiInstanceUrl = 'https://stats.mlejnek.cafour.cz';
+    public static Production = 'https://kafe.fi.muni.cz';
+    public static Staging = 'https://kafe-stage.fi.muni.cz';
+    public static ProductionStatsId = '6b9612aa-c852-486d-9708-4a9ce9a527be';
+    public static StagingStatsId = '2f99f7e3-3d46-4196-ab13-325a763c2cdb';
 
     public constructor() {
         if (window.location.hostname.startsWith('localhost') || window.location.hostname.startsWith('127.0.0.1')) {
@@ -56,12 +59,22 @@ export class API {
         });
     }
 
+    public get baseUrl() {
+        return new URL(this.apiUrl).origin
+    }
+    
     public get isProduction() {
-        return new URL(this.apiUrl).origin === API.Production;
+        return this.baseUrl === API.Production;
     }
 
     public get isStaging() {
-        return new URL(this.apiUrl).origin === API.Staging;
+        return this.baseUrl === API.Staging;
+    }
+    
+    public get statsWebsiteId() {
+        return this.isStaging ? API.StagingStatsId
+            : this.isProduction ? API.ProductionStatsId
+            : null;
     }
 
     public get isLocalhost() {

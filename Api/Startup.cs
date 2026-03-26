@@ -131,6 +131,7 @@ public partial class Startup
                     o.CallbackPath = new PathString("/signin-oidc");
                     o.SignedOutCallbackPath = new PathString("/signout-oidc");
                     o.SignedOutRedirectUri = "/";
+                    o.RemoteSignOutPath = new PathString("/force-oidc-signout");
                     o.UsePkce = true;
                     // o.Prompt = "login";
                     // o.GetClaimsFromUserInfoEndpoint = true;
@@ -146,6 +147,24 @@ public partial class Startup
                         );
                         c.HandleResponse();
                         return Task.CompletedTask;
+                    };
+
+                    o.Events.OnTokenValidated += async c =>
+                    {
+                        if (c.Principal is null)
+                        {
+                            return;
+                        }
+
+                        var result = await c.HttpContext.RequestServices.GetRequiredService<AccountService>()
+                            .AssociateExternalAccount(c.Principal);
+                        if (result.HasErrors)
+                        {
+                            c.Fail(result.AsException());
+                            return;
+                        }
+
+                        c.Principal = UserProvider.GetClaimsPrincipal(result.Value, c.Scheme.Name, c.Principal);
                     };
                 }
             );
@@ -313,22 +332,6 @@ public partial class Startup
                 {
                     await next();
                     return;
-                }
-
-                var oidcConfig = Configuration.GetRequiredSection("Oidc").Get<OidcOptions>()
-                    ?? throw new ArgumentException("OIDC is not configured well.");
-
-                if (emailClaim.Issuer.StartsWith(oidcConfig.Authority))
-                {
-                    var result = await ctx.RequestServices.GetRequiredService<AccountService>()
-                        .AssociateExternalAccount(ctx.User);
-                    if (result.HasErrors)
-                    {
-                        await ctx.ForbidAsync();
-                        return;
-                    }
-
-                    await ctx.RequestServices.GetRequiredService<UserProvider>().SignIn(result.Value);
                 }
 
                 await ctx.RequestServices.GetRequiredService<UserProvider>().RefreshAccount();

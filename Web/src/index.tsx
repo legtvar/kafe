@@ -12,7 +12,9 @@ import { CookiesProvider } from 'react-cookie';
 import { SortableProvider } from 'use-sortablejs';
 import { overrideConsole } from './consoleOverride';
 import theme from './theme';
-import {Settings} from "luxon";
+import { Settings } from 'luxon';
+
+import UmamiAnalytics from '@danielgtmn/umami-react';
 
 overrideConsole();
 
@@ -30,17 +32,22 @@ overrideConsole();
 
     const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
     root.render(
-        <I18nextProvider i18n={i18next}>
-            <CookiesProvider>
-                <SortableProvider>
-                    <ChakraProvider theme={theme}>
-                        <CaffeineProvider value={caffeine}>
-                            <ColorModeScript initialColorMode={theme.config.initialColorMode} />
-                            <RouterProvider router={router} />
-                        </CaffeineProvider>
-                    </ChakraProvider>
-                </SortableProvider>
-            </CookiesProvider>
-        </I18nextProvider>,
+        <>
+            {caffeine.api.statsWebsiteId && (
+                <UmamiAnalytics url={API.UmamiInstanceUrl} websiteId={caffeine.api.statsWebsiteId} />
+            )}
+            <I18nextProvider i18n={i18next}>
+                <CookiesProvider>
+                    <SortableProvider>
+                        <ChakraProvider theme={theme}>
+                            <CaffeineProvider value={caffeine}>
+                                <ColorModeScript initialColorMode={theme.config.initialColorMode} />
+                                <RouterProvider router={router} />
+                            </CaffeineProvider>
+                        </ChakraProvider>
+                    </SortableProvider>
+                </CookiesProvider>
+            </I18nextProvider>
+        </>,
     );
 })();

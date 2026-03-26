@@ -116,6 +116,7 @@ public partial class Startup
                 o =>
                 {
                     o.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                    o.SignOutScheme = CookieAuthenticationDefaults.AuthenticationScheme;
 
                     var oidcConfig = Configuration.GetRequiredSection("Oidc").Get<OidcOptions>()
                         ?? throw new ArgumentException("OIDC is not configured well.");
@@ -128,8 +129,12 @@ public partial class Startup
                     o.Scope.Add("profile");
                     o.Scope.Add("email");
                     o.CallbackPath = new PathString("/signin-oidc");
+                    o.SignedOutCallbackPath = new PathString("/signout-oidc");
+                    o.SignedOutRedirectUri = "/";
+                    o.UsePkce = true;
+                    // o.Prompt = "login";
                     // o.GetClaimsFromUserInfoEndpoint = true;
-                    // o.SaveTokens = true;
+                    o.SaveTokens = true;
 
                     o.Events.OnRemoteFailure += c =>
                     {
@@ -223,10 +228,7 @@ public partial class Startup
 
         var pigeonsEndpoint = Configuration.GetValue<string>("Pigeons:Endpoint") ?? "http://localhost:8042";
         Log.Logger.Information("Pigeons: Endpoint={PigeonsEndpoint}", pigeonsEndpoint);
-        services.AddHttpClient("Pigeons", client =>
-        {
-            client.BaseAddress = new Uri(pigeonsEndpoint);
-        });
+        services.AddHttpClient("Pigeons", client => { client.BaseAddress = new Uri(pigeonsEndpoint); });
 
         services.AddHttpClient();
 
@@ -279,11 +281,12 @@ public partial class Startup
         );
 
         app.UseRequestLocalization(o =>
-        {
-            var dataOptions = app.ApplicationServices.GetRequiredService<IOptions<DataOptions>>();
-            o.AddSupportedCultures([.. dataOptions.Value.Languages]);
-            o.DefaultRequestCulture = new RequestCulture(Const.InvariantCulture);
-        });
+            {
+                var dataOptions = app.ApplicationServices.GetRequiredService<IOptions<DataOptions>>();
+                o.AddSupportedCultures([.. dataOptions.Value.Languages]);
+                o.DefaultRequestCulture = new RequestCulture(Const.InvariantCulture);
+            }
+        );
 
         app.UseRouting();
 

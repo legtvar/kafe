@@ -67,7 +67,7 @@ public static class TransferMaps
             ReleasedOn: data.ReleasedOn,
             IsLocked: data.IsLocked,
             LatestReviewKind: data.Reviews != null && !data.Reviews.IsDefaultOrEmpty
-            ? data.Reviews.OrderByDescending(r => r.AddedOn).First().Kind
+            ? data.Reviews.MaxBy(r => r.AddedOn)?.Kind ?? ReviewKind.NotReviewed
             : ReviewKind.NotReviewed,
             OwnerId: data.OwnerId);
     }

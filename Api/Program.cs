@@ -47,7 +47,7 @@ public class Program
                 {
                     builder.ConfigureKestrel(k =>
                         {
-                            // set request limit to 4 GiB
+                            // set request limit to 8 GiB
                             k.Limits.MaxRequestBodySize = Const.ShardSizeLimit;
                             k.AddServerHeader = false;
                         }

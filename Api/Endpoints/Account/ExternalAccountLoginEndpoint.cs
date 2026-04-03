@@ -21,10 +21,18 @@ public class ExternalAccountLoginEndpoint : EndpointBaseSync
     [SwaggerOperation(Tags = new[] { EndpointArea.Account })]
     public override ActionResult Handle([FromQuery] RequestData request)
     {
+        var redirectUri = request.Redirect ?? RedirectUri;
+
+        // Validate redirect URL to prevent open redirect attacks
+        if (!string.IsNullOrEmpty(request.Redirect) && !Url.IsLocalUrl(request.Redirect))
+        {
+            return BadRequest("Invalid redirect URL");
+        }
+
         return Challenge(
             new AuthenticationProperties
             {
-                RedirectUri = request.Redirect ?? RedirectUri
+                RedirectUri = redirectUri
             },
             OpenIdConnectDefaults.AuthenticationScheme
         );

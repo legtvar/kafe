@@ -161,7 +161,7 @@ public partial class Startup
 
                         var result = await c.HttpContext.RequestServices.GetRequiredService<AccountService>()
                             .AssociateExternalAccount(c.Principal);
-                        if (result.HasErrors)
+                        if (result.HasError)
                         {
                             c.Fail(result.AsException());
                             return;

@@ -118,7 +118,7 @@ public class EntityService
                 throw new InvalidOperationException("System permissions cannot be set globally.");
             }
 
-            var entity = await Load(entityId, token) ?? throw new NullReferenceException("Entity could not be found.");
+            var entity = await Load(entityId, token) ?? throw new InvalidOperationException("Entity could not be found.");
 
             if (entity is not IVisibleEntity visible)
             {

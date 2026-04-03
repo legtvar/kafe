@@ -221,7 +221,7 @@ public class AccountService(
             );
         }
 
-        var addedRoles = modified.RoleIds.Except(modified.RoleIds);
+        var addedRoles = modified.RoleIds.Except(old.RoleIds);
         foreach (var newRole in addedRoles)
         {
             hasChanged = true;

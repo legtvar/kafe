@@ -58,7 +58,7 @@ public class ProjectDownloadEndpoint(
                         var mediaType = await shardService.GetShardVariantMediaType(shard.ShardId, variant, cancellationToken);
                         if (mediaType?.FileExtension == null) continue;
 
-                        var shardStream = await shardService.OpenStream(shard.ShardId, variant, cancellationToken);
+                        using var shardStream = await shardService.OpenStream(shard.ShardId, variant, cancellationToken);
 
                         var entryName = $"{shard.ShardId}/{variant}{mediaType.FileExtension}";
                         var entry = archive.CreateEntry(entryName, CompressionLevel.Fastest);

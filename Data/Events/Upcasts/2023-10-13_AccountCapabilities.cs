@@ -27,12 +27,18 @@ namespace Kafe.Data.Capabilities
         {
             // TODO: Rewrite with spans or smth.
             var subvalues = value.Split(SubvalueSeparator);
+            if (subvalues.Length < 1)
+            {
+                capability = null;
+                return false;
+            }
+
             capability = subvalues[0] switch
             {
                 nameof(Administration) => new Administration(),
-                nameof(ProjectReview) => new ProjectReview(subvalues[1]),
-                nameof(ProjectOwnership) => new ProjectOwnership(subvalues[1]),
-                nameof(AuthorManagement) => new AuthorManagement(subvalues[1]),
+                nameof(ProjectReview) when subvalues.Length >= 2 => new ProjectReview(subvalues[1]),
+                nameof(ProjectOwnership) when subvalues.Length >= 2 => new ProjectOwnership(subvalues[1]),
+                nameof(AuthorManagement) when subvalues.Length >= 2 => new AuthorManagement(subvalues[1]),
                 nameof(OrganizeFestival) => new OrganizeFestival(),
                 _ => null
             };

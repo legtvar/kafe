@@ -69,7 +69,11 @@ public class ConfigureJsonOptions : IConfigureOptions<JsonOptions>
                     bindingAttr: BindingFlags.Public | BindingFlags.Instance)
                 ?? throw new NotSupportedException("There is no IsDefault property on ImmutableArray.");
 
-            return (bool)isDefaultProp.GetMethod!.Invoke(obj, null)!;
+            var getMethod = isDefaultProp.GetMethod
+                ?? throw new NotSupportedException("IsDefault property has no getter.");
+            var result = getMethod.Invoke(obj, null)
+                ?? throw new NotSupportedException("IsDefault invocation returned null.");
+            return (bool)result;
         }
 
         object CreateImmutableArray(Type type)

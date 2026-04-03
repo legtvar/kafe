@@ -166,9 +166,9 @@ public class EntityPermissionsEditEndpoint(
                 .Add(new PathString("/" + confirmationToken));
             var confirmationUrl = new Uri(new Uri(apiOptions.Value.BaseUrl), pathString);
             // TODO: Custom email template for invites.
-            var emailSubject = Const.ConfirmationEmailSubject[ticket.Value.PreferredCulture]!;
+            var emailSubject = Const.ConfirmationEmailSubject[ticket.Value.PreferredCulture];
             var emailMessage = string.Format(
-                Const.ConfirmationEmailMessageTemplate[ticket.Value.PreferredCulture]!,
+                Const.ConfirmationEmailMessageTemplate[ticket.Value.PreferredCulture],
                 confirmationUrl,
                 Const.EmailSignOffs[RandomNumberGenerator.GetInt32(0, Const.EmailSignOffs.Length)][
                     ticket.Value.PreferredCulture]

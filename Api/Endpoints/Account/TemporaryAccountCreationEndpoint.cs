@@ -52,9 +52,9 @@ public class TemporaryAccountCreationEndpoint(
         var pathString = new PathString(apiOptions.Value.AccountConfirmPath)
             .Add(new PathString("/" + confirmationToken));
         var confirmationUrl = new Uri(new Uri(apiOptions.Value.BaseUrl), pathString);
-        var emailSubject = Const.ConfirmationEmailSubject[ticket.Value.PreferredCulture]!;
+        var emailSubject = Const.ConfirmationEmailSubject[ticket.Value.PreferredCulture];
         var emailMessage = string.Format(
-            Const.ConfirmationEmailMessageTemplate[ticket.Value.PreferredCulture]!,
+            Const.ConfirmationEmailMessageTemplate[ticket.Value.PreferredCulture],
             confirmationUrl,
             Const.EmailSignOffs[RandomNumberGenerator.GetInt32(0, Const.EmailSignOffs.Length)]
                 [ticket.Value.PreferredCulture]

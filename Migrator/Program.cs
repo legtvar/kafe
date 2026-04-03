@@ -32,7 +32,7 @@ public static class Program
         using var host = Host.CreateDefaultBuilder(args)
             .ConfigureAppConfiguration(c =>
             {
-                c.AddJsonFile("appsettings.local.json");
+                c.AddJsonFile("appsettings.local.json", optional: true);
             })
             .ConfigureServices((context, services) =>
             {

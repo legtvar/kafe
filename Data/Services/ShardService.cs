@@ -276,7 +276,7 @@ public class ShardService
         {
             throw new InvalidOperationException($"A blend shard must belong to exactly one project group. Found {projectGroupNames.Length}.");
         }
-        
+
         var blendInfo = new BlendInfo(
             FileExtension: Const.BlendFileExtension,
             MimeType: Const.BlendMimeType,
@@ -295,7 +295,7 @@ public class ShardService
         await db.SaveChangesAsync(token);
 
         await pigeonsQueue.EnqueueAsync(shardId);
-        
+
         return created.ShardId;
     }
 
@@ -321,7 +321,7 @@ public class ShardService
         // Fetch all shard IDs that were queued for testing but have not yet been tested
         var blendShards = await db.Query<BlendShardInfo>().ToListAsync();
         var missingTestShards = blendShards
-            .Where(s => s.Variants.ContainsKey(Const.OriginalShardVariant) 
+            .Where(s => s.Variants.ContainsKey(Const.OriginalShardVariant)
                 && s.Variants[Const.OriginalShardVariant].Tests == null
                 && s.Variants[Const.OriginalShardVariant].Error == null)
             .Select(s => (Hrib)s.Id);
@@ -355,7 +355,7 @@ public class ShardService
             HomeworkType: projectGroupNames[0]["iv"] ?? string.Empty,
             Path: shardFilePath);
         var client = httpClientFactory.CreateClient("Pigeons");
-        var response = await client.PostAsJsonAsync("/test", request, cancellationToken: ct);
+        using var response = await client.PostAsJsonAsync("/test", request, cancellationToken: ct);
         var content = await response.Content.ReadFromJsonAsync<BlendInfoJsonFormat>(cancellationToken: ct);
         if (content is null)
         {

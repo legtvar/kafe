@@ -1,4 +1,4 @@
-FROM alpine:latest AS builder
+FROM alpine:3.23 AS builder
 RUN apk update && apk add nodejs-current npm
 RUN corepack enable && npm install -g pnpm
 WORKDIR /app

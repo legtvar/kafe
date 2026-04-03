@@ -62,7 +62,7 @@ public partial class Startup
 
     public void ConfigureServices(IServiceCollection services)
     {
-        IdentityModelEventSource.ShowPII = true;
+        IdentityModelEventSource.ShowPII = Environment.IsDevelopment();
 
         var otlpEndpoint = Configuration.GetValue<string>("Otlp:Endpoint") ?? "http://localhost:4317";
         var otlpName = Configuration.GetValue<string>("Otlp:Name") ?? "Kafe";

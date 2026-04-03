@@ -323,7 +323,7 @@ public class LocalizedStringJsonConverter : JsonConverter<LocalizedString>
         }
         catch (ArgumentException e)
         {
-            throw new JsonException(e.Message);
+            throw new JsonException(e.Message, e);
         }
     }
 

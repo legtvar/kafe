@@ -4,6 +4,7 @@ bin/
 MockIdentity/keys/
 artifacts/
 .idea/
+*.DotSettings
 *.DotSettings.user
 **/node_modules/
 .pnpm-store/

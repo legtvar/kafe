@@ -393,7 +393,8 @@ public partial class Startup
 
         services.AddScoped<IAuthorizationHandler, PermissionHandler>();
 
-        services.AddSingleton<ProblemDetailsFactory, KafeProblemDetailsFactory>();
+        services.AddSingleton<KafeProblemDetailsFactory>();
+        services.AddSingleton<ProblemDetailsFactory>(sp => sp.GetRequiredService<KafeProblemDetailsFactory>());
         services.AddSingleton<IClientErrorFactory, KafeProblemDetailsClientErrorFactory>();
 
         services.AddOptions<ApiOptions>()

@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Diagnostics;
 using System.Globalization;
 using System.Text.Json.Serialization;
@@ -52,15 +53,24 @@ public partial record struct Diagnostic : IFormattable, IInvalidable<Diagnostic>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string StackTrace { get; init; }
 
-    public LocalizedString GetMessage()
+    public LocalizedString ToLocalizedString()
     {
-        message ??= Descriptor.GetMessage(Payload);
+        message ??= Descriptor.GetLocalizedString(Payload);
         return message;
+    }
+
+    public DiagnosticMessage ToDiagnosticMessage(KafeTypeRegistry typeRegistry, CultureInfo? culture = null)
+    {
+        return Descriptor.GetMessage(typeRegistry, Payload, culture) with
+        {
+            Severity = Severity,
+            StackTrace = StackTrace
+        };
     }
 
     public string ToString(CultureInfo culture)
     {
-        return GetMessage()[culture];
+        return ToLocalizedString()[culture];
     }
 
     public override string ToString()

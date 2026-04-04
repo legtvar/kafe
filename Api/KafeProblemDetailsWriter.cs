@@ -7,16 +7,11 @@ using Microsoft.Net.Http.Headers;
 
 namespace Kafe.Api;
 
-public class KafeProblemDetailsWriter : IProblemDetailsWriter
+public class KafeProblemDetailsWriter(IOptions<JsonOptions> jsonOptions) : IProblemDetailsWriter
 {
     private static readonly MediaTypeHeaderValue JsonMediaType = new("application/json");
     private static readonly MediaTypeHeaderValue ProblemDetailsJsonMediaType = new("application/problem+json");
-    private readonly JsonSerializerOptions serializerOptions;
-
-    public KafeProblemDetailsWriter(IOptions<JsonOptions> jsonOptions)
-    {
-        serializerOptions = jsonOptions.Value.SerializerOptions;
-    }
+    private readonly JsonSerializerOptions serializerOptions = jsonOptions.Value.SerializerOptions;
 
     public bool CanWrite(ProblemDetailsContext context)
     {

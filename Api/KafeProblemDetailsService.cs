@@ -6,14 +6,12 @@ using Microsoft.AspNetCore.Http;
 
 namespace Kafe.Api;
 
-public class KafeProblemDetailsService : IProblemDetailsService
+public class KafeProblemDetailsService(
+    KafeProblemDetailsFactory pdFactory,
+    IEnumerable<IProblemDetailsWriter> writers
+) : IProblemDetailsService
 {
-    private readonly IProblemDetailsWriter[] writers;
-
-    public KafeProblemDetailsService(IEnumerable<IProblemDetailsWriter> writers)
-    {
-        this.writers = writers.ToArray();
-    }
+    private readonly IProblemDetailsWriter[] writers = writers.ToArray();
 
     public async ValueTask WriteAsync(ProblemDetailsContext context)
     {
@@ -27,14 +25,13 @@ public class KafeProblemDetailsService : IProblemDetailsService
         }
         else
         {
-            pd = KafeProblemDetails.Create(
+            pd = pdFactory.CreateProblemDetails(
                 httpContext: context.HttpContext,
                 statusCode: context.ProblemDetails.Status,
                 title: context.ProblemDetails.Title,
                 type: context.ProblemDetails.Type,
                 detail: context.ProblemDetails.Detail,
-                instance: context.ProblemDetails.Instance,
-                skipFrames: 2
+                instance: context.ProblemDetails.Instance
             );
         }
 

@@ -3,14 +3,13 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 
 namespace Kafe.Api;
 
-public class KafeProblemDetailsClientErrorFactory : IClientErrorFactory
+public class KafeProblemDetailsClientErrorFactory(
+    KafeProblemDetailsFactory pdFactory
+) : IClientErrorFactory
 {
     public IActionResult? GetClientError(ActionContext actionContext, IClientErrorActionResult clientError)
     {
-        return KafeProblemDetails.Create(
-            httpContext: actionContext.HttpContext,
-            modelState: actionContext.ModelState,
-            statusCode: clientError.StatusCode
-        ).ToActionResult();
+        // TODO: pass clientError.StatusCode
+        return pdFactory.CreateProblemDetails(pdFactory.CreateDiagnostic(actionContext.ModelState)).ToActionResult();
     }
 }

@@ -9,5 +9,7 @@ public class ApiMod : IMod
     public void Configure(ModContext context)
     {
         context.AddDiagnosticPayload<BadCsvDiagnostic>();
+        context.AddDiagnosticPayload<AspProblemDiagnostic>();
+        context.AddDiagnosticPayload<BadRequestDiagnostic>();
     }
 }

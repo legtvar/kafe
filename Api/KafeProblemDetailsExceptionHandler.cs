@@ -8,7 +8,8 @@ using Microsoft.AspNetCore.Http.Features;
 namespace Kafe.Api;
 
 public class KafeProblemDetailsExceptionHandler(
-    IProblemDetailsService problemDetailsService
+    IProblemDetailsService problemDetailsService,
+    KafeProblemDetailsFactory pdFactory
 ) : IExceptionHandler
 {
     public async ValueTask<bool> TryHandleAsync(
@@ -17,12 +18,7 @@ public class KafeProblemDetailsExceptionHandler(
         CancellationToken cancellationToken
     )
     {
-        var pd = KafeProblemDetails.Create(
-            httpContext: httpContext,
-            statusCode: 500
-        );
-        pd.Diagnostics = [Diagnostic.FromException(exception)];
-
+        var pd = pdFactory.CreateProblemDetails(Diagnostic.FromException(exception));
         var feature = httpContext.Features.GetRequiredFeature<IExceptionHandlerFeature>();
 
         await problemDetailsService.WriteAsync(

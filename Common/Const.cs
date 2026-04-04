@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Immutable;
 using System.Globalization;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 
 namespace Kafe;
@@ -316,5 +318,14 @@ Vaše KAFE
         }
 
         return @new;
+    }
+
+    public static ImmutableDictionary<string, object?> ToDictionary(object obj)
+    {
+        return obj.GetType().GetProperties(BindingFlags.Instance)
+            .ToImmutableDictionary(
+                p => p.Name,
+                p => p.GetValue(obj)
+            );
     }
 }

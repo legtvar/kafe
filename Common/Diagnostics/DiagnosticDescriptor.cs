@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Immutable;
+using System.Globalization;
 using Serilog.Parsing;
 using SmartFormat;
 
@@ -89,7 +90,7 @@ public readonly record struct DiagnosticDescriptor : IInvalidable<DiagnosticDesc
         };
     }
 
-    public LocalizedString GetMessage(IDiagnosticPayload payload)
+    public LocalizedString GetLocalizedString(IDiagnosticPayload payload)
     {
         if (payload.GetType() != PayloadType)
         {
@@ -104,5 +105,27 @@ public readonly record struct DiagnosticDescriptor : IInvalidable<DiagnosticDesc
         }
 
         return messageBuilder.ToImmutable();
+    }
+
+    public DiagnosticMessage GetMessage(KafeTypeRegistry typeRegistry, IDiagnosticPayload payload, CultureInfo? culture = null)
+    {
+        culture ??= Const.InvariantCulture;
+
+        if (payload.GetType() != PayloadType)
+        {
+            throw new ArgumentException($"Payload must be of type '{PayloadType}'.", nameof(payload));
+        }
+
+        var kafeType = typeRegistry.RequireType(PayloadType);
+
+        var message = Smart.Format(MessageFormat[culture], payload);
+        return new DiagnosticMessage
+        {
+            Severity = Severity,
+            Language = culture.TwoLetterISOLanguageName,
+            Arguments = Const.ToDictionary(payload),
+            Message = message,
+            Type = kafeType
+        };
     }
 }

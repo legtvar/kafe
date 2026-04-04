@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Kafe.Api;
 
@@ -12,37 +13,18 @@ public static class ControllerBaseExtensions
         {
             if (err.HasError)
             {
-                var pd = KafeProblemDetails.Create(
-                    httpContext: controller.HttpContext,
-                    modelState: controller.ModelState,
-                    skipFrames: 2
-                );
-                pd.Diagnostics = pd.Diagnostics.AddRange(err.Diagnostic);
-
-                return new ObjectResult(pd)
-                {
-                    StatusCode = pd.Status
-                };
+                var factory = controller.HttpContext.RequestServices.GetRequiredService<KafeProblemDetailsFactory>();
+                return factory.CreateProblemDetails(err.Diagnostic).ToActionResult();
             }
 
             return new OkObjectResult(err.Value);
         }
 
-        public ActionResult KafeErrorResult(
-            params IEnumerable<Diagnostic> diagnostics
-        )
+        public ActionResult KafeErrorResult(params IEnumerable<Diagnostic> diagnostics)
         {
-            var pd = KafeProblemDetails.Create(
-                httpContext: controller.HttpContext,
-                modelState: controller.ModelState,
-                skipFrames: 2
-            );
-            pd.Diagnostics = pd.Diagnostics.AddRange(diagnostics);
-
-            return new ObjectResult(pd)
-            {
-                StatusCode = pd.Status
-            };
+            var diagnostic = Diagnostic.Aggregate(diagnostics);
+            var factory = controller.HttpContext.RequestServices.GetRequiredService<KafeProblemDetailsFactory>();
+            return factory.CreateProblemDetails(diagnostic).ToActionResult();
         }
     }
 }

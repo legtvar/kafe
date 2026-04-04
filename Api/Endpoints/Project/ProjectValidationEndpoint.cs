@@ -49,7 +49,7 @@ public class ProjectValidationEndpoint(
             Diagnostics: [
                 ..report.Diagnostics.Select(d => new ProjectDiagnosticDto(
                     Kind: d.Severity,
-                    Message: d.GetMessage(),
+                    Message: d.ToLocalizedString(),
                     // TODO: Reimplement the notion of stages somehow.
                     ValidationStage: null
                 ))

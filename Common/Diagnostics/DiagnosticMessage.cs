@@ -15,17 +15,21 @@ public readonly record struct DiagnosticMessage : IInvalidable<DiagnosticMessage
     {
     }
 
-    public bool IsValid => Id != KafeType.Invalid;
+    public bool IsValid => Type != KafeType.Invalid;
 
-    public KafeType Id { get; init; } = KafeType.Invalid;
+    public KafeType Type { get; init; } = KafeType.Invalid;
 
-    public string Text { get; init; } = Const.InvalidId;
+    public string Title { get; init; } = Const.InvalidId;
+
+    public string Message { get; init; } = Const.InvalidId;
 
     public DiagnosticSeverity Severity { get; init; }
 
+    public string Language { get; init; } = Const.InvariantCultureCode;
+
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public ImmutableDictionary<string, object> Arguments { get; init; }
-        = ImmutableDictionary<string, object>.Empty;
+    public ImmutableDictionary<string, object?> Arguments { get; init; }
+        = ImmutableDictionary<string, object?>.Empty;
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? StackTrace { get; init; }
@@ -33,10 +37,14 @@ public readonly record struct DiagnosticMessage : IInvalidable<DiagnosticMessage
     public override string ToString()
     {
         var sb = new StringBuilder();
-        sb.Append(Text);
-        sb.Append(" (");
-        sb.Append(Id);
-        sb.Append(')');
+        sb.Append(Severity);
+        sb.Append(" [");
+        sb.Append(Type);
+        sb.Append(']');
+        sb.Append(": ");
+        sb.Append(Title);
+        sb.Append(": ");
+        sb.Append(Message);
         return sb.ToString();
     }
 

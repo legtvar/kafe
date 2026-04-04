@@ -29,11 +29,12 @@ public readonly partial record struct KafeType : IFormattable
         var sb = new StringBuilder(Mod.Length + 1 + Category.Length + 1 + Moniker?.Length ?? 0 + 2);
         sb.Append(Mod);
         sb.Append(ModCategorySeparator);
+        sb.Append(Category);
 
         if (Moniker != null)
         {
-            sb.Append(ModCategorySeparator);
-            sb.Append(Category);
+            sb.Append(CategoryMonikerSeparator);
+            sb.Append(Moniker);
         }
 
         if (IsArray)

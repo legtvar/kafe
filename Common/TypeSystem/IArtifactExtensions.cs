@@ -13,7 +13,7 @@ public static class IArtifactExtensions
                 return null;
             }
 
-            return value;
+            return value.Value;
         }
 
         public T? GetProperty<T>(string key)

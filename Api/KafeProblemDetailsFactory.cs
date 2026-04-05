@@ -83,7 +83,7 @@ public class KafeProblemDetailsFactory(
                         new MvcModelDiagnostic(validationError.ErrorMessage),
                         stackTrace: validationError.Exception?.StackTrace,
                         skipFrames: skipFrames + 1 // NB: The plus one account for the ctor itself.
-                    ).ForParameter(parameter)
+                    )
                 );
             }
 

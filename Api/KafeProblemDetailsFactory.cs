@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Immutable;
 using System.Diagnostics;
+using System.Net;
 using Kafe.Api.Diagnostics;
 using Kafe.Api.Options;
 using Microsoft.AspNetCore.Http;
@@ -22,11 +23,13 @@ public class KafeProblemDetailsFactory(
     {
         // TODO: handle localization using Content-Language, Accept-Language, and the user's preferred language
         var diagnosticMessage = diagnostic.ToDiagnosticMessage(typeRegistry, Const.InvariantCulture);
+        var metadataUrl = $"/api/v1/metadata/diagnostic?type={WebUtility.UrlEncode(diagnosticMessage.Type.ToString())}";
         return new KafeProblemDetails
         {
-            Type = new Uri(new Uri(apiOptions.Value.BaseUrl), diagnosticMessage.Type.ToString()).AbsoluteUri,
+            Type = new Uri(new Uri(apiOptions.Value.BaseUrl), metadataUrl).AbsoluteUri,
             Title = diagnosticMessage.Type.ToString(),
             Detail = diagnosticMessage.Message,
+            Diagnostic = diagnosticMessage,
             TraceId = Activity.Current?.Id ?? httpContextAccessor.HttpContext?.TraceIdentifier,
             Status = diagnostic.Payload is AspProblemDiagnostic aspProblem
                 ? aspProblem.ProblemStatusCode

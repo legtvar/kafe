@@ -9,7 +9,7 @@ public class KafeTypeReflectionTypeJsonConverter(KafeTypeRegistry typeRegistry) 
 {
     public override bool CanConvert(Type typeToConvert)
     {
-        if (typeToConvert != typeof(Type))
+        if (!typeToConvert.IsAssignableTo(typeof(Type)))
         {
             return false;
         }

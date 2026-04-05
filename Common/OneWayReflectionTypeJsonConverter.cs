@@ -9,6 +9,11 @@ namespace Kafe;
 /// </summary>
 public class OneWayReflectionTypeJsonConverter : JsonConverter<Type>
 {
+    public override bool CanConvert(Type typeToConvert)
+    {
+        return typeToConvert.IsAssignableTo(typeof(Type));
+    }
+
     public override Type? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         throw new NotSupportedException(

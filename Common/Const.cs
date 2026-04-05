@@ -322,7 +322,7 @@ Vaše KAFE
 
     public static ImmutableDictionary<string, object?> ToDictionary(object obj)
     {
-        return obj.GetType().GetProperties(BindingFlags.Instance)
+        return obj.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public)
             .ToImmutableDictionary(
                 p => p.Name,
                 p => p.GetValue(obj)

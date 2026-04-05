@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Immutable;
 using System.Globalization;
-using Serilog.Parsing;
 using SmartFormat;
 
 namespace Kafe;
@@ -124,6 +123,7 @@ public readonly record struct DiagnosticDescriptor : IInvalidable<DiagnosticDesc
             Severity = Severity,
             Language = culture.TwoLetterISOLanguageName,
             Arguments = Const.ToDictionary(payload),
+            Title = Title[culture],
             Message = message,
             Type = kafeType
         };

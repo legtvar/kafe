@@ -4,7 +4,7 @@ public record MvcModelDiagnostic(
     string Message
 ) : IDiagnosticPayload
 {
-    public static string Moniker => "bad-csv";
+    public static string Moniker => "mvc-model";
 
     public static DiagnosticSeverity Severity => DiagnosticSeverity.Error;
 

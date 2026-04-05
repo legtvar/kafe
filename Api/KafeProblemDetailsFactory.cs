@@ -27,8 +27,9 @@ public class KafeProblemDetailsFactory(
         return new KafeProblemDetails
         {
             Type = new Uri(new Uri(apiOptions.Value.BaseUrl), metadataUrl).AbsoluteUri,
-            Title = diagnosticMessage.Type.ToString(),
+            Title = diagnosticMessage.Title,
             Detail = diagnosticMessage.Message,
+            // NB: Inner diagnostics are automatically handled using the DiagnosticMessageJsonConverter.
             Diagnostic = diagnosticMessage,
             TraceId = Activity.Current?.Id ?? httpContextAccessor.HttpContext?.TraceIdentifier,
             Status = diagnostic.Payload is AspProblemDiagnostic aspProblem

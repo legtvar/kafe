@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
+using Kafe.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
@@ -23,6 +24,9 @@ public class ConfigureJsonOptions(
         o.JsonSerializerOptions.Converters.Add(new LocalizedStringJsonConverter());
         o.JsonSerializerOptions.Converters.Add(new HribJsonConverter());
         o.JsonSerializerOptions.Converters.Add(new KafeTypeJsonConverter(typeRegistry));
+        o.JsonSerializerOptions.Converters.Add(new DiagnosticMessageJsonConverter(typeRegistry));
+        o.JsonSerializerOptions.Converters.Add(new KafeTypeReflectionTypeJsonConverter(typeRegistry));
+        o.JsonSerializerOptions.Converters.Add(new OneWayReflectionTypeJsonConverter());
 
         var typeInfoResolver = (o.JsonSerializerOptions.TypeInfoResolver ?? new DefaultJsonTypeInfoResolver())
             .WithAddedModifier(InitializeImmutableArrayProperties)

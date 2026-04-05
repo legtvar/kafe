@@ -1,7 +1,7 @@
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Json;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
 
@@ -11,7 +11,6 @@ public class KafeProblemDetailsWriter(IOptions<JsonOptions> jsonOptions) : IProb
 {
     private static readonly MediaTypeHeaderValue JsonMediaType = new("application/json");
     private static readonly MediaTypeHeaderValue ProblemDetailsJsonMediaType = new("application/problem+json");
-    private readonly JsonSerializerOptions serializerOptions = jsonOptions.Value.SerializerOptions;
 
     public bool CanWrite(ProblemDetailsContext context)
     {
@@ -45,7 +44,8 @@ public class KafeProblemDetailsWriter(IOptions<JsonOptions> jsonOptions) : IProb
     {
         return new ValueTask(context.HttpContext.Response.WriteAsJsonAsync(
             value: context.ProblemDetails,
-            jsonTypeInfo: serializerOptions.GetTypeInfo(context.ProblemDetails.GetType()),
-            contentType: ProblemDetailsJsonMediaType.ToString()));
+            jsonTypeInfo: jsonOptions.Value.JsonSerializerOptions.GetTypeInfo(context.ProblemDetails.GetType()),
+            contentType: ProblemDetailsJsonMediaType.ToString())
+        );
     }
 }

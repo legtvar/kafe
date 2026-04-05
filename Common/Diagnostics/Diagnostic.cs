@@ -68,6 +68,12 @@ public partial record struct Diagnostic : IFormattable, IInvalidable<Diagnostic>
         };
     }
 
+    public static Diagnostic FromDiagnosticMessage(KafeTypeRegistry typeRegistry, DiagnosticMessage message)
+    {
+        // TODO: Implement diagnostic deserialization if we ever collect diagnostics from the outside.
+        throw new NotImplementedException();
+    }
+
     public string ToString(CultureInfo culture)
     {
         return ToLocalizedString()[culture];

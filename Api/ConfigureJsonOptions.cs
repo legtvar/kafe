@@ -15,7 +15,7 @@ namespace Kafe.Api;
 public class ConfigureJsonOptions(
     IHostEnvironment environment,
     KafeTypeRegistry typeRegistry
-): IConfigureOptions<JsonOptions>
+) : IConfigureOptions<JsonOptions>
 {
     public void Configure(JsonOptions o)
     {
@@ -47,9 +47,10 @@ public class ConfigureJsonOptions(
         }
 
         var immutableArrayProps = type.Properties.Where(p => p.PropertyType.IsGenericType
-            && p.PropertyType.GetGenericTypeDefinition() == typeof(ImmutableArray<>)
-            && p.Get is not null
-            && p.Set is not null)
+                && p.PropertyType.GetGenericTypeDefinition() == typeof(ImmutableArray<>)
+                && p.Get is not null
+                && p.Set is not null
+            )
             .ToImmutableArray();
 
         if (immutableArrayProps.IsEmpty)
@@ -66,9 +67,10 @@ public class ConfigureJsonOptions(
             }
 
             var isDefaultProp = arrayType
-                .GetProperty(
-                    name: nameof(ImmutableArray<int>.IsDefault),
-                    bindingAttr: BindingFlags.Public | BindingFlags.Instance)
+                    .GetProperty(
+                        name: nameof(ImmutableArray<int>.IsDefault),
+                        bindingAttr: BindingFlags.Public | BindingFlags.Instance
+                    )
                 ?? throw new NotSupportedException("There is no IsDefault property on ImmutableArray.");
 
             var getMethod = isDefaultProp.GetMethod
@@ -81,15 +83,20 @@ public class ConfigureJsonOptions(
         object CreateImmutableArray(Type type)
         {
             var genericCreate = typeof(ImmutableArray).GetMethod(
-                name: nameof(ImmutableArray.Create),
-                bindingAttr: BindingFlags.Static | BindingFlags.Public,
-                types: Type.EmptyTypes)
-                    ?? throw new NotSupportedException("There is no static parameterless Create method "
-                        + "on ImmutableArray.");
+                    name: nameof(ImmutableArray.Create),
+                    bindingAttr: BindingFlags.Static | BindingFlags.Public,
+                    types: Type.EmptyTypes
+                )
+                ?? throw new NotSupportedException(
+                    "There is no static parameterless Create method "
+                    + "on ImmutableArray."
+                );
             var create = genericCreate.MakeGenericMethod([type]);
             return create.Invoke(null, null)
-                ?? throw new NotSupportedException($"An instance of ImmutableArray of '{type.Name}' "
-                    + "could not be created.");
+                ?? throw new NotSupportedException(
+                    $"An instance of ImmutableArray of '{type.Name}' "
+                    + "could not be created."
+                );
         }
 
         type.OnDeserialized = o =>
@@ -108,12 +115,15 @@ public class ConfigureJsonOptions(
 
     private static void RemoveErrorStackTraces(JsonTypeInfo type)
     {
-        if (type.Type != typeof(Diagnostic))
+        if (type.Type != typeof(Diagnostic) && type.Type != typeof(DiagnosticMessage)
+            || type.Kind == JsonTypeInfoKind.None
+        )
         {
             return;
         }
 
-        var stackTraceProp = type.Properties.Single(p => p.Name == nameof(Diagnostic.StackTrace));
+        var stackTraceProp = type.Properties
+            .Single(p => (p.AttributeProvider as PropertyInfo)?.Name == nameof(DiagnosticMessage.StackTrace));
         type.Properties.Remove(stackTraceProp);
     }
 

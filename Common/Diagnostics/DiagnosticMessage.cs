@@ -15,7 +15,8 @@ public readonly record struct DiagnosticMessage : IInvalidable<DiagnosticMessage
     {
     }
 
-    public bool IsValid => Type != KafeType.Invalid;
+    [JsonIgnore]
+    public bool IsValid => Type.IsValid;
 
     public KafeType Type { get; init; } = KafeType.Invalid;
 

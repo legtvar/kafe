@@ -35,11 +35,6 @@ public readonly partial record struct KafeType(
         && Category != Const.InvalidId
         && Moniker != Const.InvalidId;
 
-    public string Mod { get; } = Mod;
-    public string Category { get; } = Category;
-    public string Moniker { get; } = Moniker;
-    public bool IsArray { get; } = IsArray;
-
     /// <summary>
     /// A human-readable name.
     /// Used in <see cref="ToString(string?, IFormatProvider?)"/> with <see cref="HumanReadableFormat"/>.

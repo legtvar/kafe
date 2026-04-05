@@ -18,9 +18,12 @@ public class KafeTypeJsonConverter(KafeTypeRegistry typeRegistry) : JsonConverte
             throw new JsonException("Could not parse into a KafeType.");
         }
 
-        return !typeRegistry.Types.TryGetValue(kafeType, out var metadata)
+        // NB: in case it is an array
+        var itemType = kafeType with { IsArray = false };
+
+        return !typeRegistry.Types.TryGetValue(itemType, out _)
             ? throw new JsonException("This type is not registered.")
-            : metadata.KafeType;
+            : kafeType;
     }
 
     public override void Write(

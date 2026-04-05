@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 using System.Reflection;
 
 namespace Kafe;
@@ -13,8 +15,22 @@ public class KafeObjectFactory(
         var valueType = value.GetType();
         if (!valueType.IsAssignableTo(type))
         {
-            throw new ArgumentException($"Cannot wrap the value in a KafeObject because the value's type, "
-                + $"'{valueType.FullName}', is not assignable to '{type.FullName}'.");
+            throw new ArgumentException(
+                $"Cannot wrap the value in a KafeObject because the value's type, "
+                + $"'{valueType.FullName}', is not assignable to '{type.FullName}'."
+            );
+        }
+
+        var isArray = false;
+        if (type.IsArray)
+        {
+            isArray = true;
+            type = type.GetElementType()!;
+        }
+        else if (type.IsGenericType && type.GetGenericTypeDefinition().IsAssignableTo(typeof(IReadOnlyList<>)))
+        {
+            isArray = true;
+            type = type.GenericTypeArguments.Single();
         }
 
         if (!typeRegistry.DotnetTypeMap.TryGetValue(type, out var kafeType))
@@ -23,7 +39,7 @@ public class KafeObjectFactory(
         }
 
         return new KafeObject(
-            Type: kafeType,
+            Type: kafeType with { IsArray = isArray },
             Value: value
         );
     }
@@ -65,6 +81,7 @@ public class KafeObjectFactory(
                         // error happened, fallback to either Keep or Overwrite
                         return existingValueHandling == ExistingValueHandling.MergeOrOverwrite ? @new : existing;
                     }
+
                     return result;
                 }
 
@@ -90,7 +107,8 @@ public class KafeObjectFactory(
                 return existingValueHandling == ExistingValueHandling.MergeOrOverwrite ? @new : existing;
             default:
                 throw new NotImplementedException(
-                    $"{nameof(ExistingValueHandling)} '{existingValueHandling}' is not implemented.");
+                    $"{nameof(ExistingValueHandling)} '{existingValueHandling}' is not implemented."
+                );
         }
     }
 
@@ -126,12 +144,14 @@ public class KafeObjectFactory(
             return new KafeObject(
                 Type: existing.Type.GetElementType(),
                 Value: ((ImmutableArray<object>)existing.Value)
-                    .AddRange((ImmutableArray<object>)@new.Value)
+                .AddRange((ImmutableArray<object>)@new.Value)
             );
         }
 
-        error = LocalizedString.CreateInvariant($"Cannot merge a '{existing.Type}' with a '{@new.Type}' into an array. "
-            + "The array's element type would not match.");
+        error = LocalizedString.CreateInvariant(
+            $"Cannot merge a '{existing.Type}' with a '{@new.Type}' into an array. "
+            + "The array's element type would not match."
+        );
         return null;
     }
 }

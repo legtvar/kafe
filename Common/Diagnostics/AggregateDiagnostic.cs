@@ -8,7 +8,7 @@ public record AggregateDiagnostic(
 {
     public static string Moniker => "aggregate";
 
-    public static DiagnosticSeverity DefaultSeverity => DiagnosticSeverity.Error;
+    public static DiagnosticSeverity Severity => DiagnosticSeverity.Error;
 
     public static LocalizedString Title { get; } = LocalizedString.Create(
         (Const.InvariantCulture, "Aggregate Diagnostic"),

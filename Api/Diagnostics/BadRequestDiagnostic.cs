@@ -15,7 +15,7 @@ public record BadRequestDiagnostic(
 {
     public static string Moniker => "bad-request";
 
-    public static DiagnosticSeverity DefaultSeverity => DiagnosticSeverity.Error;
+    public static DiagnosticSeverity Severity => DiagnosticSeverity.Error;
 
     public static LocalizedString Title { get; } = LocalizedString.Create(
         (Const.InvariantCulture, "Bad Request"),

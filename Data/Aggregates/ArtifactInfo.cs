@@ -8,12 +8,11 @@ using System.Collections.Immutable;
 namespace Kafe.Data.Aggregates;
 
 public record ArtifactInfo(
-    [property:Hrib]
+    [property: Hrib]
     string Id,
 
     CreationMethod CreationMethod,
-
-    [property:Sortable]
+    [property: Sortable]
     DateTimeOffset AddedOn,
 
     ImmutableDictionary<string, KafeObject> Properties
@@ -58,7 +57,7 @@ public class ArtifactInfoProjection(
             Id: e.ArtifactId,
             CreationMethod: e.CreationMethod,
             AddedOn: e.AddedOn,
-            Properties: objectFactory.WrapProperties((nameof(Name), e.Name))
+            Properties: objectFactory.WrapProperties((nameof(Name), (LocalizedString)e.Name))
         );
     }
 

@@ -11,5 +11,6 @@ public class ApiMod : IMod
         context.AddDiagnosticPayload<BadCsvDiagnostic>();
         context.AddDiagnosticPayload<AspProblemDiagnostic>();
         context.AddDiagnosticPayload<BadRequestDiagnostic>();
+        context.AddDiagnosticPayload<MvcModelDiagnostic>();
     }
 }

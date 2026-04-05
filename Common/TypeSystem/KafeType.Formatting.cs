@@ -26,16 +26,12 @@ public readonly partial record struct KafeType : IFormattable
 
     public override string ToString()
     {
-        var sb = new StringBuilder(Mod.Length + 1 + Category.Length + 1 + Moniker?.Length ?? 0 + 2);
+        var sb = new StringBuilder(Mod.Length + 1 + Category.Length + 1 + Moniker.Length + 2);
         sb.Append(Mod);
         sb.Append(ModCategorySeparator);
         sb.Append(Category);
-
-        if (Moniker != null)
-        {
-            sb.Append(CategoryMonikerSeparator);
-            sb.Append(Moniker);
-        }
+        sb.Append(CategoryMonikerSeparator);
+        sb.Append(Moniker);
 
         if (IsArray)
         {

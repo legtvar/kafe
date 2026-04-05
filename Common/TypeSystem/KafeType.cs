@@ -28,7 +28,12 @@ public readonly partial record struct KafeType(
 
     public static KafeType Invalid { get; } = new(Const.InvalidId, Const.InvalidId, Const.InvalidId);
 
-    public bool IsValid => this != Invalid;
+    public bool IsValid => !string.IsNullOrEmpty(Mod)
+        && !string.IsNullOrEmpty(Category)
+        && !string.IsNullOrEmpty(Moniker)
+        && Mod != Const.InvalidId
+        && Category != Const.InvalidId
+        && Moniker != Const.InvalidId;
 
     public string Mod { get; } = Mod;
     public string Category { get; } = Category;

@@ -51,7 +51,7 @@ public class TemporaryAccountCreationEndpoint(
         var confirmationToken = accountService.EncodeLoginTicketId(ticket.Value.Id);
         var pathString = new PathString(apiOptions.Value.AccountConfirmPath)
             .Add(new PathString("/" + confirmationToken));
-        var confirmationUrl = new Uri(new Uri(apiOptions.Value.BaseUrl), pathString);
+        var confirmationUrl = new Uri(new Uri(apiOptions.Value.FrontEndUrl), pathString);
         var emailSubject = Const.ConfirmationEmailSubject[ticket.Value.PreferredCulture];
         var emailMessage = string.Format(
             Const.ConfirmationEmailMessageTemplate[ticket.Value.PreferredCulture],

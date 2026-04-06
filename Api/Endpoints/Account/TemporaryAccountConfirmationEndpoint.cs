@@ -2,20 +2,12 @@
 using Asp.Versioning;
 using Kafe.Api.Options;
 using Kafe.Api.Services;
-using Kafe.Api.Transfer;
 using Kafe.Data.Services;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.Annotations;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Security.Claims;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -24,23 +16,22 @@ namespace Kafe.Api.Endpoints.Account;
 [ApiVersion("1")]
 [Route("tmp-account/{token}")]
 public class TemporaryAccountConfirmationEndpoint : EndpointBaseAsync
-    .WithRequest<string>
+    .WithRequest<TemporaryAccountConfirmationEndpoint.RequestData>
     .WithActionResult
 {
     private readonly AccountService accountService;
     private readonly UserProvider userProvider;
-    private readonly IDataProtector dataProtector;
-
+    private readonly IOptions<ApiOptions> apiOptions;
 
     public TemporaryAccountConfirmationEndpoint(
         AccountService accountService,
         UserProvider userProvider,
-        IDataProtectionProvider dataProtectionProvider
+        IOptions<ApiOptions> apiOptions
     )
     {
         this.accountService = accountService;
         this.userProvider = userProvider;
-        this.dataProtector = dataProtectionProvider.CreateProtector(Const.TemporaryAccountPurpose);
+        this.apiOptions = apiOptions;
     }
 
     [HttpGet]
@@ -49,11 +40,11 @@ public class TemporaryAccountConfirmationEndpoint : EndpointBaseAsync
     [ProducesResponseType(400)]
     [ProducesResponseType(404)]
     public override async Task<ActionResult> HandleAsync(
-        [FromRoute] string token,
+        RequestData request,
         CancellationToken ct = default
     )
     {
-        var ticketId = accountService.DecodeLoginTicketId(token);
+        var ticketId = accountService.DecodeLoginTicketId(request.Token);
         if (ticketId is null)
         {
             return Unauthorized();
@@ -71,6 +62,19 @@ public class TemporaryAccountConfirmationEndpoint : EndpointBaseAsync
 
         await userProvider.SignIn(account.Value);
 
-        return Ok();
+        return Redirect(
+            HttpContext.GetFrontEndRedirect(
+                request.Redirect ?? apiOptions.Value.AccountConfirmRedirectPath
+            )
+        );
+    }
+
+    public record RequestData
+    {
+        [FromRoute]
+        public string Token { get; set; } = string.Empty;
+
+        [FromQuery(Name = "redirect")]
+        public string? Redirect { get; set; }
     }
 }

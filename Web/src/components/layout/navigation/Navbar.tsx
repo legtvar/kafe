@@ -165,7 +165,6 @@ export function Navbar({ onOpen, forceReload, signedIn, ...rest }: INavbarProps)
                                         onClick={() => {
                                             setUser(null);
                                             api.accounts.logout();
-                                            navigate('/');
                                         }}
                                     >
                                         {t('navbar.signout').toString()}

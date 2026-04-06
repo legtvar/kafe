@@ -9,7 +9,7 @@ services:
           && (
             PathPrefix(`/api`)
             || PathPrefix(`/swagger`)
-            || PathPrefix(`/confirm`)
+            || PathPrefix(`/account/token`)
             || PathPrefix(`/signin-oidc`)
             || PathPrefix(`/signout-oidc`)
             || PathPrefix(`/force-oidc-signout`)

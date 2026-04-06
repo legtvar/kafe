@@ -139,6 +139,7 @@ public class UserProvider(
         claims.Add(new Claim(ClaimTypes.NameIdentifier, account.Id));
         claims.Add(new Claim(ClaimTypes.Email, account.EmailAddress));
 
+
         if (account.PreferredCulture != Const.InvariantCultureCode)
         {
             claims.Add(new Claim(ClaimTypes.StateOrProvince, account.PreferredCulture));

@@ -169,9 +169,9 @@ public partial class Startup
 
                     o.Events.OnRedirectToIdentityProviderForSignOut += c =>
                     {
-                        var emailClaim = c.HttpContext.User.FindFirst(ClaimTypes.Email);
                         // Don't redirect to the ID provider if the  cookie was not provided by them.
-                        if (emailClaim is null || emailClaim.Issuer != oidcConfig.Authority)
+                        if (c.HttpContext.User.Identity?.AuthenticationType
+                            != OpenIdConnectDefaults.AuthenticationScheme)
                         {
                             c.Response.Redirect(c.HttpContext.GetFrontEndRedirect("/"));
                             c.HandleResponse();
@@ -378,10 +378,7 @@ public partial class Startup
             .Bind(Configuration)
             .ValidateDataAnnotations()
             .ValidateOnStart()
-            .Configure(o =>
-            {
-                o.FrontEndUrl ??= o.BaseUrl;
-            });
+            .Configure(o => { o.FrontEndUrl ??= o.BaseUrl; });
         services.AddOptions<EmailOptions>()
             .BindConfiguration("Email")
             .ValidateDataAnnotations()

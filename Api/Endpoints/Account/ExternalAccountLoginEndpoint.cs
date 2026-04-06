@@ -2,26 +2,28 @@ using System;
 using System.Threading;
 using Ardalis.ApiEndpoints;
 using Asp.Versioning;
+using Kafe.Api.Options;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace Kafe.Api.Endpoints.Account;
 
 [ApiVersion("1")]
 [Route("account/external-login")]
-public class ExternalAccountLoginEndpoint : EndpointBaseSync
+public class ExternalAccountLoginEndpoint(
+    IOptions<ApiOptions> apiOptions
+) : EndpointBaseSync
     .WithRequest<ExternalAccountLoginEndpoint.RequestData>
     .WithActionResult
 {
-    public const string RedirectUri = "/auth";
-
     [HttpGet]
     [SwaggerOperation(Tags = new[] { EndpointArea.Account })]
     public override ActionResult Handle([FromQuery] RequestData request)
     {
-        var redirectUri = request.Redirect ?? RedirectUri;
+        var redirectPath = request.Redirect ?? apiOptions.Value.AccountConfirmPath;
 
         // Validate redirect URL to prevent open redirect attacks
         if (!string.IsNullOrEmpty(request.Redirect) && !Url.IsLocalUrl(request.Redirect))
@@ -32,7 +34,7 @@ public class ExternalAccountLoginEndpoint : EndpointBaseSync
         return Challenge(
             new AuthenticationProperties
             {
-                RedirectUri = redirectUri
+                RedirectUri = HttpContext.GetFrontEndRedirect(redirectPath)
             },
             OpenIdConnectDefaults.AuthenticationScheme
         );

@@ -10,22 +10,25 @@ export function ErrorContent(props: IErrorContentProps) {
     let description: string | null = null;
     let suberrors: components['schemas']['Error'][] = [];
 
-    if ((props.error as unknown as any).title) {
+    if ((props.error as unknown as any)?.title) {
         const kpd = props.error as components['schemas']['KafeProblemDetails'];
         title = kpd?.title ?? title;
         description = kpd?.detail ?? description;
         suberrors = kpd?.errors ?? [];
     } else {
-        const jsError = props.error as Error;
         title = 'A client error occurred';
-        suberrors = [
-            {
-                id: jsError.name,
-                message: jsError.message,
-                arguments: {},
-                stackTrace: jsError.stack,
-            },
-        ];
+        const jsError = props.error as Error;
+        if (jsError)
+        {
+            suberrors = [
+                {
+                    id: jsError.name,
+                    message: jsError.message,
+                    arguments: {},
+                    stackTrace: jsError.stack,
+                },
+            ];
+        }
     }
 
     return (

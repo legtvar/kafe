@@ -164,7 +164,7 @@ public class EntityPermissionsEditEndpoint(
             var confirmationToken = accountService.EncodeLoginTicketId(ticket.Value.Id);
             var pathString = new PathString(apiOptions.Value.AccountConfirmPath)
                 .Add(new PathString("/" + confirmationToken));
-            var confirmationUrl = new Uri(new Uri(apiOptions.Value.BaseUrl), pathString);
+            var confirmationUrl = new Uri(new Uri(apiOptions.Value.FrontEndUrl), pathString);
             // TODO: Custom email template for invites.
             var emailSubject = Const.ConfirmationEmailSubject[ticket.Value.PreferredCulture];
             var emailMessage = string.Format(

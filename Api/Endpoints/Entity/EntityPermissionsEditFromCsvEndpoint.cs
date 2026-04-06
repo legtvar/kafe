@@ -107,7 +107,7 @@ public class EntityPermissionsEditFromCsvEndpoint(
                 accounts.Add((dto: accountPermissions, entity: account));
             }
         }
-        
+
         foreach (var emailAddress in notFoundAccounts)
         {
             if (string.IsNullOrWhiteSpace(emailAddress)
@@ -154,7 +154,6 @@ public class EntityPermissionsEditFromCsvEndpoint(
                 return this.KafeErrorResult(invite.Errors);
             }
 
-            
 
             var externalLoginUrl = linkGenerator.GetUriByAction(
                 httpContext: HttpContext,
@@ -162,13 +161,13 @@ public class EntityPermissionsEditFromCsvEndpoint(
                 controller: nameof(Account.ExternalAccountLoginEndpoint),
                 values: new
                 {
-                    redirect = $"{apiOptions.Value.BaseUrl}/auth",
+                    redirect = apiOptions.Value.AccountConfirmRedirectPath,
                     version = "1"
                 }
             );
             var inviter = await accountService.Load(userProvider.AccountId, ct);
             var invitation = inviter?.Name != null
-            ? string.Format(Const.InvitationTemplate[Const.InvariantCulture], inviter.Name) 
+            ? string.Format(Const.InvitationTemplate[Const.InvariantCulture], inviter.Name)
             : Const.InvitationGenericTemplate[Const.InvariantCulture];
             var emailSubject = Const.InvitationEmailSubject[Const.InvariantCulture]!;
             var emailMessage = string.Format(
@@ -214,7 +213,7 @@ public class EntityPermissionsEditFromCsvEndpoint(
                 }
                 else
                 {
-                    return null;        
+                    return null;
                 }
             }
 

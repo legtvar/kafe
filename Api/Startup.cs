@@ -130,7 +130,7 @@ public partial class Startup
                     o.Scope.Add("email");
                     o.CallbackPath = new PathString("/signin-oidc");
                     o.SignedOutCallbackPath = new PathString("/signout-oidc");
-                    o.SignedOutRedirectUri = "/";
+                    o.SignedOutRedirectUri = ApiOptions.GetFrontEndRedirect("/");
                     o.RemoteSignOutPath = new PathString("/force-oidc-signout");
                     o.UsePkce = true;
                     // o.Prompt = "login";
@@ -165,6 +165,19 @@ public partial class Startup
                         }
 
                         c.Principal = UserProvider.GetClaimsPrincipal(result.Value, c.Scheme.Name, c.Principal);
+                    };
+
+                    o.Events.OnRedirectToIdentityProviderForSignOut += c =>
+                    {
+                        var emailClaim = c.HttpContext.User.FindFirst(ClaimTypes.Email);
+                        // Don't redirect to the ID provider if the  cookie was not provided by them.
+                        if (emailClaim is null || emailClaim.Issuer != oidcConfig.Authority)
+                        {
+                            c.Response.Redirect(c.HttpContext.GetFrontEndRedirect("/"));
+                            c.HandleResponse();
+                        }
+
+                        return Task.CompletedTask;
                     };
                 }
             );
@@ -364,7 +377,11 @@ public partial class Startup
         services.AddOptions<ApiOptions>()
             .Bind(Configuration)
             .ValidateDataAnnotations()
-            .ValidateOnStart();
+            .ValidateOnStart()
+            .Configure(o =>
+            {
+                o.FrontEndUrl ??= o.BaseUrl;
+            });
         services.AddOptions<EmailOptions>()
             .BindConfiguration("Email")
             .ValidateDataAnnotations()

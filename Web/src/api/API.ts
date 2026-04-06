@@ -260,7 +260,8 @@ export class API {
                     );
                 },
                 async confirm(token: string) {
-                    return api.getSimple(`tmp-account/${token}`);
+                    // NB: the back end redirects to the appropriate place
+                    window.location.href = `${api.apiUrl}tmp-account/${token}?redirect=/auth`;
                 },
             },
             info: {
@@ -273,10 +274,11 @@ export class API {
             },
             external: {
                 loginUrl() {
-                    return `${api.apiUrl}account/external-login?redirect=${window.location.origin}/auth`;
+                    return `${api.apiUrl}account/external-login?redirect=/auth`;
                 },
             },
             async logout() {
+                // NB: the back end redirects to the appropriate place
                 window.location.href = `${api.apiUrl}account/logout`;
             },
             async impersonate(id: string) {

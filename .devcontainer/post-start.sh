@@ -1,6 +1,6 @@
 #!/bin/bash
 
-su postgres -c "pg_ctl -D /var/lib/postgres/data -l /var/lib/postgres/$(date +%s).log start"
+source $NVM_DIR/nvm.sh
 
 cd /kafe/Web && yes | pnpm install
 

@@ -3,9 +3,9 @@
     "dockerComposeFile": [
         "./docker-compose.devcontainer.yml"
     ],
-    "service": "all",
+    "service": "dev",
     "workspaceFolder": "/kafe",
-    "postCreateCommand": "/root/post-create.sh",
-    "postStartCommand": "/root/post-start.sh",
-    "postAttachCommand": "/root/post-attach.sh"
+    // "postCreateCommand": "/home/barista/post-create.sh",
+    "postStartCommand": "/home/barista/post-start.sh",
+    "postAttachCommand": "/home/barista/post-attach.sh"
 }

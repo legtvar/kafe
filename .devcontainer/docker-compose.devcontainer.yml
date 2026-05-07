@@ -1,15 +1,9 @@
 name: kafe-devcontainer
 
 services:
-  all:
+  dev:
     hostname: kafe-devcontainer
     environment:
-      # Postgres
-      POSTGRES_DB: postgres
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-
-      # KAFE API
       ASPNETCORE_ENVIRONMENT: Development
       BaseUrl: https://localhost:44369
       Kestrel__Endpoints__Https__Url: https://0.0.0.0:44369
@@ -23,7 +17,9 @@ services:
     ports:
       - 44369:44369
       - 3000:3000
-      - 42032:5432
+      
+    depends_on:
+      - db
 
     volumes:
       - ..:/kafe:cached
@@ -31,7 +27,6 @@ services:
       - generated:/mnt/kafe_generated
       - secrets:/mnt/kafe_secrets
       - temp:/mnt/kafe_temp
-      - postgres:/var/lib/postgres
 
     build:
       context: .
@@ -39,6 +34,19 @@ services:
 
     command: sleep infinity
 
+    restart: no
+
+  db:
+    hostname: kafe-devcontainer-postgres
+    image: postgres:17-alpine
+    expose:
+      - 5432
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres:/var/lib/postgresql/data/
     restart: no
 
 volumes:

@@ -5,6 +5,7 @@ using Kafe.Data.Services;
 using Marten;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System;
@@ -103,14 +104,17 @@ public class UserProvider(
             throw new InvalidOperationException("Cannot sign in outside of a request.");
         }
 
-        var user = contextAccessor.HttpContext.User;
-        var principal = GetClaimsPrincipal(account, CookieAuthenticationDefaults.AuthenticationScheme, user);
-        contextAccessor.HttpContext.User = principal;
+        await contextAccessor.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        await contextAccessor.HttpContext.SignOutAsync(OpenIdConnectDefaults.AuthenticationScheme);
+
+        var principal = GetClaimsPrincipal(account, CookieAuthenticationDefaults.AuthenticationScheme);
         await contextAccessor.HttpContext.SignInAsync(
             CookieAuthenticationDefaults.AuthenticationScheme,
             principal,
             authProperties
         );
+
+        contextAccessor.HttpContext.User = principal;
         Account = account;
     }
 

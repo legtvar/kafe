@@ -20,6 +20,17 @@ import {
 } from "@chakra-ui/react";
 import Markdown, { Options } from "react-markdown";
 
+const MarkdownLink = (props: any) => (
+    <Link 
+        textDecoration="underline" 
+        _hover={{ 
+            textDecoration: "underline",
+            color: "blue.600",
+        }}
+        {...props} 
+    />
+);
+
 export function ChakraMarkdown(props: Partial<Options>) {
     return (
         <Markdown
@@ -43,7 +54,7 @@ export function ChakraMarkdown(props: Partial<Options>) {
                 code: (props) => <Code p={2} children={props.children} />,
                 del: (props) => <Text as="del">{props.children}</Text>,
                 hr: (props) => <Divider />,
-                a: Link,
+                a: MarkdownLink,
                 img: Image,
                 text: (props) => <Text as="span">{props.children}</Text>,
                 pre: (props) => <chakra.pre>{props.children}</chakra.pre>,

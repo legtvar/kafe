@@ -2,10 +2,11 @@ import { Box, Button, Flex, Heading, SimpleGrid } from '@chakra-ui/react';
 import { t } from 'i18next';
 import { useCallback } from 'react';
 import { AiOutlineDownload, AiOutlineEdit } from 'react-icons/ai';
-import { Link, useParams } from 'react-router-dom';
+import { Link as RouterLink, useParams } from 'react-router-dom';
 import { Project } from '../../../data/Project';
 import { ContentThumbnail } from '../../media/ContentThumbnail';
 import { AwaitAPI } from '../../utils/AwaitAPI';
+import { ChakraMarkdown } from '../../utils/ChakraMarkdown';
 import { OutletOrChildren } from '../../utils/OutletOrChildren';
 import { ProjectAuthorList } from '../../utils/ProjectAuthorList';
 import { Status } from '../../utils/Status';
@@ -57,9 +58,9 @@ export function ProjectDetail(props: IProjectDetailProps) {
                                         {t('generic.download')}
                                     </Button>)
                                 }
-                                <Link to="edit">
+                                <RouterLink to="edit">
                                     <Button leftIcon={<AiOutlineEdit />}>{t('generic.edit').toString()}</Button>
-                                </Link>
+                                </RouterLink>
                             </Flex>
 
                             {project.ownerId && (
@@ -76,7 +77,7 @@ export function ProjectDetail(props: IProjectDetailProps) {
                             )}
 
                             <ProjectTags project={project} />
-                            <Box>{project.getDescription()}</Box>
+                            <ChakraMarkdown>{project.getDescription()}</ChakraMarkdown>
 
                             {project.crew.length > 0 && (
                                 <>

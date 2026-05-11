@@ -636,6 +636,73 @@
         }
       }
     },
+    "/api/v1/entity/perms-csv": {
+      "post": {
+        "tags": [
+          "Entity"
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "Id": {
+                    "type": "string",
+                    "description": "Human-Readable Identifier Ballast",
+                    "format": "hrib",
+                    "example": "AAAAbadf00d"
+                  },
+                  "Permissions": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/Permission"
+                    }
+                  },
+                  "CsvFile": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              },
+              "encoding": {
+                "Id": {
+                  "style": "form"
+                },
+                "Permissions": {
+                  "style": "form"
+                },
+                "CsvFile": {
+                  "style": "form"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/account/external-login": {
       "get": {
         "tags": [
@@ -1264,6 +1331,48 @@
               "text/json": {
                 "schema": {
                   "$ref": "#/components/schemas/KafeProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/project-download/{id}": {
+      "get": {
+        "tags": [
+          "Project"
+        ],
+        "parameters": [
+          {
+            "name": "Id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
                 }
               }
             }
@@ -2224,9 +2333,16 @@
         ],
         "parameters": [
           {
-            "name": "token",
+            "name": "Token",
             "in": "path",
             "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "redirect",
+            "in": "query",
             "schema": {
               "type": "string"
             }
@@ -2873,7 +2989,7 @@
           },
           "arguments": {
             "type": "object",
-            "additionalProperties": {}
+            "additionalProperties": { }
           },
           "stackTrace": {
             "type": "string"
@@ -2968,7 +3084,7 @@
             "nullable": true
           }
         },
-        "additionalProperties": {}
+        "additionalProperties": { }
       },
       "LockRequestData": {
         "required": [
@@ -3201,16 +3317,12 @@
       },
       "Permission": {
         "enum": [
-          "none",
           "read",
           "append",
           "inspect",
-          "publishable",
           "write",
           "review",
-          "administer",
-          "inheritable",
-          "all"
+          "administer"
         ],
         "type": "string"
       },
@@ -3841,7 +3953,6 @@
       "ProjectBlueprintDto": {
         "required": [
           "artifactBlueprints",
-          "name",
           "requiredReviewers"
         ],
         "type": "object",
@@ -4696,6 +4807,7 @@
           "globalPermissions",
           "id",
           "isLocked",
+          "latestReviewKind",
           "name",
           "projectGroupId",
           "releasedOn",
@@ -4781,6 +4893,9 @@
           "releasedOn": {
             "type": "string",
             "format": "date-time"
+          },
+          "latestReviewKind": {
+            "$ref": "#/components/schemas/ReviewKind"
           },
           "isLocked": {
             "type": "boolean"
@@ -4988,7 +5103,8 @@
         "enum": [
           "notReviewed",
           "accepted",
-          "rejected"
+          "rejected",
+          "needsRevision"
         ],
         "type": "string"
       },

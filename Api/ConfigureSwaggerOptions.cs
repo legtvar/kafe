@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
+using System.Numerics;
 using Asp.Versioning;
 using Kafe.Api.Swagger;
 using Kafe.Data;
@@ -60,21 +62,7 @@ public class ConfigureSwaggerOptions : IConfigureOptions<SwaggerGenOptions>
                 Properties = properties
             };
         });
-        // o.MapType<Permission>(() => new OpenApiSchema
-        // {
-        //     Title = nameof(Permission),
-        //     Ref
-        //     Type = "string",
-        //     Enum = Enum.GetValues<Permission>()
-        //         .Where(v => v != Permission.None && v != Permission.All)
-        //         .Select(v =>
-        //         {
-        //             var name = v.ToString();
-        //             name = char.ToLowerInvariant(name[0]) + name[1..];
-        //             return new OpenApiString(name) as IOpenApiAny;
-        //         })
-        //         .ToList()
-        // });
+        o.SchemaFilter<PermissionSchemaFilter>();
         o.EnableAnnotations(
             enableAnnotationsForInheritance: true,
             enableAnnotationsForPolymorphism: true);
@@ -103,6 +91,44 @@ public class ConfigureSwaggerOptions : IConfigureOptions<SwaggerGenOptions>
         foreach (var xmlFile in xmlFiles)
         {
             o.IncludeXmlComments(xmlFile.FullName);
+        }
+    }
+}
+
+public class PermissionSchemaFilter : ISchemaFilter
+{
+    private static readonly ImmutableArray<IOpenApiAny> PermissionEnumValues = [.. Enum.GetValues<Permission>()
+        .Where(v => BitOperations.PopCount((uint)v) == 1)
+        .Select(v =>
+        {
+            var name = v.ToString();
+            name = char.ToLowerInvariant(name[0]) + name[1..];
+            return new OpenApiString(name) as IOpenApiAny;
+        })];
+
+    public void Apply(OpenApiSchema schema, SchemaFilterContext context)
+    {
+        if (context.Type == typeof(Permission))
+        {
+            schema.Type = "string";
+            schema.Enum = PermissionEnumValues;
+            return;
+        }
+
+        var readOnlyListInterface = context.Type.GetInterfaces()
+            .FirstOrDefault(i => i.IsGenericType
+                && i.GetGenericTypeDefinition() == typeof(IReadOnlyList<>)
+                && i.GenericTypeArguments[0] == typeof(Permission)
+        );
+
+        if (readOnlyListInterface != null)
+        {
+            schema.Type = "array";
+            schema.Items = new OpenApiSchema
+            {
+                Type = "string",
+                Enum = PermissionEnumValues
+            };
         }
     }
 }

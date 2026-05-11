@@ -40,7 +40,7 @@ public class AccountImpersonationEndpoint : EndpointBaseAsync
             return NotFound();
         }
 
-        await userProvider.SignIn(account);
+        await userProvider.SignIn(account, isImpersonation: true);
         return Ok();
     }
 }

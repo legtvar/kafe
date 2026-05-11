@@ -25,6 +25,8 @@ public class UserProvider(
     IQuerySession query
 )
 {
+    public const string ImpersonatorClaimType = "impersonator";
+
     public AccountInfo? Account { get; private set; }
 
     /// <summary>
@@ -61,6 +63,17 @@ public class UserProvider(
         return HasPermission(entity.Id, permission, token);
     }
 
+    public Hrib? GetImpersonator()
+    {
+        var user = contextAccessor.HttpContext?.User;
+        if (user is null)
+        {
+            return null;
+        }
+
+        return user.FindFirst(ImpersonatorClaimType)?.Value;
+    }
+
     public async Task RefreshAccount(ClaimsPrincipal? user = null, CancellationToken token = default)
     {
         user ??= contextAccessor.HttpContext?.User;
@@ -88,7 +101,7 @@ public class UserProvider(
         Account = account;
     }
 
-    public async Task SignIn(AccountInfo account)
+    public async Task SignIn(AccountInfo account, bool isImpersonation = false)
     {
         var authProperties = new AuthenticationProperties
         {
@@ -96,7 +109,6 @@ public class UserProvider(
             IssuedUtc = DateTimeOffset.UtcNow,
             ExpiresUtc = DateTimeOffset.UtcNow.Add(Const.AuthenticationCookieExpirationTime),
             IsPersistent = true
-            // RedirectUri = options.Value.AccountConfirmRedirectPath
         };
 
         if (contextAccessor.HttpContext is null)
@@ -105,9 +117,12 @@ public class UserProvider(
         }
 
         await contextAccessor.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-        await contextAccessor.HttpContext.SignOutAsync(OpenIdConnectDefaults.AuthenticationScheme);
 
-        var principal = GetClaimsPrincipal(account, CookieAuthenticationDefaults.AuthenticationScheme);
+        var principal = GetClaimsPrincipal(
+            account: account,
+            authenticationScheme: CookieAuthenticationDefaults.AuthenticationScheme,
+            impersonator: contextAccessor.HttpContext.User
+        );
         await contextAccessor.HttpContext.SignInAsync(
             CookieAuthenticationDefaults.AuthenticationScheme,
             principal,
@@ -121,17 +136,27 @@ public class UserProvider(
     public static ClaimsPrincipal GetClaimsPrincipal(
         AccountInfo account,
         string? authenticationScheme = null,
-        ClaimsPrincipal? existing = null
+        ClaimsPrincipal? existing = null,
+        ClaimsPrincipal? impersonator = null
     )
     {
         var claims = new List<Claim>();
+
+        if (impersonator is not null)
+        {
+            var currentUserId = impersonator.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (!string.IsNullOrEmpty(currentUserId))
+            {
+                claims.Add(new Claim(ImpersonatorClaimType, currentUserId));
+            }
+        }
+
         if (existing is not null)
         {
+            // Preserve existing claims for non-impersonation sign-ins
             foreach (var claim in existing.Claims)
             {
-                if (claim.Type == ClaimTypes.NameIdentifier
-                    || claim.Type == ClaimTypes.Email
-                )
+                if (claim.Type == ClaimTypes.NameIdentifier || claim.Type == ClaimTypes.Email)
                 {
                     continue;
                 }
@@ -142,7 +167,6 @@ public class UserProvider(
 
         claims.Add(new Claim(ClaimTypes.NameIdentifier, account.Id));
         claims.Add(new Claim(ClaimTypes.Email, account.EmailAddress));
-
 
         if (account.PreferredCulture != Const.InvariantCultureCode)
         {

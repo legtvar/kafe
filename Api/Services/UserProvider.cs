@@ -14,6 +14,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http.Features;
 
 namespace Kafe.Api.Services;
 
@@ -21,11 +22,10 @@ public class UserProvider(
     IHttpContextAccessor contextAccessor,
     EntityService entityService,
     AccountService accountService,
-    ILogger<UserProvider> logger,
-    IQuerySession query
+    ILogger<UserProvider> logger
 )
 {
-    public const string ImpersonatorClaimType = "impersonator";
+    public const string ImpersonatesClaimType = "impersonates";
 
     public AccountInfo? Account { get; private set; }
 
@@ -63,7 +63,7 @@ public class UserProvider(
         return HasPermission(entity.Id, permission, token);
     }
 
-    public Hrib? GetImpersonator()
+    public Hrib? GetImpersonatedAccount()
     {
         var user = contextAccessor.HttpContext?.User;
         if (user is null)
@@ -71,7 +71,13 @@ public class UserProvider(
             return null;
         }
 
-        return user.FindFirst(ImpersonatorClaimType)?.Value;
+        var impersonatedAccountId = user.FindFirst(ImpersonatesClaimType)?.Value;
+        if (string.IsNullOrEmpty(impersonatedAccountId))
+        {
+            return null;
+        }
+
+        return impersonatedAccountId;
     }
 
     public async Task RefreshAccount(ClaimsPrincipal? user = null, CancellationToken token = default)
@@ -83,7 +89,8 @@ public class UserProvider(
             return;
         }
 
-        var id = user.FindFirstValue(ClaimTypes.NameIdentifier);
+        var id = user.FindFirstValue(ImpersonatesClaimType);
+        id ??= user.FindFirstValue(ClaimTypes.NameIdentifier);
         if (string.IsNullOrEmpty(id))
         {
             Account = null;
@@ -101,8 +108,13 @@ public class UserProvider(
         Account = account;
     }
 
-    public async Task SignIn(AccountInfo account, bool isImpersonation = false)
+    public async Task SignIn(AccountInfo account)
     {
+        if (contextAccessor.HttpContext is null)
+        {
+            throw new InvalidOperationException("Cannot sign in outside of a request.");
+        }
+
         var authProperties = new AuthenticationProperties
         {
             AllowRefresh = false,
@@ -111,18 +123,13 @@ public class UserProvider(
             IsPersistent = true
         };
 
-        if (contextAccessor.HttpContext is null)
-        {
-            throw new InvalidOperationException("Cannot sign in outside of a request.");
-        }
-
         await contextAccessor.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
         var principal = GetClaimsPrincipal(
             account: account,
-            authenticationScheme: CookieAuthenticationDefaults.AuthenticationScheme,
-            impersonator: contextAccessor.HttpContext.User
+            authenticationScheme: CookieAuthenticationDefaults.AuthenticationScheme
         );
+
         await contextAccessor.HttpContext.SignInAsync(
             CookieAuthenticationDefaults.AuthenticationScheme,
             principal,
@@ -133,30 +140,121 @@ public class UserProvider(
         Account = account;
     }
 
+    public async Task Impersonate(AccountInfo? impersonatedAccount)
+    {
+        if (contextAccessor.HttpContext is null)
+        {
+            throw new InvalidOperationException("Cannot impersonate outside of a request.");
+        }
+
+        if (Account is null || contextAccessor.HttpContext.User.Identity?.IsAuthenticated != true)
+        {
+            throw new InvalidOperationException("Cannot impersonate if no user is logged in.");
+        }
+
+        var authResult = contextAccessor
+            .HttpContext
+            .Features
+            .GetRequiredFeature<IAuthenticateResultFeature>()
+            .AuthenticateResult;
+        var authProperties = authResult?.Properties;
+
+        if (authProperties is null)
+        {
+            throw new InvalidOperationException("Could not obtain current authentication properties.");
+        }
+
+        var authScheme = contextAccessor.HttpContext.User.Identity?.AuthenticationType
+            ?? authResult?.Ticket?.AuthenticationScheme;
+
+        var principal = GetClaimsPrincipal(
+            account: Account,
+            authenticationScheme: authScheme,
+            existing: contextAccessor.HttpContext.User,
+            impersonatedAccountId: impersonatedAccount?.Id
+        );
+
+        await contextAccessor.HttpContext.SignInAsync(
+            CookieAuthenticationDefaults.AuthenticationScheme,
+            principal,
+            authProperties
+        );
+
+        contextAccessor.HttpContext.User = principal;
+        Account = impersonatedAccount;
+    }
+
+    public async Task Unimpersonate()
+    {
+        if (GetImpersonatedAccount() is null)
+        {
+            throw new InvalidOperationException("The current account is not impersonating anyone.");
+        }
+
+        if (contextAccessor.HttpContext is null)
+        {
+            throw new InvalidOperationException("Cannot impersonate outside of a request.");
+        }
+
+        if (Account is null || contextAccessor.HttpContext.User.Identity?.IsAuthenticated != true)
+        {
+            throw new InvalidOperationException("Cannot impersonate if no user is logged in.");
+        }
+
+        var authResult = contextAccessor
+            .HttpContext
+            .Features
+            .GetRequiredFeature<IAuthenticateResultFeature>()
+            .AuthenticateResult;
+        var authProperties = authResult?.Properties;
+
+        if (authProperties is null)
+        {
+            throw new InvalidOperationException("Could not obtain current authentication properties.");
+        }
+
+        var authScheme = contextAccessor.HttpContext.User.Identity?.AuthenticationType
+            ?? authResult?.Ticket?.AuthenticationScheme;
+
+        var principal = new ClaimsPrincipal(
+            new ClaimsIdentity(
+                contextAccessor.HttpContext.User.Claims.Where(c => c.Type != ImpersonatesClaimType),
+                authScheme
+            )
+        );
+
+        await contextAccessor.HttpContext.SignInAsync(
+            CookieAuthenticationDefaults.AuthenticationScheme,
+            principal,
+            authProperties
+        );
+
+        contextAccessor.HttpContext.User = principal;
+        await RefreshAccount();
+    }
+
     public static ClaimsPrincipal GetClaimsPrincipal(
         AccountInfo account,
         string? authenticationScheme = null,
         ClaimsPrincipal? existing = null,
-        ClaimsPrincipal? impersonator = null
+        Hrib? impersonatedAccountId = null
     )
     {
         var claims = new List<Claim>();
 
-        if (impersonator is not null)
+        if (impersonatedAccountId != null)
         {
-            var currentUserId = impersonator.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (!string.IsNullOrEmpty(currentUserId))
-            {
-                claims.Add(new Claim(ImpersonatorClaimType, currentUserId));
-            }
+            claims.Add(new Claim(ImpersonatesClaimType, impersonatedAccountId.ToString()));
         }
 
         if (existing is not null)
         {
-            // Preserve existing claims for non-impersonation sign-ins
             foreach (var claim in existing.Claims)
             {
-                if (claim.Type == ClaimTypes.NameIdentifier || claim.Type == ClaimTypes.Email)
+                if (claim.Type == ClaimTypes.NameIdentifier
+                    || claim.Type == ClaimTypes.Email
+                    || claim.Type == ImpersonatesClaimType
+                )
                 {
                     continue;
                 }

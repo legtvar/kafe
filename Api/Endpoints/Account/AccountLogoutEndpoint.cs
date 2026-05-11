@@ -23,7 +23,6 @@ public class AccountLogoutEndpoint : EndpointBaseAsync
     private readonly AccountService accountService;
     private readonly IOptions<ApiOptions> apiOptions;
 
-
     public AccountLogoutEndpoint(
         UserProvider userProvider,
         AccountService accountService,
@@ -39,19 +38,15 @@ public class AccountLogoutEndpoint : EndpointBaseAsync
     [SwaggerOperation(Tags = [EndpointArea.Account])]
     public override async Task<ActionResult> HandleAsync(CancellationToken token = default)
     {
-        var impersonatorId = userProvider.GetImpersonator();
-        if (impersonatorId is not null)
+        var impersonatedAccount = userProvider.GetImpersonatedAccount();
+        if (impersonatedAccount is not null)
         {
-            var impersonatorAccount = await accountService.Load(impersonatorId, token: token);
-            if (impersonatorAccount != null)
-            {
-                await userProvider.SignIn(impersonatorAccount, isImpersonation: false);
-                return Redirect(
-                    HttpContext.GetFrontEndRedirect(
-                        apiOptions.Value.AccountConfirmRedirectPath
-                    )
-                );
-            }
+            await userProvider.Unimpersonate();
+            return Redirect(
+                HttpContext.GetFrontEndRedirect(
+                    apiOptions.Value.AccountConfirmRedirectPath
+                )
+            );
         }
 
         return SignOut(

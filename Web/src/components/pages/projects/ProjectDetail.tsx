@@ -58,9 +58,13 @@ export function ProjectDetail(props: IProjectDetailProps) {
                                         {t('generic.download')}
                                     </Button>)
                                 }
-                                <RouterLink to="edit">
-                                    <Button leftIcon={<AiOutlineEdit />}>{t('generic.edit').toString()}</Button>
-                                </RouterLink>
+                                {(project.userPermissions.includes('write') || 
+                                  project.userPermissions.includes('review') || 
+                                  project.userPermissions.includes('administer')) && (
+                                    <RouterLink to="edit">
+                                        <Button leftIcon={<AiOutlineEdit />}>{t('generic.edit').toString()}</Button>
+                                    </RouterLink>
+                                )}
                             </Flex>
 
                             {project.ownerId && (

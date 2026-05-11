@@ -1,0 +1,13 @@
+{
+  "name": "KAFE Project Configuration",
+  "description": "Project-specific Pi configuration for KAFE",
+  "extensions": [
+    "./extensions/gitlab-issues"
+  ],
+  "settings": {
+    "gitlab": {
+      "instance": "gitlab.fi.muni.cz",
+      "project": "legtvar/kafe"
+    }
+  }
+}

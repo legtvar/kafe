@@ -1,0 +1,47 @@
+{
+  "name": "gitlab-issues",
+  "version": "1.0.0",
+  "description": "GitLab issues integration for KAFE project",
+  "author": "KAFE Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git@gitlab.fi.muni.cz:legtvar/kafe.git"
+  },
+  "keywords": [
+    "pi-extension",
+    "gitlab",
+    "issues",
+    "kafe"
+  ],
+  "engines": {
+    "pi": ">=1.0.0"
+  },
+  "main": "index.ts",
+  "files": [
+    "index.ts",
+    "README.md",
+    "QUICKSTART.md",
+    "IMPLEMENTATION.md"
+  ],
+  "pi": {
+    "type": "project-scoped",
+    "events": ["session_start"],
+    "tools": [
+      {
+        "name": "gitlab_list_issues",
+        "description": "List GitLab issues with filtering and search"
+      },
+      {
+        "name": "gitlab_get_issue",
+        "description": "Get details of a specific issue"
+      }
+    ],
+    "features": [
+      "autocomplete",
+      "issue-listing",
+      "issue-search",
+      "auto-detection"
+    ]
+  }
+}

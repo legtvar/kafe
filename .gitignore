@@ -8,3 +8,5 @@ artifacts/
 *.DotSettings.user
 **/node_modules/
 .pnpm-store/
+.pi/cache/
+.pi/sessions/

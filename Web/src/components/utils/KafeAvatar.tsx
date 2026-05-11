@@ -13,9 +13,10 @@ export type Person = {
 
 export interface IAvatarProps extends AvatarProps {
     person: Person;
+    enableImpersonation?: boolean;
 }
 
-export function KafeAvatar({ person, ...props }: IAvatarProps) {
+export function KafeAvatar({ person, enableImpersonation = false, ...props }: IAvatarProps) {
     const [timeoutHandle, setTimeoutHandle] = useState<NodeJS.Timeout | null>(null);
     const [clicks, setClicks] = useState(0);
 
@@ -28,6 +29,10 @@ export function KafeAvatar({ person, ...props }: IAvatarProps) {
     };
 
     const onClickFullfill = async () => {
+        if (!enableImpersonation) {
+            return;
+        }
+
         if (!user?.permissions['system']?.includes('write')) {
             return;
         }

@@ -93,7 +93,7 @@ export function PermsEditorItem({ user, options, initialPerms, readonly, onChang
                 </Flex>
             ) : (
                 <Flex direction="row" flex="1" align={'center'} gap={4}>
-                    <KafeAvatar size={'sm'} person={user} />
+                    <KafeAvatar size={'sm'} person={user} enableImpersonation />
                     <Text>{user.emailAddress}</Text>
                     {user.name && <Text fontSize={"xs"}>({user.name})</Text>}
                     {user.id == null && <Badge>{t("perms.invited")}</Badge>}

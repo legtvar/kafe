@@ -29,7 +29,7 @@ export function TextareaLimited({ min, max, onChange, value, defaultValue, ...re
             />
             <FormHelperText>
                 <>
-                    {(stateValue || '').toString().length}/{max} {t('textarea.characters')}{' '}
+                    {(stateValue || '').toString().length}{max !== undefined && `/${max}`} {t('textarea.characters')}{' '}
                     {tooLittle && <Text as="span" color={'red.500'}>{`(${t('textarea.min')} ${min})`}</Text>}
                 </>
             </FormHelperText>

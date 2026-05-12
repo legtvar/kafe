@@ -5,6 +5,7 @@ import { Project } from '../../../../data/Project';
 import { useColorScheme } from '../../../../hooks/useColorScheme';
 import { AuthorSelect } from '../../../utils/Authors/AuthorSelect';
 import { LocalizedInput } from '../../../utils/LocalizedInput';
+import { InputLimited } from '../../../utils/InputLimited';
 import { ProjectAuthorList } from '../../../utils/ProjectAuthorList';
 import { TextareaLimited } from '../../../utils/TextareaLimited';
 
@@ -28,13 +29,14 @@ export function MateProjectBasicInfoForm({ project, onSubmit, status, update, no
             <FormControl>
                 <FormLabel>{t('createProject.fields.nameMate').toString()}</FormLabel>
                 <LocalizedInput
-                    as={Input}
+                    as={InputLimited}
                     type="text"
                     borderColor={border}
                     bg={bg}
                     name="name"
                     placeholder={t('createProject.fields.name').toString()}
                     value={project.name}
+                    max={project.validationSettings?.maxNameLength ?? 100}
                     onChange={(value) => forceUpdate(project.set('name', value))}
                 />
             </FormControl>

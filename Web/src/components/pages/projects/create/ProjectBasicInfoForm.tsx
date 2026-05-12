@@ -9,6 +9,7 @@ import { ProjectAuthorList } from '../../../utils/ProjectAuthorList';
 import { TextareaLimited } from '../../../utils/TextareaLimited';
 import { MultiSelect } from 'chakra-multiselect';
 import genreManager from '../../../../utils/managers/genreManager';
+import { InputLimited } from '../../../utils/InputLimited';
 
 interface ProjectBasicInfoFormProps {
     project: Project;
@@ -35,7 +36,7 @@ export function ProjectBasicInfoForm({ project, onSubmit, status, update, noSelf
                     {t('createProject.fields.nameHelp').toString()}
                 </FormHelperText>
                 <LocalizedInput
-                    as={TextareaLimited}
+                    as={InputLimited}
                     min={project.validationSettings?.minNameLength ?? undefined}
                     max={project.validationSettings?.maxNameLength ?? undefined}
                     type="text"
@@ -62,7 +63,7 @@ export function ProjectBasicInfoForm({ project, onSubmit, status, update, noSelf
                     />
                 </> :
                 <LocalizedInput
-                    as={TextareaLimited}
+                    as={InputLimited}
                     min={project.validationSettings?.minGenreLength ?? undefined}
                     max={project.validationSettings?.maxGenreLength ?? undefined}
                     type="text"

@@ -164,7 +164,11 @@ public partial class Startup
                             return;
                         }
 
-                        c.Principal = UserProvider.GetClaimsPrincipal(result.Value, c.Scheme.Name, c.Principal);
+                        c.Principal = UserProvider.GetClaimsPrincipal(
+                            account: result.Value,
+                            authenticationScheme: c.Scheme.Name,
+                            existing: c.Principal
+                        );
                     };
 
                     o.Events.OnRedirectToIdentityProviderForSignOut += c =>

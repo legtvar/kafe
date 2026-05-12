@@ -4,6 +4,17 @@ import { MultiSelectTheme } from 'chakra-multiselect';
 
 // see https://chakra-ui.com/docs/styled-system/theme
 const theme = extendTheme({
+    // Define semantic z-index layers for consistent stacking
+    zIndices: {
+        'video-base': 1,
+        'video-subtitles': 2,
+        'video-overlay': 3,
+        'video-controls': 4,
+        'video-menu': 5,
+        'playlist-sidebar': 100,
+        'modal': 1000,
+        'toast': 1100,
+    },
     components: {
         MultiSelect: {
             ...MultiSelectTheme,
@@ -16,7 +27,14 @@ const theme = extendTheme({
                     }
                 }
             }
-        }
+        },
+        Menu: {
+            baseStyle: {
+                list: {
+                    zIndex: 'video-menu',
+                },
+            },
+        },
     },
     config: {
         initialColorMode: 'light',

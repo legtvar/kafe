@@ -7,6 +7,7 @@ import { Link, Navigate, useNavigate, useOutlet, useParams } from 'react-router-
 import { ApiResponse } from '../../../api/API';
 import { Playlist } from '../../../data/Playlist';
 import { getPrefered } from '../../../utils/preferedLanguage';
+import { useColorScheme } from '../../../hooks/useColorScheme';
 import { ContentViewer } from '../../media/ContentViewer';
 import { AwaitAPI } from '../../utils/AwaitAPI';
 import { AwaitMultiAPI } from '../../utils/AwaitMultiAPI';
@@ -20,6 +21,7 @@ export function PlaylistDetail(props: IPlaylistDetailProps) {
     const borderColor = useColorModeValue('gray.300', 'gray.700');
     const hoverColor = useColorModeValue('gray.300', 'gray.600');
     const selectedColor = useColorModeValue('gray.200', 'gray.700');
+    const { bg } = useColorScheme();
     const navigate = useNavigate();
 
     const outlet = useOutlet();
@@ -78,7 +80,7 @@ export function PlaylistDetail(props: IPlaylistDetailProps) {
                                         // console.log(shards);
 
                                         return (
-                                            <Stack direction={{ base: 'column', lg: 'row' }} spacing={4}>
+                                            <Stack direction={{ base: 'column', xl: 'row' }} spacing={4}>
                                                 <Stack direction="column" spacing={4} w={{ base: 'full', lg: 'full' }}>
                                                     <Box width="full">
                                                         {artifacts.length === 0 ? (
@@ -145,10 +147,14 @@ export function PlaylistDetail(props: IPlaylistDetailProps) {
                                                 </Stack>
                                                 <Box
                                                     borderWidth={1}
-                                                    w={{ base: '100%', lg: 'sm', xl: 'md' }}
+                                                    borderColor={borderColor}
+                                                    bg={bg}
+                                                    w={{ base: '100%', xl: 'md' }}
                                                     flexShrink={0}
                                                     h="100%"
                                                     mb={4}
+                                                    position="relative"
+                                                    zIndex="playlist-sidebar"
                                                 >
                                                     <Stack
                                                         spacing={4}

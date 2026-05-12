@@ -109,6 +109,7 @@ export function Video({ sources, subtitles, autoplay, videoProps, onNext, onPrev
                 position="relative"
                 background="black"
                 outline={0}
+                zIndex="video-base"
                 onClick={() => {
                     wrapperRef.current?.focus();
                 }}
@@ -209,6 +210,7 @@ export function Video({ sources, subtitles, autoplay, videoProps, onNext, onPrev
                     color="white"
                     fontSize="2em"
                     alignItems="center"
+                    zIndex="video-subtitles"
                 >
                     <Spacer />
                     {subtitles && subtitleTrack && progressState && (
@@ -223,6 +225,7 @@ export function Video({ sources, subtitles, autoplay, videoProps, onNext, onPrev
                         bottom={0}
                         right={0}
                         background={error ? 'rgba(0,0,0,0.8)' : undefined}
+                        zIndex="video-overlay"
                     >
                         {}
                         {error ? (
@@ -244,6 +247,7 @@ export function Video({ sources, subtitles, autoplay, videoProps, onNext, onPrev
                         onMouseMove={() => updateMouse()}
                         onTouchMove={() => updateMouse()}
                         transition="opacity 0.2s ease-in-out"
+                        zIndex="video-controls"
                     >
                         <Box
                             position="absolute"
@@ -276,6 +280,11 @@ export function Video({ sources, subtitles, autoplay, videoProps, onNext, onPrev
                                     base: 'column',
                                     lg: 'row',
                                 }}
+                                flexWrap={{
+                                    base: 'nowrap',
+                                    lg: 'wrap',
+                                }}
+                                zIndex="video-controls"
                             >
                                 <Flex
                                     direction="row"
@@ -366,10 +375,6 @@ export function Video({ sources, subtitles, autoplay, videoProps, onNext, onPrev
                                     }}
                                 >
                                     <IconButton
-                                        display={{
-                                            base: 'none',
-                                            lg: 'flex',
-                                        }}
                                         ml={4}
                                         variant="ghost"
                                         aria-label="Mute"
@@ -378,13 +383,9 @@ export function Video({ sources, subtitles, autoplay, videoProps, onNext, onPrev
                                         icon={muted ? <IoVolumeMuteOutline /> : <IoVolumeHighOutline />}
                                     />
                                     <Slider
-                                        ml={2}
+                                        ml={{ base: 2, lg: 1 }}
                                         value={volume}
                                         max={1}
-                                        display={{
-                                            base: 'none',
-                                            lg: 'flex',
-                                        }}
                                         w={{
                                             base: 16,
                                             xl: 32,
@@ -403,14 +404,14 @@ export function Video({ sources, subtitles, autoplay, videoProps, onNext, onPrev
                                         <SliderThumb />
                                     </Slider>
                                     {subtitles && (
-                                        <Menu>
+                                        <Menu strategy="absolute">
                                             <MenuButton
                                                 variant="ghost"
                                                 as={IconButton}
                                                 aria-label="Subtitles"
                                                 icon={<IoChatboxEllipsesOutline />}
                                                 tabIndex={-1}
-                                                ml={6}
+                                                ml={{ base: 6, lg: 3 }}
                                             />
                                             <MenuList>
                                                 <MenuItem
@@ -434,14 +435,14 @@ export function Video({ sources, subtitles, autoplay, videoProps, onNext, onPrev
                                             </MenuList>
                                         </Menu>
                                     )}
-                                    <Menu>
+                                    <Menu strategy="absolute">
                                         <MenuButton
                                             variant="ghost"
                                             as={IconButton}
                                             aria-label="Quality"
                                             icon={<BsGear />}
                                             tabIndex={-1}
-                                            ml={6}
+                                            ml={{ base: 6, lg: 3 }}
                                         />
                                         <MenuList>
                                             {Object.keys(sources).map((source, key) => (
@@ -457,14 +458,18 @@ export function Video({ sources, subtitles, autoplay, videoProps, onNext, onPrev
                                             ))}
                                         </MenuList>
                                     </Menu>
-                                    <Menu>
+                                    <Menu strategy="absolute">
                                         <MenuButton
                                             variant="ghost"
                                             as={IconButton}
                                             aria-label="Download"
                                             icon={<BsDownload />}
-                                            ml={2}
+                                            ml={{ base: 6, lg: 3 }}
                                             tabIndex={-1}
+                                            display={{
+                                                base: 'none',
+                                                xl: 'flex',
+                                            }}
                                         />
                                         <MenuList>
                                             {Object.keys(sources).map((source, key) => (
@@ -499,14 +504,10 @@ export function Video({ sources, subtitles, autoplay, videoProps, onNext, onPrev
                                     />
                                 </Link> */}
                                     <IconButton
-                                        ml={6}
+                                        ml={{ base: 6, lg: 2 }}
                                         variant="ghost"
                                         aria-label="Headless fullscreen"
                                         tabIndex={-1}
-                                        display={{
-                                            base: 'none',
-                                            lg: 'flex',
-                                        }}
                                         onClick={() => {
                                             if (headless) {
                                                 setHeadless(false);
@@ -524,7 +525,7 @@ export function Video({ sources, subtitles, autoplay, videoProps, onNext, onPrev
                                         icon={<IoEaselOutline />}
                                     />
                                     <IconButton
-                                        ml={2}
+                                        ml={{ base: 2, lg: 1 }}
                                         variant="ghost"
                                         aria-label="Fullscreen"
                                         onClick={() => screenfull.toggle(wrapperRef.current!)}

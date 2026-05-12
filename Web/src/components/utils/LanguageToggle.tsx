@@ -16,7 +16,7 @@ import CountryLanguage from '@ladjs/country-language';
 import * as Flags from 'country-flag-icons/react/3x2';
 import i18next, { t } from 'i18next';
 import { useMemo } from 'react';
-import { BsChevronDown, BsCopy } from 'react-icons/bs';
+import { BsChevronDown, BsCopy, BsGlobe } from 'react-icons/bs';
 import { LS_LANGUAGE_APP_KEY } from '../../languageConfig';
 import {
     getRawPrefered,
@@ -63,17 +63,15 @@ export function LanguageToggle({ onLanguageToggled: onLanguageChange, ...rest }:
     );
 
     const mapper = (onClick: (lang: Intl.Locale) => void) => (lang: Intl.Locale, key: number) => {
-        const Flag: Flags.FlagComponent = flags[lang.region || ''];
-        if (!Flag) {
-            return null;
-        }
+        const Flag: Flags.FlagComponent | undefined = flags[lang.region ?? ''];
+        const FlagIcon = Flag ?? BsGlobe;
 
         const lng = CountryLanguage.getLanguage(lang.language);
 
         return (
             <MenuItemOption key={key} value={lang.language} onClick={() => onClick(lang)}>
                 <HStack>
-                    <Flag width={18} />
+                    <FlagIcon width={18} />
                     <Text>
                         {lng.name[0]} {lng.nativeName[0] && `(${lng.nativeName[0]})`}
                     </Text>
@@ -83,10 +81,11 @@ export function LanguageToggle({ onLanguageToggled: onLanguageChange, ...rest }:
     };
 
     const CurrentFlag = flags[new Intl.Locale(i18next.language).maximize().region || ''];
+    const DefaultFlag = BsGlobe;
 
     return (
         <Menu closeOnSelect={false}>
-            <MenuButton as={IconButton} size="lg" icon={<CurrentFlag />} p={3} variant="ghost" {...rest} />
+            <MenuButton as={IconButton} size="lg" icon={CurrentFlag ? <CurrentFlag /> : <DefaultFlag />} p={3} variant="ghost" {...rest} />
             <MenuList overflowY="auto" maxH="80vh" w={96}>
                 <MenuOptionGroup title={t('languageToggle.system')} value={i18next.language}>
                     {translated.map(

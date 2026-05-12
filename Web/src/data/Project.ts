@@ -33,8 +33,8 @@ export class Project extends AbstractType {
 
     public reviews!: components['schemas']['ProjectReviewDto'][];
     public blueprint!: components['schemas']['ProjectBlueprintDto'];
-    public globalPermissions!: components['schemas']['Permission'];
-    public userPermissions!: components['schemas']['Permission'];
+    public globalPermissions!: components['schemas']['Permission'][];
+    public userPermissions!: components['schemas']['Permission'][];
     public isLocked!: boolean;
     public latestReviewKind?: components['schemas']['ReviewKind'];
 

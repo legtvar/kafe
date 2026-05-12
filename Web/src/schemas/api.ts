@@ -278,6 +278,35 @@ export interface paths {
       };
     };
   };
+  "/api/v1/entity/perms-csv": {
+    post: {
+      requestBody?: {
+        content: {
+          "multipart/form-data": {
+            /**
+             * Format: hrib
+             * @description Human-Readable Identifier Ballast
+             * @example AAAAbadf00d
+             */
+            Id?: string;
+            Permissions?: components["schemas"]["Permission"][];
+            /** Format: binary */
+            CsvFile?: string;
+          };
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
+          };
+        };
+      };
+    };
+  };
   "/api/v1/account/external-login": {
     get: {
       parameters: {
@@ -528,6 +557,25 @@ export interface paths {
             "text/plain": components["schemas"]["KafeProblemDetails"];
             "application/json": components["schemas"]["KafeProblemDetails"];
             "text/json": components["schemas"]["KafeProblemDetails"];
+          };
+        };
+      };
+    };
+  };
+  "/api/v1/project-download/{id}": {
+    get: {
+      parameters: {
+        path: {
+          Id: string;
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
           };
         };
       };
@@ -921,8 +969,11 @@ export interface paths {
   "/api/v1/tmp-account/{token}": {
     get: {
       parameters: {
+        query?: {
+          redirect?: string;
+        };
         path: {
-          token: string;
+          Token: string;
         };
       };
       responses: {
@@ -1294,7 +1345,7 @@ export interface components {
       };
     };
     /** @enum {string} */
-    Permission: "none" | "read" | "append" | "inspect" | "publishable" | "write" | "review" | "administer" | "inheritable" | "all";
+    Permission: "read" | "append" | "inspect" | "write" | "review" | "administer";
     PlaylistCreationDto: {
       /** LocalizedString */
       name: {
@@ -1813,6 +1864,7 @@ export interface components {
       userPermissions: components["schemas"]["Permission"][];
       /** Format: date-time */
       releasedOn: string;
+      latestReviewKind: components["schemas"]["ReviewKind"];
       isLocked: boolean;
       /**
        * Format: hrib
@@ -1886,7 +1938,7 @@ export interface components {
       requiredGenreCultures?: string[] | null;
     };
     /** @enum {string} */
-    ReviewKind: "notReviewed" | "accepted" | "rejected";
+    ReviewKind: "notReviewed" | "accepted" | "rejected" | "needsRevision";
     RoleCreationDto: {
       /**
        * Format: hrib

@@ -55,7 +55,7 @@ public class ShardDownloadEndpoint(
             : "";
 
         var stream = await shardService.OpenStream(data.Id, data.Variant, cancellationToken);
-        return File(stream, mediaType.MimeType, $"{userPrefix}{data.Id}_{mediaType.Variant}.{mediaType.FileExtension}", true);
+        return File(stream, mediaType.MimeType, $"{userPrefix}{data.Id}_{mediaType.Variant}{mediaType.FileExtension}", true);
     }
 
     private async Task<AccountInfo?> GetProjectOwner(Hrib artifactId, CancellationToken cancellationToken)

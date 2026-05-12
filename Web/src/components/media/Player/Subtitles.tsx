@@ -25,7 +25,7 @@ export function Subtitles({ path, currentSeconds }: ISubtitlesProps) {
             const response = await axios.get(path, {
                 withCredentials: true,
             });
-            const data = subsrt.parse(response.data);
+            const data = subsrt.parse(response.data.trim());
             setSubtitleData(data);
             console.log(data);
         })();

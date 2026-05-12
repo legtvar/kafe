@@ -1,4 +1,5 @@
 ---
+name: gitlab-issues
 description: GitLab issues integration for KAFE project - list, search, and retrieve issues from GitLab
 ---
 

@@ -107,14 +107,14 @@ export function ProjectListComponent({ projects }: IProjectListComponentProps) {
                                     alignItems="center"
                                     gap={4}
                                 >
-                                    <Text
-                                        minW={100}
-                                        color="gray.500"
-                                    >
-                                        {project.releasedOn
-                                            ? DateTime.fromJSDate(project.releasedOn).toLocaleString()
-                                            : t('project.releaseDate.na')}
-                                    </Text>
+                                    {project.releasedOn && (
+                                        <Text
+                                            minW={100}
+                                            color="gray.500"
+                                        >
+                                            {DateTime.fromJSDate(project.releasedOn).toLocaleString()}
+                                        </Text>
+                                    )}
                                     {project.userPermissions.includes('review') 
                                     && currentOrganization?.id === 'mate-fimuni' 
                                     && (<ProjectStatusMini project={project} stage={"pigeons-test"} />)}

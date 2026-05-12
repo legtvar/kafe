@@ -36,8 +36,8 @@ export function Subtitles({ path, currentSeconds }: ISubtitlesProps) {
     const currentSubtitles = subtitleData.filter(
         (caption) =>
             caption.type === 'caption' &&
-            currentSeconds * 1000 >= caption.start &&
-            currentSeconds * 1000 <= caption.end,
+            currentSeconds * 1000 + 0.1 >= caption.start &&
+            currentSeconds * 1000 - 0.1 <= caption.end,
     ) as ContentCaption[];
 
     return (
@@ -45,24 +45,20 @@ export function Subtitles({ path, currentSeconds }: ISubtitlesProps) {
             {currentSubtitles.map((caption, index) => {
                 const contentCaption = caption as ContentCaption;
 
-                if (currentSeconds * 1000 >= contentCaption.start && currentSeconds * 1000 <= contentCaption.end) {
-                    return (
-                        <Box
-                            key={index}
-                            maxW="100%"
-                            textAlign="center"
-                            mt={8}
-                            bg="rgba(0,0,0,0.6)"
-                            px={4}
-                            rounded="md"
-                            fontSize="1.5cqw"
-                        >
-                            {contentCaption.text}
-                        </Box>
-                    );
-                }
-
-                return null;
+                return (
+                    <Box
+                        key={index}
+                        maxW="100%"
+                        textAlign="center"
+                        mt={8}
+                        bg="rgba(0,0,0,0.6)"
+                        px={4}
+                        rounded="md"
+                        fontSize="1.5cqw"
+                    >
+                        {contentCaption.text}
+                    </Box>
+                );
             })}
         </div>
     );

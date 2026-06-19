@@ -2,4 +2,4 @@ packages:
   - Web
   - Web/proxy
 allowBuilds:
-  esbuild: set this to true or false
+  esbuild: true

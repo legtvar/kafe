@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Kafe;
 
@@ -51,6 +53,31 @@ public static class KafeTypeRegistryExtensions
             }
 
             return metadata;
+        }
+
+        public bool TryGetDotnetType(KafeType kafeType, [NotNullWhen(true)] out Type? dotnetType)
+        {
+            if (!kafeType.IsArray)
+            {
+                if (registry.Types.TryGetValue(kafeType, out var metadata))
+                {
+                    dotnetType = metadata.DotnetType;
+                    return true;
+                }
+
+                dotnetType = null;
+                return false;
+            }
+
+            var elementKafeType = kafeType.GetElementType();
+            if (!registry.TryGetDotnetType(elementKafeType, out var elementType))
+            {
+                dotnetType = null;
+                return false;
+            }
+
+            dotnetType = typeof(ImmutableArray<>).MakeGenericType(elementType);
+            return true;
         }
     }
 }

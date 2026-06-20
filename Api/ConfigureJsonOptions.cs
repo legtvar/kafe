@@ -24,9 +24,14 @@ public class ConfigureJsonOptions(
         o.JsonSerializerOptions.Converters.Add(new LocalizedStringJsonConverter());
         o.JsonSerializerOptions.Converters.Add(new HribJsonConverter());
         o.JsonSerializerOptions.Converters.Add(new KafeTypeJsonConverter(typeRegistry));
+        o.JsonSerializerOptions.Converters.Add(
+            new KafeObjectJsonConverter(
+                typeRegistry,
+                (JsonConverter<KafeObject>)o.JsonSerializerOptions.GetConverter(typeof(KafeObject))
+            )
+        );
         o.JsonSerializerOptions.Converters.Add(new DiagnosticMessageJsonConverter(typeRegistry));
-        o.JsonSerializerOptions.Converters.Add(new KafeTypeReflectionTypeJsonConverter(typeRegistry));
-        o.JsonSerializerOptions.Converters.Add(new OneWayReflectionTypeJsonConverter());
+        o.JsonSerializerOptions.Converters.Add(new ReflectionTypeJsonConverter(typeRegistry));
 
         var typeInfoResolver = (o.JsonSerializerOptions.TypeInfoResolver ?? new DefaultJsonTypeInfoResolver())
             .WithAddedModifier(InitializeImmutableArrayProperties)

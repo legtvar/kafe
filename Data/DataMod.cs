@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text.Json.Serialization;
 using Kafe.Data.Aggregates;
 using Kafe.Data.Documents;
 using Kafe.Data.Events.Upcasts;
@@ -182,6 +183,12 @@ public class DataMod : IMod
             o.Converters.Add(new HribJsonConverter());
             o.Converters.Add(new LocalizedStringJsonConverter());
             o.Converters.Add(new KafeTypeJsonConverter(typeRegistry));
+            o.Converters.Add(
+                new KafeObjectJsonConverter(
+                    typeRegistry,
+                    (JsonConverter<KafeObject>)o.GetConverter(typeof(KafeObject))
+                )
+            );
         });
 
         mo.Linq.MemberSources.Add(new KafeTypeMemberSource());

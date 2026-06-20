@@ -32,7 +32,7 @@ public class ProjectService(
         CancellationToken token = default
     )
     {
-        var idErr = Hrib.TryParseValid(project.Id);
+        var idErr = Hrib.TryParseValid(project.Id, shouldReplaceEmpty: true);
         if (idErr.HasError)
         {
             return idErr.Diagnostic.ForParameter(nameof(project.Id));
@@ -159,7 +159,7 @@ public class ProjectService(
         Hrib? AccessingAccountId = null
     );
 
-    public async Task<ImmutableArray<ProjectInfo>> List(
+    public async Task<ImmutableArray<ProjectDetail>> List(
         ProjectFilter? filter = null,
         string? sort = null,
         CancellationToken token = default
@@ -167,11 +167,11 @@ public class ProjectService(
     {
         filter ??= new ProjectFilter();
 
-        var query = db.Query<ProjectInfo>();
+        var query = db.Query<ProjectDetail>();
 
         if (filter.AccessingAccountId is not null)
         {
-            query = (IMartenQueryable<ProjectInfo>)query
+            query = (IMartenQueryable<ProjectDetail>)query
                 .WhereAccountHasPermission(
                     db.DocumentStore.Options.Schema,
                     Permission.Read,
@@ -181,7 +181,7 @@ public class ProjectService(
 
         if (filter.ProjectGroupId is not null)
         {
-            query = (IMartenQueryable<ProjectInfo>)query
+            query = (IMartenQueryable<ProjectDetail>)query
                 .Where(e => e.ProjectGroupId == filter.ProjectGroupId.ToString());
         }
 
@@ -195,13 +195,13 @@ public class ProjectService(
                      WHERE g.id = d.data ->> 'ProjectGroupId'
                  ) = ?
                  """;
-            query = (IMartenQueryable<ProjectInfo>)query
+            query = (IMartenQueryable<ProjectDetail>)query
                 .Where(p => p.MatchesSql(sql, filter.OrganizationId.ToString()));
         }
 
         if (!string.IsNullOrEmpty(sort))
         {
-            query = (IMartenQueryable<ProjectInfo>)query.OrderBySortString(entityMetadataProvider, sort);
+            query = (IMartenQueryable<ProjectDetail>)query.OrderBySortString(entityMetadataProvider, sort);
         }
 
         var results = (await query.ToListAsync(token)).ToImmutableArray();

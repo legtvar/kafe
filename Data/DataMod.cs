@@ -54,6 +54,7 @@ public class DataMod : IMod
         context.AddDiagnosticPayload<EntityBusyDiagnostic>();
         context.AddDiagnosticPayload<ShardFileAlreadyExists>();
         context.AddDiagnosticPayload<ShardFileNotFoundDiagnostic>();
+        context.AddDiagnosticPayload<MissingBlueprintDiagnostic>();
     }
 
     private static void ConfigureServices(IServiceCollection services)

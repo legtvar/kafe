@@ -101,7 +101,7 @@ public class ProjectDetailEndpoint(
             }
             else if (compatArtifactErr.HasValue)
             {
-                compatArtifacts.AddRange(compatArtifactErr.Value);
+                compatArtifacts.AddRange(compatArtifactErr.Value.IsDefaultOrEmpty ? [] : compatArtifactErr.Value);
             }
 
             return true;

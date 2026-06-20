@@ -35,7 +35,9 @@ public class ProjectListEndpoint(
             OrganizationId: requestData.OrganizationId,
             ProjectGroupId: requestData.ProjectGroupId
         );
-        var projects = (await projectService.List(filter, requestData.Sort, ct)).Where(p => p.ArtifactId is not null);
+        var projects = (await projectService.List(filter, sort: requestData.Sort, token: ct))
+            .Where(p => p.ArtifactId is not null)
+            .ToImmutableArray();
         var perms = await entityService.GetPermissions(
             [.. projects.Select(p => (Hrib)p.Id)],
             userProvider.AccountId,
@@ -48,9 +50,11 @@ public class ProjectListEndpoint(
         }
 
         var artifacts = artifactsErr.Value;
-        return Ok(projects.Zip(artifacts).Zip(perms)
-            .Select((p) => TransferMaps.ToProjectListDto(p.First.First, p.First.Second, p.Second))
-            .ToImmutableArray());
+        return Ok(
+            projects.Zip(artifacts).Zip(perms)
+                .Select((p) => TransferMaps.ToProjectListDto(p.First.First, p.First.Second, p.Second))
+                .ToImmutableArray()
+        );
     }
 
     public record RequestData

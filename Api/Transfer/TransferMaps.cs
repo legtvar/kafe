@@ -67,7 +67,7 @@ public static class TransferMaps
 
 
     public static ProjectListDto ToProjectListDto(
-        ProjectInfo data,
+        ProjectDetail data,
         ArtifactInfo? artifact,
         Permission userPermission = Permission.None
     )

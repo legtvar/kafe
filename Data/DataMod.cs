@@ -156,6 +156,7 @@ public class DataMod : IMod
                 ao.DeleteViewTypeOnTeardown<EntityPermissionInfo>();
                 ao.DeleteViewTypeOnTeardown<RoleMembersInfo>();
             });
+        mo.Projections.Add<ProjectDetailProjection>(ProjectionLifecycle.Async);
 
         mo.Events.Upcast<AccountCapabilityAddedUpcaster>();
         mo.Events.Upcast<AccountCapabilityRemovedUpcaster>();

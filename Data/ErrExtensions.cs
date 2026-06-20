@@ -14,7 +14,8 @@ public static class ErrExtensions
                     => Err.Fail<T>(new AlreadyExistsDiagnostic(typeof(T), err.Value.Id)),
                 ExistingEntityHandling.Update when err.HasError
                     => err,
-                ExistingEntityHandling.Upsert when err is { HasError: true, Diagnostic.Payload: NotFoundDiagnostic nfd }
+                ExistingEntityHandling.Upsert or ExistingEntityHandling.Insert when err is
+                        { HasError: true, Diagnostic.Payload: NotFoundDiagnostic nfd }
                     => Err.Fail(new NotCreatedDiagnostic(nfd.EntityType, nfd.Id)),
                 _ => err
             };

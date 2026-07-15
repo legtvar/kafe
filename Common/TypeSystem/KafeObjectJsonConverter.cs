@@ -4,6 +4,32 @@ using System.Text.Json.Serialization;
 
 namespace Kafe;
 
+public class KafeObjectJsonConverterFactory(KafeTypeRegistry typeRegistry, JsonConverter<KafeObject> inner)
+    : JsonConverterFactory
+{
+    public override bool CanConvert(Type typeToConvert)
+    {
+        return typeToConvert == typeof(KafeObject) || typeToConvert == typeof(KafeObject?);
+    }
+
+    public override JsonConverter? CreateConverter(Type typeToConvert, JsonSerializerOptions options)
+    {
+        var converter = new KafeObjectJsonConverter(typeRegistry, inner);
+
+        if (typeToConvert == typeof(KafeObject))
+        {
+            return converter;
+        }
+
+        if (typeToConvert == typeof(KafeObject?))
+        {
+            return new NullableKafeObjectJsonConverter(converter);
+        }
+
+        return null;
+    }
+}
+
 public class KafeObjectJsonConverter(KafeTypeRegistry typeRegistry, JsonConverter<KafeObject> inner)
     : JsonConverter<KafeObject>
 {
@@ -88,5 +114,33 @@ public class KafeObjectJsonConverter(KafeTypeRegistry typeRegistry, JsonConverte
     public override void Write(Utf8JsonWriter writer, KafeObject value, JsonSerializerOptions options)
     {
         inner.Write(writer, value, options);
+    }
+}
+
+public class NullableKafeObjectJsonConverter(KafeObjectJsonConverter inner)
+    : JsonConverter<KafeObject?>
+{
+    public override bool HandleNull => true;
+
+    public override KafeObject? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        if (reader.TokenType == JsonTokenType.Null)
+        {
+            reader.Read();
+            return null;
+        }
+
+        return inner.Read(ref reader, typeToConvert, options);
+    }
+
+    public override void Write(Utf8JsonWriter writer, KafeObject? value, JsonSerializerOptions options)
+    {
+        if (value is null)
+        {
+            writer.WriteNullValue();
+            return;
+        }
+
+        inner.Write(writer, value.Value, options);
     }
 }

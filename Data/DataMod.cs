@@ -185,12 +185,10 @@ public class DataMod : IMod
             o.Converters.Add(new HribJsonConverter());
             o.Converters.Add(new LocalizedStringJsonConverter());
             o.Converters.Add(new KafeTypeJsonConverter(typeRegistry));
-            o.Converters.Add(
-                new KafeObjectJsonConverter(
-                    typeRegistry,
-                    (JsonConverter<KafeObject>)o.GetConverter(typeof(KafeObject))
-                )
-            );
+            o.Converters.Add(new KafeObjectJsonConverterFactory(
+                typeRegistry,
+                (JsonConverter<KafeObject>)o.GetConverter(typeof(KafeObject))
+            ));
         });
 
         mo.Linq.MemberSources.Add(new KafeTypeMemberSource());

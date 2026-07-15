@@ -25,7 +25,7 @@ public class ConfigureJsonOptions(
         o.JsonSerializerOptions.Converters.Add(new HribJsonConverter());
         o.JsonSerializerOptions.Converters.Add(new KafeTypeJsonConverter(typeRegistry));
         o.JsonSerializerOptions.Converters.Add(
-            new KafeObjectJsonConverter(
+            new KafeObjectJsonConverterFactory(
                 typeRegistry,
                 (JsonConverter<KafeObject>)o.JsonSerializerOptions.GetConverter(typeof(KafeObject))
             )

@@ -72,6 +72,11 @@ public class KafeProblemDetailsFactory(
         int skipFrames = 1
     )
     {
+        if (modelState.IsValid)
+        {
+            throw new NotSupportedException("A diagnostic cannot be created from a valid model state.");
+        }
+
         var errors = ImmutableArray.CreateBuilder<Diagnostic>();
         // TODO: Handle nested errors with JSON pointers.
         foreach (var (parameter, entry) in modelState)
@@ -88,7 +93,10 @@ public class KafeProblemDetailsFactory(
                 );
             }
 
-            errors.Add(Diagnostic.Aggregate(entryErrors.ToImmutable()).ForParameter(parameter));
+            if (entryErrors.Count > 0)
+            {
+                errors.Add(Diagnostic.Aggregate(entryErrors.ToImmutable()).ForParameter(parameter));
+            }
         }
 
         return new Diagnostic(new BadRequestDiagnostic(errors.ToImmutable()), skipFrames: skipFrames + 1);

@@ -3,51 +3,51 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Kafe;
 
-public class LocalizedStringBinder : CollectionModelBinder<KeyValuePair<string, string>>
+public class LocalizedStringBinder : IModelBinder
 {
-    [Obsolete("Obsolete. Added only to fulfill the interface contract.")]
-    public LocalizedStringBinder() : this(NullLoggerFactory.Instance)
-    {
-    }
+    private readonly ILoggerFactory loggerFactory;
+    private readonly DictionaryModelBinder<string, string> inner;
 
-    public LocalizedStringBinder(ILoggerFactory loggerFactory)
-        : base(
-            new KeyValuePairModelBinder<string, string>(
-                keyBinder: new SimpleTypeModelBinder(typeof(string), loggerFactory),
-                valueBinder: new SimpleTypeModelBinder(typeof(string), loggerFactory),
-                loggerFactory: loggerFactory
-            ),
-            loggerFactory
-        )
+    public LocalizedStringBinder(ILoggerFactory? loggerFactory = null)
     {
+        this.loggerFactory ??= NullLoggerFactory.Instance;
+        inner = new DictionaryModelBinder<string, string>(
+            keyBinder: new SimpleTypeModelBinder(typeof(string), this.loggerFactory),
+            valueBinder: new SimpleTypeModelBinder(typeof(string), this.loggerFactory),
+            loggerFactory: this.loggerFactory
+        );
     }
 
     public async Task BindModelAsync(ModelBindingContext bindingContext)
     {
-        var dictionaryContext = DefaultModelBindingContext.CreateBindingContext(
-            bindingContext.ActionContext,
-            bindingContext.ValueProvider,
-            bindingContext.ModelMetadata,
-            new BindingInfo()
-            {
-                BinderModelName = bindingContext.BinderModelName,
-                BindingSource = bindingContext.BindingSource
-            },
-            modelName: bindingContext.ModelName
-        );
-        await base.BindModelAsync(bindingContext);
-        var result = bindingContext.Result;
-
-        if (result is { IsModelSet: true, Model: IDictionary<string, string> { Count: > 0 } dictionary })
+        LocalizedString? result = null;
+        using (var nestedScope = bindingContext.EnterNestedScope(
+                modelMetadata: bindingContext.ModelMetadata.GetMetadataForType(typeof(Dictionary<string, string>)),
+                fieldName: bindingContext.FieldName,
+                modelName: bindingContext.ModelName,
+                model: new Dictionary<string, string>()
+            ))
         {
-            // easy route; base
-            bindingContext.Result = ModelBindingResult.Success(LocalizedString.Create(dictionary));
+            await inner.BindModelAsync(bindingContext);
+            if (bindingContext.Result is { IsModelSet: true, Model: IDictionary<string, string> { Count: > 0 } dictionary })
+            {
+                result = LocalizedString.Create(dictionary);
+                bindingContext.ValidationState[result] = bindingContext.ValidationState[dictionary];
+            }
+        }
+
+        if (result is not null)
+        {
+            bindingContext.Result = ModelBindingResult.Success(result);
             return;
         }
+
+        bindingContext.Result = ModelBindingResult.Failed();
     }
 }

@@ -215,15 +215,23 @@ export class API {
 
         return {
             async create(
-                artifactId: string,
+                name: localizedString,
                 file: File,
                 shardKind: components['schemas']['ShardKind'],
+                artifactId?: string,
+                artifactProperty?: string,
                 onUploadProgress?: (progressEvent: AxiosProgressEvent) => void,
             ) {
                 const formData = new FormData();
+                if (name) {
+                    for (const language of Object.keys(name)) {
+                        formData.append(`name[${language}]`, name[language]);
+                    }
+                }
                 formData.append('file', file, file.name);
                 formData.append('kind', shardKind);
-                formData.append('artifactId', artifactId);
+                artifactId && formData.append('artifactId', artifactId);
+                artifactProperty && formData.append('artifactProperty', artifactProperty);
 
                 return await api.upload<FormData, string>(`shard`, formData, onUploadProgress);
             },

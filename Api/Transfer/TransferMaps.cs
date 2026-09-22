@@ -58,7 +58,7 @@ public static class TransferMaps
         = ToProjectBlueprintDto(ProjectBlueprint.TemporaryProjectBlueprint);
 
     [Obsolete("Use the new artifact abstraction instead.")]
-    public static ProjectBlueprintDto TemporaryLemmaProjectBlueprintMockup
+    public static readonly ProjectBlueprintDto TemporaryLemmaProjectBlueprintMockup
         = ToProjectBlueprintDto(ProjectBlueprint.TemporaryLemmaProjectBlueprint);
 
     [Obsolete("Use the new artifact abstraction instead.")]

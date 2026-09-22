@@ -102,6 +102,8 @@ public class ShardCreationEndpoint(
 
     public record RequestData(
         [FromForm]
+        LocalizedString Name,
+        [FromForm]
         ShardKind Kind,
         [FromForm]
         string? ArtifactId,

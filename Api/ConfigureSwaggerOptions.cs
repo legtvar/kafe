@@ -24,6 +24,38 @@ public class ConfigureSwaggerOptions : IConfigureOptions<SwaggerGenOptions>
         o.DocumentFilter<KafeComponentFilter>();
         o.SchemaFilter<RequireNonNullablePropertiesSchemaFilter>();
         o.SchemaFilter<OptionalErrorStackTraceSchemaFilter>();
+        o.MapType<LocalizedString>(() => new OpenApiSchema
+        {
+            Reference = new OpenApiReference
+            {
+                Type = ReferenceType.Schema,
+                Id = nameof(LocalizedString)
+            }
+        });
+        o.MapType<Hrib>(() => new OpenApiSchema
+        {
+            Reference = new OpenApiReference
+            {
+                Type = ReferenceType.Schema,
+                Id = nameof(Hrib)
+            }
+        });
+        o.MapType<Permission>(() => new OpenApiSchema
+        {
+            Reference = new OpenApiReference
+            {
+                Type = ReferenceType.Schema,
+                Id = nameof(Permission)
+            }
+        });
+        o.MapType<KafeType>(() => new OpenApiSchema
+        {
+            Reference = new OpenApiReference
+            {
+                Type = ReferenceType.Schema,
+                Id = nameof(KafeType)
+            }
+        });
         o.MapType<TimeSpan>(() => new OpenApiSchema
             {
                 Type = "string",
@@ -137,5 +169,14 @@ public class KafeComponentFilter(IOptions<DataOptions> dataOptions) : IDocumentF
             Enum = permissionEnumValues
         };
         Register(typeof(Permission), permissionSchema);
+
+        var kafeTypeSchema = new OpenApiSchema()
+        {
+            Title = nameof(KafeType),
+            Type = "string",
+            Format = "kafe-type",
+            Example = new OpenApiString("core:scalar/string")
+        };
+        Register(typeof(KafeType), kafeTypeSchema);
     }
 }

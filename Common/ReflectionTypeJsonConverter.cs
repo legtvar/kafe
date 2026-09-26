@@ -17,7 +17,7 @@ public class ReflectionTypeJsonConverter(KafeTypeRegistry typeRegistry) : JsonCo
         var kafeType = JsonSerializer.Deserialize<KafeType>(ref reader, options);
         if (!typeRegistry.Types.TryGetValue(kafeType, out var metadata))
         {
-            throw new JsonException("The specified KAFE object type is not registered.");
+            throw new JsonException($"The specified KAFE object type '{kafeType}' is not registered.");
         }
 
         return metadata.DotnetType;
@@ -27,7 +27,7 @@ public class ReflectionTypeJsonConverter(KafeTypeRegistry typeRegistry) : JsonCo
     {
         if (!typeRegistry.DotnetTypeMap.TryGetValue(value, out var kafeType))
         {
-            throw new JsonException("The specified System.Type is not registered.");
+            throw new JsonException($"The specified System.Type '{value.FullName}' is not registered.");
         }
 
         writer.WriteStringValue(kafeType.ToString());

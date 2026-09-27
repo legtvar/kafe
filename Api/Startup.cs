@@ -44,6 +44,7 @@ using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Kafe.Api.Middleware;
+using Kafe.Api.Swagger;
 using Microsoft.AspNetCore.Localization;
 using Kafe.Media.Services;
 using Microsoft.AspNetCore.StaticFiles;
@@ -226,6 +227,8 @@ public partial class Startup
                 o.DefaultApiVersion = new ApiVersion(1);
             }
         );
+        services.AddTransient<ISchemaGenerator, SeededSchemaGenerator>();
+        services.AddSingleton<SeededSchemaOptions>();
         services.AddSwaggerGen();
         services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
 

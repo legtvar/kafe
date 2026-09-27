@@ -15,47 +15,52 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Kafe.Api;
 
-public class ConfigureSwaggerOptions : IConfigureOptions<SwaggerGenOptions>
+public class ConfigureSwaggerOptions(
+    IOptions<DataOptions> dataOptions,
+    SeededSchemaOptions seedOptions
+    ) : IConfigureOptions<SwaggerGenOptions>
 {
     public void Configure(SwaggerGenOptions o)
     {
+        AddSeedSchemas();
+
         o.SwaggerDoc("v1", new OpenApiInfo { Title = "KAFE API", Version = "v1" });
         o.SupportNonNullableReferenceTypes();
-        o.DocumentFilter<KafeComponentFilter>();
+        // o.DocumentFilter<KafeComponentFilter>();
         o.SchemaFilter<RequireNonNullablePropertiesSchemaFilter>();
         o.SchemaFilter<OptionalErrorStackTraceSchemaFilter>();
-        o.MapType<LocalizedString>(() => new OpenApiSchema
-        {
-            Reference = new OpenApiReference
-            {
-                Type = ReferenceType.Schema,
-                Id = nameof(LocalizedString)
-            }
-        });
-        o.MapType<Hrib>(() => new OpenApiSchema
-        {
-            Reference = new OpenApiReference
-            {
-                Type = ReferenceType.Schema,
-                Id = nameof(Hrib)
-            }
-        });
-        o.MapType<Permission>(() => new OpenApiSchema
-        {
-            Reference = new OpenApiReference
-            {
-                Type = ReferenceType.Schema,
-                Id = nameof(Permission)
-            }
-        });
-        o.MapType<KafeType>(() => new OpenApiSchema
-        {
-            Reference = new OpenApiReference
-            {
-                Type = ReferenceType.Schema,
-                Id = nameof(KafeType)
-            }
-        });
+        // o.MapType<LocalizedString>(() => new OpenApiSchema
+        // {
+        //     Reference = new OpenApiReference
+        //     {
+        //         Type = ReferenceType.Schema,
+        //         Id = nameof(LocalizedString)
+        //     }
+        // });
+        // o.MapType<Hrib>(() => new OpenApiSchema
+        // {
+        //     Reference = new OpenApiReference
+        //     {
+        //         Type = ReferenceType.Schema,
+        //         Id = nameof(Hrib)
+        //     }
+        // });
+        // o.MapType<Permission>(() => new OpenApiSchema
+        // {
+        //     Reference = new OpenApiReference
+        //     {
+        //         Type = ReferenceType.Schema,
+        //         Id = nameof(Permission)
+        //     }
+        // });
+        // o.MapType<KafeType>(() => new OpenApiSchema
+        // {
+        //     Reference = new OpenApiReference
+        //     {
+        //         Type = ReferenceType.Schema,
+        //         Id = nameof(KafeType)
+        //     }
+        // });
         o.MapType<TimeSpan>(() => new OpenApiSchema
             {
                 Type = "string",
@@ -94,6 +99,68 @@ public class ConfigureSwaggerOptions : IConfigureOptions<SwaggerGenOptions>
         {
             o.IncludeXmlComments(xmlFile.FullName);
         }
+    }
+
+    private void AddSeedSchemas()
+    {
+        var properties = new Dictionary<string, OpenApiSchema>()
+        {
+            [Const.InvariantCultureCode] = new OpenApiSchema() { Type = "string" },
+        };
+
+        foreach (var languageCode in dataOptions.Value.Languages.Except([Const.InvariantCultureCode]))
+        {
+            properties[languageCode] = new OpenApiSchema() { Type = "string", Nullable = true };
+        }
+
+        var lsSchema = new OpenApiSchema
+        {
+            Title = nameof(LocalizedString),
+            Description = "Multilingual string",
+            Type = "object",
+            Properties = properties,
+            Nullable = false,
+        };
+        seedOptions.Seeds[typeof(LocalizedString)] = lsSchema;
+
+        var hribSchema = new OpenApiSchema
+        {
+            Title = nameof(Hrib),
+            Description = "Human-Readable Identifier Ballast (HRIB)",
+            Type = "string",
+            Format = "hrib",
+            Example = new OpenApiString("AAAAbadf00d")
+        };
+        seedOptions.Seeds[typeof(Hrib)] = hribSchema;
+
+        ImmutableArray<IOpenApiAny> permissionEnumValues =
+        [
+            .. Enum.GetValues<Permission>()
+                .Where(v => BitOperations.PopCount((uint)v) == 1)
+                .Select(v =>
+                    {
+                        var name = v.ToString();
+                        name = char.ToLowerInvariant(name[0]) + name[1..];
+                        return new OpenApiString(name) as IOpenApiAny;
+                    }
+                )
+        ];
+        var permissionSchema = new OpenApiSchema()
+        {
+            Title = nameof(Permission),
+            Type = "string",
+            Enum = permissionEnumValues
+        };
+        seedOptions.Seeds[typeof(Permission)] = permissionSchema;
+
+        var kafeTypeSchema = new OpenApiSchema()
+        {
+            Title = nameof(KafeType),
+            Type = "string",
+            Format = "kafe-type",
+            Example = new OpenApiString("core:scalar/string")
+        };
+        seedOptions.Seeds[typeof(KafeType)] = kafeTypeSchema;
     }
 }
 

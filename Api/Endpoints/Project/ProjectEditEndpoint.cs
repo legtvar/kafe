@@ -102,7 +102,7 @@ public class ProjectEditEndpoint(
 
         object? WrapShardReferences(string blueprintSlot)
         {
-            var ids = request.Artifacts?.Where(a => a.BlueprintSlot == blueprintSlot)
+            var ids = request.Shards?.Where(a => a.BlueprintSlot == blueprintSlot)
                 .Select(a => a.Id)
                 .ToImmutableArray() ?? [];
             return ids.Length switch

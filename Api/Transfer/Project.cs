@@ -119,7 +119,7 @@ public record ProjectEditDto(
     string? HearAboutUs,
     ImmutableArray<ProjectCreationAuthorDto>? Crew,
     ImmutableArray<ProjectCreationAuthorDto>? Cast,
-    ImmutableArray<ProjectArtifactAdditionDto>? Artifacts,
+    ImmutableArray<ProjectShardAdditionDto>? Shards,
     bool? IsLocked
 );
 
@@ -140,7 +140,7 @@ public record ProjectDiagnosticDto(
     string? ValidationStage
 );
 
-public record ProjectArtifactAdditionDto(
+public record ProjectShardAdditionDto(
     Hrib Id,
     string? BlueprintSlot
 );

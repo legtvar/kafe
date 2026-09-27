@@ -4,13 +4,13 @@ using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Numerics;
+using System.Text.Json.Nodes;
 using Asp.Versioning;
 using Kafe.Api.Swagger;
 using Kafe.Data;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Microsoft.OpenApi.Any;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Kafe.Api;
@@ -63,9 +63,9 @@ public class ConfigureSwaggerOptions(
         // });
         o.MapType<TimeSpan>(() => new OpenApiSchema
             {
-                Type = "string",
+                Type = JsonSchemaType.String,
                 Format = "time-span",
-                Example = new OpenApiString("00:00:00")
+                Example = "00:00:00"
             }
         );
         o.EnableAnnotations(
@@ -103,23 +103,22 @@ public class ConfigureSwaggerOptions(
 
     private void AddSeedSchemas()
     {
-        var properties = new Dictionary<string, OpenApiSchema>()
+        var properties = new Dictionary<string, IOpenApiSchema>()
         {
-            [Const.InvariantCultureCode] = new OpenApiSchema() { Type = "string" },
+            [Const.InvariantCultureCode] = new OpenApiSchema() { Type = JsonSchemaType.String },
         };
 
         foreach (var languageCode in dataOptions.Value.Languages.Except([Const.InvariantCultureCode]))
         {
-            properties[languageCode] = new OpenApiSchema() { Type = "string", Nullable = true };
+            properties[languageCode] = new OpenApiSchema() { Type = JsonSchemaType.String | JsonSchemaType.Null };
         }
 
         var lsSchema = new OpenApiSchema
         {
             Title = nameof(LocalizedString),
             Description = "Multilingual string",
-            Type = "object",
+            Type = JsonSchemaType.Object,
             Properties = properties,
-            Nullable = false,
         };
         seedOptions.Seeds[typeof(LocalizedString)] = lsSchema;
 
@@ -127,13 +126,13 @@ public class ConfigureSwaggerOptions(
         {
             Title = nameof(Hrib),
             Description = "Human-Readable Identifier Ballast (HRIB)",
-            Type = "string",
+            Type = JsonSchemaType.String,
             Format = "hrib",
-            Example = new OpenApiString("AAAAbadf00d")
+            Example = JsonValue.Create("AAAAbadf00d")
         };
         seedOptions.Seeds[typeof(Hrib)] = hribSchema;
 
-        ImmutableArray<IOpenApiAny> permissionEnumValues =
+        ImmutableArray<JsonNode> permissionEnumValues =
         [
             .. Enum.GetValues<Permission>()
                 .Where(v => BitOperations.PopCount((uint)v) == 1)
@@ -141,14 +140,14 @@ public class ConfigureSwaggerOptions(
                     {
                         var name = v.ToString();
                         name = char.ToLowerInvariant(name[0]) + name[1..];
-                        return new OpenApiString(name) as IOpenApiAny;
+                        return JsonValue.Create(name);
                     }
                 )
         ];
         var permissionSchema = new OpenApiSchema()
         {
             Title = nameof(Permission),
-            Type = "string",
+            Type = JsonSchemaType.String,
             Enum = permissionEnumValues
         };
         seedOptions.Seeds[typeof(Permission)] = permissionSchema;
@@ -156,9 +155,9 @@ public class ConfigureSwaggerOptions(
         var kafeTypeSchema = new OpenApiSchema()
         {
             Title = nameof(KafeType),
-            Type = "string",
+            Type = JsonSchemaType.String,
             Format = "kafe-type",
-            Example = new OpenApiString("core:scalar/string")
+            Example = JsonValue.Create("core:scalar/string")
         };
         seedOptions.Seeds[typeof(KafeType)] = kafeTypeSchema;
     }
@@ -170,7 +169,7 @@ public class KafeComponentFilter(IOptions<DataOptions> dataOptions) : IDocumentF
     {
         void Register(Type type, OpenApiSchema schema)
         {
-            swaggerDoc.Components.Schemas[type.Name] = schema;
+            swaggerDoc.Components?.Schemas?[type.Name] = schema;
             if (context.SchemaRepository.TryLookupByType(type, out var existingSchema))
             {
                 if (existingSchema.Reference.Id != type.Name)
@@ -187,23 +186,22 @@ public class KafeComponentFilter(IOptions<DataOptions> dataOptions) : IDocumentF
             }
         }
 
-        var properties = new Dictionary<string, OpenApiSchema>()
+        var properties = new Dictionary<string, IOpenApiSchema>()
         {
-            [Const.InvariantCultureCode] = new OpenApiSchema() { Type = "string" },
+            [Const.InvariantCultureCode] = new OpenApiSchema() { Type = JsonSchemaType.String },
         };
 
         foreach (var languageCode in dataOptions.Value.Languages.Except([Const.InvariantCultureCode]))
         {
-            properties[languageCode] = new OpenApiSchema() { Type = "string", Nullable = true };
+            properties[languageCode] = new OpenApiSchema() { Type = JsonSchemaType.String | JsonSchemaType.Null };
         }
 
         var lsSchema = new OpenApiSchema
         {
             Title = nameof(LocalizedString),
             Description = "Multilingual string",
-            Type = "object",
-            Properties = properties,
-            Nullable = false,
+            Type = JsonSchemaType.Object,
+            Properties = properties
         };
         Register(typeof(LocalizedString), lsSchema);
 
@@ -211,13 +209,13 @@ public class KafeComponentFilter(IOptions<DataOptions> dataOptions) : IDocumentF
         {
             Title = nameof(Hrib),
             Description = "Human-Readable Identifier Ballast (HRIB)",
-            Type = "string",
+            Type = JsonSchemaType.String,
             Format = "hrib",
-            Example = new OpenApiString("AAAAbadf00d")
+            Example = JsonValue.Create("AAAAbadf00d")
         };
         Register(typeof(Hrib), hribSchema);
 
-        ImmutableArray<IOpenApiAny> permissionEnumValues =
+        ImmutableArray<JsonNode> permissionEnumValues =
         [
             .. Enum.GetValues<Permission>()
                 .Where(v => BitOperations.PopCount((uint)v) == 1)
@@ -225,14 +223,14 @@ public class KafeComponentFilter(IOptions<DataOptions> dataOptions) : IDocumentF
                     {
                         var name = v.ToString();
                         name = char.ToLowerInvariant(name[0]) + name[1..];
-                        return new OpenApiString(name) as IOpenApiAny;
+                        return JsonValue.Create(name);
                     }
                 )
         ];
         var permissionSchema = new OpenApiSchema()
         {
             Title = nameof(Permission),
-            Type = "string",
+            Type = JsonSchemaType.String,
             Enum = permissionEnumValues
         };
         Register(typeof(Permission), permissionSchema);
@@ -240,9 +238,9 @@ public class KafeComponentFilter(IOptions<DataOptions> dataOptions) : IDocumentF
         var kafeTypeSchema = new OpenApiSchema()
         {
             Title = nameof(KafeType),
-            Type = "string",
+            Type = JsonSchemaType.String,
             Format = "kafe-type",
-            Example = new OpenApiString("core:scalar/string")
+            Example = JsonValue.Create("core:scalar/string")
         };
         Register(typeof(KafeType), kafeTypeSchema);
     }

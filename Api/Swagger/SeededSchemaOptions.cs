@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 
 namespace Kafe.Api.Swagger;
 
 public class SeededSchemaOptions
 {
-    public Dictionary<Type, OpenApiSchema> Seeds { get; } = [];
+    public Dictionary<Type, IOpenApiSchema> Seeds { get; } = [];
 }

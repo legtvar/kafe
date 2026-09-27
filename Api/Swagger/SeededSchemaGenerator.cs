@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Kafe.Api.Swagger;
@@ -23,7 +23,7 @@ public class SeededSchemaGenerator : ISchemaGenerator
         inner = new SchemaGenerator(options, dataContractResolver);
     }
 
-    public OpenApiSchema GenerateSchema(
+    public IOpenApiSchema GenerateSchema(
         Type modelType,
         SchemaRepository schemaRepository,
         MemberInfo? memberInfo = null,
@@ -43,7 +43,7 @@ public class SeededSchemaGenerator : ISchemaGenerator
         return inner.GenerateSchema(modelType, schemaRepository, memberInfo, parameterInfo, routeInfo);
     }
 
-    private void RegisterSeed(SchemaRepository schemaRepository, Type type, OpenApiSchema schema)
+    private void RegisterSeed(SchemaRepository schemaRepository, Type type, IOpenApiSchema schema)
     {
         schemaRepository.Schemas[type.Name] = schema;
         if (schemaRepository.TryLookupByType(type, out var existingSchema))

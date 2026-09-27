@@ -1,4 +1,6 @@
-using Microsoft.OpenApi.Models;
+using System;
+using System.Collections.Generic;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Linq;
 
@@ -10,14 +12,14 @@ public class RequireNonNullablePropertiesSchemaFilter : ISchemaFilter
     /// <summary>
     /// Add to model.Required all properties where Nullable is false.
     /// </summary>
-    public void Apply(OpenApiSchema model, SchemaFilterContext context)
+    public void Apply(IOpenApiSchema model, SchemaFilterContext context)
     {
-        var additionalRequiredProps = model.Properties
-            .Where(x => !x.Value.Nullable && !model.Required.Contains(x.Key))
+        var additionalRequiredProps = model.Properties?
+            .Where(x => x.Value.Type?.HasFlag(JsonSchemaType.Null) == false && model.Required?.Contains(x.Key) == false)
             .Select(x => x.Key);
-        foreach (var propKey in additionalRequiredProps)
+        foreach (var propKey in additionalRequiredProps ?? [])
         {
-            model.Required.Add(propKey);
+            model.Required?.Add(propKey);
         }
     }
 }

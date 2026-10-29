@@ -70,7 +70,7 @@ public class ShardCreationEndpoint(
         var shardErr = await shardService.Create(
             shardType: ShardCompat.ToType(request.Kind),
             stream: stream,
-            uploadFilename: request.File.FileName,
+            initialName: request.File.FileName,
             mimeType: request.File.ContentType,
             token: ct
         );
@@ -101,8 +101,6 @@ public class ShardCreationEndpoint(
     }
 
     public record RequestData(
-        [FromForm]
-        LocalizedString Name,
         [FromForm]
         ShardKind Kind,
         [FromForm]

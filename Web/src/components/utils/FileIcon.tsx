@@ -18,6 +18,7 @@ export function FileIcon(props: IFileIconProps) {
             return <BsChatLeftText />;
 
         case 'unknown':
+        default:
             return <AiOutlineFile />;
     }
 }

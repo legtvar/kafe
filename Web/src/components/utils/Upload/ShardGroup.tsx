@@ -9,17 +9,17 @@ import {
     Icon,
     Text,
 } from '@chakra-ui/react';
-import { AiOutlinePlus } from 'react-icons/ai';
-import { Artifact } from '../../../data/Artifact';
-import { Project } from '../../../data/Project';
-import { Shard } from '../../../data/Shard';
-import { useColorScheme } from '../../../hooks/useColorScheme';
-import { useReload } from '../../../hooks/useReload';
-import { components } from '../../../schemas/api';
-import { toLocalizedString } from '../../../schemas/generic';
-import { getPrefered } from '../../../utils/preferedLanguage';
-import { FileIcon } from '../FileIcon';
-import { Upload } from './Upload';
+import {AiOutlinePlus} from 'react-icons/ai';
+import {Artifact} from '../../../data/Artifact';
+import {Project} from '../../../data/Project';
+import {Shard} from '../../../data/Shard';
+import {useColorScheme} from '../../../hooks/useColorScheme';
+import {useReload} from '../../../hooks/useReload';
+import {components} from '../../../schemas/api';
+import {toLocalizedString} from '../../../schemas/generic';
+import {getPrefered} from '../../../utils/preferedLanguage';
+import {FileIcon} from '../FileIcon';
+import {Upload} from './Upload';
 
 interface IShardGroupUploadProps {
     project: Project;
@@ -29,10 +29,10 @@ interface IShardGroupUploadProps {
 }
 
 export function ShardGroupUpload(props: IShardGroupUploadProps) {
-    const { border, bg, bgPage } = useColorScheme();
+    const {border, bg, bgPage} = useColorScheme();
     const reload = useReload();
     const {
-        shardBlueprint: { name, arity, description },
+        shardBlueprint: {name, arity, description},
         project,
         artifact,
         kind,
@@ -44,8 +44,8 @@ export function ShardGroupUpload(props: IShardGroupUploadProps) {
         <Box borderColor={border} bg={bgPage} borderWidth={1} borderRadius="md" p={4}>
             <FormLabel>{getPrefered(toLocalizedString(name))}</FormLabel>
             <FormHelperText mb={6}>
-                {getPrefered(toLocalizedString(description))} ({arity.min}
-                {arity.min !== arity.max && '-' + arity.max}×)
+                {getPrefered(toLocalizedString(description))} {arity && <span>({arity.min}
+                {arity.min !== arity.max && '-' + arity.max}×)</span>}
             </FormHelperText>
             {filesInGroup.map((shard, i) => (
                 <Box
@@ -61,20 +61,20 @@ export function ShardGroupUpload(props: IShardGroupUploadProps) {
                 >
                     <Text>
                         <Icon fontSize="1.2em">
-                            <FileIcon kind={kind} />
+                            <FileIcon kind={kind}/>
                         </Icon>{' '}
                         {shard.id}
                     </Text>
                 </Box>
             ))}
-            {filesInGroup.length < arity.max && (
+            {!arity || (filesInGroup.length < arity.max) && (
                 <Box w="100%" borderColor={border} bg={bg} borderWidth={1} borderRadius="md" py={4} px={4}>
                     <Accordion allowToggle m={-4}>
                         <AccordionItem borderWidth="0 !important">
                             <AccordionButton color={'gray.500'}>
                                 <Box as="span" flex="1" textAlign="left">
                                     <Icon fontSize="1.2em">
-                                        <AiOutlinePlus />
+                                        <AiOutlinePlus/>
                                     </Icon>{' '}
                                     Přidat nový soubor
                                 </Box>

@@ -38,7 +38,7 @@ public class ShardService(
     public async Task<Err<ShardInfo>> Create(
         Type shardType,
         Stream stream,
-        string? uploadFilename,
+        string? initialName,
         string mimeType,
         Hrib? shardId = null,
         CancellationToken token = default
@@ -59,7 +59,7 @@ public class ShardService(
             return tmpUri.Diagnostic;
         }
 
-        var analysis = await analysisFactory.Analyze(shardType, tmpUri.Value, mimeType, uploadFilename, token);
+        var analysis = await analysisFactory.Analyze(shardType, tmpUri.Value, mimeType, initialName, token);
         if (!analysis.IsSuccessful)
         {
             storageService.DeleteTemporaryShard(shardId, token);
@@ -68,9 +68,8 @@ public class ShardService(
 
         var created = new ShardCreated(
             ShardId: shardId.ToString(),
-            // TODO: Allows setting a shard's name
-            Name: uploadFilename ?? $"{shardId}{fileExtension}",
-            InitialName: uploadFilename,
+            Name: initialName ?? $"{shardId}{fileExtension}",
+            InitialName: initialName,
             CreationMethod: CreationMethod.Api,
             FileLength: stream.Length,
             MimeType: analysis.MimeType ?? mimeType,

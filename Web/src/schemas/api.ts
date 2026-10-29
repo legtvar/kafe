@@ -116,6 +116,7 @@ export interface paths {
     };
   };
   "/api/v1/artifact": {
+    /** @deprecated */
     post: {
       requestBody?: {
         content: {
@@ -145,6 +146,7 @@ export interface paths {
     };
   };
   "/api/v1/artifact/{id}": {
+    /** @deprecated */
     get: {
       parameters: {
         path: {
@@ -285,7 +287,7 @@ export interface paths {
           "multipart/form-data": {
             /**
              * Format: hrib
-             * @description Human-Readable Identifier Ballast
+             * @description Human-Readable Identifier Ballast (HRIB)
              * @example AAAAbadf00d
              */
             Id?: string;
@@ -496,6 +498,7 @@ export interface paths {
     };
   };
   "/api/v1/project": {
+    /** @deprecated */
     post: {
       requestBody?: {
         content: {
@@ -515,6 +518,7 @@ export interface paths {
         };
       };
     };
+    /** @deprecated */
     patch: {
       requestBody?: {
         content: {
@@ -536,6 +540,7 @@ export interface paths {
     };
   };
   "/api/v1/project/{id}": {
+    /** @deprecated */
     get: {
       parameters: {
         path: {
@@ -846,12 +851,14 @@ export interface paths {
     };
   };
   "/api/v1/shard": {
+    /** @deprecated */
     post: {
       requestBody?: {
         content: {
           "multipart/form-data": {
             Kind?: components["schemas"]["ShardKind"];
             ArtifactId?: string;
+            ArtifactProperty?: string;
             /** Format: binary */
             File?: string;
           };
@@ -878,6 +885,7 @@ export interface paths {
     };
   };
   "/api/v1/shard/{id}": {
+    /** @deprecated */
     get: {
       parameters: {
         path: {
@@ -1090,7 +1098,7 @@ export interface components {
     AccountListDto: {
       /**
        * Format: hrib
-       * @description Human-Readable Identifier Ballast
+       * @description Human-Readable Identifier Ballast (HRIB)
        * @example AAAAbadf00d
        */
       id: string;
@@ -1114,18 +1122,12 @@ export interface components {
       max: number;
     };
     ArtifactCreationDto: {
-      /** LocalizedString */
-      name: {
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      };
+      name?: components["schemas"]["LocalizedString"];
       /** Format: date-time */
       addedOn?: string | null;
       /**
        * Format: hrib
-       * @description Human-Readable Identifier Ballast
+       * @description Human-Readable Identifier Ballast (HRIB)
        * @example AAAAbadf00d
        */
       containingProject?: string | null;
@@ -1142,14 +1144,8 @@ export interface components {
     };
     AuthorCreationDto: {
       name: string;
-      globalPermissions: components["schemas"]["Permission"];
-      /** LocalizedString */
-      bio?: ({
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      }) | null;
+      globalPermissions?: components["schemas"]["Permission"];
+      bio?: components["schemas"]["LocalizedString"];
       uco?: string | null;
       email?: string | null;
       phone?: string | null;
@@ -1157,19 +1153,13 @@ export interface components {
     AuthorDetailDto: {
       /**
        * Format: hrib
-       * @description Human-Readable Identifier Ballast
+       * @description Human-Readable Identifier Ballast (HRIB)
        * @example AAAAbadf00d
        */
       id: string;
       name: string;
-      globalPermissions: components["schemas"]["Permission"];
-      /** LocalizedString */
-      bio?: ({
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      }) | null;
+      globalPermissions?: components["schemas"]["Permission"];
+      bio?: components["schemas"]["LocalizedString"];
       uco?: string | null;
       email?: string | null;
       phone?: string | null;
@@ -1177,19 +1167,31 @@ export interface components {
     AuthorListDto: {
       /**
        * Format: hrib
-       * @description Human-Readable Identifier Ballast
+       * @description Human-Readable Identifier Ballast (HRIB)
        * @example AAAAbadf00d
        */
       id: string;
       name: string;
-      globalPermissions: components["schemas"]["Permission"];
+      globalPermissions?: components["schemas"]["Permission"];
+    };
+    /** @description A culture-specific Kafe.Diagnostic structure meant to be serialized and sent. */
+    DiagnosticMessage: {
+      type?: components["schemas"]["KafeType"];
+      title: string;
+      message: string;
+      severity?: components["schemas"]["DiagnosticSeverity"];
+      language: string;
+      arguments: {
+        [key: string]: unknown;
+      };
+      stackTrace?: string | null;
     };
     /** @enum {string} */
-    DiagnosticKind: "unknown" | "info" | "warning" | "error";
+    DiagnosticSeverity: "debug" | "info" | "warning" | "error";
     EntityPermissionsAccountEditDto: {
       /**
        * Format: hrib
-       * @description Human-Readable Identifier Ballast
+       * @description Human-Readable Identifier Ballast (HRIB)
        * @example AAAAbadf00d
        */
       id?: string | null;
@@ -1199,7 +1201,7 @@ export interface components {
     EntityPermissionsAccountListDto: {
       /**
        * Format: hrib
-       * @description Human-Readable Identifier Ballast
+       * @description Human-Readable Identifier Ballast (HRIB)
        * @example AAAAbadf00d
        */
       id?: string | null;
@@ -1210,7 +1212,7 @@ export interface components {
     EntityPermissionsDetailDto: {
       /**
        * Format: hrib
-       * @description Human-Readable Identifier Ballast
+       * @description Human-Readable Identifier Ballast (HRIB)
        * @example AAAAbadf00d
        */
       id: string;
@@ -1222,20 +1224,12 @@ export interface components {
     EntityPermissionsEditDto: {
       /**
        * Format: hrib
-       * @description Human-Readable Identifier Ballast
+       * @description Human-Readable Identifier Ballast (HRIB)
        * @example AAAAbadf00d
        */
       id: string;
       globalPermissions?: components["schemas"]["Permission"][] | null;
       accountPermissions?: components["schemas"]["EntityPermissionsAccountEditDto"][] | null;
-    };
-    Error: {
-      id: string;
-      message: string;
-      arguments: {
-        [key: string]: unknown;
-      };
-      stackTrace?: string;
     };
     ImageDto: {
       fileExtension: string;
@@ -1253,6 +1247,7 @@ export interface components {
         [key: string]: components["schemas"]["ImageDto"];
       };
     };
+    /** @description A wrapper around a Kafe.Api.KafeProblemDetails.Diagnostic that adheres to RFC 7807 (Problem details for HTTP APIs). */
     KafeProblemDetails: {
       type?: string | null;
       title?: string | null;
@@ -1260,14 +1255,30 @@ export interface components {
       status?: number | null;
       detail?: string | null;
       instance?: string | null;
-      errors: components["schemas"]["Error"][];
+      diagnostic?: components["schemas"]["DiagnosticMessage"];
       traceId?: string | null;
       [key: string]: unknown;
+    };
+    /**
+     * KafeType
+     * Format: kafe-type
+     * @example core:scalar/string
+     */
+    KafeType: string;
+    /**
+     * LocalizedString
+     * @description Multilingual string
+     */
+    LocalizedString: {
+      iv?: string;
+      en?: string | null;
+      cs?: string | null;
+      sk?: string | null;
     };
     LockRequestData: {
       /**
        * Format: hrib
-       * @description Human-Readable Identifier Ballast
+       * @description Human-Readable Identifier Ballast (HRIB)
        * @example AAAAbadf00d
        */
       id: string;
@@ -1289,264 +1300,150 @@ export interface components {
       error?: string | null;
     };
     OrganizationCreationDto: {
-      /** LocalizedString */
-      name: {
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      };
+      name?: components["schemas"]["LocalizedString"];
     };
     OrganizationDetailDto: {
       /**
        * Format: hrib
-       * @description Human-Readable Identifier Ballast
+       * @description Human-Readable Identifier Ballast (HRIB)
        * @example AAAAbadf00d
        */
       id: string;
-      /** LocalizedString */
-      name: {
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      };
+      name?: components["schemas"]["LocalizedString"];
       /** Format: date-time */
       createdOn: string;
     };
     OrganizationEditDto: {
       /**
        * Format: hrib
-       * @description Human-Readable Identifier Ballast
+       * @description Human-Readable Identifier Ballast (HRIB)
        * @example AAAAbadf00d
        */
       id: string;
-      /** LocalizedString */
-      name: {
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      };
+      name?: components["schemas"]["LocalizedString"];
     };
     OrganizationListDto: {
       /**
        * Format: hrib
-       * @description Human-Readable Identifier Ballast
+       * @description Human-Readable Identifier Ballast (HRIB)
        * @example AAAAbadf00d
        */
       id: string;
-      /** LocalizedString */
-      name: {
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      };
+      name?: components["schemas"]["LocalizedString"];
     };
-    /** @enum {string} */
+    /**
+     * Permission
+     * @enum {string}
+     */
     Permission: "read" | "append" | "inspect" | "write" | "review" | "administer";
     PlaylistCreationDto: {
-      /** LocalizedString */
-      name: {
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      };
+      name?: components["schemas"]["LocalizedString"];
       /**
        * Format: hrib
-       * @description Human-Readable Identifier Ballast
+       * @description Human-Readable Identifier Ballast (HRIB)
        * @example AAAAbadf00d
        */
       organizationId: string;
-      /** LocalizedString */
-      description?: ({
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      }) | null;
+      description?: components["schemas"]["LocalizedString"];
       globalPermissions?: components["schemas"]["Permission"][] | null;
       entryIds?: string[] | null;
     };
     PlaylistDetailDto: {
       /**
        * Format: hrib
-       * @description Human-Readable Identifier Ballast
+       * @description Human-Readable Identifier Ballast (HRIB)
        * @example AAAAbadf00d
        */
       id: string;
       /**
        * Format: hrib
-       * @description Human-Readable Identifier Ballast
+       * @description Human-Readable Identifier Ballast (HRIB)
        * @example AAAAbadf00d
        */
       organizationId: string;
-      /** LocalizedString */
-      name: {
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      };
-      /** LocalizedString */
-      description?: ({
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      }) | null;
+      name?: components["schemas"]["LocalizedString"];
+      description?: components["schemas"]["LocalizedString"];
       globalPermissions: components["schemas"]["Permission"][];
       entries: components["schemas"]["PlaylistEntryDto"][];
     };
     PlaylistEditDto: {
       /**
        * Format: hrib
-       * @description Human-Readable Identifier Ballast
+       * @description Human-Readable Identifier Ballast (HRIB)
        * @example AAAAbadf00d
        */
       id: string;
       /**
        * Format: hrib
-       * @description Human-Readable Identifier Ballast
+       * @description Human-Readable Identifier Ballast (HRIB)
        * @example AAAAbadf00d
        */
       organizationId?: string | null;
-      /** LocalizedString */
-      name?: ({
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      }) | null;
-      /** LocalizedString */
-      description?: ({
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      }) | null;
+      name?: components["schemas"]["LocalizedString"];
+      description?: components["schemas"]["LocalizedString"];
       globalPermissions?: components["schemas"]["Permission"][] | null;
       entryIds?: string[] | null;
     };
     PlaylistEntryDto: {
       /**
        * Format: hrib
-       * @description Human-Readable Identifier Ballast
+       * @description Human-Readable Identifier Ballast (HRIB)
        * @example AAAAbadf00d
        */
       id: string;
-      /** LocalizedString */
-      name: {
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      };
+      name?: components["schemas"]["LocalizedString"];
     };
     PlaylistListDto: {
       /**
        * Format: hrib
-       * @description Human-Readable Identifier Ballast
+       * @description Human-Readable Identifier Ballast (HRIB)
        * @example AAAAbadf00d
        */
       id: string;
       /**
        * Format: hrib
-       * @description Human-Readable Identifier Ballast
+       * @description Human-Readable Identifier Ballast (HRIB)
        * @example AAAAbadf00d
        */
       organizationId: string;
-      /** LocalizedString */
-      name: {
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      };
-      /** LocalizedString */
-      description?: ({
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      }) | null;
+      name?: components["schemas"]["LocalizedString"];
+      description?: components["schemas"]["LocalizedString"];
       globalPermissions: components["schemas"]["Permission"][];
     };
-    ProjectArtifactAdditionDto: {
-      /**
-       * Format: hrib
-       * @description Human-Readable Identifier Ballast
-       * @example AAAAbadf00d
-       */
-      id: string;
-      blueprintSlot?: string | null;
-    };
     ProjectArtifactBlueprintDto: {
-      /** LocalizedString */
-      name: {
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      };
-      /** LocalizedString */
-      description?: ({
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      }) | null;
-      arity: components["schemas"]["ArgumentArity"];
+      name?: components["schemas"]["LocalizedString"];
+      description?: components["schemas"]["LocalizedString"];
+      arity?: components["schemas"]["ArgumentArity"];
       shardBlueprints: {
-        unknown: components["schemas"]["ProjectArtifactShardBlueprintDto"];
-        video: components["schemas"]["ProjectArtifactShardBlueprintDto"];
-        image: components["schemas"]["ProjectArtifactShardBlueprintDto"];
-        subtitles: components["schemas"]["ProjectArtifactShardBlueprintDto"];
-        blend: components["schemas"]["ProjectArtifactShardBlueprintDto"];
+        unknown?: components["schemas"]["ProjectArtifactShardBlueprintDto"];
+        video?: components["schemas"]["ProjectArtifactShardBlueprintDto"];
+        image?: components["schemas"]["ProjectArtifactShardBlueprintDto"];
+        subtitles?: components["schemas"]["ProjectArtifactShardBlueprintDto"];
+        blend?: components["schemas"]["ProjectArtifactShardBlueprintDto"];
       };
     };
     ProjectArtifactDto: {
       /**
        * Format: hrib
-       * @description Human-Readable Identifier Ballast
+       * @description Human-Readable Identifier Ballast (HRIB)
        * @example AAAAbadf00d
        */
       id: string;
-      /** LocalizedString */
-      name: {
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      };
+      name?: components["schemas"]["LocalizedString"];
       /** Format: date-time */
-      addedOn: string;
+      addedOn?: string | null;
       blueprintSlot?: string | null;
       shards: components["schemas"]["ShardListDto"][];
     };
     ProjectArtifactShardBlueprintDto: {
-      /** LocalizedString */
-      name: {
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      };
-      /** LocalizedString */
-      description?: ({
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      }) | null;
-      arity: components["schemas"]["ArgumentArity"];
+      name?: components["schemas"]["LocalizedString"];
+      description?: components["schemas"]["LocalizedString"];
+      arity?: components["schemas"]["ArgumentArity"];
     };
     ProjectAuthorDto: {
       /**
        * Format: hrib
-       * @description Human-Readable Identifier Ballast
+       * @description Human-Readable Identifier Ballast (HRIB)
        * @example AAAAbadf00d
        */
       id: string;
@@ -1562,7 +1459,7 @@ export interface components {
     ProjectCreationAuthorDto: {
       /**
        * Format: hrib
-       * @description Human-Readable Identifier Ballast
+       * @description Human-Readable Identifier Ballast (HRIB)
        * @example AAAAbadf00d
        */
       id: string;
@@ -1571,31 +1468,13 @@ export interface components {
     ProjectCreationDto: {
       /**
        * Format: hrib
-       * @description Human-Readable Identifier Ballast
+       * @description Human-Readable Identifier Ballast (HRIB)
        * @example AAAAbadf00d
        */
       projectGroupId: string;
-      /** LocalizedString */
-      name: {
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      };
-      /** LocalizedString */
-      description?: ({
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      }) | null;
-      /** LocalizedString */
-      genre?: ({
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      }) | null;
+      name?: components["schemas"]["LocalizedString"];
+      description?: components["schemas"]["LocalizedString"];
+      genre?: components["schemas"]["LocalizedString"];
       aiUsageDeclaration?: string | null;
       hearAboutUs?: string | null;
       crew: components["schemas"]["ProjectCreationAuthorDto"][];
@@ -1605,131 +1484,71 @@ export interface components {
     ProjectDetailDto: {
       /**
        * Format: hrib
-       * @description Human-Readable Identifier Ballast
+       * @description Human-Readable Identifier Ballast (HRIB)
        * @example AAAAbadf00d
        */
       id: string;
       /**
        * Format: hrib
-       * @description Human-Readable Identifier Ballast
+       * @description Human-Readable Identifier Ballast (HRIB)
        * @example AAAAbadf00d
        */
       projectGroupId: string;
-      /** LocalizedString */
-      projectGroupName?: ({
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      }) | null;
-      validationSettings: components["schemas"]["ProjectValidationSettings"];
-      /** LocalizedString */
-      genre?: ({
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      }) | null;
-      /** LocalizedString */
-      name: {
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      };
-      /** LocalizedString */
-      description?: ({
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      }) | null;
+      projectGroupName?: components["schemas"]["LocalizedString"];
+      validationSettings?: components["schemas"]["ProjectValidationSettings"];
+      genre?: components["schemas"]["LocalizedString"];
+      name?: components["schemas"]["LocalizedString"];
+      description?: components["schemas"]["LocalizedString"];
       aiUsageDeclaration?: string | null;
       hearAboutUs?: string | null;
       globalPermissions: components["schemas"]["Permission"][];
       userPermissions: components["schemas"]["Permission"][];
       /** Format: date-time */
-      releasedOn: string;
+      releasedOn?: string | null;
       crew: components["schemas"]["ProjectAuthorDto"][];
       cast: components["schemas"]["ProjectAuthorDto"][];
       /**
        * Format: hrib
-       * @description Human-Readable Identifier Ballast
+       * @description Human-Readable Identifier Ballast (HRIB)
        * @example AAAAbadf00d
        */
       ownerId?: string | null;
       artifacts: components["schemas"]["ProjectArtifactDto"][];
       reviews: components["schemas"]["ProjectReviewDto"][];
-      blueprint: components["schemas"]["ProjectBlueprintDto"];
+      blueprint?: components["schemas"]["ProjectBlueprintDto"];
       isLocked: boolean;
     };
     ProjectDiagnosticDto: {
-      kind: components["schemas"]["DiagnosticKind"];
-      /** LocalizedString */
-      message: {
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      };
-      validationStage: string;
+      kind?: components["schemas"]["DiagnosticSeverity"];
+      message?: components["schemas"]["LocalizedString"];
+      validationStage?: string | null;
     };
     ProjectEditDto: {
       /**
        * Format: hrib
-       * @description Human-Readable Identifier Ballast
+       * @description Human-Readable Identifier Ballast (HRIB)
        * @example AAAAbadf00d
        */
       id: string;
-      /** LocalizedString */
-      name?: ({
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      }) | null;
-      /** LocalizedString */
-      description?: ({
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      }) | null;
-      /** LocalizedString */
-      genre?: ({
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      }) | null;
+      name?: components["schemas"]["LocalizedString"];
+      description?: components["schemas"]["LocalizedString"];
+      genre?: components["schemas"]["LocalizedString"];
       aiUsageDeclaration?: string | null;
       hearAboutUs?: string | null;
       crew?: components["schemas"]["ProjectCreationAuthorDto"][] | null;
       cast?: components["schemas"]["ProjectCreationAuthorDto"][] | null;
-      artifacts?: components["schemas"]["ProjectArtifactAdditionDto"][] | null;
+      shards?: components["schemas"]["ProjectShardAdditionDto"][] | null;
       isLocked?: boolean | null;
     };
     ProjectGroupCreationDto: {
       /**
        * Format: hrib
-       * @description Human-Readable Identifier Ballast
+       * @description Human-Readable Identifier Ballast (HRIB)
        * @example AAAAbadf00d
        */
       organizationId: string;
-      /** LocalizedString */
-      name: {
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      };
-      /** LocalizedString */
-      description?: ({
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      }) | null;
+      name?: components["schemas"]["LocalizedString"];
+      description?: components["schemas"]["LocalizedString"];
       /** Format: date-time */
       deadline: string;
       isOpen: boolean;
@@ -1737,95 +1556,59 @@ export interface components {
     ProjectGroupDetailDto: {
       /**
        * Format: hrib
-       * @description Human-Readable Identifier Ballast
+       * @description Human-Readable Identifier Ballast (HRIB)
        * @example AAAAbadf00d
        */
       id: string;
       /**
        * Format: hrib
-       * @description Human-Readable Identifier Ballast
+       * @description Human-Readable Identifier Ballast (HRIB)
        * @example AAAAbadf00d
        */
       organizationId: string;
-      /** LocalizedString */
-      name: {
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      };
-      /** LocalizedString */
-      description?: ({
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      }) | null;
+      name?: components["schemas"]["LocalizedString"];
+      description?: components["schemas"]["LocalizedString"];
       /** Format: date-time */
       deadline: string;
       isOpen: boolean;
       projects: components["schemas"]["ProjectListDto"][];
-      validationSettings: components["schemas"]["ProjectValidationSettings"];
+      validationSettings?: components["schemas"]["ProjectValidationSettings"];
     };
     ProjectGroupEditDto: {
       /**
        * Format: hrib
-       * @description Human-Readable Identifier Ballast
+       * @description Human-Readable Identifier Ballast (HRIB)
        * @example AAAAbadf00d
        */
       id: string;
       /**
        * Format: hrib
-       * @description Human-Readable Identifier Ballast
+       * @description Human-Readable Identifier Ballast (HRIB)
        * @example AAAAbadf00d
        */
       organizationId?: string | null;
-      /** LocalizedString */
-      name?: ({
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      }) | null;
-      /** LocalizedString */
-      description?: ({
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      }) | null;
+      name?: components["schemas"]["LocalizedString"];
+      description?: components["schemas"]["LocalizedString"];
       /** Format: date-time */
       deadline?: string | null;
       isOpen?: boolean | null;
-      validationSettings: components["schemas"]["ProjectValidationSettings"];
+      validationSettings?: components["schemas"]["ProjectValidationSettings"];
     };
     ProjectGroupListDto: {
       /**
        * Format: hrib
-       * @description Human-Readable Identifier Ballast
+       * @description Human-Readable Identifier Ballast (HRIB)
        * @example AAAAbadf00d
        */
       id: string;
       /**
        * Format: hrib
-       * @description Human-Readable Identifier Ballast
+       * @description Human-Readable Identifier Ballast (HRIB)
        * @example AAAAbadf00d
        */
       organizationId: string;
-      /** LocalizedString */
-      name: {
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      };
-      /** LocalizedString */
-      description?: ({
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      }) | null;
+      name?: components["schemas"]["LocalizedString"];
+      description?: components["schemas"]["LocalizedString"];
       /** Format: date-time */
       deadline: string;
       isOpen: boolean;
@@ -1834,41 +1617,29 @@ export interface components {
     ProjectListDto: {
       /**
        * Format: hrib
-       * @description Human-Readable Identifier Ballast
+       * @description Human-Readable Identifier Ballast (HRIB)
        * @example AAAAbadf00d
        */
       id: string;
       /**
        * Format: hrib
-       * @description Human-Readable Identifier Ballast
+       * @description Human-Readable Identifier Ballast (HRIB)
        * @example AAAAbadf00d
        */
       projectGroupId: string;
-      /** LocalizedString */
-      name: {
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      };
-      /** LocalizedString */
-      description?: ({
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      }) | null;
+      name?: components["schemas"]["LocalizedString"];
+      description?: components["schemas"]["LocalizedString"];
       /** @description Permissions that apply to all users, even the anonymous ones. */
       globalPermissions: components["schemas"]["Permission"][];
       /** @description Permissions that apply to the currently logged in user. Includes the global permissions. */
       userPermissions: components["schemas"]["Permission"][];
       /** Format: date-time */
-      releasedOn: string;
-      latestReviewKind: components["schemas"]["ReviewKind"];
+      releasedOn?: string | null;
+      latestReviewKind?: components["schemas"]["ReviewKind"];
       isLocked: boolean;
       /**
        * Format: hrib
-       * @description Human-Readable Identifier Ballast
+       * @description Human-Readable Identifier Ballast (HRIB)
        * @example AAAAbadf00d
        */
       ownerId?: string | null;
@@ -1876,43 +1647,40 @@ export interface components {
     ProjectReviewCreationDto: {
       /**
        * Format: hrib
-       * @description Human-Readable Identifier Ballast
+       * @description Human-Readable Identifier Ballast (HRIB)
        * @example AAAAbadf00d
        */
       projectId: string;
-      kind: components["schemas"]["ReviewKind"];
+      kind?: components["schemas"]["ReviewKind"];
       reviewerRole: string;
-      /** LocalizedString */
-      comment?: ({
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      }) | null;
+      comment?: components["schemas"]["LocalizedString"];
     };
     ProjectReviewDto: {
       /**
        * Format: hrib
-       * @description Human-Readable Identifier Ballast
+       * @description Human-Readable Identifier Ballast (HRIB)
        * @example AAAAbadf00d
        */
       reviewerId?: string | null;
-      kind: components["schemas"]["ReviewKind"];
+      kind?: components["schemas"]["ReviewKind"];
       reviewerRole: string;
-      /** LocalizedString */
-      comment?: ({
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      }) | null;
+      comment?: components["schemas"]["LocalizedString"];
       /** Format: date-time */
       addedOn: string;
+    };
+    ProjectShardAdditionDto: {
+      /**
+       * Format: hrib
+       * @description Human-Readable Identifier Ballast (HRIB)
+       * @example AAAAbadf00d
+       */
+      id: string;
+      blueprintSlot?: string | null;
     };
     ProjectValidationDto: {
       /**
        * Format: hrib
-       * @description Human-Readable Identifier Ballast
+       * @description Human-Readable Identifier Ballast (HRIB)
        * @example AAAAbadf00d
        */
       projectId: string;
@@ -1942,52 +1710,28 @@ export interface components {
     RoleCreationDto: {
       /**
        * Format: hrib
-       * @description Human-Readable Identifier Ballast
+       * @description Human-Readable Identifier Ballast (HRIB)
        * @example AAAAbadf00d
        */
       organizationId: string;
-      /** LocalizedString */
-      name: {
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      };
-      /** LocalizedString */
-      description?: ({
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      }) | null;
+      name?: components["schemas"]["LocalizedString"];
+      description?: components["schemas"]["LocalizedString"];
     };
     RoleDetailDto: {
       /**
        * Format: hrib
-       * @description Human-Readable Identifier Ballast
+       * @description Human-Readable Identifier Ballast (HRIB)
        * @example AAAAbadf00d
        */
       id: string;
       /**
        * Format: hrib
-       * @description Human-Readable Identifier Ballast
+       * @description Human-Readable Identifier Ballast (HRIB)
        * @example AAAAbadf00d
        */
       organizationId: string;
-      /** LocalizedString */
-      name: {
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      };
-      /** LocalizedString */
-      description?: ({
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      }) | null;
+      name?: components["schemas"]["LocalizedString"];
+      description?: components["schemas"]["LocalizedString"];
       /** Format: date-time */
       createdOn: string;
       permissions: {
@@ -1997,57 +1741,39 @@ export interface components {
     RoleEditDto: {
       /**
        * Format: hrib
-       * @description Human-Readable Identifier Ballast
+       * @description Human-Readable Identifier Ballast (HRIB)
        * @example AAAAbadf00d
        */
       id: string;
-      /** LocalizedString */
-      name: {
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      };
-      /** LocalizedString */
-      description?: ({
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      }) | null;
+      name?: components["schemas"]["LocalizedString"];
+      description?: components["schemas"]["LocalizedString"];
     };
     RoleListDto: {
       /**
        * Format: hrib
-       * @description Human-Readable Identifier Ballast
+       * @description Human-Readable Identifier Ballast (HRIB)
        * @example AAAAbadf00d
        */
       id: string;
       /**
        * Format: hrib
-       * @description Human-Readable Identifier Ballast
+       * @description Human-Readable Identifier Ballast (HRIB)
        * @example AAAAbadf00d
        */
       organizationId: string;
-      /** LocalizedString */
-      name: {
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      };
+      name?: components["schemas"]["LocalizedString"];
     };
     ShardDetailBaseDto: {
       kind: components["schemas"]["ShardKind"];
       /**
        * Format: hrib
-       * @description Human-Readable Identifier Ballast
+       * @description Human-Readable Identifier Ballast (HRIB)
        * @example AAAAbadf00d
        */
       id: string;
       /**
        * Format: hrib
-       * @description Human-Readable Identifier Ballast
+       * @description Human-Readable Identifier Ballast (HRIB)
        * @example AAAAbadf00d
        */
       artifactId: string;
@@ -2057,11 +1783,11 @@ export interface components {
     ShardListDto: {
       /**
        * Format: hrib
-       * @description Human-Readable Identifier Ballast
+       * @description Human-Readable Identifier Ballast (HRIB)
        * @example AAAAbadf00d
        */
       id: string;
-      kind: components["schemas"]["ShardKind"];
+      kind?: components["schemas"]["ShardKind"];
       variants: string[];
     };
     SubtitleStreamDto: {
@@ -2086,7 +1812,7 @@ export interface components {
     UnlockRequestData: {
       /**
        * Format: hrib
-       * @description Human-Readable Identifier Ballast
+       * @description Human-Readable Identifier Ballast (HRIB)
        * @example AAAAbadf00d
        */
       id: string;

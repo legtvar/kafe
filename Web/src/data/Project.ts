@@ -41,8 +41,11 @@ export class Project extends AbstractType {
     public constructor(struct: components['schemas']['ProjectListDto'] | components['schemas']['ProjectDetailDto']) {
         super();
         Object.assign(this, struct);
-        this.releasedOn = new Date(struct.releasedOn);
-        if (this.releasedOn.getTime() < 0) this.releasedOn = null;
+        this.releasedOn = struct.releasedOn ? new Date(struct.releasedOn) : null;
+        if (this.releasedOn && this.releasedOn.getTime() < 0) {
+            this.releasedOn = null;
+        }
+
         if (this.artifacts) {
             this.artifacts = this.artifacts.map((artifact: any) => new Artifact(artifact));
         }

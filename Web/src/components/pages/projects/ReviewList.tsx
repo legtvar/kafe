@@ -59,7 +59,7 @@ export function ReviewList({ project }: IReviewListProps) {
     );
 }
 
-export function ReviewIcon({ kind }: { kind: string }) {
+export function ReviewIcon({ kind }: { kind: string | undefined }) {
     return (
         <HStack spacing={4} alignItems="center">
             <Box fontSize="2.5rem">

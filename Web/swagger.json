@@ -315,7 +315,8 @@
               }
             }
           }
-        }
+        },
+        "deprecated": true
       }
     },
     "/api/v1/artifact/{id}": {
@@ -383,7 +384,8 @@
               }
             }
           }
-        }
+        },
+        "deprecated": true
       }
     },
     "/api/v1/author": {
@@ -1221,7 +1223,8 @@
               }
             }
           }
-        }
+        },
+        "deprecated": true
       },
       "patch": {
         "tags": [
@@ -1276,7 +1279,8 @@
               }
             }
           }
-        }
+        },
+        "deprecated": true
       }
     },
     "/api/v1/project/{id}": {
@@ -1335,7 +1339,8 @@
               }
             }
           }
-        }
+        },
+        "deprecated": true
       }
     },
     "/api/v1/project-download/{id}": {
@@ -2021,6 +2026,16 @@
         "tags": [
           "Shard"
         ],
+        "parameters": [
+          {
+            "name": "Name",
+            "in": "query",
+            "description": "Multilingual string",
+            "schema": {
+              "$ref": "#/components/schemas/LocalizedString"
+            }
+          }
+        ],
         "requestBody": {
           "content": {
             "multipart/form-data": {
@@ -2031,6 +2046,9 @@
                     "$ref": "#/components/schemas/ShardKind"
                   },
                   "ArtifactId": {
+                    "type": "string"
+                  },
+                  "ArtifactProperty": {
                     "type": "string"
                   },
                   "File": {
@@ -2044,6 +2062,9 @@
                   "style": "form"
                 },
                 "ArtifactId": {
+                  "style": "form"
+                },
+                "ArtifactProperty": {
                   "style": "form"
                 },
                 "File": {
@@ -2094,7 +2115,8 @@
               }
             }
           }
-        }
+        },
+        "deprecated": true
       }
     },
     "/api/v1/shard/{id}": {
@@ -2194,7 +2216,8 @@
               }
             }
           }
-        }
+        },
+        "deprecated": true
       }
     },
     "/api/v1/shard-download/{id}": {
@@ -2628,34 +2651,10 @@
         "description": "The lower and upper bound for the count of something."
       },
       "ArtifactCreationDto": {
-        "required": [
-          "name"
-        ],
         "type": "object",
         "properties": {
           "name": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            }
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "addedOn": {
             "type": "string",
@@ -2705,7 +2704,6 @@
       },
       "AuthorCreationDto": {
         "required": [
-          "globalPermissions",
           "name"
         ],
         "type": "object",
@@ -2717,29 +2715,7 @@
             "$ref": "#/components/schemas/Permission"
           },
           "bio": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            },
-            "nullable": true
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "uco": {
             "type": "string",
@@ -2758,7 +2734,6 @@
       },
       "AuthorDetailDto": {
         "required": [
-          "globalPermissions",
           "id",
           "name"
         ],
@@ -2777,29 +2752,7 @@
             "$ref": "#/components/schemas/Permission"
           },
           "bio": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            },
-            "nullable": true
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "uco": {
             "type": "string",
@@ -2818,7 +2771,6 @@
       },
       "AuthorListDto": {
         "required": [
-          "globalPermissions",
           "id",
           "name"
         ],
@@ -2839,9 +2791,47 @@
         },
         "additionalProperties": false
       },
-      "DiagnosticKind": {
+      "DiagnosticMessage": {
+        "required": [
+          "arguments",
+          "language",
+          "message",
+          "title"
+        ],
+        "type": "object",
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/KafeType"
+          },
+          "title": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "severity": {
+            "$ref": "#/components/schemas/DiagnosticSeverity"
+          },
+          "language": {
+            "type": "string"
+          },
+          "arguments": {
+            "type": "object",
+            "additionalProperties": {
+              "nullable": true
+            }
+          },
+          "stackTrace": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "A culture-specific Kafe.Diagnostic structure meant to be serialized and sent."
+      },
+      "DiagnosticSeverity": {
         "enum": [
-          "unknown",
+          "debug",
           "info",
           "warning",
           "error"
@@ -2973,30 +2963,6 @@
         },
         "additionalProperties": false
       },
-      "Error": {
-        "required": [
-          "arguments",
-          "id",
-          "message"
-        ],
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "message": {
-            "type": "string"
-          },
-          "arguments": {
-            "type": "object",
-            "additionalProperties": { }
-          },
-          "stackTrace": {
-            "type": "string"
-          }
-        },
-        "additionalProperties": false
-      },
       "ImageDto": {
         "required": [
           "fileExtension",
@@ -3047,9 +3013,6 @@
         ]
       },
       "KafeProblemDetails": {
-        "required": [
-          "errors"
-        ],
         "type": "object",
         "properties": {
           "type": {
@@ -3073,18 +3036,44 @@
             "type": "string",
             "nullable": true
           },
-          "errors": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Error"
-            }
+          "diagnostic": {
+            "$ref": "#/components/schemas/DiagnosticMessage"
           },
           "traceId": {
             "type": "string",
             "nullable": true
           }
         },
-        "additionalProperties": { }
+        "additionalProperties": { },
+        "description": "A wrapper around a Kafe.Api.KafeProblemDetails.Diagnostic that adheres to RFC 7807 (Problem details for HTTP APIs)."
+      },
+      "KafeType": {
+        "title": "KafeType",
+        "type": "string",
+        "format": "kafe-type",
+        "example": "core:scalar/string"
+      },
+      "LocalizedString": {
+        "title": "LocalizedString",
+        "type": "object",
+        "properties": {
+          "iv": {
+            "type": "string"
+          },
+          "en": {
+            "type": "string",
+            "nullable": true
+          },
+          "cs": {
+            "type": "string",
+            "nullable": true
+          },
+          "sk": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "description": "Multilingual string"
       },
       "LockRequestData": {
         "required": [
@@ -3158,34 +3147,10 @@
         "additionalProperties": false
       },
       "OrganizationCreationDto": {
-        "required": [
-          "name"
-        ],
         "type": "object",
         "properties": {
           "name": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            }
+            "$ref": "#/components/schemas/LocalizedString"
           }
         },
         "additionalProperties": false
@@ -3193,8 +3158,7 @@
       "OrganizationDetailDto": {
         "required": [
           "createdOn",
-          "id",
-          "name"
+          "id"
         ],
         "type": "object",
         "properties": {
@@ -3205,28 +3169,7 @@
             "example": "AAAAbadf00d"
           },
           "name": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            }
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "createdOn": {
             "type": "string",
@@ -3237,8 +3180,7 @@
       },
       "OrganizationEditDto": {
         "required": [
-          "id",
-          "name"
+          "id"
         ],
         "type": "object",
         "properties": {
@@ -3249,36 +3191,14 @@
             "example": "AAAAbadf00d"
           },
           "name": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            }
+            "$ref": "#/components/schemas/LocalizedString"
           }
         },
         "additionalProperties": false
       },
       "OrganizationListDto": {
         "required": [
-          "id",
-          "name"
+          "id"
         ],
         "type": "object",
         "properties": {
@@ -3289,33 +3209,13 @@
             "example": "AAAAbadf00d"
           },
           "name": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            }
+            "$ref": "#/components/schemas/LocalizedString"
           }
         },
         "additionalProperties": false
       },
       "Permission": {
+        "title": "Permission",
         "enum": [
           "read",
           "append",
@@ -3328,34 +3228,12 @@
       },
       "PlaylistCreationDto": {
         "required": [
-          "name",
           "organizationId"
         ],
         "type": "object",
         "properties": {
           "name": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            }
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "organizationId": {
             "type": "string",
@@ -3364,29 +3242,7 @@
             "example": "AAAAbadf00d"
           },
           "description": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            },
-            "nullable": true
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "globalPermissions": {
             "type": "array",
@@ -3410,7 +3266,6 @@
           "entries",
           "globalPermissions",
           "id",
-          "name",
           "organizationId"
         ],
         "type": "object",
@@ -3428,53 +3283,10 @@
             "example": "AAAAbadf00d"
           },
           "name": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            }
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "description": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            },
-            "nullable": true
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "globalPermissions": {
             "type": "array",
@@ -3511,54 +3323,10 @@
             "example": "AAAAbadf00d"
           },
           "name": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            },
-            "nullable": true
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "description": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            },
-            "nullable": true
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "globalPermissions": {
             "type": "array",
@@ -3579,8 +3347,7 @@
       },
       "PlaylistEntryDto": {
         "required": [
-          "id",
-          "name"
+          "id"
         ],
         "type": "object",
         "properties": {
@@ -3591,28 +3358,7 @@
             "example": "AAAAbadf00d"
           },
           "name": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            }
+            "$ref": "#/components/schemas/LocalizedString"
           }
         },
         "additionalProperties": false
@@ -3621,7 +3367,6 @@
         "required": [
           "globalPermissions",
           "id",
-          "name",
           "organizationId"
         ],
         "type": "object",
@@ -3639,53 +3384,10 @@
             "example": "AAAAbadf00d"
           },
           "name": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            }
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "description": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            },
-            "nullable": true
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "globalPermissions": {
             "type": "array",
@@ -3696,93 +3398,22 @@
         },
         "additionalProperties": false
       },
-      "ProjectArtifactAdditionDto": {
-        "required": [
-          "id"
-        ],
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "Human-Readable Identifier Ballast",
-            "format": "hrib",
-            "example": "AAAAbadf00d"
-          },
-          "blueprintSlot": {
-            "type": "string",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
       "ProjectArtifactBlueprintDto": {
         "required": [
-          "arity",
-          "name",
           "shardBlueprints"
         ],
         "type": "object",
         "properties": {
           "name": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            }
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "description": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            },
-            "nullable": true
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "arity": {
             "$ref": "#/components/schemas/ArgumentArity"
           },
           "shardBlueprints": {
-            "required": [
-              "unknown",
-              "video",
-              "image",
-              "subtitles",
-              "blend"
-            ],
             "type": "object",
             "properties": {
               "unknown": {
@@ -3808,9 +3439,7 @@
       },
       "ProjectArtifactDto": {
         "required": [
-          "addedOn",
           "id",
-          "name",
           "shards"
         ],
         "type": "object",
@@ -3822,32 +3451,12 @@
             "example": "AAAAbadf00d"
           },
           "name": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            }
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "addedOn": {
             "type": "string",
-            "format": "date-time"
+            "format": "date-time",
+            "nullable": true
           },
           "blueprintSlot": {
             "type": "string",
@@ -3863,60 +3472,13 @@
         "additionalProperties": false
       },
       "ProjectArtifactShardBlueprintDto": {
-        "required": [
-          "arity",
-          "name"
-        ],
         "type": "object",
         "properties": {
           "name": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            }
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "description": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            },
-            "nullable": true
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "arity": {
             "$ref": "#/components/schemas/ArgumentArity"
@@ -3999,7 +3561,6 @@
           "cast",
           "crew",
           "isLocked",
-          "name",
           "projectGroupId"
         ],
         "type": "object",
@@ -4011,78 +3572,13 @@
             "example": "AAAAbadf00d"
           },
           "name": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            }
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "description": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            },
-            "nullable": true
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "genre": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            },
-            "nullable": true
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "aiUsageDeclaration": {
             "type": "string",
@@ -4113,18 +3609,14 @@
       "ProjectDetailDto": {
         "required": [
           "artifacts",
-          "blueprint",
           "cast",
           "crew",
           "globalPermissions",
           "id",
           "isLocked",
-          "name",
           "projectGroupId",
-          "releasedOn",
           "reviews",
-          "userPermissions",
-          "validationSettings"
+          "userPermissions"
         ],
         "type": "object",
         "properties": {
@@ -4141,106 +3633,19 @@
             "example": "AAAAbadf00d"
           },
           "projectGroupName": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            },
-            "nullable": true
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "validationSettings": {
             "$ref": "#/components/schemas/ProjectValidationSettings"
           },
           "genre": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            },
-            "nullable": true
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "name": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            }
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "description": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            },
-            "nullable": true
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "aiUsageDeclaration": {
             "type": "string",
@@ -4264,7 +3669,8 @@
           },
           "releasedOn": {
             "type": "string",
-            "format": "date-time"
+            "format": "date-time",
+            "nullable": true
           },
           "crew": {
             "type": "array",
@@ -4307,42 +3713,17 @@
         "additionalProperties": false
       },
       "ProjectDiagnosticDto": {
-        "required": [
-          "kind",
-          "message",
-          "validationStage"
-        ],
         "type": "object",
         "properties": {
           "kind": {
-            "$ref": "#/components/schemas/DiagnosticKind"
+            "$ref": "#/components/schemas/DiagnosticSeverity"
           },
           "message": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            }
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "validationStage": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -4360,79 +3741,13 @@
             "example": "AAAAbadf00d"
           },
           "name": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            },
-            "nullable": true
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "description": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            },
-            "nullable": true
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "genre": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            },
-            "nullable": true
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "aiUsageDeclaration": {
             "type": "string",
@@ -4456,10 +3771,10 @@
             },
             "nullable": true
           },
-          "artifacts": {
+          "shards": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/ProjectArtifactAdditionDto"
+              "$ref": "#/components/schemas/ProjectShardAdditionDto"
             },
             "nullable": true
           },
@@ -4474,7 +3789,6 @@
         "required": [
           "deadline",
           "isOpen",
-          "name",
           "organizationId"
         ],
         "type": "object",
@@ -4486,53 +3800,10 @@
             "example": "AAAAbadf00d"
           },
           "name": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            }
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "description": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            },
-            "nullable": true
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "deadline": {
             "type": "string",
@@ -4549,10 +3820,8 @@
           "deadline",
           "id",
           "isOpen",
-          "name",
           "organizationId",
-          "projects",
-          "validationSettings"
+          "projects"
         ],
         "type": "object",
         "properties": {
@@ -4569,53 +3838,10 @@
             "example": "AAAAbadf00d"
           },
           "name": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            }
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "description": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            },
-            "nullable": true
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "deadline": {
             "type": "string",
@@ -4638,8 +3864,7 @@
       },
       "ProjectGroupEditDto": {
         "required": [
-          "id",
-          "validationSettings"
+          "id"
         ],
         "type": "object",
         "properties": {
@@ -4657,54 +3882,10 @@
             "example": "AAAAbadf00d"
           },
           "name": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            },
-            "nullable": true
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "description": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            },
-            "nullable": true
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "deadline": {
             "type": "string",
@@ -4726,7 +3907,6 @@
           "deadline",
           "id",
           "isOpen",
-          "name",
           "organizationId"
         ],
         "type": "object",
@@ -4744,53 +3924,10 @@
             "example": "AAAAbadf00d"
           },
           "name": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            }
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "description": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            },
-            "nullable": true
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "deadline": {
             "type": "string",
@@ -4807,10 +3944,7 @@
           "globalPermissions",
           "id",
           "isLocked",
-          "latestReviewKind",
-          "name",
           "projectGroupId",
-          "releasedOn",
           "userPermissions"
         ],
         "type": "object",
@@ -4828,53 +3962,10 @@
             "example": "AAAAbadf00d"
           },
           "name": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            }
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "description": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            },
-            "nullable": true
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "globalPermissions": {
             "type": "array",
@@ -4892,7 +3983,8 @@
           },
           "releasedOn": {
             "type": "string",
-            "format": "date-time"
+            "format": "date-time",
+            "nullable": true
           },
           "latestReviewKind": {
             "$ref": "#/components/schemas/ReviewKind"
@@ -4913,7 +4005,6 @@
       },
       "ProjectReviewCreationDto": {
         "required": [
-          "kind",
           "projectId",
           "reviewerRole"
         ],
@@ -4932,29 +4023,7 @@
             "type": "string"
           },
           "comment": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            },
-            "nullable": true
+            "$ref": "#/components/schemas/LocalizedString"
           }
         },
         "additionalProperties": false
@@ -4962,7 +4031,6 @@
       "ProjectReviewDto": {
         "required": [
           "addedOn",
-          "kind",
           "reviewerRole"
         ],
         "type": "object",
@@ -4981,33 +4049,30 @@
             "type": "string"
           },
           "comment": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            },
-            "nullable": true
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "addedOn": {
             "type": "string",
             "format": "date-time"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ProjectShardAdditionDto": {
+        "required": [
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Human-Readable Identifier Ballast",
+            "format": "hrib",
+            "example": "AAAAbadf00d"
+          },
+          "blueprintSlot": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -5110,7 +4175,6 @@
       },
       "RoleCreationDto": {
         "required": [
-          "name",
           "organizationId"
         ],
         "type": "object",
@@ -5122,53 +4186,10 @@
             "example": "AAAAbadf00d"
           },
           "name": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            }
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "description": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            },
-            "nullable": true
+            "$ref": "#/components/schemas/LocalizedString"
           }
         },
         "additionalProperties": false
@@ -5177,7 +4198,6 @@
         "required": [
           "createdOn",
           "id",
-          "name",
           "organizationId",
           "permissions"
         ],
@@ -5196,53 +4216,10 @@
             "example": "AAAAbadf00d"
           },
           "name": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            }
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "description": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            },
-            "nullable": true
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "createdOn": {
             "type": "string",
@@ -5262,8 +4239,7 @@
       },
       "RoleEditDto": {
         "required": [
-          "id",
-          "name"
+          "id"
         ],
         "type": "object",
         "properties": {
@@ -5274,53 +4250,10 @@
             "example": "AAAAbadf00d"
           },
           "name": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            }
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "description": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            },
-            "nullable": true
+            "$ref": "#/components/schemas/LocalizedString"
           }
         },
         "additionalProperties": false
@@ -5328,7 +4261,6 @@
       "RoleListDto": {
         "required": [
           "id",
-          "name",
           "organizationId"
         ],
         "type": "object",
@@ -5346,28 +4278,7 @@
             "example": "AAAAbadf00d"
           },
           "name": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            }
+            "$ref": "#/components/schemas/LocalizedString"
           }
         },
         "additionalProperties": false
@@ -5418,7 +4329,6 @@
       "ShardListDto": {
         "required": [
           "id",
-          "kind",
           "variants"
         ],
         "type": "object",

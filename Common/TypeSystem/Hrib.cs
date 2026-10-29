@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Security.Cryptography;
@@ -11,6 +12,7 @@ namespace Kafe;
 /// Human-Readable Identifier Ballast
 /// </summary>
 [JsonConverter(typeof(HribJsonConverter))]
+[TypeConverter(typeof(HribTypeConverter))]
 public record Hrib : IParsable<Hrib>, IInvalidable<Hrib>
 {
     public const string Alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";

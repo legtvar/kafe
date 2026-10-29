@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Kafe.Api.Swagger;
 
-public class RemoveVersionParameter : IOperationFilter
+public class RemoveVersionParameterFilter : IOperationFilter
 {
     public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {

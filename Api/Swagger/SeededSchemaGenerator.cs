@@ -7,21 +7,14 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Kafe.Api.Swagger;
 
-public class SeededSchemaGenerator : ISchemaGenerator
+public class SeededSchemaGenerator(
+    SchemaGeneratorOptions options,
+    SeededSchemaOptions seedOptions,
+    ISerializerDataContractResolver dataContractResolver
+) : ISchemaGenerator
 {
-    private readonly ISchemaGenerator inner;
+    private readonly ISchemaGenerator inner = new SchemaGenerator(options, dataContractResolver);
     private bool isSeeded = false;
-    private readonly SeededSchemaOptions seedOptions;
-
-    public SeededSchemaGenerator(
-        SchemaGeneratorOptions options,
-        SeededSchemaOptions seedOptions,
-        ISerializerDataContractResolver dataContractResolver
-    )
-    {
-        this.seedOptions = seedOptions;
-        inner = new SchemaGenerator(options, dataContractResolver);
-    }
 
     public IOpenApiSchema GenerateSchema(
         Type modelType,

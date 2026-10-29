@@ -26,41 +26,16 @@ public class ConfigureSwaggerOptions(
 
         o.SwaggerDoc("v1", new OpenApiInfo { Title = "KAFE API", Version = "v1" });
         o.SupportNonNullableReferenceTypes();
-        // o.DocumentFilter<KafeComponentFilter>();
         o.SchemaFilter<RequireNonNullablePropertiesSchemaFilter>();
         o.SchemaFilter<OptionalErrorStackTraceSchemaFilter>();
-        // o.MapType<LocalizedString>(() => new OpenApiSchema
-        // {
-        //     Reference = new OpenApiReference
-        //     {
-        //         Type = ReferenceType.Schema,
-        //         Id = nameof(LocalizedString)
-        //     }
-        // });
-        // o.MapType<Hrib>(() => new OpenApiSchema
-        // {
-        //     Reference = new OpenApiReference
-        //     {
-        //         Type = ReferenceType.Schema,
-        //         Id = nameof(Hrib)
-        //     }
-        // });
-        // o.MapType<Permission>(() => new OpenApiSchema
-        // {
-        //     Reference = new OpenApiReference
-        //     {
-        //         Type = ReferenceType.Schema,
-        //         Id = nameof(Permission)
-        //     }
-        // });
-        // o.MapType<KafeType>(() => new OpenApiSchema
-        // {
-        //     Reference = new OpenApiReference
-        //     {
-        //         Type = ReferenceType.Schema,
-        //         Id = nameof(KafeType)
-        //     }
-        // });
+        o.MapType<LocalizedString>(() => new OpenApiSchemaReference(nameof(LocalizedString)));
+        o.MapType<Hrib>(() => new OpenApiSchema
+        {
+            Description = "Human-Readable Identifier Ballast (HRIB)",
+            Type = JsonSchemaType.String,
+            Format = "hrib",
+            Example = JsonValue.Create("AAAAbadf00d")
+        });
         o.MapType<TimeSpan>(() => new OpenApiSchema
             {
                 Type = JsonSchemaType.String,
@@ -72,7 +47,8 @@ public class ConfigureSwaggerOptions(
             enableAnnotationsForInheritance: true,
             enableAnnotationsForPolymorphism: true
         );
-        o.OperationFilter<RemoveVersionParameter>();
+        o.OperationFilter<RemoveVersionParameterFilter>();
+        o.DocumentFilter<RemoveEndpointTagsFilter>();
         o.DocumentFilter<ReplaceVersionWithDocVersion>();
         o.DocInclusionPredicate((version, desc) =>
             {
@@ -122,16 +98,6 @@ public class ConfigureSwaggerOptions(
         };
         seedOptions.Seeds[typeof(LocalizedString)] = lsSchema;
 
-        var hribSchema = new OpenApiSchema
-        {
-            Title = nameof(Hrib),
-            Description = "Human-Readable Identifier Ballast (HRIB)",
-            Type = JsonSchemaType.String,
-            Format = "hrib",
-            Example = JsonValue.Create("AAAAbadf00d")
-        };
-        seedOptions.Seeds[typeof(Hrib)] = hribSchema;
-
         ImmutableArray<JsonNode> permissionEnumValues =
         [
             .. Enum.GetValues<Permission>()
@@ -160,88 +126,5 @@ public class ConfigureSwaggerOptions(
             Example = JsonValue.Create("core:scalar/string")
         };
         seedOptions.Seeds[typeof(KafeType)] = kafeTypeSchema;
-    }
-}
-
-public class KafeComponentFilter(IOptions<DataOptions> dataOptions) : IDocumentFilter
-{
-    public void Apply(OpenApiDocument swaggerDoc, DocumentFilterContext context)
-    {
-        void Register(Type type, OpenApiSchema schema)
-        {
-            swaggerDoc.Components?.Schemas?[type.Name] = schema;
-            if (context.SchemaRepository.TryLookupByType(type, out var existingSchema))
-            {
-                if (existingSchema.Reference.Id != type.Name)
-                {
-                    throw new InvalidOperationException(
-                        $"Cannot re-register schema for type '{type.FullName}'. "
-                        + $"It is already mapped to schema '{existingSchema.Reference.Id}'."
-                    );
-                }
-            }
-            else
-            {
-                context.SchemaRepository.RegisterType(type, type.Name);
-            }
-        }
-
-        var properties = new Dictionary<string, IOpenApiSchema>()
-        {
-            [Const.InvariantCultureCode] = new OpenApiSchema() { Type = JsonSchemaType.String },
-        };
-
-        foreach (var languageCode in dataOptions.Value.Languages.Except([Const.InvariantCultureCode]))
-        {
-            properties[languageCode] = new OpenApiSchema() { Type = JsonSchemaType.String | JsonSchemaType.Null };
-        }
-
-        var lsSchema = new OpenApiSchema
-        {
-            Title = nameof(LocalizedString),
-            Description = "Multilingual string",
-            Type = JsonSchemaType.Object,
-            Properties = properties
-        };
-        Register(typeof(LocalizedString), lsSchema);
-
-        var hribSchema = new OpenApiSchema
-        {
-            Title = nameof(Hrib),
-            Description = "Human-Readable Identifier Ballast (HRIB)",
-            Type = JsonSchemaType.String,
-            Format = "hrib",
-            Example = JsonValue.Create("AAAAbadf00d")
-        };
-        Register(typeof(Hrib), hribSchema);
-
-        ImmutableArray<JsonNode> permissionEnumValues =
-        [
-            .. Enum.GetValues<Permission>()
-                .Where(v => BitOperations.PopCount((uint)v) == 1)
-                .Select(v =>
-                    {
-                        var name = v.ToString();
-                        name = char.ToLowerInvariant(name[0]) + name[1..];
-                        return JsonValue.Create(name);
-                    }
-                )
-        ];
-        var permissionSchema = new OpenApiSchema()
-        {
-            Title = nameof(Permission),
-            Type = JsonSchemaType.String,
-            Enum = permissionEnumValues
-        };
-        Register(typeof(Permission), permissionSchema);
-
-        var kafeTypeSchema = new OpenApiSchema()
-        {
-            Title = nameof(KafeType),
-            Type = JsonSchemaType.String,
-            Format = "kafe-type",
-            Example = JsonValue.Create("core:scalar/string")
-        };
-        Register(typeof(KafeType), kafeTypeSchema);
     }
 }

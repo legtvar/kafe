@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>$(DefaultTargetFrameworks)</TargetFrameworks>
     <Nullable>enable</Nullable>
+    <SixLaborsLicenseFile>../sixlabors.lic</SixLaborsLicenseFile>
   </PropertyGroup>
 
   <ItemGroup>

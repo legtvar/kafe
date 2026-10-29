@@ -10,7 +10,7 @@
     <PackageVersion Include="Duende.IdentityServer" Version="7.0.8" />
     <PackageVersion Include="FFMpegCore" Version="5.3.0" />
     <PackageVersion Include="JunitXml.TestLogger" Version="7.0.2" />
-    <PackageVersion Include="MailKit" Version="4.15.1" />
+    <PackageVersion Include="MailKit" Version="4.18.2" />
     <PackageVersion Include="Marten" Version="8.16.1" />
     <PackageVersion Include="Microsoft.AspNetCore.DataProtection.Abstractions" Version="9.0.10" />
     <PackageVersion Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="9.0.10" />
@@ -27,16 +27,16 @@
     <PackageVersion Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.10" />
     <PackageVersion Include="Microsoft.Extensions.Http" Version="9.0.10" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.0.0" />
-    <PackageVersion Include="MimeKit" Version="4.15.1" />
+    <PackageVersion Include="MimeKit" Version="4.18.2" />
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
     <PackageVersion Include="Npgsql.OpenTelemetry" Version="9.0.4" />
-    <PackageVersion Include="OpenTelemetry" Version="1.13.1" />
-    <PackageVersion Include="OpenTelemetry.Exporter.Console" Version="1.13.1" />
-    <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.13.1" />
-    <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.13.1" />
-    <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.13.0" />
-    <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime" Version="1.13.0" />
-    <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="1.13.0" />
+    <PackageVersion Include="OpenTelemetry" Version="1.20.1" />
+    <PackageVersion Include="OpenTelemetry.Exporter.Console" Version="1.20.1" />
+    <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.20.1" />
+    <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.20.1" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.20.1" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime" Version="1.20.1" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="1.20.1" />
     <PackageVersion Include="Serilog" Version="4.3.0" />
     <PackageVersion Include="RestSharp" Version="112.1.0" />
     <PackageVersion Include="Serilog.AspNetCore" Version="9.0.0" />

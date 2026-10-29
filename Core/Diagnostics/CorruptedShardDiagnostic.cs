@@ -2,7 +2,7 @@
 namespace Kafe.Core.Diagnostics;
 
 public record CorruptedShardDiagnostic(
-    LocalizedString ShardName,
+    string ShardName,
     Hrib ShardId,
     string? Variant = null
 ) : IDiagnosticPayload

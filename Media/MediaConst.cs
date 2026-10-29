@@ -16,7 +16,7 @@ public static class MediaConst
     public static IDiagnosticPayload CreateMissingMediaStreamDiagnostic(
         Type mediaStreamType,
         Hrib shardId,
-        LocalizedString shardName,
+        string shardName,
         string? variant,
         int streamIndex
     )

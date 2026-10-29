@@ -145,10 +145,10 @@ namespace Kafe.Data.Events.Upcasts
         {
             return new ShardCreated(
                 ShardId: oldEvent.ShardId,
-                Name: null,
+                Name: $"{oldEvent.ShardId}{oldEvent.OriginalVariantInfo.FileExtension}",
+                InitialName: null,
                 CreationMethod: oldEvent.CreationMethod,
                 FileLength: oldEvent.OriginalVariantInfo.FileLength,
-                UploadFilename: $"{oldEvent.ShardId}{oldEvent.OriginalVariantInfo.FileExtension}",
                 MimeType: oldEvent.OriginalVariantInfo.MimeType,
                 Payload: new KafeObject(
                     Type: new KafeType("media", "shard", "video", false),
@@ -191,10 +191,10 @@ namespace Kafe.Data.Events.Upcasts
         {
             return new ShardCreated(
                 ShardId: oldEvent.ShardId,
-                Name: null,
+                Name: $"{oldEvent.ShardId}{oldEvent.OriginalVariantInfo.FileExtension}",
+                InitialName: null,
                 CreationMethod: oldEvent.CreationMethod,
                 FileLength: null,
-                UploadFilename: $"{oldEvent.ShardId}{oldEvent.OriginalVariantInfo.FileExtension}",
                 MimeType: oldEvent.OriginalVariantInfo.MimeType,
                 Payload: new KafeObject(
                     Type: new KafeType("media", "shard", "image", false),
@@ -237,10 +237,10 @@ namespace Kafe.Data.Events.Upcasts
         {
             return new ShardCreated(
                 ShardId: oldEvent.ShardId,
-                Name: null,
+                Name: $"{oldEvent.ShardId}{oldEvent.OriginalVariantInfo.FileExtension}",
+                InitialName: null,
                 CreationMethod: oldEvent.CreationMethod,
                 FileLength: null,
-                UploadFilename: $"{oldEvent.ShardId}{oldEvent.OriginalVariantInfo.FileExtension}",
                 MimeType: oldEvent.OriginalVariantInfo.MimeType,
                 Payload: new KafeObject(
                     Type: new KafeType("media", "shard", "subtitles", false),
@@ -284,10 +284,10 @@ namespace Kafe.Data.Events.Upcasts
         {
             return new ShardCreated(
                 ShardId: oldEvent.ShardId,
-                Name: null,
+                Name: $"{oldEvent.ShardId}{oldEvent.OriginalVariantInfo.FileExtension}",
+                InitialName: null,
                 CreationMethod: oldEvent.CreationMethod,
                 FileLength: null,
-                UploadFilename: $"{oldEvent.ShardId}{oldEvent.OriginalVariantInfo.FileExtension}",
                 MimeType: oldEvent.OriginalVariantInfo.MimeType,
                 Payload: new KafeObject(
                     Type: new KafeType("media", "shard", "blend", false),

@@ -4,7 +4,7 @@ namespace Kafe.Media.Diagnostics;
 
 public record AudioCodecNotAllowedDiagnostic(
     Hrib ShardId,
-    LocalizedString ShardName,
+    string ShardName,
     string Codec,
     ImmutableArray<string> AllowedCodecs,
     int StreamIndex

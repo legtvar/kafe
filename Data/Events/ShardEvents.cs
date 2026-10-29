@@ -4,10 +4,10 @@ namespace Kafe.Data.Events;
 
 public record ShardCreated(
     [Hrib] string ShardId,
-    LocalizedString? Name,
+    string Name,
+    string? InitialName,
     CreationMethod CreationMethod,
     long? FileLength,
-    string? UploadFilename,
     string? MimeType,
     KafeObject Payload
 );
@@ -20,9 +20,8 @@ public record ShardPayloadSet(
 
 public record ShardInfoChanged(
     [Hrib] string ShardId,
-    LocalizedString? Name,
+    string? Name,
     long? FileLength,
-    string? UploadFilename,
     string? MimeType
 );
 

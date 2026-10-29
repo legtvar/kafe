@@ -4,7 +4,7 @@ namespace Kafe.Media.Diagnostics;
 
 public record VideoFramerateNotAllowedDiagnostic(
     Hrib ShardId,
-    LocalizedString ShardName,
+    string ShardName,
     double Framerate,
     ImmutableArray<double> AllowedFramerates,
     int StreamIndex

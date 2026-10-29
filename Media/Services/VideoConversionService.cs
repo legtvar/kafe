@@ -329,10 +329,7 @@ public class VideoConversionService(
 
         logger.LogInformation("Succeeded.");
 
-        var generatedShardName = LocalizedString.Concat(
-            shardErr.Value.Name,
-            LocalizedString.CreateInvariant($"({conversion.Variant})")
-        );
+        var generatedShardName = $"{shardErr.Value.Name}_{conversion.Variant}";
 
         var generatedShardErr = await shardService.Upsert(
             ShardInfo.Create(generatedShardName) with

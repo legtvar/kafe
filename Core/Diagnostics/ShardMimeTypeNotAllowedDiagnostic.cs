@@ -4,7 +4,7 @@ namespace Kafe.Core.Diagnostics;
 
 public record ShardMimeTypeNotAllowedDiagnostic(
     Hrib ShardId,
-    LocalizedString ShardName,
+    string ShardName,
     string MimeType,
     ImmutableArray<string> AllowedMimeTypes
 ) : IDiagnosticPayload

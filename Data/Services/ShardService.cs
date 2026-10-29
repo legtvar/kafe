@@ -69,10 +69,10 @@ public class ShardService(
         var created = new ShardCreated(
             ShardId: shardId.ToString(),
             // TODO: Allows setting a shard's name
-            Name: null,
+            Name: uploadFilename ?? $"{shardId}{fileExtension}",
+            InitialName: uploadFilename,
             CreationMethod: CreationMethod.Api,
             FileLength: stream.Length,
-            UploadFilename: uploadFilename,
             MimeType: analysis.MimeType ?? mimeType,
             Payload: kafeObjectFactory.Wrap(analysis.Payload)
         );
@@ -107,9 +107,9 @@ public class ShardService(
             var created = new ShardCreated(
                 ShardId: id.ToString(),
                 Name: shard.Name,
+                InitialName: shard.InitialName,
                 CreationMethod: CreationMethod.Api,
                 FileLength: shard.FileLength,
-                UploadFilename: shard.UploadFilename,
                 MimeType: shard.MimeType,
                 Payload: shard.Payload
             );
@@ -130,14 +130,12 @@ public class ShardService(
 
         var infoChanged = new ShardInfoChanged(
             ShardId: id.ToString(),
-            Name: Const.PreferNew<LocalizedString>(existing.Name, shard.Name),
+            Name: Const.PreferNew(existing.Name, shard.Name),
             FileLength: Const.PreferNew(existing.FileLength, shard.FileLength),
-            UploadFilename: Const.PreferNew(existing.UploadFilename, shard.UploadFilename),
             MimeType: Const.PreferNew(existing.MimeType, shard.MimeType)
         );
 
-        if (infoChanged.Name != null || infoChanged.FileLength != null || infoChanged.UploadFilename != null
-            || infoChanged.MimeType != null)
+        if (infoChanged.Name != null || infoChanged.FileLength != null || infoChanged.MimeType != null)
         {
             eventStream.AppendOne(infoChanged);
         }

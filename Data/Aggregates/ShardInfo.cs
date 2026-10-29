@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text.Json.Serialization;
 using JasperFx.Events;
 using Kafe.Data.Events;
-using Marten.Events;
 using Marten.Events.Aggregation;
 using Marten.Events.CodeGeneration;
 
@@ -14,12 +13,12 @@ namespace Kafe.Data.Aggregates;
 public record ShardInfo(
     [Hrib]
     string Id,
-    LocalizedString Name,
+    string Name,
+    string? InitialName,
     CreationMethod CreationMethod,
     DateTimeOffset CreatedAt,
     string MimeType,
     long FileLength,
-    string? UploadFilename,
     KafeObject Payload,
     ImmutableHashSet<ShardLink> Links
 ) : IShard
@@ -28,11 +27,11 @@ public record ShardInfo(
 
     public ShardInfo() : this(
         Id: Hrib.InvalidValue,
-        Name: LocalizedString.Empty,
+        Name: string.Empty,
+        InitialName: null,
         CreationMethod: CreationMethod.Unknown,
         CreatedAt: default,
         FileLength: -1,
-        UploadFilename: null,
         MimeType: Const.InvalidMimeType,
         Payload: KafeObject.Invalid,
         Links: []
@@ -41,7 +40,7 @@ public record ShardInfo(
     }
 
     [MartenIgnore]
-    public static ShardInfo Create(LocalizedString name)
+    public static ShardInfo Create(string name)
     {
         return new ShardInfo()
         {
@@ -81,11 +80,11 @@ public class ShardInfoProjection(
     {
         return new(
             Id: e.Data.ShardId,
-            Name: e.Data.Name ?? LocalizedString.Empty,
+            Name: e.Data.Name,
+            InitialName: e.Data.InitialName,
             CreationMethod: e.Data.CreationMethod,
             CreatedAt: e.Timestamp,
             FileLength: e.Data.FileLength ?? -1,
-            UploadFilename: e.Data.UploadFilename,
             MimeType: e.Data.MimeType ?? Const.InvalidMimeType,
             Payload: e.Data.Payload,
             Links: []
@@ -98,7 +97,6 @@ public class ShardInfoProjection(
         {
             Name = e.Name ?? s.Name,
             FileLength = e.FileLength ?? s.FileLength,
-            UploadFilename = e.UploadFilename ?? s.UploadFilename,
             MimeType = e.MimeType ?? s.MimeType
         };
     }

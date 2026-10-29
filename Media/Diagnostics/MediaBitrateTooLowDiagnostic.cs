@@ -3,7 +3,7 @@ using System;
 namespace Kafe.Media.Diagnostics;
 
 public record MediaBitrateTooLowDiagnostic(
-    LocalizedString ShardName,
+    string ShardName,
     Hrib ShardId,
     string? Variant,
     int Min

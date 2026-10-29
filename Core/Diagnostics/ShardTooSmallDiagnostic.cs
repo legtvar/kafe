@@ -1,7 +1,7 @@
 namespace Kafe.Core.Diagnostics;
 
 public record ShardTooSmallDiagnostic(
-    LocalizedString ShardName,
+    string ShardName,
     Hrib ShardId,
     int MinLength,
     string? Variant = null

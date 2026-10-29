@@ -2,7 +2,7 @@
 namespace Kafe.Core.Diagnostics;
 
 public record MissingShardVariantDiagnostic(
-    LocalizedString ShardName,
+    string ShardName,
     Hrib ShardId,
     string Variant
 ) : IDiagnosticPayload

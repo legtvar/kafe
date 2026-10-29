@@ -218,7 +218,7 @@ public class ProjectDetailEndpoint(
                 compatShards.Add(
                     new ProjectArtifactDto(
                         Id: shard.Id,
-                        Name: shard.Name,
+                        Name: LocalizedString.CreateInvariant(shard.Name),
                         AddedOn: null,
                         BlueprintSlot: blueprintSlot,
                         Shards: mockShards.ToImmutable()

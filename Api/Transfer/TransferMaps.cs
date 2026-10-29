@@ -350,7 +350,7 @@ public static class TransferMaps
                 Id: data.Id,
                 Kind: ShardKind.Blend,
                 ArtifactId: Hrib.Empty,
-                FileName: data.UploadFilename,
+                FileName: data.Name,
                 Variants: ImmutableDictionary.CreateRange(
                     [
                         new KeyValuePair<string, BlendDto>(

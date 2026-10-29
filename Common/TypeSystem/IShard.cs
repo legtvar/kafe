@@ -18,7 +18,7 @@ public interface IShard : IEntity
         (Const.CzechCulture, "Střípek")
     );
 
-    LocalizedString Name { get; }
+    string Name { get; }
 
     KafeObject Payload { get; }
 

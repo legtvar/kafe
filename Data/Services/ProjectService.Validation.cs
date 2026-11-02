@@ -910,6 +910,26 @@ public partial class ProjectService
         )
     );
 
+    public static readonly Diagnostic TooFewP5Projects = new Diagnostic(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: FileStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, "A p5.js project is required."),
+            (Const.CzechCulture, "Je vyžadován p5.js projekt."),
+            (Const.SlovakCulture, "Je vyžadovaný p5.js projekt.")
+        )
+    );
+
+    public static readonly Diagnostic TooFewVideoPresentations = new Diagnostic(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: FileStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, "A video presentation is required."),
+            (Const.CzechCulture, "Je vyžadována video prezentace."),
+            (Const.SlovakCulture, "Je vyžadovaná video prezentácia.")
+        )
+    );
+
     public ProjectReport ValidateBasicInfo(ProjectInfo project, ProjectValidationSettings? settings = null)
     {
         settings = ProjectValidationSettings.Merge(settings, ProjectValidationSettings.Default);
@@ -1082,8 +1102,8 @@ public partial class ProjectService
             diagnostics.Add(MissingDramaturgyReview);
         }
 
-        if ((project.Authors.Count(a => a.Kind == ProjectAuthorKind.Crew) < 1 && group.OrganizationId != "mate-fimuni")
-            || (group.OrganizationId == "mate-fimuni" && project.OwnerId is null))
+        if ((project.Authors.Count(a => a.Kind == ProjectAuthorKind.Crew) < 1 && group.OrganizationId != "mate-fimuni" && group.OrganizationId != "agua-fimuni")
+            || ((group.OrganizationId == "mate-fimuni" || group.OrganizationId == "agua-fimuni") && project.OwnerId is null))
         {
             diagnostics.Add(MissingCrew);
         }
@@ -1380,6 +1400,44 @@ public partial class ProjectService
             else if (textureArtifacts.Length > artifactBlueprints[Const.TextureBlueprintSlot].Arity.Max)
             {
                 diagnostics.Add(TooManyTextures);
+            }
+        }
+
+        if (artifactBlueprints!.GetValueOrDefault(Const.GenerativeProjectBlueprintSlot, null) is not null)
+        {
+            var generativeArtifacts = artifacts.Where(a => a.projectArtifact.BlueprintSlot == Const.GenerativeProjectBlueprintSlot)
+                .ToImmutableArray();
+
+            if (generativeArtifacts.Length < artifactBlueprints[Const.GenerativeProjectBlueprintSlot].Arity.Min)
+            {
+                diagnostics.Add(TooFewP5Projects);
+                diagnostics.Add(TooFewCoverPhotos);
+            }
+            else
+            {
+                if (!generativeArtifacts.Single().info.Shards.Any(s => s.Kind == ShardKind.Generative))
+                {
+                    diagnostics.Add(TooFewP5Projects);
+                }
+                if (!generativeArtifacts.Single().info.Shards.Any(s => s.Kind == ShardKind.Image))
+                {
+                    diagnostics.Add(TooFewCoverPhotos);
+                }
+            }
+        }
+
+        if (artifactBlueprints!.GetValueOrDefault(Const.VideoPresentationBlueprintSlot, null) is not null)
+        {
+            var presentationArtifacts = artifacts.Where(a => a.projectArtifact.BlueprintSlot == Const.VideoPresentationBlueprintSlot)
+                .ToImmutableArray();
+
+            if (presentationArtifacts.Length < artifactBlueprints[Const.VideoPresentationBlueprintSlot].Arity.Min)
+            {
+                diagnostics.Add(TooFewVideoPresentations);
+            }
+            else if (presentationArtifacts.Single().info.Shards.Length < artifactBlueprints[Const.VideoPresentationBlueprintSlot].Arity.Min)
+            {
+                diagnostics.Add(TooFewVideoPresentations);
             }
         }
 

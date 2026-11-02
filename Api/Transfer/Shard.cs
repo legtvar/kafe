@@ -46,6 +46,13 @@ public record BlendShardDetailDto(
     ImmutableDictionary<string, BlendDto> Variants
 ) : ShardDetailBaseDto(Id, Kind, ArtifactId);
 
+public record GenerativeShardDetailDto(
+    Hrib Id,
+    ShardKind Kind,
+    Hrib ArtifactId,
+    ImmutableDictionary<string, GenerativeDto> Variants
+) : ShardDetailBaseDto(Id, Kind, ArtifactId);
+
 public record ShardCreationDto(
     ShardKind Kind,
     Hrib ArtifactId);

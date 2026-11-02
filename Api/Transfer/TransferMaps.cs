@@ -39,6 +39,8 @@ public static class TransferMaps
         {
             case "mate-fimuni":
                 return TemporaryMateProjectBlueprintMockup;
+            case "agua-fimuni":
+                return TemporaryAguaProjectBlueprintMockup;
             case "lemmafimuni":
                 return TemporaryLemmaProjectBlueprintMockup;
             default:
@@ -54,6 +56,9 @@ public static class TransferMaps
 
     public static ProjectBlueprintDto TemporaryMateProjectBlueprintMockup =
         ToProjectBlueprintDto(ProjectBlueprint.TemporaryMateProjectBlueprint);
+
+    public static ProjectBlueprintDto TemporaryAguaProjectBlueprintMockup =
+        ToProjectBlueprintDto(ProjectBlueprint.TemporaryAguaProjectBlueprint);
 
     public static ProjectListDto ToProjectListDto(ProjectInfo data, Permission userPermission = Permission.None)
     {
@@ -285,6 +290,7 @@ public static class TransferMaps
             ImageShardInfo i => ToImageShardDetailDto(i),
             SubtitlesShardInfo s => ToSubtitlesShardDetailDto(s),
             BlendShardInfo b => ToBlendShardDetailDto(b),
+            GenerativeShardInfo g => ToGenerativeShardDetailDto(g),
             _ => throw new NotSupportedException($"Shards of '{data.GetType()}' are not supported.")
         };
     }
@@ -335,6 +341,23 @@ public static class TransferMaps
             Datablock: data.Datablock,
             Message: data.Message,
             Traceback: data.Traceback);
+    }
+
+    public static GenerativeShardDetailDto ToGenerativeShardDetailDto(GenerativeShardInfo data)
+    {
+        return new GenerativeShardDetailDto(
+            Id: data.Id,
+            Kind: data.Kind,
+            ArtifactId: data.ArtifactId,
+            Variants: data.Variants.ToImmutableDictionary(p => p.Key, p => ToGenerativeDto(p.Value)));
+    }
+
+    public static GenerativeDto ToGenerativeDto(GenerativeInfo data)
+    {
+        return new GenerativeDto(
+            FileExtension: data.FileExtension,
+            MimeType: data.MimeType
+        );
     }
 
 

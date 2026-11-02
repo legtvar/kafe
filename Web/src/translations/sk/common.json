@@ -254,6 +254,7 @@
         "tech": "Posudok technika",
         "visual": "Posudok grafika",
         "dramaturgy": "Posudok z dramaturgie",
+        "teacher": "Posudok učiteľa",
         "unknown": "Neznámy hodnotiteľ",
         "placeholder": "-- vyberte rolu --"
       },
@@ -319,6 +320,11 @@
       "ok": "Projekt prešiel kontrolou grafikom",
       "nok": "Projekt neprešiel kontrolou grafikom",
       "unknown": "Projekt ešte nebol posúdený grafikom"
+    },
+    "teacher": {
+      "ok": "Projekt prešiel kontrolou učiteľom",
+      "nok": "Projekt neprešiel kontrolou učiteľom",
+      "unknown": "Projekt ešte nebol posúdený učiteľom"
     },
     "pigeons-test": {
       "ok": "Projekt prešiel automatizovanými testami PIGEOnS",

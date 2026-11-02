@@ -438,12 +438,79 @@ public record ProjectBlueprint
             )
     };
 
+    //  AGUA PROJECT BLUEPRINT
+    public static readonly ProjectBlueprint TemporaryAguaProjectBlueprint = new ProjectBlueprint{
+        RequiredReviewers = [Const.TeacherReviewer],
+        ArtifactBlueprints = ImmutableDictionary<string, ProjectArtifactBlueprint>.Empty
+        .Add(Const.GenerativeProjectBlueprintSlot,
+                new ProjectArtifactBlueprint
+                {
+                    Name = LocalizedString.Create(
+                        (Const.InvariantCulture, "P5.js project"),
+                        (Const.CzechCulture, "P5.js projekt"),
+                        (Const.SlovakCulture, "P5.js projekt")
+                    ),
+                    Description = null,
+                    Arity = ArgumentArity.ExactlyOne,
+                    ShardBlueprints = ImmutableDictionary<ShardKind, ProjectArtifactShardBlueprint>.Empty
+                        .Add(ShardKind.Generative,
+                            new ProjectArtifactShardBlueprint
+                            {
+                                Name = LocalizedString.Create(
+                                    (Const.InvariantCulture, "An archive containing the project"),
+                                    (Const.CzechCulture, "Archiv s projektem"),
+                                    (Const.SlovakCulture, "Archív s projektom")
+                                ),
+                                Description = null,
+                                Arity = ArgumentArity.ExactlyOne
+                            })
+                        .Add(ShardKind.Image,
+                            new ProjectArtifactShardBlueprint
+                            {
+                                Name = LocalizedString.Create(
+                                    (Const.InvariantCulture, "An annotation screenshot"),
+                                    (Const.CzechCulture, "Anotační fotografie"),
+                                    (Const.SlovakCulture, "Anotačná fotografia")
+                                ),
+                                Description = null,
+                                Arity = ArgumentArity.OneOrMore
+                            })
+                }
+            )
+            .Add(Const.VideoPresentationBlueprintSlot,
+                new ProjectArtifactBlueprint
+                {
+                    Name = LocalizedString.Create(
+                        (Const.InvariantCulture, "Video presentation"),
+                        (Const.CzechCulture, "Video prezentace"),
+                        (Const.SlovakCulture, "Video prezentácia")
+                    ),
+                    Description = null,
+                    Arity = ArgumentArity.ExactlyOne,
+                    ShardBlueprints = ImmutableDictionary<ShardKind, ProjectArtifactShardBlueprint>.Empty
+                        .Add(ShardKind.Video,
+                            new ProjectArtifactShardBlueprint
+                            {
+                                Name = LocalizedString.Create(
+                                    (Const.InvariantCulture, "Video presentation file"),
+                                    (Const.CzechCulture, "Soubor s video prezentací"),
+                                    (Const.SlovakCulture, "Súbor s video prezentáciou")
+                                ),
+                                Description = null,
+                                Arity = ArgumentArity.ExactlyOne
+                            })
+                }
+            )
+    };
+
     public static ProjectBlueprint GetProjectBlueprintByOrgId(string id)
     {
         switch (id)
         {
             case "mate-fimuni":
                 return ProjectBlueprint.TemporaryMateProjectBlueprint;
+            case "agua-fimuni":
+                return ProjectBlueprint.TemporaryAguaProjectBlueprint;
             case "lemmafimuni":
                 return ProjectBlueprint.TemporaryLemmaProjectBlueprint;
             default:

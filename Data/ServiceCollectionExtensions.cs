@@ -71,6 +71,7 @@ public static class ServiceCollectionExtensions
             mo.Projections.Add<ImageShardInfoProjection>(ProjectionLifecycle.Inline);
             mo.Projections.Add<SubtitlesShardInfoProjection>(ProjectionLifecycle.Inline);
             mo.Projections.Add<BlendShardInfoProjection>(ProjectionLifecycle.Inline);
+            mo.Projections.Add<GenerativeShardInfoProjection>(ProjectionLifecycle.Inline);
             mo.Projections.Add<NotificationInfoProjection>(ProjectionLifecycle.Inline);
             mo.Projections.Add<PlaylistInfoProjection>(ProjectionLifecycle.Inline);
             mo.Projections.Add<ProjectInfoProjection>(ProjectionLifecycle.Inline);

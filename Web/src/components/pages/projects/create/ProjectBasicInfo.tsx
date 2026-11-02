@@ -14,6 +14,7 @@ import { SendAPI } from '../../../utils/SendAPI';
 import { TextareaLimited } from '../../../utils/TextareaLimited';
 import { ProjectBasicInfoForm } from './ProjectBasicInfoForm';
 import { MateProjectBasicInfoForm } from './MateProjectBasicInfoForm';
+import { AguaProjectBasicInfoForm } from './AguaProjectBasicInfoForm';
 import { currentOrganizationIdMapper } from '../../../../data/serialize/currentOrganizationIdMapper';
 import { components } from '@/schemas/api';
 
@@ -73,6 +74,14 @@ export function ProjectBasicInfo(props: IProjectBasicInfoProps) {
                 update={update}
                 noSelfSubmit={props.noSelfSubmit}
                 />
+            ) : (orgId === 'agua-fimuni' ? (
+                <AguaProjectBasicInfoForm
+                project={project}
+                onSubmit={onSubmit}
+                status={status}
+                update={update}
+                noSelfSubmit={props.noSelfSubmit}
+                />
             ) : (
                 <ProjectBasicInfoForm
                 project={project}
@@ -81,7 +90,7 @@ export function ProjectBasicInfo(props: IProjectBasicInfoProps) {
                 update={update}
                 noSelfSubmit={props.noSelfSubmit}
                 />
-            )
+            ))
             }
         </SendAPI>
     );

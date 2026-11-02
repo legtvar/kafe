@@ -6,5 +6,6 @@ public enum ShardKind
     Video = 1,
     Image = 2,
     Subtitles = 3,
-    Blend = 4
+    Blend = 4,
+    Generative = 5
 }

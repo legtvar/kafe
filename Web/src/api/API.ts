@@ -241,6 +241,12 @@ export class API {
                     withCredentials: true,
                 });
             },
+            async getZipContent(id: string) {
+                return await api.client.get(`shard-download/${id}`, {
+                    withCredentials: true,
+                    responseType: 'blob',
+                });
+            },
         };
     }
 

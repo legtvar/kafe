@@ -36,6 +36,7 @@ public record StorageOptions
         [ShardKind.Video] = "videos",
         [ShardKind.Subtitles] = "subtitles",
         [ShardKind.Blend] = "blends",
+        [ShardKind.Generative] = "generatives",
         [ShardKind.Unknown] = "unknown"
     };
 }

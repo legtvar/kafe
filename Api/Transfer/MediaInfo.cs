@@ -64,3 +64,8 @@ public record PigeonsTestInfoDto(
     string? Message,
     string? Traceback
 );
+
+public record GenerativeDto(
+    string FileExtension,
+    string MimeType
+);

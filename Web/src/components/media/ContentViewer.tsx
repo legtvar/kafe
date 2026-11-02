@@ -7,6 +7,9 @@ import { Artifact } from '../../data/Artifact';
 import { Shard } from '../../data/Shard';
 import { useApi } from '../../hooks/Caffeine';
 import { Video } from './Player/Video';
+import { GenerativeScript } from './GenerativeScript';
+import JSZip from 'jszip';
+import { useState } from 'react';
 
 interface IContentViewerProps {
     artifact: Artifact;
@@ -18,7 +21,7 @@ interface IContentViewerProps {
     width?: string;
 }
 
-type ContentType = 'Video' | 'Image' | 'Unknown' | 'Blend';
+type ContentType = 'Video' | 'Image' | 'Unknown' | 'Blend' | 'Generative';
 
 export function ContentViewer({
     artifact,
@@ -36,6 +39,8 @@ export function ContentViewer({
     // Determine the type of the content
     if (artifact.shards.some((shard) => shard.kind === 'video')) {
         type = 'Video';
+    } else if (artifact.shards.some((shard) => shard.kind === 'generative')) {
+        type = 'Generative';
     } else if (artifact.shards.some((shard) => shard.kind === 'image')) {
         type = 'Image';
     } else if (artifact.shards.some((shard) => shard.kind === 'blend')) {
@@ -117,6 +122,38 @@ export function ContentViewer({
                             </Text>
                         )}
                     </VStack>
+                );
+            case 'Generative':
+                const generative = artifact.shards.filter((shard) => shard.kind === 'generative')[0];
+                const [code, setCode] = useState("");
+                api.shards.getZipContent(generative.id).then(function (response) {
+                    const zipBlob: Blob = response.data;
+                    JSZip.loadAsync(zipBlob).then(function (archive) {
+                        for (const [path, entry] of Object.entries(archive.files)) {
+                            if (entry.dir) continue;
+                            if (path.endsWith("sketch.js")) entry.async('string').then(function (content) {setCode(content)})
+                        }
+                    });
+                });
+                return (
+                    <GenerativeScript code={code}/>
+                    /*<VStack spacing={6}>
+                        {artifact.shards.map((shard) => (
+                            <Button
+                                key={shard.id}
+                                as={'a'}
+                                href={api.shards.defaultStreamUrl(shard.id)}
+                                leftIcon={<AiOutlineDownload />}
+                            >
+                                {t('generic.download')} {t('generic.file')} {shard.id}
+                            </Button>
+                        ))}
+                        {artifact.shards.length === 0 && (
+                            <Text color="gray.500" fontStyle="italic">
+                                {t('artifact.noContent').toString()}
+                            </Text>
+                        )}
+                    </VStack>*/
                 );
         }
     }

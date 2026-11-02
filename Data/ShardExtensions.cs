@@ -18,6 +18,7 @@ public static class ShardExtensions
             ShardKind.Image => typeof(ImageShardInfo),
             ShardKind.Subtitles => typeof(SubtitlesShardInfo),
             ShardKind.Blend => typeof(BlendShardInfo),
+            ShardKind.Generative => typeof(GenerativeShardInfo),
             _ => throw new NotSupportedException($"ShardKind '{value}' does not have an aggregate type assigned by " +
                 "this method. This could be an oversight.")
         };
@@ -31,6 +32,7 @@ public static class ShardExtensions
             IImageShardEvent => ShardKind.Image,
             ISubtitlesShardEvent => ShardKind.Subtitles,
             IBlendShardEvent => ShardKind.Blend,
+            IGenerativeShardEvent => ShardKind.Generative,
             _ => ShardKind.Unknown
         };
     }

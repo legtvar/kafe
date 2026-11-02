@@ -12,6 +12,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Net.Http;
 using System.Net.Http.Json;
+using SharpCompress.Readers;
+using SharpCompress.Writers;
+using SharpCompress.Common;
 
 namespace Kafe.Data.Services;
 
@@ -55,6 +58,7 @@ public class ShardService
             ShardKind.Image => await db.LoadAsync<ImageShardInfo>(id.ToString(), token),
             ShardKind.Subtitles => await db.LoadAsync<SubtitlesShardInfo>(id.ToString(), token),
             ShardKind.Blend => await db.LoadAsync<BlendShardInfo>(id.ToString(), token),
+            ShardKind.Generative => await db.LoadAsync<GenerativeShardInfo>(id.ToString(), token),
             _ => throw new NotSupportedException($"ShardKind '{shardKind}' is not supported.")
         };
         return shard;
@@ -82,6 +86,7 @@ public class ShardService
             ShardKind.Image => await CreateImage(artifactId, stream, shardId, token),
             ShardKind.Subtitles => await CreateSubtitles(artifactId, stream, shardId, token),
             ShardKind.Blend => await CreateBlend(artifactId, fileName, stream, shardId, token),
+            ShardKind.Generative => await CreateGenerative(artifactId, stream, shardId, token),
             _ => throw new NotSupportedException($"Creation of '{kind}' shards is not supported yet.")
         };
     }
@@ -364,6 +369,81 @@ public class ShardService
         return await UpdateBlend(shardId, content.ToBlendInfo(), ct);
     }
 
+    private async Task<Hrib?> CreateGenerative(
+        Hrib artifactId,
+        Stream generativeStream,
+        Hrib? shardId = null,
+        CancellationToken token = default
+    )
+    {
+        generativeStream.Seek(0, SeekOrigin.Begin);
+
+        using var unifiedStream = new MemoryStream();
+        if (!await TryProcessArchive(generativeStream, unifiedStream, token))
+        {
+            throw new InvalidOperationException("The project has an unsuppported format.");
+        }
+        unifiedStream.Seek(0, SeekOrigin.Begin);
+
+        var info = new GenerativeInfo();
+
+        shardId ??= Hrib.Create();
+
+        var created = new GenerativeShardCreated(
+            ShardId: shardId.ToString(),
+            CreationMethod: CreationMethod.Api,
+            ArtifactId: artifactId.ToString(),
+            OriginalVariantInfo: info
+        );
+
+        if (!await storageService.TryStoreShard(
+                ShardKind.Generative,
+                created.ShardId,
+                unifiedStream,
+                Const.OriginalShardVariant,
+                Const.ZipFileExtension,
+                token
+            ))
+        {
+            throw new InvalidOperationException("The project could not be stored.");
+        }
+
+        db.Events.KafeStartStream<GenerativeShardInfo>(created.ShardId, created);
+
+        await db.SaveChangesAsync(token);
+        return created.ShardId;
+    }
+
+    public async Task<bool> TryProcessArchive(
+        Stream source,
+        Stream destination,
+        CancellationToken token
+    )
+    {
+        bool foundSketch = false;
+        try
+        {
+            await using var writer = await WriterFactory.OpenAsyncWriter(destination, ArchiveType.Zip, new WriterOptions(CompressionType.Deflate) , cancellationToken: token);
+            await using var reader = await ReaderFactory.OpenAsyncReader(source, cancellationToken: token);
+
+            while (await reader.MoveToNextEntryAsync(token))
+            {
+                if (!reader.Entry.IsDirectory && reader.Entry.Key is not null)
+                {
+                    if (reader.Entry.Key.EndsWith("sketch.js")) foundSketch = true;
+                    await using var entry = await reader.OpenEntryStreamAsync(token);
+                    await writer.WriteAsync(reader.Entry.Key, entry, token);
+                }
+            }
+        }
+        catch
+        {
+            return false;
+        }
+
+        return foundSketch;
+    }
+
     public async Task<Stream> OpenStream(Hrib id, string? variant, CancellationToken token = default)
     {
         variant = SanitizeVariantName(variant);
@@ -436,6 +516,14 @@ public class ShardService
                 )
                 : null,
             ShardKind.Blend => ((BlendShardInfo)shard).Variants.TryGetValue(variant, out var media)
+                ? new VariantInfo(
+                    ShardId: shard.Id,
+                    Variant: variant,
+                    FileExtension: media.FileExtension,
+                    MimeType: media.MimeType
+                )
+                : null,
+            ShardKind.Generative => ((GenerativeShardInfo)shard).Variants.TryGetValue(variant, out var media)
                 ? new VariantInfo(
                     ShardId: shard.Id,
                     Variant: variant,

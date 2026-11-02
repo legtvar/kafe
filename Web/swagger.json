@@ -3781,7 +3781,8 @@
               "video",
               "image",
               "subtitles",
-              "blend"
+              "blend",
+              "generative"
             ],
             "type": "object",
             "properties": {
@@ -3798,6 +3799,9 @@
                 "$ref": "#/components/schemas/ProjectArtifactShardBlueprintDto"
               },
               "blend": {
+                "$ref": "#/components/schemas/ProjectArtifactShardBlueprintDto"
+              },
+              "generative": {
                 "$ref": "#/components/schemas/ProjectArtifactShardBlueprintDto"
               }
             },
@@ -5411,7 +5415,8 @@
           "video",
           "image",
           "subtitles",
-          "blend"
+          "blend",
+          "generative"
         ],
         "type": "string"
       },

@@ -254,6 +254,7 @@
         "tech": "Technician review",
         "visual": "Visual review",
         "dramaturgy": "Dramaturgy review",
+        "teacher": "Teacher review",
         "unknown": "Unknown reviewer",
         "placeholder": "-- select a role --"
       },
@@ -319,6 +320,11 @@
       "ok": "The project passed the graphic designer's check",
       "nok": "The project did not pass the graphic designer's check",
       "unknown": "The project has not yet received a review from a designer"
+    },
+    "teacher": {
+      "ok": "The project passed the teacher's check",
+      "nok": "The project did not pass the teacher's check",
+      "unknown": "The project has not yet received a review from a teacher"
     },
     "pigeons-test": {
       "ok": "The project passed the PIGEOnS automated tests",

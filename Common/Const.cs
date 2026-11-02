@@ -18,6 +18,7 @@ public static class Const
     public const string TechReviewer = "tech";
     public const string VisualReviewer = "visual";
     public const string DramaturgyReviewer = "dramaturgy";
+    public const string TeacherReviewer = "teacher";
 
     public const string FilmBlueprintSlot = "film";
     public const string VideoAnnotationBlueprintSlot = "video-annotation";
@@ -49,6 +50,11 @@ public static class Const
     public const string TextureBlueprintSlot = "texture";
     public const string RenderedImageBlueprintSlot = "rendered-image";
     public const string RenderedAnimationBlueprintSlot = "rendered-animation";
+
+    public const string VideoPresentationBlueprintSlot = "video-presentation";
+    public const string GenerativeProjectBlueprintSlot = "generative";
+    public const string ZipFileExtension = ".zip";
+    public const string ZipMimeType = "application/zip";
 
     public const string InvariantCultureCode = "iv";
     public static readonly CultureInfo InvariantCulture = CultureInfo.InvariantCulture;

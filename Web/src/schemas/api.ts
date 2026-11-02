@@ -1505,6 +1505,7 @@ export interface components {
         image: components["schemas"]["ProjectArtifactShardBlueprintDto"];
         subtitles: components["schemas"]["ProjectArtifactShardBlueprintDto"];
         blend: components["schemas"]["ProjectArtifactShardBlueprintDto"];
+        generative: components["schemas"]["ProjectArtifactShardBlueprintDto"];
       };
     };
     ProjectArtifactDto: {
@@ -2053,7 +2054,7 @@ export interface components {
       artifactId: string;
     };
     /** @enum {string} */
-    ShardKind: "unknown" | "video" | "image" | "subtitles" | "blend";
+    ShardKind: "unknown" | "video" | "image" | "subtitles" | "blend" | "generative";
     ShardListDto: {
       /**
        * Format: hrib

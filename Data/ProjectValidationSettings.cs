@@ -32,6 +32,19 @@ public record ProjectValidationSettings
         RequiredGenreCultures = [],
     };
 
+    public static readonly ProjectValidationSettings AguaValidationSettings = new ProjectValidationSettings
+    {
+        MinNameLength = 1,
+        MaxNameLength = 42,
+        RequiredNameCultures = [Const.InvariantCultureCode],
+        MinDescriptionLength = 100,
+        MaxDescriptionLength = 10000,
+        RequiredDescriptionCultures = [Const.InvariantCultureCode],
+        MinGenreLength = 0,
+        MaxGenreLength = 0,
+        RequiredGenreCultures = [],
+    };
+
     public int? MinNameLength { get; init; }
 
     public int? MaxNameLength { get; init; }

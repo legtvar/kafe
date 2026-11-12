@@ -1,12 +1,12 @@
 <Project>
   <!-- https://www.strathweb.com/2018/07/solution-wide-nuget-package-version-handling-with-msbuild-15/ -->
   <ItemGroup>
-    <PackageReference Update="System.Text.Json" Version="9.0.10" />
-    <PackageReference Update="Microsoft.Extensions.Logging.Abstractions" Version="9.0.10" />
-    <PackageReference Update="Microsoft.Extensions.Options.DataAnnotations" Version="9.0.10" />
-    <PackageReference Update="Microsoft.AspNetCore.DataProtection.Abstractions" Version="9.0.10" />
-    <PackageReference Update="Microsoft.AspNetCore.WebUtilities" Version="9.0.10" />
-    <PackageReference Update="Serilog.AspNetCore" Version="9.0.0" />
-    <PackageReference Update="GitInfo" Version="3.6.0" />
+    <PackageReference Update="System.Text.Json" />
+    <PackageReference Update="Microsoft.Extensions.Logging.Abstractions" />
+    <PackageReference Update="Microsoft.Extensions.Options.DataAnnotations" />
+    <PackageReference Update="Microsoft.AspNetCore.DataProtection.Abstractions" />
+    <PackageReference Update="Microsoft.AspNetCore.WebUtilities" />
+    <PackageReference Update="Serilog.AspNetCore" />
+    <PackageReference Update="GitInfo" />
   </ItemGroup>
 </Project>

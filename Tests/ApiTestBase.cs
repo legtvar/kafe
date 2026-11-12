@@ -11,7 +11,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Serilog.Sinks.XUnit.Injectable.Abstract;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace Kafe.Tests;
 
@@ -22,7 +21,7 @@ public class ApiTestBase(ApiFixture fixture, ITestOutputHelper testOutput) : IAs
     public IProjectionCoordinator? ProjectionCoordinator { get; private set; }
     public ILogger? Log { get; private set; }
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
         Log = Host.Server.Services.GetRequiredService<ILogger>().ForContext(GetType());
         Log.Information("Initializing.");
@@ -43,7 +42,7 @@ public class ApiTestBase(ApiFixture fixture, ITestOutputHelper testOutput) : IAs
         Log.Information("Initialization complete.");
     }
 
-    public async Task DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
         if (ProjectionCoordinator is not null)
         {

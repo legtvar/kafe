@@ -1514,7 +1514,9 @@ public partial class ProjectService
             yield return unsupportedFramerateError;
         }
 
-        var shorterSideResolution = Math.Min(videoStream.Width, videoStream.Height);
+        int? shorterSideResolution = videoStream is { Width: not null, Height: not null }
+            ? Math.Min(videoStream.Width.Value, videoStream.Height.Value)
+            : null;
         if (shorterSideResolution < VideoShorterSideResolution)
         {
             yield return wrongResolutionError;

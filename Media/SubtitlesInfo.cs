@@ -10,6 +10,6 @@ public record SubtitlesInfo(
     string FileExtension,
     string MimeType,
     string? Language,
-    string Codec,
-    long Bitrate,
+    string? Codec,
+    long? Bitrate,
     bool IsCorrupted);

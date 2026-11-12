@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 namespace Kafe.Media;
 
 public record VideoStreamInfo(
-    string Codec,
-    long Bitrate,
-    int Width,
-    int Height,
+    string? Codec,
+    long? Bitrate,
+    int? Width,
+    int? Height,
     double Framerate);

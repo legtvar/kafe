@@ -262,3 +262,6 @@ container_scanning_postgres:
   needs: []
   variables:
     CS_IMAGE: "postgres:17-alpine"
+
+include:
+  - local: ./Tests/EndToEnd/.gitlab-ci.yml

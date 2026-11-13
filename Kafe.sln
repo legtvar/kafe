@@ -44,6 +44,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kafe.MockIdentity", "MockId
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kafe.Pigeons", "Pigeons\Kafe.Pigeons.csproj", "{0471CCDE-174B-4396-A2C8-93F041044C2B}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kafe.EndToEnd", "EndToEnd\Kafe.EndToEnd.csproj", "{6AAC8681-BED8-4C41-8283-B10A5F801A22}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -90,6 +92,10 @@ Global
 		{0471CCDE-174B-4396-A2C8-93F041044C2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0471CCDE-174B-4396-A2C8-93F041044C2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0471CCDE-174B-4396-A2C8-93F041044C2B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6AAC8681-BED8-4C41-8283-B10A5F801A22}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6AAC8681-BED8-4C41-8283-B10A5F801A22}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6AAC8681-BED8-4C41-8283-B10A5F801A22}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6AAC8681-BED8-4C41-8283-B10A5F801A22}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

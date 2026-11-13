@@ -8,7 +8,7 @@ using Microsoft.Playwright;
 using Xunit;
 using static Microsoft.Playwright.Assertions;
 
-namespace Kafe.Tests.EndToEnd;
+namespace Kafe.EndToEnd;
 
 [Collection(FilmUploadE2ECollection.Name)]
 public sealed class FilmUploadE2ETests(FilmUploadE2EFixture fixture)
@@ -16,7 +16,7 @@ public sealed class FilmUploadE2ETests(FilmUploadE2EFixture fixture)
     [SkippableTheory]
     [InlineData("sample.mp4")]
     [InlineData("sample.mkv")]
-    public async Task UploadFilmAndPlayInBrowser(string fileName)
+    public async Task FilmUpload_ValidMp4OrMkvFile_ConvertsAndPlaysInBrowser(string fileName)
     {
         Skip.IfNot(fixture.IsConfigured, FilmUploadE2EFixture.SkipMessage);
 
@@ -49,7 +49,7 @@ public sealed class FilmUploadE2ETests(FilmUploadE2EFixture fixture)
     }
 
     [SkippableFact]
-    public async Task MovUploadIsRejectedAndCanBeRetried()
+    public async Task FilmUpload_MovMimeType_RejectsUploadAndAllowsRetry()
     {
         Skip.IfNot(fixture.IsConfigured, FilmUploadE2EFixture.SkipMessage);
 
@@ -69,7 +69,7 @@ public sealed class FilmUploadE2ETests(FilmUploadE2EFixture fixture)
     }
 
     [SkippableFact]
-    public async Task CorruptVideoDoesNotReachPlayableState()
+    public async Task FilmUpload_CorruptVideo_DoesNotReachPlayableState()
     {
         Skip.IfNot(fixture.IsConfigured, FilmUploadE2EFixture.SkipMessage);
 
@@ -94,7 +94,7 @@ public sealed class FilmUploadE2ETests(FilmUploadE2EFixture fixture)
     }
 
     [SkippableFact]
-    public async Task OpenProjectGroupRequiresAuthentication()
+    public async Task ProjectGroup_AnonymousVisitor_RedirectsToLogin()
     {
         Skip.IfNot(fixture.IsConfigured, FilmUploadE2EFixture.SkipMessage);
 
@@ -192,7 +192,7 @@ public sealed class FilmUploadE2ETests(FilmUploadE2EFixture fixture)
             ".mov" => "video/quicktime",
             _ => "video/mp4"
         };
-        var fixturePath = Path.Combine(AppContext.BaseDirectory, "EndToEnd", "Fixtures", fileName);
+        var fixturePath = Path.Combine(AppContext.BaseDirectory, "Fixtures", fileName);
         await filmSection.Locator("input[type=file]").First.SetInputFilesAsync(new[]
         {
             new FilePayload

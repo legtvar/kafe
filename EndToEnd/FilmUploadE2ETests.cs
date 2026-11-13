@@ -18,8 +18,6 @@ public sealed class FilmUploadE2ETests(FilmUploadE2EFixture fixture)
     [InlineData("sample.mkv")]
     public async Task FilmUpload_ValidMp4OrMkvFile_ConvertsAndPlaysInBrowser(string fileName)
     {
-        Skip.IfNot(fixture.IsConfigured, FilmUploadE2EFixture.SkipMessage);
-
         await RunBrowserTestAsync($"happy-{fileName}", async page =>
         {
             await LogInThroughTemporaryAccountAsync(page);
@@ -51,8 +49,6 @@ public sealed class FilmUploadE2ETests(FilmUploadE2EFixture fixture)
     [SkippableFact]
     public async Task FilmUpload_MovMimeType_RejectsUploadAndAllowsRetry()
     {
-        Skip.IfNot(fixture.IsConfigured, FilmUploadE2EFixture.SkipMessage);
-
         await RunBrowserTestAsync("mov-rejected", async page =>
         {
             await LogInThroughTemporaryAccountAsync(page);
@@ -71,8 +67,6 @@ public sealed class FilmUploadE2ETests(FilmUploadE2EFixture fixture)
     [SkippableFact]
     public async Task FilmUpload_CorruptVideo_DoesNotReachPlayableState()
     {
-        Skip.IfNot(fixture.IsConfigured, FilmUploadE2EFixture.SkipMessage);
-
         await RunBrowserTestAsync("corrupt-video", async page =>
         {
             await LogInThroughTemporaryAccountAsync(page);
@@ -96,8 +90,6 @@ public sealed class FilmUploadE2ETests(FilmUploadE2EFixture fixture)
     [SkippableFact]
     public async Task ProjectGroup_AnonymousVisitor_RedirectsToLogin()
     {
-        Skip.IfNot(fixture.IsConfigured, FilmUploadE2EFixture.SkipMessage);
-
         await RunBrowserTestAsync("authentication-required", async page =>
         {
             await page.GotoAsync(fixture.GroupPath);

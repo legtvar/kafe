@@ -17,7 +17,6 @@ public sealed class FilmUploadE2EFixture : IAsyncLifetime
 {
     public const string GroupId = "test--group";
     public const string OrganizationId = "test----org";
-    public const string SkipMessage = "Set KAFE_E2E=1 to provision the containerized E2E stack.";
 
     private readonly List<IFutureDockerImage> images = [];
     private ComposeContainer? stack;
@@ -26,7 +25,6 @@ public sealed class FilmUploadE2EFixture : IAsyncLifetime
     private string? repositoryRoot;
 
     public IBrowser? Browser { get; private set; }
-    public bool IsConfigured => Environment.GetEnvironmentVariable("KAFE_E2E") == "1";
     public static string TestHost => Environment.GetEnvironmentVariable("KAFE_E2E_HOST") ?? "localhost";
     public string BaseUrl => $"https://{TestHost}:3001";
     public string ApiBaseUrl => $"https://{TestHost}:44369";
@@ -39,11 +37,6 @@ public sealed class FilmUploadE2EFixture : IAsyncLifetime
 
     public async Task InitializeAsync()
     {
-        if (!IsConfigured)
-        {
-            return;
-        }
-
         try
         {
             EnsureChromiumIsAvailable();

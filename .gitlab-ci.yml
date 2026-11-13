@@ -267,7 +267,6 @@ test-e2e:
   image: mcr.microsoft.com/dotnet/sdk:9.0
   stage: test
   variables:
-    KAFE_E2E: "1"
     KAFE_E2E_HOST: docker
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""

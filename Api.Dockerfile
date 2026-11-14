@@ -1,7 +1,12 @@
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS builder
 COPY ./ /kafe/src
 RUN apt install -y git
-RUN dotnet publish /kafe/src/Api/Kafe.Api.csproj --configuration Release --output /kafe/publish --runtime linux-x64 --self-contained
+RUN dotnet restore --locked-mode /kafe/src/Api/Kafe.Api.csproj && \
+    dotnet publish  --no-restore /kafe/src/Api/Kafe.Api.csproj \
+                    --configuration Release \
+                    --output /kafe/publish \
+                    --runtime linux-x64 \
+                    --self-contained
 
 FROM mcr.microsoft.com/dotnet/sdk:9.0
 ENV DEBIAN_FRONTEND=noninteractive

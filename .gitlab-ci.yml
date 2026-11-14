@@ -9,7 +9,8 @@ build-api:
   variables:
     NUGET_PACKAGES: $CI_PROJECT_DIR/.nuget
   script:
-    - dotnet build Kafe.sln
+    - dotnet restore --locked-mode Kafe.sln
+    - dotnet build --no-restore Kafe.sln
   tags:
     - shared-fi
   cache:

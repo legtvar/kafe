@@ -1,7 +1,7 @@
 stages:
-  - deploy
   - build
   - test
+  - deploy
 
 build-api:
   image: mcr.microsoft.com/dotnet/sdk:9.0-alpine
@@ -92,9 +92,11 @@ deploy-production:
   environment:
     name: production
     url: https://kafe.fi.muni.cz
+  needs: []
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
       when: manual
+      allow_failure: true
 
 deploy-staging:
   stage: deploy
@@ -113,6 +115,7 @@ deploy-staging:
     name: staging
     url: https://kafe-stage.fi.muni.cz
   when: manual
+  allow_failure: true
 
 deploy-docs:
   stage: deploy
@@ -126,6 +129,8 @@ deploy-docs:
     name: docs
     url: https://kafe.fi.muni.cz/docs
   when: manual
+  needs: []
+  allow_failure: true
   
 deploy-nuget:
   stage: deploy
@@ -139,6 +144,8 @@ deploy-nuget:
       --store-password-in-clear-text
     - dotnet nuget push "artifacts/*.nupkg" --source KAFE
   when: manual
+  needs: []
+  allow_failure: true
 
 include:
   - template: Jobs/Dependency-Scanning.v2.gitlab-ci.yml

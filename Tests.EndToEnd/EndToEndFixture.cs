@@ -152,7 +152,7 @@ public sealed class EndToEndFixture : IAsyncLifetime
                     "Directory.Build.targets",
                     "Web",
                     "Web.Dockerfile",
-                    "EndToEnd/artifacts"
+                    "Tests.EndToEnd/artifacts"
                 )
                 .WithProjectNamePrefix("kafe-e2e-")
                 .WithComposeUpOption("--no-build")

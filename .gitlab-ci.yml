@@ -134,3 +134,11 @@ deploy-nuget:
       --store-password-in-clear-text
     - dotnet nuget push "artifacts/*.nupkg" --source KAFE
   when: manual
+
+include:
+  - template: Jobs/Dependency-Scanning.v2.gitlab-ci.yml
+  - template: Jobs/Container-Scanning.gitlab-ci.yml
+
+container_scanning:
+  variables:
+    CS_IMAGE: "postgres:17-alpine"

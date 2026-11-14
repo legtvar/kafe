@@ -17,7 +17,9 @@ build-api:
     paths:
       - .nuget/
   rules:
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
 
 test-api:
   image: mcr.microsoft.com/dotnet/sdk:9.0-alpine
@@ -71,7 +73,9 @@ build-web:
     paths:
       - Web/.pnpm-store/
   rules:
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
 
 deploy-production:
   stage: deploy
@@ -159,7 +163,7 @@ container_scanning:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: '$CI_PIPELINE_SOURCE == "schedule"'
     - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
-    
+
 container_scanning_postgres:
   extends: container_scanning
   variables:

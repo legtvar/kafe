@@ -143,6 +143,8 @@ include:
 dependency-scanning:
   tags:
     - shared-fi
+  artifacts:
+    expire_in: 1 week
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: '$CI_PIPELINE_SOURCE == "schedule"'
@@ -151,6 +153,8 @@ dependency-scanning:
 container_scanning:
   tags:
     - shared-fi
+  artifacts:
+    expire_in: 1 week
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: '$CI_PIPELINE_SOURCE == "schedule"'

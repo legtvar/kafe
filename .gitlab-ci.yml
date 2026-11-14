@@ -156,11 +156,6 @@ container_scanning:
     - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
     
 container_scanning_postgres:
-  tags:
-    - shared-fi
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-    - if: '$CI_PIPELINE_SOURCE == "schedule"'
-    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+  extends: container_scanning
   variables:
     CS_IMAGE: "postgres:17-alpine"

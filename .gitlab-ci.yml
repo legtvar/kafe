@@ -4,14 +4,17 @@ stages:
   - deploy
 
 .build-image:
-  image: docker:29-dind-rootless
+  image: docker:29-cli
   stage: build
   services:
     - name: docker:29-dind-rootless
       alias: docker
   variables:
-    DOCKER_HOST: tcp://docker:2375
+    DOCKER_HOST: unix:///runner/services/docker/docker.sock
     DOCKER_TLS_CERTDIR: ""
+    # Avoid Buildx OCI attestation manifests that GitLab Registry can reject
+    # with "blob unknown to registry" during docker push.
+    BUILDX_NO_DEFAULT_ATTESTATIONS: "true"
   tags:
     - shared-fi
   before_script:

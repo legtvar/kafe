@@ -24,7 +24,7 @@
     <PackageReference Include="xunit.v3.mtp-v2" Version="4.0.3" />
     <PackageReference Include="Microsoft.Playwright" Version="1.56.0" />
     <PackageReference Include="Testcontainers" Version="4.16.0" />
-    <PackageReference Include="JunitXml.TestLogger" Version="7.0.2" />
+    <PackageReference Include="JunitXml.TestLogger" Version="8.1.0" />
     <PackageReference Include="Serilog.Extensions.Logging" Version="9.0.0" />
   </ItemGroup>
 

@@ -1,13 +1,10 @@
 using System;
 using System.Diagnostics;
-using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using DotNet.Testcontainers.Builders;
-using DotNet.Testcontainers.Configurations;
 using DotNet.Testcontainers.Containers;
-using DotNet.Testcontainers.Images;
 using Microsoft.Extensions.Logging;
 using Microsoft.Playwright;
 using Serilog;
@@ -21,7 +18,6 @@ public sealed class EndToEndFixture : IAsyncLifetime
     public const string GroupId = "test--group";
     public const string OrganizationId = "test----org";
 
-    private readonly List<IFutureDockerImage> images = [];
     private ComposeContainer? stack;
     private IContainer? api;
     private IPlaywright? playwright;
@@ -256,17 +252,14 @@ public sealed class EndToEndFixture : IAsyncLifetime
             await stack.DisposeAsync();
         }
 
-        foreach (var image in images)
-        {
-            await image.DeleteAsync();
-        }
-
         LoggerFactory.Dispose();
     }
 
     private async Task BuildImageAsync(string name, string dockerfile, string? target = null)
     {
+        // Keep the images and their layers for subsequent test runs.
         var builder = new ImageFromDockerfileBuilder()
+            .WithCleanUp(false)
             .WithLogger(FixtureLogger)
             .WithName($"kafe-e2e-{name}:local")
             .WithDockerfile(dockerfile)
@@ -279,34 +272,6 @@ public sealed class EndToEndFixture : IAsyncLifetime
 
         var image = builder.Build();
         await image.CreateAsync();
-        images.Add(image);
-        await PruneDanglingImagesAsync();
-    }
-
-    private async Task PruneDanglingImagesAsync()
-    {
-        var dockerEndpoint = TestcontainersSettings.OS.DockerEndpointAuthConfig.Endpoint;
-        var pruneBuilder = new ContainerBuilder("docker:29-cli")
-            .WithLogger(FixtureLogger)
-            .WithEntrypoint("docker", "image", "prune", "--force")
-            .WithEnvironment("DOCKER_HOST", dockerEndpoint.AbsoluteUri);
-        if (dockerEndpoint.Scheme == "unix")
-        {
-            pruneBuilder = pruneBuilder.WithBindMount(dockerEndpoint.AbsolutePath, dockerEndpoint.AbsolutePath);
-        }
-
-        await using var prune = pruneBuilder.Build();
-        await prune.StartAsync();
-        var exitCode = await prune.GetExitCodeAsync();
-        var logs = await prune.GetLogsAsync(timestampsEnabled: false);
-        if (exitCode != 0)
-        {
-            FixtureLogger.LogWarning(
-                "Could not prune dangling Docker images:\nStdOut: {Stdout}\nStdErr:{Stderr}",
-                logs.Stdout,
-                logs.Stderr
-            );
-        }
     }
 
     private static void EnsureChromiumIsAvailable()

@@ -6,12 +6,14 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Playwright;
 using Xunit;
+using Xunit.Abstractions;
 using static Microsoft.Playwright.Assertions;
 
 namespace Kafe.EndToEnd;
 
-[Collection(FilmUploadE2ECollection.Name)]
-public sealed class FilmUploadE2ETests(FilmUploadE2EFixture fixture)
+[Collection(FilmSubmissionEndToEndCollection.Name)]
+public sealed class FilmSubmissionEndToEndTests(EndToEndFixture fixture, ITestOutputHelper testOutput)
+    : EndToEndTestBase(fixture, testOutput)
 {
     [SkippableTheory]
     [InlineData("sample.mp4")]

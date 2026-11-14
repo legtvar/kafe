@@ -10,10 +10,11 @@ using DotNet.Testcontainers.Containers;
 using DotNet.Testcontainers.Images;
 using Microsoft.Playwright;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Kafe.EndToEnd;
 
-public sealed class FilmUploadE2EFixture : IAsyncLifetime
+public sealed class EndToEndFixture(IMessageSink diagnosticSink) : IAsyncLifetime
 {
     public const string GroupId = "test--group";
     public const string OrganizationId = "test----org";
@@ -34,6 +35,8 @@ public sealed class FilmUploadE2EFixture : IAsyncLifetime
 
     private string RepositoryRoot => repositoryRoot ??=
         Environment.GetEnvironmentVariable("KAFE_REPOSITORY_ROOT") ?? FindRepositoryRoot();
+
+    public IMessageSink DiagnosticSink { get; } = diagnosticSink;
 
     public async Task InitializeAsync()
     {

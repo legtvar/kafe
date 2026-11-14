@@ -3,7 +3,7 @@ using Xunit;
 namespace Kafe.EndToEnd;
 
 [CollectionDefinition(Name, DisableParallelization = true)]
-public sealed class FilmUploadE2ECollection : ICollectionFixture<FilmUploadE2EFixture>
+public sealed class FilmSubmissionEndToEndCollection : ICollectionFixture<EndToEndFixture>
 {
     public const string Name = "Film upload E2E";
 }

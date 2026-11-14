@@ -264,7 +264,7 @@ container_scanning_postgres:
     CS_IMAGE: "postgres:17-alpine"
 
 test-e2e:
-  image: mcr.microsoft.com/dotnet/sdk:9.0
+  image: mcr.microsoft.com/dotnet/sdk:10.0-noble
   stage: test
   variables:
     KAFE_E2E_HOST: docker
@@ -291,6 +291,9 @@ test-e2e:
       junit:
         - ./**/*test-result.xml
   script:
+    # The SDK targets net9.0, but the test executable needs this runtime as well.
+    - curl -fsSL https://dot.net/v1/dotnet-install.sh -o /tmp/dotnet-install.sh
+    - bash /tmp/dotnet-install.sh --runtime aspnetcore --channel 9.0 --install-dir /usr/share/dotnet
     - dotnet restore Tests.EndToEnd/Kafe.Tests.EndToEnd.csproj
     - dotnet build Tests.EndToEnd/Kafe.Tests.EndToEnd.csproj --no-restore
-    - dotnet test Tests.EndToEnd/Kafe.Tests.EndToEnd.csproj --no-build --logger "junit;LogFilePath=Tests.EndToEnd/artifacts/e2e-test-result.xml;MethodFormat=Class;FailureBodyFormat=Verbose"
+    - dotnet test Tests.EndToEnd/Kafe.Tests.EndToEnd.csproj --no-build -- --report-spekt-junit "MethodFormat=Class;FailureBodyFormat=Verbose" --report-spekt-junit-filename Tests.EndToEnd/artifacts/e2e-test-result.xml

@@ -10,7 +10,7 @@ stages:
     - name: docker:29-dind-rootless
       alias: docker
   variables:
-    DOCKER_HOST: unix:///runner/services/docker/docker.sock
+    DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
     # Avoid Buildx OCI attestation manifests that GitLab Registry can reject
     # with "blob unknown to registry" during docker push.

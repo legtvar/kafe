@@ -139,6 +139,12 @@ include:
   - template: Jobs/Dependency-Scanning.v2.gitlab-ci.yml
   - template: Jobs/Container-Scanning.gitlab-ci.yml
 
+dependency-scanning:
+  tags:
+    - shared-fi
+
 container_scanning:
+  tags:
+    - shared-fi
   variables:
     CS_IMAGE: "postgres:17-alpine"

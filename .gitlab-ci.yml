@@ -291,6 +291,6 @@ test-e2e:
       junit:
         - ./**/*test-result.xml
   script:
-    - dotnet restore EndToEnd/Kafe.EndToEnd.csproj
-    - dotnet build EndToEnd/Kafe.EndToEnd.csproj --no-restore
-    - dotnet test EndToEnd/Kafe.EndToEnd.csproj --no-build --logger "junit;LogFilePath=EndToEnd/artifacts/e2e-test-result.xml;MethodFormat=Class;FailureBodyFormat=Verbose"
+    - dotnet restore Tests.EndToEnd/Kafe.Tests.EndToEnd.csproj
+    - dotnet build Tests.EndToEnd/Kafe.Tests.EndToEnd.csproj --no-restore
+    - dotnet test Tests.EndToEnd/Kafe.Tests.EndToEnd.csproj --no-build --logger "junit;LogFilePath=Tests.EndToEnd/artifacts/e2e-test-result.xml;MethodFormat=Class;FailureBodyFormat=Verbose"

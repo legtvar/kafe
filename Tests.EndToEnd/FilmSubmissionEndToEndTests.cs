@@ -6,16 +6,14 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Playwright;
 using Xunit;
-using Xunit.Abstractions;
 using static Microsoft.Playwright.Assertions;
 
-namespace Kafe.EndToEnd;
+namespace Kafe.Tests.EndToEnd;
 
 [Collection(FilmSubmissionEndToEndCollection.Name)]
-public sealed class FilmSubmissionEndToEndTests(EndToEndFixture fixture, ITestOutputHelper testOutput)
-    : EndToEndTestBase(fixture, testOutput)
+public sealed class FilmSubmissionEndToEndTests(EndToEndFixture fixture)
 {
-    [SkippableTheory]
+    [Theory]
     [InlineData("sample.mp4")]
     [InlineData("sample.mkv")]
     public async Task FilmUpload_ValidMp4OrMkvFile_ConvertsAndPlaysInBrowser(string fileName)
@@ -48,7 +46,7 @@ public sealed class FilmSubmissionEndToEndTests(EndToEndFixture fixture, ITestOu
         });
     }
 
-    [SkippableFact]
+    [Fact]
     public async Task FilmUpload_MovMimeType_RejectsUploadAndAllowsRetry()
     {
         await RunBrowserTestAsync("mov-rejected", async page =>
@@ -66,7 +64,7 @@ public sealed class FilmSubmissionEndToEndTests(EndToEndFixture fixture, ITestOu
         });
     }
 
-    [SkippableFact]
+    [Fact]
     public async Task FilmUpload_CorruptVideo_DoesNotReachPlayableState()
     {
         await RunBrowserTestAsync("corrupt-video", async page =>
@@ -89,7 +87,7 @@ public sealed class FilmSubmissionEndToEndTests(EndToEndFixture fixture, ITestOu
         });
     }
 
-    [SkippableFact]
+    [Fact]
     public async Task ProjectGroup_AnonymousVisitor_RedirectsToLogin()
     {
         await RunBrowserTestAsync("authentication-required", async page =>

@@ -1,6 +1,4 @@
-using Xunit;
-
-namespace Kafe.EndToEnd;
+namespace Kafe.Tests.EndToEnd;
 
 [CollectionDefinition(Name, DisableParallelization = true)]
 public sealed class FilmSubmissionEndToEndCollection : ICollectionFixture<EndToEndFixture>

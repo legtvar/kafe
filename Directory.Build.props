@@ -16,6 +16,7 @@
     <PackageLicenseExpression>BSD-3-Clause</PackageLicenseExpression>
     <PackageProjectUrl>https://kafe.fi.muni.cz</PackageProjectUrl>
     <Authors>LeGTVaR</Authors>
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
   </PropertyGroup>
   
   <ItemGroup>

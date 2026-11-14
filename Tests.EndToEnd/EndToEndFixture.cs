@@ -35,7 +35,7 @@ public sealed class EndToEndFixture : IAsyncLifetime
     public string GroupPath => $"/auth/{OrganizationId}/groups/{GroupId}";
 
     public string ArtifactsDirectory => Environment.GetEnvironmentVariable("KAFE_E2E_ARTIFACTS")
-        ?? Path.Combine(RepositoryRoot, "EndToEnd", "artifacts");
+        ?? Path.Combine(RepositoryRoot, "Tests.EndToEnd", "artifacts");
 
     private string RepositoryRoot => repositoryRoot ??=
         Environment.GetEnvironmentVariable("KAFE_REPOSITORY_ROOT") ?? FindRepositoryRoot();

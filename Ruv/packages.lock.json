@@ -36,6 +36,9 @@
           "System.Threading.Tasks.Extensions": "4.6.3"
         }
       }
-    }
+    },
+    "net9.0/linux-x64": {},
+    "net9.0/osx-x64": {},
+    "net9.0/win-x64": {}
   }
 }

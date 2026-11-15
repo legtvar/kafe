@@ -12,3 +12,6 @@ Web/build/
 .config/
 .vscode/
 *.tar
+
+# Git metadata must enter the build context because of GitInfo
+!.git/**

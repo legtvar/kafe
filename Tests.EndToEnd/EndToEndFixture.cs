@@ -189,8 +189,6 @@ public sealed class EndToEndFixture : IAsyncLifetime
                 .WithComposeUpOption("--no-build")
                 .WithPull(!usePrebuiltImages)
                 .WithService("db", "api", "web")
-                .WithExposedService("api", 44369)
-                .WithExposedService("web", 3000)
                 .Build();
             await stack.StartAsync();
 

@@ -306,6 +306,7 @@ test-e2e:
     - dotnet restore Tests.EndToEnd/Kafe.Tests.EndToEnd.csproj
     - dotnet build Tests.EndToEnd/Kafe.Tests.EndToEnd.csproj --no-restore
     - echo "$CI_REGISTRY_PASSWORD" | docker login --username "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+    - docker image prune --force
     - docker pull "$CI_REGISTRY_IMAGE/api:$CI_COMMIT_REF_SLUG"
     - docker pull "$CI_REGISTRY_IMAGE/blender:$CI_COMMIT_REF_SLUG"
     - docker pull "$CI_REGISTRY_IMAGE/web:$CI_COMMIT_REF_SLUG"

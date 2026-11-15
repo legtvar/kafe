@@ -191,7 +191,7 @@ dependency-scanning-third-party:
     - dotnet restore Kafe.sln --locked-mode
     - >
       dotnet list Kafe.sln package --vulnerable --include-transitive
-      --format json --no-restore > nuget-audit.json
+      --format json > nuget-audit.json
     - >
       /tmp/trivy fs --scanners vuln --include-dev-deps --exit-code 0
       --format json --output trivy-dependencies.json

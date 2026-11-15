@@ -60,7 +60,9 @@ public sealed class EndToEndFixture : IAsyncLifetime
             FixtureLogger.LogInformation("Initializing the E2E fixture.");
 
             Directory.CreateDirectory(ArtifactsDirectory);
-            var dockerEndpoint = TestcontainersSettings.OS.DockerEndpointAuthConfig.Endpoint;
+            var dockerEndpoint = new Uri(
+                Environment.GetEnvironmentVariable("DOCKER_HOST")
+                ?? TestcontainersSettings.OS.DockerEndpointAuthConfig.Endpoint.AbsoluteUri);
             if (!dockerEndpoint.Scheme.Equals("unix", StringComparison.OrdinalIgnoreCase))
             {
                 // TestContainers insists on having the unix socket even if it doesn't use it because it accesses
@@ -140,9 +142,20 @@ public sealed class EndToEndFixture : IAsyncLifetime
                 .Build();
             await backbone.CreateAsync();
 
-            stack = new ComposeBuilder("docker:29-cli")
-                .WithLogger(FixtureLogger)
-                .WithEnvironment("DOCKER_HOST", dockerEndpoint.AbsoluteUri)
+            var composeBuilder = new ComposeBuilder("docker:29-cli")
+                .WithLogger(FixtureLogger);
+            if (!dockerEndpoint.Scheme.Equals("unix", StringComparison.OrdinalIgnoreCase))
+            {
+                composeBuilder = composeBuilder
+                    .WithEnvironment("DOCKER_HOST", dockerEndpoint.AbsoluteUri)
+                    .WithCreateParameterModifier(parameters =>
+                    {
+                        parameters.HostConfig ??= new Docker.DotNet.Models.HostConfig();
+                        parameters.HostConfig.NetworkMode = "host";
+                    });
+            }
+
+            stack = composeBuilder
                 .WithEnvironment("COMPOSE_PARALLEL_LIMIT", "1")
                 .WithComposeFile(
                     Path.Combine(RepositoryRoot, "docker-compose.base.yml"),

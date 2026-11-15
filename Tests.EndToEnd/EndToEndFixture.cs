@@ -120,7 +120,13 @@ public sealed class EndToEndFixture : IAsyncLifetime
                       FrontEndUrl: https://{TestHost}:3001
                       VideoConversion__PollWaitTime: 00:00:01
 
-                  {GetWebConfiguration()}
+                  web:
+                    image: {GetServiceImage("web", usePrebuiltImages)}
+                    command: ["pnpm", "run", "start", "--", "--config", "/tmp/vite.config.e2e.ts"]
+                    ports:
+                      - "3001:3000"
+                    volumes:
+                      - '{Path.Combine(ArtifactsDirectory, "vite.config.e2e.ts")}:/tmp/vite.config.e2e.ts:ro'
 
                   blender:
                     image: {GetServiceImage("blender", usePrebuiltImages)}
@@ -310,19 +316,6 @@ public sealed class EndToEndFixture : IAsyncLifetime
         }
 
         return $"kafe-e2e-{service}:local";
-    }
-
-    private string GetWebConfiguration()
-    {
-        return $"""
-                  web:
-                    image: {GetServiceImage("web", Environment.GetEnvironmentVariable("KAFE_E2E_USE_PREBUILT_IMAGES") == "1")}
-                    command: ["pnpm", "run", "start", "--", "--config", "/tmp/vite.config.e2e.ts"]
-                    ports:
-                      - "3001:3000"
-                    volumes:
-                      - '{Path.Combine(ArtifactsDirectory, "vite.config.e2e.ts")}:/tmp/vite.config.e2e.ts:ro'
-                """;
     }
 
     private async Task BuildImageAsync(string name, string dockerfile, string? target = null)

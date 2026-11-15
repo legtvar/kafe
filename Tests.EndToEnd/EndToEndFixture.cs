@@ -127,7 +127,7 @@ public sealed class EndToEndFixture : IAsyncLifetime
 
                   web:
                     image: {GetServiceImage("web", usePrebuiltImages)}
-                    command: ["pnpm", "run", "start", "--", "--config", "/tmp/vite.config.e2e.ts"]
+                    command: ["pnpm", "run", "start", "--config", "/tmp/vite.config.e2e.ts"]
                     ports:
                       - "3001:3000"
                     volumes:

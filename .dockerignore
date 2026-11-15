@@ -11,3 +11,4 @@ Web/build/
 .vs/
 .config/
 .vscode/
+*.tar

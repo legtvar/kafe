@@ -173,11 +173,6 @@ dependency-scanning-third-party:
     TRIVY_VERSION: "0.76.2"
     TRIVY_NO_PROGRESS: "true"
     TRIVY_CACHE_DIR: $CI_PROJECT_DIR/.trivy-cache
-  cache:
-    key: dependency-scanning-third-party
-    paths:
-      - .nuget/
-      - .trivy-cache/
   before_script:
     - apk update && apk add --no-cache build-base ca-certificates curl jq ruby ruby-dev
     - >

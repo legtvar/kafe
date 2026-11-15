@@ -3,23 +3,48 @@ stages:
   - test
   - deploy
 
-build-api:
-  image: mcr.microsoft.com/dotnet/sdk:9.0-alpine
+.build-image:
+  image: docker:29-cli
   stage: build
+  services:
+    - name: docker:29-dind-rootless
+      alias: docker
   variables:
-    NUGET_PACKAGES: $CI_PROJECT_DIR/.nuget
-  script:
-    - dotnet restore --locked-mode Kafe.sln
-    - dotnet build --no-restore Kafe.sln
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
+    # Avoid Buildx OCI attestation manifests that GitLab Registry can reject
+    # with "blob unknown to registry" during docker push.
+    BUILDX_NO_DEFAULT_ATTESTATIONS: "true"
   tags:
     - shared-fi
-  cache:
-    paths:
-      - .nuget/
-  rules:
+  before_script:
+    - echo "$CI_REGISTRY_PASSWORD" | docker login --username "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+    - docker image prune --all --force
+  script:
+    - docker build --pull --file "$DOCKERFILE" --tag "$IMAGE" .
+    - docker push "$IMAGE"
+  rules: &image_pipeline_rules
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: '$CI_PIPELINE_SOURCE == "schedule"'
     - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+
+build-api-image:
+  extends: .build-image
+  variables:
+    DOCKERFILE: Api.Dockerfile
+    IMAGE: "$CI_REGISTRY_IMAGE/api:$CI_COMMIT_REF_SLUG"
+
+build-web-image:
+  extends: .build-image
+  variables:
+    DOCKERFILE: Web.Dockerfile
+    IMAGE: "$CI_REGISTRY_IMAGE/web:$CI_COMMIT_REF_SLUG"
+
+build-blender-image:
+  extends: .build-image
+  variables:
+    DOCKERFILE: Blender.Dockerfile
+    IMAGE: "$CI_REGISTRY_IMAGE/blender:$CI_COMMIT_REF_SLUG"
 
 test-api:
   image: mcr.microsoft.com/dotnet/sdk:9.0-alpine
@@ -52,30 +77,6 @@ test-api:
       ./Api/appsettings.local.json | sponge ./Api/appsettings.local.json
     - dotnet test Tests
       --logger:"junit;LogFilePath=./artifacts/{assembly}-test-result.xml;MethodFormat=Class;FailureBodyFormat=Verbose"
-
-build-web:
-  image: alpine:latest
-  stage: build
-  variables:
-    CI: ''
-  script:
-    - apk update
-    - apk add nodejs-current npm
-    - npm install -g corepack@latest --force && npx corepack enable && npx corepack prepare pnpm@latest --activate
-
-    - cd Web
-    - pnpm config set store-dir .pnpm-store/
-    - pnpm i
-    - pnpm run build
-  tags:
-    - shared-fi
-  cache:
-    paths:
-      - Web/.pnpm-store/
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-    - if: '$CI_PIPELINE_SOURCE == "schedule"'
-    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
 
 deploy-production:
   stage: deploy
@@ -161,17 +162,45 @@ dependency-scanning:
     - if: '$CI_PIPELINE_SOURCE == "schedule"'
     - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
 
+# The specific image-scanning jobs below replace the template's single automatically-targeted scan.
 container_scanning:
+  rules:
+    - when: never
+
+.container-scanning-image:
+  extends: container_scanning
   tags:
     - shared-fi
   artifacts:
     expire_in: 1 week
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-    - if: '$CI_PIPELINE_SOURCE == "schedule"'
-    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+  rules: *image_pipeline_rules
+
+container_scanning_api:
+  extends: .container-scanning-image
+  needs:
+    - job: build-api-image
+      artifacts: false
+  variables:
+    CS_IMAGE: "$CI_REGISTRY_IMAGE/api:$CI_COMMIT_REF_SLUG"
+
+container_scanning_web:
+  extends: .container-scanning-image
+  needs:
+    - job: build-web-image
+      artifacts: false
+  variables:
+    CS_IMAGE: "$CI_REGISTRY_IMAGE/web:$CI_COMMIT_REF_SLUG"
+
+container_scanning_blender:
+  extends: .container-scanning-image
+  needs:
+    - job: build-blender-image
+      artifacts: false
+  variables:
+    CS_IMAGE: "$CI_REGISTRY_IMAGE/blender:$CI_COMMIT_REF_SLUG"
 
 container_scanning_postgres:
-  extends: container_scanning
+  extends: .container-scanning-image
+  needs: []
   variables:
     CS_IMAGE: "postgres:17-alpine"

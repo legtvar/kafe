@@ -19,6 +19,7 @@ stages:
     - shared-fi
   before_script:
     - echo "$CI_REGISTRY_PASSWORD" | docker login --username "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+    - docker image prune --all --force
   script:
     - docker build --pull --file "$DOCKERFILE" --tag "$IMAGE" .
     - docker push "$IMAGE"

@@ -296,4 +296,5 @@ test-e2e:
     - bash /tmp/dotnet-install.sh --runtime aspnetcore --channel 9.0 --install-dir /usr/share/dotnet
     - dotnet restore Tests.EndToEnd/Kafe.Tests.EndToEnd.csproj
     - dotnet build Tests.EndToEnd/Kafe.Tests.EndToEnd.csproj --no-restore
-    - dotnet test Tests.EndToEnd/Kafe.Tests.EndToEnd.csproj --no-build -- --report-spekt-junit "MethodFormat=Class;FailureBodyFormat=Verbose" --report-spekt-junit-filename $CI_PROJECT_DIR/Tests.EndToEnd/artifacts/e2e-test-result.xml
+    - dotnet run 
+    - dotnet run --project Tests.EndToEnd/Kafe.Tests.EndToEnd.csproj --no-build -- -result-junit $CI_PROJECT_DIR/Tests.EndToEnd/artifacts/e2e-test-result.xml

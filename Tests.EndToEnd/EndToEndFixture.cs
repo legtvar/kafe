@@ -57,7 +57,6 @@ public sealed class EndToEndFixture : IAsyncLifetime
         try
         {
             FixtureLogger.LogInformation("Initializing the E2E fixture.");
-            EnsureChromiumIsAvailable();
 
             Directory.CreateDirectory(ArtifactsDirectory);
             var viteConfig = Path.Combine(ArtifactsDirectory, "vite.config.e2e.ts");
@@ -69,6 +68,7 @@ public sealed class EndToEndFixture : IAsyncLifetime
 
                 export default mergeConfig(baseConfig, {
                     server: {
+                        allowedHosts: ['{TestHost}'],
                         proxy: {
                             '/api': {
                                 target: 'https://api:44369',
@@ -171,6 +171,15 @@ public sealed class EndToEndFixture : IAsyncLifetime
             );
 
             playwright = await Playwright.CreateAsync();
+            if (!File.Exists(playwright.Chromium.ExecutablePath))
+            {
+                var exitCode = Program.Main(["install", "--with-deps", "--no-shell", "chromium"]);
+                if (exitCode != 0)
+                {
+                    throw new InvalidOperationException($"Playwright exited while installing Chromium with code {exitCode}.");
+                }
+            }
+
             Browser = await playwright.Chromium.LaunchAsync(
                 new()
                 {
@@ -272,15 +281,6 @@ public sealed class EndToEndFixture : IAsyncLifetime
 
         var image = builder.Build();
         await image.CreateAsync();
-    }
-
-    private static void EnsureChromiumIsAvailable()
-    {
-        var exitCode = Program.Main(["install", "--with-deps", "--no-shell", "chromium"]);
-        if (exitCode != 0)
-        {
-            throw new InvalidOperationException($"Playwright exited while installing Chromium with code {exitCode}.");
-        }
     }
 
     private static string FindRepositoryRoot()

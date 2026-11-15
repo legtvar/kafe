@@ -88,33 +88,36 @@ public sealed class EndToEndFixture : IAsyncLifetime
             await File.WriteAllTextAsync(
                 composeOverride,
                 $"""
-                 services:
-                   api:
-                     image: kafe-e2e-api:local
-                     depends_on:
-                       db:
-                         condition: service_healthy
-                       blender:
-                         condition: service_started
-                     environment:
-                       FrontEndUrl: https://{TestHost}:3001
-                       VideoConversion__PollWaitTime: 00:00:01
-                   web:
-                     image: kafe-e2e-web:local
-                     command: ["pnpm", "run", "start", "--", "--config", "/tmp/vite.config.e2e.ts"]
-                     ports:
-                       - "3001:3000"
-                     volumes:
-                       - '{viteConfig}:/tmp/vite.config.e2e.ts:ro'
-                   blender:
-                     image: kafe-e2e-blender:local
-                   db:
-                     healthcheck:
-                       test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
-                       interval: 2s
-                       timeout: 3s
-                       retries: 30
-                 """
+                services:
+                  api:
+                    image: kafe-e2e-api:local
+                    depends_on:
+                      db:
+                        condition: service_healthy
+                      blender:
+                        condition: service_started
+                    environment:
+                      FrontEndUrl: https://{TestHost}:3001
+                      VideoConversion__PollWaitTime: 00:00:01
+
+                  web:
+                    image: kafe-e2e-web:local
+                    command: ["pnpm", "run", "start", "--", "--config", "/tmp/vite.config.e2e.ts"]
+                    ports:
+                      - "3001:3000"
+                    volumes:
+                      - '{viteConfig}:/tmp/vite.config.e2e.ts:ro'
+
+                  blender:
+                    image: kafe-e2e-blender:local
+
+                  db:
+                    healthcheck:
+                      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+                      interval: 2s
+                      timeout: 3s
+                      retries: 30
+                """
             );
 
             // docker-compose.base.yml uses this external network for its Traefik alias.

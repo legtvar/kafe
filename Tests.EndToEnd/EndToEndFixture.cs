@@ -60,6 +60,11 @@ public sealed class EndToEndFixture : IAsyncLifetime
         try
         {
             FixtureLogger.LogInformation("Initializing the E2E fixture.");
+            FixtureLogger.LogInformation(
+                "E2E host: {TestHost}; frontend URL: {BaseUrl}; API URL: {ApiBaseUrl}.",
+                TestHost,
+                BaseUrl,
+                ApiBaseUrl);
 
             Directory.CreateDirectory(ArtifactsDirectory);
             var usePrebuiltImages = Environment.GetEnvironmentVariable("KAFE_E2E_USE_PREBUILT_IMAGES") == "1";
@@ -94,7 +99,7 @@ public sealed class EndToEndFixture : IAsyncLifetime
                         },
                     },
                 });
-                """
+                """.Replace("{TestHost}", TestHost)
             );
 
             if (!usePrebuiltImages)
@@ -204,6 +209,9 @@ public sealed class EndToEndFixture : IAsyncLifetime
                 ]
             );
 
+            await WaitForEndpointAsync(new Uri($"{ApiBaseUrl}/api/v1/organizations"), "API");
+            await WaitForEndpointAsync(new Uri($"{BaseUrl}/api/v1/organizations"), "frontend API proxy");
+
             playwright = await Playwright.CreateAsync();
             if (!File.Exists(playwright.Chromium.ExecutablePath))
             {
@@ -296,6 +304,70 @@ public sealed class EndToEndFixture : IAsyncLifetime
         }
 
         LoggerFactory.Dispose();
+    }
+
+    private async Task WaitForEndpointAsync(Uri url, string name)
+    {
+        var timeout = TimeSpan.FromSeconds(90);
+        var stopwatch = Stopwatch.StartNew();
+        Exception? lastFailure = null;
+        using var handler = new HttpClientHandler
+        {
+            ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+        };
+        using var client = new HttpClient(handler) { Timeout = TimeSpan.FromSeconds(5) };
+
+        while (stopwatch.Elapsed < timeout)
+        {
+            try
+            {
+                using var response = await client.GetAsync(url);
+                var content = await response.Content.ReadAsStringAsync();
+                if (response.IsSuccessStatusCode
+                    && response.Content.Headers.ContentType?.MediaType == "application/json")
+                {
+                    FixtureLogger.LogInformation("{Name} is ready at {Url}.", name, url);
+                    return;
+                }
+
+                lastFailure = new InvalidOperationException(
+                    $"{(int)response.StatusCode} {response.StatusCode}: {content}");
+            }
+            catch (Exception exception) when (exception is HttpRequestException or TaskCanceledException)
+            {
+                lastFailure = exception;
+            }
+
+            await Task.Delay(500);
+        }
+
+        await LogServiceOutputAsync("api");
+        await LogServiceOutputAsync("web");
+        throw new TimeoutException(
+            $"The {name} was not ready at {url} within {timeout}.",
+            lastFailure);
+    }
+
+    private async Task LogServiceOutputAsync(string name)
+    {
+        if (stack is null)
+        {
+            return;
+        }
+
+        try
+        {
+            var logs = await stack.GetServiceContainer(name).GetLogsAsync(timestampsEnabled: false);
+            FixtureLogger.LogError(
+                "{Service} logs after startup failure:\nStandard output:\n{Stdout}\nStandard error:\n{Stderr}",
+                name,
+                logs.Stdout,
+                logs.Stderr);
+        }
+        catch (Exception exception)
+        {
+            FixtureLogger.LogError(exception, "Could not read logs for {Service}.", name);
+        }
     }
 
     private string GetServiceImage(string service, bool usePrebuiltImages)

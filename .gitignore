@@ -6,6 +6,7 @@ artifacts/
 .idea/
 *.DotSettings
 *.DotSettings.user
+*.received.*
 **/node_modules/
 .pnpm-store/
 .pi/cache/

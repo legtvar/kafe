@@ -295,6 +295,5 @@ test-e2e:
     - curl -fsSL https://dot.net/v1/dotnet-install.sh -o /tmp/dotnet-install.sh
     - bash /tmp/dotnet-install.sh --runtime aspnetcore --channel 9.0 --install-dir /usr/share/dotnet
     - dotnet restore Tests.EndToEnd/Kafe.Tests.EndToEnd.csproj
-    - dotnet build Tests.EndToEnd/Kafe.Tests.EndToEnd.csproj --no-restore
-    - dotnet run 
+    - dotnet build Tests.EndToEnd/Kafe.Tests.EndToEnd.csproj --no-restore 
     - dotnet run --project Tests.EndToEnd/Kafe.Tests.EndToEnd.csproj --no-build -- -result-junit $CI_PROJECT_DIR/Tests.EndToEnd/artifacts/e2e-test-result.xml

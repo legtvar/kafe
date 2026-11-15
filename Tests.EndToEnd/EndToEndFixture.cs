@@ -146,13 +146,13 @@ public sealed class EndToEndFixture : IAsyncLifetime
                 .WithLogger(FixtureLogger);
             if (!dockerEndpoint.Scheme.Equals("unix", StringComparison.OrdinalIgnoreCase))
             {
+                // The Docker hostname belongs to the CI job's network, not the new
+                // container's network. Reach the remote DinD through its host gateway.
                 composeBuilder = composeBuilder
-                    .WithEnvironment("DOCKER_HOST", dockerEndpoint.AbsoluteUri)
-                    .WithCreateParameterModifier(parameters =>
-                    {
-                        parameters.HostConfig ??= new Docker.DotNet.Models.HostConfig();
-                        parameters.HostConfig.NetworkMode = "host";
-                    });
+                    .WithExtraHost("host.docker.internal", "host-gateway")
+                    .WithEnvironment(
+                        "DOCKER_HOST",
+                        new UriBuilder(dockerEndpoint) { Host = "host.docker.internal" }.Uri.AbsoluteUri);
             }
 
             stack = composeBuilder

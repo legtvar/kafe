@@ -63,6 +63,12 @@ belong to the `docker` service rather than to the test runner's `localhost`. Ryu
 disabled for rootless compatibility; the fixture explicitly removes its stack while
 preserving cached images. Test startup installs Chromium through the Playwright .NET API.
 
+`KAFE_E2E_USE_PREBUILT_IMAGES=1` is set for this job. It selects the existing
+`$CI_REGISTRY_IMAGE/{api,web,blender}:$CI_COMMIT_REF_SLUG` images instead of rebuilding
+them. The test assumes those images have already been pulled and disables further
+Compose pulls. The web image is built at the `builder` stage so the existing Vite
+workflow continues to work.
+
 The repository's path must be identical in the test container and DinD service (as it
 is with GitLab's mounted project directory), so Docker Compose can resolve its build
 context. Testcontainers provides PostgreSQL and all application services, so no

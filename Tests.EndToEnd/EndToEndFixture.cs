@@ -1,6 +1,8 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using DotNet.Testcontainers.Builders;
@@ -60,6 +62,7 @@ public sealed class EndToEndFixture : IAsyncLifetime
             FixtureLogger.LogInformation("Initializing the E2E fixture.");
 
             Directory.CreateDirectory(ArtifactsDirectory);
+            var usePrebuiltImages = Environment.GetEnvironmentVariable("KAFE_E2E_USE_PREBUILT_IMAGES") == "1";
             var dockerEndpoint = new Uri(
                 Environment.GetEnvironmentVariable("DOCKER_HOST")
                 ?? TestcontainersSettings.OS.DockerEndpointAuthConfig.Endpoint.AbsoluteUri);
@@ -94,9 +97,12 @@ public sealed class EndToEndFixture : IAsyncLifetime
                 """
             );
 
-            await BuildImageAsync("api", "Api.Dockerfile");
-            await BuildImageAsync("web", "Web.Dockerfile", "builder");
-            await BuildImageAsync("blender", "Blender.Dockerfile");
+            if (!usePrebuiltImages)
+            {
+                await BuildImageAsync("api", "Api.Dockerfile");
+                await BuildImageAsync("web", "Web.Dockerfile", "builder");
+                await BuildImageAsync("blender", "Blender.Dockerfile");
+            }
 
             var composeOverride = Path.Combine(ArtifactsDirectory, "docker-compose.override.yml");
             await File.WriteAllTextAsync(
@@ -104,7 +110,7 @@ public sealed class EndToEndFixture : IAsyncLifetime
                 $"""
                 services:
                   api:
-                    image: kafe-e2e-api:local
+                    image: {GetServiceImage("api", usePrebuiltImages)}
                     depends_on:
                       db:
                         condition: service_healthy
@@ -114,16 +120,10 @@ public sealed class EndToEndFixture : IAsyncLifetime
                       FrontEndUrl: https://{TestHost}:3001
                       VideoConversion__PollWaitTime: 00:00:01
 
-                  web:
-                    image: kafe-e2e-web:local
-                    command: ["pnpm", "run", "start", "--", "--config", "/tmp/vite.config.e2e.ts"]
-                    ports:
-                      - "3001:3000"
-                    volumes:
-                      - '{viteConfig}:/tmp/vite.config.e2e.ts:ro'
+                  {GetWebConfiguration()}
 
                   blender:
-                    image: kafe-e2e-blender:local
+                    image: {GetServiceImage("blender", usePrebuiltImages)}
 
                   db:
                     healthcheck:
@@ -181,6 +181,7 @@ public sealed class EndToEndFixture : IAsyncLifetime
                 )
                 .WithProjectNamePrefix("kafe-e2e-")
                 .WithComposeUpOption("--no-build")
+                .WithPull(!usePrebuiltImages)
                 .WithService("db", "api", "web")
                 .WithExposedService("api", 44369)
                 .WithExposedService("web", 3000)
@@ -291,6 +292,37 @@ public sealed class EndToEndFixture : IAsyncLifetime
         }
 
         LoggerFactory.Dispose();
+    }
+
+    private string GetServiceImage(string service, bool usePrebuiltImages)
+    {
+        if (usePrebuiltImages)
+        {
+            var registry = Environment.GetEnvironmentVariable("CI_REGISTRY_IMAGE");
+            if (string.IsNullOrWhiteSpace(registry))
+            {
+                throw new InvalidOperationException(
+                    "KAFE_E2E_USE_PREBUILT_IMAGES=1 requires CI_REGISTRY_IMAGE.");
+            }
+
+            var tag = Environment.GetEnvironmentVariable("CI_COMMIT_REF_SLUG") ?? "local";
+            return $"{registry}/{service}:{tag}";
+        }
+
+        return $"kafe-e2e-{service}:local";
+    }
+
+    private string GetWebConfiguration()
+    {
+        return $"""
+                  web:
+                    image: {GetServiceImage("web", Environment.GetEnvironmentVariable("KAFE_E2E_USE_PREBUILT_IMAGES") == "1")}
+                    command: ["pnpm", "run", "start", "--", "--config", "/tmp/vite.config.e2e.ts"]
+                    ports:
+                      - "3001:3000"
+                    volumes:
+                      - '{Path.Combine(ArtifactsDirectory, "vite.config.e2e.ts")}:/tmp/vite.config.e2e.ts:ro'
+                """;
     }
 
     private async Task BuildImageAsync(string name, string dockerfile, string? target = null)

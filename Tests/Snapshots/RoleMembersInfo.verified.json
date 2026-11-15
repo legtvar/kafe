@@ -1,0 +1,15 @@
+﻿[
+  {
+    "Id": "snaprol0001",
+    "MemberIds": [
+      "testuser000"
+    ]
+  },
+  {
+    "Id": "snaprol0002",
+    "MemberIds": [
+      "testadmin00",
+      "testuser000"
+    ]
+  }
+]

@@ -1,0 +1,2672 @@
+﻿[
+  {
+    "Id": "legacy--org",
+    "GlobalPermission": {},
+    "DependencyGraph": {
+      "legacy--org": [
+        "legacy--org"
+      ],
+      "system": [
+        "system"
+      ]
+    },
+    "AccountEntries": {
+      "testadmin00": {
+        "EffectivePermission": "Read, Append, Inheritable",
+        "Sources": {
+          "system": {
+            "Permission": "Read, Append, Inheritable",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Id": "snapart0001",
+    "GlobalPermission": {},
+    "DependencyGraph": {
+      "snapart0001": [
+        "snapart0001"
+      ],
+      "snapgrp0001": [
+        "snapprj0001"
+      ],
+      "snaporg0001": [
+        "snapgrp0001"
+      ],
+      "snapprj0001": [
+        "snapart0001"
+      ],
+      "system": [
+        "system"
+      ]
+    },
+    "RoleEntries": {
+      "snaprol0001": {
+        "EffectivePermission": "Read, Inspect, Review",
+        "Sources": {
+          "snaporg0001": {
+            "Permission": "Read, Inspect",
+            "GrantedAt": "2024-01-01 +0"
+          },
+          "snapprj0001": {
+            "Permission": "Review",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      }
+    },
+    "AccountEntries": {
+      "testadmin00": {
+        "EffectivePermission": "Read, Append, Inheritable",
+        "Sources": {
+          "system": {
+            "Permission": "Read, Append, Inheritable",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      },
+      "testuser000": {
+        "EffectivePermission": "Read, Inspect, Review",
+        "Sources": {
+          "snaporg0001": {
+            "Permission": "Read, Inspect",
+            "GrantedAt": "2024-01-01 +0",
+            "RoleId": "snaprol0001"
+          },
+          "snapprj0001": {
+            "Permission": "Review",
+            "GrantedAt": "2024-01-01 +0",
+            "RoleId": "snaprol0001"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Id": "snapart0002",
+    "GlobalPermission": {},
+    "DependencyGraph": {
+      "snapart0002": [
+        "snapart0002"
+      ],
+      "snapgrp0001": [
+        "snapprj0002"
+      ],
+      "snaporg0001": [
+        "snapgrp0001"
+      ],
+      "snapprj0002": [
+        "snapart0002"
+      ],
+      "system": [
+        "system"
+      ]
+    },
+    "RoleEntries": {
+      "snaprol0001": {
+        "EffectivePermission": "Read, Inspect",
+        "Sources": {
+          "snaporg0001": {
+            "Permission": "Read, Inspect",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      },
+      "snaprol0002": {
+        "EffectivePermission": "Review",
+        "Sources": {
+          "snapprj0002": {
+            "Permission": "Review",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      }
+    },
+    "AccountEntries": {
+      "testadmin00": {
+        "EffectivePermission": "Read, Append, Inheritable",
+        "Sources": {
+          "snapprj0002": {
+            "Permission": "Review",
+            "GrantedAt": "2024-01-01 +0",
+            "RoleId": "snaprol0002"
+          },
+          "system": {
+            "Permission": "Read, Append, Inheritable",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      },
+      "testuser000": {
+        "EffectivePermission": "Read, Inspect, Review",
+        "Sources": {
+          "snaporg0001": {
+            "Permission": "Read, Inspect",
+            "GrantedAt": "2024-01-01 +0",
+            "RoleId": "snaprol0001"
+          },
+          "snapprj0002": {
+            "Permission": "Review",
+            "GrantedAt": "2024-01-01 +0",
+            "RoleId": "snaprol0002"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Id": "snapart0003",
+    "GlobalPermission": {},
+    "DependencyGraph": {
+      "snapart0003": [
+        "snapart0003"
+      ],
+      "snapgrp0001": [
+        "snapprj0003"
+      ],
+      "snaporg0001": [
+        "snapgrp0001"
+      ],
+      "snapprj0003": [
+        "snapart0003"
+      ],
+      "system": [
+        "system"
+      ]
+    },
+    "RoleEntries": {
+      "snaprol0001": {
+        "EffectivePermission": "Read, Inspect",
+        "Sources": {
+          "snaporg0001": {
+            "Permission": "Read, Inspect",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      }
+    },
+    "AccountEntries": {
+      "testadmin00": {
+        "EffectivePermission": "Read, Append, Inheritable",
+        "Sources": {
+          "system": {
+            "Permission": "Read, Append, Inheritable",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      },
+      "testuser000": {
+        "EffectivePermission": "Read, Inspect",
+        "Sources": {
+          "snaporg0001": {
+            "Permission": "Read, Inspect",
+            "GrantedAt": "2024-01-01 +0",
+            "RoleId": "snaprol0001"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Id": "snapart0004",
+    "GlobalPermission": {},
+    "DependencyGraph": {
+      "snapart0004": [
+        "snapart0004"
+      ],
+      "snapgrp0001": [
+        "snapprj0004"
+      ],
+      "snaporg0001": [
+        "snapgrp0001"
+      ],
+      "snapprj0004": [
+        "snapart0004"
+      ],
+      "system": [
+        "system"
+      ]
+    },
+    "RoleEntries": {
+      "snaprol0001": {
+        "EffectivePermission": "Read, Inspect",
+        "Sources": {
+          "snaporg0001": {
+            "Permission": "Read, Inspect",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      }
+    },
+    "AccountEntries": {
+      "testadmin00": {
+        "EffectivePermission": "Read, Append, Inheritable",
+        "Sources": {
+          "system": {
+            "Permission": "Read, Append, Inheritable",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      },
+      "testuser000": {
+        "EffectivePermission": "Read, Inspect",
+        "Sources": {
+          "snaporg0001": {
+            "Permission": "Read, Inspect",
+            "GrantedAt": "2024-01-01 +0",
+            "RoleId": "snaprol0001"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Id": "snapart0005",
+    "GlobalPermission": {
+      "EffectivePermission": "Read, Inspect",
+      "Sources": {
+        "snapgrp0002": {
+          "Permission": "Read, Inspect",
+          "GrantedAt": "2024-01-01 +0"
+        }
+      }
+    },
+    "DependencyGraph": {
+      "snapart0005": [
+        "snapart0005"
+      ],
+      "snapgrp0002": [
+        "snapprj0005"
+      ],
+      "snaporg0001": [
+        "snapgrp0002"
+      ],
+      "snapprj0005": [
+        "snapart0005"
+      ],
+      "system": [
+        "system"
+      ]
+    },
+    "RoleEntries": {
+      "snaprol0001": {
+        "EffectivePermission": "Read, Inspect",
+        "Sources": {
+          "snaporg0001": {
+            "Permission": "Read, Inspect",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      }
+    },
+    "AccountEntries": {
+      "testadmin00": {
+        "EffectivePermission": "Read, Append, Inheritable",
+        "Sources": {
+          "system": {
+            "Permission": "Read, Append, Inheritable",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      },
+      "testuser000": {
+        "EffectivePermission": "Read, Inspect",
+        "Sources": {
+          "snaporg0001": {
+            "Permission": "Read, Inspect",
+            "GrantedAt": "2024-01-01 +0",
+            "RoleId": "snaprol0001"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Id": "snapart0006",
+    "GlobalPermission": {
+      "EffectivePermission": "Read, Inspect",
+      "Sources": {
+        "snapgrp0002": {
+          "Permission": "Read, Inspect",
+          "GrantedAt": "2024-01-01 +0"
+        }
+      }
+    },
+    "DependencyGraph": {
+      "snapart0006": [
+        "snapart0006"
+      ],
+      "snapgrp0002": [
+        "snapprj0006"
+      ],
+      "snaporg0001": [
+        "snapgrp0002"
+      ],
+      "snapprj0006": [
+        "snapart0006"
+      ],
+      "system": [
+        "system"
+      ]
+    },
+    "RoleEntries": {
+      "snaprol0001": {
+        "EffectivePermission": "Read, Inspect",
+        "Sources": {
+          "snaporg0001": {
+            "Permission": "Read, Inspect",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      }
+    },
+    "AccountEntries": {
+      "testadmin00": {
+        "EffectivePermission": "Read, Append, Inheritable",
+        "Sources": {
+          "system": {
+            "Permission": "Read, Append, Inheritable",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      },
+      "testuser000": {
+        "EffectivePermission": "Read, Inspect",
+        "Sources": {
+          "snaporg0001": {
+            "Permission": "Read, Inspect",
+            "GrantedAt": "2024-01-01 +0",
+            "RoleId": "snaprol0001"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Id": "snapart0007",
+    "GlobalPermission": {
+      "EffectivePermission": "Read, Inspect",
+      "Sources": {
+        "snapgrp0002": {
+          "Permission": "Read, Inspect",
+          "GrantedAt": "2024-01-01 +0"
+        }
+      }
+    },
+    "DependencyGraph": {
+      "snapart0007": [
+        "snapart0007"
+      ],
+      "snapgrp0002": [
+        "snapprj0007"
+      ],
+      "snaporg0001": [
+        "snapgrp0002"
+      ],
+      "snapprj0007": [
+        "snapart0007"
+      ],
+      "system": [
+        "system"
+      ]
+    },
+    "RoleEntries": {
+      "snaprol0001": {
+        "EffectivePermission": "Read, Inspect",
+        "Sources": {
+          "snaporg0001": {
+            "Permission": "Read, Inspect",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      }
+    },
+    "AccountEntries": {
+      "testadmin00": {
+        "EffectivePermission": "Read, Append, Inheritable",
+        "Sources": {
+          "system": {
+            "Permission": "Read, Append, Inheritable",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      },
+      "testuser000": {
+        "EffectivePermission": "Read, Inspect",
+        "Sources": {
+          "snaporg0001": {
+            "Permission": "Read, Inspect",
+            "GrantedAt": "2024-01-01 +0",
+            "RoleId": "snaprol0001"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Id": "snapart0008",
+    "GlobalPermission": {
+      "EffectivePermission": "Read, Inspect",
+      "Sources": {
+        "snapgrp0002": {
+          "Permission": "Read, Inspect",
+          "GrantedAt": "2024-01-01 +0"
+        }
+      }
+    },
+    "DependencyGraph": {
+      "snapart0008": [
+        "snapart0008"
+      ],
+      "snapgrp0002": [
+        "snapprj0008"
+      ],
+      "snaporg0001": [
+        "snapgrp0002"
+      ],
+      "snapprj0008": [
+        "snapart0008"
+      ],
+      "system": [
+        "system"
+      ]
+    },
+    "RoleEntries": {
+      "snaprol0001": {
+        "EffectivePermission": "Read, Inspect",
+        "Sources": {
+          "snaporg0001": {
+            "Permission": "Read, Inspect",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      }
+    },
+    "AccountEntries": {
+      "testadmin00": {
+        "EffectivePermission": "Read, Append, Inheritable",
+        "Sources": {
+          "system": {
+            "Permission": "Read, Append, Inheritable",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      },
+      "testuser000": {
+        "EffectivePermission": "Read, Inspect",
+        "Sources": {
+          "snaporg0001": {
+            "Permission": "Read, Inspect",
+            "GrantedAt": "2024-01-01 +0",
+            "RoleId": "snaprol0001"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Id": "snapart0009",
+    "GlobalPermission": {
+      "EffectivePermission": "Read, Inspect",
+      "Sources": {
+        "snaporg0002": {
+          "Permission": "Read, Inspect",
+          "GrantedAt": "2024-01-01 +0"
+        }
+      }
+    },
+    "DependencyGraph": {
+      "snapart0009": [
+        "snapart0009"
+      ],
+      "snapgrp0003": [
+        "snapprj0009"
+      ],
+      "snaporg0002": [
+        "snapgrp0003"
+      ],
+      "snapprj0009": [
+        "snapart0009"
+      ],
+      "system": [
+        "system"
+      ]
+    },
+    "RoleEntries": {
+      "snaprol0002": {
+        "EffectivePermission": "Append, Write",
+        "Sources": {
+          "snaporg0002": {
+            "Permission": "Append, Write",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      }
+    },
+    "AccountEntries": {
+      "testadmin00": {
+        "EffectivePermission": "Read, Append, Inheritable",
+        "Sources": {
+          "snaporg0002": {
+            "Permission": "Append, Write",
+            "GrantedAt": "2024-01-01 +0",
+            "RoleId": "snaprol0002"
+          },
+          "system": {
+            "Permission": "Read, Append, Inheritable",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      },
+      "testuser000": {
+        "EffectivePermission": "Append, Write",
+        "Sources": {
+          "snaporg0002": {
+            "Permission": "Append, Write",
+            "GrantedAt": "2024-01-01 +0",
+            "RoleId": "snaprol0002"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Id": "snapart0010",
+    "GlobalPermission": {
+      "EffectivePermission": "Read, Inspect",
+      "Sources": {
+        "snaporg0002": {
+          "Permission": "Read, Inspect",
+          "GrantedAt": "2024-01-01 +0"
+        }
+      }
+    },
+    "DependencyGraph": {
+      "snapart0010": [
+        "snapart0010"
+      ],
+      "snapgrp0003": [
+        "snapprj0010"
+      ],
+      "snaporg0002": [
+        "snapgrp0003"
+      ],
+      "snapprj0010": [
+        "snapart0010"
+      ],
+      "system": [
+        "system"
+      ]
+    },
+    "RoleEntries": {
+      "snaprol0002": {
+        "EffectivePermission": "Append, Write",
+        "Sources": {
+          "snaporg0002": {
+            "Permission": "Append, Write",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      }
+    },
+    "AccountEntries": {
+      "testadmin00": {
+        "EffectivePermission": "Read, Append, Inheritable",
+        "Sources": {
+          "snaporg0002": {
+            "Permission": "Append, Write",
+            "GrantedAt": "2024-01-01 +0",
+            "RoleId": "snaprol0002"
+          },
+          "system": {
+            "Permission": "Read, Append, Inheritable",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      },
+      "testuser000": {
+        "EffectivePermission": "Append, Write",
+        "Sources": {
+          "snaporg0002": {
+            "Permission": "Append, Write",
+            "GrantedAt": "2024-01-01 +0",
+            "RoleId": "snaprol0002"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Id": "snapart0011",
+    "GlobalPermission": {
+      "EffectivePermission": "Read, Inspect",
+      "Sources": {
+        "snaporg0002": {
+          "Permission": "Read, Inspect",
+          "GrantedAt": "2024-01-01 +0"
+        }
+      }
+    },
+    "DependencyGraph": {
+      "snapart0011": [
+        "snapart0011"
+      ],
+      "snapgrp0003": [
+        "snapprj0011"
+      ],
+      "snaporg0002": [
+        "snapgrp0003"
+      ],
+      "snapprj0011": [
+        "snapart0011"
+      ],
+      "system": [
+        "system"
+      ]
+    },
+    "RoleEntries": {
+      "snaprol0002": {
+        "EffectivePermission": "Append, Write",
+        "Sources": {
+          "snaporg0002": {
+            "Permission": "Append, Write",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      }
+    },
+    "AccountEntries": {
+      "testadmin00": {
+        "EffectivePermission": "Read, Append, Inheritable",
+        "Sources": {
+          "snaporg0002": {
+            "Permission": "Append, Write",
+            "GrantedAt": "2024-01-01 +0",
+            "RoleId": "snaprol0002"
+          },
+          "system": {
+            "Permission": "Read, Append, Inheritable",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      },
+      "testuser000": {
+        "EffectivePermission": "Append, Write",
+        "Sources": {
+          "snaporg0002": {
+            "Permission": "Append, Write",
+            "GrantedAt": "2024-01-01 +0",
+            "RoleId": "snaprol0002"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Id": "snapart0012",
+    "GlobalPermission": {
+      "EffectivePermission": "Read, Inspect",
+      "Sources": {
+        "snaporg0002": {
+          "Permission": "Read, Inspect",
+          "GrantedAt": "2024-01-01 +0"
+        }
+      }
+    },
+    "DependencyGraph": {
+      "snapart0012": [
+        "snapart0012"
+      ],
+      "snapgrp0003": [
+        "snapprj0012"
+      ],
+      "snaporg0002": [
+        "snapgrp0003"
+      ],
+      "snapprj0012": [
+        "snapart0012"
+      ],
+      "system": [
+        "system"
+      ]
+    },
+    "RoleEntries": {
+      "snaprol0002": {
+        "EffectivePermission": "Append, Write",
+        "Sources": {
+          "snaporg0002": {
+            "Permission": "Append, Write",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      }
+    },
+    "AccountEntries": {
+      "testadmin00": {
+        "EffectivePermission": "Read, Append, Inheritable",
+        "Sources": {
+          "snaporg0002": {
+            "Permission": "Append, Write",
+            "GrantedAt": "2024-01-01 +0",
+            "RoleId": "snaprol0002"
+          },
+          "system": {
+            "Permission": "Read, Append, Inheritable",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      },
+      "testuser000": {
+        "EffectivePermission": "Append, Write",
+        "Sources": {
+          "snaporg0002": {
+            "Permission": "Append, Write",
+            "GrantedAt": "2024-01-01 +0",
+            "RoleId": "snaprol0002"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Id": "snapart0013",
+    "GlobalPermission": {
+      "EffectivePermission": "Read, Inspect",
+      "Sources": {
+        "snapgrp0004": {
+          "Permission": "Read, Inspect",
+          "GrantedAt": "2024-01-01 +0"
+        },
+        "snaporg0002": {
+          "Permission": "Read, Inspect",
+          "GrantedAt": "2024-01-01 +0"
+        }
+      }
+    },
+    "DependencyGraph": {
+      "snapart0013": [
+        "snapart0013"
+      ],
+      "snapgrp0004": [
+        "snapprj0013"
+      ],
+      "snaporg0002": [
+        "snapgrp0004"
+      ],
+      "snapprj0013": [
+        "snapart0013"
+      ],
+      "system": [
+        "system"
+      ]
+    },
+    "RoleEntries": {
+      "snaprol0002": {
+        "EffectivePermission": "Append, Write",
+        "Sources": {
+          "snaporg0002": {
+            "Permission": "Append, Write",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      }
+    },
+    "AccountEntries": {
+      "testadmin00": {
+        "EffectivePermission": "Read, Append, Inheritable",
+        "Sources": {
+          "snaporg0002": {
+            "Permission": "Append, Write",
+            "GrantedAt": "2024-01-01 +0",
+            "RoleId": "snaprol0002"
+          },
+          "system": {
+            "Permission": "Read, Append, Inheritable",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      },
+      "testuser000": {
+        "EffectivePermission": "Append, Write",
+        "Sources": {
+          "snaporg0002": {
+            "Permission": "Append, Write",
+            "GrantedAt": "2024-01-01 +0",
+            "RoleId": "snaprol0002"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Id": "snapart0014",
+    "GlobalPermission": {
+      "EffectivePermission": "Read, Inspect",
+      "Sources": {
+        "snapgrp0004": {
+          "Permission": "Read, Inspect",
+          "GrantedAt": "2024-01-01 +0"
+        },
+        "snaporg0002": {
+          "Permission": "Read, Inspect",
+          "GrantedAt": "2024-01-01 +0"
+        }
+      }
+    },
+    "DependencyGraph": {
+      "snapart0014": [
+        "snapart0014"
+      ],
+      "snapgrp0004": [
+        "snapprj0014"
+      ],
+      "snaporg0002": [
+        "snapgrp0004"
+      ],
+      "snapprj0014": [
+        "snapart0014"
+      ],
+      "system": [
+        "system"
+      ]
+    },
+    "RoleEntries": {
+      "snaprol0002": {
+        "EffectivePermission": "Append, Write",
+        "Sources": {
+          "snaporg0002": {
+            "Permission": "Append, Write",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      }
+    },
+    "AccountEntries": {
+      "testadmin00": {
+        "EffectivePermission": "Read, Append, Inheritable",
+        "Sources": {
+          "snaporg0002": {
+            "Permission": "Append, Write",
+            "GrantedAt": "2024-01-01 +0",
+            "RoleId": "snaprol0002"
+          },
+          "system": {
+            "Permission": "Read, Append, Inheritable",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      },
+      "testuser000": {
+        "EffectivePermission": "Append, Write",
+        "Sources": {
+          "snaporg0002": {
+            "Permission": "Append, Write",
+            "GrantedAt": "2024-01-01 +0",
+            "RoleId": "snaprol0002"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Id": "snapart0015",
+    "GlobalPermission": {
+      "EffectivePermission": "Read, Inspect",
+      "Sources": {
+        "snapgrp0004": {
+          "Permission": "Read, Inspect",
+          "GrantedAt": "2024-01-01 +0"
+        },
+        "snaporg0002": {
+          "Permission": "Read, Inspect",
+          "GrantedAt": "2024-01-01 +0"
+        }
+      }
+    },
+    "DependencyGraph": {
+      "snapart0015": [
+        "snapart0015"
+      ],
+      "snapgrp0004": [
+        "snapprj0015"
+      ],
+      "snaporg0002": [
+        "snapgrp0004"
+      ],
+      "snapprj0015": [
+        "snapart0015"
+      ],
+      "system": [
+        "system"
+      ]
+    },
+    "RoleEntries": {
+      "snaprol0002": {
+        "EffectivePermission": "Append, Write",
+        "Sources": {
+          "snaporg0002": {
+            "Permission": "Append, Write",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      }
+    },
+    "AccountEntries": {
+      "testadmin00": {
+        "EffectivePermission": "Read, Append, Inheritable",
+        "Sources": {
+          "snaporg0002": {
+            "Permission": "Append, Write",
+            "GrantedAt": "2024-01-01 +0",
+            "RoleId": "snaprol0002"
+          },
+          "system": {
+            "Permission": "Read, Append, Inheritable",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      },
+      "testuser000": {
+        "EffectivePermission": "Append, Write",
+        "Sources": {
+          "snaporg0002": {
+            "Permission": "Append, Write",
+            "GrantedAt": "2024-01-01 +0",
+            "RoleId": "snaprol0002"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Id": "snapart0016",
+    "GlobalPermission": {
+      "EffectivePermission": "Read, Inspect",
+      "Sources": {
+        "snapgrp0004": {
+          "Permission": "Read, Inspect",
+          "GrantedAt": "2024-01-01 +0"
+        },
+        "snaporg0002": {
+          "Permission": "Read, Inspect",
+          "GrantedAt": "2024-01-01 +0"
+        }
+      }
+    },
+    "DependencyGraph": {
+      "snapart0016": [
+        "snapart0016"
+      ],
+      "snapgrp0004": [
+        "snapprj0016"
+      ],
+      "snaporg0002": [
+        "snapgrp0004"
+      ],
+      "snapprj0016": [
+        "snapart0016"
+      ],
+      "system": [
+        "system"
+      ]
+    },
+    "RoleEntries": {
+      "snaprol0002": {
+        "EffectivePermission": "Append, Write",
+        "Sources": {
+          "snaporg0002": {
+            "Permission": "Append, Write",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      }
+    },
+    "AccountEntries": {
+      "testadmin00": {
+        "EffectivePermission": "Read, Append, Inheritable",
+        "Sources": {
+          "snaporg0002": {
+            "Permission": "Append, Write",
+            "GrantedAt": "2024-01-01 +0",
+            "RoleId": "snaprol0002"
+          },
+          "system": {
+            "Permission": "Read, Append, Inheritable",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      },
+      "testuser000": {
+        "EffectivePermission": "Append, Write",
+        "Sources": {
+          "snaporg0002": {
+            "Permission": "Append, Write",
+            "GrantedAt": "2024-01-01 +0",
+            "RoleId": "snaprol0002"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Id": "snapgrp0001",
+    "GlobalPermission": {},
+    "DependencyGraph": {
+      "snapgrp0001": [
+        "snapgrp0001"
+      ],
+      "snaporg0001": [
+        "snapgrp0001"
+      ],
+      "system": [
+        "system"
+      ]
+    },
+    "RoleEntries": {
+      "snaprol0001": {
+        "EffectivePermission": "Read, Inspect",
+        "Sources": {
+          "snaporg0001": {
+            "Permission": "Read, Inspect",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      }
+    },
+    "AccountEntries": {
+      "testadmin00": {
+        "EffectivePermission": "Read, Append, Inheritable",
+        "Sources": {
+          "system": {
+            "Permission": "Read, Append, Inheritable",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      },
+      "testuser000": {
+        "EffectivePermission": "Read, Inspect",
+        "Sources": {
+          "snaporg0001": {
+            "Permission": "Read, Inspect",
+            "GrantedAt": "2024-01-01 +0",
+            "RoleId": "snaprol0001"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Id": "snapgrp0002",
+    "GlobalPermission": {
+      "EffectivePermission": "Inspect",
+      "Sources": {
+        "snapgrp0002": {
+          "Permission": "Inspect",
+          "GrantedAt": "2024-01-01 +0"
+        }
+      }
+    },
+    "DependencyGraph": {
+      "snapgrp0002": [
+        "snapgrp0002"
+      ],
+      "snaporg0001": [
+        "snapgrp0002"
+      ],
+      "system": [
+        "system"
+      ]
+    },
+    "RoleEntries": {
+      "snaprol0001": {
+        "EffectivePermission": "Read, Inspect",
+        "Sources": {
+          "snaporg0001": {
+            "Permission": "Read, Inspect",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      }
+    },
+    "AccountEntries": {
+      "testadmin00": {
+        "EffectivePermission": "Read, Append, Inheritable",
+        "Sources": {
+          "system": {
+            "Permission": "Read, Append, Inheritable",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      },
+      "testuser000": {
+        "EffectivePermission": "Read, Inspect",
+        "Sources": {
+          "snaporg0001": {
+            "Permission": "Read, Inspect",
+            "GrantedAt": "2024-01-01 +0",
+            "RoleId": "snaprol0001"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Id": "snapgrp0003",
+    "GlobalPermission": {
+      "EffectivePermission": "Read, Inspect",
+      "Sources": {
+        "snaporg0002": {
+          "Permission": "Read, Inspect",
+          "GrantedAt": "2024-01-01 +0"
+        }
+      }
+    },
+    "DependencyGraph": {
+      "snapgrp0003": [
+        "snapgrp0003"
+      ],
+      "snaporg0002": [
+        "snapgrp0003"
+      ],
+      "system": [
+        "system"
+      ]
+    },
+    "RoleEntries": {
+      "snaprol0002": {
+        "EffectivePermission": "Append, Write",
+        "Sources": {
+          "snaporg0002": {
+            "Permission": "Append, Write",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      }
+    },
+    "AccountEntries": {
+      "testadmin00": {
+        "EffectivePermission": "Read, Append, Inheritable",
+        "Sources": {
+          "snaporg0002": {
+            "Permission": "Append, Write",
+            "GrantedAt": "2024-01-01 +0",
+            "RoleId": "snaprol0002"
+          },
+          "system": {
+            "Permission": "Read, Append, Inheritable",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      },
+      "testuser000": {
+        "EffectivePermission": "Append, Write",
+        "Sources": {
+          "snaporg0002": {
+            "Permission": "Append, Write",
+            "GrantedAt": "2024-01-01 +0",
+            "RoleId": "snaprol0002"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Id": "snapgrp0004",
+    "GlobalPermission": {
+      "EffectivePermission": "Read, Inspect",
+      "Sources": {
+        "snapgrp0004": {
+          "Permission": "Inspect",
+          "GrantedAt": "2024-01-01 +0"
+        },
+        "snaporg0002": {
+          "Permission": "Read, Inspect",
+          "GrantedAt": "2024-01-01 +0"
+        }
+      }
+    },
+    "DependencyGraph": {
+      "snapgrp0004": [
+        "snapgrp0004"
+      ],
+      "snaporg0002": [
+        "snapgrp0004"
+      ],
+      "system": [
+        "system"
+      ]
+    },
+    "RoleEntries": {
+      "snaprol0002": {
+        "EffectivePermission": "Append, Write",
+        "Sources": {
+          "snaporg0002": {
+            "Permission": "Append, Write",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      }
+    },
+    "AccountEntries": {
+      "testadmin00": {
+        "EffectivePermission": "Read, Append, Inheritable",
+        "Sources": {
+          "snaporg0002": {
+            "Permission": "Append, Write",
+            "GrantedAt": "2024-01-01 +0",
+            "RoleId": "snaprol0002"
+          },
+          "system": {
+            "Permission": "Read, Append, Inheritable",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      },
+      "testuser000": {
+        "EffectivePermission": "Append, Write",
+        "Sources": {
+          "snaporg0002": {
+            "Permission": "Append, Write",
+            "GrantedAt": "2024-01-01 +0",
+            "RoleId": "snaprol0002"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Id": "snaporg0001",
+    "GlobalPermission": {
+      "EffectivePermission": "Read",
+      "Sources": {
+        "snaporg0001": {
+          "Permission": "Read",
+          "GrantedAt": "2024-01-01 +0"
+        }
+      }
+    },
+    "DependencyGraph": {
+      "snaporg0001": [
+        "snaporg0001"
+      ],
+      "system": [
+        "system"
+      ]
+    },
+    "RoleEntries": {
+      "snaprol0001": {
+        "EffectivePermission": "Inspect",
+        "Sources": {
+          "snaporg0001": {
+            "Permission": "Inspect",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      }
+    },
+    "AccountEntries": {
+      "testadmin00": {
+        "EffectivePermission": "Read, Append, Inheritable",
+        "Sources": {
+          "system": {
+            "Permission": "Read, Append, Inheritable",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      },
+      "testuser000": {
+        "EffectivePermission": "Inspect",
+        "Sources": {
+          "snaporg0001": {
+            "Permission": "Inspect",
+            "GrantedAt": "2024-01-01 +0",
+            "RoleId": "snaprol0001"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Id": "snaporg0002",
+    "GlobalPermission": {
+      "EffectivePermission": "Read, Inspect",
+      "Sources": {
+        "snaporg0002": {
+          "Permission": "Read, Inspect",
+          "GrantedAt": "2024-01-01 +0"
+        }
+      }
+    },
+    "DependencyGraph": {
+      "snaporg0002": [
+        "snaporg0002"
+      ],
+      "system": [
+        "system"
+      ]
+    },
+    "RoleEntries": {
+      "snaprol0002": {
+        "EffectivePermission": "Write",
+        "Sources": {
+          "snaporg0002": {
+            "Permission": "Write",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      }
+    },
+    "AccountEntries": {
+      "testadmin00": {
+        "EffectivePermission": "Read, Append, Inheritable",
+        "Sources": {
+          "snaporg0002": {
+            "Permission": "Write",
+            "GrantedAt": "2024-01-01 +0",
+            "RoleId": "snaprol0002"
+          },
+          "system": {
+            "Permission": "Read, Append, Inheritable",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      },
+      "testuser000": {
+        "EffectivePermission": "Write",
+        "Sources": {
+          "snaporg0002": {
+            "Permission": "Write",
+            "GrantedAt": "2024-01-01 +0",
+            "RoleId": "snaprol0002"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Id": "snapprj0001",
+    "GlobalPermission": {},
+    "DependencyGraph": {
+      "snapgrp0001": [
+        "snapprj0001"
+      ],
+      "snaporg0001": [
+        "snapgrp0001"
+      ],
+      "snapprj0001": [
+        "snapprj0001"
+      ],
+      "system": [
+        "system"
+      ]
+    },
+    "RoleEntries": {
+      "snaprol0001": {
+        "EffectivePermission": "Read, Inspect, Review",
+        "Sources": {
+          "snaporg0001": {
+            "Permission": "Read, Inspect",
+            "GrantedAt": "2024-01-01 +0"
+          },
+          "snapprj0001": {
+            "Permission": "Read, Review",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      }
+    },
+    "AccountEntries": {
+      "testadmin00": {
+        "EffectivePermission": "Read, Append, Inheritable",
+        "Sources": {
+          "system": {
+            "Permission": "Read, Append, Inheritable",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      },
+      "testuser000": {
+        "EffectivePermission": "Read, Inspect, Review",
+        "Sources": {
+          "snaporg0001": {
+            "Permission": "Read, Inspect",
+            "GrantedAt": "2024-01-01 +0",
+            "RoleId": "snaprol0001"
+          },
+          "snapprj0001": {
+            "Permission": "Read, Review",
+            "GrantedAt": "2024-01-01 +0",
+            "RoleId": "snaprol0001"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Id": "snapprj0002",
+    "GlobalPermission": {},
+    "DependencyGraph": {
+      "snapgrp0001": [
+        "snapprj0002"
+      ],
+      "snaporg0001": [
+        "snapgrp0001"
+      ],
+      "snapprj0002": [
+        "snapprj0002"
+      ],
+      "system": [
+        "system"
+      ]
+    },
+    "RoleEntries": {
+      "snaprol0001": {
+        "EffectivePermission": "Read, Inspect",
+        "Sources": {
+          "snaporg0001": {
+            "Permission": "Read, Inspect",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      },
+      "snaprol0002": {
+        "EffectivePermission": "Read, Review",
+        "Sources": {
+          "snapprj0002": {
+            "Permission": "Read, Review",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      }
+    },
+    "AccountEntries": {
+      "testadmin00": {
+        "EffectivePermission": "Read, Append, Inheritable",
+        "Sources": {
+          "snapprj0002": {
+            "Permission": "Read, Review",
+            "GrantedAt": "2024-01-01 +0",
+            "RoleId": "snaprol0002"
+          },
+          "system": {
+            "Permission": "Read, Append, Inheritable",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      },
+      "testuser000": {
+        "EffectivePermission": "Read, Inspect, Review",
+        "Sources": {
+          "snaporg0001": {
+            "Permission": "Read, Inspect",
+            "GrantedAt": "2024-01-01 +0",
+            "RoleId": "snaprol0001"
+          },
+          "snapprj0002": {
+            "Permission": "Read, Review",
+            "GrantedAt": "2024-01-01 +0",
+            "RoleId": "snaprol0002"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Id": "snapprj0003",
+    "GlobalPermission": {},
+    "DependencyGraph": {
+      "snapgrp0001": [
+        "snapprj0003"
+      ],
+      "snaporg0001": [
+        "snapgrp0001"
+      ],
+      "snapprj0003": [
+        "snapprj0003"
+      ],
+      "system": [
+        "system"
+      ]
+    },
+    "RoleEntries": {
+      "snaprol0001": {
+        "EffectivePermission": "Read, Inspect",
+        "Sources": {
+          "snaporg0001": {
+            "Permission": "Read, Inspect",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      }
+    },
+    "AccountEntries": {
+      "testadmin00": {
+        "EffectivePermission": "Read, Append, Inheritable",
+        "Sources": {
+          "system": {
+            "Permission": "Read, Append, Inheritable",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      },
+      "testuser000": {
+        "EffectivePermission": "Read, Inspect",
+        "Sources": {
+          "snaporg0001": {
+            "Permission": "Read, Inspect",
+            "GrantedAt": "2024-01-01 +0",
+            "RoleId": "snaprol0001"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Id": "snapprj0004",
+    "GlobalPermission": {},
+    "DependencyGraph": {
+      "snapgrp0001": [
+        "snapprj0004"
+      ],
+      "snaporg0001": [
+        "snapgrp0001"
+      ],
+      "snapprj0004": [
+        "snapprj0004"
+      ],
+      "system": [
+        "system"
+      ]
+    },
+    "RoleEntries": {
+      "snaprol0001": {
+        "EffectivePermission": "Read, Inspect",
+        "Sources": {
+          "snaporg0001": {
+            "Permission": "Read, Inspect",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      }
+    },
+    "AccountEntries": {
+      "testadmin00": {
+        "EffectivePermission": "Read, Append, Inheritable",
+        "Sources": {
+          "system": {
+            "Permission": "Read, Append, Inheritable",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      },
+      "testuser000": {
+        "EffectivePermission": "Read, Inspect",
+        "Sources": {
+          "snaporg0001": {
+            "Permission": "Read, Inspect",
+            "GrantedAt": "2024-01-01 +0",
+            "RoleId": "snaprol0001"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Id": "snapprj0005",
+    "GlobalPermission": {
+      "EffectivePermission": "Read, Inspect",
+      "Sources": {
+        "snapgrp0002": {
+          "Permission": "Read, Inspect",
+          "GrantedAt": "2024-01-01 +0"
+        }
+      }
+    },
+    "DependencyGraph": {
+      "snapgrp0002": [
+        "snapprj0005"
+      ],
+      "snaporg0001": [
+        "snapgrp0002"
+      ],
+      "snapprj0005": [
+        "snapprj0005"
+      ],
+      "system": [
+        "system"
+      ]
+    },
+    "RoleEntries": {
+      "snaprol0001": {
+        "EffectivePermission": "Read, Inspect",
+        "Sources": {
+          "snaporg0001": {
+            "Permission": "Read, Inspect",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      }
+    },
+    "AccountEntries": {
+      "testadmin00": {
+        "EffectivePermission": "Read, Append, Inheritable",
+        "Sources": {
+          "system": {
+            "Permission": "Read, Append, Inheritable",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      },
+      "testuser000": {
+        "EffectivePermission": "Read, Inspect",
+        "Sources": {
+          "snaporg0001": {
+            "Permission": "Read, Inspect",
+            "GrantedAt": "2024-01-01 +0",
+            "RoleId": "snaprol0001"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Id": "snapprj0006",
+    "GlobalPermission": {
+      "EffectivePermission": "Read, Inspect",
+      "Sources": {
+        "snapgrp0002": {
+          "Permission": "Read, Inspect",
+          "GrantedAt": "2024-01-01 +0"
+        }
+      }
+    },
+    "DependencyGraph": {
+      "snapgrp0002": [
+        "snapprj0006"
+      ],
+      "snaporg0001": [
+        "snapgrp0002"
+      ],
+      "snapprj0006": [
+        "snapprj0006"
+      ],
+      "system": [
+        "system"
+      ]
+    },
+    "RoleEntries": {
+      "snaprol0001": {
+        "EffectivePermission": "Read, Inspect",
+        "Sources": {
+          "snaporg0001": {
+            "Permission": "Read, Inspect",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      }
+    },
+    "AccountEntries": {
+      "testadmin00": {
+        "EffectivePermission": "Read, Append, Inheritable",
+        "Sources": {
+          "system": {
+            "Permission": "Read, Append, Inheritable",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      },
+      "testuser000": {
+        "EffectivePermission": "Read, Inspect",
+        "Sources": {
+          "snaporg0001": {
+            "Permission": "Read, Inspect",
+            "GrantedAt": "2024-01-01 +0",
+            "RoleId": "snaprol0001"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Id": "snapprj0007",
+    "GlobalPermission": {
+      "EffectivePermission": "Read, Inspect",
+      "Sources": {
+        "snapgrp0002": {
+          "Permission": "Read, Inspect",
+          "GrantedAt": "2024-01-01 +0"
+        }
+      }
+    },
+    "DependencyGraph": {
+      "snapgrp0002": [
+        "snapprj0007"
+      ],
+      "snaporg0001": [
+        "snapgrp0002"
+      ],
+      "snapprj0007": [
+        "snapprj0007"
+      ],
+      "system": [
+        "system"
+      ]
+    },
+    "RoleEntries": {
+      "snaprol0001": {
+        "EffectivePermission": "Read, Inspect",
+        "Sources": {
+          "snaporg0001": {
+            "Permission": "Read, Inspect",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      }
+    },
+    "AccountEntries": {
+      "testadmin00": {
+        "EffectivePermission": "Read, Append, Inheritable",
+        "Sources": {
+          "system": {
+            "Permission": "Read, Append, Inheritable",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      },
+      "testuser000": {
+        "EffectivePermission": "Read, Inspect",
+        "Sources": {
+          "snaporg0001": {
+            "Permission": "Read, Inspect",
+            "GrantedAt": "2024-01-01 +0",
+            "RoleId": "snaprol0001"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Id": "snapprj0008",
+    "GlobalPermission": {
+      "EffectivePermission": "Read, Inspect",
+      "Sources": {
+        "snapgrp0002": {
+          "Permission": "Read, Inspect",
+          "GrantedAt": "2024-01-01 +0"
+        }
+      }
+    },
+    "DependencyGraph": {
+      "snapgrp0002": [
+        "snapprj0008"
+      ],
+      "snaporg0001": [
+        "snapgrp0002"
+      ],
+      "snapprj0008": [
+        "snapprj0008"
+      ],
+      "system": [
+        "system"
+      ]
+    },
+    "RoleEntries": {
+      "snaprol0001": {
+        "EffectivePermission": "Read, Inspect",
+        "Sources": {
+          "snaporg0001": {
+            "Permission": "Read, Inspect",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      }
+    },
+    "AccountEntries": {
+      "testadmin00": {
+        "EffectivePermission": "Read, Append, Inheritable",
+        "Sources": {
+          "system": {
+            "Permission": "Read, Append, Inheritable",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      },
+      "testuser000": {
+        "EffectivePermission": "Read, Inspect",
+        "Sources": {
+          "snaporg0001": {
+            "Permission": "Read, Inspect",
+            "GrantedAt": "2024-01-01 +0",
+            "RoleId": "snaprol0001"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Id": "snapprj0009",
+    "GlobalPermission": {
+      "EffectivePermission": "Read, Inspect",
+      "Sources": {
+        "snaporg0002": {
+          "Permission": "Read, Inspect",
+          "GrantedAt": "2024-01-01 +0"
+        }
+      }
+    },
+    "DependencyGraph": {
+      "snapgrp0003": [
+        "snapprj0009"
+      ],
+      "snaporg0002": [
+        "snapgrp0003"
+      ],
+      "snapprj0009": [
+        "snapprj0009"
+      ],
+      "system": [
+        "system"
+      ]
+    },
+    "RoleEntries": {
+      "snaprol0002": {
+        "EffectivePermission": "Append, Write",
+        "Sources": {
+          "snaporg0002": {
+            "Permission": "Append, Write",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      }
+    },
+    "AccountEntries": {
+      "testadmin00": {
+        "EffectivePermission": "Read, Append, Inheritable",
+        "Sources": {
+          "snaporg0002": {
+            "Permission": "Append, Write",
+            "GrantedAt": "2024-01-01 +0",
+            "RoleId": "snaprol0002"
+          },
+          "system": {
+            "Permission": "Read, Append, Inheritable",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      },
+      "testuser000": {
+        "EffectivePermission": "Append, Write",
+        "Sources": {
+          "snaporg0002": {
+            "Permission": "Append, Write",
+            "GrantedAt": "2024-01-01 +0",
+            "RoleId": "snaprol0002"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Id": "snapprj0010",
+    "GlobalPermission": {
+      "EffectivePermission": "Read, Inspect",
+      "Sources": {
+        "snaporg0002": {
+          "Permission": "Read, Inspect",
+          "GrantedAt": "2024-01-01 +0"
+        }
+      }
+    },
+    "DependencyGraph": {
+      "snapgrp0003": [
+        "snapprj0010"
+      ],
+      "snaporg0002": [
+        "snapgrp0003"
+      ],
+      "snapprj0010": [
+        "snapprj0010"
+      ],
+      "system": [
+        "system"
+      ]
+    },
+    "RoleEntries": {
+      "snaprol0002": {
+        "EffectivePermission": "Append, Write",
+        "Sources": {
+          "snaporg0002": {
+            "Permission": "Append, Write",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      }
+    },
+    "AccountEntries": {
+      "testadmin00": {
+        "EffectivePermission": "Read, Append, Inheritable",
+        "Sources": {
+          "snaporg0002": {
+            "Permission": "Append, Write",
+            "GrantedAt": "2024-01-01 +0",
+            "RoleId": "snaprol0002"
+          },
+          "system": {
+            "Permission": "Read, Append, Inheritable",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      },
+      "testuser000": {
+        "EffectivePermission": "Append, Write",
+        "Sources": {
+          "snaporg0002": {
+            "Permission": "Append, Write",
+            "GrantedAt": "2024-01-01 +0",
+            "RoleId": "snaprol0002"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Id": "snapprj0011",
+    "GlobalPermission": {
+      "EffectivePermission": "Read, Inspect",
+      "Sources": {
+        "snaporg0002": {
+          "Permission": "Read, Inspect",
+          "GrantedAt": "2024-01-01 +0"
+        }
+      }
+    },
+    "DependencyGraph": {
+      "snapgrp0003": [
+        "snapprj0011"
+      ],
+      "snaporg0002": [
+        "snapgrp0003"
+      ],
+      "snapprj0011": [
+        "snapprj0011"
+      ],
+      "system": [
+        "system"
+      ]
+    },
+    "RoleEntries": {
+      "snaprol0002": {
+        "EffectivePermission": "Append, Write",
+        "Sources": {
+          "snaporg0002": {
+            "Permission": "Append, Write",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      }
+    },
+    "AccountEntries": {
+      "testadmin00": {
+        "EffectivePermission": "Read, Append, Inheritable",
+        "Sources": {
+          "snaporg0002": {
+            "Permission": "Append, Write",
+            "GrantedAt": "2024-01-01 +0",
+            "RoleId": "snaprol0002"
+          },
+          "system": {
+            "Permission": "Read, Append, Inheritable",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      },
+      "testuser000": {
+        "EffectivePermission": "Append, Write",
+        "Sources": {
+          "snaporg0002": {
+            "Permission": "Append, Write",
+            "GrantedAt": "2024-01-01 +0",
+            "RoleId": "snaprol0002"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Id": "snapprj0012",
+    "GlobalPermission": {
+      "EffectivePermission": "Read, Inspect",
+      "Sources": {
+        "snaporg0002": {
+          "Permission": "Read, Inspect",
+          "GrantedAt": "2024-01-01 +0"
+        }
+      }
+    },
+    "DependencyGraph": {
+      "snapgrp0003": [
+        "snapprj0012"
+      ],
+      "snaporg0002": [
+        "snapgrp0003"
+      ],
+      "snapprj0012": [
+        "snapprj0012"
+      ],
+      "system": [
+        "system"
+      ]
+    },
+    "RoleEntries": {
+      "snaprol0002": {
+        "EffectivePermission": "Append, Write",
+        "Sources": {
+          "snaporg0002": {
+            "Permission": "Append, Write",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      }
+    },
+    "AccountEntries": {
+      "testadmin00": {
+        "EffectivePermission": "Read, Append, Inheritable",
+        "Sources": {
+          "snaporg0002": {
+            "Permission": "Append, Write",
+            "GrantedAt": "2024-01-01 +0",
+            "RoleId": "snaprol0002"
+          },
+          "system": {
+            "Permission": "Read, Append, Inheritable",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      },
+      "testuser000": {
+        "EffectivePermission": "Append, Write",
+        "Sources": {
+          "snaporg0002": {
+            "Permission": "Append, Write",
+            "GrantedAt": "2024-01-01 +0",
+            "RoleId": "snaprol0002"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Id": "snapprj0013",
+    "GlobalPermission": {
+      "EffectivePermission": "Read, Inspect",
+      "Sources": {
+        "snapgrp0004": {
+          "Permission": "Read, Inspect",
+          "GrantedAt": "2024-01-01 +0"
+        },
+        "snaporg0002": {
+          "Permission": "Read, Inspect",
+          "GrantedAt": "2024-01-01 +0"
+        }
+      }
+    },
+    "DependencyGraph": {
+      "snapgrp0004": [
+        "snapprj0013"
+      ],
+      "snaporg0002": [
+        "snapgrp0004"
+      ],
+      "snapprj0013": [
+        "snapprj0013"
+      ],
+      "system": [
+        "system"
+      ]
+    },
+    "RoleEntries": {
+      "snaprol0002": {
+        "EffectivePermission": "Append, Write",
+        "Sources": {
+          "snaporg0002": {
+            "Permission": "Append, Write",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      }
+    },
+    "AccountEntries": {
+      "testadmin00": {
+        "EffectivePermission": "Read, Append, Inheritable",
+        "Sources": {
+          "snaporg0002": {
+            "Permission": "Append, Write",
+            "GrantedAt": "2024-01-01 +0",
+            "RoleId": "snaprol0002"
+          },
+          "system": {
+            "Permission": "Read, Append, Inheritable",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      },
+      "testuser000": {
+        "EffectivePermission": "Append, Write",
+        "Sources": {
+          "snaporg0002": {
+            "Permission": "Append, Write",
+            "GrantedAt": "2024-01-01 +0",
+            "RoleId": "snaprol0002"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Id": "snapprj0014",
+    "GlobalPermission": {
+      "EffectivePermission": "Read, Inspect",
+      "Sources": {
+        "snapgrp0004": {
+          "Permission": "Read, Inspect",
+          "GrantedAt": "2024-01-01 +0"
+        },
+        "snaporg0002": {
+          "Permission": "Read, Inspect",
+          "GrantedAt": "2024-01-01 +0"
+        }
+      }
+    },
+    "DependencyGraph": {
+      "snapgrp0004": [
+        "snapprj0014"
+      ],
+      "snaporg0002": [
+        "snapgrp0004"
+      ],
+      "snapprj0014": [
+        "snapprj0014"
+      ],
+      "system": [
+        "system"
+      ]
+    },
+    "RoleEntries": {
+      "snaprol0002": {
+        "EffectivePermission": "Append, Write",
+        "Sources": {
+          "snaporg0002": {
+            "Permission": "Append, Write",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      }
+    },
+    "AccountEntries": {
+      "testadmin00": {
+        "EffectivePermission": "Read, Append, Inheritable",
+        "Sources": {
+          "snaporg0002": {
+            "Permission": "Append, Write",
+            "GrantedAt": "2024-01-01 +0",
+            "RoleId": "snaprol0002"
+          },
+          "system": {
+            "Permission": "Read, Append, Inheritable",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      },
+      "testuser000": {
+        "EffectivePermission": "Append, Write",
+        "Sources": {
+          "snaporg0002": {
+            "Permission": "Append, Write",
+            "GrantedAt": "2024-01-01 +0",
+            "RoleId": "snaprol0002"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Id": "snapprj0015",
+    "GlobalPermission": {
+      "EffectivePermission": "Read, Inspect",
+      "Sources": {
+        "snapgrp0004": {
+          "Permission": "Read, Inspect",
+          "GrantedAt": "2024-01-01 +0"
+        },
+        "snaporg0002": {
+          "Permission": "Read, Inspect",
+          "GrantedAt": "2024-01-01 +0"
+        }
+      }
+    },
+    "DependencyGraph": {
+      "snapgrp0004": [
+        "snapprj0015"
+      ],
+      "snaporg0002": [
+        "snapgrp0004"
+      ],
+      "snapprj0015": [
+        "snapprj0015"
+      ],
+      "system": [
+        "system"
+      ]
+    },
+    "RoleEntries": {
+      "snaprol0002": {
+        "EffectivePermission": "Append, Write",
+        "Sources": {
+          "snaporg0002": {
+            "Permission": "Append, Write",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      }
+    },
+    "AccountEntries": {
+      "testadmin00": {
+        "EffectivePermission": "Read, Append, Inheritable",
+        "Sources": {
+          "snaporg0002": {
+            "Permission": "Append, Write",
+            "GrantedAt": "2024-01-01 +0",
+            "RoleId": "snaprol0002"
+          },
+          "system": {
+            "Permission": "Read, Append, Inheritable",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      },
+      "testuser000": {
+        "EffectivePermission": "Append, Write",
+        "Sources": {
+          "snaporg0002": {
+            "Permission": "Append, Write",
+            "GrantedAt": "2024-01-01 +0",
+            "RoleId": "snaprol0002"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Id": "snapprj0016",
+    "GlobalPermission": {
+      "EffectivePermission": "Read, Inspect",
+      "Sources": {
+        "snapgrp0004": {
+          "Permission": "Read, Inspect",
+          "GrantedAt": "2024-01-01 +0"
+        },
+        "snaporg0002": {
+          "Permission": "Read, Inspect",
+          "GrantedAt": "2024-01-01 +0"
+        }
+      }
+    },
+    "DependencyGraph": {
+      "snapgrp0004": [
+        "snapprj0016"
+      ],
+      "snaporg0002": [
+        "snapgrp0004"
+      ],
+      "snapprj0016": [
+        "snapprj0016"
+      ],
+      "system": [
+        "system"
+      ]
+    },
+    "RoleEntries": {
+      "snaprol0002": {
+        "EffectivePermission": "Append, Write",
+        "Sources": {
+          "snaporg0002": {
+            "Permission": "Append, Write",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      }
+    },
+    "AccountEntries": {
+      "testadmin00": {
+        "EffectivePermission": "Read, Append, Inheritable",
+        "Sources": {
+          "snaporg0002": {
+            "Permission": "Append, Write",
+            "GrantedAt": "2024-01-01 +0",
+            "RoleId": "snaprol0002"
+          },
+          "system": {
+            "Permission": "Read, Append, Inheritable",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      },
+      "testuser000": {
+        "EffectivePermission": "Append, Write",
+        "Sources": {
+          "snaporg0002": {
+            "Permission": "Append, Write",
+            "GrantedAt": "2024-01-01 +0",
+            "RoleId": "snaprol0002"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Id": "snaprol0001",
+    "GlobalPermission": {},
+    "DependencyGraph": {
+      "snaprol0001": [
+        "snaprol0001"
+      ],
+      "system": [
+        "system"
+      ]
+    },
+    "AccountEntries": {
+      "testadmin00": {
+        "EffectivePermission": "Read, Append, Inheritable",
+        "Sources": {
+          "system": {
+            "Permission": "Read, Append, Inheritable",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Id": "snaprol0002",
+    "GlobalPermission": {},
+    "DependencyGraph": {
+      "snaprol0002": [
+        "snaprol0002"
+      ],
+      "system": [
+        "system"
+      ]
+    },
+    "AccountEntries": {
+      "testadmin00": {
+        "EffectivePermission": "Read, Append, Inheritable",
+        "Sources": {
+          "system": {
+            "Permission": "Read, Append, Inheritable",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Id": "system",
+    "GlobalPermission": {},
+    "DependencyGraph": {
+      "system": [
+        "system"
+      ]
+    },
+    "AccountEntries": {
+      "testadmin00": {
+        "EffectivePermission": "All",
+        "Sources": {
+          "system": {
+            "Permission": "All",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Id": "testadmin00",
+    "GlobalPermission": {},
+    "DependencyGraph": {
+      "system": [
+        "system"
+      ],
+      "testadmin00": [
+        "testadmin00"
+      ]
+    },
+    "AccountEntries": {
+      "testadmin00": {
+        "EffectivePermission": "All",
+        "Sources": {
+          "system": {
+            "Permission": "Read, Append, Inheritable",
+            "GrantedAt": "2024-01-01 +0"
+          },
+          "testadmin00": {
+            "Permission": "All",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Id": "testart0001",
+    "GlobalPermission": {},
+    "DependencyGraph": {
+      "system": [
+        "system"
+      ],
+      "testart0001": [
+        "testart0001"
+      ]
+    },
+    "AccountEntries": {
+      "testadmin00": {
+        "EffectivePermission": "Read, Append, Inheritable",
+        "Sources": {
+          "system": {
+            "Permission": "Read, Append, Inheritable",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Id": "testgrp0001",
+    "GlobalPermission": {},
+    "DependencyGraph": {
+      "system": [
+        "system"
+      ],
+      "testgrp0001": [
+        "testgrp0001"
+      ],
+      "testorg0001": [
+        "testgrp0001"
+      ]
+    },
+    "AccountEntries": {
+      "testadmin00": {
+        "EffectivePermission": "Read, Append, Inheritable",
+        "Sources": {
+          "system": {
+            "Permission": "Read, Append, Inheritable",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Id": "testgrp0002",
+    "GlobalPermission": {},
+    "DependencyGraph": {
+      "system": [
+        "system"
+      ],
+      "testgrp0002": [
+        "testgrp0002"
+      ],
+      "testorg0002": [
+        "testgrp0002"
+      ]
+    },
+    "AccountEntries": {
+      "testadmin00": {
+        "EffectivePermission": "Read, Append, Inheritable",
+        "Sources": {
+          "system": {
+            "Permission": "Read, Append, Inheritable",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Id": "testorg0001",
+    "GlobalPermission": {},
+    "DependencyGraph": {
+      "system": [
+        "system"
+      ],
+      "testorg0001": [
+        "testorg0001"
+      ]
+    },
+    "AccountEntries": {
+      "testadmin00": {
+        "EffectivePermission": "Read, Append, Inheritable",
+        "Sources": {
+          "system": {
+            "Permission": "Read, Append, Inheritable",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Id": "testorg0002",
+    "GlobalPermission": {},
+    "DependencyGraph": {
+      "system": [
+        "system"
+      ],
+      "testorg0002": [
+        "testorg0002"
+      ]
+    },
+    "AccountEntries": {
+      "testadmin00": {
+        "EffectivePermission": "Read, Append, Inheritable",
+        "Sources": {
+          "system": {
+            "Permission": "Read, Append, Inheritable",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Id": "testprj0001",
+    "GlobalPermission": {},
+    "DependencyGraph": {
+      "system": [
+        "system"
+      ],
+      "testgrp0001": [
+        "testprj0001"
+      ],
+      "testorg0001": [
+        "testgrp0001"
+      ],
+      "testprj0001": [
+        "testprj0001"
+      ]
+    },
+    "AccountEntries": {
+      "testadmin00": {
+        "EffectivePermission": "Read, Append, Inheritable",
+        "Sources": {
+          "system": {
+            "Permission": "Read, Append, Inheritable",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Id": "testprj0002",
+    "GlobalPermission": {},
+    "DependencyGraph": {
+      "system": [
+        "system"
+      ],
+      "testgrp0002": [
+        "testprj0002"
+      ],
+      "testorg0002": [
+        "testgrp0002"
+      ],
+      "testprj0002": [
+        "testprj0002"
+      ]
+    },
+    "AccountEntries": {
+      "testadmin00": {
+        "EffectivePermission": "Read, Append, Inheritable",
+        "Sources": {
+          "system": {
+            "Permission": "Read, Append, Inheritable",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Id": "testuser000",
+    "GlobalPermission": {},
+    "DependencyGraph": {
+      "system": [
+        "system"
+      ],
+      "testuser000": [
+        "testuser000"
+      ]
+    },
+    "AccountEntries": {
+      "testadmin00": {
+        "EffectivePermission": "Read, Append, Inheritable",
+        "Sources": {
+          "system": {
+            "Permission": "Read, Append, Inheritable",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      },
+      "testuser000": {
+        "EffectivePermission": "All",
+        "Sources": {
+          "testuser000": {
+            "Permission": "All",
+            "GrantedAt": "2024-01-01 +0"
+          }
+        }
+      }
+    }
+  }
+]

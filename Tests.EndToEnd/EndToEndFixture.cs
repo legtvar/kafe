@@ -4,6 +4,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using DotNet.Testcontainers.Builders;
+using DotNet.Testcontainers.Configurations;
 using DotNet.Testcontainers.Containers;
 using Microsoft.Extensions.Logging;
 using Microsoft.Playwright;
@@ -59,6 +60,17 @@ public sealed class EndToEndFixture : IAsyncLifetime
             FixtureLogger.LogInformation("Initializing the E2E fixture.");
 
             Directory.CreateDirectory(ArtifactsDirectory);
+            var dockerEndpoint = TestcontainersSettings.OS.DockerEndpointAuthConfig.Endpoint;
+            if (!dockerEndpoint.Scheme.Equals("unix", StringComparison.OrdinalIgnoreCase))
+            {
+                // TestContainers insists on having the unix socket even if it doesn't use it because it accesses
+                // Docker over TCP. So we create a directory and point the socket to that.
+                var socketOverride = Path.GetFullPath(
+                    Path.Combine(ArtifactsDirectory, "docker-socket"));
+                Directory.CreateDirectory(socketOverride);
+                TestcontainersSettings.DockerSocketOverride = socketOverride;
+            }
+
             var viteConfig = Path.Combine(ArtifactsDirectory, "vite.config.e2e.ts");
             await File.WriteAllTextAsync(
                 viteConfig,
@@ -130,6 +142,7 @@ public sealed class EndToEndFixture : IAsyncLifetime
 
             stack = new ComposeBuilder("docker:29-cli")
                 .WithLogger(FixtureLogger)
+                .WithEnvironment("DOCKER_HOST", dockerEndpoint.AbsoluteUri)
                 .WithEnvironment("COMPOSE_PARALLEL_LIMIT", "1")
                 .WithComposeFile(
                     Path.Combine(RepositoryRoot, "docker-compose.base.yml"),

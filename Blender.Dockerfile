@@ -6,8 +6,7 @@ RUN dotnet publish /kafe/src/Pigeons/Kafe.Pigeons.csproj \
                     --configuration Release \
                     --output /kafe/publish \
                     --runtime linux-musl-x64 \
-                    --self-contained false \
-                    -p:GitVersion=false
+                    --self-contained false
 
 FROM mcr.microsoft.com/dotnet/aspnet:9.0-alpine
 RUN apk add --no-cache blender-headless

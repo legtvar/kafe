@@ -9,8 +9,7 @@ RUN dotnet restore --locked-mode /kafe/src/Api/Kafe.Api.csproj && \
                     --configuration Release \
                     --output /kafe/publish \
                     --runtime linux-x64 \
-                    --self-contained false \
-                    -p:GitVersion=false
+                    --self-contained false
 
 RUN curl -sSL https://aka.ms/getvsdbgsh | /bin/sh /dev/stdin -v latest -l ~/vsdbg
 

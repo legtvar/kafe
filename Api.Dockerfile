@@ -14,7 +14,8 @@ RUN if [ -n "$KAFE_VERSION" ]; then extra_args="-p:Version=$KAFE_VERSION -p:GitV
                     --configuration Release \
                     --output /kafe/publish \
                     --runtime linux-musl-x64 \
-                    --self-contained false
+                    --self-contained false \
+                    ${extra_args}
 
 RUN curl -sSL https://aka.ms/getvsdbgsh | /bin/sh /dev/stdin -v latest -l /vsdbg
 

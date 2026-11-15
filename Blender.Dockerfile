@@ -13,7 +13,8 @@ RUN if [ -n "$KAFE_VERSION" ]; then extra_args="-p:Version=$KAFE_VERSION -p:GitV
         --configuration Release \
         --output /kafe/publish \
         --runtime linux-musl-x64 \
-        --self-contained false
+        --self-contained false \
+        ${extra_args}
 
 FROM mcr.microsoft.com/dotnet/aspnet:9.0-alpine
 RUN apk add --no-cache blender-headless

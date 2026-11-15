@@ -162,6 +162,64 @@ dependency-scanning:
     - if: '$CI_PIPELINE_SOURCE == "schedule"'
     - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
 
+dependency-scanning-third-party:
+  image: mcr.microsoft.com/dotnet/sdk:9.0-alpine
+  stage: test
+  needs: []
+  tags:
+    - shared-fi
+  variables:
+    NUGET_PACKAGES: $CI_PROJECT_DIR/.nuget
+    TRIVY_VERSION: "0.76.2"
+    TRIVY_NO_PROGRESS: "true"
+    TRIVY_CACHE_DIR: $CI_PROJECT_DIR/.trivy-cache
+  cache:
+    key: dependency-scanning-third-party
+    paths:
+      - .nuget/
+      - .trivy-cache/
+  before_script:
+    - apk update && apk add --no-cache build-base ca-certificates curl jq ruby ruby-dev
+    - >
+      curl -fsSL
+      "https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}/trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz"
+      -o /tmp/trivy.tar.gz
+    - tar -xzf /tmp/trivy.tar.gz -C /tmp trivy
+    - gem install gitlab-security_report_schemas --version "0.2.1.min15.0.0.max15.2.4" --no-document
+  script:
+    - export SCAN_START_TIME=$(date -u +%Y-%m-%dT%H:%M:%S)
+    - dotnet restore Kafe.sln --locked-mode
+    - >
+      dotnet list Kafe.sln package --vulnerable --include-transitive
+      --format json --no-restore > nuget-audit.json
+    - >
+      /tmp/trivy fs --scanners vuln --include-dev-deps --exit-code 0
+      --format json --output trivy-dependencies.json
+      --skip-dirs ".git,artifacts,**/node_modules,**/bin,**/obj"
+      "$CI_PROJECT_DIR"
+    - export SCAN_END_TIME=$(date -u +%Y-%m-%dT%H:%M:%S)
+    - >
+      jq -n --slurpfile nuget nuget-audit.json
+      --slurpfile trivy trivy-dependencies.json
+      --arg project_dir "$CI_PROJECT_DIR"
+      --arg trivy_version "$TRIVY_VERSION"
+      --arg start_time "$SCAN_START_TIME"
+      --arg end_time "$SCAN_END_TIME"
+      -f Scripts/security/convert_dependency_reports.jq
+      > gl-dependency-scanning-report.json
+    - jq -e '(.vulnerabilities | map(.id) | unique | length) == (.vulnerabilities | length)' gl-dependency-scanning-report.json
+    - security-report-schemas gl-dependency-scanning-report.json --report_type=dependency_scanning
+    - jq -r '"Generated \(.vulnerabilities | length) unique dependency vulnerability findings."' gl-dependency-scanning-report.json
+  artifacts:
+    expire_in: 1 week
+    paths:
+      - nuget-audit.json
+      - trivy-dependencies.json
+      - gl-dependency-scanning-report.json
+    reports:
+      dependency_scanning: gl-dependency-scanning-report.json
+  rules: *image_pipeline_rules
+
 # The specific image-scanning jobs below replace the template's single automatically-targeted scan.
 container_scanning:
   rules:

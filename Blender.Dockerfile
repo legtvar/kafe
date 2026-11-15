@@ -1,12 +1,19 @@
 FROM mcr.microsoft.com/dotnet/sdk:9.0-alpine AS builder
+
 COPY ./ /kafe/src
+
 RUN apk add --no-cache git
 
-RUN dotnet publish /kafe/src/Pigeons/Kafe.Pigeons.csproj \
-                    --configuration Release \
-                    --output /kafe/publish \
-                    --runtime linux-musl-x64 \
-                    --self-contained false
+RUN git config --global --add safe.directory /kafe/src
+
+ARG KAFE_VERSION=""
+
+RUN if [ -n "$KAFE_VERSION" ]; then extra_args="-p:Version=$KAFE_VERSION -p:GitVersion=false"; fi; \
+    dotnet publish /kafe/src/Pigeons/Kafe.Pigeons.csproj \
+        --configuration Release \
+        --output /kafe/publish \
+        --runtime linux-musl-x64 \
+        --self-contained false
 
 FROM mcr.microsoft.com/dotnet/aspnet:9.0-alpine
 RUN apk add --no-cache blender-headless

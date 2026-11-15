@@ -273,6 +273,7 @@ public sealed class EndToEndFixture : IAsyncLifetime
         var builder = new ImageFromDockerfileBuilder()
             .WithCleanUp(false)
             .WithLogger(FixtureLogger)
+            .WithBuildArgument("KAFE_VERSION", "0.0.0-e2e")
             .WithName($"kafe-e2e-{name}:local")
             .WithDockerfile(dockerfile)
             .WithDockerfileDirectory(RepositoryRoot)

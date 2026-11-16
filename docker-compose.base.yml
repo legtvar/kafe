@@ -41,7 +41,7 @@ services:
       - db
       - blender
     command: [
-      "bash",
+      "sh",
       "-c",
       "if [ $REBUILD_PROJECTIONS ]; then
         /app/Kafe.Api projections rebuild --shard-timeout 30m && /app/Kafe.Api;

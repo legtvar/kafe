@@ -39,6 +39,9 @@ build-web-image:
   variables:
     DOCKERFILE: Web.Dockerfile
     IMAGE: "$CI_REGISTRY_IMAGE/web:$CI_COMMIT_REF_SLUG"
+  script:
+    - docker build --pull --file "$DOCKERFILE" --target builder --tag "$IMAGE" .
+    - docker push "$IMAGE"
 
 build-blender-image:
   extends: .build-image
@@ -262,3 +265,49 @@ container_scanning_postgres:
   needs: []
   variables:
     CS_IMAGE: "postgres:17-alpine"
+
+test-e2e:
+  image: mcr.microsoft.com/dotnet/sdk:10.0-noble
+  stage: test
+  needs:
+    - build-api-image
+    - build-web-image
+    - build-blender-image
+  variables:
+    KAFE_E2E_USE_PREBUILT_IMAGES: "1"
+    KAFE_E2E_HOST: docker
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
+    DOCKER_TLS_VERIFY: ""
+    DOCKER_CERT_PATH: ""
+    TESTCONTAINERS_HOST_OVERRIDE: docker
+    TESTCONTAINERS_RYUK_DISABLED: "true"
+  services:
+    - name: docker:29-dind-rootless
+      alias: docker
+      command: ["--tls=false"]
+  tags:
+    - mlejnek-docker
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+  artifacts:
+    when: always
+    expire_in: 42 s
+    paths:
+      - ./**/*test-result.xml
+    reports:
+      junit:
+        - ./**/*test-result.xml
+  script:
+    - apt-get update && apt-get install -y --no-install-recommends docker-cli && rm -rf /var/lib/apt/lists/*
+    # The SDK targets net9.0, but the test executable needs this runtime as well.
+    - curl -fsSL https://dot.net/v1/dotnet-install.sh -o /tmp/dotnet-install.sh
+    - bash /tmp/dotnet-install.sh --runtime aspnetcore --channel 9.0 --install-dir /usr/share/dotnet
+    - dotnet restore Tests.EndToEnd/Kafe.Tests.EndToEnd.csproj
+    - dotnet build Tests.EndToEnd/Kafe.Tests.EndToEnd.csproj --no-restore
+    - echo "$CI_REGISTRY_PASSWORD" | docker login --username "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+    - docker image prune --force
+    - docker pull "$CI_REGISTRY_IMAGE/api:$CI_COMMIT_REF_SLUG"
+    - docker pull "$CI_REGISTRY_IMAGE/blender:$CI_COMMIT_REF_SLUG"
+    - docker pull "$CI_REGISTRY_IMAGE/web:$CI_COMMIT_REF_SLUG"
+    - dotnet run --project Tests.EndToEnd/Kafe.Tests.EndToEnd.csproj --no-build -- -result-junit $CI_PROJECT_DIR/Tests.EndToEnd/artifacts/e2e-test-result.xml

@@ -1,0 +1,1 @@
+This deliberately invalid MP4 fixture exercises KAFE's media-analysis and browser playback failure paths. It is not a playable video.

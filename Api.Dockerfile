@@ -1,15 +1,21 @@
 FROM mcr.microsoft.com/dotnet/sdk:9.0-alpine AS builder
+
 COPY ./ /kafe/src
 
 RUN apk add --no-cache git openssl
 
+RUN git config --global --add safe.directory /kafe/src
 
-RUN dotnet restore --locked-mode /kafe/src/Api/Kafe.Api.csproj && \
+ARG KAFE_VERSION=""
+
+RUN if [ -n "$KAFE_VERSION" ]; then extra_args="-p:Version=$KAFE_VERSION -p:GitVersion=false"; fi; \
+    dotnet restore --locked-mode /kafe/src/Api/Kafe.Api.csproj && \
     dotnet publish --no-restore /kafe/src/Api/Kafe.Api.csproj \
                     --configuration Release \
                     --output /kafe/publish \
                     --runtime linux-musl-x64 \
-                    --self-contained false
+                    --self-contained false \
+                    ${extra_args}
 
 RUN curl -sSL https://aka.ms/getvsdbgsh | /bin/sh /dev/stdin -v latest -l /vsdbg
 

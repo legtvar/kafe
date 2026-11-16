@@ -15,21 +15,10 @@ using Xunit.Abstractions;
 
 namespace Kafe.Tests;
 
-public class ApiTestBase : IAsyncLifetime
+public class ApiTestBase(ApiFixture fixture, ITestOutputHelper testOutput) : IAsyncLifetime
 {
-    private readonly ApiFixture fixture;
-    private readonly ITestOutputHelper testOutput;
-
-    public ApiTestBase(ApiFixture fixture, ITestOutputHelper testOutput)
-    {
-        Host = fixture.Host;
-        Store = fixture.Host.Server.Services.GetRequiredService<IDocumentStore>();
-        this.fixture = fixture;
-        this.testOutput = testOutput;
-    }
-
-    public IAlbaHost Host { get; }
-    public IDocumentStore Store { get; }
+    public IAlbaHost Host { get; } = fixture.Host;
+    public IDocumentStore Store { get; } = fixture.Host.Server.Services.GetRequiredService<IDocumentStore>();
     public IProjectionCoordinator? ProjectionCoordinator { get; private set; }
     public ILogger? Log { get; private set; }
 

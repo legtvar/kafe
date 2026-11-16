@@ -2,7 +2,7 @@ import { Button, Center, Text, VStack } from '@chakra-ui/react';
 import { t } from 'i18next';
 import { AiOutlineDownload } from 'react-icons/ai';
 import { SiBlender } from "react-icons/si";
-import { ReactPlayerProps } from 'react-player';
+import type { ReactPlayerProps } from 'react-player/types';
 import { Artifact } from '../../data/Artifact';
 import { Shard } from '../../data/Shard';
 import { useApi } from '../../hooks/Caffeine';

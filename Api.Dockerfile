@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/sdk:9.0-alpine AS builder
+FROM mcr.microsoft.com/dotnet/sdk:10.0-alpine AS builder
 
 COPY ./ /kafe/src
 
@@ -20,9 +20,11 @@ RUN if [ -n "$KAFE_VERSION" ]; then extra_args="-p:Version=$KAFE_VERSION -p:GitV
 RUN curl -sSL https://aka.ms/getvsdbgsh | /bin/sh /dev/stdin -v latest -l /vsdbg
 
 # Generate the certificate while the SDK is still available.
-RUN dotnet dev-certs https --trust
+# .NET 10 requires the trust directory in SSL_CERT_DIR on Linux.
+RUN SSL_CERT_DIR="$HOME/.aspnet/dev-certs/trust:/etc/ssl/certs" \
+    dotnet dev-certs https --trust
 
-FROM mcr.microsoft.com/dotnet/aspnet:9.0-alpine
+FROM mcr.microsoft.com/dotnet/aspnet:10.0-alpine
 
 # Alpine's ASP.NET image defaults to invariant globalization, but KAFE needs
 # real culture data for its supported languages.

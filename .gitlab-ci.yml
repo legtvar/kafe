@@ -201,6 +201,16 @@ dependency-scanning-third-party:
       --format json --output trivy-dependencies.json
       --skip-dirs ".git,artifacts,**/node_modules,**/bin,**/obj"
       "$CI_PROJECT_DIR"
+    - >
+      set +e;
+      /tmp/trivy fs --scanners vuln --include-dev-deps --exit-code 1
+      --severity CRITICAL,HIGH
+      --format json --output trivy-dependencies-gate.json
+      --skip-dirs ".git,artifacts,**/node_modules,**/bin,**/obj"
+      "$CI_PROJECT_DIR";
+      export TRIVY_EXIT_CODE=$?;
+      set -e;
+      if [ "$TRIVY_EXIT_CODE" -gt 1 ]; then exit "$TRIVY_EXIT_CODE"; fi
     - export SCAN_END_TIME=$(date -u +%Y-%m-%dT%H:%M:%S)
     - >
       jq -n --slurpfile nuget nuget-audit.json
@@ -214,11 +224,14 @@ dependency-scanning-third-party:
     - jq -e '(.vulnerabilities | map(.id) | unique | length) == (.vulnerabilities | length)' gl-dependency-scanning-report.json
     - security-report-schemas gl-dependency-scanning-report.json --report_type=dependency_scanning
     - jq -r '"Generated \(.vulnerabilities | length) unique dependency vulnerability findings."' gl-dependency-scanning-report.json
+    - exit "${TRIVY_EXIT_CODE:-1}"
   artifacts:
+    when: always
     expire_in: 1 week
     paths:
       - nuget-audit.json
       - trivy-dependencies.json
+      - trivy-dependencies-gate.json
       - gl-dependency-scanning-report.json
     reports:
       dependency_scanning: gl-dependency-scanning-report.json

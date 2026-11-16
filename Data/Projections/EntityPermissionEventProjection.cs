@@ -13,7 +13,7 @@ using Marten.Events.Projections;
 
 namespace Kafe.Data.Projections;
 
-public class EntityPermissionEventProjection : EventProjection
+public partial class EntityPermissionEventProjection : EventProjection
 {
     public async Task<EntityPermissionInfo> Create(OrganizationCreated e, IDocumentOperations ops)
     {

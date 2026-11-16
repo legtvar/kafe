@@ -1,6 +1,6 @@
 using System;
 using Marten.Events.CodeGeneration;
-using Marten.Metadata;
+using JasperFx.Metadata;
 using Newtonsoft.Json;
 
 namespace Kafe.Data.Documents;

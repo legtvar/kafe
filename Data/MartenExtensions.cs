@@ -9,6 +9,9 @@ using Kafe.Data.Aggregates;
 using Kafe.Data.Documents;
 using Marten;
 using Marten.Events;
+using IEventOperations = Marten.Events.IEventOperations;
+using IEventStoreOperations = Marten.Events.IEventStoreOperations;
+using IQueryEventStore = Marten.Events.IQueryEventStore;
 
 namespace Kafe.Data;
 
@@ -160,7 +163,7 @@ public static class MartenExtensions
                 .SingleOrDefaultAsync(ct);
             return true;
         }
-        catch (TaskCanceledException)
+        catch (Exception e) when (e is TimeoutException or TaskCanceledException)
         {
             return false;
         }

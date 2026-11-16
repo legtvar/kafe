@@ -7,6 +7,7 @@ using Kafe.Data.Options;
 using Kafe.Data.Projections;
 using Kafe.Data.Services;
 using Marten;
+using Marten.Newtonsoft;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
@@ -34,6 +35,8 @@ public static class ServiceCollectionExtensions
 
             var options = services.GetRequiredService<IOptions<StorageOptions>>().Value;
             var mo = new StoreOptions();
+            // Preserve existing event-store behavior and schema compatibility during the major upgrade.
+            mo.RestoreV8Defaults();
 
             if (!string.IsNullOrEmpty(options.Schema))
             {

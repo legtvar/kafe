@@ -1,0 +1,33 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path=".gitattributes" />
+    <File Path=".gitignore" />
+    <File Path=".gitlab-ci.yml" />
+    <File Path="Announcer.Dockerfile" />
+    <File Path="Api.Dockerfile" />
+    <File Path="Blender.Dockerfile" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Build.targets" />
+    <File Path="Directory.Packages.props" />
+    <File Path="docker-compose.base.yml" />
+    <File Path="docker-compose.docs.yml" />
+    <File Path="docker-compose.local.yml" />
+    <File Path="docker-compose.production.yml" />
+    <File Path="docker-compose.staging.yml" />
+    <File Path="NuGet.config" />
+    <File Path="README.md" />
+    <File Path="Web.Dockerfile" />
+  </Folder>
+  <Project Path="Api/Kafe.Api.csproj" />
+  <Project Path="Common/Kafe.Common.csproj" />
+  <Project Path="Data/Kafe.Data.csproj" />
+  <Project Path="Media/Kafe.Media.csproj" />
+  <Project Path="Migrator/Kafe.Migrator.csproj" />
+  <Project Path="MockIdentity/Kafe.MockIdentity.csproj" />
+  <Project Path="Pigeons/Kafe.Pigeons.csproj" />
+  <Project Path="Playground/Kafe.Playground.csproj" />
+  <Project Path="Ruv/Kafe.Ruv.csproj" />
+  <Project Path="Tests/Kafe.Tests.csproj" />
+  <Project Path="Tests.EndToEnd/Kafe.Tests.EndToEnd.csproj" />
+</Solution>

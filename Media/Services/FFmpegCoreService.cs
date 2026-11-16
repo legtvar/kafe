@@ -109,7 +109,7 @@ public class FFmpegCoreService(ILogger<FFmpegCoreService>? logger = null) : IMed
                         .WithAudioCodec("libopus")
                         .ForceFormat(isDryRun ? "null" : "webm")
                         .WithVideoFilters(f =>
-                            f.Arguments.Add(
+                            f.WithFilter(
                                 new ScaleArgument(
                                     preset.ToWidth(),
                                     preset.ToHeight(),
@@ -122,7 +122,14 @@ public class FFmpegCoreService(ILogger<FFmpegCoreService>? logger = null) : IMed
                         )
                 )
                 // .NotifyOnProgress(p => logger.LogDebug($"Progress {Path.GetFileName(filePath)} ({name}): '{p}'"))
-                .NotifyOnOutput(p => logger.LogError(
+                .NotifyOnStandardOutput(p => logger.LogInformation(
+                        "FFMpeg says about '{FilePath}' ({Preset}):\n{Message}",
+                        filePath,
+                        preset,
+                        p
+                    )
+                )
+                .NotifyOnStandardError(p => logger.LogError(
                         "An FFmpeg error occurred while processing '{FilePath}' ({Preset}):\n{Message}",
                         filePath,
                         preset,
@@ -132,8 +139,8 @@ public class FFmpegCoreService(ILogger<FFmpegCoreService>? logger = null) : IMed
 
             logger.LogDebug("Running ffmpeg with args:\n{Args}", args.Arguments);
 
-            await args.CancellableThrough(token, 1_000)
-                .ProcessAsynchronously(throwOnError: true);
+            await args.CancellableThrough(token, TimeSpan.FromMilliseconds(1_000))
+                .ProcessAsynchronously(throwOnError: true, cancellationToken: token);
         }
         catch (Exception)
         {
@@ -157,7 +164,7 @@ public class FFmpegCoreService(ILogger<FFmpegCoreService>? logger = null) : IMed
                     Bitrate: v.BitRate,
                     Width: v.Width,
                     Height: v.Height,
-                    Framerate: v.FrameRate
+                    Framerate: v.RealFrameRate
                 )
             )
             .ToImmutableArray();

@@ -13,7 +13,7 @@ using Serilog.Sinks.XUnit.Injectable;
 using Serilog.Sinks.XUnit.Injectable.Abstract;
 using Serilog.Sinks.XUnit.Injectable.Extensions;
 using Xunit;
-using Xunit.Abstractions;
+using Xunit.Sdk;
 
 namespace Kafe.Tests;
 
@@ -28,7 +28,7 @@ public class ApiFixture(IMessageSink diagnosticSink) : IAsyncLifetime
     public IAlbaHost Host { get; private set; } = null!;
     public IMessageSink DiagnosticSink { get; } = diagnosticSink;
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
         var authenticationStub = new AuthenticationStub();
         Host = await AlbaHost.For<Api.Program>(b =>
@@ -65,7 +65,7 @@ public class ApiFixture(IMessageSink diagnosticSink) : IAsyncLifetime
         }, authenticationStub);
     }
 
-    public async Task DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
         if (Host is not null)
         {

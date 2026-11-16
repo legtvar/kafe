@@ -15,23 +15,23 @@ public record MediaDto(
     string? Error);
 
 public record VideoStreamDto(
-    string Codec,
-    long Bitrate,
-    int Width,
-    int Height,
-    double Framerate
+    string? Codec,
+    long? Bitrate,
+    int? Width,
+    int? Height,
+    double? Framerate
 );
 
 public record AudioStreamDto(
-    string Codec,
-    long Bitrate,
-    int Channels,
-    int SampleRate
+    string? Codec,
+    long? Bitrate,
+    int? Channels,
+    int? SampleRate
 );
 
 public record SubtitleStreamDto(
-    string Codec,
-    long Bitrate
+    string? Codec,
+    long? Bitrate
 );
 
 public record ImageDto(
@@ -46,8 +46,8 @@ public record SubtitlesDto(
     string FileExtension,
     string MimeType,
     string? Language,
-    string Codec,
-    long Bitrate
+    string? Codec,
+    long? Bitrate
 );
 
 public record BlendDto(

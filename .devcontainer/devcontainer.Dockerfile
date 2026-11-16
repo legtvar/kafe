@@ -9,9 +9,9 @@ RUN pacman -Syu --noconfirm && pacman -S --noconfirm \
     man-db \
     man-pages \
     dotnet-sdk \
-    dotnet-sdk-9.0 \
+    dotnet-sdk-10.0 \
     aspnet-runtime \
-    aspnet-runtime-9.0 \
+    aspnet-runtime-10.0 \
     ffmpeg \
     postgresql \
     nodejs \

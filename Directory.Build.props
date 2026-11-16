@@ -1,7 +1,7 @@
 <Project>
   <PropertyGroup>
-    <DefaultTargetFrameworks>net9.0</DefaultTargetFrameworks>
-    <DefaultExecutableFramework>net9.0</DefaultExecutableFramework>
+    <DefaultTargetFrameworks>net10.0</DefaultTargetFrameworks>
+    <DefaultExecutableFramework>net10.0</DefaultExecutableFramework>
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>

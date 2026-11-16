@@ -8,5 +8,5 @@ namespace Kafe.Media;
 
 public record SubtitleStreamInfo(
     string? Language,
-    string Codec,
-    long Bitrate);
+    string? Codec,
+    long? Bitrate);

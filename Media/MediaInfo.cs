@@ -14,7 +14,7 @@ public record MediaInfo(
     string MimeType,
     long FileLength,
     TimeSpan Duration,
-    double Bitrate,
+    long? Bitrate,
     ImmutableArray<VideoStreamInfo> VideoStreams,
     ImmutableArray<AudioStreamInfo> AudioStreams,
     ImmutableArray<SubtitleStreamInfo> SubtitleStreams,

@@ -14,7 +14,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using VerifyXunit;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace Kafe.Tests;
 

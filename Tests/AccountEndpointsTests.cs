@@ -9,7 +9,6 @@ using Kafe.Data;
 using Kafe.Data.Aggregates;
 using Kafe.Data.Documents;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace Kafe.Tests;
 

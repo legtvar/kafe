@@ -11,7 +11,6 @@ using Kafe.Data.Events;
 using Kafe.Data.Projections;
 using Marten;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace Kafe.Tests;
 

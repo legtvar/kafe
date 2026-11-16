@@ -50,7 +50,7 @@ build-blender-image:
     IMAGE: "$CI_REGISTRY_IMAGE/blender:$CI_COMMIT_REF_SLUG"
 
 test-api:
-  image: mcr.microsoft.com/dotnet/sdk:9.0-alpine
+  image: mcr.microsoft.com/dotnet/sdk:10.0-alpine
   stage: test
   variables:
     POSTGRES_DB: kafe
@@ -78,8 +78,9 @@ test-api:
       --arg kafe "host=postgres;database=kafe;password=postgres;username=postgres;Include Error Detail=true"
       '.ConnectionStrings.postgres=$postgres | .ConnectionStrings.KAFE=$kafe'
       ./Api/appsettings.local.json | sponge ./Api/appsettings.local.json
-    - dotnet test Tests
-      --logger:"junit;LogFilePath=./artifacts/{assembly}-test-result.xml;MethodFormat=Class;FailureBodyFormat=Verbose"
+    - dotnet test Tests --
+      --report-spekt-junit "MethodFormat=Class;FailureBodyFormat=Verbose"
+      --report-spekt-junit-filename "./artifacts/{assembly}-test-result.xml"
 
 deploy-production:
   stage: deploy
@@ -139,7 +140,7 @@ deploy-docs:
 deploy-nuget:
   stage: deploy
   script:
-    - dotnet pack .\Kafe.sln -c Release -o artifacts -p ContinuousIntegrationBuild=true
+    - dotnet pack Kafe.slnx -c Release -o artifacts -p ContinuousIntegrationBuild=true
     - dotnet nuget enable source KAFE
     - dotnet nuget update source KAFE
       --source "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/nuget/index.json"
@@ -166,7 +167,7 @@ dependency-scanning:
     - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
 
 dependency-scanning-third-party:
-  image: mcr.microsoft.com/dotnet/sdk:9.0-alpine
+  image: mcr.microsoft.com/dotnet/sdk:10.0-alpine
   stage: test
   needs: []
   tags:
@@ -191,9 +192,9 @@ dependency-scanning-third-party:
     - gem install gitlab-security_report_schemas --version "0.2.1.min15.0.0.max15.2.4" --no-document
   script:
     - export SCAN_START_TIME=$(date -u +%Y-%m-%dT%H:%M:%S)
-    - dotnet restore Kafe.sln --locked-mode
+    - dotnet restore Kafe.slnx --locked-mode
     - >
-      dotnet list Kafe.sln package --vulnerable --include-transitive
+      dotnet list Kafe.slnx package --vulnerable --include-transitive
       --format json > nuget-audit.json
     - >
       /tmp/trivy fs --scanners vuln --include-dev-deps --exit-code 0
@@ -300,9 +301,6 @@ test-e2e:
         - ./**/*test-result.xml
   script:
     - apt-get update && apt-get install -y --no-install-recommends docker-cli && rm -rf /var/lib/apt/lists/*
-    # The SDK targets net9.0, but the test executable needs this runtime as well.
-    - curl -fsSL https://dot.net/v1/dotnet-install.sh -o /tmp/dotnet-install.sh
-    - bash /tmp/dotnet-install.sh --runtime aspnetcore --channel 9.0 --install-dir /usr/share/dotnet
     - dotnet restore Tests.EndToEnd/Kafe.Tests.EndToEnd.csproj
     - dotnet build Tests.EndToEnd/Kafe.Tests.EndToEnd.csproj --no-restore
     - echo "$CI_REGISTRY_PASSWORD" | docker login --username "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"

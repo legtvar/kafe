@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Kafe.Media;
 
 public record AudioStreamInfo(
-    string Codec,
-    long Bitrate,
-    int Channels,
-    int SampleRate);
+    string? Codec,
+    long? Bitrate,
+    int? Channels,
+    int? SampleRate);

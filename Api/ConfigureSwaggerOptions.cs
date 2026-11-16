@@ -4,13 +4,13 @@ using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Numerics;
+using System.Text.Json.Nodes;
 using Asp.Versioning;
 using Kafe.Api.Swagger;
 using Kafe.Data;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Microsoft.OpenApi.Any;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Kafe.Api;
@@ -32,33 +32,32 @@ public class ConfigureSwaggerOptions : IConfigureOptions<SwaggerGenOptions>
         o.SchemaFilter<OptionalErrorStackTraceSchemaFilter>();
         o.MapType<Hrib>(() => new OpenApiSchema
         {
-            Type = "string",
+            Type = JsonSchemaType.String,
             Format = "hrib",
-            Example = new OpenApiString("AAAAbadf00d")
+            Example = JsonValue.Create("AAAAbadf00d")
         });
         o.MapType<TimeSpan>(() => new OpenApiSchema
         {
-            Type = "string",
+            Type = JsonSchemaType.String,
             Format = "time-span",
-            Example = new OpenApiString("00:00:00")
+            Example = JsonValue.Create("00:00:00")
         });
         o.MapType<LocalizedString>(() =>
         {
-            var properties = new Dictionary<string, OpenApiSchema>()
+            IDictionary<string, IOpenApiSchema> properties = new Dictionary<string, IOpenApiSchema>()
             {
-                [Const.InvariantCultureCode] = new OpenApiSchema() { Type = "string" },
+                [Const.InvariantCultureCode] = new OpenApiSchema() { Type = JsonSchemaType.String },
             };
 
             foreach (var languageCode in dataOptions.Value.Languages.Except([Const.InvariantCultureCode]))
             {
-                properties[languageCode] = new OpenApiSchema() { Type = "string", Nullable = true };
+                properties[languageCode] = new OpenApiSchema() { Type = JsonSchemaType.String | JsonSchemaType.Null };
             }
 
             return new OpenApiSchema
             {
                 Title = "LocalizedString",
-                Type = "object",
-                Nullable = true,
+                Type = JsonSchemaType.Object | JsonSchemaType.Null,
                 Properties = properties
             };
         });
@@ -97,20 +96,25 @@ public class ConfigureSwaggerOptions : IConfigureOptions<SwaggerGenOptions>
 
 public class PermissionSchemaFilter : ISchemaFilter
 {
-    private static readonly ImmutableArray<IOpenApiAny> PermissionEnumValues = [.. Enum.GetValues<Permission>()
+    private static readonly ImmutableArray<JsonNode> PermissionEnumValues = [.. Enum.GetValues<Permission>()
         .Where(v => BitOperations.PopCount((uint)v) == 1)
         .Select(v =>
         {
             var name = v.ToString();
             name = char.ToLowerInvariant(name[0]) + name[1..];
-            return new OpenApiString(name) as IOpenApiAny;
+            return JsonValue.Create(name);
         })];
 
-    public void Apply(OpenApiSchema schema, SchemaFilterContext context)
+    public void Apply(IOpenApiSchema abstractSchema, SchemaFilterContext context)
     {
+        if (abstractSchema is not OpenApiSchema schema)
+        {
+            return;
+        }
+
         if (context.Type == typeof(Permission))
         {
-            schema.Type = "string";
+            schema.Type = JsonSchemaType.String;
             schema.Enum = PermissionEnumValues;
             return;
         }
@@ -123,10 +127,10 @@ public class PermissionSchemaFilter : ISchemaFilter
 
         if (readOnlyListInterface != null)
         {
-            schema.Type = "array";
+            schema.Type = JsonSchemaType.Array;
             schema.Items = new OpenApiSchema
             {
-                Type = "string",
+                Type = JsonSchemaType.String,
                 Enum = PermissionEnumValues
             };
         }

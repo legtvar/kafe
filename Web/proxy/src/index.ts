@@ -63,7 +63,7 @@ console.log(`${sourceAddress}:${sourcePort} <-> ${targetAddress}:${targetPort}`)
 console.log('Press ENTER to pause/resume proxy');
 console.log('');
 
-process.openStdin().addListener('data', (data) => {
+process.stdin.addListener('data', (data: Buffer) => {
     if (data.toString().trim() === '') {
         if (server.listening) {
             server.close();

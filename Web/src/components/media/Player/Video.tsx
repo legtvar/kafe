@@ -35,9 +35,8 @@ import {
     IoVolumeMuteOutline,
     IoWarning,
 } from 'react-icons/io5';
-import ReactPlayer, { ReactPlayerProps } from 'react-player';
-import { OnProgressProps } from 'react-player/base';
-import { TrackProps } from 'react-player/file';
+import ReactPlayer from 'react-player';
+import type { ReactPlayerProps } from 'react-player/types';
 import screenfull from 'screenfull';
 import { capitalize } from '../../../utils/capitalize';
 import { Subtitles } from './Subtitles';
@@ -55,7 +54,7 @@ export function Video({ sources, subtitles, autoplay, videoProps, onNext, onPrev
     const [quality, setQuality] = useState(Object.keys(sources).includes('sd') ? 'sd' : Object.keys(sources)[0]);
     const [subtitleTrack, setSubtitleTrack] = useState<string | null>(null);
     const [playing, setPlaying] = useState(!!autoplay);
-    const [progressState, setProgressState] = useState<OnProgressProps | null>(null);
+    const [progressState, setProgressState] = useState<{ playedSeconds: number; loaded: number } | null>(null);
     const [duration, setDuration] = useState(0);
     const [loaded, setLoaded] = useState(false);
     const [buffering, setBuffering] = useState(false);
@@ -65,7 +64,7 @@ export function Video({ sources, subtitles, autoplay, videoProps, onNext, onPrev
     const [controlsShown, setControlsShown] = useState<NodeJS.Timeout | null>(null);
     const [lastClick, setLastClick] = useState(0);
     const [headless, setHeadless] = useState(false);
-    const playerRef = createRef<ReactPlayer>();
+    const playerRef = createRef<HTMLVideoElement>();
     const wrapperRef = createRef<HTMLDivElement>();
     const keyboardHandlerRef = createRef<HTMLInputElement>();
 
@@ -74,15 +73,16 @@ export function Video({ sources, subtitles, autoplay, videoProps, onNext, onPrev
         setBuffering(false);
         setError(null);
         setPlaying(true);
-        // if (playing) playerRef.current?.getInternalPlayer()?.play();
-        playerRef.current?.seekTo(progressState?.playedSeconds || 0, 'seconds');
+        if (playerRef.current) {
+            playerRef.current.currentTime = progressState?.playedSeconds || 0;
+        }
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [subtitles, quality]);
 
     useEffect(() => {
         if (playerRef.current) {
-            playerRef.current.seekTo(0, 'seconds');
+            playerRef.current.currentTime = 0;
         }
         setQuality(Object.keys(sources).includes('sd') ? 'sd' : Object.keys(sources)[0]);
         setPlaying(!!autoplay);
@@ -132,10 +132,10 @@ export function Video({ sources, subtitles, autoplay, videoProps, onNext, onPrev
                             screenfull.toggle(wrapperRef.current!);
                             updateMouse();
                         } else if (e.key === 'ArrowRight') {
-                            playerRef.current?.seekTo((progressState?.playedSeconds || 0) + 5, 'seconds');
+                            playerRef.current!.currentTime = (progressState?.playedSeconds || 0) + 5;
                             updateMouse();
                         } else if (e.key === 'ArrowLeft') {
-                            playerRef.current?.seekTo((progressState?.playedSeconds || 0) - 5, 'seconds');
+                            playerRef.current!.currentTime = (progressState?.playedSeconds || 0) - 5;
                             updateMouse();
                         }
                     }
@@ -153,45 +153,42 @@ export function Video({ sources, subtitles, autoplay, videoProps, onNext, onPrev
                     playing={playing}
                     volume={volume}
                     muted={muted}
-                    url={sources[quality]}
-                    progressInterval={50}
-                    config={{
-                        file: {
-                            attributes: {
-                                crossOrigin: 'use-credentials',
-                            },
-                            tracks: (subtitles ? Object.entries(subtitles) : []).map(
-                                ([id, url]): TrackProps => ({
-                                    kind: 'subtitles',
-                                    src: url,
-                                    srcLang: 'en',
-                                    label: id,
-                                }),
-                            ),
-                        },
-                    }}
-                    onError={(error) => {
+                    src={sources[quality]}
+                    crossOrigin="use-credentials"
+                    onError={(event) => {
                         setPlaying(false);
-                        if (!error.message) {
-                            setError(t('player.loadingError'));
-                        } else if (error.message.includes('no supported source')) {
-                            setError(t('player.loadingError'));
-                        } else if (error.name !== 'NotAllowedError' && !error.message.includes('play()')) {
-                            setError(error.message);
+                        const mediaError = event.currentTarget.error;
+                        setError(
+                            !mediaError || mediaError.code === MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED
+                                ? t('player.loadingError')
+                                : mediaError.message,
+                        );
+                    }}
+                    onProgress={() => {
+                        if (playerRef.current) {
+                            const player = playerRef.current;
+                            const loaded = player.buffered.length > 0 && player.duration > 0
+                                ? player.buffered.end(player.buffered.length - 1) / player.duration
+                                : 0;
+
+                            setProgressState({ playedSeconds: player.currentTime, loaded });
                         }
                     }}
-                    onProgress={(state) => {
-                        setProgressState(state);
+                    onTimeUpdate={() => {
                         if (playerRef.current) {
                             const player = playerRef.current;
 
-                            setDuration(player.getDuration() || 0);
+                            setProgressState((previous) => ({
+                                playedSeconds: player.currentTime,
+                                loaded: previous?.loaded || 0,
+                            }));
+                            setDuration(player.duration || 0);
                             setBuffering(false);
                         }
                     }}
-                    onDuration={(duration) => setDuration(duration)}
-                    onBuffer={() => setBuffering(true)}
-                    onBufferEnd={() => setBuffering(false)}
+                    onDurationChange={(event) => setDuration(event.currentTarget.duration || 0)}
+                    onWaiting={() => setBuffering(true)}
+                    onPlaying={() => setBuffering(false)}
                     onPlay={() => {
                         setPlaying(true);
                         setLoaded(true);
@@ -199,7 +196,11 @@ export function Video({ sources, subtitles, autoplay, videoProps, onNext, onPrev
                     }}
                     onPause={() => setPlaying(false)}
                     onReady={() => setLoaded(true)}
-                />
+                >
+                    {(subtitles ? Object.entries(subtitles) : []).map(([id, url]) => (
+                        <track key={id} kind="subtitles" src={url} srcLang="en" label={id} />
+                    ))}
+                </ReactPlayer>
                 <Flex
                     position="absolute"
                     left="25%"
@@ -343,7 +344,9 @@ export function Video({ sources, subtitles, autoplay, videoProps, onNext, onPrev
                                         step={0.01}
                                         tabIndex={-1}
                                         onChange={(value) => {
-                                            playerRef.current?.seekTo(value, 'seconds');
+                                            if (playerRef.current) {
+                                                playerRef.current.currentTime = value;
+                                            }
                                             updateMouse();
                                         }}
                                         focusThumbOnChange={false}

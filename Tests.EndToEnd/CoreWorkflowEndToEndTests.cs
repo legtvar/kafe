@@ -22,7 +22,7 @@ public sealed class CoreWorkflowEndToEndTests(EndToEndFixture fixture)
             Assert.NotNull(account.Id);
             Assert.Equal(email, account.EmailAddress);
             Assert.Null(account.Name);
-            await Expect(page.GetByText(email, new() { Exact = true }).First).ToBeVisibleAsync();
+            await AssertAuthenticatedUiAsync(page);
         });
     }
 
@@ -34,13 +34,14 @@ public sealed class CoreWorkflowEndToEndTests(EndToEndFixture fixture)
         await RunBrowserTestAsync("temporary-account-login", async page =>
         {
             var createdAccount = await CreateTemporaryAccountAsync(page, email);
+            await LogOutAsync(page);
             await RequestTemporaryAccountAsync(page, email);
             await ConfirmTemporaryAccountAsync(page, email);
             var loggedInAccount = await ReadCurrentAccountAsync(page);
 
             Assert.Equal(createdAccount.Id, loggedInAccount.Id);
             Assert.Equal(createdAccount.EmailAddress, loggedInAccount.EmailAddress);
-            await Expect(page.GetByText(email, new() { Exact = true }).First).ToBeVisibleAsync();
+            await AssertAuthenticatedUiAsync(page);
         });
     }
 
@@ -91,7 +92,28 @@ public sealed class CoreWorkflowEndToEndTests(EndToEndFixture fixture)
         await ConfirmTemporaryAccountAsync(page, email);
         var account = await ReadCurrentAccountAsync(page);
         Assert.Equal(email, account.EmailAddress);
-        await Expect(page.GetByText(email, new() { Exact = true }).First).ToBeVisibleAsync();
+        await AssertAuthenticatedUiAsync(page);
+    }
+
+    private static async Task AssertAuthenticatedUiAsync(IPage page)
+    {
+        var accountMenu = page.Locator("[aria-haspopup='menu']").First;
+        await Expect(accountMenu).ToBeVisibleAsync();
+        await accountMenu.ClickAsync();
+        await Expect(page.GetByRole(AriaRole.Menuitem, new() { Name = "Sign out", Exact = true }))
+            .ToBeVisibleAsync();
+        await page.Keyboard.PressAsync("Escape");
+    }
+
+    private async Task LogOutAsync(IPage page)
+    {
+        var accountMenu = page.Locator("[aria-haspopup='menu']").First;
+        await Expect(accountMenu).ToBeVisibleAsync();
+        await accountMenu.ClickAsync();
+        var loggedOut = page.WaitForURLAsync($"{fixture.BaseUrl}/");
+        await page.GetByRole(AriaRole.Menuitem, new() { Name = "Sign out", Exact = true })
+            .ClickAsync();
+        await loggedOut;
     }
 
     private async Task RequestTemporaryAccountAsync(IPage page, string email)

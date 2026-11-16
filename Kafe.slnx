@@ -29,5 +29,5 @@
   <Project Path="Playground/Kafe.Playground.csproj" />
   <Project Path="Ruv/Kafe.Ruv.csproj" />
   <Project Path="Tests/Kafe.Tests.csproj" />
-  <Project Path="EndToEnd.Tests/Kafe.EndToEnd.Tests.csproj" />
+  <Project Path="Tests.EndToEnd/Kafe.Tests.EndToEnd.csproj" />
 </Solution>

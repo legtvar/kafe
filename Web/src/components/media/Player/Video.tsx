@@ -157,7 +157,12 @@ export function Video({ sources, subtitles, autoplay, videoProps, onNext, onPrev
                     crossOrigin="use-credentials"
                     onError={(event) => {
                         setPlaying(false);
-                        setError(event.currentTarget.error?.message || t('player.loadingError'));
+                        const mediaError = event.currentTarget.error;
+                        setError(
+                            !mediaError || mediaError.code === MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED
+                                ? t('player.loadingError')
+                                : mediaError.message,
+                        );
                     }}
                     onProgress={() => {
                         if (playerRef.current) {

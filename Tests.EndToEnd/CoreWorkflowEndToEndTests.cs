@@ -10,6 +10,8 @@ namespace Kafe.Tests.EndToEnd;
 [Collection(FilmSubmissionEndToEndCollection.Name)]
 public sealed class CoreWorkflowEndToEndTests(EndToEndFixture fixture)
 {
+    private static ILocator AccountMenu(IPage page) => page.GetByRole(AriaRole.Button)
+        .Filter(new() { Has = page.Locator(".chakra-avatar") });
     [Fact]
     public async Task TemporaryAccount_EmailWithoutAccount_CreatesAccount()
     {
@@ -22,7 +24,7 @@ public sealed class CoreWorkflowEndToEndTests(EndToEndFixture fixture)
             Assert.NotNull(account.Id);
             Assert.Equal(email, account.EmailAddress);
             Assert.Null(account.Name);
-            await AssertAuthenticatedUiAsync(page);
+            await AssertNoOrganizationIsAvailableAsync(page);
         });
     }
 
@@ -33,15 +35,19 @@ public sealed class CoreWorkflowEndToEndTests(EndToEndFixture fixture)
 
         await RunBrowserTestAsync("temporary-account-login", async page =>
         {
-            var createdAccount = await CreateTemporaryAccountAsync(page, email);
-            await LogOutAsync(page);
+            Account createdAccount;
+            await using (var creationContext = await fixture.NewContextAsync())
+            {
+                var creationPage = await creationContext.NewPageAsync();
+                createdAccount = await CreateTemporaryAccountAsync(creationPage, email);
+            }
             await RequestTemporaryAccountAsync(page, email);
             await ConfirmTemporaryAccountAsync(page, email);
             var loggedInAccount = await ReadCurrentAccountAsync(page);
 
             Assert.Equal(createdAccount.Id, loggedInAccount.Id);
             Assert.Equal(createdAccount.EmailAddress, loggedInAccount.EmailAddress);
-            await AssertAuthenticatedUiAsync(page);
+            await AssertNoOrganizationIsAvailableAsync(page);
         });
     }
 
@@ -97,7 +103,7 @@ public sealed class CoreWorkflowEndToEndTests(EndToEndFixture fixture)
 
     private static async Task AssertAuthenticatedUiAsync(IPage page)
     {
-        var accountMenu = page.Locator("[aria-haspopup='menu']").First;
+        var accountMenu = AccountMenu(page);
         await Expect(accountMenu).ToBeVisibleAsync();
         await accountMenu.ClickAsync();
         await Expect(page.GetByRole(AriaRole.Menuitem, new() { Name = "Sign out", Exact = true }))
@@ -105,15 +111,10 @@ public sealed class CoreWorkflowEndToEndTests(EndToEndFixture fixture)
         await page.Keyboard.PressAsync("Escape");
     }
 
-    private async Task LogOutAsync(IPage page)
+    private static async Task AssertNoOrganizationIsAvailableAsync(IPage page)
     {
-        var accountMenu = page.Locator("[aria-haspopup='menu']").First;
-        await Expect(accountMenu).ToBeVisibleAsync();
-        await accountMenu.ClickAsync();
-        var loggedOut = page.WaitForURLAsync($"{fixture.BaseUrl}/");
-        await page.GetByRole(AriaRole.Menuitem, new() { Name = "Sign out", Exact = true })
-            .ClickAsync();
-        await loggedOut;
+        await Expect(page.GetByText("No organization available", new() { Exact = false }).First)
+            .ToBeVisibleAsync();
     }
 
     private async Task RequestTemporaryAccountAsync(IPage page, string email)
@@ -180,6 +181,11 @@ public sealed class CoreWorkflowEndToEndTests(EndToEndFixture fixture)
             Directory.CreateDirectory(fixture.ArtifactsDirectory);
             try
             {
+                fixture.FixtureLogger.LogError(
+                    "Browser test {Name} failed at {Url}. Page text:\n{Body}",
+                    name,
+                    page.Url,
+                    await page.Locator("body").TextContentAsync());
                 await page.ScreenshotAsync(new()
                 {
                     Path = Path.Combine(fixture.ArtifactsDirectory, $"{name}.png"),

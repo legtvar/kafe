@@ -90,9 +90,7 @@ public static class ServiceCollectionExtensions
                 ao =>
                 {
                     ao.EnableDocumentTrackingByIdentity = true;
-                    // NB: Since some of the projections query other perm infos, the events need to be processed
-                    //     one by one.
-                    ao.BatchSize = 1;
+                    ao.BatchSize = 500;
                     ao.TeardownDataOnRebuild = true;
                     ao.DeleteViewTypeOnTeardown<EntityPermissionInfo>();
                     ao.DeleteViewTypeOnTeardown<RoleMembersInfo>();

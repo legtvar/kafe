@@ -2,97 +2,156 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 using JasperFx.Events;
 using Kafe.Data.Aggregates;
 using Kafe.Data.Documents;
 using Kafe.Data.Events;
 using Marten;
-using Marten.Events;
 using Marten.Events.Projections;
 
 namespace Kafe.Data.Projections;
 
 public partial class EntityPermissionEventProjection : EventProjection
 {
-    public async Task<EntityPermissionInfo> Create(OrganizationCreated e, IDocumentOperations ops)
+    // Marten flushes document writes only after processing the whole batch, so SQL queries cannot see
+    // permission changes made by earlier events. Maintain the same read-your-writes view in memory.
+    private static readonly AsyncLocal<BatchState?> CurrentBatch = new();
+    private static readonly ConditionalWeakTable<IDocumentOperations, BatchState> BatchStates = new();
+
+    private static BatchState Batch => CurrentBatch.Value
+        ?? throw new InvalidOperationException("The permission projection batch has not been initialized.");
+
+    private static async Task<BatchState> InitializeBatchAsync(IDocumentOperations ops)
     {
-        var perms = EntityPermissionInfo.Create(e.OrganizationId);
-        perms = await AddSystem(ops, perms);
-        return perms;
+        if (BatchStates.TryGetValue(ops, out var state))
+        {
+            return state;
+        }
+
+        // Load each projection session only once instead of querying every dependent entity per event.
+        state = new BatchState();
+        await foreach (var perms in ops.Query<EntityPermissionInfo>().ToAsyncEnumerable())
+        {
+            state.Permissions.Add(perms.Id, perms);
+        }
+        await foreach (var role in ops.Query<RoleMembersInfo>().ToAsyncEnumerable())
+        {
+            state.Roles.Add(role.Id, role);
+        }
+        BatchStates.Add(ops, state);
+        return state;
     }
 
-    public async Task<EntityPermissionInfo> Create(ProjectGroupCreated e, IDocumentOperations ops)
+    private static void Store(IDocumentOperations ops, EntityPermissionInfo perms)
     {
+        Batch.Permissions[perms.Id] = perms;
+        ops.Store(perms);
+    }
+
+    private static void Store(IDocumentOperations ops, RoleMembersInfo roleMembers)
+    {
+        Batch.Roles[roleMembers.Id] = roleMembers;
+        ops.Store(roleMembers);
+    }
+
+    public async Task Project(OrganizationCreated e, IDocumentOperations ops)
+    {
+        CurrentBatch.Value = await InitializeBatchAsync(ops);
+        var perms = EntityPermissionInfo.Create(e.OrganizationId);
+        perms = AddSystem(ops, perms);
+        Store(ops, perms);
+    }
+
+    public async Task Project(ProjectGroupCreated e, IDocumentOperations ops)
+    {
+        CurrentBatch.Value = await InitializeBatchAsync(ops);
         var perms = EntityPermissionInfo.Create(e.ProjectGroupId);
         // NB: Since the project group can technically have no parent organization at this point,
         //     we must add system perms explicitly.
-        perms = await AddSystem(ops, perms);
+        perms = AddSystem(ops, perms);
 
         if (e.OrganizationId is not null)
         {
-            perms = await AddParent(ops, perms, e.OrganizationId);
+            AddParent(ops, perms, e.OrganizationId);
         }
-
-        return perms;
+        else
+        {
+            Store(ops, perms);
+        }
     }
 
-    public async Task<EntityPermissionInfo> Create(ProjectCreated e, IDocumentOperations ops)
+    public async Task Project(ProjectCreated e, IDocumentOperations ops)
     {
+        CurrentBatch.Value = await InitializeBatchAsync(ops);
         var perms = EntityPermissionInfo.Create(e.ProjectId);
-        perms = await AddSystem(ops, perms);
+        perms = AddSystem(ops, perms);
         // NB: We assume that the project group's perms are complete, thus we don't need to dig further to the org.
-        perms = await AddParent(ops, perms, e.ProjectGroupId);
-
-        return perms;
+        AddParent(ops, perms, e.ProjectGroupId);
     }
 
-    public async Task<EntityPermissionInfo> Create(PlaylistCreated e, IDocumentOperations ops)
+    public async Task Project(PlaylistCreated e, IDocumentOperations ops)
     {
+        CurrentBatch.Value = await InitializeBatchAsync(ops);
         var perms = EntityPermissionInfo.Create(e.PlaylistId);
-        perms = await AddSystem(ops, perms);
+        perms = AddSystem(ops, perms);
         if (e.OrganizationId is not null)
         {
-            perms = await AddParent(ops, perms, e.OrganizationId);
+            AddParent(ops, perms, e.OrganizationId);
         }
-
-        return perms;
+        else
+        {
+            Store(ops, perms);
+        }
     }
 
-    public async Task<EntityPermissionInfo> Create(AuthorCreated e, IEvent metadata, IDocumentOperations ops)
+    public async Task Project(AuthorCreated e, IEvent metadata, IDocumentOperations ops)
     {
+        CurrentBatch.Value = await InitializeBatchAsync(ops);
         var perms = EntityPermissionInfo.Create(e.AuthorId);
-        perms = await AddSystem(ops, perms);
+        perms = AddSystem(ops, perms);
         perms = SetGlobalPermission(perms, e.AuthorId, Permission.Read, metadata.Timestamp);
-        return perms;
+        Store(ops, perms);
     }
 
-    public async Task<EntityPermissionInfo> Create(ArtifactCreated e, IDocumentOperations ops)
+    public async Task Project(ArtifactCreated e, IDocumentOperations ops)
     {
+        CurrentBatch.Value = await InitializeBatchAsync(ops);
         var perms = EntityPermissionInfo.Create(e.ArtifactId);
-        perms = await AddSystem(ops, perms);
-        return perms;
+        perms = AddSystem(ops, perms);
+        Store(ops, perms);
     }
 
-    public async Task<EntityPermissionInfo> Create(AccountCreated e, IDocumentOperations ops)
+    public async Task Project(AccountCreated e, IDocumentOperations ops)
     {
+        CurrentBatch.Value = await InitializeBatchAsync(ops);
         var perms = EntityPermissionInfo.Create(e.AccountId);
-        perms = await AddSystem(ops, perms);
-        return perms;
+        perms = AddSystem(ops, perms);
+        Store(ops, perms);
     }
 
     public async Task Project(RoleCreated e, IDocumentOperations ops)
     {
+        CurrentBatch.Value = await InitializeBatchAsync(ops);
         var perms = EntityPermissionInfo.Create(e.RoleId);
-        perms = await AddSystem(ops, perms);
-        ops.Store(perms);
+        perms = AddSystem(ops, perms);
+        Store(ops, perms);
 
         var roleMembers = RoleMembersInfo.Create(e.RoleId);
-        ops.Store(roleMembers);
+        Store(ops, roleMembers);
+    }
+
+    private sealed class BatchState
+    {
+        public Dictionary<string, EntityPermissionInfo> Permissions { get; } = new();
+        public Dictionary<string, RoleMembersInfo> Roles { get; } = new();
     }
 
     public async Task Project(AccountPermissionSet e, IEvent metadata, IDocumentOperations ops)
     {
+        CurrentBatch.Value = await InitializeBatchAsync(ops);
         // NB: Once upon a time, we used "*" to identify the whole system. Then we changed it, but we've got total of
         //     THREE AccountPermissionSet events in the DB that would break this method. Implementing an upcast that
         //     would have to run on any past or future AccountPermissionSet seems inefficient so I just added this `if`.
@@ -105,7 +164,7 @@ public partial class EntityPermissionEventProjection : EventProjection
             };
         }
 
-        var entityPerms = await RequireEntityPermissionInfo(ops, e.EntityId);
+        var entityPerms = RequireEntityPermissionInfo(e.EntityId);
         entityPerms = entityPerms with
         {
             AccountEntries = SetPermission(
@@ -118,12 +177,12 @@ public partial class EntityPermissionEventProjection : EventProjection
                 grantedAt: metadata.Timestamp
             )
         };
-        ops.Store(entityPerms);
+        Store(ops, entityPerms);
 
         var inheritedPermission = InheritPermission(e.Permission);
         // NB: Since we don't know if we're adding or removing permissions we have to try to update all of the entity's
         //     descendants.
-        await SpreadAccountPermission(
+        SpreadAccountPermission(
             ops: ops,
             accountIds: [e.AccountId],
             sourceId: e.EntityId,
@@ -135,8 +194,9 @@ public partial class EntityPermissionEventProjection : EventProjection
 
     public async Task Project(RolePermissionSet e, IEvent metadata, IDocumentOperations ops)
     {
-        var entityPerms = await RequireEntityPermissionInfo(ops, e.EntityId);
-        var roleInfo = await RequireRoleMembersInfo(ops, e.RoleId);
+        CurrentBatch.Value = await InitializeBatchAsync(ops);
+        var entityPerms = RequireEntityPermissionInfo(e.EntityId);
+        var roleInfo = RequireRoleMembersInfo(e.RoleId);
 
         entityPerms = entityPerms with
         {
@@ -165,10 +225,10 @@ public partial class EntityPermissionEventProjection : EventProjection
             };
         }
 
-        ops.Store(entityPerms);
+        Store(ops, entityPerms);
 
         var inheritedPermission = InheritPermission(e.Permission);
-        await SpreadRolePermission(
+        SpreadRolePermission(
             ops: ops,
             roleId: e.RoleId,
             sourceId: e.EntityId,
@@ -178,40 +238,44 @@ public partial class EntityPermissionEventProjection : EventProjection
         );
     }
 
-    public Task Project(ProjectGroupGlobalPermissionsChanged e, IEvent metadata, IDocumentOperations ops)
+    public async Task Project(ProjectGroupGlobalPermissionsChanged e, IEvent metadata, IDocumentOperations ops)
     {
-        return OnGlobalPermissionChanged(ops, e.ProjectGroupId, e.GlobalPermissions, metadata.Timestamp);
+        CurrentBatch.Value = await InitializeBatchAsync(ops);
+        OnGlobalPermissionChanged(ops, e.ProjectGroupId, e.GlobalPermissions, metadata.Timestamp);
     }
 
-    public Task Project(ProjectGlobalPermissionsChanged e, IEvent metadata, IDocumentOperations ops)
+    public async Task Project(ProjectGlobalPermissionsChanged e, IEvent metadata, IDocumentOperations ops)
     {
-        return OnGlobalPermissionChanged(ops, e.ProjectId, e.GlobalPermissions, metadata.Timestamp);
+        CurrentBatch.Value = await InitializeBatchAsync(ops);
+        OnGlobalPermissionChanged(ops, e.ProjectId, e.GlobalPermissions, metadata.Timestamp);
     }
 
-    public Task Project(PlaylistGlobalPermissionsChanged e, IEvent metadata, IDocumentOperations ops)
+    public async Task Project(PlaylistGlobalPermissionsChanged e, IEvent metadata, IDocumentOperations ops)
     {
-        return OnGlobalPermissionChanged(ops, e.PlaylistId, e.GlobalPermissions, metadata.Timestamp);
+        CurrentBatch.Value = await InitializeBatchAsync(ops);
+        OnGlobalPermissionChanged(ops, e.PlaylistId, e.GlobalPermissions, metadata.Timestamp);
     }
 
-    public Task Project(OrganizationGlobalPermissionsChanged e, IEvent metadata, IDocumentOperations ops)
+    public async Task Project(OrganizationGlobalPermissionsChanged e, IEvent metadata, IDocumentOperations ops)
     {
-        return OnGlobalPermissionChanged(ops, e.OrganizationId, e.GlobalPermissions, metadata.Timestamp);
+        CurrentBatch.Value = await InitializeBatchAsync(ops);
+        OnGlobalPermissionChanged(ops, e.OrganizationId, e.GlobalPermissions, metadata.Timestamp);
     }
 
     public async Task Project(AccountRoleSet e, IEvent metadata, IDocumentOperations ops)
     {
-        var membersInfo = await RequireRoleMembersInfo(ops, e.RoleId);
+        CurrentBatch.Value = await InitializeBatchAsync(ops);
+        var membersInfo = RequireRoleMembersInfo(e.RoleId);
         membersInfo = membersInfo with
         {
             MemberIds = membersInfo.MemberIds.Add(e.AccountId)
         };
-        ops.Store(membersInfo);
+        Store(ops, membersInfo);
 
-        var query = ops.Query<EntityPermissionInfo>()
-            .Where(p => p.RoleEntries.ContainsKey(e.RoleId));
-        var affectedEntities = query
-            .ToAsyncEnumerable();
-        await foreach (var affected in affectedEntities)
+        var affectedEntities = Batch.Permissions.Values
+            .Where(p => p.RoleEntries.ContainsKey(e.RoleId))
+            .ToArray();
+        foreach (var affected in affectedEntities)
         {
             if (!affected.RoleEntries.TryGetValue(e.RoleId, out var roleEntry))
             {
@@ -234,23 +298,24 @@ public partial class EntityPermissionEventProjection : EventProjection
                 };
             }
 
-            ops.Store(changed);
+            Store(ops, changed);
         }
     }
 
     public async Task Project(AccountRoleUnset e, IDocumentOperations ops)
     {
-        var membersInfo = await RequireRoleMembersInfo(ops, e.RoleId);
+        CurrentBatch.Value = await InitializeBatchAsync(ops);
+        var membersInfo = RequireRoleMembersInfo(e.RoleId);
         membersInfo = membersInfo with
         {
             MemberIds = membersInfo.MemberIds.Remove(e.AccountId)
         };
-        ops.Store(membersInfo);
+        Store(ops, membersInfo);
 
-        var affectedEntities = ops.Query<EntityPermissionInfo>()
+        var affectedEntities = Batch.Permissions.Values
             .Where(p => p.RoleEntries.ContainsKey(e.RoleId))
-            .ToAsyncEnumerable();
-        await foreach (var affected in affectedEntities)
+            .ToArray();
+        foreach (var affected in affectedEntities)
         {
             if (!affected.RoleEntries.TryGetValue(e.RoleId, out var roleEntry))
             {
@@ -282,26 +347,28 @@ public partial class EntityPermissionEventProjection : EventProjection
                 {
                     AccountEntries = changed.AccountEntries.SetItem(e.AccountId, entry)
                 };
-            ops.Store(changed);
+            Store(ops, changed);
         }
     }
 
     public async Task Project(ProjectArtifactAdded e, IDocumentOperations ops)
     {
-        var perms = await RequireEntityPermissionInfo(ops, e.ArtifactId);
-        perms = await AddParent(ops, perms, e.ProjectId);
-        ops.Store(perms);
+        CurrentBatch.Value = await InitializeBatchAsync(ops);
+        var perms = RequireEntityPermissionInfo(e.ArtifactId);
+        AddParent(ops, perms, e.ProjectId);
     }
 
     public async Task Project(ProjectArtifactRemoved e, IDocumentOperations ops)
     {
-        var perms = await RequireEntityPermissionInfo(ops, e.ArtifactId);
-        perms = await RemoveDependency(ops, perms, e.ProjectId);
-        ops.Store(perms);
+        CurrentBatch.Value = await InitializeBatchAsync(ops);
+        var perms = RequireEntityPermissionInfo(e.ArtifactId);
+        perms = RemoveDependency(ops, perms, e.ProjectId);
+        Store(ops, perms);
     }
 
     public async Task Project(ProjectGroupMovedToOrganization e, IEvent metadata, IDocumentOperations ops)
     {
+        CurrentBatch.Value = await InitializeBatchAsync(ops);
         var entitySoFar = await ops.Events.KafeAggregateStream<ProjectGroupInfo>(
             id: e.ProjectGroupId,
             version: metadata.Version - 1
@@ -313,18 +380,18 @@ public partial class EntityPermissionEventProjection : EventProjection
             );
         }
 
-        var perms = await RequireEntityPermissionInfo(ops, e.ProjectGroupId);
+        var perms = RequireEntityPermissionInfo(e.ProjectGroupId);
         if (((Hrib)entitySoFar.OrganizationId).IsValidNonEmpty)
         {
-            perms = await RemoveDependency(ops, perms, entitySoFar.OrganizationId);
+            perms = RemoveDependency(ops, perms, entitySoFar.OrganizationId);
         }
 
-        perms = await AddParent(ops, perms, e.OrganizationId);
-        ops.Store(perms);
+        AddParent(ops, perms, e.OrganizationId);
     }
 
     public async Task Project(PlaylistMovedToOrganization e, IEvent metadata, IDocumentOperations ops)
     {
+        CurrentBatch.Value = await InitializeBatchAsync(ops);
         var entitySoFar = await ops.Events.KafeAggregateStream<PlaylistInfo>(
             id: e.PlaylistId,
             version: metadata.Version - 1
@@ -336,28 +403,27 @@ public partial class EntityPermissionEventProjection : EventProjection
             );
         }
 
-        var perms = await RequireEntityPermissionInfo(ops, e.PlaylistId);
+        var perms = RequireEntityPermissionInfo(e.PlaylistId);
         if (((Hrib)entitySoFar.OrganizationId).IsValidNonEmpty)
         {
-            perms = await RemoveDependency(ops, perms, entitySoFar.OrganizationId);
+            perms = RemoveDependency(ops, perms, entitySoFar.OrganizationId);
         }
 
-        perms = await AddParent(ops, perms, e.OrganizationId);
-        ops.Store(perms);
+        AddParent(ops, perms, e.OrganizationId);
     }
 
-    private static async Task OnGlobalPermissionChanged(
+    private static void OnGlobalPermissionChanged(
         IDocumentOperations ops,
         Hrib entityId,
         Permission globalPermission,
         DateTimeOffset grantedAt
     )
     {
-        var entityPerms = await RequireEntityPermissionInfo(ops, entityId);
+        var entityPerms = RequireEntityPermissionInfo(entityId);
         entityPerms = SetGlobalPermission(entityPerms, entityId, globalPermission, grantedAt);
-        ops.Store(entityPerms);
+        Store(ops, entityPerms);
 
-        await SpreadGlobalPermission(
+        SpreadGlobalPermission(
             ops: ops,
             sourceId: entityId,
             permission: InheritPermission(globalPermission),
@@ -394,13 +460,9 @@ public partial class EntityPermissionEventProjection : EventProjection
         return entityPerms;
     }
 
-    private static async Task<EntityPermissionInfo> RequireEntityPermissionInfo(
-        IDocumentOperations ops,
-        Hrib entityId
-    )
+    private static EntityPermissionInfo RequireEntityPermissionInfo(Hrib entityId)
     {
-        var entityPerms = await ops.KafeLoadAsync<EntityPermissionInfo>(entityId);
-        if (entityPerms.HasErrors)
+        if (!Batch.Permissions.TryGetValue(entityId.ToString(), out var entityPerms))
         {
             // NB: Once upon a time, there were Capabilities instead of Permissions.
             //     They were terribly designed and served the only the first year KAFE was used in production.
@@ -433,53 +495,43 @@ public partial class EntityPermissionEventProjection : EventProjection
 
             throw new InvalidOperationException(
                 $"No permission info exists for '{entityId}'. "
-                + "Either the events are out of order or the permission info projection is broken.",
-                entityPerms.AsException()
+                + "Either the events are out of order or the permission info projection is broken."
             );
         }
 
-        return entityPerms.Value;
+        return entityPerms;
     }
 
-    private static async Task<RoleMembersInfo> RequireRoleMembersInfo(
-        IDocumentOperations ops,
-        Hrib roleId
-    )
+    private static RoleMembersInfo RequireRoleMembersInfo(Hrib roleId)
     {
-        var roleInfo = await ops.KafeLoadAsync<RoleMembersInfo>(roleId);
-        if (roleInfo.HasErrors)
-        {
-            throw new InvalidOperationException(
+        return Batch.Roles.TryGetValue(roleId.ToString(), out var roleInfo)
+            ? roleInfo
+            : throw new InvalidOperationException(
                 $"No role members info exists for '{roleId}'. "
-                + "Either the events are out of order or the permission info projection is broken.",
-                roleInfo.AsException()
+                + "Either the events are out of order or the permission info projection is broken."
             );
-        }
-
-        return roleInfo.Value;
     }
 
     /// <summary>
     /// Add Hrib.System to <see cref="EntityPermissionInfo.DependencyGraph"/>.
     /// Also, adds account entries for all accounts that have permissions for System with inherited permissions values.
     /// </summary>
-    private static async Task<EntityPermissionInfo> AddSystem(
+    private static EntityPermissionInfo AddSystem(
         IDocumentOperations ops,
         EntityPermissionInfo perms
     )
     {
-        var systemPerms = await ops.KafeLoadAsync<EntityPermissionInfo>(Hrib.System);
-        if (systemPerms.HasErrors && systemPerms.Errors.Length == 1 && systemPerms.Errors[0].Id == Error.NotFoundId)
+        if (!Batch.Permissions.TryGetValue(Hrib.SystemValue, out var systemPerms))
         {
             systemPerms = EntityPermissionInfo.Create(Hrib.SystemValue);
-            ops.Store(systemPerms.Value);
+            Store(ops, systemPerms);
         }
 
         return perms with
         {
             AccountEntries = MergeManyEntries(
                 perms.AccountEntries,
-                InheritEntries(systemPerms.Value.AccountEntries)
+                InheritEntries(systemPerms.AccountEntries)
             ),
             // NB: We ignore RoleEntries and GlobalPermission, since `system` can have neither.
             DependencyGraph = perms.DependencyGraph.SetItem(Hrib.SystemValue, [Hrib.SystemValue])
@@ -491,13 +543,13 @@ public partial class EntityPermissionEventProjection : EventProjection
     /// along with its further ancestors and the `system` object.
     /// Also merges in inheritable permission entries from the parent (and thus further ancestors).
     /// </summary>
-    private static async Task<EntityPermissionInfo> AddParent(
+    private static void AddParent(
         IDocumentOperations ops,
         EntityPermissionInfo perms,
         Hrib parentId
     )
     {
-        var ancestorPerms = await RequireEntityPermissionInfo(ops, parentId);
+        var ancestorPerms = RequireEntityPermissionInfo(parentId);
 
         var changedPerms = perms with
         {
@@ -518,10 +570,10 @@ public partial class EntityPermissionEventProjection : EventProjection
         };
 
         // NB: "Spread" the new dependency to all entities where `perms.Id` was already in the dependency graph
-        var affectedEntities = ops.Query<EntityPermissionInfo>()
+        var affectedEntities = Batch.Permissions.Values
             .Where(p => p.Id != changedPerms.Id && p.DependencyGraph.ContainsKey(changedPerms.Id))
-            .ToAsyncEnumerable();
-        await foreach (var affected in affectedEntities)
+            .ToArray();
+        foreach (var affected in affectedEntities)
         {
             var changed = affected with
             {
@@ -539,18 +591,17 @@ public partial class EntityPermissionEventProjection : EventProjection
                 ),
                 DependencyGraph = MergeDependencyGraphs(affected.DependencyGraph, changedPerms.DependencyGraph)
             };
-            ops.Store(changed);
+            Store(ops, changed);
         }
 
-        ops.Store(changedPerms);
-        return changedPerms;
+        Store(ops, changedPerms);
     }
 
     /// <summary>
     /// Removes a dependency from an <see cref="EntityPermissionInfo.DependencyGraph"/> along with its transitive
     /// dependencies (but only should they become orphans) and related account and role entries.
     /// </summary>
-    private static async Task<EntityPermissionInfo> RemoveDependency(
+    private static EntityPermissionInfo RemoveDependency(
         IDocumentOperations ops,
         EntityPermissionInfo perms,
         Hrib dependencyId
@@ -571,10 +622,10 @@ public partial class EntityPermissionEventProjection : EventProjection
         };
 
         // NB: Recalculate perms of entities where `perms` is a grantor.
-        var affectedEntities = ops.Query<EntityPermissionInfo>()
+        var affectedEntities = Batch.Permissions.Values
             .Where(p => p.Id != changedPerms.Id && p.DependencyGraph.ContainsKey(changedPerms.Id))
-            .ToAsyncEnumerable();
-        await foreach (var affected in affectedEntities)
+            .ToArray();
+        foreach (var affected in affectedEntities)
         {
             var affectedGraph = RemoveFromDependencyGraph(
                 affected.DependencyGraph,
@@ -590,10 +641,10 @@ public partial class EntityPermissionEventProjection : EventProjection
                 RoleEntries = RemoveEntrySources(affected.RoleEntries, removedAffectedGrantors),
                 GlobalPermission = RemoveEntrySources(affected.GlobalPermission, removedAffectedGrantors)
             };
-            ops.Store(changed);
+            Store(ops, changed);
         }
 
-        ops.Store(changedPerms);
+        Store(ops, changedPerms);
         return changedPerms;
     }
 
@@ -811,7 +862,7 @@ public partial class EntityPermissionEventProjection : EventProjection
     /// Spreads (add, removes or overwries) a set of account permissions to all entities
     /// that have <paramref name="sourceId"/> among its grantors.
     /// </summary>
-    private static async Task SpreadAccountPermission(
+    private static void SpreadAccountPermission(
         IDocumentOperations ops,
         ImmutableHashSet<Hrib> accountIds,
         Hrib sourceId,
@@ -825,11 +876,11 @@ public partial class EntityPermissionEventProjection : EventProjection
             return;
         }
 
-        var affectedEntities = ops.Query<EntityPermissionInfo>()
+        var affectedEntities = Batch.Permissions.Values
             .Where(p => p.DependencyGraph.ContainsKey(sourceId.ToString()))
-            .ToAsyncEnumerable();
+            .ToArray();
 
-        await foreach (var affected in affectedEntities)
+        foreach (var affected in affectedEntities)
         {
             if (affected.Id == sourceId && ignoreSelf)
             {
@@ -851,11 +902,11 @@ public partial class EntityPermissionEventProjection : EventProjection
                 };
             }
 
-            ops.Store(changed);
+            Store(ops, changed);
         }
     }
 
-    private static async Task SpreadRolePermission(
+    private static void SpreadRolePermission(
         IDocumentOperations ops,
         Hrib roleId,
         Hrib sourceId,
@@ -864,13 +915,13 @@ public partial class EntityPermissionEventProjection : EventProjection
         bool ignoreSelf = false
     )
     {
-        var roleInfo = await RequireRoleMembersInfo(ops, roleId);
+        var roleInfo = RequireRoleMembersInfo(roleId);
 
-        var affectedEntities = ops.Query<EntityPermissionInfo>()
+        var affectedEntities = Batch.Permissions.Values
             .Where(p => p.DependencyGraph.ContainsKey(sourceId.ToString()))
-            .ToAsyncEnumerable();
+            .ToArray();
 
-        await foreach (var affected in affectedEntities)
+        foreach (var affected in affectedEntities)
         {
             if (affected.Id == sourceId && ignoreSelf)
             {
@@ -903,11 +954,11 @@ public partial class EntityPermissionEventProjection : EventProjection
                 };
             }
 
-            ops.Store(changed);
+            Store(ops, changed);
         }
     }
 
-    private static async Task SpreadGlobalPermission(
+    private static void SpreadGlobalPermission(
         IDocumentOperations ops,
         Hrib sourceId,
         Permission permission,
@@ -915,11 +966,11 @@ public partial class EntityPermissionEventProjection : EventProjection
         bool ignoreSelf = false
     )
     {
-        var affectedEntities = ops.Query<EntityPermissionInfo>()
+        var affectedEntities = Batch.Permissions.Values
             .Where(p => p.DependencyGraph.ContainsKey(sourceId.ToString()))
-            .ToAsyncEnumerable();
+            .ToArray();
 
-        await foreach (var affected in affectedEntities)
+        foreach (var affected in affectedEntities)
         {
             if (affected.Id == sourceId && ignoreSelf)
             {
@@ -927,7 +978,7 @@ public partial class EntityPermissionEventProjection : EventProjection
             }
 
             var changed = SetGlobalPermission(affected, sourceId, permission, grantedAt);
-            ops.Store(changed);
+            Store(ops, changed);
         }
     }
 

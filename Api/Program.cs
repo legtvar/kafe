@@ -36,8 +36,7 @@ public class Program
 
 
         var builder = CreateHostBuilder(args);
-        var host = builder.Build();
-        return await host.RunJasperFxCommands(args);
+        return await builder.RunJasperFxCommands(args);
     }
 
     public static IHostBuilder CreateHostBuilder(string[] args)

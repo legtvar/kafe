@@ -29,7 +29,7 @@ FROM mcr.microsoft.com/dotnet/aspnet:10.0-alpine
 # Alpine's ASP.NET image defaults to invariant globalization, but KAFE needs
 # real culture data for its supported languages.
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
-RUN apk add --no-cache ffmpeg icu-data-full icu-libs
+RUN apk add --no-cache ffmpeg icu-data-full icu-libs krb5-libs
 
 # Required by the HTTPS endpoint in docker-compose.local.yml.
 COPY --from=builder /root/.aspnet /root/.aspnet

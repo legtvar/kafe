@@ -7,6 +7,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using JasperFx.Events;
 using Kafe.Data.Aggregates;
 using Kafe.Data.Documents;
 using Kafe.Data.Metadata;

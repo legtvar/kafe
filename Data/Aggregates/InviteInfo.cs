@@ -4,12 +4,12 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using JasperFx.Events;
 using JasperFx.Events.Daemon;
+using JasperFx.Metadata;
 using Kafe.Data.Events;
 using Marten.Events.Aggregation;
-using Marten.Metadata;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Kafe.Data.Aggregates;
 

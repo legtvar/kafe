@@ -1,4 +1,5 @@
-﻿using Kafe.Data.Aggregates;
+﻿using JasperFx.Events;
+using Kafe.Data.Aggregates;
 using Kafe.Data.Events;
 using Kafe.Data.Metadata;
 using Marten;

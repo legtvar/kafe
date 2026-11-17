@@ -1,7 +1,7 @@
 using System;
 using Marten.Events.CodeGeneration;
-using Marten.Metadata;
-using Newtonsoft.Json;
+using JasperFx.Metadata;
+using System.Text.Json.Serialization;
 
 namespace Kafe.Data.Documents;
 

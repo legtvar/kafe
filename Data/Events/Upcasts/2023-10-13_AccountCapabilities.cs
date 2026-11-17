@@ -5,7 +5,6 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Kafe.Data.Capabilities;
 using Marten.Services.Json.Transformations;
-using Microsoft.CodeAnalysis.VisualBasic.Syntax;
 
 namespace Kafe.Data.Capabilities
 {

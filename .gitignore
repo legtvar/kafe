@@ -7,7 +7,9 @@ artifacts/
 *.DotSettings
 *.DotSettings.user
 *.received.*
+BenchmarkDotNet.Artifacts/
 **/node_modules/
 .pnpm-store/
 .pi/cache/
 .pi/sessions/
+backup_*.tar.gz

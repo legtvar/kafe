@@ -20,6 +20,7 @@
     <File Path="Web.Dockerfile" />
   </Folder>
   <Project Path="Api/Kafe.Api.csproj" />
+  <Project Path="Benchmarks/Kafe.Benchmarks.csproj" />
   <Project Path="Common/Kafe.Common.csproj" />
   <Project Path="Data/Kafe.Data.csproj" />
   <Project Path="Media/Kafe.Media.csproj" />

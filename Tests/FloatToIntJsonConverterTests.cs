@@ -35,7 +35,7 @@ public class FloatToIntJsonConverterTests
     private static JsonSerializerOptions CreateOptions()
     {
         var options = new JsonSerializerOptions();
-        options.Converters.Add(new NewtonsoftCompatibleInt64JsonConverter());
+        options.Converters.Add(new FloatToIntJsonConverter());
         return options;
     }
 }

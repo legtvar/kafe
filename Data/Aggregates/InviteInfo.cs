@@ -9,7 +9,7 @@ using Kafe.Data.Events;
 using Marten.Events.Aggregation;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Kafe.Data.Aggregates;
 

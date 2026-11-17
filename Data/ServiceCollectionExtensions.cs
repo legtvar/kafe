@@ -1,4 +1,5 @@
-﻿using Kafe.Data;
+﻿using Kafe;
+using Kafe.Data;
 using Kafe.Data.Aggregates;
 using Kafe.Data.Documents;
 using Kafe.Data.Events.Upcasts;
@@ -7,7 +8,6 @@ using Kafe.Data.Options;
 using Kafe.Data.Projections;
 using Kafe.Data.Services;
 using Marten;
-using Marten.Newtonsoft;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
@@ -19,6 +19,7 @@ using JasperFx;
 using JasperFx.Events;
 using JasperFx.Events.Daemon;
 using JasperFx.Events.Projections;
+using Weasel.Core;
 using Weasel.Postgresql;
 using Weasel.Postgresql.Functions;
 
@@ -103,7 +104,10 @@ public static class ServiceCollectionExtensions
             mo.Events.Upcast<TemporaryAccountCreatedUpcaster>();
             mo.Events.Upcast<TemporaryAccountClosedUpcaster>();
             mo.Events.Upcast<AccountPermissionUnsetUpcaster>();
-            mo.UseNewtonsoftForSerialization();
+            // Keep the existing PascalCase wire format; only the serializer implementation changes.
+            mo.UseSystemTextJsonForSerialization(
+                casing: Casing.Default,
+                configure: o => o.Converters.Add(new FloatToIntJsonConverter()));
 
             RegisterEmbeddedSql(mo);
 

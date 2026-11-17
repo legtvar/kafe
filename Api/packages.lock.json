@@ -389,24 +389,10 @@
           "NetTopologySuite": "[2.0.0, 3.0.0-A)"
         }
       },
-      "Newtonsoft.Json": {
-        "type": "Transitive",
-        "resolved": "13.0.3",
-        "contentHash": "HrC5BXdl00IP9zeV+0Z848QWPAoCr9P3bDEZguI+gkLcBKAOxix/tLEAAHC+UvDNPv4a2d18lOReHMOagPa+zQ=="
-      },
       "Npgsql": {
         "type": "Transitive",
         "resolved": "10.0.3",
         "contentHash": "7nb5YzXuvWWJxB0J8DiyL3we+X4FOctZrt0fIBnucOIaIevFEEwGQVZKtiu9olXdlNAK1eNgqSral6r/jlhI4w=="
-      },
-      "Npgsql.Json.NET": {
-        "type": "Transitive",
-        "resolved": "9.0.4",
-        "contentHash": "Eunq7mqatJujFOaZMdiWT9N7eUXHEFxe4IX/PeN8Nt1BpNYjzF2tPlmqR90EvuGT3tiEicmj4xDviC0UcPwM1w==",
-        "dependencies": {
-          "Newtonsoft.Json": "13.0.3",
-          "Npgsql": "9.0.4"
-        }
       },
       "Npgsql.NetTopologySuite": {
         "type": "Transitive",
@@ -613,7 +599,6 @@
           "Kafe.Common": "[0.0.0-local, )",
           "Kafe.Media": "[0.0.0-local, )",
           "Marten": "[9.61.0, )",
-          "Marten.Newtonsoft": "[9.61.0, )",
           "MimeKit": "[5.0.0, )"
         }
       },
@@ -645,17 +630,6 @@
           "Microsoft.IO.RecyclableMemoryStream": "3.0.1",
           "Weasel.Postgresql": "9.50.0",
           "Weasel.Storage": "9.50.0"
-        }
-      },
-      "Marten.Newtonsoft": {
-        "type": "CentralTransitive",
-        "requested": "[9.61.0, )",
-        "resolved": "9.61.0",
-        "contentHash": "w6JA5V6GlFy/mBMQ5rrKR6PdLYI7WtTCteMzZRUgOSYXRW8mFWmKmxe1sR4OPFWN7Do5/6Reh3isRdgnEklGKQ==",
-        "dependencies": {
-          "Marten": "9.61.0",
-          "Newtonsoft.Json": "13.0.3",
-          "Npgsql.Json.NET": "9.0.4"
         }
       },
       "MimeKit": {

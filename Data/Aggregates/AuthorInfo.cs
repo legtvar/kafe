@@ -3,6 +3,7 @@ using Kafe.Data.Events;
 using System.Collections.Immutable;
 using Npgsql;
 using Marten.Events.CodeGeneration;
+using JasperFx.Core;
 
 namespace Kafe.Data.Aggregates;
 
@@ -46,6 +47,7 @@ public record AuthorInfo(
     /// Creates a bare-bones but valid <see cref="AuthorInfo"/>.
     /// </summary>
     [MartenIgnore]
+    [JasperFxIgnore]
     public static AuthorInfo Create(string name)
     {
         return new AuthorInfo() with

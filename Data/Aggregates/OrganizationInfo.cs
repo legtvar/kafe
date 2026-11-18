@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Immutable;
+using JasperFx.Core;
 using JasperFx.Events;
 using Kafe.Data.Events;
 using Marten.Events;
@@ -39,6 +40,7 @@ public record OrganizationInfo(
     /// Creates a bare-bones but valid <see cref="OrganizationInfo"/>.
     /// </summary>
     [MartenIgnore]
+    [JasperFxIgnore]
     public static OrganizationInfo Create(LocalizedString name)
     {
         return new OrganizationInfo() with

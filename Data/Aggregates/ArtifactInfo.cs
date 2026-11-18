@@ -1,4 +1,5 @@
-﻿using Kafe.Data.Events;
+﻿using JasperFx.Core;
+using Kafe.Data.Events;
 using Marten.Events.Aggregation;
 using Marten.Events.CodeGeneration;
 using System;
@@ -28,6 +29,7 @@ public record ArtifactInfo(
     /// Creates a bare-bones but valid <see cref="ArtifactInfo"/>.
     /// </summary>
     [MartenIgnore]
+    [JasperFxIgnore]
     public static ArtifactInfo Create(LocalizedString name)
     {
         return new ArtifactInfo() with

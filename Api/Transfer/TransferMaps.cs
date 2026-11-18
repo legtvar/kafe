@@ -84,6 +84,7 @@ public static class TransferMaps
             Description: data.Description,
             AiUsageDeclaration: data.AiUsageDeclaration,
             HearAboutUs: data.HearAboutUs,
+            IsPublishedForUnlimitedTime: data.IsPublishedForUnlimitedTime,
             GlobalPermissions: ToPermissionArray(data.GlobalPermissions),
             UserPermissions: ToPermissionArray(data.GlobalPermissions | userPermission),
             ReleasedOn: data.ReleasedOn,

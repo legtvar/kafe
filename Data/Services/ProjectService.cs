@@ -114,10 +114,18 @@ public partial class ProjectService
             Description: LocalizedString.MakeOverride(existing.Description, project.Description),
             Genre: LocalizedString.MakeOverride(existing.Genre, project.Genre),
             AiUsageDeclaration: Const.MakeOverride(existing.AiUsageDeclaration, project.AiUsageDeclaration),
-            HearAboutUs: Const.MakeOverride(existing.HearAboutUs, project.HearAboutUs)
+            HearAboutUs: Const.MakeOverride(existing.HearAboutUs, project.HearAboutUs),
+            IsPublishedForUnlimitedTime: project.IsPublishedForUnlimitedTime != existing.IsPublishedForUnlimitedTime
+                ? project.IsPublishedForUnlimitedTime
+                : null
         );
-        if (infoChanged.Name is not null || infoChanged.Description is not null || infoChanged.Genre is not null
-            || infoChanged.AiUsageDeclaration is not null || infoChanged.HearAboutUs is not null)
+        if (infoChanged.Name is not null
+            || infoChanged.Description is not null
+            || infoChanged.Genre is not null
+            || infoChanged.AiUsageDeclaration is not null
+            || infoChanged.HearAboutUs is not null
+            || infoChanged.IsPublishedForUnlimitedTime is not null
+        )
         {
             eventStream.AppendOne(infoChanged);
         }

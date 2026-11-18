@@ -58,6 +58,7 @@ public class ProjectCreationEndpoint : EndpointBaseAsync
                 Genre = request.Genre,
                 AiUsageDeclaration = request.AiUsageDeclaration,
                 HearAboutUs = request.HearAboutUs,
+                IsPublishedForUnlimitedTime = request.IsPublishedForUnlimitedTime,
                 Authors = request.Cast
                     .Select(c => new ProjectAuthorInfo(c.Id.ToString(), ProjectAuthorKind.Cast, c.Roles))
                     .Concat(request.Crew

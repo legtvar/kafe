@@ -3661,6 +3661,7 @@
           "cast",
           "crew",
           "isLocked",
+          "isPublishedForUnlimitedTime",
           "name",
           "projectGroupId"
         ],
@@ -3693,6 +3694,9 @@
               "string"
             ]
           },
+          "isPublishedForUnlimitedTime": {
+            "type": "boolean"
+          },
           "crew": {
             "type": "array",
             "items": {
@@ -3720,6 +3724,7 @@
           "globalPermissions",
           "id",
           "isLocked",
+          "isPublishedForUnlimitedTime",
           "name",
           "projectGroupId",
           "releasedOn",
@@ -3767,6 +3772,9 @@
               "null",
               "string"
             ]
+          },
+          "isPublishedForUnlimitedTime": {
+            "type": "boolean"
           },
           "globalPermissions": {
             "type": "array",
@@ -3878,6 +3886,10 @@
               "null",
               "string"
             ]
+          },
+          "isPublishedForUnlimitedTime": {
+            "type": "boolean",
+            "nullable": true
           },
           "crew": {
             "type": [

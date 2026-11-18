@@ -35,6 +35,7 @@ public record ProjectDetailDto(
     LocalizedString? Description,
     string? AiUsageDeclaration,
     string? HearAboutUs,
+    bool IsPublishedForUnlimitedTime,
     ImmutableArray<Permission> GlobalPermissions,
     ImmutableArray<Permission> UserPermissions,
     DateTimeOffset ReleasedOn,
@@ -101,6 +102,7 @@ public record ProjectCreationDto(
     LocalizedString? Genre,
     string? AiUsageDeclaration,
     string? HearAboutUs,
+    bool IsPublishedForUnlimitedTime,
     ImmutableArray<ProjectCreationAuthorDto> Crew,
     ImmutableArray<ProjectCreationAuthorDto> Cast,
     bool IsLocked
@@ -113,6 +115,7 @@ public record ProjectEditDto(
     LocalizedString? Genre,
     string? AiUsageDeclaration,
     string? HearAboutUs,
+    bool? IsPublishedForUnlimitedTime,
     ImmutableArray<ProjectCreationAuthorDto>? Crew,
     ImmutableArray<ProjectCreationAuthorDto>? Cast,
     ImmutableArray<ProjectArtifactAdditionDto>? Artifacts,

@@ -92,6 +92,7 @@ public class ProjectEditEndpoint : EndpointBaseAsync
             Description = LocalizedString.Merge(@old.Description, request.Description),
             AiUsageDeclaration = request.AiUsageDeclaration ?? @old.AiUsageDeclaration,
             HearAboutUs = request.HearAboutUs ?? @old.HearAboutUs,
+            IsPublishedForUnlimitedTime = request.IsPublishedForUnlimitedTime ?? @old.IsPublishedForUnlimitedTime,
             Authors = authors,
             Artifacts = request.Artifacts.HasValue
                 ? request.Artifacts.Value.Select(a => new ProjectArtifactInfo(

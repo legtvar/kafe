@@ -55,6 +55,7 @@ public class ShardService
             ShardKind.Image => await db.LoadAsync<ImageShardInfo>(id.ToString(), token),
             ShardKind.Subtitles => await db.LoadAsync<SubtitlesShardInfo>(id.ToString(), token),
             ShardKind.Blend => await db.LoadAsync<BlendShardInfo>(id.ToString(), token),
+            ShardKind.Blob => await db.LoadAsync<BlobShardInfo>(id.ToString(), token),
             _ => throw new NotSupportedException($"ShardKind '{shardKind}' is not supported.")
         };
         return shard;
@@ -82,6 +83,7 @@ public class ShardService
             ShardKind.Image => await CreateImage(artifactId, stream, shardId, token),
             ShardKind.Subtitles => await CreateSubtitles(artifactId, stream, shardId, token),
             ShardKind.Blend => await CreateBlend(artifactId, fileName, stream, shardId, token),
+            ShardKind.Blob => await CreateBlob(artifactId, fileName, stream, mimeType, shardId, token),
             _ => throw new NotSupportedException($"Creation of '{kind}' shards is not supported yet.")
         };
     }
@@ -299,6 +301,48 @@ public class ShardService
         return created.ShardId;
     }
 
+    private async Task<Hrib?> CreateBlob(
+        Hrib artifactId,
+        string? fileName,
+        Stream blobStream,
+        string mimeType,
+        Hrib? shardId = null,
+        CancellationToken token = default
+    )
+    {
+        shardId ??= Hrib.Create();
+        var fileExtension = Path.GetExtension(fileName) ?? string.Empty;
+
+        if (!await storageService.TryStoreShard(
+            ShardKind.Blob,
+            shardId,
+            blobStream,
+            Const.OriginalShardVariant,
+            fileExtension,
+            token
+        ))
+        {
+            throw new InvalidOperationException("The blob could not be stored.");
+        }
+
+        var blobInfo = new BlobInfo(
+            FileExtension: fileExtension,
+            MimeType: mimeType
+        );
+
+        var created = new BlobShardCreated(
+            ShardId: shardId.ToString(),
+            FileName: fileName,
+            CreationMethod: CreationMethod.Api,
+            ArtifactId: artifactId.ToString(),
+            Info: blobInfo);
+
+        db.Events.KafeStartStream<BlobShardInfo>(created.ShardId, created);
+        await db.SaveChangesAsync(token);
+
+        return created.ShardId;
+    }
+
     public async Task<BlendShardInfo> UpdateBlend(
         Hrib shardId,
         BlendInfo blendInfo,
@@ -441,6 +485,14 @@ public class ShardService
                     Variant: variant,
                     FileExtension: media.FileExtension,
                     MimeType: media.MimeType
+                )
+                : null,
+            ShardKind.Blob => variant == Const.OriginalShardVariant
+                ? new VariantInfo(
+                    ShardId: shard.Id,
+                    Variant: variant,
+                    FileExtension: ((BlobShardInfo)shard).Info.FileExtension,
+                    MimeType: ((BlobShardInfo)shard).Info.MimeType
                 )
                 : null,
             _ => throw new NotImplementedException()

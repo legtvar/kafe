@@ -40,6 +40,8 @@ public record ProjectInfo(
 
     string? HearAboutUs = null,
 
+    bool IsPublishedForUnlimitedTime = false,
+
     Permission GlobalPermissions = Permission.None,
 
     [property:Sortable]
@@ -63,6 +65,7 @@ public record ProjectInfo(
         Genre: null,
         AiUsageDeclaration: null,
         HearAboutUs: null,
+        IsPublishedForUnlimitedTime: false,
         GlobalPermissions: Permission.None,
         ReleasedOn: default,
         IsLocked: false,
@@ -133,7 +136,8 @@ public class ProjectInfoProjection : SingleStreamProjection<ProjectInfo, string>
             ReleasedOn = e.ReleasedOn ?? p.ReleasedOn,
             Genre = e.Genre ?? p.Genre,
             AiUsageDeclaration = e.AiUsageDeclaration ?? p.AiUsageDeclaration,
-            HearAboutUs = e.HearAboutUs ?? p.HearAboutUs
+            HearAboutUs = e.HearAboutUs ?? p.HearAboutUs,
+            IsPublishedForUnlimitedTime = e.IsPublishedForUnlimitedTime ?? p.IsPublishedForUnlimitedTime
         };
     }
 

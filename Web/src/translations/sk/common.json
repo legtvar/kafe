@@ -67,6 +67,11 @@
         "yes": "Vyhlasujem, že pri tvorbe tohto filmového diela bol(i) použitý(é) nástroj(e) umelej inteligencie pre generovanie príbehu, scenára, dabingu, tituliek, alebo obrazovej, či zvukovej zložky.",
         "no": "Vyhlasujem, že pri tvorbe tohto filmového diela NEbol(i) použitý(é) nástroj(e) umelej inteligencie pre generovanie príbehu, scenára, dabingu, tituliek, alebo obrazovej, či zvukovej zložky."
       },
+      "isPublishedForUnlimitedTime": {
+        "label": "Zverejnenie online po neobmedzený čas",
+        "yes": "V prípade prijatia filmu súhlasím s jeho zverejnením online bez časového obmedzenia.",
+        "help": "Pri nezačiarknutí súhlasíte so zverejnením prihláseného filmu online po dobu jedného mesiaca od festivalu podľa festivalových propozícií. Pri začiarknutí môžete tento súhlas kedykoľvek odvolať kontaktovaním organizátorov festivalu."
+      },
       "hearAboutUs": "Ako ste sa o nás dozvedeli?",
       "hearAboutUsHelp": "Prosím, uveďte, ako ste sa o nás dozvedeli. Môžete uviesť sociálne siete, ľudí, predmety laboratória LEMMA, alebo ďalšie možné zdroje. Príklad: \"Pred pár rokmi u vás bol kamarát kamaráta, a tiež som videl/a príspevok na Facebooku.\"",
       "cast": "Herci",

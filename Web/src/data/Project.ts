@@ -21,6 +21,7 @@ export class Project extends AbstractType {
     public description?: localizedString;
     public aiUsageDeclaration?: string;
     public hearAboutUs?: string;
+    public isPublishedForUnlimitedTime = false;
     // public visibility!: components['schemas']['Visibility'];
     public releasedOn!: Date | null;
 
@@ -94,6 +95,7 @@ export class Project extends AbstractType {
             .add('description', localizedMapper)
             .add('aiUsageDeclaration')
             .add('hearAboutUs')
+            .add('isPublishedForUnlimitedTime')
             .add('artifacts', (artifacts: Artifact[]) =>
                 artifacts ? artifacts.map((artifact) => artifact.serialize(false)) : undefined,
             )

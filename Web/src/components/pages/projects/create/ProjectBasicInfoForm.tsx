@@ -1,4 +1,4 @@
-import { Button, FormControl, FormHelperText, FormLabel, HStack, Input, RadioGroup, Radio, Stack, Textarea } from '@chakra-ui/react';
+import { Button, Checkbox, FormControl, FormHelperText, FormLabel, HStack, Input, RadioGroup, Radio, Stack, Textarea } from '@chakra-ui/react';
 import useForceUpdate from 'use-force-update';
 import { t } from 'i18next';
 import { Project } from '../../../../data/Project';
@@ -30,7 +30,7 @@ export function ProjectBasicInfoForm({ project, onSubmit, status, update, noSelf
 
     return (
         <Stack spacing={8} direction="column" mb={8}>
-            <FormControl>
+            <FormControl my={4}>
                 <FormLabel>{t('createProject.fields.name').toString()}</FormLabel>
                 <FormHelperText mb={"1rem"}>
                     {t('createProject.fields.nameHelp').toString()}
@@ -48,7 +48,7 @@ export function ProjectBasicInfoForm({ project, onSubmit, status, update, noSelf
                     onChange={(value) => forceUpdate(project.set('name', value))}
                 />
             </FormControl>
-            <FormControl>
+            <FormControl my={4}>
                 <FormLabel>{t('createProject.fields.genre').toString()}</FormLabel>
                 {isDropdownSelect ?
                 <>
@@ -75,7 +75,7 @@ export function ProjectBasicInfoForm({ project, onSubmit, status, update, noSelf
                     onChange={(value) => forceUpdate(project.set('genre', value))}
                 />}
             </FormControl>
-            <FormControl>
+            <FormControl my={4}>
                 <FormLabel>{t('createProject.fields.description').toString()}</FormLabel>
                 <FormHelperText mb={"1rem"}>
                     {t('createProject.fields.descriptionHelp').toString()}
@@ -92,7 +92,7 @@ export function ProjectBasicInfoForm({ project, onSubmit, status, update, noSelf
                     onChange={(value) => forceUpdate(project.set('description', value))}
                 />
             </FormControl>
-            <FormControl py={12}>
+            <FormControl my={4}>
                 <FormLabel>{t('createProject.fields.crew').toString()}</FormLabel>
                 <FormHelperText mb={"1rem"}>
                     {t(`createProject.fields.crewHelp`).toString()}
@@ -126,7 +126,7 @@ export function ProjectBasicInfoForm({ project, onSubmit, status, update, noSelf
                     isDropdownCrewSelect={isDropdownSelect}
                 />
             </FormControl>
-            <FormControl pb={12}>
+            <FormControl my={4}>
                 <FormLabel>{t('createProject.fields.cast').toString()}</FormLabel>
                 <FormHelperText mb={"1rem"}>
                     {t('createProject.fields.castHelp').toString()}
@@ -159,7 +159,7 @@ export function ProjectBasicInfoForm({ project, onSubmit, status, update, noSelf
                 />
             </FormControl>
 
-            <FormControl>
+            <FormControl my={4}>
                 <FormLabel>{t('createProject.fields.aiUsageDeclaration.label').toString()}</FormLabel>
                 <FormHelperText mb={"1rem"}>
                     {t('createProject.fields.aiUsageDeclaration.help').toString()}
@@ -190,7 +190,21 @@ export function ProjectBasicInfoForm({ project, onSubmit, status, update, noSelf
                 }
             </FormControl>
 
-            <FormControl>
+            <FormControl my={4}>
+                <FormLabel>{t('createProject.fields.isPublishedForUnlimitedTime.label').toString()}</FormLabel>
+                <FormHelperText mb={"1rem"}>
+                    {t('createProject.fields.isPublishedForUnlimitedTime.help').toString()}
+                </FormHelperText>
+                <Checkbox
+                    borderColor="gray.500"
+                    isChecked={project.isPublishedForUnlimitedTime}
+                    onChange={(event) => forceUpdate(project.set('isPublishedForUnlimitedTime', event.target.checked))}
+                >
+                    {t('createProject.fields.isPublishedForUnlimitedTime.yes').toString()}
+                </Checkbox>
+            </FormControl>
+
+            <FormControl my={4}>
                 <FormLabel>{t('createProject.fields.hearAboutUs').toString()}</FormLabel>
                 <FormHelperText mb={"1rem"}>
                     {t('createProject.fields.hearAboutUsHelp').toString()}

@@ -2466,6 +2466,7 @@ export interface components {
             genre?: components["schemas"]["LocalizedString"];
             aiUsageDeclaration?: null | string;
             hearAboutUs?: null | string;
+            isPublishedForUnlimitedTime: boolean;
             crew: components["schemas"]["ProjectCreationAuthorDto"][];
             cast: components["schemas"]["ProjectCreationAuthorDto"][];
             isLocked: boolean;
@@ -2490,6 +2491,7 @@ export interface components {
             description?: components["schemas"]["LocalizedString"];
             aiUsageDeclaration?: null | string;
             hearAboutUs?: null | string;
+            isPublishedForUnlimitedTime: boolean;
             globalPermissions: components["schemas"]["Permission"][];
             userPermissions: components["schemas"]["Permission"][];
             /** Format: date-time */
@@ -2524,6 +2526,7 @@ export interface components {
             genre?: components["schemas"]["LocalizedString"];
             aiUsageDeclaration?: null | string;
             hearAboutUs?: null | string;
+            isPublishedForUnlimitedTime?: boolean | null;
             crew?: null | components["schemas"]["ProjectCreationAuthorDto"][];
             cast?: null | components["schemas"]["ProjectCreationAuthorDto"][];
             artifacts?: null | components["schemas"]["ProjectArtifactAdditionDto"][];

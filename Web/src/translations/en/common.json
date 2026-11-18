@@ -67,6 +67,11 @@
         "yes": "I declare that an artificial intelligence tool(s) was (were) used in the creation of this film work for generating a story, script, dubbing, subtitles, or an image or audio component.",
         "no": "I declare that an artificial intelligence tool(s) was (were) NOT used in the creation of this film work for generating a story, script, dubbing, subtitles, or an image or audio component."
       },
+      "isPublishedForUnlimitedTime": {
+        "label": "Online publication for an unlimited time",
+        "yes": "If the submitted film gets accepted, I agree with its publication online for unlimited time.",
+        "help": "If unchecked, you consent with the online publication of the submitted film for one month since the date of the festival according to the festival propositions. If checked, you can revoke this consent at any time by contacting the festival organizers."
+      },
       "hearAboutUs": "How did you find out about us?",
       "hearAboutUsHelp": "Please write down how did you find out about us. You can list social media, people, LEMMA laboratory courses, or other possible sources. Example: \"A friend of a friend attended few years ago, and I also saw a post on Facebook.\"",
       "cast": "Cast",

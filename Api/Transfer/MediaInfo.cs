@@ -57,6 +57,12 @@ public record BlendDto(
     string? Error
 );
 
+public record BlobDto(
+    string FileExtension,
+    string MimeType,
+    long FileLength
+);
+
 public record PigeonsTestInfoDto(
     string? Label,
     string? State,

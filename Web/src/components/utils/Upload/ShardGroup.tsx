@@ -12,8 +12,8 @@ import {
 import { AiOutlinePlus } from 'react-icons/ai';
 import { Artifact } from '../../../data/Artifact';
 import { Project } from '../../../data/Project';
-import { Shard } from '../../../data/Shard';
 import { useColorScheme } from '../../../hooks/useColorScheme';
+import { useApi } from '../../../hooks/Caffeine';
 import { useReload } from '../../../hooks/useReload';
 import { components } from '../../../schemas/api';
 import { toLocalizedString } from '../../../schemas/generic';
@@ -31,6 +31,7 @@ interface IShardGroupUploadProps {
 export function ShardGroupUpload(props: IShardGroupUploadProps) {
     const { border, bg, bgPage } = useColorScheme();
     const reload = useReload();
+    const api = useApi();
     const {
         shardBlueprint: { name, arity, description },
         project,
@@ -86,13 +87,13 @@ export function ShardGroupUpload(props: IShardGroupUploadProps) {
                                     shardKind={kind as any}
                                     artifactId={artifact.id}
                                     maxSize={artifact.blueprintSlot === 'license-file' ? 10 * 1024 * 1024 : undefined}
-                                    onUploaded={(id) => {
-                                        artifact.shards.push(
-                                            new Shard({
-                                                id,
-                                                kind,
-                                            }),
-                                        );
+                                    onUploaded={async (id) => {
+                                        const response = await api.shards.getById(id);
+                                        if (response.status !== 200) {
+                                            throw new Error('Failed to fetch the uploaded shard metadata.');
+                                        }
+
+                                        artifact.shards.push(response.data);
                                         reload();
                                     }}
                                     repeatable

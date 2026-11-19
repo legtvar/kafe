@@ -15,7 +15,7 @@ interface IUploadProps {
     projectId: string;
     shardKind: components['schemas']['ShardKind'];
     artifactId: string;
-    onUploaded?: (id: HRIB) => void;
+    onUploaded?: (id: HRIB) => void | Promise<void>;
     repeatable?: boolean;
     maxSize?: number;
 }
@@ -44,7 +44,9 @@ export function Upload(props: IUploadProps) {
             );
 
             if (response.status === 200) {
-                props.onUploaded && props.onUploaded(response.data);
+                if (props.onUploaded) {
+                    await props.onUploaded(response.data);
+                }
                 setStatus('uploaded');
             } else {
                 setStatus('error');

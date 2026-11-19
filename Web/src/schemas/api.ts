@@ -3,2137 +3,2843 @@
  * Do not make direct changes to the file.
  */
 
-
 export interface paths {
-  "/api/v1/account": {
-    get: {
-      responses: {
-        /** @description OK */
-        200: {
-          content: {
-            "text/plain": components["schemas"]["AccountDetailDto"];
-            "application/json": components["schemas"]["AccountDetailDto"];
-            "text/json": components["schemas"]["AccountDetailDto"];
-          };
+    "/api/v1/account": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        /** @description Bad Request */
-        400: {
-          content: {
-            "text/plain": components["schemas"]["KafeProblemDetails"];
-            "application/json": components["schemas"]["KafeProblemDetails"];
-            "text/json": components["schemas"]["KafeProblemDetails"];
-          };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["AccountDetailDto"];
+                        "application/json": components["schemas"]["AccountDetailDto"];
+                        "text/json": components["schemas"]["AccountDetailDto"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["KafeProblemDetails"];
+                        "application/json": components["schemas"]["KafeProblemDetails"];
+                        "text/json": components["schemas"]["KafeProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["KafeProblemDetails"];
+                        "application/json": components["schemas"]["KafeProblemDetails"];
+                        "text/json": components["schemas"]["KafeProblemDetails"];
+                    };
+                };
+            };
         };
-        /** @description Not Found */
-        404: {
-          content: {
-            "text/plain": components["schemas"]["KafeProblemDetails"];
-            "application/json": components["schemas"]["KafeProblemDetails"];
-            "text/json": components["schemas"]["KafeProblemDetails"];
-          };
-        };
-      };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-  };
-  "/api/v1/account/{id}": {
-    get: {
-      parameters: {
-        path: {
-          id: string;
+    "/api/v1/account/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          content: {
-            "text/plain": components["schemas"]["AccountDetailDto"];
-            "application/json": components["schemas"]["AccountDetailDto"];
-            "text/json": components["schemas"]["AccountDetailDto"];
-          };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["AccountDetailDto"];
+                        "application/json": components["schemas"]["AccountDetailDto"];
+                        "text/json": components["schemas"]["AccountDetailDto"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["KafeProblemDetails"];
+                        "application/json": components["schemas"]["KafeProblemDetails"];
+                        "text/json": components["schemas"]["KafeProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["KafeProblemDetails"];
+                        "application/json": components["schemas"]["KafeProblemDetails"];
+                        "text/json": components["schemas"]["KafeProblemDetails"];
+                    };
+                };
+            };
         };
-        /** @description Bad Request */
-        400: {
-          content: {
-            "text/plain": components["schemas"]["KafeProblemDetails"];
-            "application/json": components["schemas"]["KafeProblemDetails"];
-            "text/json": components["schemas"]["KafeProblemDetails"];
-          };
-        };
-        /** @description Not Found */
-        404: {
-          content: {
-            "text/plain": components["schemas"]["KafeProblemDetails"];
-            "application/json": components["schemas"]["KafeProblemDetails"];
-            "text/json": components["schemas"]["KafeProblemDetails"];
-          };
-        };
-      };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-  };
-  "/api/v1/account/impersonate/{id}": {
-    get: {
-      parameters: {
-        path: {
-          id: string;
+    "/api/v1/account/impersonate/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          content: never;
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
         };
-      };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-  };
-  "/api/v1/accounts": {
-    get: {
-      parameters: {
-        query?: {
-          entity?: string;
-          sort?: string;
+    "/api/v1/accounts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          content: {
-            "text/plain": components["schemas"]["AccountListDto"][];
-            "application/json": components["schemas"]["AccountListDto"][];
-            "text/json": components["schemas"]["AccountListDto"][];
-          };
+        get: {
+            parameters: {
+                query?: {
+                    entity?: string;
+                    sort?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["AccountListDto"][];
+                        "application/json": components["schemas"]["AccountListDto"][];
+                        "text/json": components["schemas"]["AccountListDto"][];
+                    };
+                };
+            };
         };
-      };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-  };
-  "/api/v1/account/logout": {
-    get: {
-      responses: {
-        /** @description OK */
-        200: {
-          content: never;
+    "/api/v1/account/logout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-      };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-  };
-  "/api/v1/artifact": {
-    post: {
-      requestBody?: {
-        content: {
-          "application/json": components["schemas"]["ArtifactCreationDto"];
-          "text/json": components["schemas"]["ArtifactCreationDto"];
-          "application/*+json": components["schemas"]["ArtifactCreationDto"];
+    "/api/v1/artifact": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          content: {
-            "text/plain": string;
-            "application/json": string;
-            "text/json": string;
-          };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["ArtifactCreationDto"];
+                    "text/json": components["schemas"]["ArtifactCreationDto"];
+                    "application/*+json": components["schemas"]["ArtifactCreationDto"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": string;
+                        "application/json": string;
+                        "text/json": string;
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["KafeProblemDetails"];
+                        "application/json": components["schemas"]["KafeProblemDetails"];
+                        "text/json": components["schemas"]["KafeProblemDetails"];
+                    };
+                };
+            };
         };
-        /** @description Bad Request */
-        400: {
-          content: {
-            "text/plain": components["schemas"]["KafeProblemDetails"];
-            "application/json": components["schemas"]["KafeProblemDetails"];
-            "text/json": components["schemas"]["KafeProblemDetails"];
-          };
-        };
-      };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-  };
-  "/api/v1/artifact/{id}": {
-    get: {
-      parameters: {
-        path: {
-          id: string;
+    "/api/v1/artifact/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          content: {
-            "text/plain": string;
-            "application/json": string;
-            "text/json": string;
-          };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": string;
+                        "application/json": string;
+                        "text/json": string;
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["KafeProblemDetails"];
+                        "application/json": components["schemas"]["KafeProblemDetails"];
+                        "text/json": components["schemas"]["KafeProblemDetails"];
+                    };
+                };
+            };
         };
-        /** @description Bad Request */
-        400: {
-          content: {
-            "text/plain": components["schemas"]["KafeProblemDetails"];
-            "application/json": components["schemas"]["KafeProblemDetails"];
-            "text/json": components["schemas"]["KafeProblemDetails"];
-          };
-        };
-      };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-  };
-  "/api/v1/author": {
-    post: {
-      requestBody?: {
-        content: {
-          "application/json": components["schemas"]["AuthorCreationDto"];
-          "text/json": components["schemas"]["AuthorCreationDto"];
-          "application/*+json": components["schemas"]["AuthorCreationDto"];
+    "/api/v1/author": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          content: {
-            "text/plain": string;
-            "application/json": string;
-            "text/json": string;
-          };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["AuthorCreationDto"];
+                    "text/json": components["schemas"]["AuthorCreationDto"];
+                    "application/*+json": components["schemas"]["AuthorCreationDto"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": string;
+                        "application/json": string;
+                        "text/json": string;
+                    };
+                };
+            };
         };
-      };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-  };
-  "/api/v1/author/{id}": {
-    get: {
-      parameters: {
-        path: {
-          id: string;
+    "/api/v1/author/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          content: {
-            "text/plain": components["schemas"]["AuthorDetailDto"];
-            "application/json": components["schemas"]["AuthorDetailDto"];
-            "text/json": components["schemas"]["AuthorDetailDto"];
-          };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["AuthorDetailDto"];
+                        "application/json": components["schemas"]["AuthorDetailDto"];
+                        "text/json": components["schemas"]["AuthorDetailDto"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["KafeProblemDetails"];
+                        "application/json": components["schemas"]["KafeProblemDetails"];
+                        "text/json": components["schemas"]["KafeProblemDetails"];
+                    };
+                };
+            };
         };
-        /** @description Not Found */
-        404: {
-          content: {
-            "text/plain": components["schemas"]["KafeProblemDetails"];
-            "application/json": components["schemas"]["KafeProblemDetails"];
-            "text/json": components["schemas"]["KafeProblemDetails"];
-          };
-        };
-      };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-  };
-  "/api/v1/authors": {
-    get: {
-      parameters: {
-        query?: {
-          sort?: string;
+    "/api/v1/authors": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          content: {
-            "text/plain": components["schemas"]["AuthorListDto"][];
-            "application/json": components["schemas"]["AuthorListDto"][];
-            "text/json": components["schemas"]["AuthorListDto"][];
-          };
+        get: {
+            parameters: {
+                query?: {
+                    sort?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["AuthorListDto"][];
+                        "application/json": components["schemas"]["AuthorListDto"][];
+                        "text/json": components["schemas"]["AuthorListDto"][];
+                    };
+                };
+            };
         };
-      };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-  };
-  "/api/v1/entity/perms/{id}": {
-    get: {
-      parameters: {
-        path: {
-          id: string;
+    "/api/v1/entity/perms/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          content: {
-            "text/plain": components["schemas"]["EntityPermissionsDetailDto"];
-            "application/json": components["schemas"]["EntityPermissionsDetailDto"];
-            "text/json": components["schemas"]["EntityPermissionsDetailDto"];
-          };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["EntityPermissionsDetailDto"];
+                        "application/json": components["schemas"]["EntityPermissionsDetailDto"];
+                        "text/json": components["schemas"]["EntityPermissionsDetailDto"];
+                    };
+                };
+            };
         };
-      };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-  };
-  "/api/v1/entity/perms": {
-    patch: {
-      requestBody?: {
-        content: {
-          "application/json": components["schemas"]["EntityPermissionsEditDto"];
-          "text/json": components["schemas"]["EntityPermissionsEditDto"];
-          "application/*+json": components["schemas"]["EntityPermissionsEditDto"];
+    "/api/v1/entity/perms": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          content: {
-            "text/plain": string;
-            "application/json": string;
-            "text/json": string;
-          };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["EntityPermissionsEditDto"];
+                    "text/json": components["schemas"]["EntityPermissionsEditDto"];
+                    "application/*+json": components["schemas"]["EntityPermissionsEditDto"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": string;
+                        "application/json": string;
+                        "text/json": string;
+                    };
+                };
+            };
         };
-      };
+        trace?: never;
     };
-  };
-  "/api/v1/entity/perms-csv": {
-    post: {
-      requestBody?: {
-        content: {
-          "multipart/form-data": {
+    "/api/v1/entity/perms-csv": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "multipart/form-data": {
+                        /**
+                         * Format: hrib
+                         * @description Human-Readable Identifier Ballast (HRIB)
+                         * @example AAAAbadf00d
+                         */
+                        Id?: string;
+                        Permissions?: components["schemas"]["Permission"][];
+                        /** Format: binary */
+                        CsvFile?: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": string;
+                        "application/json": string;
+                        "text/json": string;
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/account/external-login": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    redirect?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/organization": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["OrganizationCreationDto"];
+                    "text/json": components["schemas"]["OrganizationCreationDto"];
+                    "application/*+json": components["schemas"]["OrganizationCreationDto"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": string;
+                        "application/json": string;
+                        "text/json": string;
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["OrganizationEditDto"];
+                    "text/json": components["schemas"]["OrganizationEditDto"];
+                    "application/*+json": components["schemas"]["OrganizationEditDto"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": string;
+                        "application/json": string;
+                        "text/json": string;
+                    };
+                };
+            };
+        };
+        trace?: never;
+    };
+    "/api/v1/organization/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["OrganizationDetailDto"];
+                        "application/json": components["schemas"]["OrganizationDetailDto"];
+                        "text/json": components["schemas"]["OrganizationDetailDto"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["KafeProblemDetails"];
+                        "application/json": components["schemas"]["KafeProblemDetails"];
+                        "text/json": components["schemas"]["KafeProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/organizations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    sort?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["OrganizationListDto"][];
+                        "application/json": components["schemas"]["OrganizationListDto"][];
+                        "text/json": components["schemas"]["OrganizationListDto"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/playlist": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["PlaylistCreationDto"];
+                    "text/json": components["schemas"]["PlaylistCreationDto"];
+                    "application/*+json": components["schemas"]["PlaylistCreationDto"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": string;
+                        "application/json": string;
+                        "text/json": string;
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["PlaylistEditDto"];
+                    "text/json": components["schemas"]["PlaylistEditDto"];
+                    "application/*+json": components["schemas"]["PlaylistEditDto"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": string;
+                        "application/json": string;
+                        "text/json": string;
+                    };
+                };
+            };
+        };
+        trace?: never;
+    };
+    "/api/v1/playlist/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["PlaylistDetailDto"];
+                        "application/json": components["schemas"]["PlaylistDetailDto"];
+                        "text/json": components["schemas"]["PlaylistDetailDto"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["KafeProblemDetails"];
+                        "application/json": components["schemas"]["KafeProblemDetails"];
+                        "text/json": components["schemas"]["KafeProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/playlists": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    organization?: string;
+                    sort?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["PlaylistListDto"][];
+                        "application/json": components["schemas"]["PlaylistListDto"][];
+                        "text/json": components["schemas"]["PlaylistListDto"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/project": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["ProjectCreationDto"];
+                    "text/json": components["schemas"]["ProjectCreationDto"];
+                    "application/*+json": components["schemas"]["ProjectCreationDto"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": string;
+                        "application/json": string;
+                        "text/json": string;
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["ProjectEditDto"];
+                    "text/json": components["schemas"]["ProjectEditDto"];
+                    "application/*+json": components["schemas"]["ProjectEditDto"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": string;
+                        "application/json": string;
+                        "text/json": string;
+                    };
+                };
+            };
+        };
+        trace?: never;
+    };
+    "/api/v1/project/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProjectDetailDto"];
+                        "application/json": components["schemas"]["ProjectDetailDto"];
+                        "text/json": components["schemas"]["ProjectDetailDto"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["KafeProblemDetails"];
+                        "application/json": components["schemas"]["KafeProblemDetails"];
+                        "text/json": components["schemas"]["KafeProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/project-download/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    Id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": string;
+                        "application/json": string;
+                        "text/json": string;
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/project-group": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["ProjectGroupCreationDto"];
+                    "text/json": components["schemas"]["ProjectGroupCreationDto"];
+                    "application/*+json": components["schemas"]["ProjectGroupCreationDto"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": string;
+                        "application/json": string;
+                        "text/json": string;
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["ProjectGroupEditDto"];
+                    "text/json": components["schemas"]["ProjectGroupEditDto"];
+                    "application/*+json": components["schemas"]["ProjectGroupEditDto"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": string;
+                        "application/json": string;
+                        "text/json": string;
+                    };
+                };
+            };
+        };
+        trace?: never;
+    };
+    "/api/v1/project-group/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProjectGroupDetailDto"];
+                        "application/json": components["schemas"]["ProjectGroupDetailDto"];
+                        "text/json": components["schemas"]["ProjectGroupDetailDto"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["KafeProblemDetails"];
+                        "application/json": components["schemas"]["KafeProblemDetails"];
+                        "text/json": components["schemas"]["KafeProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/project-groups": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    organization?: string;
+                    sort?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProjectGroupListDto"][];
+                        "application/json": components["schemas"]["ProjectGroupListDto"][];
+                        "text/json": components["schemas"]["ProjectGroupListDto"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/project-group/lock": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["LockRequestData"];
+                    "text/json": components["schemas"]["LockRequestData"];
+                    "application/*+json": components["schemas"]["LockRequestData"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/project-group/unlock": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["UnlockRequestData"];
+                    "text/json": components["schemas"]["UnlockRequestData"];
+                    "application/*+json": components["schemas"]["UnlockRequestData"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    organization?: string;
+                    "project-group"?: string;
+                    sort?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProjectListDto"][];
+                        "application/json": components["schemas"]["ProjectListDto"][];
+                        "text/json": components["schemas"]["ProjectListDto"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/project-review": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["ProjectReviewCreationDto"];
+                    "text/json": components["schemas"]["ProjectReviewCreationDto"];
+                    "application/*+json": components["schemas"]["ProjectReviewCreationDto"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/project-validation/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProjectValidationDto"];
+                        "application/json": components["schemas"]["ProjectValidationDto"];
+                        "text/json": components["schemas"]["ProjectValidationDto"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/role": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["RoleCreationDto"];
+                    "text/json": components["schemas"]["RoleCreationDto"];
+                    "application/*+json": components["schemas"]["RoleCreationDto"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": string;
+                        "application/json": string;
+                        "text/json": string;
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["RoleEditDto"];
+                    "text/json": components["schemas"]["RoleEditDto"];
+                    "application/*+json": components["schemas"]["RoleEditDto"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": string;
+                        "application/json": string;
+                        "text/json": string;
+                    };
+                };
+            };
+        };
+        trace?: never;
+    };
+    "/api/v1/role/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["RoleDetailDto"];
+                        "application/json": components["schemas"]["RoleDetailDto"];
+                        "text/json": components["schemas"]["RoleDetailDto"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["KafeProblemDetails"];
+                        "application/json": components["schemas"]["KafeProblemDetails"];
+                        "text/json": components["schemas"]["KafeProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/roles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    sort?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["RoleListDto"][];
+                        "application/json": components["schemas"]["RoleListDto"][];
+                        "text/json": components["schemas"]["RoleListDto"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/shard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "multipart/form-data": {
+                        Kind?: components["schemas"]["ShardKind"];
+                        ArtifactId?: string;
+                        /** Format: binary */
+                        File?: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["KafeProblemDetails"];
+                        "application/json": components["schemas"]["KafeProblemDetails"];
+                        "text/json": components["schemas"]["KafeProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["KafeProblemDetails"];
+                        "application/json": components["schemas"]["KafeProblemDetails"];
+                        "text/json": components["schemas"]["KafeProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/shard/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["VideoShardDetailDto"] | components["schemas"]["ImageShardDetailDto"];
+                        "application/json": components["schemas"]["VideoShardDetailDto"] | components["schemas"]["ImageShardDetailDto"];
+                        "text/json": components["schemas"]["VideoShardDetailDto"] | components["schemas"]["ImageShardDetailDto"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["KafeProblemDetails"];
+                        "application/json": components["schemas"]["KafeProblemDetails"];
+                        "text/json": components["schemas"]["KafeProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["KafeProblemDetails"];
+                        "application/json": components["schemas"]["KafeProblemDetails"];
+                        "text/json": components["schemas"]["KafeProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/shard-download/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    Id: string;
+                    Variant: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": string;
+                        "application/json": string;
+                        "text/json": string;
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/shard-download/{id}/{variant}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    Id: string;
+                    Variant: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": string;
+                        "application/json": string;
+                        "text/json": string;
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/system": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["SystemDetailDto"];
+                        "application/json": components["schemas"]["SystemDetailDto"];
+                        "text/json": components["schemas"]["SystemDetailDto"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/tmp-account/{token}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    redirect?: string;
+                };
+                header?: never;
+                path: {
+                    Token: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["KafeProblemDetails"];
+                        "application/json": components["schemas"]["KafeProblemDetails"];
+                        "text/json": components["schemas"]["KafeProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["KafeProblemDetails"];
+                        "application/json": components["schemas"]["KafeProblemDetails"];
+                        "text/json": components["schemas"]["KafeProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/tmp-account": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["TemporaryAccountCreationDto"];
+                    "text/json": components["schemas"]["TemporaryAccountCreationDto"];
+                    "application/*+json": components["schemas"]["TemporaryAccountCreationDto"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["KafeProblemDetails"];
+                        "application/json": components["schemas"]["KafeProblemDetails"];
+                        "text/json": components["schemas"]["KafeProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/system/video-conversion-retry": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["VideoConversionRetryDto"];
+                    "text/json": components["schemas"]["VideoConversionRetryDto"];
+                    "application/*+json": components["schemas"]["VideoConversionRetryDto"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["VideoConversionStatsDto"];
+                        "application/json": components["schemas"]["VideoConversionStatsDto"];
+                        "text/json": components["schemas"]["VideoConversionStatsDto"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/system/video-conversion-stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["VideoConversionStatsDto"];
+                        "application/json": components["schemas"]["VideoConversionStatsDto"];
+                        "text/json": components["schemas"]["VideoConversionStatsDto"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+}
+export type webhooks = Record<string, never>;
+export interface components {
+    schemas: {
+        /** @description A detail of a user account. */
+        AccountDetailDto: {
             /**
              * Format: hrib
-             * @description Human-Readable Identifier Ballast
+             * @description The id of the account.
              * @example AAAAbadf00d
              */
-            Id?: string;
-            Permissions?: components["schemas"]["Permission"][];
-            /** Format: binary */
-            CsvFile?: string;
-          };
+            id: string;
+            /** @description The name of the user. Null if the account is temporary. */
+            name?: null | string;
+            /** @description The uco of the user. Null if the account is temporary. */
+            uco?: null | string;
+            /** @description The email address of the user. */
+            emailAddress: string;
+            /** @description The preferred culture of the user. */
+            preferredCulture: string;
+            /** @description The explicit permissions this user has been granted. */
+            permissions: {
+                [key: string]: components["schemas"]["Permission"][];
+            };
         };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          content: {
-            "text/plain": string;
-            "application/json": string;
-            "text/json": string;
-          };
+        AccountListDto: {
+            /**
+             * Format: hrib
+             * @description Human-Readable Identifier Ballast (HRIB)
+             * @example AAAAbadf00d
+             */
+            id: string;
+            emailAddress: string;
+            preferredCulture: string;
+            permissions: {
+                [key: string]: components["schemas"]["Permission"][];
+            };
         };
-      };
+        /** @description The lower and upper bound for the count of something. */
+        ArgumentArity: {
+            /**
+             * Format: int32
+             * @description The inclusive lower bound.
+             */
+            min: number;
+            /**
+             * Format: int32
+             * @description The inclusive upper bound.
+             */
+            max: number;
+        };
+        ArtifactCreationDto: {
+            name: components["schemas"]["LocalizedString"];
+            /** Format: date-time */
+            addedOn?: null | string;
+            /**
+             * Format: hrib
+             * @description Human-Readable Identifier Ballast (HRIB)
+             * @example AAAAbadf00d
+             */
+            containingProject?: null | string;
+            blueprintSlot?: null | string;
+        };
+        AudioStreamDto: {
+            codec?: null | string;
+            /** Format: int64 */
+            bitrate?: null | number;
+            /** Format: int32 */
+            channels?: null | number;
+            /** Format: int32 */
+            sampleRate?: null | number;
+        };
+        AuthorCreationDto: {
+            name: string;
+            globalPermissions: components["schemas"]["Permission"];
+            bio?: components["schemas"]["LocalizedString"];
+            uco?: null | string;
+            email?: null | string;
+            phone?: null | string;
+        };
+        AuthorDetailDto: {
+            /**
+             * Format: hrib
+             * @description Human-Readable Identifier Ballast (HRIB)
+             * @example AAAAbadf00d
+             */
+            id: string;
+            name: string;
+            globalPermissions: components["schemas"]["Permission"];
+            bio?: components["schemas"]["LocalizedString"];
+            uco?: null | string;
+            email?: null | string;
+            phone?: null | string;
+        };
+        AuthorListDto: {
+            /**
+             * Format: hrib
+             * @description Human-Readable Identifier Ballast (HRIB)
+             * @example AAAAbadf00d
+             */
+            id: string;
+            name: string;
+            globalPermissions: components["schemas"]["Permission"];
+        };
+        /** @enum {string} */
+        DiagnosticKind: "unknown" | "info" | "warning" | "error";
+        EntityPermissionsAccountEditDto: {
+            /**
+             * Format: hrib
+             * @description Human-Readable Identifier Ballast (HRIB)
+             * @example AAAAbadf00d
+             */
+            id?: null | string;
+            emailAddress?: null | string;
+            permissions: components["schemas"]["Permission"][];
+        };
+        EntityPermissionsAccountListDto: {
+            /**
+             * Format: hrib
+             * @description Human-Readable Identifier Ballast (HRIB)
+             * @example AAAAbadf00d
+             */
+            id?: null | string;
+            emailAddress?: null | string;
+            name?: null | string;
+            permissions: components["schemas"]["Permission"][];
+        };
+        EntityPermissionsDetailDto: {
+            /**
+             * Format: hrib
+             * @description Human-Readable Identifier Ballast (HRIB)
+             * @example AAAAbadf00d
+             */
+            id: string;
+            entityType?: null | string;
+            globalPermissions?: null | components["schemas"]["Permission"][];
+            userPermissions?: null | components["schemas"]["Permission"][];
+            accountPermissions: components["schemas"]["EntityPermissionsAccountListDto"][];
+        };
+        EntityPermissionsEditDto: {
+            /**
+             * Format: hrib
+             * @description Human-Readable Identifier Ballast (HRIB)
+             * @example AAAAbadf00d
+             */
+            id: string;
+            globalPermissions?: null | components["schemas"]["Permission"][];
+            accountPermissions?: null | components["schemas"]["EntityPermissionsAccountEditDto"][];
+        };
+        Error: {
+            id: string;
+            message: string;
+            arguments: {
+                [key: string]: unknown;
+            };
+            stackTrace?: string;
+        };
+        ImageDto: {
+            fileExtension: string;
+            mimeType: string;
+            /** Format: int32 */
+            width: number;
+            /** Format: int32 */
+            height: number;
+            isCorrupted: boolean;
+        };
+        ImageShardDetailDto: Omit<components["schemas"]["ShardDetailBaseDto"], "kind"> & {
+            variants: {
+                [key: string]: components["schemas"]["ImageDto"];
+            };
+        } & {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            kind: "Image";
+        };
+        KafeProblemDetails: {
+            type?: null | string;
+            title?: null | string;
+            /** Format: int32 */
+            status?: null | number;
+            detail?: null | string;
+            instance?: null | string;
+            errors: components["schemas"]["Error"][];
+            traceId?: null | string;
+        } & {
+            [key: string]: unknown;
+        };
+        /**
+         * LocalizedString
+         * @description Multilingual string
+         */
+        LocalizedString: {
+            iv?: string;
+            en?: null | string;
+            cs?: null | string;
+            sk?: null | string;
+        };
+        LockRequestData: {
+            /**
+             * Format: hrib
+             * @description Human-Readable Identifier Ballast (HRIB)
+             * @example AAAAbadf00d
+             */
+            id: string;
+        };
+        MediaDto: {
+            fileExtension: string;
+            mimeType: string;
+            /** Format: int64 */
+            fileLength: number;
+            /**
+             * Format: time-span
+             * @example 00:00:00
+             */
+            duration: string;
+            videoStreams: components["schemas"]["VideoStreamDto"][];
+            audioStreams: components["schemas"]["AudioStreamDto"][];
+            subtitleStreams: components["schemas"]["SubtitleStreamDto"][];
+            isCorrupted: boolean;
+            error?: null | string;
+        };
+        OrganizationCreationDto: {
+            name: components["schemas"]["LocalizedString"];
+        };
+        OrganizationDetailDto: {
+            /**
+             * Format: hrib
+             * @description Human-Readable Identifier Ballast (HRIB)
+             * @example AAAAbadf00d
+             */
+            id: string;
+            name: components["schemas"]["LocalizedString"];
+            /** Format: date-time */
+            createdOn: string;
+        };
+        OrganizationEditDto: {
+            /**
+             * Format: hrib
+             * @description Human-Readable Identifier Ballast (HRIB)
+             * @example AAAAbadf00d
+             */
+            id: string;
+            name: components["schemas"]["LocalizedString"];
+        };
+        OrganizationListDto: {
+            /**
+             * Format: hrib
+             * @description Human-Readable Identifier Ballast (HRIB)
+             * @example AAAAbadf00d
+             */
+            id: string;
+            name: components["schemas"]["LocalizedString"];
+        };
+        /**
+         * Permission
+         * @enum {string}
+         */
+        Permission: "read" | "append" | "inspect" | "write" | "review" | "administer";
+        PlaylistCreationDto: {
+            name: components["schemas"]["LocalizedString"];
+            /**
+             * Format: hrib
+             * @description Human-Readable Identifier Ballast (HRIB)
+             * @example AAAAbadf00d
+             */
+            organizationId: string;
+            description?: components["schemas"]["LocalizedString"];
+            globalPermissions?: null | components["schemas"]["Permission"][];
+            entryIds?: null | string[];
+        };
+        PlaylistDetailDto: {
+            /**
+             * Format: hrib
+             * @description Human-Readable Identifier Ballast (HRIB)
+             * @example AAAAbadf00d
+             */
+            id: string;
+            /**
+             * Format: hrib
+             * @description Human-Readable Identifier Ballast (HRIB)
+             * @example AAAAbadf00d
+             */
+            organizationId: string;
+            name: components["schemas"]["LocalizedString"];
+            description?: components["schemas"]["LocalizedString"];
+            globalPermissions: components["schemas"]["Permission"][];
+            entries: components["schemas"]["PlaylistEntryDto"][];
+        };
+        PlaylistEditDto: {
+            /**
+             * Format: hrib
+             * @description Human-Readable Identifier Ballast (HRIB)
+             * @example AAAAbadf00d
+             */
+            id: string;
+            /**
+             * Format: hrib
+             * @description Human-Readable Identifier Ballast (HRIB)
+             * @example AAAAbadf00d
+             */
+            organizationId?: null | string;
+            name?: components["schemas"]["LocalizedString"];
+            description?: components["schemas"]["LocalizedString"];
+            globalPermissions?: null | components["schemas"]["Permission"][];
+            entryIds?: null | string[];
+        };
+        PlaylistEntryDto: {
+            /**
+             * Format: hrib
+             * @description Human-Readable Identifier Ballast (HRIB)
+             * @example AAAAbadf00d
+             */
+            id: string;
+            name: components["schemas"]["LocalizedString"];
+        };
+        PlaylistListDto: {
+            /**
+             * Format: hrib
+             * @description Human-Readable Identifier Ballast (HRIB)
+             * @example AAAAbadf00d
+             */
+            id: string;
+            /**
+             * Format: hrib
+             * @description Human-Readable Identifier Ballast (HRIB)
+             * @example AAAAbadf00d
+             */
+            organizationId: string;
+            name: components["schemas"]["LocalizedString"];
+            description?: components["schemas"]["LocalizedString"];
+            globalPermissions: components["schemas"]["Permission"][];
+        };
+        ProjectArtifactAdditionDto: {
+            /**
+             * Format: hrib
+             * @description Human-Readable Identifier Ballast (HRIB)
+             * @example AAAAbadf00d
+             */
+            id: string;
+            blueprintSlot?: null | string;
+        };
+        ProjectArtifactBlueprintDto: {
+            name: components["schemas"]["LocalizedString"];
+            description?: components["schemas"]["LocalizedString"];
+            /** @description The lower and upper bound for the count of something. */
+            arity: components["schemas"]["ArgumentArity"];
+            shardBlueprints: {
+                unknown?: components["schemas"]["ProjectArtifactShardBlueprintDto"];
+                video?: components["schemas"]["ProjectArtifactShardBlueprintDto"];
+                image?: components["schemas"]["ProjectArtifactShardBlueprintDto"];
+                subtitles?: components["schemas"]["ProjectArtifactShardBlueprintDto"];
+                blend?: components["schemas"]["ProjectArtifactShardBlueprintDto"];
+            };
+        };
+        ProjectArtifactDto: {
+            /**
+             * Format: hrib
+             * @description Human-Readable Identifier Ballast (HRIB)
+             * @example AAAAbadf00d
+             */
+            id: string;
+            name: components["schemas"]["LocalizedString"];
+            /** Format: date-time */
+            addedOn: string;
+            blueprintSlot?: null | string;
+            shards: components["schemas"]["ShardListDto"][];
+        };
+        ProjectArtifactShardBlueprintDto: {
+            name: components["schemas"]["LocalizedString"];
+            description?: components["schemas"]["LocalizedString"];
+            /** @description The lower and upper bound for the count of something. */
+            arity: components["schemas"]["ArgumentArity"];
+        };
+        ProjectAuthorDto: {
+            /**
+             * Format: hrib
+             * @description Human-Readable Identifier Ballast (HRIB)
+             * @example AAAAbadf00d
+             */
+            id: string;
+            name: string;
+            roles: string[];
+        };
+        ProjectBlueprintDto: {
+            requiredReviewers: string[];
+            artifactBlueprints: {
+                [key: string]: components["schemas"]["ProjectArtifactBlueprintDto"];
+            };
+        };
+        ProjectCreationAuthorDto: {
+            /**
+             * Format: hrib
+             * @description Human-Readable Identifier Ballast (HRIB)
+             * @example AAAAbadf00d
+             */
+            id: string;
+            roles: string[];
+        };
+        ProjectCreationDto: {
+            /**
+             * Format: hrib
+             * @description Human-Readable Identifier Ballast (HRIB)
+             * @example AAAAbadf00d
+             */
+            projectGroupId: string;
+            name: components["schemas"]["LocalizedString"];
+            description?: components["schemas"]["LocalizedString"];
+            genre?: components["schemas"]["LocalizedString"];
+            aiUsageDeclaration?: null | string;
+            hearAboutUs?: null | string;
+            crew: components["schemas"]["ProjectCreationAuthorDto"][];
+            cast: components["schemas"]["ProjectCreationAuthorDto"][];
+            isLocked: boolean;
+        };
+        ProjectDetailDto: {
+            /**
+             * Format: hrib
+             * @description Human-Readable Identifier Ballast (HRIB)
+             * @example AAAAbadf00d
+             */
+            id: string;
+            /**
+             * Format: hrib
+             * @description Human-Readable Identifier Ballast (HRIB)
+             * @example AAAAbadf00d
+             */
+            projectGroupId: string;
+            projectGroupName?: components["schemas"]["LocalizedString"];
+            validationSettings: components["schemas"]["ProjectValidationSettings"];
+            genre?: components["schemas"]["LocalizedString"];
+            name: components["schemas"]["LocalizedString"];
+            description?: components["schemas"]["LocalizedString"];
+            aiUsageDeclaration?: null | string;
+            hearAboutUs?: null | string;
+            globalPermissions: components["schemas"]["Permission"][];
+            userPermissions: components["schemas"]["Permission"][];
+            /** Format: date-time */
+            releasedOn: string;
+            crew: components["schemas"]["ProjectAuthorDto"][];
+            cast: components["schemas"]["ProjectAuthorDto"][];
+            /**
+             * Format: hrib
+             * @description Human-Readable Identifier Ballast (HRIB)
+             * @example AAAAbadf00d
+             */
+            ownerId?: null | string;
+            artifacts: components["schemas"]["ProjectArtifactDto"][];
+            reviews: components["schemas"]["ProjectReviewDto"][];
+            blueprint: components["schemas"]["ProjectBlueprintDto"];
+            isLocked: boolean;
+        };
+        ProjectDiagnosticDto: {
+            kind: components["schemas"]["DiagnosticKind"];
+            message: components["schemas"]["LocalizedString"];
+            validationStage: string;
+        };
+        ProjectEditDto: {
+            /**
+             * Format: hrib
+             * @description Human-Readable Identifier Ballast (HRIB)
+             * @example AAAAbadf00d
+             */
+            id: string;
+            name?: components["schemas"]["LocalizedString"];
+            description?: components["schemas"]["LocalizedString"];
+            genre?: components["schemas"]["LocalizedString"];
+            aiUsageDeclaration?: null | string;
+            hearAboutUs?: null | string;
+            crew?: null | components["schemas"]["ProjectCreationAuthorDto"][];
+            cast?: null | components["schemas"]["ProjectCreationAuthorDto"][];
+            artifacts?: null | components["schemas"]["ProjectArtifactAdditionDto"][];
+            isLocked?: null | boolean;
+        };
+        ProjectGroupCreationDto: {
+            /**
+             * Format: hrib
+             * @description Human-Readable Identifier Ballast (HRIB)
+             * @example AAAAbadf00d
+             */
+            organizationId: string;
+            name: components["schemas"]["LocalizedString"];
+            description?: components["schemas"]["LocalizedString"];
+            /** Format: date-time */
+            deadline: string;
+            isOpen: boolean;
+        };
+        ProjectGroupDetailDto: {
+            /**
+             * Format: hrib
+             * @description Human-Readable Identifier Ballast (HRIB)
+             * @example AAAAbadf00d
+             */
+            id: string;
+            /**
+             * Format: hrib
+             * @description Human-Readable Identifier Ballast (HRIB)
+             * @example AAAAbadf00d
+             */
+            organizationId: string;
+            name: components["schemas"]["LocalizedString"];
+            description?: components["schemas"]["LocalizedString"];
+            /** Format: date-time */
+            deadline: string;
+            isOpen: boolean;
+            projects: components["schemas"]["ProjectListDto"][];
+            validationSettings?: components["schemas"]["ProjectValidationSettings"];
+        };
+        ProjectGroupEditDto: {
+            /**
+             * Format: hrib
+             * @description Human-Readable Identifier Ballast (HRIB)
+             * @example AAAAbadf00d
+             */
+            id: string;
+            /**
+             * Format: hrib
+             * @description Human-Readable Identifier Ballast (HRIB)
+             * @example AAAAbadf00d
+             */
+            organizationId?: null | string;
+            name?: components["schemas"]["LocalizedString"];
+            description?: components["schemas"]["LocalizedString"];
+            /** Format: date-time */
+            deadline?: null | string;
+            isOpen?: null | boolean;
+            validationSettings?: components["schemas"]["ProjectValidationSettings"];
+        };
+        ProjectGroupListDto: {
+            /**
+             * Format: hrib
+             * @description Human-Readable Identifier Ballast (HRIB)
+             * @example AAAAbadf00d
+             */
+            id: string;
+            /**
+             * Format: hrib
+             * @description Human-Readable Identifier Ballast (HRIB)
+             * @example AAAAbadf00d
+             */
+            organizationId: string;
+            name: components["schemas"]["LocalizedString"];
+            description?: components["schemas"]["LocalizedString"];
+            /** Format: date-time */
+            deadline: string;
+            isOpen: boolean;
+        };
+        /** @description A DTO of a project. To be used when listing projects. */
+        ProjectListDto: {
+            /**
+             * Format: hrib
+             * @description Human-Readable Identifier Ballast (HRIB)
+             * @example AAAAbadf00d
+             */
+            id: string;
+            /**
+             * Format: hrib
+             * @description Human-Readable Identifier Ballast (HRIB)
+             * @example AAAAbadf00d
+             */
+            projectGroupId: string;
+            name: components["schemas"]["LocalizedString"];
+            description?: components["schemas"]["LocalizedString"];
+            /** @description Permissions that apply to all users, even the anonymous ones. */
+            globalPermissions: components["schemas"]["Permission"][];
+            /** @description Permissions that apply to the currently logged in user. Includes the global permissions. */
+            userPermissions: components["schemas"]["Permission"][];
+            /** Format: date-time */
+            releasedOn: string;
+            latestReviewKind: components["schemas"]["ReviewKind"];
+            isLocked: boolean;
+            /**
+             * Format: hrib
+             * @description Human-Readable Identifier Ballast (HRIB)
+             * @example AAAAbadf00d
+             */
+            ownerId?: null | string;
+        };
+        ProjectReviewCreationDto: {
+            /**
+             * Format: hrib
+             * @description Human-Readable Identifier Ballast (HRIB)
+             * @example AAAAbadf00d
+             */
+            projectId: string;
+            kind: components["schemas"]["ReviewKind"];
+            reviewerRole: string;
+            comment?: components["schemas"]["LocalizedString"];
+        };
+        ProjectReviewDto: {
+            /**
+             * Format: hrib
+             * @description Human-Readable Identifier Ballast (HRIB)
+             * @example AAAAbadf00d
+             */
+            reviewerId?: null | string;
+            kind: components["schemas"]["ReviewKind"];
+            reviewerRole: string;
+            comment?: components["schemas"]["LocalizedString"];
+            /** Format: date-time */
+            addedOn: string;
+        };
+        ProjectValidationDto: {
+            /**
+             * Format: hrib
+             * @description Human-Readable Identifier Ballast (HRIB)
+             * @example AAAAbadf00d
+             */
+            projectId: string;
+            /** Format: date-time */
+            validatedOn: string;
+            diagnostics: components["schemas"]["ProjectDiagnosticDto"][];
+        };
+        ProjectValidationSettings: {
+            /** Format: int32 */
+            minNameLength?: null | number;
+            /** Format: int32 */
+            maxNameLength?: null | number;
+            requiredNameCultures?: null | string[];
+            /** Format: int32 */
+            minDescriptionLength?: null | number;
+            /** Format: int32 */
+            maxDescriptionLength?: null | number;
+            requiredDescriptionCultures?: null | string[];
+            /** Format: int32 */
+            minGenreLength?: null | number;
+            /** Format: int32 */
+            maxGenreLength?: null | number;
+            requiredGenreCultures?: null | string[];
+        };
+        /** @enum {string} */
+        ReviewKind: "notReviewed" | "accepted" | "rejected" | "needsRevision";
+        RoleCreationDto: {
+            /**
+             * Format: hrib
+             * @description Human-Readable Identifier Ballast (HRIB)
+             * @example AAAAbadf00d
+             */
+            organizationId: string;
+            name: components["schemas"]["LocalizedString"];
+            description?: components["schemas"]["LocalizedString"];
+        };
+        RoleDetailDto: {
+            /**
+             * Format: hrib
+             * @description Human-Readable Identifier Ballast (HRIB)
+             * @example AAAAbadf00d
+             */
+            id: string;
+            /**
+             * Format: hrib
+             * @description Human-Readable Identifier Ballast (HRIB)
+             * @example AAAAbadf00d
+             */
+            organizationId: string;
+            name: components["schemas"]["LocalizedString"];
+            description?: components["schemas"]["LocalizedString"];
+            /** Format: date-time */
+            createdOn: string;
+            permissions: {
+                [key: string]: components["schemas"]["Permission"][];
+            };
+        };
+        RoleEditDto: {
+            /**
+             * Format: hrib
+             * @description Human-Readable Identifier Ballast (HRIB)
+             * @example AAAAbadf00d
+             */
+            id: string;
+            name: components["schemas"]["LocalizedString"];
+            description?: components["schemas"]["LocalizedString"];
+        };
+        RoleListDto: {
+            /**
+             * Format: hrib
+             * @description Human-Readable Identifier Ballast (HRIB)
+             * @example AAAAbadf00d
+             */
+            id: string;
+            /**
+             * Format: hrib
+             * @description Human-Readable Identifier Ballast (HRIB)
+             * @example AAAAbadf00d
+             */
+            organizationId: string;
+            name: components["schemas"]["LocalizedString"];
+        };
+        ShardDetailBaseDto: {
+            kind: components["schemas"]["ShardKind"];
+            /**
+             * Format: hrib
+             * @description Human-Readable Identifier Ballast (HRIB)
+             * @example AAAAbadf00d
+             */
+            id: string;
+            /**
+             * Format: hrib
+             * @description Human-Readable Identifier Ballast (HRIB)
+             * @example AAAAbadf00d
+             */
+            artifactId: string;
+        };
+        /** @enum {string} */
+        ShardKind: "unknown" | "video" | "image" | "subtitles" | "blend";
+        ShardListDto: {
+            /**
+             * Format: hrib
+             * @description Human-Readable Identifier Ballast (HRIB)
+             * @example AAAAbadf00d
+             */
+            id: string;
+            kind: components["schemas"]["ShardKind"];
+            variants: string[];
+        };
+        SubtitleStreamDto: {
+            codec?: null | string;
+            /** Format: int64 */
+            bitrate?: null | number;
+        };
+        SystemDetailDto: {
+            name: string;
+            baseUrls: string[];
+            version: string;
+            commit: string;
+            /** Format: date-time */
+            commitDate: string;
+            /** Format: date-time */
+            runningSince: string;
+        };
+        TemporaryAccountCreationDto: {
+            emailAddress: string;
+            preferredCulture?: null | string;
+        };
+        UnlockRequestData: {
+            /**
+             * Format: hrib
+             * @description Human-Readable Identifier Ballast (HRIB)
+             * @example AAAAbadf00d
+             */
+            id: string;
+        };
+        VideoConversionRetryDto: {
+            ids?: null | string[];
+            shouldRetryOriginalAnalysis: boolean;
+            shouldRetryConversion: boolean;
+        };
+        VideoConversionStatsDto: {
+            /** Format: int32 */
+            totalVideoShardCount: number;
+            /** Format: int32 */
+            corruptedVideoShardCount: number;
+            /** Format: int32 */
+            pendingVideoConversionCount: number;
+            /** Format: int32 */
+            failedVideoConversionCount: number;
+        };
+        VideoShardDetailDto: Omit<components["schemas"]["ShardDetailBaseDto"], "kind"> & {
+            variants: {
+                [key: string]: components["schemas"]["MediaDto"];
+            };
+        } & {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            kind: "Video";
+        };
+        VideoStreamDto: {
+            codec?: null | string;
+            /** Format: int64 */
+            bitrate?: null | number;
+            /** Format: int32 */
+            width?: null | number;
+            /** Format: int32 */
+            height?: null | number;
+            /** Format: double */
+            framerate?: null | number;
+        };
     };
-  };
-  "/api/v1/account/external-login": {
-    get: {
-      parameters: {
-        query?: {
-          redirect?: string;
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          content: never;
-        };
-      };
-    };
-  };
-  "/api/v1/organization": {
-    post: {
-      requestBody?: {
-        content: {
-          "application/json": components["schemas"]["OrganizationCreationDto"];
-          "text/json": components["schemas"]["OrganizationCreationDto"];
-          "application/*+json": components["schemas"]["OrganizationCreationDto"];
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          content: {
-            "text/plain": string;
-            "application/json": string;
-            "text/json": string;
-          };
-        };
-      };
-    };
-    patch: {
-      requestBody?: {
-        content: {
-          "application/json": components["schemas"]["OrganizationEditDto"];
-          "text/json": components["schemas"]["OrganizationEditDto"];
-          "application/*+json": components["schemas"]["OrganizationEditDto"];
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          content: {
-            "text/plain": string;
-            "application/json": string;
-            "text/json": string;
-          };
-        };
-      };
-    };
-  };
-  "/api/v1/organization/{id}": {
-    get: {
-      parameters: {
-        path: {
-          id: string;
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          content: {
-            "text/plain": components["schemas"]["OrganizationDetailDto"];
-            "application/json": components["schemas"]["OrganizationDetailDto"];
-            "text/json": components["schemas"]["OrganizationDetailDto"];
-          };
-        };
-        /** @description Not Found */
-        404: {
-          content: {
-            "text/plain": components["schemas"]["KafeProblemDetails"];
-            "application/json": components["schemas"]["KafeProblemDetails"];
-            "text/json": components["schemas"]["KafeProblemDetails"];
-          };
-        };
-      };
-    };
-  };
-  "/api/v1/organizations": {
-    get: {
-      parameters: {
-        query?: {
-          sort?: string;
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          content: {
-            "text/plain": components["schemas"]["OrganizationListDto"][];
-            "application/json": components["schemas"]["OrganizationListDto"][];
-            "text/json": components["schemas"]["OrganizationListDto"][];
-          };
-        };
-      };
-    };
-  };
-  "/api/v1/playlist": {
-    post: {
-      requestBody?: {
-        content: {
-          "application/json": components["schemas"]["PlaylistCreationDto"];
-          "text/json": components["schemas"]["PlaylistCreationDto"];
-          "application/*+json": components["schemas"]["PlaylistCreationDto"];
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          content: {
-            "text/plain": string;
-            "application/json": string;
-            "text/json": string;
-          };
-        };
-      };
-    };
-    patch: {
-      requestBody?: {
-        content: {
-          "application/json": components["schemas"]["PlaylistEditDto"];
-          "text/json": components["schemas"]["PlaylistEditDto"];
-          "application/*+json": components["schemas"]["PlaylistEditDto"];
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          content: {
-            "text/plain": string;
-            "application/json": string;
-            "text/json": string;
-          };
-        };
-      };
-    };
-  };
-  "/api/v1/playlist/{id}": {
-    get: {
-      parameters: {
-        path: {
-          id: string;
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          content: {
-            "text/plain": components["schemas"]["PlaylistDetailDto"];
-            "application/json": components["schemas"]["PlaylistDetailDto"];
-            "text/json": components["schemas"]["PlaylistDetailDto"];
-          };
-        };
-        /** @description Not Found */
-        404: {
-          content: {
-            "text/plain": components["schemas"]["KafeProblemDetails"];
-            "application/json": components["schemas"]["KafeProblemDetails"];
-            "text/json": components["schemas"]["KafeProblemDetails"];
-          };
-        };
-      };
-    };
-  };
-  "/api/v1/playlists": {
-    get: {
-      parameters: {
-        query?: {
-          organization?: string;
-          sort?: string;
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          content: {
-            "text/plain": components["schemas"]["PlaylistListDto"][];
-            "application/json": components["schemas"]["PlaylistListDto"][];
-            "text/json": components["schemas"]["PlaylistListDto"][];
-          };
-        };
-      };
-    };
-  };
-  "/api/v1/project": {
-    post: {
-      requestBody?: {
-        content: {
-          "application/json": components["schemas"]["ProjectCreationDto"];
-          "text/json": components["schemas"]["ProjectCreationDto"];
-          "application/*+json": components["schemas"]["ProjectCreationDto"];
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          content: {
-            "text/plain": string;
-            "application/json": string;
-            "text/json": string;
-          };
-        };
-      };
-    };
-    patch: {
-      requestBody?: {
-        content: {
-          "application/json": components["schemas"]["ProjectEditDto"];
-          "text/json": components["schemas"]["ProjectEditDto"];
-          "application/*+json": components["schemas"]["ProjectEditDto"];
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          content: {
-            "text/plain": string;
-            "application/json": string;
-            "text/json": string;
-          };
-        };
-      };
-    };
-  };
-  "/api/v1/project/{id}": {
-    get: {
-      parameters: {
-        path: {
-          id: string;
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          content: {
-            "text/plain": components["schemas"]["ProjectDetailDto"];
-            "application/json": components["schemas"]["ProjectDetailDto"];
-            "text/json": components["schemas"]["ProjectDetailDto"];
-          };
-        };
-        /** @description Not Found */
-        404: {
-          content: {
-            "text/plain": components["schemas"]["KafeProblemDetails"];
-            "application/json": components["schemas"]["KafeProblemDetails"];
-            "text/json": components["schemas"]["KafeProblemDetails"];
-          };
-        };
-      };
-    };
-  };
-  "/api/v1/project-download/{id}": {
-    get: {
-      parameters: {
-        path: {
-          Id: string;
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          content: {
-            "text/plain": string;
-            "application/json": string;
-            "text/json": string;
-          };
-        };
-      };
-    };
-  };
-  "/api/v1/project-group": {
-    post: {
-      requestBody?: {
-        content: {
-          "application/json": components["schemas"]["ProjectGroupCreationDto"];
-          "text/json": components["schemas"]["ProjectGroupCreationDto"];
-          "application/*+json": components["schemas"]["ProjectGroupCreationDto"];
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          content: {
-            "text/plain": string;
-            "application/json": string;
-            "text/json": string;
-          };
-        };
-      };
-    };
-    patch: {
-      requestBody?: {
-        content: {
-          "application/json": components["schemas"]["ProjectGroupEditDto"];
-          "text/json": components["schemas"]["ProjectGroupEditDto"];
-          "application/*+json": components["schemas"]["ProjectGroupEditDto"];
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          content: {
-            "text/plain": string;
-            "application/json": string;
-            "text/json": string;
-          };
-        };
-      };
-    };
-  };
-  "/api/v1/project-group/{id}": {
-    get: {
-      parameters: {
-        path: {
-          id: string;
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          content: {
-            "text/plain": components["schemas"]["ProjectGroupDetailDto"];
-            "application/json": components["schemas"]["ProjectGroupDetailDto"];
-            "text/json": components["schemas"]["ProjectGroupDetailDto"];
-          };
-        };
-        /** @description Not Found */
-        404: {
-          content: {
-            "text/plain": components["schemas"]["KafeProblemDetails"];
-            "application/json": components["schemas"]["KafeProblemDetails"];
-            "text/json": components["schemas"]["KafeProblemDetails"];
-          };
-        };
-      };
-    };
-  };
-  "/api/v1/project-groups": {
-    get: {
-      parameters: {
-        query?: {
-          organization?: string;
-          sort?: string;
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          content: {
-            "text/plain": components["schemas"]["ProjectGroupListDto"][];
-            "application/json": components["schemas"]["ProjectGroupListDto"][];
-            "text/json": components["schemas"]["ProjectGroupListDto"][];
-          };
-        };
-      };
-    };
-  };
-  "/api/v1/project-group/lock": {
-    post: {
-      requestBody?: {
-        content: {
-          "application/json": components["schemas"]["LockRequestData"];
-          "text/json": components["schemas"]["LockRequestData"];
-          "application/*+json": components["schemas"]["LockRequestData"];
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          content: never;
-        };
-      };
-    };
-  };
-  "/api/v1/project-group/unlock": {
-    post: {
-      requestBody?: {
-        content: {
-          "application/json": components["schemas"]["UnlockRequestData"];
-          "text/json": components["schemas"]["UnlockRequestData"];
-          "application/*+json": components["schemas"]["UnlockRequestData"];
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          content: never;
-        };
-      };
-    };
-  };
-  "/api/v1/projects": {
-    get: {
-      parameters: {
-        query?: {
-          organization?: string;
-          "project-group"?: string;
-          sort?: string;
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          content: {
-            "text/plain": components["schemas"]["ProjectListDto"][];
-            "application/json": components["schemas"]["ProjectListDto"][];
-            "text/json": components["schemas"]["ProjectListDto"][];
-          };
-        };
-      };
-    };
-  };
-  "/api/v1/project-review": {
-    post: {
-      requestBody?: {
-        content: {
-          "application/json": components["schemas"]["ProjectReviewCreationDto"];
-          "text/json": components["schemas"]["ProjectReviewCreationDto"];
-          "application/*+json": components["schemas"]["ProjectReviewCreationDto"];
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          content: never;
-        };
-      };
-    };
-  };
-  "/api/v1/project-validation/{id}": {
-    get: {
-      parameters: {
-        path: {
-          id: string;
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          content: {
-            "text/plain": components["schemas"]["ProjectValidationDto"];
-            "application/json": components["schemas"]["ProjectValidationDto"];
-            "text/json": components["schemas"]["ProjectValidationDto"];
-          };
-        };
-      };
-    };
-  };
-  "/api/v1/role": {
-    post: {
-      requestBody?: {
-        content: {
-          "application/json": components["schemas"]["RoleCreationDto"];
-          "text/json": components["schemas"]["RoleCreationDto"];
-          "application/*+json": components["schemas"]["RoleCreationDto"];
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          content: {
-            "text/plain": string;
-            "application/json": string;
-            "text/json": string;
-          };
-        };
-      };
-    };
-    patch: {
-      requestBody?: {
-        content: {
-          "application/json": components["schemas"]["RoleEditDto"];
-          "text/json": components["schemas"]["RoleEditDto"];
-          "application/*+json": components["schemas"]["RoleEditDto"];
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          content: {
-            "text/plain": string;
-            "application/json": string;
-            "text/json": string;
-          };
-        };
-      };
-    };
-  };
-  "/api/v1/role/{id}": {
-    get: {
-      parameters: {
-        path: {
-          id: string;
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          content: {
-            "text/plain": components["schemas"]["RoleDetailDto"];
-            "application/json": components["schemas"]["RoleDetailDto"];
-            "text/json": components["schemas"]["RoleDetailDto"];
-          };
-        };
-        /** @description Not Found */
-        404: {
-          content: {
-            "text/plain": components["schemas"]["KafeProblemDetails"];
-            "application/json": components["schemas"]["KafeProblemDetails"];
-            "text/json": components["schemas"]["KafeProblemDetails"];
-          };
-        };
-      };
-    };
-  };
-  "/api/v1/roles": {
-    get: {
-      parameters: {
-        query?: {
-          sort?: string;
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          content: {
-            "text/plain": components["schemas"]["RoleListDto"][];
-            "application/json": components["schemas"]["RoleListDto"][];
-            "text/json": components["schemas"]["RoleListDto"][];
-          };
-        };
-      };
-    };
-  };
-  "/api/v1/shard": {
-    post: {
-      requestBody?: {
-        content: {
-          "multipart/form-data": {
-            Kind?: components["schemas"]["ShardKind"];
-            ArtifactId?: string;
-            /** Format: binary */
-            File?: string;
-          };
-        };
-      };
-      responses: {
-        /** @description Forbidden */
-        403: {
-          content: {
-            "text/plain": components["schemas"]["KafeProblemDetails"];
-            "application/json": components["schemas"]["KafeProblemDetails"];
-            "text/json": components["schemas"]["KafeProblemDetails"];
-          };
-        };
-        /** @description Not Found */
-        404: {
-          content: {
-            "text/plain": components["schemas"]["KafeProblemDetails"];
-            "application/json": components["schemas"]["KafeProblemDetails"];
-            "text/json": components["schemas"]["KafeProblemDetails"];
-          };
-        };
-      };
-    };
-  };
-  "/api/v1/shard/{id}": {
-    get: {
-      parameters: {
-        path: {
-          id: string;
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          content: {
-            "text/plain": components["schemas"]["VideoShardDetailDto"] | components["schemas"]["ImageShardDetailDto"];
-            "application/json": components["schemas"]["VideoShardDetailDto"] | components["schemas"]["ImageShardDetailDto"];
-            "text/json": components["schemas"]["VideoShardDetailDto"] | components["schemas"]["ImageShardDetailDto"];
-          };
-        };
-        /** @description Forbidden */
-        403: {
-          content: {
-            "text/plain": components["schemas"]["KafeProblemDetails"];
-            "application/json": components["schemas"]["KafeProblemDetails"];
-            "text/json": components["schemas"]["KafeProblemDetails"];
-          };
-        };
-        /** @description Not Found */
-        404: {
-          content: {
-            "text/plain": components["schemas"]["KafeProblemDetails"];
-            "application/json": components["schemas"]["KafeProblemDetails"];
-            "text/json": components["schemas"]["KafeProblemDetails"];
-          };
-        };
-      };
-    };
-  };
-  "/api/v1/shard-download/{id}": {
-    get: {
-      parameters: {
-        path: {
-          Id: string;
-          Variant: string;
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          content: {
-            "text/plain": string;
-            "application/json": string;
-            "text/json": string;
-          };
-        };
-      };
-    };
-  };
-  "/api/v1/shard-download/{id}/{variant}": {
-    get: {
-      parameters: {
-        path: {
-          Id: string;
-          Variant: string;
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          content: {
-            "text/plain": string;
-            "application/json": string;
-            "text/json": string;
-          };
-        };
-      };
-    };
-  };
-  "/api/v1/system": {
-    get: {
-      responses: {
-        /** @description OK */
-        200: {
-          content: {
-            "text/plain": components["schemas"]["SystemDetailDto"];
-            "application/json": components["schemas"]["SystemDetailDto"];
-            "text/json": components["schemas"]["SystemDetailDto"];
-          };
-        };
-      };
-    };
-  };
-  "/api/v1/tmp-account/{token}": {
-    get: {
-      parameters: {
-        query?: {
-          redirect?: string;
-        };
-        path: {
-          Token: string;
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          content: never;
-        };
-        /** @description Bad Request */
-        400: {
-          content: {
-            "text/plain": components["schemas"]["KafeProblemDetails"];
-            "application/json": components["schemas"]["KafeProblemDetails"];
-            "text/json": components["schemas"]["KafeProblemDetails"];
-          };
-        };
-        /** @description Not Found */
-        404: {
-          content: {
-            "text/plain": components["schemas"]["KafeProblemDetails"];
-            "application/json": components["schemas"]["KafeProblemDetails"];
-            "text/json": components["schemas"]["KafeProblemDetails"];
-          };
-        };
-      };
-    };
-  };
-  "/api/v1/tmp-account": {
-    post: {
-      requestBody?: {
-        content: {
-          "application/json": components["schemas"]["TemporaryAccountCreationDto"];
-          "text/json": components["schemas"]["TemporaryAccountCreationDto"];
-          "application/*+json": components["schemas"]["TemporaryAccountCreationDto"];
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          content: never;
-        };
-        /** @description Bad Request */
-        400: {
-          content: {
-            "text/plain": components["schemas"]["KafeProblemDetails"];
-            "application/json": components["schemas"]["KafeProblemDetails"];
-            "text/json": components["schemas"]["KafeProblemDetails"];
-          };
-        };
-      };
-    };
-  };
-  "/api/v1/system/video-conversion-retry": {
-    post: {
-      requestBody?: {
-        content: {
-          "application/json": components["schemas"]["VideoConversionRetryDto"];
-          "text/json": components["schemas"]["VideoConversionRetryDto"];
-          "application/*+json": components["schemas"]["VideoConversionRetryDto"];
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          content: {
-            "text/plain": components["schemas"]["VideoConversionStatsDto"];
-            "application/json": components["schemas"]["VideoConversionStatsDto"];
-            "text/json": components["schemas"]["VideoConversionStatsDto"];
-          };
-        };
-      };
-    };
-  };
-  "/api/v1/system/video-conversion-stats": {
-    get: {
-      responses: {
-        /** @description OK */
-        200: {
-          content: {
-            "text/plain": components["schemas"]["VideoConversionStatsDto"];
-            "application/json": components["schemas"]["VideoConversionStatsDto"];
-            "text/json": components["schemas"]["VideoConversionStatsDto"];
-          };
-        };
-      };
-    };
-  };
+    responses: never;
+    parameters: never;
+    requestBodies: never;
+    headers: never;
+    pathItems: never;
 }
-
-export type webhooks = Record<string, never>;
-
-export interface components {
-  schemas: {
-    /** @description A detail of a user account. */
-    AccountDetailDto: {
-      /**
-       * Format: hrib
-       * @description The id of the account.
-       * @example AAAAbadf00d
-       */
-      id: string;
-      /** @description The name of the user. Null if the account is temporary. */
-      name?: string | null;
-      /** @description The uco of the user. Null if the account is temporary. */
-      uco?: string | null;
-      /** @description The email address of the user. */
-      emailAddress: string;
-      /** @description The preferred culture of the user. */
-      preferredCulture: string;
-      /** @description The explicit permissions this user has been granted. */
-      permissions: {
-        [key: string]: components["schemas"]["Permission"][];
-      };
-    };
-    AccountListDto: {
-      /**
-       * Format: hrib
-       * @description Human-Readable Identifier Ballast
-       * @example AAAAbadf00d
-       */
-      id: string;
-      emailAddress: string;
-      preferredCulture: string;
-      permissions: {
-        [key: string]: components["schemas"]["Permission"][];
-      };
-    };
-    /** @description The lower and upper bound for the count of something. */
-    ArgumentArity: {
-      /**
-       * Format: int32
-       * @description The inclusive lower bound.
-       */
-      min: number;
-      /**
-       * Format: int32
-       * @description The inclusive upper bound.
-       */
-      max: number;
-    };
-    ArtifactCreationDto: {
-      /** LocalizedString */
-      name: {
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      };
-      /** Format: date-time */
-      addedOn?: string | null;
-      /**
-       * Format: hrib
-       * @description Human-Readable Identifier Ballast
-       * @example AAAAbadf00d
-       */
-      containingProject?: string | null;
-      blueprintSlot?: string | null;
-    };
-    AudioStreamDto: {
-      codec: string;
-      /** Format: int64 */
-      bitrate: number;
-      /** Format: int32 */
-      channels: number;
-      /** Format: int32 */
-      sampleRate: number;
-    };
-    AuthorCreationDto: {
-      name: string;
-      globalPermissions: components["schemas"]["Permission"];
-      /** LocalizedString */
-      bio?: ({
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      }) | null;
-      uco?: string | null;
-      email?: string | null;
-      phone?: string | null;
-    };
-    AuthorDetailDto: {
-      /**
-       * Format: hrib
-       * @description Human-Readable Identifier Ballast
-       * @example AAAAbadf00d
-       */
-      id: string;
-      name: string;
-      globalPermissions: components["schemas"]["Permission"];
-      /** LocalizedString */
-      bio?: ({
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      }) | null;
-      uco?: string | null;
-      email?: string | null;
-      phone?: string | null;
-    };
-    AuthorListDto: {
-      /**
-       * Format: hrib
-       * @description Human-Readable Identifier Ballast
-       * @example AAAAbadf00d
-       */
-      id: string;
-      name: string;
-      globalPermissions: components["schemas"]["Permission"];
-    };
-    /** @enum {string} */
-    DiagnosticKind: "unknown" | "info" | "warning" | "error";
-    EntityPermissionsAccountEditDto: {
-      /**
-       * Format: hrib
-       * @description Human-Readable Identifier Ballast
-       * @example AAAAbadf00d
-       */
-      id?: string | null;
-      emailAddress?: string | null;
-      permissions: components["schemas"]["Permission"][];
-    };
-    EntityPermissionsAccountListDto: {
-      /**
-       * Format: hrib
-       * @description Human-Readable Identifier Ballast
-       * @example AAAAbadf00d
-       */
-      id?: string | null;
-      emailAddress?: string | null;
-      name?: string | null;
-      permissions: components["schemas"]["Permission"][];
-    };
-    EntityPermissionsDetailDto: {
-      /**
-       * Format: hrib
-       * @description Human-Readable Identifier Ballast
-       * @example AAAAbadf00d
-       */
-      id: string;
-      entityType?: string | null;
-      globalPermissions?: components["schemas"]["Permission"][] | null;
-      userPermissions?: components["schemas"]["Permission"][] | null;
-      accountPermissions: components["schemas"]["EntityPermissionsAccountListDto"][];
-    };
-    EntityPermissionsEditDto: {
-      /**
-       * Format: hrib
-       * @description Human-Readable Identifier Ballast
-       * @example AAAAbadf00d
-       */
-      id: string;
-      globalPermissions?: components["schemas"]["Permission"][] | null;
-      accountPermissions?: components["schemas"]["EntityPermissionsAccountEditDto"][] | null;
-    };
-    Error: {
-      id: string;
-      message: string;
-      arguments: {
-        [key: string]: unknown;
-      };
-      stackTrace?: string;
-    };
-    ImageDto: {
-      fileExtension: string;
-      mimeType: string;
-      /** Format: int32 */
-      width: number;
-      /** Format: int32 */
-      height: number;
-      isCorrupted: boolean;
-    };
-    ImageShardDetailDto: {
-      kind: "Image";
-    } & Omit<components["schemas"]["ShardDetailBaseDto"], "kind"> & {
-      variants?: {
-        [key: string]: components["schemas"]["ImageDto"];
-      };
-    };
-    KafeProblemDetails: {
-      type?: string | null;
-      title?: string | null;
-      /** Format: int32 */
-      status?: number | null;
-      detail?: string | null;
-      instance?: string | null;
-      errors: components["schemas"]["Error"][];
-      traceId?: string | null;
-      [key: string]: unknown;
-    };
-    LockRequestData: {
-      /**
-       * Format: hrib
-       * @description Human-Readable Identifier Ballast
-       * @example AAAAbadf00d
-       */
-      id: string;
-    };
-    MediaDto: {
-      fileExtension: string;
-      mimeType: string;
-      /** Format: int64 */
-      fileLength: number;
-      /**
-       * Format: time-span
-       * @example 00:00:00
-       */
-      duration: string;
-      videoStreams: components["schemas"]["VideoStreamDto"][];
-      audioStreams: components["schemas"]["AudioStreamDto"][];
-      subtitleStreams: components["schemas"]["SubtitleStreamDto"][];
-      isCorrupted: boolean;
-      error?: string | null;
-    };
-    OrganizationCreationDto: {
-      /** LocalizedString */
-      name: {
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      };
-    };
-    OrganizationDetailDto: {
-      /**
-       * Format: hrib
-       * @description Human-Readable Identifier Ballast
-       * @example AAAAbadf00d
-       */
-      id: string;
-      /** LocalizedString */
-      name: {
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      };
-      /** Format: date-time */
-      createdOn: string;
-    };
-    OrganizationEditDto: {
-      /**
-       * Format: hrib
-       * @description Human-Readable Identifier Ballast
-       * @example AAAAbadf00d
-       */
-      id: string;
-      /** LocalizedString */
-      name: {
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      };
-    };
-    OrganizationListDto: {
-      /**
-       * Format: hrib
-       * @description Human-Readable Identifier Ballast
-       * @example AAAAbadf00d
-       */
-      id: string;
-      /** LocalizedString */
-      name: {
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      };
-    };
-    /** @enum {string} */
-    Permission: "read" | "append" | "inspect" | "write" | "review" | "administer";
-    PlaylistCreationDto: {
-      /** LocalizedString */
-      name: {
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      };
-      /**
-       * Format: hrib
-       * @description Human-Readable Identifier Ballast
-       * @example AAAAbadf00d
-       */
-      organizationId: string;
-      /** LocalizedString */
-      description?: ({
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      }) | null;
-      globalPermissions?: components["schemas"]["Permission"][] | null;
-      entryIds?: string[] | null;
-    };
-    PlaylistDetailDto: {
-      /**
-       * Format: hrib
-       * @description Human-Readable Identifier Ballast
-       * @example AAAAbadf00d
-       */
-      id: string;
-      /**
-       * Format: hrib
-       * @description Human-Readable Identifier Ballast
-       * @example AAAAbadf00d
-       */
-      organizationId: string;
-      /** LocalizedString */
-      name: {
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      };
-      /** LocalizedString */
-      description?: ({
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      }) | null;
-      globalPermissions: components["schemas"]["Permission"][];
-      entries: components["schemas"]["PlaylistEntryDto"][];
-    };
-    PlaylistEditDto: {
-      /**
-       * Format: hrib
-       * @description Human-Readable Identifier Ballast
-       * @example AAAAbadf00d
-       */
-      id: string;
-      /**
-       * Format: hrib
-       * @description Human-Readable Identifier Ballast
-       * @example AAAAbadf00d
-       */
-      organizationId?: string | null;
-      /** LocalizedString */
-      name?: ({
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      }) | null;
-      /** LocalizedString */
-      description?: ({
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      }) | null;
-      globalPermissions?: components["schemas"]["Permission"][] | null;
-      entryIds?: string[] | null;
-    };
-    PlaylistEntryDto: {
-      /**
-       * Format: hrib
-       * @description Human-Readable Identifier Ballast
-       * @example AAAAbadf00d
-       */
-      id: string;
-      /** LocalizedString */
-      name: {
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      };
-    };
-    PlaylistListDto: {
-      /**
-       * Format: hrib
-       * @description Human-Readable Identifier Ballast
-       * @example AAAAbadf00d
-       */
-      id: string;
-      /**
-       * Format: hrib
-       * @description Human-Readable Identifier Ballast
-       * @example AAAAbadf00d
-       */
-      organizationId: string;
-      /** LocalizedString */
-      name: {
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      };
-      /** LocalizedString */
-      description?: ({
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      }) | null;
-      globalPermissions: components["schemas"]["Permission"][];
-    };
-    ProjectArtifactAdditionDto: {
-      /**
-       * Format: hrib
-       * @description Human-Readable Identifier Ballast
-       * @example AAAAbadf00d
-       */
-      id: string;
-      blueprintSlot?: string | null;
-    };
-    ProjectArtifactBlueprintDto: {
-      /** LocalizedString */
-      name: {
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      };
-      /** LocalizedString */
-      description?: ({
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      }) | null;
-      arity: components["schemas"]["ArgumentArity"];
-      shardBlueprints: {
-        unknown: components["schemas"]["ProjectArtifactShardBlueprintDto"];
-        video: components["schemas"]["ProjectArtifactShardBlueprintDto"];
-        image: components["schemas"]["ProjectArtifactShardBlueprintDto"];
-        subtitles: components["schemas"]["ProjectArtifactShardBlueprintDto"];
-        blend: components["schemas"]["ProjectArtifactShardBlueprintDto"];
-      };
-    };
-    ProjectArtifactDto: {
-      /**
-       * Format: hrib
-       * @description Human-Readable Identifier Ballast
-       * @example AAAAbadf00d
-       */
-      id: string;
-      /** LocalizedString */
-      name: {
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      };
-      /** Format: date-time */
-      addedOn: string;
-      blueprintSlot?: string | null;
-      shards: components["schemas"]["ShardListDto"][];
-    };
-    ProjectArtifactShardBlueprintDto: {
-      /** LocalizedString */
-      name: {
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      };
-      /** LocalizedString */
-      description?: ({
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      }) | null;
-      arity: components["schemas"]["ArgumentArity"];
-    };
-    ProjectAuthorDto: {
-      /**
-       * Format: hrib
-       * @description Human-Readable Identifier Ballast
-       * @example AAAAbadf00d
-       */
-      id: string;
-      name: string;
-      roles: string[];
-    };
-    ProjectBlueprintDto: {
-      requiredReviewers: string[];
-      artifactBlueprints: {
-        [key: string]: components["schemas"]["ProjectArtifactBlueprintDto"];
-      };
-    };
-    ProjectCreationAuthorDto: {
-      /**
-       * Format: hrib
-       * @description Human-Readable Identifier Ballast
-       * @example AAAAbadf00d
-       */
-      id: string;
-      roles: string[];
-    };
-    ProjectCreationDto: {
-      /**
-       * Format: hrib
-       * @description Human-Readable Identifier Ballast
-       * @example AAAAbadf00d
-       */
-      projectGroupId: string;
-      /** LocalizedString */
-      name: {
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      };
-      /** LocalizedString */
-      description?: ({
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      }) | null;
-      /** LocalizedString */
-      genre?: ({
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      }) | null;
-      aiUsageDeclaration?: string | null;
-      hearAboutUs?: string | null;
-      crew: components["schemas"]["ProjectCreationAuthorDto"][];
-      cast: components["schemas"]["ProjectCreationAuthorDto"][];
-      isLocked: boolean;
-    };
-    ProjectDetailDto: {
-      /**
-       * Format: hrib
-       * @description Human-Readable Identifier Ballast
-       * @example AAAAbadf00d
-       */
-      id: string;
-      /**
-       * Format: hrib
-       * @description Human-Readable Identifier Ballast
-       * @example AAAAbadf00d
-       */
-      projectGroupId: string;
-      /** LocalizedString */
-      projectGroupName?: ({
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      }) | null;
-      validationSettings: components["schemas"]["ProjectValidationSettings"];
-      /** LocalizedString */
-      genre?: ({
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      }) | null;
-      /** LocalizedString */
-      name: {
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      };
-      /** LocalizedString */
-      description?: ({
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      }) | null;
-      aiUsageDeclaration?: string | null;
-      hearAboutUs?: string | null;
-      globalPermissions: components["schemas"]["Permission"][];
-      userPermissions: components["schemas"]["Permission"][];
-      /** Format: date-time */
-      releasedOn: string;
-      crew: components["schemas"]["ProjectAuthorDto"][];
-      cast: components["schemas"]["ProjectAuthorDto"][];
-      /**
-       * Format: hrib
-       * @description Human-Readable Identifier Ballast
-       * @example AAAAbadf00d
-       */
-      ownerId?: string | null;
-      artifacts: components["schemas"]["ProjectArtifactDto"][];
-      reviews: components["schemas"]["ProjectReviewDto"][];
-      blueprint: components["schemas"]["ProjectBlueprintDto"];
-      isLocked: boolean;
-    };
-    ProjectDiagnosticDto: {
-      kind: components["schemas"]["DiagnosticKind"];
-      /** LocalizedString */
-      message: {
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      };
-      validationStage: string;
-    };
-    ProjectEditDto: {
-      /**
-       * Format: hrib
-       * @description Human-Readable Identifier Ballast
-       * @example AAAAbadf00d
-       */
-      id: string;
-      /** LocalizedString */
-      name?: ({
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      }) | null;
-      /** LocalizedString */
-      description?: ({
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      }) | null;
-      /** LocalizedString */
-      genre?: ({
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      }) | null;
-      aiUsageDeclaration?: string | null;
-      hearAboutUs?: string | null;
-      crew?: components["schemas"]["ProjectCreationAuthorDto"][] | null;
-      cast?: components["schemas"]["ProjectCreationAuthorDto"][] | null;
-      artifacts?: components["schemas"]["ProjectArtifactAdditionDto"][] | null;
-      isLocked?: boolean | null;
-    };
-    ProjectGroupCreationDto: {
-      /**
-       * Format: hrib
-       * @description Human-Readable Identifier Ballast
-       * @example AAAAbadf00d
-       */
-      organizationId: string;
-      /** LocalizedString */
-      name: {
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      };
-      /** LocalizedString */
-      description?: ({
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      }) | null;
-      /** Format: date-time */
-      deadline: string;
-      isOpen: boolean;
-    };
-    ProjectGroupDetailDto: {
-      /**
-       * Format: hrib
-       * @description Human-Readable Identifier Ballast
-       * @example AAAAbadf00d
-       */
-      id: string;
-      /**
-       * Format: hrib
-       * @description Human-Readable Identifier Ballast
-       * @example AAAAbadf00d
-       */
-      organizationId: string;
-      /** LocalizedString */
-      name: {
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      };
-      /** LocalizedString */
-      description?: ({
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      }) | null;
-      /** Format: date-time */
-      deadline: string;
-      isOpen: boolean;
-      projects: components["schemas"]["ProjectListDto"][];
-      validationSettings: components["schemas"]["ProjectValidationSettings"];
-    };
-    ProjectGroupEditDto: {
-      /**
-       * Format: hrib
-       * @description Human-Readable Identifier Ballast
-       * @example AAAAbadf00d
-       */
-      id: string;
-      /**
-       * Format: hrib
-       * @description Human-Readable Identifier Ballast
-       * @example AAAAbadf00d
-       */
-      organizationId?: string | null;
-      /** LocalizedString */
-      name?: ({
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      }) | null;
-      /** LocalizedString */
-      description?: ({
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      }) | null;
-      /** Format: date-time */
-      deadline?: string | null;
-      isOpen?: boolean | null;
-      validationSettings: components["schemas"]["ProjectValidationSettings"];
-    };
-    ProjectGroupListDto: {
-      /**
-       * Format: hrib
-       * @description Human-Readable Identifier Ballast
-       * @example AAAAbadf00d
-       */
-      id: string;
-      /**
-       * Format: hrib
-       * @description Human-Readable Identifier Ballast
-       * @example AAAAbadf00d
-       */
-      organizationId: string;
-      /** LocalizedString */
-      name: {
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      };
-      /** LocalizedString */
-      description?: ({
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      }) | null;
-      /** Format: date-time */
-      deadline: string;
-      isOpen: boolean;
-    };
-    /** @description A DTO of a project. To be used when listing projects. */
-    ProjectListDto: {
-      /**
-       * Format: hrib
-       * @description Human-Readable Identifier Ballast
-       * @example AAAAbadf00d
-       */
-      id: string;
-      /**
-       * Format: hrib
-       * @description Human-Readable Identifier Ballast
-       * @example AAAAbadf00d
-       */
-      projectGroupId: string;
-      /** LocalizedString */
-      name: {
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      };
-      /** LocalizedString */
-      description?: ({
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      }) | null;
-      /** @description Permissions that apply to all users, even the anonymous ones. */
-      globalPermissions: components["schemas"]["Permission"][];
-      /** @description Permissions that apply to the currently logged in user. Includes the global permissions. */
-      userPermissions: components["schemas"]["Permission"][];
-      /** Format: date-time */
-      releasedOn: string;
-      latestReviewKind: components["schemas"]["ReviewKind"];
-      isLocked: boolean;
-      /**
-       * Format: hrib
-       * @description Human-Readable Identifier Ballast
-       * @example AAAAbadf00d
-       */
-      ownerId?: string | null;
-    };
-    ProjectReviewCreationDto: {
-      /**
-       * Format: hrib
-       * @description Human-Readable Identifier Ballast
-       * @example AAAAbadf00d
-       */
-      projectId: string;
-      kind: components["schemas"]["ReviewKind"];
-      reviewerRole: string;
-      /** LocalizedString */
-      comment?: ({
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      }) | null;
-    };
-    ProjectReviewDto: {
-      /**
-       * Format: hrib
-       * @description Human-Readable Identifier Ballast
-       * @example AAAAbadf00d
-       */
-      reviewerId?: string | null;
-      kind: components["schemas"]["ReviewKind"];
-      reviewerRole: string;
-      /** LocalizedString */
-      comment?: ({
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      }) | null;
-      /** Format: date-time */
-      addedOn: string;
-    };
-    ProjectValidationDto: {
-      /**
-       * Format: hrib
-       * @description Human-Readable Identifier Ballast
-       * @example AAAAbadf00d
-       */
-      projectId: string;
-      /** Format: date-time */
-      validatedOn: string;
-      diagnostics: components["schemas"]["ProjectDiagnosticDto"][];
-    };
-    ProjectValidationSettings: {
-      /** Format: int32 */
-      minNameLength?: number | null;
-      /** Format: int32 */
-      maxNameLength?: number | null;
-      requiredNameCultures?: string[] | null;
-      /** Format: int32 */
-      minDescriptionLength?: number | null;
-      /** Format: int32 */
-      maxDescriptionLength?: number | null;
-      requiredDescriptionCultures?: string[] | null;
-      /** Format: int32 */
-      minGenreLength?: number | null;
-      /** Format: int32 */
-      maxGenreLength?: number | null;
-      requiredGenreCultures?: string[] | null;
-    };
-    /** @enum {string} */
-    ReviewKind: "notReviewed" | "accepted" | "rejected" | "needsRevision";
-    RoleCreationDto: {
-      /**
-       * Format: hrib
-       * @description Human-Readable Identifier Ballast
-       * @example AAAAbadf00d
-       */
-      organizationId: string;
-      /** LocalizedString */
-      name: {
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      };
-      /** LocalizedString */
-      description?: ({
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      }) | null;
-    };
-    RoleDetailDto: {
-      /**
-       * Format: hrib
-       * @description Human-Readable Identifier Ballast
-       * @example AAAAbadf00d
-       */
-      id: string;
-      /**
-       * Format: hrib
-       * @description Human-Readable Identifier Ballast
-       * @example AAAAbadf00d
-       */
-      organizationId: string;
-      /** LocalizedString */
-      name: {
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      };
-      /** LocalizedString */
-      description?: ({
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      }) | null;
-      /** Format: date-time */
-      createdOn: string;
-      permissions: {
-        [key: string]: components["schemas"]["Permission"][];
-      };
-    };
-    RoleEditDto: {
-      /**
-       * Format: hrib
-       * @description Human-Readable Identifier Ballast
-       * @example AAAAbadf00d
-       */
-      id: string;
-      /** LocalizedString */
-      name: {
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      };
-      /** LocalizedString */
-      description?: ({
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      }) | null;
-    };
-    RoleListDto: {
-      /**
-       * Format: hrib
-       * @description Human-Readable Identifier Ballast
-       * @example AAAAbadf00d
-       */
-      id: string;
-      /**
-       * Format: hrib
-       * @description Human-Readable Identifier Ballast
-       * @example AAAAbadf00d
-       */
-      organizationId: string;
-      /** LocalizedString */
-      name: {
-        iv: string;
-        en?: string | null;
-        cs?: string | null;
-        sk?: string | null;
-      };
-    };
-    ShardDetailBaseDto: {
-      kind: components["schemas"]["ShardKind"];
-      /**
-       * Format: hrib
-       * @description Human-Readable Identifier Ballast
-       * @example AAAAbadf00d
-       */
-      id: string;
-      /**
-       * Format: hrib
-       * @description Human-Readable Identifier Ballast
-       * @example AAAAbadf00d
-       */
-      artifactId: string;
-    };
-    /** @enum {string} */
-    ShardKind: "unknown" | "video" | "image" | "subtitles" | "blend";
-    ShardListDto: {
-      /**
-       * Format: hrib
-       * @description Human-Readable Identifier Ballast
-       * @example AAAAbadf00d
-       */
-      id: string;
-      kind: components["schemas"]["ShardKind"];
-      variants: string[];
-    };
-    SubtitleStreamDto: {
-      codec: string;
-      /** Format: int64 */
-      bitrate: number;
-    };
-    SystemDetailDto: {
-      name: string;
-      baseUrls: string[];
-      version: string;
-      commit: string;
-      /** Format: date-time */
-      commitDate: string;
-      /** Format: date-time */
-      runningSince: string;
-    };
-    TemporaryAccountCreationDto: {
-      emailAddress: string;
-      preferredCulture?: string | null;
-    };
-    UnlockRequestData: {
-      /**
-       * Format: hrib
-       * @description Human-Readable Identifier Ballast
-       * @example AAAAbadf00d
-       */
-      id: string;
-    };
-    VideoConversionRetryDto: {
-      ids?: string[] | null;
-      shouldRetryOriginalAnalysis: boolean;
-      shouldRetryConversion: boolean;
-    };
-    VideoConversionStatsDto: {
-      /** Format: int32 */
-      totalVideoShardCount: number;
-      /** Format: int32 */
-      corruptedVideoShardCount: number;
-      /** Format: int32 */
-      pendingVideoConversionCount: number;
-      /** Format: int32 */
-      failedVideoConversionCount: number;
-    };
-    VideoShardDetailDto: {
-      kind: "Video";
-    } & Omit<components["schemas"]["ShardDetailBaseDto"], "kind"> & {
-      variants?: {
-        [key: string]: components["schemas"]["MediaDto"];
-      };
-    };
-    VideoStreamDto: {
-      codec: string;
-      /** Format: int64 */
-      bitrate: number;
-      /** Format: int32 */
-      width: number;
-      /** Format: int32 */
-      height: number;
-      /** Format: double */
-      framerate: number;
-    };
-  };
-  responses: never;
-  parameters: never;
-  requestBodies: never;
-  headers: never;
-  pathItems: never;
-}
-
 export type $defs = Record<string, never>;
-
-export type external = Record<string, never>;
-
 export type operations = Record<string, never>;

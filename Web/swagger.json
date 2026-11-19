@@ -1,5 +1,5 @@
 {
-  "openapi": "3.0.4",
+  "openapi": "3.1.1",
   "info": {
     "title": "KAFE API",
     "version": "v1"
@@ -16,16 +16,19 @@
             "content": {
               "text/plain": {
                 "schema": {
+                  "description": "A detail of a user account.",
                   "$ref": "#/components/schemas/AccountDetailDto"
                 }
               },
               "application/json": {
                 "schema": {
+                  "description": "A detail of a user account.",
                   "$ref": "#/components/schemas/AccountDetailDto"
                 }
               },
               "text/json": {
                 "schema": {
+                  "description": "A detail of a user account.",
                   "$ref": "#/components/schemas/AccountDetailDto"
                 }
               }
@@ -95,16 +98,19 @@
             "content": {
               "text/plain": {
                 "schema": {
+                  "description": "A detail of a user account.",
                   "$ref": "#/components/schemas/AccountDetailDto"
                 }
               },
               "application/json": {
                 "schema": {
+                  "description": "A detail of a user account.",
                   "$ref": "#/components/schemas/AccountDetailDto"
                 }
               },
               "text/json": {
                 "schema": {
+                  "description": "A detail of a user account.",
                   "$ref": "#/components/schemas/AccountDetailDto"
                 }
               }
@@ -649,7 +655,7 @@
                 "properties": {
                   "Id": {
                     "type": "string",
-                    "description": "Human-Readable Identifier Ballast",
+                    "description": "Human-Readable Identifier Ballast (HRIB)",
                     "format": "hrib",
                     "example": "AAAAbadf00d"
                   },
@@ -1703,6 +1709,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
+                    "description": "A DTO of a project. To be used when listing projects.",
                     "$ref": "#/components/schemas/ProjectListDto"
                   }
                 }
@@ -1711,6 +1718,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
+                    "description": "A DTO of a project. To be used when listing projects.",
                     "$ref": "#/components/schemas/ProjectListDto"
                   }
                 }
@@ -1719,6 +1727,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
+                    "description": "A DTO of a project. To be used when listing projects.",
                     "$ref": "#/components/schemas/ProjectListDto"
                   }
                 }
@@ -2542,14 +2551,18 @@
             "example": "AAAAbadf00d"
           },
           "name": {
-            "type": "string",
-            "description": "The name of the user. Null if the account is temporary.",
-            "nullable": true
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "The name of the user. Null if the account is temporary."
           },
           "uco": {
-            "type": "string",
-            "description": "The uco of the user. Null if the account is temporary.",
-            "nullable": true
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "The uco of the user. Null if the account is temporary."
           },
           "emailAddress": {
             "type": "string",
@@ -2584,7 +2597,7 @@
         "properties": {
           "id": {
             "type": "string",
-            "description": "Human-Readable Identifier Ballast",
+            "description": "Human-Readable Identifier Ballast (HRIB)",
             "format": "hrib",
             "example": "AAAAbadf00d"
           },
@@ -2634,70 +2647,61 @@
         "type": "object",
         "properties": {
           "name": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            }
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "addedOn": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
           },
           "containingProject": {
-            "type": "string",
-            "description": "Human-Readable Identifier Ballast",
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Human-Readable Identifier Ballast (HRIB)",
             "format": "hrib",
-            "nullable": true,
             "example": "AAAAbadf00d"
           },
           "blueprintSlot": {
-            "type": "string",
-            "nullable": true
+            "type": [
+              "null",
+              "string"
+            ]
           }
         },
         "additionalProperties": false
       },
       "AudioStreamDto": {
-        "required": [
-          "bitrate",
-          "channels",
-          "codec",
-          "sampleRate"
-        ],
         "type": "object",
         "properties": {
           "codec": {
-            "type": "string"
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "bitrate": {
-            "type": "integer",
+            "type": [
+              "null",
+              "integer"
+            ],
             "format": "int64"
           },
           "channels": {
-            "type": "integer",
+            "type": [
+              "null",
+              "integer"
+            ],
             "format": "int32"
           },
           "sampleRate": {
-            "type": "integer",
+            "type": [
+              "null",
+              "integer"
+            ],
             "format": "int32"
           }
         },
@@ -2717,41 +2721,25 @@
             "$ref": "#/components/schemas/Permission"
           },
           "bio": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            },
-            "nullable": true
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "uco": {
-            "type": "string",
-            "nullable": true
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "email": {
-            "type": "string",
-            "nullable": true
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "phone": {
-            "type": "string",
-            "nullable": true
+            "type": [
+              "null",
+              "string"
+            ]
           }
         },
         "additionalProperties": false
@@ -2766,7 +2754,7 @@
         "properties": {
           "id": {
             "type": "string",
-            "description": "Human-Readable Identifier Ballast",
+            "description": "Human-Readable Identifier Ballast (HRIB)",
             "format": "hrib",
             "example": "AAAAbadf00d"
           },
@@ -2777,41 +2765,25 @@
             "$ref": "#/components/schemas/Permission"
           },
           "bio": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            },
-            "nullable": true
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "uco": {
-            "type": "string",
-            "nullable": true
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "email": {
-            "type": "string",
-            "nullable": true
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "phone": {
-            "type": "string",
-            "nullable": true
+            "type": [
+              "null",
+              "string"
+            ]
           }
         },
         "additionalProperties": false
@@ -2826,7 +2798,7 @@
         "properties": {
           "id": {
             "type": "string",
-            "description": "Human-Readable Identifier Ballast",
+            "description": "Human-Readable Identifier Ballast (HRIB)",
             "format": "hrib",
             "example": "AAAAbadf00d"
           },
@@ -2855,15 +2827,19 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "string",
-            "description": "Human-Readable Identifier Ballast",
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Human-Readable Identifier Ballast (HRIB)",
             "format": "hrib",
-            "nullable": true,
             "example": "AAAAbadf00d"
           },
           "emailAddress": {
-            "type": "string",
-            "nullable": true
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "permissions": {
             "type": "array",
@@ -2881,19 +2857,25 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "string",
-            "description": "Human-Readable Identifier Ballast",
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Human-Readable Identifier Ballast (HRIB)",
             "format": "hrib",
-            "nullable": true,
             "example": "AAAAbadf00d"
           },
           "emailAddress": {
-            "type": "string",
-            "nullable": true
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "permissions": {
             "type": "array",
@@ -2913,27 +2895,33 @@
         "properties": {
           "id": {
             "type": "string",
-            "description": "Human-Readable Identifier Ballast",
+            "description": "Human-Readable Identifier Ballast (HRIB)",
             "format": "hrib",
             "example": "AAAAbadf00d"
           },
           "entityType": {
-            "type": "string",
-            "nullable": true
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "globalPermissions": {
-            "type": "array",
+            "type": [
+              "null",
+              "array"
+            ],
             "items": {
               "$ref": "#/components/schemas/Permission"
-            },
-            "nullable": true
+            }
           },
           "userPermissions": {
-            "type": "array",
+            "type": [
+              "null",
+              "array"
+            ],
             "items": {
               "$ref": "#/components/schemas/Permission"
-            },
-            "nullable": true
+            }
           },
           "accountPermissions": {
             "type": "array",
@@ -2952,23 +2940,27 @@
         "properties": {
           "id": {
             "type": "string",
-            "description": "Human-Readable Identifier Ballast",
+            "description": "Human-Readable Identifier Ballast (HRIB)",
             "format": "hrib",
             "example": "AAAAbadf00d"
           },
           "globalPermissions": {
-            "type": "array",
+            "type": [
+              "null",
+              "array"
+            ],
             "items": {
               "$ref": "#/components/schemas/Permission"
-            },
-            "nullable": true
+            }
           },
           "accountPermissions": {
-            "type": "array",
+            "type": [
+              "null",
+              "array"
+            ],
             "items": {
               "$ref": "#/components/schemas/EntityPermissionsAccountEditDto"
-            },
-            "nullable": true
+            }
           }
         },
         "additionalProperties": false
@@ -3033,6 +3025,9 @@
             "$ref": "#/components/schemas/ShardDetailBaseDto"
           },
           {
+            "required": [
+              "variants"
+            ],
             "type": "object",
             "properties": {
               "variants": {
@@ -3053,25 +3048,35 @@
         "type": "object",
         "properties": {
           "type": {
-            "type": "string",
-            "nullable": true
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "title": {
-            "type": "string",
-            "nullable": true
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "status": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
           },
           "detail": {
-            "type": "string",
-            "nullable": true
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "instance": {
-            "type": "string",
-            "nullable": true
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "errors": {
             "type": "array",
@@ -3080,11 +3085,41 @@
             }
           },
           "traceId": {
-            "type": "string",
-            "nullable": true
+            "type": [
+              "null",
+              "string"
+            ]
           }
         },
         "additionalProperties": { }
+      },
+      "LocalizedString": {
+        "title": "LocalizedString",
+        "type": "object",
+        "properties": {
+          "iv": {
+            "type": "string"
+          },
+          "en": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "cs": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "sk": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        },
+        "description": "Multilingual string"
       },
       "LockRequestData": {
         "required": [
@@ -3094,7 +3129,7 @@
         "properties": {
           "id": {
             "type": "string",
-            "description": "Human-Readable Identifier Ballast",
+            "description": "Human-Readable Identifier Ballast (HRIB)",
             "format": "hrib",
             "example": "AAAAbadf00d"
           }
@@ -3151,8 +3186,10 @@
             "type": "boolean"
           },
           "error": {
-            "type": "string",
-            "nullable": true
+            "type": [
+              "null",
+              "string"
+            ]
           }
         },
         "additionalProperties": false
@@ -3164,28 +3201,7 @@
         "type": "object",
         "properties": {
           "name": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            }
+            "$ref": "#/components/schemas/LocalizedString"
           }
         },
         "additionalProperties": false
@@ -3200,33 +3216,12 @@
         "properties": {
           "id": {
             "type": "string",
-            "description": "Human-Readable Identifier Ballast",
+            "description": "Human-Readable Identifier Ballast (HRIB)",
             "format": "hrib",
             "example": "AAAAbadf00d"
           },
           "name": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            }
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "createdOn": {
             "type": "string",
@@ -3244,33 +3239,12 @@
         "properties": {
           "id": {
             "type": "string",
-            "description": "Human-Readable Identifier Ballast",
+            "description": "Human-Readable Identifier Ballast (HRIB)",
             "format": "hrib",
             "example": "AAAAbadf00d"
           },
           "name": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            }
+            "$ref": "#/components/schemas/LocalizedString"
           }
         },
         "additionalProperties": false
@@ -3284,38 +3258,18 @@
         "properties": {
           "id": {
             "type": "string",
-            "description": "Human-Readable Identifier Ballast",
+            "description": "Human-Readable Identifier Ballast (HRIB)",
             "format": "hrib",
             "example": "AAAAbadf00d"
           },
           "name": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            }
+            "$ref": "#/components/schemas/LocalizedString"
           }
         },
         "additionalProperties": false
       },
       "Permission": {
+        "title": "Permission",
         "enum": [
           "read",
           "append",
@@ -3334,73 +3288,34 @@
         "type": "object",
         "properties": {
           "name": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            }
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "organizationId": {
             "type": "string",
-            "description": "Human-Readable Identifier Ballast",
+            "description": "Human-Readable Identifier Ballast (HRIB)",
             "format": "hrib",
             "example": "AAAAbadf00d"
           },
           "description": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            },
-            "nullable": true
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "globalPermissions": {
-            "type": "array",
+            "type": [
+              "null",
+              "array"
+            ],
             "items": {
               "$ref": "#/components/schemas/Permission"
-            },
-            "nullable": true
+            }
           },
           "entryIds": {
-            "type": "array",
+            "type": [
+              "null",
+              "array"
+            ],
             "items": {
               "type": "string"
-            },
-            "nullable": true
+            }
           }
         },
         "additionalProperties": false
@@ -3417,64 +3332,21 @@
         "properties": {
           "id": {
             "type": "string",
-            "description": "Human-Readable Identifier Ballast",
+            "description": "Human-Readable Identifier Ballast (HRIB)",
             "format": "hrib",
             "example": "AAAAbadf00d"
           },
           "organizationId": {
             "type": "string",
-            "description": "Human-Readable Identifier Ballast",
+            "description": "Human-Readable Identifier Ballast (HRIB)",
             "format": "hrib",
             "example": "AAAAbadf00d"
           },
           "name": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            }
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "description": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            },
-            "nullable": true
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "globalPermissions": {
             "type": "array",
@@ -3499,80 +3371,42 @@
         "properties": {
           "id": {
             "type": "string",
-            "description": "Human-Readable Identifier Ballast",
+            "description": "Human-Readable Identifier Ballast (HRIB)",
             "format": "hrib",
             "example": "AAAAbadf00d"
           },
           "organizationId": {
-            "type": "string",
-            "description": "Human-Readable Identifier Ballast",
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Human-Readable Identifier Ballast (HRIB)",
             "format": "hrib",
-            "nullable": true,
             "example": "AAAAbadf00d"
           },
           "name": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            },
-            "nullable": true
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "description": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            },
-            "nullable": true
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "globalPermissions": {
-            "type": "array",
+            "type": [
+              "null",
+              "array"
+            ],
             "items": {
               "$ref": "#/components/schemas/Permission"
-            },
-            "nullable": true
+            }
           },
           "entryIds": {
-            "type": "array",
+            "type": [
+              "null",
+              "array"
+            ],
             "items": {
               "type": "string"
-            },
-            "nullable": true
+            }
           }
         },
         "additionalProperties": false
@@ -3586,33 +3420,12 @@
         "properties": {
           "id": {
             "type": "string",
-            "description": "Human-Readable Identifier Ballast",
+            "description": "Human-Readable Identifier Ballast (HRIB)",
             "format": "hrib",
             "example": "AAAAbadf00d"
           },
           "name": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            }
+            "$ref": "#/components/schemas/LocalizedString"
           }
         },
         "additionalProperties": false
@@ -3628,64 +3441,21 @@
         "properties": {
           "id": {
             "type": "string",
-            "description": "Human-Readable Identifier Ballast",
+            "description": "Human-Readable Identifier Ballast (HRIB)",
             "format": "hrib",
             "example": "AAAAbadf00d"
           },
           "organizationId": {
             "type": "string",
-            "description": "Human-Readable Identifier Ballast",
+            "description": "Human-Readable Identifier Ballast (HRIB)",
             "format": "hrib",
             "example": "AAAAbadf00d"
           },
           "name": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            }
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "description": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            },
-            "nullable": true
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "globalPermissions": {
             "type": "array",
@@ -3704,13 +3474,15 @@
         "properties": {
           "id": {
             "type": "string",
-            "description": "Human-Readable Identifier Ballast",
+            "description": "Human-Readable Identifier Ballast (HRIB)",
             "format": "hrib",
             "example": "AAAAbadf00d"
           },
           "blueprintSlot": {
-            "type": "string",
-            "nullable": true
+            "type": [
+              "null",
+              "string"
+            ]
           }
         },
         "additionalProperties": false
@@ -3724,65 +3496,16 @@
         "type": "object",
         "properties": {
           "name": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            }
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "description": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            },
-            "nullable": true
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "arity": {
+            "description": "The lower and upper bound for the count of something.",
             "$ref": "#/components/schemas/ArgumentArity"
           },
           "shardBlueprints": {
-            "required": [
-              "unknown",
-              "video",
-              "image",
-              "subtitles",
-              "blend"
-            ],
             "type": "object",
             "properties": {
               "unknown": {
@@ -3817,41 +3540,22 @@
         "properties": {
           "id": {
             "type": "string",
-            "description": "Human-Readable Identifier Ballast",
+            "description": "Human-Readable Identifier Ballast (HRIB)",
             "format": "hrib",
             "example": "AAAAbadf00d"
           },
           "name": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            }
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "addedOn": {
             "type": "string",
             "format": "date-time"
           },
           "blueprintSlot": {
-            "type": "string",
-            "nullable": true
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "shards": {
             "type": "array",
@@ -3870,55 +3574,13 @@
         "type": "object",
         "properties": {
           "name": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            }
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "description": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            },
-            "nullable": true
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "arity": {
+            "description": "The lower and upper bound for the count of something.",
             "$ref": "#/components/schemas/ArgumentArity"
           }
         },
@@ -3934,7 +3596,7 @@
         "properties": {
           "id": {
             "type": "string",
-            "description": "Human-Readable Identifier Ballast",
+            "description": "Human-Readable Identifier Ballast (HRIB)",
             "format": "hrib",
             "example": "AAAAbadf00d"
           },
@@ -3981,7 +3643,7 @@
         "properties": {
           "id": {
             "type": "string",
-            "description": "Human-Readable Identifier Ballast",
+            "description": "Human-Readable Identifier Ballast (HRIB)",
             "format": "hrib",
             "example": "AAAAbadf00d"
           },
@@ -4006,91 +3668,30 @@
         "properties": {
           "projectGroupId": {
             "type": "string",
-            "description": "Human-Readable Identifier Ballast",
+            "description": "Human-Readable Identifier Ballast (HRIB)",
             "format": "hrib",
             "example": "AAAAbadf00d"
           },
           "name": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            }
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "description": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            },
-            "nullable": true
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "genre": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            },
-            "nullable": true
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "aiUsageDeclaration": {
-            "type": "string",
-            "nullable": true
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "hearAboutUs": {
-            "type": "string",
-            "nullable": true
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "crew": {
             "type": "array",
@@ -4130,125 +3731,42 @@
         "properties": {
           "id": {
             "type": "string",
-            "description": "Human-Readable Identifier Ballast",
+            "description": "Human-Readable Identifier Ballast (HRIB)",
             "format": "hrib",
             "example": "AAAAbadf00d"
           },
           "projectGroupId": {
             "type": "string",
-            "description": "Human-Readable Identifier Ballast",
+            "description": "Human-Readable Identifier Ballast (HRIB)",
             "format": "hrib",
             "example": "AAAAbadf00d"
           },
           "projectGroupName": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            },
-            "nullable": true
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "validationSettings": {
             "$ref": "#/components/schemas/ProjectValidationSettings"
           },
           "genre": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            },
-            "nullable": true
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "name": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            }
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "description": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            },
-            "nullable": true
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "aiUsageDeclaration": {
-            "type": "string",
-            "nullable": true
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "hearAboutUs": {
-            "type": "string",
-            "nullable": true
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "globalPermissions": {
             "type": "array",
@@ -4279,10 +3797,12 @@
             }
           },
           "ownerId": {
-            "type": "string",
-            "description": "Human-Readable Identifier Ballast",
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Human-Readable Identifier Ballast (HRIB)",
             "format": "hrib",
-            "nullable": true,
             "example": "AAAAbadf00d"
           },
           "artifacts": {
@@ -4318,28 +3838,7 @@
             "$ref": "#/components/schemas/DiagnosticKind"
           },
           "message": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            }
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "validationStage": {
             "type": "string"
@@ -4355,117 +3854,63 @@
         "properties": {
           "id": {
             "type": "string",
-            "description": "Human-Readable Identifier Ballast",
+            "description": "Human-Readable Identifier Ballast (HRIB)",
             "format": "hrib",
             "example": "AAAAbadf00d"
           },
           "name": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            },
-            "nullable": true
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "description": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            },
-            "nullable": true
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "genre": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            },
-            "nullable": true
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "aiUsageDeclaration": {
-            "type": "string",
-            "nullable": true
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "hearAboutUs": {
-            "type": "string",
-            "nullable": true
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "crew": {
-            "type": "array",
+            "type": [
+              "null",
+              "array"
+            ],
             "items": {
               "$ref": "#/components/schemas/ProjectCreationAuthorDto"
-            },
-            "nullable": true
+            }
           },
           "cast": {
-            "type": "array",
+            "type": [
+              "null",
+              "array"
+            ],
             "items": {
               "$ref": "#/components/schemas/ProjectCreationAuthorDto"
-            },
-            "nullable": true
+            }
           },
           "artifacts": {
-            "type": "array",
+            "type": [
+              "null",
+              "array"
+            ],
             "items": {
               "$ref": "#/components/schemas/ProjectArtifactAdditionDto"
-            },
-            "nullable": true
+            }
           },
           "isLocked": {
-            "type": "boolean",
-            "nullable": true
+            "type": [
+              "null",
+              "boolean"
+            ]
           }
         },
         "additionalProperties": false
@@ -4481,58 +3926,15 @@
         "properties": {
           "organizationId": {
             "type": "string",
-            "description": "Human-Readable Identifier Ballast",
+            "description": "Human-Readable Identifier Ballast (HRIB)",
             "format": "hrib",
             "example": "AAAAbadf00d"
           },
           "name": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            }
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "description": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            },
-            "nullable": true
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "deadline": {
             "type": "string",
@@ -4551,71 +3953,27 @@
           "isOpen",
           "name",
           "organizationId",
-          "projects",
-          "validationSettings"
+          "projects"
         ],
         "type": "object",
         "properties": {
           "id": {
             "type": "string",
-            "description": "Human-Readable Identifier Ballast",
+            "description": "Human-Readable Identifier Ballast (HRIB)",
             "format": "hrib",
             "example": "AAAAbadf00d"
           },
           "organizationId": {
             "type": "string",
-            "description": "Human-Readable Identifier Ballast",
+            "description": "Human-Readable Identifier Ballast (HRIB)",
             "format": "hrib",
             "example": "AAAAbadf00d"
           },
           "name": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            }
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "description": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            },
-            "nullable": true
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "deadline": {
             "type": "string",
@@ -4627,6 +3985,7 @@
           "projects": {
             "type": "array",
             "items": {
+              "description": "A DTO of a project. To be used when listing projects.",
               "$ref": "#/components/schemas/ProjectListDto"
             }
           },
@@ -4638,82 +3997,43 @@
       },
       "ProjectGroupEditDto": {
         "required": [
-          "id",
-          "validationSettings"
+          "id"
         ],
         "type": "object",
         "properties": {
           "id": {
             "type": "string",
-            "description": "Human-Readable Identifier Ballast",
+            "description": "Human-Readable Identifier Ballast (HRIB)",
             "format": "hrib",
             "example": "AAAAbadf00d"
           },
           "organizationId": {
-            "type": "string",
-            "description": "Human-Readable Identifier Ballast",
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Human-Readable Identifier Ballast (HRIB)",
             "format": "hrib",
-            "nullable": true,
             "example": "AAAAbadf00d"
           },
           "name": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            },
-            "nullable": true
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "description": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            },
-            "nullable": true
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "deadline": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
           },
           "isOpen": {
-            "type": "boolean",
-            "nullable": true
+            "type": [
+              "null",
+              "boolean"
+            ]
           },
           "validationSettings": {
             "$ref": "#/components/schemas/ProjectValidationSettings"
@@ -4733,64 +4053,21 @@
         "properties": {
           "id": {
             "type": "string",
-            "description": "Human-Readable Identifier Ballast",
+            "description": "Human-Readable Identifier Ballast (HRIB)",
             "format": "hrib",
             "example": "AAAAbadf00d"
           },
           "organizationId": {
             "type": "string",
-            "description": "Human-Readable Identifier Ballast",
+            "description": "Human-Readable Identifier Ballast (HRIB)",
             "format": "hrib",
             "example": "AAAAbadf00d"
           },
           "name": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            }
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "description": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            },
-            "nullable": true
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "deadline": {
             "type": "string",
@@ -4817,64 +4094,21 @@
         "properties": {
           "id": {
             "type": "string",
-            "description": "Human-Readable Identifier Ballast",
+            "description": "Human-Readable Identifier Ballast (HRIB)",
             "format": "hrib",
             "example": "AAAAbadf00d"
           },
           "projectGroupId": {
             "type": "string",
-            "description": "Human-Readable Identifier Ballast",
+            "description": "Human-Readable Identifier Ballast (HRIB)",
             "format": "hrib",
             "example": "AAAAbadf00d"
           },
           "name": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            }
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "description": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            },
-            "nullable": true
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "globalPermissions": {
             "type": "array",
@@ -4901,10 +4135,12 @@
             "type": "boolean"
           },
           "ownerId": {
-            "type": "string",
-            "description": "Human-Readable Identifier Ballast",
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Human-Readable Identifier Ballast (HRIB)",
             "format": "hrib",
-            "nullable": true,
             "example": "AAAAbadf00d"
           }
         },
@@ -4921,7 +4157,7 @@
         "properties": {
           "projectId": {
             "type": "string",
-            "description": "Human-Readable Identifier Ballast",
+            "description": "Human-Readable Identifier Ballast (HRIB)",
             "format": "hrib",
             "example": "AAAAbadf00d"
           },
@@ -4932,29 +4168,7 @@
             "type": "string"
           },
           "comment": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            },
-            "nullable": true
+            "$ref": "#/components/schemas/LocalizedString"
           }
         },
         "additionalProperties": false
@@ -4968,10 +4182,12 @@
         "type": "object",
         "properties": {
           "reviewerId": {
-            "type": "string",
-            "description": "Human-Readable Identifier Ballast",
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Human-Readable Identifier Ballast (HRIB)",
             "format": "hrib",
-            "nullable": true,
             "example": "AAAAbadf00d"
           },
           "kind": {
@@ -4981,29 +4197,7 @@
             "type": "string"
           },
           "comment": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            },
-            "nullable": true
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "addedOn": {
             "type": "string",
@@ -5022,7 +4216,7 @@
         "properties": {
           "projectId": {
             "type": "string",
-            "description": "Human-Readable Identifier Ballast",
+            "description": "Human-Readable Identifier Ballast (HRIB)",
             "format": "hrib",
             "example": "AAAAbadf00d"
           },
@@ -5043,58 +4237,76 @@
         "type": "object",
         "properties": {
           "minNameLength": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
           },
           "maxNameLength": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
           },
           "requiredNameCultures": {
             "uniqueItems": true,
-            "type": "array",
+            "type": [
+              "null",
+              "array"
+            ],
             "items": {
               "type": "string"
-            },
-            "nullable": true
+            }
           },
           "minDescriptionLength": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
           },
           "maxDescriptionLength": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
           },
           "requiredDescriptionCultures": {
             "uniqueItems": true,
-            "type": "array",
+            "type": [
+              "null",
+              "array"
+            ],
             "items": {
               "type": "string"
-            },
-            "nullable": true
+            }
           },
           "minGenreLength": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
           },
           "maxGenreLength": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
           },
           "requiredGenreCultures": {
             "uniqueItems": true,
-            "type": "array",
+            "type": [
+              "null",
+              "array"
+            ],
             "items": {
               "type": "string"
-            },
-            "nullable": true
+            }
           }
         },
         "additionalProperties": false
@@ -5117,58 +4329,15 @@
         "properties": {
           "organizationId": {
             "type": "string",
-            "description": "Human-Readable Identifier Ballast",
+            "description": "Human-Readable Identifier Ballast (HRIB)",
             "format": "hrib",
             "example": "AAAAbadf00d"
           },
           "name": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            }
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "description": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            },
-            "nullable": true
+            "$ref": "#/components/schemas/LocalizedString"
           }
         },
         "additionalProperties": false
@@ -5185,64 +4354,21 @@
         "properties": {
           "id": {
             "type": "string",
-            "description": "Human-Readable Identifier Ballast",
+            "description": "Human-Readable Identifier Ballast (HRIB)",
             "format": "hrib",
             "example": "AAAAbadf00d"
           },
           "organizationId": {
             "type": "string",
-            "description": "Human-Readable Identifier Ballast",
+            "description": "Human-Readable Identifier Ballast (HRIB)",
             "format": "hrib",
             "example": "AAAAbadf00d"
           },
           "name": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            }
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "description": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            },
-            "nullable": true
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "createdOn": {
             "type": "string",
@@ -5269,58 +4395,15 @@
         "properties": {
           "id": {
             "type": "string",
-            "description": "Human-Readable Identifier Ballast",
+            "description": "Human-Readable Identifier Ballast (HRIB)",
             "format": "hrib",
             "example": "AAAAbadf00d"
           },
           "name": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            }
+            "$ref": "#/components/schemas/LocalizedString"
           },
           "description": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            },
-            "nullable": true
+            "$ref": "#/components/schemas/LocalizedString"
           }
         },
         "additionalProperties": false
@@ -5335,39 +4418,18 @@
         "properties": {
           "id": {
             "type": "string",
-            "description": "Human-Readable Identifier Ballast",
+            "description": "Human-Readable Identifier Ballast (HRIB)",
             "format": "hrib",
             "example": "AAAAbadf00d"
           },
           "organizationId": {
             "type": "string",
-            "description": "Human-Readable Identifier Ballast",
+            "description": "Human-Readable Identifier Ballast (HRIB)",
             "format": "hrib",
             "example": "AAAAbadf00d"
           },
           "name": {
-            "title": "LocalizedString",
-            "required": [
-              "iv"
-            ],
-            "type": "object",
-            "properties": {
-              "iv": {
-                "type": "string"
-              },
-              "en": {
-                "type": "string",
-                "nullable": true
-              },
-              "cs": {
-                "type": "string",
-                "nullable": true
-              },
-              "sk": {
-                "type": "string",
-                "nullable": true
-              }
-            }
+            "$ref": "#/components/schemas/LocalizedString"
           }
         },
         "additionalProperties": false
@@ -5385,13 +4447,13 @@
           },
           "id": {
             "type": "string",
-            "description": "Human-Readable Identifier Ballast",
+            "description": "Human-Readable Identifier Ballast (HRIB)",
             "format": "hrib",
             "example": "AAAAbadf00d"
           },
           "artifactId": {
             "type": "string",
-            "description": "Human-Readable Identifier Ballast",
+            "description": "Human-Readable Identifier Ballast (HRIB)",
             "format": "hrib",
             "example": "AAAAbadf00d"
           }
@@ -5425,7 +4487,7 @@
         "properties": {
           "id": {
             "type": "string",
-            "description": "Human-Readable Identifier Ballast",
+            "description": "Human-Readable Identifier Ballast (HRIB)",
             "format": "hrib",
             "example": "AAAAbadf00d"
           },
@@ -5442,17 +4504,19 @@
         "additionalProperties": false
       },
       "SubtitleStreamDto": {
-        "required": [
-          "bitrate",
-          "codec"
-        ],
         "type": "object",
         "properties": {
           "codec": {
-            "type": "string"
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "bitrate": {
-            "type": "integer",
+            "type": [
+              "null",
+              "integer"
+            ],
             "format": "int64"
           }
         },
@@ -5505,8 +4569,10 @@
             "type": "string"
           },
           "preferredCulture": {
-            "type": "string",
-            "nullable": true
+            "type": [
+              "null",
+              "string"
+            ]
           }
         },
         "additionalProperties": false
@@ -5519,7 +4585,7 @@
         "properties": {
           "id": {
             "type": "string",
-            "description": "Human-Readable Identifier Ballast",
+            "description": "Human-Readable Identifier Ballast (HRIB)",
             "format": "hrib",
             "example": "AAAAbadf00d"
           }
@@ -5534,14 +4600,16 @@
         "type": "object",
         "properties": {
           "ids": {
-            "type": "array",
+            "type": [
+              "null",
+              "array"
+            ],
             "items": {
               "type": "string",
               "description": "Human-Readable Identifier Ballast",
               "format": "hrib",
               "example": "AAAAbadf00d"
-            },
-            "nullable": true
+            }
           },
           "shouldRetryOriginalAnalysis": {
             "type": "boolean"
@@ -5586,6 +4654,9 @@
             "$ref": "#/components/schemas/ShardDetailBaseDto"
           },
           {
+            "required": [
+              "variants"
+            ],
             "type": "object",
             "properties": {
               "variants": {
@@ -5600,32 +4671,40 @@
         ]
       },
       "VideoStreamDto": {
-        "required": [
-          "bitrate",
-          "codec",
-          "framerate",
-          "height",
-          "width"
-        ],
         "type": "object",
         "properties": {
           "codec": {
-            "type": "string"
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "bitrate": {
-            "type": "integer",
+            "type": [
+              "null",
+              "integer"
+            ],
             "format": "int64"
           },
           "width": {
-            "type": "integer",
+            "type": [
+              "null",
+              "integer"
+            ],
             "format": "int32"
           },
           "height": {
-            "type": "integer",
+            "type": [
+              "null",
+              "integer"
+            ],
             "format": "int32"
           },
           "framerate": {
-            "type": "number",
+            "type": [
+              "null",
+              "number"
+            ],
             "format": "double"
           }
         },

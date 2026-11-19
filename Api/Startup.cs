@@ -44,6 +44,8 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Kafe.Api.Middleware;
 using Microsoft.AspNetCore.Localization;
 using Kafe.Media.Services;
+using Kafe.Api.Swagger;
+using Microsoft.OpenApi;
 
 namespace Kafe.Api;
 
@@ -223,6 +225,8 @@ public partial class Startup
                 o.DefaultApiVersion = new ApiVersion(1);
             }
         );
+        services.AddTransient<ISchemaGenerator, SeededSchemaGenerator>();
+        services.AddSingleton<SeededSchemaOptions>();
         services.AddSwaggerGen();
         services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
 
@@ -337,6 +341,7 @@ public partial class Startup
         app.UseDefaultFiles();
         app.UseStaticFiles();
 
+        app.UseSwagger(o => o.OpenApiVersion = OpenApiSpecVersion.OpenApi3_1);
         app.UseSwaggerUI();
 
         app.UseCors();

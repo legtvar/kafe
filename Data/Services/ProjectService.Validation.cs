@@ -412,6 +412,16 @@ public partial class ProjectService
         )
     );
 
+    public static readonly Diagnostic LicenseFileIsTooLarge = new Diagnostic(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: FileStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, $"A license file is larger than {LicenseFileMaxFileLengthDescription}."),
+            (Const.CzechCulture, $"Licenční soubor je větší než {LicenseFileMaxFileLengthDescription}."),
+            (Const.SlovakCulture, $"Licenčný súbor je väčší než {LicenseFileMaxFileLengthDescription}.")
+        )
+    );
+
     public static readonly Diagnostic FilmTooShort = new Diagnostic(
         Kind: DiagnosticKind.Error,
         ValidationStage: FileStage,
@@ -1329,10 +1339,23 @@ public partial class ProjectService
 
         if (artifactBlueprints!.GetValueOrDefault(Const.LicenseFileBlueprintSlot, null) is not null)
         {
-            var licenseFileCount = artifacts.Count(a => a.projectArtifact.BlueprintSlot == Const.LicenseFileBlueprintSlot);
-            if (licenseFileCount > artifactBlueprints[Const.LicenseFileBlueprintSlot].Arity.Max)
+            var licenseArtifacts = artifacts
+                .Where(a => a.projectArtifact.BlueprintSlot == Const.LicenseFileBlueprintSlot)
+                .ToImmutableArray();
+            if (licenseArtifacts.Length > artifactBlueprints[Const.LicenseFileBlueprintSlot].Arity.Max)
             {
                 diagnostics.Add(TooManyLicenseFiles);
+            }
+
+            var licenseShards = licenseArtifacts
+                .SelectMany(a => a.info.Shards.Where(s => s.Kind == ShardKind.Blob));
+            foreach (var licenseShard in licenseShards)
+            {
+                var blob = await db.LoadAsync<BlobShardInfo>(licenseShard.ShardId, token);
+                if (blob?.Info.FileLength > LicenseFileMaxFileLength)
+                {
+                    diagnostics.Add(LicenseFileIsTooLarge);
+                }
             }
         }
 

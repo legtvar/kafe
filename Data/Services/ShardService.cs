@@ -17,6 +17,8 @@ namespace Kafe.Data.Services;
 
 public class ShardService
 {
+    public const int UploadFileNameMaxLength = 255;
+
     private readonly IDocumentSession db;
     private readonly StorageService storageService;
     private readonly IMediaService mediaService;
@@ -77,19 +79,52 @@ public class ShardService
         CancellationToken token = default
     )
     {
+        fileName = SanitizeUploadFileName(fileName);
+
         return kind switch
         {
-            ShardKind.Video => await CreateVideo(artifactId, stream, mimeType, shardId, token),
-            ShardKind.Image => await CreateImage(artifactId, stream, shardId, token),
-            ShardKind.Subtitles => await CreateSubtitles(artifactId, stream, shardId, token),
+            ShardKind.Video => await CreateVideo(artifactId, fileName, stream, mimeType, shardId, token),
+            ShardKind.Image => await CreateImage(artifactId, fileName, stream, shardId, token),
+            ShardKind.Subtitles => await CreateSubtitles(artifactId, fileName, stream, shardId, token),
             ShardKind.Blend => await CreateBlend(artifactId, fileName, stream, shardId, token),
             ShardKind.Blob => await CreateBlob(artifactId, fileName, stream, mimeType, shardId, token),
             _ => throw new NotSupportedException($"Creation of '{kind}' shards is not supported yet.")
         };
     }
 
+    public static string? SanitizeUploadFileName(string? fileName)
+    {
+        if (string.IsNullOrWhiteSpace(fileName))
+        {
+            return null;
+        }
+
+        var sanitized = new string(fileName.Where(c => !char.IsControl(c)).ToArray()).Replace('\\', '/');
+        sanitized = Path.GetFileName(sanitized).Trim();
+        if (sanitized.Length == 0)
+        {
+            return null;
+        }
+
+        if (sanitized.Length <= UploadFileNameMaxLength)
+        {
+            return sanitized;
+        }
+
+        var extension = Path.GetExtension(sanitized);
+        var baseName = Path.GetFileNameWithoutExtension(sanitized);
+        var maxBaseNameLength = UploadFileNameMaxLength - extension.Length;
+        if (maxBaseNameLength <= 0)
+        {
+            return sanitized[..UploadFileNameMaxLength];
+        }
+
+        return baseName[..Math.Min(baseName.Length, maxBaseNameLength)] + extension;
+    }
+
     private async Task<Hrib?> CreateVideo(
         Hrib artifactId,
+        string? fileName,
         Stream videoStream,
         string mimeType,
         Hrib? shardId = null,
@@ -136,7 +171,8 @@ public class ShardService
             ShardId: shardId.ToString(),
             CreationMethod: CreationMethod.Api,
             ArtifactId: artifactId.ToString(),
-            OriginalVariantInfo: mediaInfo
+            OriginalVariantInfo: mediaInfo,
+            UploadFileName: fileName
         );
         db.Events.KafeStartStream<VideoShardInfo>(created.ShardId, created);
         await db.SaveChangesAsync(token);
@@ -146,6 +182,7 @@ public class ShardService
 
     private async Task<Hrib?> CreateImage(
         Hrib artifactId,
+        string? fileName,
         Stream imageStream,
         Hrib? shardId = null,
         CancellationToken token = default
@@ -161,7 +198,8 @@ public class ShardService
             ShardId: shardId.ToString(),
             CreationMethod: CreationMethod.Api,
             ArtifactId: artifactId.ToString(),
-            OriginalVariantInfo: imageInfo
+            OriginalVariantInfo: imageInfo,
+            UploadFileName: fileName
         );
 
         if (!await storageService.TryStoreShard(
@@ -184,6 +222,7 @@ public class ShardService
 
     private async Task<Hrib?> CreateSubtitles(
         Hrib artifactId,
+        string? fileName,
         Stream subtitlesStream,
         Hrib? shardId = null,
         CancellationToken token = default
@@ -219,7 +258,8 @@ public class ShardService
             ShardId: shardId.ToString(),
             CreationMethod: CreationMethod.Api,
             ArtifactId: artifactId.ToString(),
-            OriginalVariantInfo: info
+            OriginalVariantInfo: info,
+            UploadFileName: fileName
         );
 
         if (!await storageService.TryStoreShard(
@@ -291,7 +331,8 @@ public class ShardService
             FileName: fileName,
             CreationMethod: CreationMethod.Api,
             ArtifactId: artifactId.ToString(),
-            OriginalVariantInfo: blendInfo);
+            OriginalVariantInfo: blendInfo,
+            UploadFileName: fileName);
 
         db.Events.KafeStartStream<BlendShardInfo>(created.ShardId, created);
         await db.SaveChangesAsync(token);
@@ -336,7 +377,8 @@ public class ShardService
             FileName: fileName,
             CreationMethod: CreationMethod.Api,
             ArtifactId: artifactId.ToString(),
-            Info: blobInfo);
+            Info: blobInfo,
+            UploadFileName: fileName);
 
         db.Events.KafeStartStream<BlobShardInfo>(created.ShardId, created);
         await db.SaveChangesAsync(token);

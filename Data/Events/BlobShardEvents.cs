@@ -11,5 +11,6 @@ public record BlobShardCreated(
     string? FileName,
     CreationMethod CreationMethod,
     [Hrib] string ArtifactId,
-    BlobInfo Info
+    BlobInfo Info,
+    string? UploadFileName = null
 ) : IBlobShardEvent, IShardCreated;

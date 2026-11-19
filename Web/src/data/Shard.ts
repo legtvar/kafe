@@ -5,6 +5,7 @@ import { ShardVariant } from './ShardVariant';
 export class Shard extends AbstractType {
     // API object
     public kind!: components['schemas']['ShardKind'];
+    public uploadFileName?: string | null;
     public variants!: string[] | Record<string, ShardVariant>;
 
     public constructor(struct: any) {

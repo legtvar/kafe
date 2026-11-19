@@ -63,7 +63,7 @@ export function ShardGroupUpload(props: IShardGroupUploadProps) {
                         <Icon fontSize="1.2em">
                             <FileIcon kind={kind} />
                         </Icon>{' '}
-                        {shard.id}
+                        {shard.uploadFileName ?? shard.id}
                     </Text>
                 </Box>
             ))}

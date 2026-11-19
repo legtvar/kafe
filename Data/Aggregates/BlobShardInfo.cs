@@ -12,8 +12,9 @@ public record BlobShardInfo(
     CreationMethod CreationMethod,
     DateTimeOffset CreatedAt,
     [Hrib] string ArtifactId,
-    BlobInfo Info
-) : ShardInfoBase(Id, CreationMethod, ArtifactId, CreatedAt)
+    BlobInfo Info,
+    string? UploadFileName = null
+) : ShardInfoBase(Id, CreationMethod, ArtifactId, CreatedAt, UploadFileName)
 {
     public override ShardKind Kind => ShardKind.Blob;
 }
@@ -28,7 +29,8 @@ public class BlobShardInfoProjection : SingleStreamProjection<BlobShardInfo, str
             CreationMethod: e.Data.CreationMethod,
             ArtifactId: e.Data.ArtifactId,
             CreatedAt: e.Timestamp,
-            Info: e.Data.Info
+            Info: e.Data.Info,
+            UploadFileName: e.Data.UploadFileName
         );
     }
 }

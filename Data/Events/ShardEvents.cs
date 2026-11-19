@@ -20,6 +20,8 @@ public interface IShardCreated : IShardEvent
 
     [Hrib]
     string ArtifactId { get; }
+
+    string? UploadFileName { get; }
 }
 
 public interface IShardVariantAdded : IShardEvent

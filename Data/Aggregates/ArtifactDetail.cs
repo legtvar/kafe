@@ -28,7 +28,8 @@ public record ArtifactDetail(
 public record ArtifactShardInfo(
     [Hrib] string ShardId,
     ShardKind Kind,
-    ImmutableHashSet<string> Variants
+    ImmutableHashSet<string> Variants,
+    string? UploadFileName = null
 );
 
 public class ArtifactDetailProjection : MultiStreamProjection<ArtifactDetail, string>
@@ -62,7 +63,8 @@ public class ArtifactDetailProjection : MultiStreamProjection<ArtifactDetail, st
             Shards = a.Shards.Add(new ArtifactShardInfo(
                 ShardId: e.ShardId,
                 Kind: e.GetShardKind(),
-                Variants: ImmutableHashSet.Create(Const.OriginalShardVariant)))
+                Variants: ImmutableHashSet.Create(Const.OriginalShardVariant),
+                UploadFileName: e.UploadFileName))
         };
     }
 

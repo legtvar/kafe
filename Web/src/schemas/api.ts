@@ -2772,6 +2772,7 @@ export interface components {
             id: string;
             kind: components["schemas"]["ShardKind"];
             variants: string[];
+            uploadFileName?: string | null;
         };
         SubtitleStreamDto: {
             codec?: null | string;

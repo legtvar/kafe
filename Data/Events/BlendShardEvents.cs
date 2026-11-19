@@ -11,7 +11,8 @@ public record BlendShardCreated(
     string? FileName,
     CreationMethod CreationMethod,
     [Hrib] string ArtifactId,
-    BlendInfo OriginalVariantInfo
+    BlendInfo OriginalVariantInfo,
+    string? UploadFileName = null
 ) : IBlendShardEvent, IShardCreated;
 
 public record BlendShardVariantAdded(

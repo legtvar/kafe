@@ -327,7 +327,8 @@ public class ShardService
 
         var blobInfo = new BlobInfo(
             FileExtension: fileExtension,
-            MimeType: mimeType
+            MimeType: mimeType,
+            FileLength: blobStream.Length
         );
 
         var created = new BlobShardCreated(

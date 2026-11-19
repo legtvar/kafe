@@ -75,17 +75,6 @@ export function ArtifactUpload(props: IArtifactUploadProps) {
                             </AccordionButton>
                             <AccordionPanel pb={4}>
                                 <Text mb={2} opacity={0.5}>
-                                    {t('artifact.section.preview.title')}
-                                </Text>
-                                <ContentThumbnail
-                                    artifact={artifact}
-                                    w={{
-                                        base: '100%',
-                                        lg: 'calc(50% - var(--kafe-space-4) / 2)',
-                                        xl: 'calc(33.33% - var(--kafe-space-4) / 2)',
-                                    }}
-                                />
-                                <Text mt={6} opacity={0.5}>
                                     {t('artifact.section.shards.title')}
                                 </Text>
                                 <Text mb={3} opacity={0.5} fontSize="sm">
@@ -101,6 +90,23 @@ export function ArtifactUpload(props: IArtifactUploadProps) {
                                         />
                                     ))}
                                 </SimpleGrid>
+
+                                {artifact.shards?.length > 0 && (
+                                    <>
+                                        <Text mt={6} mb={2} opacity={0.5}>
+                                            {t('artifact.section.preview.title')}
+                                        </Text>
+                                        <ContentThumbnail
+                                            artifact={artifact}
+                                            w={{
+                                                base: '100%',
+                                                lg: 'calc(50% - var(--kafe-space-4) / 2)',
+                                                xl: 'calc(33.33% - var(--kafe-space-4) / 2)',
+                                            }}
+                                        />
+                                    </>
+                                )}
+
                                 <Text mt={6} mb={2} opacity={0.5}>
                                     Správa
                                 </Text>

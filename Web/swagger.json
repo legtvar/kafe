@@ -4468,6 +4468,10 @@
             "description": "Human-Readable Identifier Ballast (HRIB)",
             "format": "hrib",
             "example": "AAAAbadf00d"
+          },
+          "uploadFileName": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false,
@@ -4485,7 +4489,8 @@
           "video",
           "image",
           "subtitles",
-          "blend"
+          "blend",
+          "blob"
         ],
         "type": "string"
       },

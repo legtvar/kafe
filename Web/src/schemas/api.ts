@@ -2760,9 +2760,10 @@ export interface components {
              * @example AAAAbadf00d
              */
             artifactId: string;
+            uploadFileName?: string | null;
         };
         /** @enum {string} */
-        ShardKind: "unknown" | "video" | "image" | "subtitles" | "blend";
+        ShardKind: "unknown" | "video" | "image" | "subtitles" | "blend" | "blob";
         ShardListDto: {
             /**
              * Format: hrib

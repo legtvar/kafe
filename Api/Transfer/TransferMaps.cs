@@ -217,7 +217,8 @@ public static class TransferMaps
             Id: data.Id,
             Kind: data.Kind,
             ArtifactId: data.ArtifactId,
-            Variants: data.Variants.ToImmutableDictionary(v => v.Key, v => ToMediaInfoDto(v.Value)));
+            Variants: data.Variants.ToImmutableDictionary(v => v.Key, v => ToMediaInfoDto(v.Value)),
+            UploadFileName: data.UploadFileName);
     }
 
     public static MediaDto ToMediaInfoDto(MediaInfo data)
@@ -266,7 +267,8 @@ public static class TransferMaps
             Id: data.Id,
             Kind: data.Kind,
             ArtifactId: data.ArtifactId,
-            Variants: data.Variants.ToImmutableDictionary(v => v.Key, v => ToImageDto(v.Value)));
+            Variants: data.Variants.ToImmutableDictionary(v => v.Key, v => ToImageDto(v.Value)),
+            UploadFileName: data.UploadFileName);
     }
 
     public static ImageDto ToImageDto(ImageInfo data)
@@ -287,8 +289,27 @@ public static class TransferMaps
             ImageShardInfo i => ToImageShardDetailDto(i),
             SubtitlesShardInfo s => ToSubtitlesShardDetailDto(s),
             BlendShardInfo b => ToBlendShardDetailDto(b),
+            BlobShardInfo b => ToBlobShardDetailDto(b),
             _ => throw new NotSupportedException($"Shards of '{data.GetType()}' are not supported.")
         };
+    }
+
+    public static BlobShardDetailDto ToBlobShardDetailDto(BlobShardInfo data)
+    {
+        return new BlobShardDetailDto(
+            Id: data.Id,
+            Kind: data.Kind,
+            ArtifactId: data.ArtifactId,
+            Info: ToBlobDto(data.Info),
+            UploadFileName: data.UploadFileName);
+    }
+
+    public static BlobDto ToBlobDto(BlobInfo data)
+    {
+        return new BlobDto(
+            FileExtension: data.FileExtension,
+            MimeType: data.MimeType,
+            FileLength: data.FileLength);
     }
 
     public static SubtitlesShardDetailDto ToSubtitlesShardDetailDto(SubtitlesShardInfo data)
@@ -297,7 +318,8 @@ public static class TransferMaps
             Id: data.Id,
             Kind: data.Kind,
             ArtifactId: data.ArtifactId,
-            Variants: data.Variants.ToImmutableDictionary(p => p.Key, p => ToSubtitlesDto(p.Value)));
+            Variants: data.Variants.ToImmutableDictionary(p => p.Key, p => ToSubtitlesDto(p.Value)),
+            UploadFileName: data.UploadFileName);
     }
 
     public static SubtitlesDto ToSubtitlesDto(SubtitlesInfo data)
@@ -317,7 +339,8 @@ public static class TransferMaps
             FileName: data.FileName,
             Kind: data.Kind,
             ArtifactId: data.ArtifactId,
-            Variants: data.Variants.ToImmutableDictionary(p => p.Key, p => ToBlendDto(p.Value)));
+            Variants: data.Variants.ToImmutableDictionary(p => p.Key, p => ToBlendDto(p.Value)),
+            UploadFileName: data.UploadFileName);
     }
 
     public static BlendDto ToBlendDto(BlendInfo data)

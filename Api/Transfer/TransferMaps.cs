@@ -207,7 +207,8 @@ public static class TransferMaps
         return new ShardListDto(
             Id: data.ShardId,
             Kind: data.Kind,
-            Variants: data.Variants.ToImmutableArray());
+            Variants: data.Variants.ToImmutableArray(),
+            UploadFileName: data.UploadFileName);
     }
 
     public static VideoShardDetailDto ToVideoShardDetailDto(VideoShardInfo data)

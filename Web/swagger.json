@@ -4511,6 +4511,10 @@
             "items": {
               "type": "string"
             }
+          },
+          "uploadFileName": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false

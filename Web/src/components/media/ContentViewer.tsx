@@ -108,7 +108,7 @@ export function ContentViewer({
                                 href={api.shards.defaultStreamUrl(shard.id)}
                                 leftIcon={<AiOutlineDownload />}
                             >
-                                {t('generic.download')} {t('generic.file')} {shard.id}
+                                {t('generic.download')} {t('generic.file')} {shard.uploadFileName ?? shard.id}
                             </Button>
                         ))}
                         {artifact.shards.length === 0 && (
@@ -131,7 +131,7 @@ export function ContentViewer({
                     href={api.shards.defaultStreamUrl(shard.id)}
                     leftIcon={<AiOutlineDownload />}
                 >
-                    {t('generic.download')} {t('generic.file')} {shard.id}
+                    {t('generic.download')} {t('generic.file')} {shard.uploadFileName ?? shard.id}
                 </Button>
             ))}
             {artifact.shards.length === 0 && (

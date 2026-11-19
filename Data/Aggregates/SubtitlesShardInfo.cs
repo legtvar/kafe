@@ -16,8 +16,9 @@ public record SubtitlesShardInfo(
     CreationMethod CreationMethod,
     [Hrib] string ArtifactId,
     DateTimeOffset CreatedAt,
-    ImmutableDictionary<string, SubtitlesInfo> Variants
-) : ShardInfoBase(Id, CreationMethod, ArtifactId, CreatedAt)
+    ImmutableDictionary<string, SubtitlesInfo> Variants,
+    string? UploadFileName = null
+) : ShardInfoBase(Id, CreationMethod, ArtifactId, CreatedAt, UploadFileName)
 {
     public override ShardKind Kind => ShardKind.Subtitles;
 }
@@ -39,7 +40,8 @@ public class SubtitlesShardInfoProjection : SingleStreamProjection<SubtitlesShar
             Variants: ImmutableDictionary.CreateRange(new KeyValuePair<string, SubtitlesInfo>[]
             {
                 new(Const.OriginalShardVariant, e.Data.OriginalVariantInfo)
-            })
+            }),
+            UploadFileName: e.Data.UploadFileName
         );
     }
 

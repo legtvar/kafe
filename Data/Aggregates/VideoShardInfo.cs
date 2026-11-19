@@ -16,8 +16,9 @@ public record VideoShardInfo(
     CreationMethod CreationMethod,
     DateTimeOffset CreatedAt,
     [Hrib] string ArtifactId,
-    ImmutableDictionary<string, MediaInfo> Variants
-) : ShardInfoBase(Id, CreationMethod, ArtifactId, CreatedAt)
+    ImmutableDictionary<string, MediaInfo> Variants,
+    string? UploadFileName = null
+) : ShardInfoBase(Id, CreationMethod, ArtifactId, CreatedAt, UploadFileName)
 {
     public override ShardKind Kind => ShardKind.Video;
 }
@@ -39,7 +40,8 @@ public class VideoShardInfoProjection : SingleStreamProjection<VideoShardInfo, s
             Variants: ImmutableDictionary.CreateRange(new KeyValuePair<string, MediaInfo>[]
             {
                 new(Const.OriginalShardVariant, e.Data.OriginalVariantInfo)
-            })
+            }),
+            UploadFileName: e.Data.UploadFileName
         );
     }
 

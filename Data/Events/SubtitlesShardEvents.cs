@@ -10,7 +10,8 @@ public record SubtitlesShardCreated(
     [Hrib] string ShardId,
     CreationMethod CreationMethod,
     [Hrib] string ArtifactId,
-    SubtitlesInfo OriginalVariantInfo
+    SubtitlesInfo OriginalVariantInfo,
+    string? UploadFileName = null
 ) : ISubtitlesShardEvent, IShardCreated;
 
 public record SubtitlesShardVariantsAdded(

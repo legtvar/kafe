@@ -17,6 +17,7 @@ interface IUploadProps {
     artifactId: string;
     onUploaded?: (id: HRIB) => void;
     repeatable?: boolean;
+    maxSize?: number;
 }
 
 export function Upload(props: IUploadProps) {
@@ -65,7 +66,7 @@ export function Upload(props: IUploadProps) {
 
     if (status === 'ready')
         return (
-            <Dropzone onDrop={upload} maxFiles={1}>
+            <Dropzone onDrop={upload} maxFiles={1} maxSize={props.maxSize}>
                 {({ getRootProps, getInputProps, isDragActive, isFileDialogActive }) => (
                     <Center
                         py={8}

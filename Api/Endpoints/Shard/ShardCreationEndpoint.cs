@@ -57,6 +57,11 @@ public class ShardCreationEndpoint : EndpointBaseAsync
             return Unauthorized();
         }
 
+        if (request.Kind == ShardKind.Blob && request.File.Length > ProjectService.LicenseFileMaxFileLength)
+        {
+            return BadRequest($"A license file cannot exceed {ProjectService.LicenseFileMaxFileLengthDescription}.");
+        }
+
         using var stream = request.File.OpenReadStream();
         var id = await shardService.Create(
             kind: request.Kind,

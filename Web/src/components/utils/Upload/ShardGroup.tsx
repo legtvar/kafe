@@ -85,6 +85,7 @@ export function ShardGroupUpload(props: IShardGroupUploadProps) {
                                     projectId={project.id}
                                     shardKind={kind as any}
                                     artifactId={artifact.id}
+                                    maxSize={artifact.blueprintSlot === 'license-file' ? 10 * 1024 * 1024 : undefined}
                                     onUploaded={(id) => {
                                         artifact.shards.push(
                                             new Shard({

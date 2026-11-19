@@ -327,6 +327,44 @@ public record ProjectBlueprint
                             })
                 }
             )
+            // License files
+            .Add(Const.LicenseFileBlueprintSlot,
+                new ProjectArtifactBlueprint
+                {
+                    Name = LocalizedString.Create(
+                        (Const.InvariantCulture, "License files"),
+                        (Const.CzechCulture, "Licenční soubory"),
+                        (Const.SlovakCulture, "Licenčné súbory")
+                    ),
+                    Description = LocalizedString.Create(
+                        (
+                            Const.InvariantCulture,
+                            "License files for your film. Each file may be at most 10 MiB. (Optional)"
+                        ),
+                        (
+                            Const.CzechCulture,
+                            "Licenční soubory k vašemu filmu. Maximální velikost jednoho souboru je 10 MiB. (Volitelné)"
+                        ),
+                        (
+                            Const.SlovakCulture,
+                            "Licenčné súbory k vášmu filmu. Maximálna veľkosť jedného súboru je 10 MiB. (Voliteľné)"
+                        )
+                    ),
+                    Arity = new ArgumentArity(Const.LicenseFileMinCount, Const.LicenseFileMaxCount),
+                    ShardBlueprints = ImmutableDictionary<ShardKind, ProjectArtifactShardBlueprint>.Empty
+                        .Add(ShardKind.Blob,
+                            new ProjectArtifactShardBlueprint
+                            {
+                                Name = LocalizedString.Create(
+                                    (Const.InvariantCulture, "License file"),
+                                    (Const.CzechCulture, "Licenční soubor"),
+                                    (Const.SlovakCulture, "Licenčný súbor")
+                                ),
+                                Description = null,
+                                Arity = ArgumentArity.ExactlyOne
+                            })
+                }
+            )
     };
 
     //  MATE PROJECT BLUEPRINT

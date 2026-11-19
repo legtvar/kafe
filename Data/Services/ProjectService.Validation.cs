@@ -19,6 +19,8 @@ public partial class ProjectService
     public static readonly TimeSpan AcceptableDurationError = TimeSpan.FromSeconds(1);
     public const long FilmMaxFileLength = 2L << 30; // 2 GiB
     public const string FilmMaxFileLengthDescription = "2 GiB";
+    public const long LicenseFileMaxFileLength = 10L << 20; // 10 MiB
+    public const string LicenseFileMaxFileLengthDescription = "10 MiB";
     public const long VideoMinBitrate = 10_000_000;
     public const string VideoMinBitrateDescription = "10 Mbps";
     public const long VideoMaxBitrate = 20_000_000;
@@ -397,6 +399,16 @@ public partial class ProjectService
             (Const.InvariantCulture, "Too many annotation photographs have been provided."),
             (Const.CzechCulture, "Přihláška obsahuje příliš mnoho anotačních fotografií."),
             (Const.SlovakCulture, "Prihláška obsahuje príliš veľa anotačných fotografií.")
+        )
+    );
+
+    public static readonly Diagnostic TooManyLicenseFiles = new Diagnostic(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: FileStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, $"A project can contain at most {Const.LicenseFileMaxCount} license files."),
+            (Const.CzechCulture, $"Projekt může obsahovat nejvýše {Const.LicenseFileMaxCount} licenčních souborů."),
+            (Const.SlovakCulture, $"Projekt môže obsahovať najviac {Const.LicenseFileMaxCount} licenčných súborov.")
         )
     );
 
@@ -1312,6 +1324,15 @@ public partial class ProjectService
                     }
                     diagnostics.AddRange(ValidateImage(imageShard));
                 }
+            }
+        }
+
+        if (artifactBlueprints!.GetValueOrDefault(Const.LicenseFileBlueprintSlot, null) is not null)
+        {
+            var licenseFileCount = artifacts.Count(a => a.projectArtifact.BlueprintSlot == Const.LicenseFileBlueprintSlot);
+            if (licenseFileCount > artifactBlueprints[Const.LicenseFileBlueprintSlot].Arity.Max)
+            {
+                diagnostics.Add(TooManyLicenseFiles);
             }
         }
 

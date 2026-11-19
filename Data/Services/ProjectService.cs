@@ -317,6 +317,13 @@ public partial class ProjectService
             return Error.NotFound(projectId, "A project");
         }
 
+        var addedLicenseFileCount = artifacts.Count(a => a.blueprintSlot == Const.LicenseFileBlueprintSlot);
+        var existingLicenseFileCount = project.Artifacts.Count(a => a.BlueprintSlot == Const.LicenseFileBlueprintSlot);
+        if (existingLicenseFileCount + addedLicenseFileCount > Const.LicenseFileMaxCount)
+        {
+            return Error.ValidationError($"A project can contain at most {Const.LicenseFileMaxCount} license files.");
+        }
+
         var existingArtifactIds = (await artifactService.LoadMany(artifacts.Select(a => a.id), token))
             .Select(a => a.Id)
             .ToImmutableHashSet();

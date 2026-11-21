@@ -16,6 +16,7 @@ import {
     ModalHeader,
     ModalOverlay,
     Text,
+    Textarea,
     useDisclosure,
     VStack,
 } from '@chakra-ui/react';
@@ -27,7 +28,7 @@ import { useColorScheme } from '../../../hooks/useColorScheme';
 import { HRIB } from '../../../schemas/generic';
 import { AwaitAPI } from '../AwaitAPI';
 import { SendAPI } from '../SendAPI';
-import { TextareaLimited } from '../TextareaLimited';
+import { LocalizedInput } from '../LocalizedInput';
 import { TagInput } from './TagInput';
 import { MultiSelect } from 'chakra-multiselect';
 import crewRolesManager from '../../../utils/managers/crewRolesManager';
@@ -176,7 +177,7 @@ export function AuthorSelect(props: IAuthorSelectProps) {
                                                     <FormLabel>{t('authorSelect.email').toString()}</FormLabel>
                                                     <Input
                                                         placeholder={t('authorSelect.email').toString()}
-                                                        defaultValue={author!.uco}
+                                                        defaultValue={author!.email}
                                                         onChange={(event) =>
                                                             setAuthor(author!.set('email', event.target.value))
                                                         }
@@ -187,7 +188,7 @@ export function AuthorSelect(props: IAuthorSelectProps) {
                                                     <FormLabel>{t('authorSelect.phone').toString()}</FormLabel>
                                                     <Input
                                                         placeholder={t('authorSelect.phone').toString()}
-                                                        defaultValue={author!.uco}
+                                                        defaultValue={author!.phone}
                                                         onChange={(event) =>
                                                             setAuthor(author!.set('phone', event.target.value))
                                                         }
@@ -196,36 +197,15 @@ export function AuthorSelect(props: IAuthorSelectProps) {
 
                                                 <FormControl>
                                                     <FormLabel>{t('authorSelect.bio').toString()}</FormLabel>
-                                                    <TextareaLimited
-                                                        placeholder={`${t('authorSelect.bio').toString()} ${t(
-                                                            'createProject.language.cs',
-                                                        )}`}
-                                                        max={200}
-                                                        defaultValue={author!.bio?.cs}
-                                                        onChange={(event) =>
-                                                            setAuthor(
-                                                                author!.set('bio', {
-                                                                    ...author!.bio,
-                                                                    cs: event.target.value,
-                                                                }),
-                                                            )
-                                                        }
-                                                        mb={4}
-                                                    />
-                                                    <TextareaLimited
-                                                        placeholder={`${t('authorSelect.bio').toString()} ${t(
-                                                            'createProject.language.en',
-                                                        )}`}
-                                                        max={200}
-                                                        defaultValue={author!.bio?.en}
-                                                        onChange={(event) =>
-                                                            setAuthor(
-                                                                author!.set('bio', {
-                                                                    ...author!.bio,
-                                                                    en: event.target.value,
-                                                                }),
-                                                            )
-                                                        }
+                                                    <LocalizedInput
+                                                        as={Textarea}
+                                                        minLength={0}
+                                                        maxLength={200}
+                                                        name="bio"
+                                                        placeholder={t('authorSelect.bio').toString()}
+                                                        value={{ cs: '', en: '', ...author!.bio }}
+                                                        onChange={(value) => setAuthor(author!.set('bio', value))}
+                                                        split
                                                     />
                                                 </FormControl>
                                             </>

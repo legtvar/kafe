@@ -24,7 +24,6 @@
   <Project Path="Data/Kafe.Data.csproj" />
   <Project Path="Media/Kafe.Media.csproj" />
   <Project Path="Migrator/Kafe.Migrator.csproj" />
-  <Project Path="MockIdentity/Kafe.MockIdentity.csproj" />
   <Project Path="Pigeons/Kafe.Pigeons.csproj" />
   <Project Path="Playground/Kafe.Playground.csproj" />
   <Project Path="Ruv/Kafe.Ruv.csproj" />

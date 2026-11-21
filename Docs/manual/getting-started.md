@@ -82,7 +82,7 @@ By default:
 - It generates lower-resolution videos in `C:/dev/fi/kafe-generated`.
 - It doesn't send emails, it just logs them into the terminal.
 - It creates an admin account with email `kafe@example.com`.
-- It expects an OpenIdConnect server at `https://localhost:44370`.
+- It expects an OpenIdConnect server at `http://localhost:44370/default`.
 
 **Front end (Web)**
 
@@ -93,7 +93,9 @@ By default:
 
 ## Logging in
 
-To log in:
+### Temporary account
+
+To log in using a temporary account:
 
 1. Use the `kafe@example.com` email address in the front-end's UI or in a call to `TemporaryAccountCreationEndpoint` (POST to `/api/v1/tmp-account`). This is the default admin account.
 2. Look into back end's console output and look for the confirmation email.
@@ -109,6 +111,16 @@ To log in:
    where `:token` is the confirmation token.
 
 4. Now, your browser should have a valid session cookie.
+
+### External login with the mock OIDC server
+
+Start the container-based mock from the repository root:
+
+```bash
+docker compose -f MockIdentity/docker-compose.yml up
+```
+
+On the front end's login screen (`/account/login`) click _Login through MUNI_. Then, select an account using the mock identity provider's UI. There's users `alice` and `bob` and an admin called `kafe`.
 
 
 ## Rebuilding projections

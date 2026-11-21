@@ -126,6 +126,7 @@ public partial class Startup
                     o.Authority = oidcConfig.Authority;
                     o.ClientId = oidcConfig.ClientId;
                     o.ClientSecret = oidcConfig.ClientSecret;
+                    o.RequireHttpsMetadata = oidcConfig.RequireHttpsMetadata;
                     o.ResponseType = OpenIdConnectResponseType.Code;
                     o.Scope.Add("openid");
                     o.Scope.Add("profile");
@@ -185,6 +186,8 @@ public partial class Startup
 
                         return Task.CompletedTask;
                     };
+
+                    Log.Logger.Information("OIDC: Authority={OidcAuthority}", oidcConfig.Authority);
                 }
             );
 

@@ -309,6 +309,7 @@ public partial class Startup
     public void Configure(IApplicationBuilder app)
     {
         app.UseMiddleware<ClacksMiddleware>();
+        app.UseSecurityHeaders(ApiSecurityHeaders.Create());
 
         app.UseForwardedHeaders();
 

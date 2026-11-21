@@ -9,7 +9,6 @@ import { ProjectAuthorList } from '../../../utils/ProjectAuthorList';
 import { TextareaLimited } from '../../../utils/TextareaLimited';
 import { MultiSelect } from 'chakra-multiselect';
 import genreManager from '../../../../utils/managers/genreManager';
-import { InputLimited } from '../../../utils/InputLimited';
 
 interface ProjectBasicInfoFormProps {
     project: Project;
@@ -36,9 +35,8 @@ export function ProjectBasicInfoForm({ project, onSubmit, status, update, noSelf
                     {t('createProject.fields.nameHelp').toString()}
                 </FormHelperText>
                 <LocalizedInput
-                    as={InputLimited}
-                    min={project.validationSettings?.minNameLength ?? undefined}
-                    max={project.validationSettings?.maxNameLength ?? undefined}
+                    minLength={project.validationSettings?.minNameLength ?? undefined}
+                    maxLength={project.validationSettings?.maxNameLength ?? undefined}
                     type="text"
                     borderColor={border}
                     bg={bg}
@@ -46,6 +44,8 @@ export function ProjectBasicInfoForm({ project, onSubmit, status, update, noSelf
                     placeholder={t('createProject.fields.name').toString()}
                     value={project.name}
                     onChange={(value) => forceUpdate(project.set('name', value))}
+                    required={["en", ["cs", "sk"]]}
+                    split
                 />
             </FormControl>
             <FormControl my={4}>
@@ -63,9 +63,8 @@ export function ProjectBasicInfoForm({ project, onSubmit, status, update, noSelf
                     />
                 </> :
                 <LocalizedInput
-                    as={InputLimited}
-                    min={project.validationSettings?.minGenreLength ?? undefined}
-                    max={project.validationSettings?.maxGenreLength ?? undefined}
+                    minLength={project.validationSettings?.minGenreLength ?? undefined}
+                    maxLength={project.validationSettings?.maxGenreLength ?? undefined}
                     type="text"
                     borderColor={border}
                     bg={bg}
@@ -81,15 +80,17 @@ export function ProjectBasicInfoForm({ project, onSubmit, status, update, noSelf
                     {t('createProject.fields.descriptionHelp').toString()}
                 </FormHelperText>
                 <LocalizedInput
-                    as={TextareaLimited}
-                    min={project.validationSettings?.minDescriptionLength ?? undefined}
-                    max={project.validationSettings?.maxDescriptionLength ?? undefined}
+                    as={Textarea}
+                    minLength={project.validationSettings?.minDescriptionLength ?? undefined}
+                    maxLength={project.validationSettings?.maxDescriptionLength ?? undefined}
                     borderColor={border}
                     bg={bg}
                     name="description"
                     placeholder={t('createProject.fields.description').toString()}
                     value={project.description}
                     onChange={(value) => forceUpdate(project.set('description', value))}
+                    required={["en", ["cs", "sk"]]}
+                    split
                 />
             </FormControl>
             <FormControl my={4}>

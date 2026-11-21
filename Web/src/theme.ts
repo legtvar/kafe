@@ -68,6 +68,7 @@ const theme = extendTheme({
         },
         gray: {
             650: '#374358',
+            950: '#0f131a'
         },
     },
     fonts: {

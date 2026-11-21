@@ -71,7 +71,7 @@ export function ProjectEdit(props: IProjectEditProps) {
                                 alignItems="start"
                             >
                                 <Heading fontSize="4xl" fontWeight="semibold" as="h2" lineHeight="tight" mr="auto">
-                                    {project.getName()}
+                                    {project.getName() || " "}
                                 </Heading>
                                 <SendAPI
                                     value={project}

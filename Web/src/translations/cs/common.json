@@ -42,7 +42,8 @@
     "save": "Uložit",
     "understood": "Chápu",
     "send": "Odeslat",
-    "invariant": "Mezinárodní"
+    "invariant": "Mezinárodní",
+    "invariantHint": "Mezinárodní text se použije jako výchozí hodnota, pokud není k dispozici lokalizovaná verze."
   },
   "content": {
     "noFileSelected": "Žádný vybraný soubor",
@@ -107,7 +108,7 @@
         "vfxArtist": "Vizuální Efekty"
       },
       "description": "Anotace",
-      "descriptionHelp": "Stručný popis vašeho filmu, který zaujme diváka, aniž by prozradil příliš mnoho. Přiložte anglickou, a českou nebo slovenskou verzi!",
+      "descriptionHelp": "Stručný popis vašeho filmu, který zaujme diváka, aniž by prozradil příliš mnoho. Přiložte anglickou, a českou nebo slovenskou verzi.",
       "genre": "Žánr",
       "genreHelp": "Vyberte alespoň 1 a maximálně 4 žánry nebo definujte své vlastní. Žánry, které definujete, nesmí obsahovat čárku a musí mít délku alespoň 1 a maximálně 32 znaků.",
       "genres": {
@@ -137,7 +138,7 @@
       },
       "movie": "Film",
       "name": "Název filmu",
-      "nameHelp": "Název vašeho filmu. Přiložte anglickou, a českou nebo slovenskou verzi!",
+      "nameHelp": "Název vašeho filmu. Přiložte anglickou, a českou nebo slovenskou verzi.",
       "videoannotation": "Videoanotace",
       "nameMate": "Název projektu"
     },
@@ -468,7 +469,8 @@
   },
   "textarea": {
     "characters": "znaků",
-    "min": "min"
+    "min": "min",
+    "max": "max"
   },
   "upload": {
     "ready": "Sem přetáhněte <1>{{title}}</1><2></2>nebo klikněte pro výběr z počítače<4></4>",

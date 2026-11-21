@@ -42,7 +42,8 @@
     "save": "Save",
     "understood": "I understand",
     "send": "Send",
-    "invariant": "International"
+    "invariant": "International",
+    "invariantHint": "The international text is used as a default value when a localized version is not available."
   },
   "content": {
     "noFileSelected": "No file selected",
@@ -468,7 +469,8 @@
   },
   "textarea": {
     "characters": "characters",
-    "min": "min"
+    "min": "min",
+    "max": "max"
   },
   "upload": {
     "ready": "Drag the <1>{{title}}</1> here<2></2>or click to select the file from your computer<4></4>",

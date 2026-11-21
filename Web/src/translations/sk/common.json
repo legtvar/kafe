@@ -42,7 +42,8 @@
     "save": "Uložiť",
     "understood": "Chápem",
     "send": "Odoslať",
-    "invariant": "Medzinárodný"
+    "invariant": "Medzinárodný",
+    "invariantHint": "Medzinárodný text sa použije ako predvolená hodnota, ak lokalizovaná verzia nie je k dispozícii."
   },
   "content": {
     "noFileSelected": "Žiadny vybraný súbor",
@@ -468,7 +469,8 @@
   },
   "textarea": {
     "characters": "znakov",
-    "min": "min"
+    "min": "min",
+    "max": "max"
   },
   "upload": {
     "ready": "Sem pretiahnite <1>{{title}}</1><2></2>alebo kliknite pre výber z počítača<4></4>",

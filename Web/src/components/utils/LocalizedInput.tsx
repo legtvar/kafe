@@ -306,7 +306,7 @@ export const LocalizedInput: ComponentWithAs<'input', ILocalizedInputProps> = ({
             </TabList>
             <TabPanels>
                 {keys.map((key) => (
-                    <TabPanel key={key} p={0}>
+                    <TabPanel key={key} p={0} tabIndex={-1}>
                         {renderInput(key)}
                     </TabPanel>
                 ))}

@@ -1,0 +1,50 @@
+{
+  "interactiveLogin": true,
+  "httpServer": "NettyWrapper",
+  "tokenCallbacks": [
+    {
+      "issuerId": "default",
+      "requestMappings": [
+        {
+          "requestParam": "subject",
+          "match": "alice",
+          "claims": {
+            "sub": "1",
+            "aud": ["${clientId}"],
+            "name": "Alice Smith",
+            "given_name": "Alice",
+            "family_name": "Smith",
+            "email": "AliceSmith@email.com",
+            "email_verified": true,
+            "preferred_username": "alice"
+          }
+        },
+        {
+          "requestParam": "subject",
+          "match": "bob",
+          "claims": {
+            "sub": "2",
+            "aud": ["${clientId}"],
+            "name": "Bob Smith",
+            "given_name": "Bob",
+            "family_name": "Smith",
+            "email": "BobSmith@email.com",
+            "email_verified": true,
+            "preferred_username": "bob"
+          }
+        },
+        {
+          "requestParam": "subject",
+          "match": ".*",
+          "claims": {
+            "sub": "${subject}",
+            "aud": ["${clientId}"],
+            "name": "${subject}",
+            "email": "${subject}@example.com",
+            "preferred_username": "${subject}"
+          }
+        }
+      ]
+    }
+  ]
+}

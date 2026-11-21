@@ -88,6 +88,28 @@ public sealed class FilmSubmissionEndToEndTests(EndToEndFixture fixture)
     }
 
     [Fact]
+    public async Task ProjectCreation_LanguageSwitch_PreservesUnsavedProgress()
+    {
+        await RunBrowserTestAsync("project-creation-language-switch", async page =>
+        {
+            await LogInThroughTemporaryAccountAsync(page);
+            await OpenProjectCreationAsync(page);
+            var title = $"E2E-{Guid.NewGuid():N}";
+            const string description = "This draft must survive an interface language switch.";
+            await page.Locator("[id='name.iv']").FillAsync(title);
+            await page.Locator("[id='description.iv']").FillAsync(description);
+
+            await page.GetByRole(AriaRole.Button, new() { Name = "Language", Exact = true }).ClickAsync();
+            await page.GetByRole(AriaRole.Menuitemradio, new() { Name = "Czech", Exact = false }).ClickAsync();
+
+            await Expect(page.GetByRole(AriaRole.Heading, new() { Name = "Vytvořte nový projekt", Exact = true }))
+                .ToBeVisibleAsync();
+            await Expect(page.Locator("[id='name.iv']")).ToHaveValueAsync(title);
+            await Expect(page.Locator("[id='description.iv']")).ToHaveValueAsync(description);
+        });
+    }
+
+    [Fact]
     public async Task ProjectGroup_AnonymousVisitor_RedirectsToLogin()
     {
         await RunBrowserTestAsync("authentication-required", async page =>
@@ -119,31 +141,14 @@ public sealed class FilmSubmissionEndToEndTests(EndToEndFixture fixture)
 
     private async Task CreateProjectFromOpenGroupAsync(IPage page, string title)
     {
-        await page.GotoAsync("/auth/test----org/groups/test--group");
-        var createProjectButton = page.GetByRole(AriaRole.Button, new() { Name = "Create a project", Exact = true });
-        var editGroupButton = page.GetByRole(AriaRole.Button, new() { Name = "Edit", Exact = true });
-        await Expect(editGroupButton).ToBeVisibleAsync();
-        if (await createProjectButton.CountAsync() == 0)
-        {
-            var response = await page.Context.APIRequest.PatchAsync(
-                $"{fixture.ApiBaseUrl}/api/v1/project-group",
-                new() { DataObject = new { id = "test--group", isOpen = true } });
-            Assert.True(response.Ok, $"Could not open the E2E project group: {(HttpStatusCode)response.Status} {await response.TextAsync()}");
-            await page.ReloadAsync();
-        }
-
-        await createProjectButton.ClickAsync();
-        await page.GetByPlaceholder("Title of the movie - International", new() { Exact = true }).FillAsync(title);
-        await page.GetByPlaceholder("Description - International", new() { Exact = true })
-            .FillAsync("End-to-end browser upload of a small film festival sample video.");
-        await AddProjectTranslationAsync(page, "Title of the movie", "English");
-        await page.GetByPlaceholder("Title of the movie - English", new() { Exact = true }).FillAsync(title);
-        await AddProjectTranslationAsync(page, "Title of the movie", "Czech");
+        await OpenProjectCreationAsync(page);
+        await page.Locator("[id='name.iv']").FillAsync(title);
+        await page.Locator("[id='name.en']").FillAsync(title);
         await page.Locator("[id='name.cs']").FillAsync(title);
-        await AddProjectTranslationAsync(page, "Description", "English");
-        await page.GetByPlaceholder("Description - English", new() { Exact = true })
+        await page.Locator("[id='description.iv']")
             .FillAsync("End-to-end browser upload of a small film festival sample video.");
-        await AddProjectTranslationAsync(page, "Description", "Czech");
+        await page.Locator("[id='description.en']")
+            .FillAsync("End-to-end browser upload of a small film festival sample video.");
         await page.Locator("[id='description.cs']")
             .FillAsync("End-to-end browser upload of a small film festival sample video.");
 
@@ -158,14 +163,22 @@ public sealed class FilmSubmissionEndToEndTests(EndToEndFixture fixture)
         await page.WaitForURLAsync("**/projects/*/edit");
     }
 
-    private static async Task AddProjectTranslationAsync(
-        IPage page,
-        string fieldLabel,
-        string language)
+    private async Task OpenProjectCreationAsync(IPage page)
     {
-        var field = page.GetByText(fieldLabel, new() { Exact = true }).Locator("..");
-        await field.GetByRole(AriaRole.Button, new() { Name = "Add", Exact = true }).ClickAsync();
-        await page.GetByRole(AriaRole.Menuitem, new() { Name = language, Exact = false }).First.ClickAsync();
+        await page.GotoAsync("/auth/test----org/groups/test--group");
+        var createProjectButton = page.GetByRole(AriaRole.Button, new() { Name = "Create a project", Exact = true });
+        var editGroupButton = page.GetByRole(AriaRole.Button, new() { Name = "Edit", Exact = true });
+        await Expect(editGroupButton).ToBeVisibleAsync();
+        if (await createProjectButton.CountAsync() == 0)
+        {
+            var response = await page.Context.APIRequest.PatchAsync(
+                $"{fixture.ApiBaseUrl}/api/v1/project-group",
+                new() { DataObject = new { id = "test--group", isOpen = true } });
+            Assert.True(response.Ok, $"Could not open the E2E project group: {(HttpStatusCode)response.Status} {await response.TextAsync()}");
+            await page.ReloadAsync();
+        }
+
+        await createProjectButton.ClickAsync();
     }
 
     private static async Task<UploadResult> UploadFilmAsync(IPage page, string fileName)
@@ -200,7 +213,7 @@ public sealed class FilmSubmissionEndToEndTests(EndToEndFixture fixture)
         if (statusCode == HttpStatusCode.OK)
         {
             shardId = (await response.TextAsync()).Trim().Trim('"');
-            await Expect(filmSection.GetByText(shardId!, new() { Exact = true })).ToBeVisibleAsync();
+            await Expect(filmSection.GetByText(Path.GetFileName(fileName), new() { Exact = true })).ToBeVisibleAsync();
         }
 
         return new(statusCode, shardId);

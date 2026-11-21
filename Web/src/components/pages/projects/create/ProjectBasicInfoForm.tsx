@@ -1,6 +1,6 @@
 import { Button, Checkbox, FormControl, FormHelperText, FormLabel, HStack, Input, RadioGroup, Radio, Stack, Textarea } from '@chakra-ui/react';
 import useForceUpdate from 'use-force-update';
-import { t } from 'i18next';
+import { useTranslation } from 'react-i18next';
 import { Project } from '../../../../data/Project';
 import { useColorScheme } from '../../../../hooks/useColorScheme';
 import { AuthorSelect } from '../../../utils/Authors/AuthorSelect';
@@ -20,6 +20,7 @@ interface ProjectBasicInfoFormProps {
 
 export function ProjectBasicInfoForm({ project, onSubmit, status, update, noSelfSubmit }: ProjectBasicInfoFormProps) {
     const { border, bg } = useColorScheme();
+    const { t } = useTranslation();
     const fu = useForceUpdate();
     const forceUpdate = (any: any) => {
         fu();

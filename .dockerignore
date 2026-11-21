@@ -6,6 +6,11 @@
 # frontend
 Web/node_modules/
 Web/build/
+.pnpm-store/
+
+# local runtime data
+Api/archive/
+Api/generated/
 
 # other
 .vs/

@@ -83,20 +83,6 @@
         "resolved": "2.7.0",
         "contentHash": "U+12df8UEWHgBi04YVf/Lgi2dy3SItlIYvHjjEVa/BngCQIzDCDRBk50DDByCfDvSbe5pRNFr3b7UrVK2kMcLw=="
       },
-      "DistributedLock.Core": {
-        "type": "Transitive",
-        "resolved": "1.0.8",
-        "contentHash": "LAOsY8WxX8JU/n3lfXFz+f2pfnv0+4bHkCrOO3bwa28u9HrS3DlxSG6jf+u76SqesKs+KehZi0CndkfaUXBKvg=="
-      },
-      "DistributedLock.Postgres": {
-        "type": "Transitive",
-        "resolved": "1.3.0",
-        "contentHash": "CyjXmbhFgG30qPg4DwGnsmZO63y5DBRo+PI2xW0NwtFrsYsMVt/T1RcEUlb36JMKhDkf+euhnkanv/nU+W35qA==",
-        "dependencies": {
-          "DistributedLock.Core": "[1.0.8, 1.1.0)",
-          "Npgsql": "8.0.6"
-        }
-      },
       "FastExpressionCompiler": {
         "type": "Transitive",
         "resolved": "5.4.1",
@@ -638,6 +624,7 @@
           "Kafe.Media": "[0.0.0-local, )",
           "MailKit": "[5.0.0, )",
           "Microsoft.AspNetCore.Authentication.OpenIdConnect": "[10.0.15, )",
+          "NetEscapades.AspNetCore.SecurityHeaders": "[1.3.1, )",
           "Npgsql.OpenTelemetry": "[10.0.3, )",
           "OpenTelemetry": "[1.21.0, )",
           "OpenTelemetry.Exporter.Console": "[1.21.0, )",
@@ -743,6 +730,12 @@
           "MimeKit.Core": "5.0.0",
           "MimeKit.Cryptography": "5.0.0"
         }
+      },
+      "NetEscapades.AspNetCore.SecurityHeaders": {
+        "type": "CentralTransitive",
+        "requested": "[1.3.1, )",
+        "resolved": "1.3.1",
+        "contentHash": "wccVMVSGq9nQ43SjJl1s/VaAo+iWauJYWiZy/Hkvszk2vCQdq7aRn7GL3LTBMsnHuI13JRMfCi9Lk8747+njUg=="
       },
       "Npgsql.OpenTelemetry": {
         "type": "CentralTransitive",

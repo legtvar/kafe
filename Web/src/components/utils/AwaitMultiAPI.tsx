@@ -31,7 +31,8 @@ export function AwaitMultiAPI<T>(props: IAwaitMultiAPIProps<T>) {
                     <Error error={error} />
                 );
             }}
-            children={((data) => (
+        >
+            {(data) =>
                 data.every((data) => data.status === 200) ? (
                     props.children(data.map((response) => (response as any).data))
                 ) : props.error ? (
@@ -43,7 +44,7 @@ export function AwaitMultiAPI<T>(props: IAwaitMultiAPIProps<T>) {
                 ) : (
                     <Error error={(data.filter((data) => data.status !== 200)[0] as any).error} />
                 )
-            ))}
-        />            
+            }
+        </Await>
     );
 }

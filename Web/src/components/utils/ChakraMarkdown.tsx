@@ -51,7 +51,7 @@ export function ChakraMarkdown(props: Partial<Options>) {
                         {props.children}
                     </Code>
                 ),
-                code: (props) => <Code p={2} children={props.children} />,
+                code: (props) => <Code p={2}>{props.children}</Code>,
                 del: (props) => <Text as="del">{props.children}</Text>,
                 hr: (props) => <Divider />,
                 a: MarkdownLink,

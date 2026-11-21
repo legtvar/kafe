@@ -239,8 +239,7 @@ export function Video({ sources, subtitles, autoplay, videoProps, onNext, onPrev
                         )}
                     </Center>
                 )}
-                {true && (
-                    <Box
+                <Box
                         position="absolute"
                         inset={0}
                         opacity={controlsShown || !playing ? 1 : 0}
@@ -538,8 +537,7 @@ export function Video({ sources, subtitles, autoplay, videoProps, onNext, onPrev
                                 </Flex>
                             </Flex>
                         )}
-                    </Box>
-                )}
+                </Box>
             </Box>
         </DarkMode>
     );

@@ -304,7 +304,9 @@ export class API {
                 async updateFromCsv(id: string, perms: Permission[], csvFile: File) {
                     const formData = new FormData();
                     formData.append("Id", id);
-                    perms.length > 0 && formData.append("Permissions", perms.join(","));
+                    if (perms.length > 0) {
+                        formData.append("Permissions", perms.join(","));
+                    }
                     formData.append("CsvFile", csvFile);
 
                     return await api.upload<FormData, string>(`entity/perms-csv`, formData);

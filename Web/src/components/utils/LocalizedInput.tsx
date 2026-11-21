@@ -140,7 +140,7 @@ export const LocalizedInput: ComponentWithAs<'input', ILocalizedInputProps> = ({
     };
 
     const addLanguage = (language: string) => {
-        onChange && onChange({ ...localizedValue, [language]: '' });
+        onChange?.({ ...localizedValue, [language]: '' });
         setTabIndex(keys.length);
     };
 
@@ -199,7 +199,7 @@ export const LocalizedInput: ComponentWithAs<'input', ILocalizedInputProps> = ({
             placeholder: placeholder ? `${placeholder} - ${langName}` : undefined,
             value: localizedValue[key],
             onChange: (event: ChangeEvent<HTMLInputElement>) => {
-                onChange && onChange({ ...localizedValue, [key]: event.target.value });
+                onChange?.({ ...localizedValue, [key]: event.target.value });
             },
             borderTopLeftRadius: split ? undefined : 0,
             borderLeftRadius: split ? 0 : undefined,
@@ -246,7 +246,7 @@ export const LocalizedInput: ComponentWithAs<'input', ILocalizedInputProps> = ({
                                 setTabIndex(Math.max(0, tabIndex - 1));
                                 const remaining = { ...localizedValue };
                                 delete remaining[key];
-                                onChange && onChange(remaining);
+                                onChange?.(remaining);
                             }}
                             colorScheme="red"
                         />
@@ -285,9 +285,8 @@ export const LocalizedInput: ComponentWithAs<'input', ILocalizedInputProps> = ({
         <Tabs variant="enclosed" onChange={(index) => setTabIndex(index)} index={tabIndex}>
             <TabList borderBottom="none" px={0}>
                 {keys.map((key) => (
-                    <Tooltip label={getLanguageHint(key)} hasArrow>
+                    <Tooltip key={key} label={getLanguageHint(key)} hasArrow>
                         <Tab
-                            key={key}
                             p={3}
                             aria-label={getLanguageName(key)}
                             _selected={{

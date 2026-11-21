@@ -35,14 +35,14 @@ export function LanguageToggle({ onLanguageToggled: onLanguageChange, ...rest }:
     const changeLanguage = (lang: string) => {
         i18next.changeLanguage(lang);
         localStorage.setItem(LS_LANGUAGE_APP_KEY, lang);
-        onLanguageChange && onLanguageChange(lang);
+        onLanguageChange?.(lang);
         forceReload();
     };
 
     const changeContentLanguage = (lang: string) => {
         setPreferedLanguage(lang);
         localStorage.setItem(LS_LANGUAGE_CONTENT_KEY, lang);
-        onLanguageChange && onLanguageChange(lang);
+        onLanguageChange?.(lang);
         forceReload();
     };
 

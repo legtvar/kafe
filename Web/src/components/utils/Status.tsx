@@ -27,9 +27,13 @@ export const Status: React.FC<IStatusProps> = (props: IStatusProps) => {
         statusCode = "Unknown error";
     }
 
-    routeError && console.error(routeError);
+    if (routeError) {
+        console.error(routeError);
+    }
 
-    props.log && console.log(props.log);
+    if (props.log) {
+        console.log(props.log);
+    }
 
     return (
         <Center w={props.embeded ? '100%' : '100vw'} h={props.embeded ? '100%' : '100vh'}>

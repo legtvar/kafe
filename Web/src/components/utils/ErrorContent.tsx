@@ -52,6 +52,7 @@ export function ErrorContent(props: IErrorContentProps) {
 
             {suberrors.map((e) => (
                 <Box
+                    key={e.id}
                     borderRadius={'lg'}
                     border="1px"
                     borderColor={useColorModeValue('orange.300', 'orange.800')}

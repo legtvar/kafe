@@ -149,12 +149,14 @@ export const LocalizedInput: ComponentWithAs<'input', ILocalizedInputProps> = ({
             <MenuButton
                 as={IconButton}
                 icon={<IoAdd />}
-                size="lg"
+                size={split ? "lg" : undefined}
                 variant="link"
                 aria-label="Add"
-                height="2rem"
+                height={split ? "2rem" : undefined}
                 borderWidth='1px'
                 borderColor={useColorModeValue('gray.300', 'gray.600')}
+                borderRadius="md"
+                borderBottomRadius={split ? undefined : "0"}
                 _hover={{
                     bg: useColorModeValue('gray.50', 'gray.950'),
                 }}

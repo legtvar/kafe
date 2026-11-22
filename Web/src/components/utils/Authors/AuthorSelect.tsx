@@ -22,6 +22,7 @@ import {
 } from '@chakra-ui/react';
 import { t } from 'i18next';
 import { useCallback, useRef, useState } from 'react';
+import useForceUpdate from 'use-force-update';
 import { AiOutlinePlus, AiOutlineSearch } from 'react-icons/ai';
 import { Author } from '../../../data/Author';
 import { useColorScheme } from '../../../hooks/useColorScheme';
@@ -47,6 +48,7 @@ export function AuthorSelect(props: IAuthorSelectProps) {
     const [roleString, setRoleString] = useState<string>('');
     const [status, setStatus] = useState<'query' | 'new' | 'role'>('query');
     const { bg, lighten } = useColorScheme();
+    const forceUpdate = useForceUpdate();
 
     const initialRef = useRef(null);
 
@@ -204,7 +206,10 @@ export function AuthorSelect(props: IAuthorSelectProps) {
                                                         name="bio"
                                                         placeholder={t('authorSelect.bio').toString()}
                                                         value={{ cs: '', en: '', ...author!.bio }}
-                                                        onChange={(value) => setAuthor(author!.set('bio', value))}
+                                                        onChange={(value) => {
+                                                            setAuthor(author!.set('bio', value));
+                                                            forceUpdate();
+                                                        }}
                                                         split
                                                     />
                                                 </FormControl>

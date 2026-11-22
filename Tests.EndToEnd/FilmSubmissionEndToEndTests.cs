@@ -110,6 +110,49 @@ public sealed class FilmSubmissionEndToEndTests(EndToEndFixture fixture)
     }
 
     [Fact]
+    public async Task AuthorCreation_LocalizedBio_PersistsAndLeavesContactsEmpty()
+    {
+        await RunBrowserTestAsync("author-localized-bio", async page =>
+        {
+            await LogInThroughTemporaryAccountAsync(page);
+            await OpenProjectCreationAsync(page);
+            var authorName = $"E2E Author {Guid.NewGuid():N}";
+            const string uco = "123456";
+            const string czechBio = "Autor testovacího filmu.";
+            const string englishBio = "Author of the test film.";
+
+            await page.GetByRole(AriaRole.Button, new() { Name = "Add a person", Exact = true }).First.ClickAsync();
+            var dialog = page.GetByRole(AriaRole.Dialog);
+            await dialog.GetByPlaceholder("Name", new() { Exact = true }).First.FillAsync(authorName);
+            await dialog.GetByText("New author", new() { Exact = true }).ClickAsync();
+            await dialog.GetByPlaceholder("UCO", new() { Exact = true }).FillAsync(uco);
+            await dialog.Locator("[id='bio.cs']").FillAsync(czechBio);
+            await dialog.Locator("[id='bio.en']").FillAsync(englishBio);
+
+            var createResponseTask = page.WaitForResponseAsync(response =>
+                response.Request.Method == "POST" && new Uri(response.Url).AbsolutePath == "/api/v1/author");
+            await dialog.GetByRole(AriaRole.Button, new() { Name = "Add", Exact = true }).Last.ClickAsync();
+            var createResponse = await createResponseTask;
+            Assert.Equal(HttpStatusCode.OK, (HttpStatusCode)createResponse.Status);
+            var authorId = (await createResponse.TextAsync()).Trim().Trim('"');
+
+            await dialog.GetByRole(AriaRole.Button, new() { Name = "Add", Exact = true }).ClickAsync();
+            await Expect(page.GetByText(authorName, new() { Exact = true })).ToBeVisibleAsync();
+            await Expect(dialog).Not.ToBeVisibleAsync();
+
+            var authorResponse = await page.Context.APIRequest.GetAsync($"{fixture.ApiBaseUrl}/api/v1/author/{authorId}");
+            Assert.True(authorResponse.Ok, $"Could not inspect the new author: {(HttpStatusCode)authorResponse.Status}");
+            using var document = JsonDocument.Parse(await authorResponse.TextAsync());
+            var author = document.RootElement;
+            Assert.Equal(uco, author.GetProperty("uco").GetString());
+            Assert.Equal(JsonValueKind.Null, author.GetProperty("email").ValueKind);
+            Assert.Equal(JsonValueKind.Null, author.GetProperty("phone").ValueKind);
+            Assert.Equal(czechBio, author.GetProperty("bio").GetProperty("cs").GetString());
+            Assert.Equal(englishBio, author.GetProperty("bio").GetProperty("en").GetString());
+        });
+    }
+
+    [Fact]
     public async Task ProjectGroup_AnonymousVisitor_RedirectsToLogin()
     {
         await RunBrowserTestAsync("authentication-required", async page =>

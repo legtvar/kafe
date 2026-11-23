@@ -203,6 +203,27 @@ public sealed class FilmSubmissionEndToEndTests(EndToEndFixture fixture)
     }
 
     [Fact]
+    public async Task FilmUpload_StatusTab_RefreshesValidationAfterAutomaticSave()
+    {
+        await RunBrowserTestAsync("validation-refreshed-after-upload", async page =>
+        {
+            await LogInThroughTemporaryAccountAsync(page);
+            await CreateProjectFromOpenGroupAsync(page, $"E2E-{Guid.NewGuid():N}");
+            await Expect(page.GetByText("The film is required.", new() { Exact = false })).ToBeVisibleAsync();
+
+            var upload = await UploadFilmAsync(page, "sample.mp4");
+            Assert.Equal(HttpStatusCode.OK, upload.StatusCode);
+
+            var validationResponse = page.WaitForResponseAsync(response =>
+                response.Request.Method == "GET"
+                && new Uri(response.Url).AbsolutePath.StartsWith("/api/v1/project-validation/"));
+            await page.GetByRole(AriaRole.Tab, new() { Name = "Status", Exact = true }).ClickAsync();
+            Assert.Equal(HttpStatusCode.OK, (HttpStatusCode)(await validationResponse).Status);
+            await Expect(page.GetByText("The film is required.", new() { Exact = false })).ToHaveCountAsync(0);
+        });
+    }
+
+    [Fact]
     public async Task ProjectGroup_AnonymousVisitor_RedirectsToLogin()
     {
         await RunBrowserTestAsync("authentication-required", async page =>

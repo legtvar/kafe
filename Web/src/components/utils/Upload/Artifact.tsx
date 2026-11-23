@@ -32,6 +32,7 @@ interface IArtifactUploadProps {
     project: Project;
     artifactBlueprint: components['schemas']['ProjectArtifactBlueprintDto'];
     artifact: Artifact;
+    onArtifactsChanged: () => void;
 }
 
 export function ArtifactUpload(props: IArtifactUploadProps) {

@@ -26,6 +26,7 @@ interface IShardGroupUploadProps {
     shardBlueprint: components['schemas']['ProjectArtifactShardBlueprintDto'];
     artifact: Artifact;
     kind: components['schemas']['ShardKind'];
+    onArtifactsChanged: () => void;
 }
 
 export function ShardGroupUpload(props: IShardGroupUploadProps) {
@@ -37,6 +38,7 @@ export function ShardGroupUpload(props: IShardGroupUploadProps) {
         project,
         artifact,
         kind,
+        onArtifactsChanged,
     } = props;
 
     const filesInGroup = artifact.shards.filter((shard) => shard.kind === kind);
@@ -95,6 +97,7 @@ export function ShardGroupUpload(props: IShardGroupUploadProps) {
 
                                         artifact.shards.push(response.data);
                                         reload();
+                                        onArtifactsChanged();
                                     }}
                                     repeatable
                                 />

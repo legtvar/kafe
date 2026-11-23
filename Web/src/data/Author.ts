@@ -6,6 +6,7 @@ import { Serializer } from './serialize/Serializer';
 
 export class Author extends AbstractType {
     public name!: string;
+    public globalPermissions!: components['schemas']['Permission'];
     public bio!: localizedString;
     public email!: string;
     public phone!: string;
@@ -20,7 +21,9 @@ export class Author extends AbstractType {
         Object.assign(this, struct);
     }
 
-    serialize(changesOnly: boolean = false): components['schemas']['AuthorCreationDto'] {
+    serialize(): components['schemas']['AuthorCreationDto'];
+    serialize(changesOnly: true): components['schemas']['AuthorEditDto'];
+    serialize(changesOnly: boolean = false): components['schemas']['AuthorCreationDto'] | components['schemas']['AuthorEditDto'] {
         return new Serializer(this, changesOnly).add('name').add('bio').add('uco').add('email').add('phone').build();
     }
 }

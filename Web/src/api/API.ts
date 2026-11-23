@@ -168,6 +168,9 @@ export class API {
             async create(author: Author) {
                 return api.post<components['schemas']['AuthorCreationDto'], HRIB>(`author`, author.serialize());
             },
+            async update(author: Author) {
+                return api.patch<components['schemas']['AuthorEditDto'], HRIB>(`author`, author.serialize(true));
+            },
         };
     }
 

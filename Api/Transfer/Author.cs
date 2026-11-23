@@ -9,6 +9,16 @@ public record AuthorListDto(
     Permission GlobalPermissions
 );
 
+public record AuthorEditDto(
+    Hrib Id,
+    string? Name,
+    Permission? GlobalPermissions,
+    LocalizedString? Bio,
+    string? Uco,
+    string? Email,
+    string? Phone
+);
+
 public record AuthorDetailDto(
     Hrib Id,
     string Name,

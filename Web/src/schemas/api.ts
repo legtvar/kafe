@@ -376,7 +376,34 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        patch?: never;
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["AuthorEditDto"];
+                    "text/json": components["schemas"]["AuthorEditDto"];
+                    "application/*+json": components["schemas"]["AuthorEditDto"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": string;
+                        "application/json": string;
+                        "text/json": string;
+                    };
+                };
+            };
+        };
         trace?: never;
     };
     "/api/v1/author/{id}": {
@@ -2134,6 +2161,20 @@ export interface components {
             email?: null | string;
             phone?: null | string;
         };
+        AuthorEditDto: {
+            /**
+             * Format: hrib
+             * @description Human-Readable Identifier Ballast (HRIB)
+             * @example AAAAbadf00d
+             */
+            id: string;
+            name?: null | string;
+            globalPermissions?: components["schemas"]["Permission"];
+            bio?: components["schemas"]["LocalizedString"];
+            uco?: null | string;
+            email?: null | string;
+            phone?: null | string;
+        };
         AuthorDetailDto: {
             /**
              * Format: hrib
@@ -2313,7 +2354,7 @@ export interface components {
          * Permission
          * @enum {string}
          */
-        Permission: "read" | "append" | "inspect" | "write" | "review" | "administer";
+        Permission: "none" | "read" | "append" | "inspect" | "write" | "review" | "administer";
         PlaylistCreationDto: {
             name: components["schemas"]["LocalizedString"];
             /**

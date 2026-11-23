@@ -447,6 +447,61 @@
             }
           }
         }
+      },
+      "patch": {
+        "tags": [
+          "Author"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthorEditDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthorEditDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthorEditDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "description": "Human-Readable Identifier Ballast",
+                  "format": "hrib",
+                  "example": "AAAAbadf00d"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "description": "Human-Readable Identifier Ballast",
+                  "format": "hrib",
+                  "example": "AAAAbadf00d"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "string",
+                  "description": "Human-Readable Identifier Ballast",
+                  "format": "hrib",
+                  "example": "AAAAbadf00d"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/api/v1/author/{id}": {
@@ -2744,6 +2799,51 @@
         },
         "additionalProperties": false
       },
+      "AuthorEditDto": {
+        "required": [
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Human-Readable Identifier Ballast (HRIB)",
+            "format": "hrib",
+            "example": "AAAAbadf00d"
+          },
+          "name": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "globalPermissions": {
+            "$ref": "#/components/schemas/Permission"
+          },
+          "bio": {
+            "$ref": "#/components/schemas/LocalizedString"
+          },
+          "uco": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "email": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "phone": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
       "AuthorDetailDto": {
         "required": [
           "globalPermissions",
@@ -3271,6 +3371,7 @@
       "Permission": {
         "title": "Permission",
         "enum": [
+          "none",
           "read",
           "append",
           "inspect",

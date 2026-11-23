@@ -1,5 +1,5 @@
-import { CloseButton, HStack, SimpleGrid, Text, VStack } from '@chakra-ui/react';
-import { useCallback } from 'react';
+import { Button, CloseButton, HStack, SimpleGrid, Text, VStack } from '@chakra-ui/react';
+import { useCallback, useState } from 'react';
 import { API } from '../../api/API';
 import { Author } from '../../data/Author';
 import { components } from '../../schemas/api';
@@ -8,6 +8,7 @@ import { AwaitAPI } from './AwaitAPI';
 import { KafeAvatar } from './KafeAvatar';
 import { t } from 'i18next';
 import crewRoleManager from '@/utils/managers/crewRolesManager';
+import { AuthorDialog } from './Authors/AuthorDialog';
 
 interface IProjectAuthorListProps {
     authors: components['schemas']['ProjectAuthorDto'][];
@@ -45,23 +46,37 @@ function SimpleProjectAuthorList({
     onRemove,
     editable,
     isDropdownCrewList
-}: { author: components['schemas']['ProjectAuthorDto'] } & Omit<IProjectAuthorListProps, 'authors'>) {
+}: { author: components['schemas']['ProjectAuthorDto'] & Partial<Author> } & Omit<IProjectAuthorListProps, 'authors'>) {
+    const [editedAuthor, setEditedAuthor] = useState<Author | null>(null);
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const displayedAuthor = editedAuthor ? { ...author, ...editedAuthor } : author;
+
     return (
-        // TODO: Uncomment when back-end is ready
-        // <Link to={useAuthLink('/projects/authors/' + author.id)}>
         <HStack alignItems="start">
-            <KafeAvatar size={'md'} person={author} />
+            <KafeAvatar size={'md'} person={displayedAuthor} />
             <VStack alignItems="start" pl={2} spacing={0}>
-                <Text fontWeight="bolder">{author.name}</Text>
+                <Button variant="link" fontWeight="bolder" onClick={() => setIsDialogOpen(true)}>
+                    {displayedAuthor.name}
+                </Button>
                 <Text color="gray.500">
-                    {(isDropdownCrewList && author.roles.every(role => crewRoleManager.tags.has(role))
-                    ? author.roles.map(role => t(`createProject.fields.crewRoles.${role}`))
-                    : author.roles)
+                    {(isDropdownCrewList && displayedAuthor.roles.every(role => crewRoleManager.tags.has(role))
+                    ? displayedAuthor.roles.map(role => t(`createProject.fields.crewRoles.${role}`))
+                    : displayedAuthor.roles)
                     .join(', ')}
                 </Text>
             </VStack>
             {editable && <CloseButton onClick={() => onRemove && onRemove(author.id)} />}
+            {isDialogOpen && (
+                <AuthorDialog
+                    author={new Author({
+                        ...displayedAuthor,
+                        globalPermissions: displayedAuthor.globalPermissions ?? 'none'
+                    })}
+                    canEdit={editable === true}
+                    onClose={() => setIsDialogOpen(false)}
+                    onSaved={setEditedAuthor}
+                />
+            )}
         </HStack>
-        // </Link>
     );
 }

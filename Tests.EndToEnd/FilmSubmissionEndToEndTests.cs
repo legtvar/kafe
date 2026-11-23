@@ -121,24 +121,8 @@ public sealed class FilmSubmissionEndToEndTests(EndToEndFixture fixture)
             const string czechBio = "Autor testovacího filmu.";
             const string englishBio = "Author of the test film.";
 
-            await page.GetByRole(AriaRole.Button, new() { Name = "Add a person", Exact = true }).First.ClickAsync();
-            var dialog = page.GetByRole(AriaRole.Dialog);
-            await dialog.GetByPlaceholder("Name", new() { Exact = true }).First.FillAsync(authorName);
-            await dialog.GetByText("New author", new() { Exact = true }).ClickAsync();
-            await dialog.GetByPlaceholder("UCO", new() { Exact = true }).FillAsync(uco);
-            await dialog.Locator("[id='bio.cs']").FillAsync(czechBio);
-            await dialog.Locator("[id='bio.en']").FillAsync(englishBio);
-
-            var createResponseTask = page.WaitForResponseAsync(response =>
-                response.Request.Method == "POST" && new Uri(response.Url).AbsolutePath == "/api/v1/author");
-            await dialog.GetByRole(AriaRole.Button, new() { Name = "Add", Exact = true }).Last.ClickAsync();
-            var createResponse = await createResponseTask;
-            Assert.Equal(HttpStatusCode.OK, (HttpStatusCode)createResponse.Status);
-            var authorId = (await createResponse.TextAsync()).Trim().Trim('"');
-
-            await dialog.GetByRole(AriaRole.Button, new() { Name = "Add", Exact = true }).ClickAsync();
+            var authorId = await AddNewAuthorAsync(page, authorName, uco, czechBio, englishBio);
             await Expect(page.GetByText(authorName, new() { Exact = true })).ToBeVisibleAsync();
-            await Expect(dialog).Not.ToBeVisibleAsync();
 
             var authorResponse = await page.Context.APIRequest.GetAsync($"{fixture.ApiBaseUrl}/api/v1/author/{authorId}");
             Assert.True(authorResponse.Ok, $"Could not inspect the new author: {(HttpStatusCode)authorResponse.Status}");
@@ -153,6 +137,69 @@ public sealed class FilmSubmissionEndToEndTests(EndToEndFixture fixture)
     }
 
     [Fact]
+    public async Task ProjectAuthorLinks_ReadAndEditAuthor()
+    {
+        await RunBrowserTestAsync("project-author-links", async page =>
+        {
+            await LogInThroughTemporaryAccountAsync(page);
+            await OpenProjectCreationAsync(page);
+            var authorName = $"E2E Author {Guid.NewGuid():N}";
+            const string uco = "123456";
+            const string czechBio = "Autor testovacího filmu.";
+            const string englishBio = "Author of the test film.";
+            const string updatedEnglishBio = "Author biography edited through the project.";
+            var authorId = await AddNewAuthorAsync(page, authorName, uco, czechBio, englishBio);
+            await FillAndSubmitProjectCreationAsync(page, $"E2E-{Guid.NewGuid():N}");
+            await page.GetByRole(AriaRole.Tab, new() { Name = "Basic information", Exact = true }).ClickAsync();
+
+            await page.GetByRole(AriaRole.Button, new() { Name = authorName, Exact = true }).ClickAsync();
+            var editDialog = page.GetByRole(AriaRole.Dialog);
+            await Expect(editDialog.GetByPlaceholder("Name", new() { Exact = true }))
+                .ToHaveValueAsync(authorName);
+            await Expect(editDialog.GetByPlaceholder("UCO", new() { Exact = true }))
+                .ToHaveValueAsync(uco);
+            await Expect(editDialog.Locator("[id='bio.en']"))
+                .ToHaveValueAsync(englishBio);
+
+            var updatedName = authorName + " Edited";
+            await editDialog.GetByPlaceholder("Name", new() { Exact = true }).FillAsync(updatedName);
+            await editDialog.Locator("[id='bio.en']").FillAsync(updatedEnglishBio);
+            var editResponseTask = page.WaitForResponseAsync(response =>
+                response.Request.Method == "PATCH" && new Uri(response.Url).AbsolutePath == "/api/v1/author");
+            await editDialog.GetByRole(AriaRole.Button, new() { Name = "Save", Exact = true }).ClickAsync();
+            var editResponse = await editResponseTask;
+            Assert.Equal(HttpStatusCode.OK, (HttpStatusCode)editResponse.Status);
+            await Expect(page.GetByRole(AriaRole.Button, new() { Name = updatedName, Exact = true }))
+                .ToBeVisibleAsync();
+
+            await page.GotoAsync(page.Url[..^5]);
+            await page.GetByRole(AriaRole.Button, new() { Name = updatedName, Exact = true }).ClickAsync();
+            var readDialog = page.GetByRole(AriaRole.Dialog);
+            await Expect(readDialog).ToContainTextAsync(updatedName);
+            await Expect(readDialog).ToContainTextAsync(uco);
+            await Expect(readDialog).ToContainTextAsync(updatedEnglishBio);
+            await readDialog.GetByRole(AriaRole.Button, new() { Name = "Cancel", Exact = true }).ClickAsync();
+
+            await page.GetByRole(AriaRole.Button, new() { Name = "Language", Exact = true }).ClickAsync();
+            await page.GetByRole(AriaRole.Menuitemradio, new() { Name = "Czech", Exact = false }).ClickAsync();
+            await page.GetByRole(AriaRole.Button, new() { Name = updatedName, Exact = true }).ClickAsync();
+            await Expect(readDialog).ToContainTextAsync(czechBio);
+            await Expect(readDialog).Not.ToContainTextAsync(updatedEnglishBio);
+
+            var authorResponse = await page.Context.APIRequest.GetAsync($"{fixture.ApiBaseUrl}/api/v1/author/{authorId}");
+            Assert.True(authorResponse.Ok, $"Could not inspect the edited author: {(HttpStatusCode)authorResponse.Status}");
+            using var document = JsonDocument.Parse(await authorResponse.TextAsync());
+            var author = document.RootElement;
+            Assert.Equal(updatedName, author.GetProperty("name").GetString());
+            Assert.Equal(uco, author.GetProperty("uco").GetString());
+            Assert.Equal(updatedEnglishBio, author.GetProperty("bio").GetProperty("en").GetString());
+            Assert.Equal(czechBio, author.GetProperty("bio").GetProperty("cs").GetString());
+            Assert.Equal(JsonValueKind.Null, author.GetProperty("email").ValueKind);
+            Assert.Equal(JsonValueKind.Null, author.GetProperty("phone").ValueKind);
+        });
+    }
+
+    [Fact]
     public async Task ProjectGroup_AnonymousVisitor_RedirectsToLogin()
     {
         await RunBrowserTestAsync("authentication-required", async page =>
@@ -162,6 +209,33 @@ public sealed class FilmSubmissionEndToEndTests(EndToEndFixture fixture)
             await Expect(page.GetByRole(AriaRole.Heading, new() { Name = "Log in to KAFE", Exact = true }))
                 .ToBeVisibleAsync();
         });
+    }
+
+    private static async Task<string> AddNewAuthorAsync(
+        IPage page,
+        string authorName,
+        string uco,
+        string czechBio,
+        string englishBio)
+    {
+        await page.GetByRole(AriaRole.Button, new() { Name = "Add a person", Exact = true }).First.ClickAsync();
+        var dialog = page.GetByRole(AriaRole.Dialog);
+        await dialog.GetByPlaceholder("Name", new() { Exact = true }).First.FillAsync(authorName);
+        await dialog.GetByText("New author", new() { Exact = true }).ClickAsync();
+        await dialog.GetByPlaceholder("UCO", new() { Exact = true }).FillAsync(uco);
+        await dialog.Locator("[id='bio.cs']").FillAsync(czechBio);
+        await dialog.Locator("[id='bio.en']").FillAsync(englishBio);
+
+        var createResponseTask = page.WaitForResponseAsync(response =>
+            response.Request.Method == "POST" && new Uri(response.Url).AbsolutePath == "/api/v1/author");
+        await dialog.GetByRole(AriaRole.Button, new() { Name = "Add", Exact = true }).Last.ClickAsync();
+        var createResponse = await createResponseTask;
+        Assert.Equal(HttpStatusCode.OK, (HttpStatusCode)createResponse.Status);
+        var authorId = (await createResponse.TextAsync()).Trim().Trim('"');
+        await dialog.GetByRole(AriaRole.Button, new() { Name = "Add", Exact = true }).ClickAsync();
+        await Expect(page.GetByText(authorName, new() { Exact = true })).ToBeVisibleAsync();
+        await Expect(dialog).Not.ToBeVisibleAsync();
+        return authorId;
     }
 
     private async Task LogInThroughTemporaryAccountAsync(IPage page)
@@ -185,6 +259,11 @@ public sealed class FilmSubmissionEndToEndTests(EndToEndFixture fixture)
     private async Task CreateProjectFromOpenGroupAsync(IPage page, string title)
     {
         await OpenProjectCreationAsync(page);
+        await FillAndSubmitProjectCreationAsync(page, title);
+    }
+
+    private static async Task FillAndSubmitProjectCreationAsync(IPage page, string title)
+    {
         await page.Locator("[id='name.iv']").FillAsync(title);
         await page.Locator("[id='name.en']").FillAsync(title);
         await page.Locator("[id='name.cs']").FillAsync(title);

@@ -16,20 +16,18 @@ import {
     ModalHeader,
     ModalOverlay,
     Text,
-    Textarea,
     useDisclosure,
     VStack,
 } from '@chakra-ui/react';
 import { t } from 'i18next';
 import { useCallback, useRef, useState } from 'react';
-import useForceUpdate from 'use-force-update';
 import { AiOutlinePlus, AiOutlineSearch } from 'react-icons/ai';
 import { Author } from '../../../data/Author';
 import { useColorScheme } from '../../../hooks/useColorScheme';
 import { HRIB } from '../../../schemas/generic';
 import { AwaitAPI } from '../AwaitAPI';
 import { SendAPI } from '../SendAPI';
-import { LocalizedInput } from '../LocalizedInput';
+import { AuthorInfoForm } from './AuthorInfoForm';
 import { TagInput } from './TagInput';
 import { MultiSelect } from 'chakra-multiselect';
 import crewRolesManager from '../../../utils/managers/crewRolesManager';
@@ -48,7 +46,6 @@ export function AuthorSelect(props: IAuthorSelectProps) {
     const [roleString, setRoleString] = useState<string>('');
     const [status, setStatus] = useState<'query' | 'new' | 'role'>('query');
     const { bg, lighten } = useColorScheme();
-    const forceUpdate = useForceUpdate();
 
     const initialRef = useRef(null);
 
@@ -153,66 +150,7 @@ export function AuthorSelect(props: IAuthorSelectProps) {
 
                                         {status === 'new' && (
                                             <>
-                                                <FormControl mb={6}>
-                                                    <FormLabel>{t('authorSelect.name').toString()}</FormLabel>
-                                                    <Input
-                                                        placeholder={t('authorSelect.name').toString()}
-                                                        defaultValue={author!.name}
-                                                        onChange={(event) =>
-                                                            setAuthor(author!.set('name', event.target.value))
-                                                        }
-                                                    />
-                                                </FormControl>
-
-                                                <FormControl mb={6}>
-                                                    <FormLabel>{t('authorSelect.uco').toString()}</FormLabel>
-                                                    <Input
-                                                        placeholder={t('authorSelect.uco').toString()}
-                                                        defaultValue={author!.uco}
-                                                        onChange={(event) =>
-                                                            setAuthor(author!.set('uco', event.target.value))
-                                                        }
-                                                    />
-                                                </FormControl>
-
-                                                <FormControl mb={6}>
-                                                    <FormLabel>{t('authorSelect.email').toString()}</FormLabel>
-                                                    <Input
-                                                        placeholder={t('authorSelect.email').toString()}
-                                                        defaultValue={author!.email}
-                                                        onChange={(event) =>
-                                                            setAuthor(author!.set('email', event.target.value))
-                                                        }
-                                                    />
-                                                </FormControl>
-
-                                                <FormControl mb={6}>
-                                                    <FormLabel>{t('authorSelect.phone').toString()}</FormLabel>
-                                                    <Input
-                                                        placeholder={t('authorSelect.phone').toString()}
-                                                        defaultValue={author!.phone}
-                                                        onChange={(event) =>
-                                                            setAuthor(author!.set('phone', event.target.value))
-                                                        }
-                                                    />
-                                                </FormControl>
-
-                                                <FormControl>
-                                                    <FormLabel>{t('authorSelect.bio').toString()}</FormLabel>
-                                                    <LocalizedInput
-                                                        as={Textarea}
-                                                        minLength={0}
-                                                        maxLength={200}
-                                                        name="bio"
-                                                        placeholder={t('authorSelect.bio').toString()}
-                                                        value={{ cs: '', en: '', ...author!.bio }}
-                                                        onChange={(value) => {
-                                                            setAuthor(author!.set('bio', value));
-                                                            forceUpdate();
-                                                        }}
-                                                        split
-                                                    />
-                                                </FormControl>
+                                                <AuthorInfoForm author={author!} onChange={setAuthor} />
                                             </>
                                         )}
 

@@ -153,12 +153,14 @@ export const LocalizedInput: ComponentWithAs<'input', ILocalizedInputProps> = ({
                 variant="link"
                 aria-label="Add"
                 height={split ? "2rem" : undefined}
-                borderWidth='1px'
+                borderWidth={split ? "1px" : undefined}
                 borderColor={useColorModeValue('gray.300', 'gray.600')}
-                borderRadius="md"
+                borderRadius={split ? "md" : undefined}
                 borderBottomRadius={split ? undefined : "0"}
+                color={useColorModeValue('gray.900', 'gray.100')}
                 _hover={{
                     bg: useColorModeValue('gray.50', 'gray.950'),
+                    borderWidth: "1px"
                 }}
             />
             <MenuList overflowY="auto" maxH="20vh">

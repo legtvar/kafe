@@ -2188,6 +2188,7 @@ export interface components {
             uco?: null | string;
             email?: null | string;
             phone?: null | string;
+            userPermissions: components["schemas"]["Permission"][];
         };
         AuthorListDto: {
             /**

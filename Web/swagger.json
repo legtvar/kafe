@@ -2848,7 +2848,8 @@
         "required": [
           "globalPermissions",
           "id",
-          "name"
+          "name",
+          "userPermissions"
         ],
         "type": "object",
         "properties": {
@@ -2884,6 +2885,12 @@
               "null",
               "string"
             ]
+          },
+          "userPermissions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Permission"
+            }
           }
         },
         "additionalProperties": false

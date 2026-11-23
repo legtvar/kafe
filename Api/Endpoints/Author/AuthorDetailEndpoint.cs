@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Swashbuckle.AspNetCore.Annotations;
 using Kafe.Data.Services;
+using Kafe.Api.Services;
 
 namespace Kafe.Api.Endpoints.Author;
 
@@ -17,13 +18,19 @@ public class AuthorDetailEndpoint : EndpointBaseAsync
     .WithActionResult<AuthorDetailDto?>
 {
     private readonly AuthorService authorService;
+    private readonly EntityService entityService;
+    private readonly UserProvider userProvider;
     private readonly IAuthorizationService authorizationService;
 
     public AuthorDetailEndpoint(
         AuthorService authorService,
+        EntityService entityService,
+        UserProvider userProvider,
         IAuthorizationService authorizationService)
     {
         this.authorService = authorService;
+        this.entityService = entityService;
+        this.userProvider = userProvider;
         this.authorizationService = authorizationService;
     }
 
@@ -47,6 +54,7 @@ public class AuthorDetailEndpoint : EndpointBaseAsync
             return NotFound();
         }
 
-        return Ok(TransferMaps.ToAuthorDetailDto(data));
+        var userPerms = await entityService.GetPermission(id, userProvider.AccountId, cancellationToken);
+        return Ok(TransferMaps.ToAuthorDetailDto(data, userPerms));
     }
 }

@@ -26,7 +26,8 @@ public record AuthorDetailDto(
     LocalizedString? Bio,
     string? Uco,
     string? Email,
-    string? Phone
+    string? Phone,
+    ImmutableArray<Permission> UserPermissions
 );
 
 public record AuthorCreationDto(

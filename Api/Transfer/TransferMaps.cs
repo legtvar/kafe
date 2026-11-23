@@ -119,7 +119,7 @@ public static class TransferMaps
             GlobalPermissions: data.GlobalPermissions);
     }
 
-    public static AuthorDetailDto ToAuthorDetailDto(AuthorInfo data)
+    public static AuthorDetailDto ToAuthorDetailDto(AuthorInfo data, Permission userPermission)
     {
         return new AuthorDetailDto(
             Id: data.Id,
@@ -128,7 +128,8 @@ public static class TransferMaps
             Bio: data.Bio,
             Uco: data.Uco,
             Email: data.Email,
-            Phone: data.Phone);
+            Phone: data.Phone,
+            UserPermissions: ToPermissionArray(data.GlobalPermissions | userPermission));
     }
 
     public static PlaylistListDto ToPlaylistListDto(PlaylistInfo data)

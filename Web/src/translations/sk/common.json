@@ -7,6 +7,8 @@
     "createButtom": "Vytvoriť osobu",
     "editDetails": "Upraviť údaje autora",
     "editRoles": "Upraviť role autora",
+    "missingUco": "Autor nemá uvedené UČO.",
+    "missingBio": "Autor nemá uvedenú biografiu.",
     "removeAuthor": "Odobrať autora",
     "email": "Email",
     "name": "Meno",

@@ -260,18 +260,26 @@ function AuthorNewModal({ author, onChange, isExisting, canEdit, onSaved, onClos
                         </FormControl>
                     </>
                 ) : (
-                    <VStack align="stretch" spacing={6}>
+                    <VStack align="stretch" spacing={8}>
                         <Box>
                             <FormLabel fontWeight="bold">{t('authorSelect.name').toString()}</FormLabel>
                             <Text>{author.name}</Text>
                         </Box>
                         <Box>
                             <FormLabel fontWeight="bold">{t('authorSelect.uco').toString()}</FormLabel>
-                            <Text>{author.uco}</Text>
+                            {author.uco ? (
+                                <Text>{author.uco}</Text>
+                            ) : (
+                                <Text fontStyle="italic">{t('authorSelect.missingUco').toString()}</Text>
+                            )}
                         </Box>
                         <Box>
                             <FormLabel fontWeight="bold">{t('authorSelect.bio').toString()}</FormLabel>
-                            <Text whiteSpace="pre-wrap">{author.getBio()}</Text>
+                            {author.getBio().trim() ? (
+                                <Text whiteSpace="pre-wrap">{author.getBio()}</Text>
+                            ) : (
+                                <Text fontStyle="italic">{t('authorSelect.missingBio').toString()}</Text>
+                            )}
                         </Box>
                     </VStack>
                 )}

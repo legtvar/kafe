@@ -7,6 +7,8 @@
     "createButtom": "Create a person",
     "editDetails": "Edit author details",
     "editRoles": "Edit author roles",
+    "missingUco": "The author has no Učo.",
+    "missingBio": "The author has no bio.",
     "removeAuthor": "Remove author",
     "email": "Email",
     "name": "Name",

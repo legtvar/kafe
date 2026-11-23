@@ -255,7 +255,6 @@ function AuthorNewModal({ author, onChange, isExisting, canEdit, onSaved, onClos
                                     onChange(author.set('bio', value));
                                     forceUpdate();
                                 }}
-                                split
                             />
                         </FormControl>
                     </>

@@ -111,6 +111,16 @@ export function ProjectBasicInfoForm({ project, onSubmit, status, update, noSelf
                             ),
                         )
                     }
+                    onRoleChange={(id, roles) =>
+                        forceUpdate(
+                            project.set(
+                                'crew',
+                                (project.crew || []).map((member) =>
+                                    member.id === id ? { ...member, roles } : member,
+                                ),
+                            ),
+                        )
+                    }
                     isDropdownCrewList={isDropdownSelect}
                 />
                 <AuthorSelect
@@ -142,6 +152,16 @@ export function ProjectBasicInfoForm({ project, onSubmit, status, update, noSelf
                             project.set(
                                 'cast',
                                 (project.cast || []).filter((member) => member.id !== id),
+                            ),
+                        )
+                    }
+                    onRoleChange={(id, roles) =>
+                        forceUpdate(
+                            project.set(
+                                'cast',
+                                (project.cast || []).map((member) =>
+                                    member.id === id ? { ...member, roles } : member,
+                                ),
                             ),
                         )
                     }

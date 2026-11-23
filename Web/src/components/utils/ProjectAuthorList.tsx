@@ -1,4 +1,4 @@
-import { Button, CloseButton, HStack, SimpleGrid, Text, VStack } from '@chakra-ui/react';
+import { CloseButton, HStack, IconButton, SimpleGrid, Text, Tooltip, VStack } from '@chakra-ui/react';
 import { useCallback, useState } from 'react';
 import { API } from '../../api/API';
 import { Author } from '../../data/Author';
@@ -9,12 +9,16 @@ import { KafeAvatar } from './KafeAvatar';
 import { t } from 'i18next';
 import crewRoleManager from '@/utils/managers/crewRolesManager';
 import { AuthorDialog } from './Authors/AuthorDialog';
+import { AuthorRolesDialog } from './Authors/AuthorRolesDialog';
+import { AiOutlineEdit, AiOutlineClose } from 'react-icons/ai';
+import { BsPeople } from 'react-icons/bs';
 
 interface IProjectAuthorListProps {
     authors: components['schemas']['ProjectAuthorDto'][];
     editable?: boolean;
     requestDetails?: boolean;
     onRemove?: (id: HRIB) => void;
+    onRoleChange?: (id: HRIB, roles: string[]) => void;
     isDropdownCrewList?: boolean
 }
 
@@ -44,37 +48,78 @@ export function ProjectAuthorList(props: IProjectAuthorListProps) {
 function SimpleProjectAuthorList({
     author,
     onRemove,
+    onRoleChange,
     editable,
     isDropdownCrewList
 }: { author: components['schemas']['ProjectAuthorDto'] & Partial<Author> } & Omit<IProjectAuthorListProps, 'authors'>) {
     const [editedAuthor, setEditedAuthor] = useState<Author | null>(null);
+    const [editedRoles, setEditedRoles] = useState<string[] | null>(null);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [isRoleDialogOpen, setIsRoleDialogOpen] = useState(false);
     const displayedAuthor = editedAuthor ? { ...author, ...editedAuthor } : author;
+    const displayedRoles = editedRoles ?? displayedAuthor.roles;
+    const canEditDetails = editable === true && displayedAuthor.userPermissions?.includes('write') === true;
 
     return (
         <HStack alignItems="start">
             <KafeAvatar size={'md'} person={displayedAuthor} />
             <VStack alignItems="start" pl={2} spacing={0}>
-                <Button variant="link" fontWeight="bolder" onClick={() => setIsDialogOpen(true)}>
-                    {displayedAuthor.name}
-                </Button>
+                <Text fontWeight="bolder">{displayedAuthor.name}</Text>
                 <Text color="gray.500">
-                    {(isDropdownCrewList && displayedAuthor.roles.every(role => crewRoleManager.tags.has(role))
-                    ? displayedAuthor.roles.map(role => t(`createProject.fields.crewRoles.${role}`))
-                    : displayedAuthor.roles)
+                    {(isDropdownCrewList && displayedRoles.every(role => crewRoleManager.tags.has(role))
+                    ? displayedRoles.map(role => t(`createProject.fields.crewRoles.${role}`))
+                    : displayedRoles)
                     .join(', ')}
                 </Text>
             </VStack>
-            {editable && <CloseButton onClick={() => onRemove && onRemove(author.id)} />}
+            {editable && <HStack spacing={1}>
+                <Tooltip label={t('authorSelect.editDetails').toString()}>
+                    <IconButton
+                        aria-label={t('authorSelect.editDetails').toString()}
+                        icon={<AiOutlineEdit />}
+                        size="sm"
+                        isDisabled={!canEditDetails}
+                        onClick={() => setIsDialogOpen(true)}
+                    />
+                </Tooltip>
+                <Tooltip label={t('authorSelect.editRoles').toString()}>
+                    <IconButton
+                        aria-label={t('authorSelect.editRoles').toString()}
+                        icon={<BsPeople />}
+                        size="sm"
+                        onClick={() => setIsRoleDialogOpen(true)}
+                    />
+                </Tooltip>
+                <Tooltip label={t("authorSelect.removeAuthor").toString()}>
+                    <IconButton
+                        aria-label={t("authorSelect.removeAuthor").toString()}
+                        icon={<AiOutlineClose/>}
+                        size="sm"
+                        onClick={() => onRemove && onRemove(author.id)}
+                        />
+                </Tooltip>
+            </HStack>}
+            
             {isDialogOpen && (
                 <AuthorDialog
                     author={new Author({
                         ...displayedAuthor,
                         globalPermissions: displayedAuthor.globalPermissions ?? 'none'
                     })}
-                    canEdit={editable === true}
+                    canEdit={canEditDetails}
                     onClose={() => setIsDialogOpen(false)}
                     onSaved={setEditedAuthor}
+                />
+            )}
+            {isRoleDialogOpen && (
+                <AuthorRolesDialog
+                    roles={displayedRoles}
+                    isDropdownCrewSelect={isDropdownCrewList}
+                    onClose={() => setIsRoleDialogOpen(false)}
+                    onSaved={(roles) => {
+                        setEditedRoles(roles);
+                        onRoleChange?.(author.id, roles);
+                    }}
                 />
             )}
         </HStack>

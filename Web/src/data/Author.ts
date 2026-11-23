@@ -7,6 +7,7 @@ import { Serializer } from './serialize/Serializer';
 export class Author extends AbstractType {
     public name!: string;
     public globalPermissions!: components['schemas']['Permission'];
+    public userPermissions!: components['schemas']['Permission'][];
     public bio!: localizedString;
     public email!: string;
     public phone!: string;

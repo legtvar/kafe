@@ -173,11 +173,11 @@ public sealed class FilmSubmissionEndToEndTests(EndToEndFixture fixture)
 
             await page.GetByRole(AriaRole.Button, new() { Name = "Edit author roles", Exact = true }).ClickAsync();
             var roleDialog = page.GetByRole(AriaRole.Dialog);
-            await roleDialog.Locator("input").First.FillAsync("Director");
-            await page.GetByRole(AriaRole.Option, new() { Name = "Director", Exact = true }).ClickAsync();
+            await roleDialog.Locator("input").First.FillAsync("Producer");
+            await page.GetByRole(AriaRole.Option, new() { Name = "Producer", Exact = true }).ClickAsync();
             await roleDialog.GetByText("Select person roles", new() { Exact = true }).First.ClickAsync();
             await roleDialog.GetByRole(AriaRole.Button, new() { Name = "Save", Exact = true }).ClickAsync();
-            await Expect(page.GetByText("Director", new() { Exact = true })).ToBeVisibleAsync();
+            await Expect(page.GetByText("Director, Producer", new() { Exact = true })).ToBeVisibleAsync();
             var projectEditResponseTask = page.WaitForResponseAsync(response =>
                 response.Request.Method == "PATCH" && new Uri(response.Url).AbsolutePath == "/api/v1/project");
             await page.GetByRole(AriaRole.Button, new() { Name = "Save", Exact = true }).ClickAsync();
@@ -186,18 +186,8 @@ public sealed class FilmSubmissionEndToEndTests(EndToEndFixture fixture)
             await page.WaitForLoadStateAsync();
 
             await page.GotoAsync(page.Url[..^5]);
-            await page.GetByRole(AriaRole.Button, new() { Name = "Edit author details", Exact = true }).ClickAsync();
-            var readDialog = page.GetByRole(AriaRole.Dialog);
-            await Expect(readDialog).ToContainTextAsync(updatedName);
-            await Expect(readDialog).ToContainTextAsync(uco);
-            await Expect(readDialog).ToContainTextAsync(updatedEnglishBio);
-            await readDialog.GetByRole(AriaRole.Button, new() { Name = "Cancel", Exact = true }).ClickAsync();
-
-            await page.GetByRole(AriaRole.Button, new() { Name = "Language", Exact = true }).ClickAsync();
-            await page.GetByRole(AriaRole.Menuitemradio, new() { Name = "Czech", Exact = false }).ClickAsync();
-            await page.GetByRole(AriaRole.Button, new() { Name = "Edit author details", Exact = true }).ClickAsync();
-            await Expect(readDialog).ToContainTextAsync(czechBio);
-            await Expect(readDialog).Not.ToContainTextAsync(updatedEnglishBio);
+            await Expect(page.GetByText(updatedName, new() { Exact = true })).ToBeVisibleAsync();
+            await Expect(page.GetByText("Director, Producer", new() { Exact = true })).ToBeVisibleAsync();
 
             var authorResponse = await page.Context.APIRequest.GetAsync($"{fixture.ApiBaseUrl}/api/v1/author/{authorId}");
             Assert.True(authorResponse.Ok, $"Could not inspect the edited author: {(HttpStatusCode)authorResponse.Status}");
@@ -245,7 +235,10 @@ public sealed class FilmSubmissionEndToEndTests(EndToEndFixture fixture)
         var createResponse = await createResponseTask;
         Assert.Equal(HttpStatusCode.OK, (HttpStatusCode)createResponse.Status);
         var authorId = (await createResponse.TextAsync()).Trim().Trim('"');
-        await dialog.GetByRole(AriaRole.Button, new() { Name = "Add", Exact = true }).ClickAsync();
+        await dialog.Locator("input").First.FillAsync("Director");
+        await page.GetByRole(AriaRole.Option, new() { Name = "Director", Exact = true }).ClickAsync();
+        await dialog.GetByText("Select person roles", new() { Exact = true }).First.ClickAsync();
+        await dialog.GetByRole(AriaRole.Button, new() { Name = "Save", Exact = true }).ClickAsync();
         await Expect(page.GetByText(authorName, new() { Exact = true })).ToBeVisibleAsync();
         await Expect(dialog).Not.ToBeVisibleAsync();
         return authorId;

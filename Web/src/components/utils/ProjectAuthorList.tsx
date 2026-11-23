@@ -8,8 +8,7 @@ import { AwaitAPI } from './AwaitAPI';
 import { KafeAvatar } from './KafeAvatar';
 import { t } from 'i18next';
 import crewRoleManager from '@/utils/managers/crewRolesManager';
-import { AuthorDialog } from './Authors/AuthorDialog';
-import { AuthorRolesDialog } from './Authors/AuthorRolesDialog';
+import { AuthorFlowDialog } from './Authors/AuthorFlowDialog';
 import { AiOutlineEdit, AiOutlineClose } from 'react-icons/ai';
 import { BsPeople } from 'react-icons/bs';
 
@@ -101,7 +100,8 @@ function SimpleProjectAuthorList({
             </HStack>}
             
             {isDialogOpen && (
-                <AuthorDialog
+                <AuthorFlowDialog
+                    isOpen={isDialogOpen}
                     author={new Author({
                         ...displayedAuthor,
                         globalPermissions: displayedAuthor.globalPermissions ?? 'none'
@@ -112,11 +112,13 @@ function SimpleProjectAuthorList({
                 />
             )}
             {isRoleDialogOpen && (
-                <AuthorRolesDialog
+                <AuthorFlowDialog
+                    isOpen={isRoleDialogOpen}
+                    initialStatus="role"
                     roles={displayedRoles}
                     isDropdownCrewSelect={isDropdownCrewList}
                     onClose={() => setIsRoleDialogOpen(false)}
-                    onSaved={(roles) => {
+                    onRolesSaved={(roles) => {
                         setEditedRoles(roles);
                         onRoleChange?.(author.id, roles);
                     }}

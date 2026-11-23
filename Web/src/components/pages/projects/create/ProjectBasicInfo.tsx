@@ -1,17 +1,12 @@
-import { Button, FormControl, FormLabel, HStack, Input, Stack, useConst } from '@chakra-ui/react';
+import { useConst } from '@chakra-ui/react';
 import useForceUpdate from 'use-force-update';
-import { t } from 'i18next';
 import { useNavigate } from 'react-router-dom';
 import { API } from '../../../../api/API';
 import { Project } from '../../../../data/Project';
 import { useAuthLinkFunction } from '../../../../hooks/useAuthLink';
 import { useColorScheme } from '../../../../hooks/useColorScheme';
 import { HRIB } from '../../../../schemas/generic';
-import { AuthorSelect } from '../../../utils/Authors/AuthorSelect';
-import { LocalizedInput } from '../../../utils/LocalizedInput';
-import { ProjectAuthorList } from '../../../utils/ProjectAuthorList';
 import { SendAPI } from '../../../utils/SendAPI';
-import { TextareaLimited } from '../../../utils/TextareaLimited';
 import { ProjectBasicInfoForm } from './ProjectBasicInfoForm';
 import { MateProjectBasicInfoForm } from './MateProjectBasicInfoForm';
 import { currentOrganizationIdMapper } from '../../../../data/serialize/currentOrganizationIdMapper';
@@ -37,13 +32,8 @@ export function ProjectBasicInfo(props: IProjectBasicInfoProps) {
     );
     const orgId = currentOrganizationIdMapper();
 
-    const fu = useForceUpdate();
     const navigate = useNavigate();
     const authLink = useAuthLinkFunction();
-
-    const forceUpdate = (any: any) => {
-        fu();
-    };
 
     const sendApiProps = update
         ? {

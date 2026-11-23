@@ -3,7 +3,7 @@ import useForceUpdate from 'use-force-update';
 import { useTranslation } from 'react-i18next';
 import { Project } from '../../../../data/Project';
 import { useColorScheme } from '../../../../hooks/useColorScheme';
-import { AuthorSelect } from '../../../utils/Authors/AuthorSelect';
+import { AuthorFlowDialog } from '../../../utils/Authors/AuthorFlowDialog';
 import { LocalizedInput } from '../../../utils/LocalizedInput';
 import { ProjectAuthorList } from '../../../utils/ProjectAuthorList';
 import { TextareaLimited } from '../../../utils/TextareaLimited';
@@ -123,7 +123,7 @@ export function ProjectBasicInfoForm({ project, onSubmit, status, update, noSelf
                     }
                     isDropdownCrewList={isDropdownSelect}
                 />
-                <AuthorSelect
+                <AuthorFlowDialog
                     onSelect={(id, roles) =>
                         forceUpdate(
                             project.set('crew', [
@@ -166,7 +166,7 @@ export function ProjectBasicInfoForm({ project, onSubmit, status, update, noSelf
                         )
                     }
                 />
-                <AuthorSelect
+                <AuthorFlowDialog
                     onSelect={(id, roles) =>
                         forceUpdate(
                             project.set('cast', [

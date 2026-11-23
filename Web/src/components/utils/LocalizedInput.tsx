@@ -1,5 +1,6 @@
 import {
     Center,
+    chakra,
     ComponentWithAs,
     FormControl,
     FormHelperText,
@@ -17,6 +18,7 @@ import {
     TabPanel,
     TabPanels,
     Tabs,
+    TabProps,
     Text,
     Tooltip,
     useColorModeValue,
@@ -25,9 +27,15 @@ import {
 import CountryLanguage from '@ladjs/country-language';
 import * as Flags from 'country-flag-icons/react/3x2';
 import i18next, { t } from 'i18next';
-import { ChangeEvent, useMemo, useState } from 'react';
+import { ChangeEvent, forwardRef, useMemo, useState } from 'react';
 import { IoAdd, IoEarth, IoTrash } from 'react-icons/io5';
 import { localizedString } from '../../schemas/generic';
+
+// Chakra's useTab roving focus removes all but the selected tab from sequential keyboard navigation.
+// Keep that behavior, but also allow tabbing through every language option directly.
+const FullyTabbableTab = forwardRef<HTMLButtonElement, TabProps>((props, ref) => (
+    <chakra.button {...props} ref={ref} tabIndex={0} />
+));
 
 export type LocalizedInputRequirement = string | string[];
 
@@ -286,11 +294,12 @@ export const LocalizedInput: ComponentWithAs<'input', ILocalizedInputProps> = ({
     }
 
     return (
-        <Tabs variant="enclosed" onChange={(index) => setTabIndex(index)} index={tabIndex}>
+        <Tabs isManual variant="enclosed" onChange={(index) => setTabIndex(index)} index={tabIndex}>
             <TabList borderBottom="none" px={0}>
                 {keys.map((key) => (
                     <Tooltip key={key} label={getLanguageHint(key)} hasArrow>
                         <Tab
+                            as={FullyTabbableTab}
                             p={3}
                             aria-label={getLanguageName(key)}
                             _selected={{

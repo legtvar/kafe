@@ -86,6 +86,45 @@ public sealed class CoreWorkflowEndToEndTests(EndToEndFixture fixture)
         });
     }
 
+    [Fact]
+    public async Task GroupCreation_LocalizedLanguageTabs_AreAllReachableByKeyboard()
+    {
+        await RunBrowserTestAsync("localized-input-language-focus", async page =>
+        {
+            await RequestTemporaryAccountAsync(page, "kafe@example.com");
+            await LogInAsync(page, "kafe@example.com");
+            await page.GotoAsync($"/auth/{EndToEndFixture.OrganizationId}/groups/create");
+
+            var internationalTab = page.GetByRole(AriaRole.Tab, new() { Name = "International", Exact = true }).First;
+            var englishTab = page.GetByRole(AriaRole.Tab, new() { Name = "English", Exact = true }).First;
+            await Expect(internationalTab).ToBeVisibleAsync();
+            await page.GetByRole(AriaRole.Button, new() { Name = "Add", Exact = true }).First.ClickAsync();
+            await page.GetByRole(AriaRole.Menuitem, new() { Name = "English", Exact = false }).First.ClickAsync();
+            await Expect(englishTab).ToBeVisibleAsync();
+
+            foreach (var tab in await page.GetByRole(AriaRole.Tab).AllAsync())
+            {
+                Assert.Equal("0", await tab.GetAttributeAsync("tabindex"));
+            }
+
+            await englishTab.FocusAsync();
+            await page.Keyboard.PressAsync("Shift+Tab");
+            await Expect(internationalTab).ToBeFocusedAsync();
+            await page.Keyboard.PressAsync("Tab");
+            await Expect(englishTab).ToBeFocusedAsync();
+            await Expect(internationalTab).ToHaveAttributeAsync("aria-selected", "false");
+            await Expect(englishTab).ToHaveAttributeAsync("aria-selected", "true");
+
+            await page.Keyboard.PressAsync("Shift+Tab");
+            await Expect(internationalTab).ToBeFocusedAsync();
+            await page.Keyboard.PressAsync("Enter");
+            await Expect(internationalTab).ToHaveAttributeAsync("aria-selected", "true");
+            await Expect(englishTab).ToHaveAttributeAsync("aria-selected", "false");
+            await page.Locator("[id='name.iv']").FillAsync("Keyboard-edited group name");
+            await Expect(page.Locator("[id='name.iv']")).ToHaveValueAsync("Keyboard-edited group name");
+        });
+    }
+
     private async Task<Account> CreateTemporaryAccountAsync(IPage page, string email)
     {
         await RequestTemporaryAccountAsync(page, email);

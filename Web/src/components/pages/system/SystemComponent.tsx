@@ -134,10 +134,10 @@ export function SystemComponent(props: ISystemComponentProps) {
                                                 </Heading>
                                                 <UnorderedList>
                                                     <ListItem>
-                                                        Version <strong>{status.version}</strong>
+                                                        {t('system.version').toString()} <strong>{status.version}</strong>
                                                     </ListItem>
                                                     <ListItem>
-                                                        Commit{' '}
+                                                        {t('system.commit').toString()}{' '}
                                                         <Link
                                                             href={`https://gitlab.fi.muni.cz/legtvar/kafe/-/commit/${status.commit}`}
                                                             fontWeight="bold"
@@ -145,7 +145,7 @@ export function SystemComponent(props: ISystemComponentProps) {
                                                         >
                                                             {status.commit}
                                                         </Link>{' '}
-                                                        from {DateTime.fromISO(status.commitDate).toLocaleString(DateTime.DATETIME_SHORT)}
+                                                        {t('system.from').toString()} {DateTime.fromISO(status.commitDate).toLocaleString(DateTime.DATETIME_SHORT)}
                                                     </ListItem>
                                                     <ListItem>
                                                         {t('system.runningFrom')}{' '}

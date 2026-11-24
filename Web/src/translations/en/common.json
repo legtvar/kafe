@@ -5,6 +5,11 @@
     "bio": "Bio",
     "button": "Add a person",
     "createButtom": "Create a person",
+    "editDetails": "Edit author details",
+    "editRoles": "Edit author roles",
+    "missingUco": "The author has no Učo.",
+    "missingBio": "The author has no bio.",
+    "removeAuthor": "Remove author",
     "email": "Email",
     "name": "Name",
     "new": "New author",
@@ -28,6 +33,7 @@
     "sendTo": "Please send us this report to <1>kafe@fi.muni.cz</1>, thank you!",
     "mailContents": "Good morning,\n\nI experienced the following problem while using KAFE:\n{{message}}\n\nI am attaching the generated report\n\nThank you and have a nice day\n\n---\n\n",
     "selectAttachments": "We would appreciate as much detail as possible about the problem. However, you can choose what information you provide us:",
+    "copy": "Copy report",
     "page": "The page where the problem occurred",
     "browser": "The browser you are using",
     "user": "The account that had a problem",
@@ -42,11 +48,13 @@
     "save": "Save",
     "understood": "I understand",
     "send": "Send",
-    "invariant": "International"
+    "invariant": "International",
+    "invariantHint": "The international text is used as a default value when a localized version is not available."
   },
   "content": {
     "noFileSelected": "No file selected",
-    "unknownType": "Unknown type"
+    "unknownType": "Unknown type",
+    "info": "Information"
   },
   "countdown": {
     "days": "days",
@@ -66,6 +74,11 @@
         "text": "Please indicate what content was generated using artificial intelligence.",
         "yes": "I declare that an artificial intelligence tool(s) was (were) used in the creation of this film work for generating a story, script, dubbing, subtitles, or an image or audio component.",
         "no": "I declare that an artificial intelligence tool(s) was (were) NOT used in the creation of this film work for generating a story, script, dubbing, subtitles, or an image or audio component."
+      },
+      "isPublishedForUnlimitedTime": {
+        "label": "Online publication for an unlimited time",
+        "yes": "If the submitted film gets accepted, I agree with its publication online for unlimited time.",
+        "help": "If unchecked, you consent with the online publication of the submitted film for one month since the date of the festival according to the festival propositions. If checked, you can revoke this consent at any time by contacting the festival organizers."
       },
       "hearAboutUs": "How did you find out about us?",
       "hearAboutUsHelp": "Please write down how did you find out about us. You can list social media, people, LEMMA laboratory courses, or other possible sources. Example: \"A friend of a friend attended few years ago, and I also saw a post on Facebook.\"",
@@ -161,7 +174,8 @@
     "title": "Whops, something went wrong",
     "tokenInvalid": "Token is invalid",
     "leavePageTitle": "Unsaved changes",
-    "leavePageWarn": "You may have unsaved changes on this page. Are you sure you want to leave?"
+    "leavePageWarn": "You may have unsaved changes on this page. Are you sure you want to leave?",
+    "client": "A client error occurred"
   },
   "generic": {
     "cancel": "Cancel",
@@ -170,6 +184,9 @@
     "empty": "It's empty in here...",
     "for": "for",
     "save": "Save",
+    "submitting": "Submitting",
+    "add": "Add",
+    "remove": "Remove",
     "files": "files",
     "quitEdit": "Stop editing",
     "construction": "This section is under construction...",
@@ -213,6 +230,7 @@
     "error": "There was an error logging in, please try again!"
   },
   "navbar": {
+    "openMenu": "Open menu",
     "colorMode": "Toggle color mode",
     "language": "Language",
     "profile": "Profile",
@@ -273,7 +291,15 @@
         "pass": "Template competing block",
         "reject": "Template rejected by dramaturge",
         "bonus": "Template bonus block",
-        "custom": "Vlastní"
+        "custom": "Custom"
+      },
+      "messages": {
+        "ok": "Hello,\n\nYour submitted film has passed the technical check and is proceeding to the dramaturgy review of the Film Festival of the Faculty of Informatics, Masaryk University.\n\nThe dramaturgy review will take place on 12 April 2023. An expert jury will decide whether your film advances to the festival competition and is screened on 19 May 2023 at the Scala cinema and the Faculty of Informatics, Masaryk University.\n\nThank you for submitting your film to the festival. We look forward to seeing you soon with the dramaturgy results,\n\nThe FFFFI MU technical team.",
+        "nok": "Hello,\n\nYour submitted film did not pass the technical check and cannot proceed to the dramaturgy review of the Film Festival of the Faculty of Informatics, Masaryk University.\n\nPlease provide _____ so that we can successfully accept your film and present it to the expert jury at the dramaturgy review, which will take place on 12 April 2023. The deadline for completing all requirements is 9 April 2023.\n\nThank you for submitting your film to the festival,\n\nThe FFFFI MU technical team.",
+        "pass": "Hello,\n\nCongratulations, your film has been accepted into the competition section of the 23rd Film Festival of the Faculty of Informatics, Masaryk University. We look forward to seeing you at the festival evening on 19 May 2023.\n\nThank you for your support,\n\nThe FFFFI MU technical team.",
+        "reject": "Hello,\n\nWe regret to inform you that your film was not selected by the jury for the 23rd Film Festival of the Faculty of Informatics, Masaryk University; competition was high this year. Nevertheless, thank you for your interest in the festival, and we warmly invite you to the festival evening on 19 May 2023.\n\nThank you for your support,\n\nThe FFFFI MU technical team.",
+        "bonus": "Hello,\n\nCongratulations, your film has been accepted into the bonus section of the 23rd Film Festival of the Faculty of Informatics, Masaryk University. This means that it cannot be voted for, but audiences will still be able to enjoy it on the big screen. We look forward to seeing you at the festival evening on 19 May 2023.\n\nThank you for your support,\n\nThe FFFFI MU technical team.",
+        "custom": ""
       }
     },
     "edit": "Edit project",
@@ -330,6 +356,8 @@
       "nok": "The project was rejected or needs revision",
       "unknown": "The project has not yet received a review"
     },
+    "notRun": "The automated check was not run",
+    "statusIllustration": "Status illustration",
     "disclaimer": "The automated check is still in development. Please take the results with caution."
   },
   "register": {
@@ -456,14 +484,16 @@
   "temp": {
     "after": "We have sent information for activating a temporary account to your email address. Please click on the link in the email to continue to the KAFE.",
     "after2": "If you did not receive the email, you can request it again.",
-    "back": "Request again"
+    "back": "Request again",
+    "sendingAgain": "Sending again"
   },
   "tempAccount": {
     "title": "Create a temporary account"
   },
   "textarea": {
     "characters": "characters",
-    "min": "min"
+    "min": "min",
+    "max": "max"
   },
   "upload": {
     "ready": "Drag the <1>{{title}}</1> here<2></2>or click to select the file from your computer<4></4>",
@@ -481,6 +511,8 @@
     "note": "Separate the roles with a comma or a new line"
   },
   "artifact": {
+    "management": "Management",
+    "addFile": "Add a new file",
     "delete": "Delete the entire artifact",
     "deleteWarn": "Are you sure you want to delete the selected artifact? \nThis operation is irreversible!",
     "noContent": "The artifact does not contain any files",
@@ -493,6 +525,13 @@
         "subtitle": "Each artifact can contain several files - shards. \nA typical example can be a movie and its subtitles. These files are displayed together within a single artifact."
       }
     }
+  },
+  "pagination": {
+    "first": "First page",
+    "previous": "Previous page",
+    "page": "Page {{page}}",
+    "next": "Next page",
+    "last": "Last page"
   },
   "projectList": {
     "search": "Filter projects"
@@ -512,7 +551,10 @@
     "homepage": "Homepage",
     "status": "System status",
     "runningFrom": "Running since",
-    "console": "Console"
+    "console": "Console",
+    "version": "Version",
+    "commit": "Commit",
+    "from": "from"
   },
   "perms": {
     "read": "View",
@@ -603,7 +645,20 @@
     "none": "Hide subtitles"
   },
   "player": {
-    "loadingError": "Unfortunately, this video cannot be played in this quality"
+    "loadingError": "Unfortunately, this video cannot be played in this quality",
+    "controls": {
+      "play": "Play",
+      "previous": "Previous",
+      "next": "Next",
+      "seek": "Video position",
+      "mute": "Mute",
+      "subtitles": "Subtitles",
+      "quality": "Quality",
+      "download": "Download",
+      "share": "Share",
+      "headlessFullscreen": "Fullscreen without controls",
+      "fullscreen": "Fullscreen"
+    }
   },
   "general": {
     "copied": "Copied!",
@@ -619,6 +674,7 @@
     "title": "Create new playlist"
   },
   "playlistsEdit": {
+    "removeFile": "Remove from playlist",
     "tabs": {
       "info": "Basic info",
       "files": "Files",

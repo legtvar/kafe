@@ -16,8 +16,9 @@ public record ImageShardInfo(
     CreationMethod CreationMethod,
     [Hrib] string ArtifactId,
     DateTimeOffset CreatedAt,
-    ImmutableDictionary<string, ImageInfo> Variants
-) : ShardInfoBase(Id, CreationMethod, ArtifactId, CreatedAt)
+    ImmutableDictionary<string, ImageInfo> Variants,
+    string? UploadFileName = null
+) : ShardInfoBase(Id, CreationMethod, ArtifactId, CreatedAt, UploadFileName)
 {
     public override ShardKind Kind => ShardKind.Image;
 }
@@ -39,7 +40,8 @@ public class ImageShardInfoProjection : SingleStreamProjection<ImageShardInfo, s
             Variants: ImmutableDictionary.CreateRange(new KeyValuePair<string, ImageInfo>[]
             {
                 new(Const.OriginalShardVariant, e.Data.OriginalVariantInfo)
-            })
+            }),
+            UploadFileName: e.Data.UploadFileName
         );
     }
 

@@ -16,7 +16,7 @@ export function OrganizationRedirect() {
     const reload = useForceUpdate();
 
     if (organizations.length === 0) {
-        return <Box>{t('organizationRedirect.noOrgs')}</Box>;
+        return <Box data-testid="organization-empty">{t('organizationRedirect.noOrgs')}</Box>;
     }
 
     if (organizations.length === 1) {

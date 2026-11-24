@@ -22,7 +22,7 @@ export function TextareaMarkdown({ value, defaultValue, ...props }: TextareaProp
                 {...props}
                 value={textareaValue}
                 onChange={(event) => {
-                    props.onChange && props.onChange(event);
+                    props.onChange?.(event);
                     setTextareaValue(event.target.value);
                 }}
             />

@@ -3,7 +3,6 @@ import useForceUpdate from 'use-force-update';
 import { t } from 'i18next';
 import { Project } from '../../../../data/Project';
 import { useColorScheme } from '../../../../hooks/useColorScheme';
-import { AuthorSelect } from '../../../utils/Authors/AuthorSelect';
 import { LocalizedInput } from '../../../utils/LocalizedInput';
 import { InputLimited } from '../../../utils/InputLimited';
 import { ProjectAuthorList } from '../../../utils/ProjectAuthorList';

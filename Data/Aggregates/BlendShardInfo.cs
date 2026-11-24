@@ -17,8 +17,9 @@ public record BlendShardInfo(
     CreationMethod CreationMethod,
     DateTimeOffset CreatedAt,
     [Hrib] string ArtifactId,
-    ImmutableDictionary<string, BlendInfo> Variants
-) : ShardInfoBase(Id, CreationMethod, ArtifactId, CreatedAt)
+    ImmutableDictionary<string, BlendInfo> Variants,
+    string? UploadFileName = null
+) : ShardInfoBase(Id, CreationMethod, ArtifactId, CreatedAt, UploadFileName)
 {
     public override ShardKind Kind => ShardKind.Blend;
 }
@@ -41,7 +42,8 @@ public class BlendShardInfoProjection : SingleStreamProjection<BlendShardInfo, s
             Variants: ImmutableDictionary.CreateRange(new KeyValuePair<string, BlendInfo>[]
             {
                 new(Const.OriginalShardVariant, e.Data.OriginalVariantInfo)
-            })
+            }),
+            UploadFileName: e.Data.UploadFileName
         );
     }
 

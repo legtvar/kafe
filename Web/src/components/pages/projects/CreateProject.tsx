@@ -1,6 +1,6 @@
 import { Box, Stack } from '@chakra-ui/react';
-import { t } from 'i18next';
 import { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { Group } from '../../../data/Group';
 import { useTitle } from '../../../utils/useTitle';
@@ -14,6 +14,7 @@ interface ICreateProjectProps {}
 
 export function CreateProject(props: ICreateProjectProps) {
     const { id } = useParams();
+    const { t } = useTranslation();
     useTitle(t('createProject.title'));
 
     if (!id) {
@@ -30,8 +31,8 @@ export function CreateProject(props: ICreateProjectProps) {
             >
                 {(group: Group) => (
                     <Stack spacing={4} m={6} direction="column">
-                        <Box fontSize="xl" as="h2" lineHeight="tight" color="gray.500">
-                            {t('createProject.title').toString()}
+                        <Box data-testid="project-create-heading" fontSize="xl" as="h2" lineHeight="tight" color="gray.500">
+                            {t('createProject.title').toString() ?? ' '}
                         </Box>
                         <Box fontSize="4xl" fontWeight="semibold" as="h2" lineHeight="tight">
                             {group.getName()}

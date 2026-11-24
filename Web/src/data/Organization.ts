@@ -18,7 +18,6 @@ export class Organization extends AbstractType {
     ) {
         super();
         Object.assign(this, struct);
-        7;
         if ('createdOn' in struct && struct.createdOn) {
             this.createdOn = new Date(struct.createdOn);
         }

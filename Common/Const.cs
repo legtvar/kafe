@@ -29,6 +29,10 @@ public static class Const
     public const int BTSPhotoMinCount = 0;
     public const int BTSPhotoMaxCount = 5;
 
+    public const string LicenseFileBlueprintSlot = "license-file";
+    public const int LicenseFileMinCount = 0;
+    public const int LicenseFileMaxCount = 50;
+
     public const string SystemName = "System";
 
     public const string TemporaryAccountPurpose = "TemporaryAccount";
@@ -41,6 +45,9 @@ public static class Const
 
     public const string Mp4MimeType = "video/mp4";
     public const string Mp4FileExtension = ".mp4";
+
+    public const string MovMimeType = "video/quicktime";
+    public const string MovFileExtension = ".mov";
 
     public const string BlendBlueprintSlot = "blend";
     public const string BlendMimeType = "application/x-blender";

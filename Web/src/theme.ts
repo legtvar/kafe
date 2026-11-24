@@ -12,8 +12,8 @@ const theme = extendTheme({
         'video-controls': 4,
         'video-menu': 5,
         'playlist-sidebar': 100,
-        'modal': 1000,
-        'toast': 1100,
+        'modal': 1400,
+        'toast': 1500,
     },
     components: {
         MultiSelect: {
@@ -68,6 +68,7 @@ const theme = extendTheme({
         },
         gray: {
             650: '#374358',
+            950: '#0f131a'
         },
     },
     fonts: {

@@ -66,9 +66,11 @@ export function PlaylistAddNewFileWrapper({ isOpen, onClose, groups, projects }:
                                     setSelectedGroup(value);
 
                                     // If the selected group is changed and the selected project is not in the new group, reset the selected project
-                                    projects.find(
+                                    if (!projects.some(
                                         (project) => project.id === selectedProject && project.projectGroupId === value,
-                                    ) || setSelectedProject(NO_PROJECT);
+                                    )) {
+                                        setSelectedProject(NO_PROJECT);
+                                    }
                                 }}
                             >
                                 <HStack

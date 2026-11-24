@@ -7,6 +7,7 @@ import {
     useColorModeValue, 
     VStack, 
 } from '@chakra-ui/react';
+import { t } from 'i18next';
 import { Fragment } from 'react';
 import { useTranslation } from 'react-i18next';
 import { IoReader, IoReaderOutline, IoSettingsOutline } from 'react-icons/io5';
@@ -164,7 +165,7 @@ export function Sidebar({ onClose, forceReload, ...rest }: ISidebarProps) {
                         destPath={authLink('/system')}  
                         handleConfirm={() => {}}
                     >
-                        <IconButton aria-label="Settings" icon={<IoSettingsOutline />} borderRadius="full" />
+                        <IconButton aria-label={t('navbar.settings').toString()} icon={<IoSettingsOutline />} borderRadius="full" />
                     </ConfirmExitLink>
                 )}
             </VStack>

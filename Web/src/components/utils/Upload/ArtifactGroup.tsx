@@ -15,6 +15,7 @@ interface IArtifactGroupUploadProps {
     artifactBlueprint: components['schemas']['ProjectArtifactBlueprintDto'];
     slotName: string;
     project: Project;
+    onArtifactsChanged: () => void;
 }
 
 export function ArtifactGroupUpload(props: IArtifactGroupUploadProps) {
@@ -24,6 +25,7 @@ export function ArtifactGroupUpload(props: IArtifactGroupUploadProps) {
         artifactBlueprint: { name, arity, description },
         project,
         slotName,
+        onArtifactsChanged,
     } = props;
 
     const artifactsInSlot = project.artifacts.filter((artifact) => artifact.blueprintSlot === slotName);
@@ -42,13 +44,14 @@ export function ArtifactGroupUpload(props: IArtifactGroupUploadProps) {
                     }),
                 );
                 reload();
+                onArtifactsChanged();
             }}
             request={(api) => api.artifacts.create(newArtname, project.id, slotName)}
             value={null}
             repeatable
         >
             {(onSubmit, status) => (
-                <FormControl>
+                <FormControl data-testid={`artifact-group-${slotName}`}>
                     <FormLabel>{getPrefered(toLocalizedString(name))}</FormLabel>
                     <FormHelperText mb={6}>
                         {getPrefered(toLocalizedString(description))}{' '}
@@ -65,6 +68,7 @@ export function ArtifactGroupUpload(props: IArtifactGroupUploadProps) {
 
                     {artifactsInSlot.length < arity.max && (
                         <Box
+                            data-testid={`artifact-create-${slotName}`}
                             borderColor={border}
                             bg={bg}
                             borderWidth={1}

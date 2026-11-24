@@ -9,11 +9,12 @@ import {
     Icon,
     Text,
 } from '@chakra-ui/react';
+import { t } from 'i18next';
 import { AiOutlinePlus } from 'react-icons/ai';
 import { Artifact } from '../../../data/Artifact';
 import { Project } from '../../../data/Project';
-import { Shard } from '../../../data/Shard';
 import { useColorScheme } from '../../../hooks/useColorScheme';
+import { useApi } from '../../../hooks/Caffeine';
 import { useReload } from '../../../hooks/useReload';
 import { components } from '../../../schemas/api';
 import { toLocalizedString } from '../../../schemas/generic';
@@ -26,16 +27,19 @@ interface IShardGroupUploadProps {
     shardBlueprint: components['schemas']['ProjectArtifactShardBlueprintDto'];
     artifact: Artifact;
     kind: components['schemas']['ShardKind'];
+    onArtifactsChanged: () => void;
 }
 
 export function ShardGroupUpload(props: IShardGroupUploadProps) {
     const { border, bg, bgPage } = useColorScheme();
     const reload = useReload();
+    const api = useApi();
     const {
         shardBlueprint: { name, arity, description },
         project,
         artifact,
         kind,
+        onArtifactsChanged,
     } = props;
 
     const filesInGroup = artifact.shards.filter((shard) => shard.kind === kind);
@@ -59,11 +63,11 @@ export function ShardGroupUpload(props: IShardGroupUploadProps) {
                     mb={2}
                     key={i}
                 >
-                    <Text>
+                    <Text data-testid={`shard-${kind}-file-name`}>
                         <Icon fontSize="1.2em">
                             <FileIcon kind={kind} />
                         </Icon>{' '}
-                        {shard.id}
+                        {shard.uploadFileName ?? shard.id}
                     </Text>
                 </Box>
             ))}
@@ -71,12 +75,12 @@ export function ShardGroupUpload(props: IShardGroupUploadProps) {
                 <Box w="100%" borderColor={border} bg={bg} borderWidth={1} borderRadius="md" py={4} px={4}>
                     <Accordion allowToggle m={-4}>
                         <AccordionItem borderWidth="0 !important">
-                            <AccordionButton color={'gray.500'}>
+                            <AccordionButton data-testid={`shard-${kind}-add-file`} color={'gray.500'}>
                                 <Box as="span" flex="1" textAlign="left">
                                     <Icon fontSize="1.2em">
                                         <AiOutlinePlus />
                                     </Icon>{' '}
-                                    Přidat nový soubor
+                                    {t('artifact.addFile').toString()}
                                 </Box>
                             </AccordionButton>
                             <AccordionPanel pb={4}>
@@ -85,14 +89,16 @@ export function ShardGroupUpload(props: IShardGroupUploadProps) {
                                     projectId={project.id}
                                     shardKind={kind as any}
                                     artifactId={artifact.id}
-                                    onUploaded={(id) => {
-                                        artifact.shards.push(
-                                            new Shard({
-                                                id,
-                                                kind,
-                                            }),
-                                        );
+                                    maxSize={artifact.blueprintSlot === 'license-file' ? 10 * 1024 * 1024 : undefined}
+                                    onUploaded={async (id) => {
+                                        const response = await api.shards.getById(id);
+                                        if (response.status !== 200) {
+                                            throw new Error('Failed to fetch the uploaded shard metadata.');
+                                        }
+
+                                        artifact.shards.push(response.data);
                                         reload();
+                                        onArtifactsChanged();
                                     }}
                                     repeatable
                                 />

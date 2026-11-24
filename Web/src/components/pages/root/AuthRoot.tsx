@@ -7,7 +7,7 @@ import { Sidebar } from '../../layout/navigation/Sidebar';
 import { ErrorBoundary } from '../../utils/ErrorBoundary';
 export const AuthRoot: React.FC = () => {
     const { isOpen, onOpen, onClose } = useDisclosure();
-    const { reload, value } = useReloadVar();
+    const { reload } = useReloadVar();
 
     return (
         <Flex direction="column" w="100vw" h="100vh" align="stretch">
@@ -29,7 +29,7 @@ export const AuthRoot: React.FC = () => {
                 </Drawer>
                 <Box px={4} pt={4} flexGrow={1} overflowY="auto">
                     <ErrorBoundary>
-                        <Outlet key={value ? 'a' : 'b'} />
+                        <Outlet />
                     </ErrorBoundary>
                 </Box>
             </Flex>

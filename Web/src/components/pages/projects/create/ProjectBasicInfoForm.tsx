@@ -1,15 +1,14 @@
-import { Button, FormControl, FormHelperText, FormLabel, HStack, Input, RadioGroup, Radio, Stack, Textarea } from '@chakra-ui/react';
+import { Button, Checkbox, FormControl, FormHelperText, FormLabel, HStack, Input, RadioGroup, Radio, Stack, Textarea } from '@chakra-ui/react';
 import useForceUpdate from 'use-force-update';
-import { t } from 'i18next';
+import { useTranslation } from 'react-i18next';
 import { Project } from '../../../../data/Project';
 import { useColorScheme } from '../../../../hooks/useColorScheme';
-import { AuthorSelect } from '../../../utils/Authors/AuthorSelect';
+import { AuthorFlowDialog } from '../../../utils/Authors/AuthorFlowDialog';
 import { LocalizedInput } from '../../../utils/LocalizedInput';
 import { ProjectAuthorList } from '../../../utils/ProjectAuthorList';
 import { TextareaLimited } from '../../../utils/TextareaLimited';
-import { MultiSelect } from 'chakra-multiselect';
+import { MultiSelect, type SelectedListProps } from 'chakra-multiselect';
 import genreManager from '../../../../utils/managers/genreManager';
-import { InputLimited } from '../../../utils/InputLimited';
 
 interface ProjectBasicInfoFormProps {
     project: Project;
@@ -21,24 +20,27 @@ interface ProjectBasicInfoFormProps {
 
 export function ProjectBasicInfoForm({ project, onSubmit, status, update, noSelfSubmit }: ProjectBasicInfoFormProps) {
     const { border, bg } = useColorScheme();
+    const { t } = useTranslation();
     const fu = useForceUpdate();
     const forceUpdate = (any: any) => {
         fu();
     };
 
     const isDropdownSelect = (project.genre === undefined || project.genreTags !== undefined);
+    const genreSelectedListProps: SelectedListProps & { 'data-testid': string } = {
+        'data-testid': 'project-genre-selected-options',
+    };
 
     return (
         <Stack spacing={8} direction="column" mb={8}>
-            <FormControl>
+            <FormControl my={4}>
                 <FormLabel>{t('createProject.fields.name').toString()}</FormLabel>
                 <FormHelperText mb={"1rem"}>
                     {t('createProject.fields.nameHelp').toString()}
                 </FormHelperText>
                 <LocalizedInput
-                    as={InputLimited}
-                    min={project.validationSettings?.minNameLength ?? undefined}
-                    max={project.validationSettings?.maxNameLength ?? undefined}
+                    minLength={project.validationSettings?.minNameLength ?? undefined}
+                    maxLength={project.validationSettings?.maxNameLength ?? undefined}
                     type="text"
                     borderColor={border}
                     bg={bg}
@@ -46,9 +48,11 @@ export function ProjectBasicInfoForm({ project, onSubmit, status, update, noSelf
                     placeholder={t('createProject.fields.name').toString()}
                     value={project.name}
                     onChange={(value) => forceUpdate(project.set('name', value))}
+                    required={["en", ["cs", "sk"]]}
+                    split
                 />
             </FormControl>
-            <FormControl>
+            <FormControl data-testid="project-genre-control" my={4}>
                 <FormLabel>{t('createProject.fields.genre').toString()}</FormLabel>
                 {isDropdownSelect ?
                 <>
@@ -56,6 +60,7 @@ export function ProjectBasicInfoForm({ project, onSubmit, status, update, noSelf
                         {t(`createProject.fields.genreHelp`).toString()}
                     </FormHelperText>
                     <MultiSelect
+                        selectedListProps={genreSelectedListProps}
                         options={genreManager.getOptions()}
                         value={project.genreTags}
                         onChange={value => genreManager.onChange(value, project, forceUpdate)}
@@ -63,9 +68,8 @@ export function ProjectBasicInfoForm({ project, onSubmit, status, update, noSelf
                     />
                 </> :
                 <LocalizedInput
-                    as={InputLimited}
-                    min={project.validationSettings?.minGenreLength ?? undefined}
-                    max={project.validationSettings?.maxGenreLength ?? undefined}
+                    minLength={project.validationSettings?.minGenreLength ?? undefined}
+                    maxLength={project.validationSettings?.maxGenreLength ?? undefined}
                     type="text"
                     borderColor={border}
                     bg={bg}
@@ -75,24 +79,26 @@ export function ProjectBasicInfoForm({ project, onSubmit, status, update, noSelf
                     onChange={(value) => forceUpdate(project.set('genre', value))}
                 />}
             </FormControl>
-            <FormControl>
+            <FormControl my={4}>
                 <FormLabel>{t('createProject.fields.description').toString()}</FormLabel>
                 <FormHelperText mb={"1rem"}>
                     {t('createProject.fields.descriptionHelp').toString()}
                 </FormHelperText>
                 <LocalizedInput
-                    as={TextareaLimited}
-                    min={project.validationSettings?.minDescriptionLength ?? undefined}
-                    max={project.validationSettings?.maxDescriptionLength ?? undefined}
+                    as={Textarea}
+                    minLength={project.validationSettings?.minDescriptionLength ?? undefined}
+                    maxLength={project.validationSettings?.maxDescriptionLength ?? undefined}
                     borderColor={border}
                     bg={bg}
                     name="description"
                     placeholder={t('createProject.fields.description').toString()}
                     value={project.description}
                     onChange={(value) => forceUpdate(project.set('description', value))}
+                    required={["en", ["cs", "sk"]]}
+                    split
                 />
             </FormControl>
-            <FormControl py={12}>
+            <FormControl my={4}>
                 <FormLabel>{t('createProject.fields.crew').toString()}</FormLabel>
                 <FormHelperText mb={"1rem"}>
                     {t(`createProject.fields.crewHelp`).toString()}
@@ -109,9 +115,19 @@ export function ProjectBasicInfoForm({ project, onSubmit, status, update, noSelf
                             ),
                         )
                     }
+                    onRoleChange={(id, roles) =>
+                        forceUpdate(
+                            project.set(
+                                'crew',
+                                (project.crew || []).map((member) =>
+                                    member.id === id ? { ...member, roles } : member,
+                                ),
+                            ),
+                        )
+                    }
                     isDropdownCrewList={isDropdownSelect}
                 />
-                <AuthorSelect
+                <AuthorFlowDialog
                     onSelect={(id, roles) =>
                         forceUpdate(
                             project.set('crew', [
@@ -126,7 +142,7 @@ export function ProjectBasicInfoForm({ project, onSubmit, status, update, noSelf
                     isDropdownCrewSelect={isDropdownSelect}
                 />
             </FormControl>
-            <FormControl pb={12}>
+            <FormControl my={4}>
                 <FormLabel>{t('createProject.fields.cast').toString()}</FormLabel>
                 <FormHelperText mb={"1rem"}>
                     {t('createProject.fields.castHelp').toString()}
@@ -143,8 +159,18 @@ export function ProjectBasicInfoForm({ project, onSubmit, status, update, noSelf
                             ),
                         )
                     }
+                    onRoleChange={(id, roles) =>
+                        forceUpdate(
+                            project.set(
+                                'cast',
+                                (project.cast || []).map((member) =>
+                                    member.id === id ? { ...member, roles } : member,
+                                ),
+                            ),
+                        )
+                    }
                 />
-                <AuthorSelect
+                <AuthorFlowDialog
                     onSelect={(id, roles) =>
                         forceUpdate(
                             project.set('cast', [
@@ -159,7 +185,7 @@ export function ProjectBasicInfoForm({ project, onSubmit, status, update, noSelf
                 />
             </FormControl>
 
-            <FormControl>
+            <FormControl my={4}>
                 <FormLabel>{t('createProject.fields.aiUsageDeclaration.label').toString()}</FormLabel>
                 <FormHelperText mb={"1rem"}>
                     {t('createProject.fields.aiUsageDeclaration.help').toString()}
@@ -190,7 +216,21 @@ export function ProjectBasicInfoForm({ project, onSubmit, status, update, noSelf
                 }
             </FormControl>
 
-            <FormControl>
+            <FormControl my={4}>
+                <FormLabel>{t('createProject.fields.isPublishedForUnlimitedTime.label').toString()}</FormLabel>
+                <FormHelperText mb={"1rem"}>
+                    {t('createProject.fields.isPublishedForUnlimitedTime.help').toString()}
+                </FormHelperText>
+                <Checkbox
+                    borderColor="gray.500"
+                    isChecked={project.isPublishedForUnlimitedTime}
+                    onChange={(event) => forceUpdate(project.set('isPublishedForUnlimitedTime', event.target.checked))}
+                >
+                    {t('createProject.fields.isPublishedForUnlimitedTime.yes').toString()}
+                </Checkbox>
+            </FormControl>
+
+            <FormControl my={4}>
                 <FormLabel>{t('createProject.fields.hearAboutUs').toString()}</FormLabel>
                 <FormHelperText mb={"1rem"}>
                     {t('createProject.fields.hearAboutUsHelp').toString()}
@@ -209,6 +249,7 @@ export function ProjectBasicInfoForm({ project, onSubmit, status, update, noSelf
             {!noSelfSubmit && (
                 <HStack w="100%">
                     <Button
+                        data-testid="project-submit"
                         colorScheme="blue"
                         ml="auto"
                         isDisabled={status === 'sending' || status === 'ok'}

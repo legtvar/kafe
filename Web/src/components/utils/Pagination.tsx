@@ -100,7 +100,7 @@ export function Pagination<T>(props: IPaginationProps<T>) {
                             size="md"
                             variant="solid"
                             onClick={() => setPage(0)}
-                            aria-label={"First"}
+                            aria-label={t("pagination.first").toString()}
                             icon={<AiOutlineDoubleLeft />}
                             isDisabled={page === 0}
                             key={-2}
@@ -109,7 +109,7 @@ export function Pagination<T>(props: IPaginationProps<T>) {
                             size="md"
                             variant="solid"
                             onClick={() => setPage(Math.max(page - 1, 0))}
-                            aria-label={"Previous"}
+                            aria-label={t("pagination.previous").toString()}
                             icon={<AiOutlineLeft />}
                             isDisabled={page === 0}
                             key={-1}
@@ -120,7 +120,7 @@ export function Pagination<T>(props: IPaginationProps<T>) {
                                 variant="solid"
                                 colorScheme={id === page ? "brand" : undefined}
                                 onClick={() => setPage(id)}
-                                aria-label={`Page ${(id + 1).toString()}`}
+                                aria-label={t("pagination.page", { page: id + 1 }).toString()}
                                 icon={<>{id + 1}</>}
                                 key={id}
                             />
@@ -130,7 +130,7 @@ export function Pagination<T>(props: IPaginationProps<T>) {
                             variant="solid"
                             onClick={() =>
                                 setPage(Math.min(page + 1, pagesInData - 1))}
-                            aria-label={"Next"}
+                            aria-label={t("pagination.next").toString()}
                             icon={<AiOutlineRight />}
                             isDisabled={page === pagesInData - 1}
                             key={-11}
@@ -139,7 +139,7 @@ export function Pagination<T>(props: IPaginationProps<T>) {
                             size="md"
                             variant="solid"
                             onClick={() => setPage(pagesInData - 1)}
-                            aria-label={"Last"}
+                            aria-label={t("pagination.last").toString()}
                             icon={<AiOutlineDoubleRight />}
                             isDisabled={page === pagesInData - 1}
                             key={-12}

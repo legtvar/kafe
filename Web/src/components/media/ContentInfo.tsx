@@ -16,7 +16,7 @@ export function ContentInfo({ artifact }: ContentInfoProps) {
     return (
         <Tooltip label={artifactInfo} bg="gray.700" color="white">
           <IconButton
-            aria-label="Info"
+            aria-label={t('content.info').toString()}
             icon={
               <IoInformationCircleOutline style={{ width: '100%', height: '100%' }} />
             }

@@ -29,9 +29,9 @@ public sealed class FilmSubmissionEndToEndTests(EndToEndFixture fixture)
             await WaitForVariantAsync(page, upload.ShardId!, "sd", TimeSpan.FromMinutes(3));
 
             await OpenFilmPreviewAsync(page);
-            var video = page.Locator("video");
+            var video = page.GetByTestId("video-player").Locator("video");
             await Expect(video).ToBeVisibleAsync();
-            await page.GetByRole(AriaRole.Button, new() { Name = "Play", Exact = true }).ClickAsync();
+            await page.GetByTestId("video-play-toggle").ClickAsync();
             await page.WaitForFunctionAsync(
                 """
                 () => {
@@ -47,20 +47,33 @@ public sealed class FilmSubmissionEndToEndTests(EndToEndFixture fixture)
     }
 
     [Fact]
-    public async Task FilmUpload_MovMimeType_RejectsUploadAndAllowsRetry()
+    public async Task FilmUpload_MovMimeType_ConvertsAndPlaysInBrowser()
     {
-        await RunBrowserTestAsync("mov-rejected", async page =>
+        await RunBrowserTestAsync("mov-supported", async page =>
         {
             await LogInThroughTemporaryAccountAsync(page);
             await CreateProjectFromOpenGroupAsync(page, $"E2E-{Guid.NewGuid():N}");
             var upload = await UploadFilmAsync(page, "sample.mov");
 
-            Assert.True((int)upload.StatusCode >= 400, $"MOV unexpectedly returned {(int)upload.StatusCode}.");
-            await Expect(page.GetByText("Upload failed", new() { Exact = true })).ToBeVisibleAsync();
+            Assert.Equal(HttpStatusCode.OK, upload.StatusCode);
+            Assert.False(string.IsNullOrWhiteSpace(upload.ShardId));
+            await WaitForVariantAsync(page, upload.ShardId!, "sd", TimeSpan.FromMinutes(3));
 
-            // The error state is clickable and returns to a usable upload control.
-            await page.GetByText("Upload failed", new() { Exact = true }).ClickAsync();
-            await Expect(page.Locator("input[type=file]").First).ToBeAttachedAsync();
+            await OpenFilmPreviewAsync(page);
+            var video = page.GetByTestId("video-player").Locator("video");
+            await Expect(video).ToBeVisibleAsync();
+            await page.GetByTestId("video-play-toggle").ClickAsync();
+            await page.WaitForFunctionAsync(
+                """
+                () => {
+                    const video = document.querySelector('video');
+                    return video && !video.paused && video.readyState >= 2 && video.currentTime > 0.1;
+                }
+                """);
+
+            var source = await video.GetAttributeAsync("src");
+            Assert.Contains("/sd", source);
+            Assert.True(await video.EvaluateAsync<double>("video => video.currentTime") > 0.1);
         });
     }
 
@@ -76,14 +89,148 @@ public sealed class FilmSubmissionEndToEndTests(EndToEndFixture fixture)
             // KAFE stores the original and records failed media analysis; it must not offer a playable video.
             Assert.Equal(HttpStatusCode.OK, upload.StatusCode);
             await OpenFilmPreviewAsync(page);
-            var video = page.Locator("video");
+            var video = page.GetByTestId("video-player").Locator("video");
             await Expect(video).ToBeVisibleAsync();
-            await page.GetByRole(AriaRole.Button, new() { Name = "Play", Exact = true }).ClickAsync();
-            await Expect(page.GetByText(
-                "Unfortunately, this video cannot be played in this quality",
-                new() { Exact = true })).ToBeVisibleAsync();
+            await page.GetByTestId("video-play-toggle").ClickAsync();
+            await Expect(page.GetByTestId("video-error")).ToBeVisibleAsync();
             Assert.Equal(0, await video.EvaluateAsync<int>("video => video.readyState"));
             Assert.True(await video.EvaluateAsync<bool>("video => video.paused"));
+        });
+    }
+
+    [Fact]
+    public async Task ProjectCreation_LanguageSwitch_PreservesUnsavedProgress()
+    {
+        await RunBrowserTestAsync("project-creation-language-switch", async page =>
+        {
+            await LogInThroughTemporaryAccountAsync(page);
+            await OpenProjectCreationAsync(page);
+            var title = $"E2E-{Guid.NewGuid():N}";
+            const string description = "This draft must survive an interface language switch.";
+            await page.GetByTestId("localized-input-name-iv-input").FillAsync(title);
+            await page.GetByTestId("localized-input-description-iv-input").FillAsync(description);
+
+            await page.GetByTestId("language-selector").First.ClickAsync();
+            await page.GetByTestId("language-app-option-cs").First.ClickAsync();
+
+            await Expect(page.GetByTestId("project-create-heading")).ToHaveTextAsync("Vytvořte nový projekt");
+            await Expect(page.GetByTestId("localized-input-name-iv-input")).ToHaveValueAsync(title);
+            await Expect(page.GetByTestId("localized-input-description-iv-input")).ToHaveValueAsync(description);
+        });
+    }
+
+    [Fact]
+    public async Task AuthorCreation_LocalizedBio_PersistsAndLeavesContactsEmpty()
+    {
+        await RunBrowserTestAsync("author-localized-bio", async page =>
+        {
+            await LogInThroughTemporaryAccountAsync(page);
+            await OpenProjectCreationAsync(page);
+            var authorName = $"E2E Author {Guid.NewGuid():N}";
+            const string uco = "123456";
+            const string czechBio = "Autor testovacího filmu.";
+            const string englishBio = "Author of the test film.";
+
+            var authorId = await AddNewAuthorAsync(page, authorName, uco, czechBio, englishBio);
+            await Expect(page.GetByTestId("project-author-name")).ToHaveTextAsync(authorName);
+
+            var authorResponse = await page.Context.APIRequest.GetAsync($"{fixture.ApiBaseUrl}/api/v1/author/{authorId}");
+            Assert.True(authorResponse.Ok, $"Could not inspect the new author: {(HttpStatusCode)authorResponse.Status}");
+            using var document = JsonDocument.Parse(await authorResponse.TextAsync());
+            var author = document.RootElement;
+            Assert.Equal(uco, author.GetProperty("uco").GetString());
+            Assert.Equal(JsonValueKind.Null, author.GetProperty("email").ValueKind);
+            Assert.Equal(JsonValueKind.Null, author.GetProperty("phone").ValueKind);
+            Assert.Equal(czechBio, author.GetProperty("bio").GetProperty("cs").GetString());
+            Assert.Equal(englishBio, author.GetProperty("bio").GetProperty("en").GetString());
+        });
+    }
+
+    [Fact]
+    public async Task ProjectAuthorLinks_ReadAndEditAuthor()
+    {
+        await RunBrowserTestAsync("project-author-links", async page =>
+        {
+            await LogInThroughTemporaryAccountAsync(page);
+            await OpenProjectCreationAsync(page);
+            var authorName = $"E2E Author {Guid.NewGuid():N}";
+            const string uco = "123456";
+            const string czechBio = "Autor testovacího filmu.";
+            const string englishBio = "Author of the test film.";
+            const string updatedEnglishBio = "Author biography edited through the project.";
+            var authorId = await AddNewAuthorAsync(page, authorName, uco, czechBio, englishBio);
+            await FillAndSubmitProjectCreationAsync(page, $"E2E-{Guid.NewGuid():N}");
+            await page.GetByTestId("project-basic-info-tab").ClickAsync();
+
+            await page.GetByTestId("project-author-edit-details").ClickAsync();
+            var editDialog = page.GetByRole(AriaRole.Dialog);
+            await Expect(editDialog.GetByTestId("author-name-input")).ToHaveValueAsync(authorName);
+            await Expect(editDialog.GetByTestId("author-uco-input")).ToHaveValueAsync(uco);
+            await editDialog.GetByTestId("localized-input-bio-en-tab").ClickAsync();
+            await Expect(editDialog.GetByTestId("localized-input-bio-en-input")).ToHaveValueAsync(englishBio);
+
+            var updatedName = authorName + " Edited";
+            await editDialog.GetByTestId("author-name-input").FillAsync(updatedName);
+            await editDialog.GetByTestId("localized-input-bio-en-input").FillAsync(updatedEnglishBio);
+            var editResponseTask = page.WaitForResponseAsync(response =>
+                response.Request.Method == "PATCH" && new Uri(response.Url).AbsolutePath == "/api/v1/author");
+            await editDialog.GetByTestId("author-save").ClickAsync();
+            var editResponse = await editResponseTask;
+            Assert.Equal(HttpStatusCode.OK, (HttpStatusCode)editResponse.Status);
+            await Expect(page.GetByTestId("project-author-name")).ToHaveTextAsync(updatedName);
+
+            await page.GetByTestId("project-author-edit-roles").ClickAsync();
+            var roleDialog = page.GetByRole(AriaRole.Dialog);
+            var roleInput = roleDialog.GetByTestId("author-roles-control").Locator("input").First;
+            await roleInput.FillAsync("Producer");
+            await roleInput.PressAsync("ArrowDown");
+            await roleInput.PressAsync("Enter");
+            await Expect(roleDialog.GetByTestId("author-roles-selected-options")).ToContainTextAsync("Producer");
+            await roleDialog.GetByTestId("author-roles-label").ClickAsync();
+            await roleDialog.GetByTestId("author-roles-save").ClickAsync();
+            await Expect(page.GetByTestId("project-author-roles")).ToHaveTextAsync("Director, Producer");
+            var projectEditResponseTask = page.WaitForResponseAsync(response =>
+                response.Request.Method == "PATCH" && new Uri(response.Url).AbsolutePath == "/api/v1/project");
+            await page.GetByTestId("project-save").ClickAsync();
+            var projectEditResponse = await projectEditResponseTask;
+            Assert.Equal(HttpStatusCode.OK, (HttpStatusCode)projectEditResponse.Status);
+            await page.WaitForLoadStateAsync();
+
+            await page.GotoAsync(page.Url[..^5]);
+            await Expect(page.GetByTestId("project-author-name")).ToHaveTextAsync(updatedName);
+            await Expect(page.GetByTestId("project-author-roles")).ToHaveTextAsync("Director, Producer");
+
+            var authorResponse = await page.Context.APIRequest.GetAsync($"{fixture.ApiBaseUrl}/api/v1/author/{authorId}");
+            Assert.True(authorResponse.Ok, $"Could not inspect the edited author: {(HttpStatusCode)authorResponse.Status}");
+            using var document = JsonDocument.Parse(await authorResponse.TextAsync());
+            var author = document.RootElement;
+            Assert.Equal(updatedName, author.GetProperty("name").GetString());
+            Assert.Equal(uco, author.GetProperty("uco").GetString());
+            Assert.Equal(updatedEnglishBio, author.GetProperty("bio").GetProperty("en").GetString());
+            Assert.Equal(czechBio, author.GetProperty("bio").GetProperty("cs").GetString());
+            Assert.Equal(JsonValueKind.Null, author.GetProperty("email").ValueKind);
+            Assert.Equal(JsonValueKind.Null, author.GetProperty("phone").ValueKind);
+        });
+    }
+
+    [Fact]
+    public async Task FilmUpload_StatusTab_RefreshesValidationAfterAutomaticSave()
+    {
+        await RunBrowserTestAsync("validation-refreshed-after-upload", async page =>
+        {
+            await LogInThroughTemporaryAccountAsync(page);
+            await CreateProjectFromOpenGroupAsync(page, $"E2E-{Guid.NewGuid():N}");
+            await Expect(page.GetByTestId("project-validation-status")).ToContainTextAsync("The film is required.");
+
+            var upload = await UploadFilmAsync(page, "sample.mp4");
+            Assert.Equal(HttpStatusCode.OK, upload.StatusCode);
+
+            var validationResponse = page.WaitForResponseAsync(response =>
+                response.Request.Method == "GET"
+                && new Uri(response.Url).AbsolutePath.StartsWith("/api/v1/project-validation/"));
+            await page.GetByTestId("project-status-tab").ClickAsync();
+            Assert.Equal(HttpStatusCode.OK, (HttpStatusCode)(await validationResponse).Status);
+            await Expect(page.GetByTestId("project-validation-status")).Not.ToContainTextAsync("The film is required.");
         });
     }
 
@@ -94,23 +241,56 @@ public sealed class FilmSubmissionEndToEndTests(EndToEndFixture fixture)
         {
             await page.GotoAsync(fixture.GroupPath);
             await page.WaitForURLAsync("**/account/login**");
-            await Expect(page.GetByRole(AriaRole.Heading, new() { Name = "Log in to KAFE", Exact = true }))
-                .ToBeVisibleAsync();
+            await Expect(page.GetByTestId("account-login-heading")).ToBeVisibleAsync();
         });
+    }
+
+    private static async Task<string> AddNewAuthorAsync(
+        IPage page,
+        string authorName,
+        string uco,
+        string czechBio,
+        string englishBio)
+    {
+        await page.GetByTestId("author-add-button").First.ClickAsync();
+        var dialog = page.GetByRole(AriaRole.Dialog);
+        await dialog.GetByTestId("author-name-query").FillAsync(authorName);
+        await dialog.GetByTestId("author-create-option").ClickAsync();
+        await dialog.GetByTestId("author-uco-input").FillAsync(uco);
+        await dialog.GetByTestId("localized-input-bio-cs-tab").ClickAsync();
+        await dialog.GetByTestId("localized-input-bio-cs-input").FillAsync(czechBio);
+        await dialog.GetByTestId("localized-input-bio-en-tab").ClickAsync();
+        await dialog.GetByTestId("localized-input-bio-en-input").FillAsync(englishBio);
+
+        var createResponseTask = page.WaitForResponseAsync(response =>
+            response.Request.Method == "POST" && new Uri(response.Url).AbsolutePath == "/api/v1/author");
+        await dialog.GetByTestId("author-save").ClickAsync();
+        var createResponse = await createResponseTask;
+        Assert.Equal(HttpStatusCode.OK, (HttpStatusCode)createResponse.Status);
+        var authorId = (await createResponse.TextAsync()).Trim().Trim('"');
+        var roleInput = dialog.GetByTestId("author-roles-control").Locator("input").First;
+        await roleInput.FillAsync("Director");
+        await dialog.GetByRole(AriaRole.Option).Nth(2).ClickAsync();
+        await Expect(dialog.GetByTestId("author-roles-selected-options")).ToContainTextAsync("Director");
+        await dialog.GetByTestId("author-roles-label").ClickAsync();
+        await dialog.GetByTestId("author-roles-save").ClickAsync();
+        await Expect(page.GetByTestId("project-author-name")).ToHaveTextAsync(authorName);
+        await Expect(dialog).Not.ToBeVisibleAsync();
+        return authorId;
     }
 
     private async Task LogInThroughTemporaryAccountAsync(IPage page)
     {
         const string email = "kafe@example.com";
         await page.GotoAsync("/account/login");
-        await page.Locator("input[type=email]").FillAsync(email);
-        await page.GetByRole(AriaRole.Button, new() { Name = "Log in", Exact = true }).ClickAsync();
-        await Expect(page.GetByText("We have sent information", new() { Exact = false })).ToBeVisibleAsync();
+        await page.GetByTestId("account-login-email").FillAsync(email);
+        await page.GetByTestId("account-login-submit").ClickAsync();
+        await Expect(page.GetByTestId("account-login-confirmation-sent")).ToBeVisibleAsync();
 
         var token = await fixture.CreateConfirmationTokenAsync(email);
         await page.GotoAsync($"/account/token/{token}");
         await page.WaitForURLAsync("**/auth");
-        var acceptCookies = page.GetByRole(AriaRole.Button, new() { Name = "Yum, I'll take it!", Exact = true });
+        var acceptCookies = page.GetByTestId("cookie-consent-accept");
         if (await acceptCookies.CountAsync() > 0)
         {
             await acceptCookies.ClickAsync();
@@ -119,9 +299,40 @@ public sealed class FilmSubmissionEndToEndTests(EndToEndFixture fixture)
 
     private async Task CreateProjectFromOpenGroupAsync(IPage page, string title)
     {
+        await OpenProjectCreationAsync(page);
+        await FillAndSubmitProjectCreationAsync(page, title);
+    }
+
+    private static async Task FillAndSubmitProjectCreationAsync(IPage page, string title)
+    {
+        await page.GetByTestId("localized-input-name-iv-input").FillAsync(title);
+        await page.GetByTestId("localized-input-name-en-input").FillAsync(title);
+        await page.GetByTestId("localized-input-name-cs-input").FillAsync(title);
+        await page.GetByTestId("localized-input-description-iv-input")
+            .FillAsync("End-to-end browser upload of a small film festival sample video.");
+        await page.GetByTestId("localized-input-description-en-input")
+            .FillAsync("End-to-end browser upload of a small film festival sample video.");
+        await page.GetByTestId("localized-input-description-cs-input")
+            .FillAsync("End-to-end browser upload of a small film festival sample video.");
+
+        var genreInput = page.GetByTestId("project-genre-control").Locator("input").First;
+        await genreInput.FillAsync("Animation");
+        await genreInput.PressAsync("ArrowDown");
+        await genreInput.PressAsync("Enter");
+        await Expect(page.GetByTestId("project-genre-selected-options")).ToContainTextAsync("Animation");
+
+        var createResponse = page.WaitForResponseAsync(response =>
+            response.Request.Method == "POST" && new Uri(response.Url).AbsolutePath == "/api/v1/project");
+        await page.GetByTestId("project-submit").ClickAsync();
+        Assert.Equal(HttpStatusCode.OK, (HttpStatusCode)(await createResponse).Status);
+        await page.WaitForURLAsync("**/projects/*/edit");
+    }
+
+    private async Task OpenProjectCreationAsync(IPage page)
+    {
         await page.GotoAsync("/auth/test----org/groups/test--group");
-        var createProjectButton = page.GetByRole(AriaRole.Button, new() { Name = "Create a project", Exact = true });
-        var editGroupButton = page.GetByRole(AriaRole.Button, new() { Name = "Edit", Exact = true });
+        var createProjectButton = page.GetByTestId("project-create-button");
+        var editGroupButton = page.GetByTestId("project-group-edit-button");
         await Expect(editGroupButton).ToBeVisibleAsync();
         if (await createProjectButton.CountAsync() == 0)
         {
@@ -133,48 +344,15 @@ public sealed class FilmSubmissionEndToEndTests(EndToEndFixture fixture)
         }
 
         await createProjectButton.ClickAsync();
-        await page.GetByPlaceholder("Title of the movie - International", new() { Exact = true }).FillAsync(title);
-        await page.GetByPlaceholder("Description - International", new() { Exact = true })
-            .FillAsync("End-to-end browser upload of a small film festival sample video.");
-        await AddProjectTranslationAsync(page, "Title of the movie", "English");
-        await page.GetByPlaceholder("Title of the movie - English", new() { Exact = true }).FillAsync(title);
-        await AddProjectTranslationAsync(page, "Title of the movie", "Czech");
-        await page.Locator("[id='name.cs']").FillAsync(title);
-        await AddProjectTranslationAsync(page, "Description", "English");
-        await page.GetByPlaceholder("Description - English", new() { Exact = true })
-            .FillAsync("End-to-end browser upload of a small film festival sample video.");
-        await AddProjectTranslationAsync(page, "Description", "Czech");
-        await page.Locator("[id='description.cs']")
-            .FillAsync("End-to-end browser upload of a small film festival sample video.");
-
-        var genreControl = page.GetByText("Genre", new() { Exact = true }).Locator("..");
-        await genreControl.Locator("input").First.FillAsync("Animation");
-        await page.GetByRole(AriaRole.Option, new() { Name = "Animation", Exact = true }).ClickAsync();
-
-        var createResponse = page.WaitForResponseAsync(response =>
-            response.Request.Method == "POST" && new Uri(response.Url).AbsolutePath == "/api/v1/project");
-        await page.GetByRole(AriaRole.Button, new() { Name = "Create project", Exact = true }).ClickAsync();
-        Assert.Equal(HttpStatusCode.OK, (HttpStatusCode)(await createResponse).Status);
-        await page.WaitForURLAsync("**/projects/*/edit");
-    }
-
-    private static async Task AddProjectTranslationAsync(
-        IPage page,
-        string fieldLabel,
-        string language)
-    {
-        var field = page.GetByText(fieldLabel, new() { Exact = true }).Locator("..");
-        await field.GetByRole(AriaRole.Button, new() { Name = "Add", Exact = true }).ClickAsync();
-        await page.GetByRole(AriaRole.Menuitem, new() { Name = language, Exact = false }).First.ClickAsync();
     }
 
     private static async Task<UploadResult> UploadFilmAsync(IPage page, string fileName)
     {
         await OpenFilesTabAsync(page);
         var filmSection = await OpenFilmSectionForArtifactCreationAsync(page);
-        await filmSection.GetByText("Create a new artifact", new() { Exact = true }).ClickAsync();
-        await filmSection.GetByRole(AriaRole.Button, new() { Name = "Film", Exact = true }).ClickAsync();
-        await filmSection.GetByText("Přidat nový soubor", new() { Exact = true }).First.ClickAsync();
+        await filmSection.GetByTestId("artifact-create-film").ClickAsync();
+        await filmSection.GetByTestId("artifact-film-toggle").ClickAsync();
+        await filmSection.GetByTestId("shard-video-add-file").First.ClickAsync();
 
         var uploadResponse = page.WaitForResponseAsync(response =>
             response.Request.Method == "POST" && new Uri(response.Url).AbsolutePath == "/api/v1/shard");
@@ -185,7 +363,7 @@ public sealed class FilmSubmissionEndToEndTests(EndToEndFixture fixture)
             _ => "video/mp4"
         };
         var fixturePath = Path.Combine(AppContext.BaseDirectory, "Fixtures", fileName);
-        await filmSection.Locator("input[type=file]").First.SetInputFilesAsync(new[]
+        await filmSection.GetByTestId("shard-video-input").First.SetInputFilesAsync(new[]
         {
             new FilePayload
             {
@@ -200,7 +378,8 @@ public sealed class FilmSubmissionEndToEndTests(EndToEndFixture fixture)
         if (statusCode == HttpStatusCode.OK)
         {
             shardId = (await response.TextAsync()).Trim().Trim('"');
-            await Expect(filmSection.GetByText(shardId!, new() { Exact = true })).ToBeVisibleAsync();
+            await Expect(filmSection.GetByTestId("shard-video-file-name").First)
+                .ToHaveTextAsync(Path.GetFileName(fileName));
         }
 
         return new(statusCode, shardId);
@@ -229,25 +408,23 @@ public sealed class FilmSubmissionEndToEndTests(EndToEndFixture fixture)
     {
         await page.ReloadAsync();
         await OpenFilesTabAsync(page);
-        var filmLabel = page.Locator("label").GetByText("Film", new() { Exact = true });
-        var filmSection = filmLabel.Locator("..");
-        await filmSection.GetByRole(AriaRole.Button, new() { Name = "Film", Exact = true }).ClickAsync();
-        await filmSection.GetByText("Preview", new() { Exact = true })
-            .Locator("xpath=following-sibling::*[1]").ClickAsync();
+        var filmSection = page.GetByTestId("artifact-group-film");
+        await filmSection.GetByTestId("artifact-film-toggle").ClickAsync();
+        await filmSection.GetByTestId("artifact-preview").ClickAsync();
     }
 
     private static async Task OpenFilesTabAsync(IPage page)
     {
-        var tab = page.GetByRole(AriaRole.Tab, new() { Name = "Files", Exact = true });
+        var tab = page.GetByTestId("project-files-tab");
         await Expect(tab).ToBeVisibleAsync();
         await tab.ClickAsync();
     }
 
     private static async Task<ILocator> OpenFilmSectionForArtifactCreationAsync(IPage page)
     {
-        var filmLabel = page.Locator("label").GetByText("Film", new() { Exact = true });
-        await Expect(filmLabel).ToBeVisibleAsync();
-        return filmLabel.Locator("..");
+        var filmSection = page.GetByTestId("artifact-group-film");
+        await Expect(filmSection).ToBeVisibleAsync();
+        return filmSection;
     }
 
     private async Task RunBrowserTestAsync(string name, Func<IPage, Task> test)

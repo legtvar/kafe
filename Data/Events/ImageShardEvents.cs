@@ -10,7 +10,8 @@ public record ImageShardCreated(
     [Hrib] string ShardId,
     CreationMethod CreationMethod,
     [Hrib] string ArtifactId,
-    ImageInfo OriginalVariantInfo
+    ImageInfo OriginalVariantInfo,
+    string? UploadFileName = null
 ) : IImageShardEvent, IShardCreated;
 
 public record ImageShardVariantsAdded(

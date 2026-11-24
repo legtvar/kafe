@@ -10,7 +10,8 @@ public record VideoShardCreated(
     [Hrib] string ShardId,
     CreationMethod CreationMethod,
     [Hrib] string ArtifactId,
-    MediaInfo OriginalVariantInfo
+    MediaInfo OriginalVariantInfo,
+    string? UploadFileName = null
 ) : IVideoShardEvent, IShardCreated;
 
 public record VideoShardVariantAdded(

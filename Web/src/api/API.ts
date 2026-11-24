@@ -168,6 +168,9 @@ export class API {
             async create(author: Author) {
                 return api.post<components['schemas']['AuthorCreationDto'], HRIB>(`author`, author.serialize());
             },
+            async update(author: Author) {
+                return api.patch<components['schemas']['AuthorEditDto'], HRIB>(`author`, author.serialize(true));
+            },
         };
     }
 
@@ -304,7 +307,9 @@ export class API {
                 async updateFromCsv(id: string, perms: Permission[], csvFile: File) {
                     const formData = new FormData();
                     formData.append("Id", id);
-                    perms.length > 0 && formData.append("Permissions", perms.join(","));
+                    if (perms.length > 0) {
+                        formData.append("Permissions", perms.join(","));
+                    }
                     formData.append("CsvFile", csvFile);
 
                     return await api.upload<FormData, string>(`entity/perms-csv`, formData);

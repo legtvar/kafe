@@ -32,6 +32,7 @@ interface IArtifactUploadProps {
     project: Project;
     artifactBlueprint: components['schemas']['ProjectArtifactBlueprintDto'];
     artifact: Artifact;
+    onArtifactsChanged: () => void;
 }
 
 export function ArtifactUpload(props: IArtifactUploadProps) {
@@ -64,7 +65,7 @@ export function ArtifactUpload(props: IArtifactUploadProps) {
                 <Box borderColor={border} bg={bg} borderWidth={1} borderRadius="md" p={4} mb={2}>
                     <Accordion allowToggle m={-4}>
                         <AccordionItem borderWidth="0 !important">
-                            <AccordionButton>
+                            <AccordionButton data-testid={`artifact-${artifact.blueprintSlot}-toggle`}>
                                 <Box as="span" flex="1" textAlign="left">
                                     {artifact.getName()}{' '}
                                     {/* <Text as="span" pl={4} color={'gray.500'}>
@@ -75,17 +76,6 @@ export function ArtifactUpload(props: IArtifactUploadProps) {
                             </AccordionButton>
                             <AccordionPanel pb={4}>
                                 <Text mb={2} opacity={0.5}>
-                                    {t('artifact.section.preview.title')}
-                                </Text>
-                                <ContentThumbnail
-                                    artifact={artifact}
-                                    w={{
-                                        base: '100%',
-                                        lg: 'calc(50% - var(--kafe-space-4) / 2)',
-                                        xl: 'calc(33.33% - var(--kafe-space-4) / 2)',
-                                    }}
-                                />
-                                <Text mt={6} opacity={0.5}>
                                     {t('artifact.section.shards.title')}
                                 </Text>
                                 <Text mb={3} opacity={0.5} fontSize="sm">
@@ -101,8 +91,26 @@ export function ArtifactUpload(props: IArtifactUploadProps) {
                                         />
                                     ))}
                                 </SimpleGrid>
+
+                                {artifact.shards?.length > 0 && (
+                                    <>
+                                        <Text mt={6} mb={2} opacity={0.5}>
+                                            {t('artifact.section.preview.title')}
+                                        </Text>
+                                        <ContentThumbnail
+                                            data-testid="artifact-preview"
+                                            artifact={artifact}
+                                            w={{
+                                                base: '100%',
+                                                lg: 'calc(50% - var(--kafe-space-4) / 2)',
+                                                xl: 'calc(33.33% - var(--kafe-space-4) / 2)',
+                                            }}
+                                        />
+                                    </>
+                                )}
+
                                 <Text mt={6} mb={2} opacity={0.5}>
-                                    Správa
+                                    {t('artifact.management').toString()}
                                 </Text>
                                 <Button colorScheme="red" leftIcon={<IoTrashOutline />} onClick={onOpen}>
                                     {t('artifact.delete').toString()}

@@ -21,11 +21,11 @@ export const VideoJS = (props: IVideoJSProps) => {
 
             const player = videojs(videoElement, options, () => {
                 videojs.log('Player is ready');
-                onReady && onReady(player);
+                onReady?.(player);
             });
             setPlayer(player);
-        } else {
-            options.sources && player.src(options.sources);
+        } else if (options.sources) {
+            player.src(options.sources);
         }
     }, [options, videoRef, onReady, player]);
 

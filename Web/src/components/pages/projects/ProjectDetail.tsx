@@ -90,6 +90,7 @@ export function ProjectDetail(props: IProjectDetailProps) {
                                     </Heading>
                                     <ProjectAuthorList
                                         authors={project.crew}
+                                        requestDetails
                                         isDropdownCrewList={
                                             (project.genre === undefined || project.genreTags !== undefined)
                                         }
@@ -101,7 +102,7 @@ export function ProjectDetail(props: IProjectDetailProps) {
                                     <Heading as="h3" size="md" pt={12} pb={4}>
                                         {t('project.cast')}
                                     </Heading>
-                                    <ProjectAuthorList authors={project.cast} />
+                                    <ProjectAuthorList authors={project.cast} requestDetails />
                                 </>
                             )}
 

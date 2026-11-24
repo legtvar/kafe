@@ -447,6 +447,61 @@
             }
           }
         }
+      },
+      "patch": {
+        "tags": [
+          "Author"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthorEditDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthorEditDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthorEditDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "description": "Human-Readable Identifier Ballast",
+                  "format": "hrib",
+                  "example": "AAAAbadf00d"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "description": "Human-Readable Identifier Ballast",
+                  "format": "hrib",
+                  "example": "AAAAbadf00d"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "string",
+                  "description": "Human-Readable Identifier Ballast",
+                  "format": "hrib",
+                  "example": "AAAAbadf00d"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/api/v1/author/{id}": {
@@ -2744,11 +2799,57 @@
         },
         "additionalProperties": false
       },
+      "AuthorEditDto": {
+        "required": [
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Human-Readable Identifier Ballast (HRIB)",
+            "format": "hrib",
+            "example": "AAAAbadf00d"
+          },
+          "name": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "globalPermissions": {
+            "$ref": "#/components/schemas/Permission"
+          },
+          "bio": {
+            "$ref": "#/components/schemas/LocalizedString"
+          },
+          "uco": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "email": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "phone": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
       "AuthorDetailDto": {
         "required": [
           "globalPermissions",
           "id",
-          "name"
+          "name",
+          "userPermissions"
         ],
         "type": "object",
         "properties": {
@@ -2784,6 +2885,12 @@
               "null",
               "string"
             ]
+          },
+          "userPermissions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Permission"
+            }
           }
         },
         "additionalProperties": false
@@ -3271,6 +3378,7 @@
       "Permission": {
         "title": "Permission",
         "enum": [
+          "none",
           "read",
           "append",
           "inspect",
@@ -3661,6 +3769,7 @@
           "cast",
           "crew",
           "isLocked",
+          "isPublishedForUnlimitedTime",
           "name",
           "projectGroupId"
         ],
@@ -3693,6 +3802,9 @@
               "string"
             ]
           },
+          "isPublishedForUnlimitedTime": {
+            "type": "boolean"
+          },
           "crew": {
             "type": "array",
             "items": {
@@ -3720,6 +3832,7 @@
           "globalPermissions",
           "id",
           "isLocked",
+          "isPublishedForUnlimitedTime",
           "name",
           "projectGroupId",
           "releasedOn",
@@ -3767,6 +3880,9 @@
               "null",
               "string"
             ]
+          },
+          "isPublishedForUnlimitedTime": {
+            "type": "boolean"
           },
           "globalPermissions": {
             "type": "array",
@@ -3878,6 +3994,10 @@
               "null",
               "string"
             ]
+          },
+          "isPublishedForUnlimitedTime": {
+            "type": "boolean",
+            "nullable": true
           },
           "crew": {
             "type": [
@@ -4456,6 +4576,10 @@
             "description": "Human-Readable Identifier Ballast (HRIB)",
             "format": "hrib",
             "example": "AAAAbadf00d"
+          },
+          "uploadFileName": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false,
@@ -4473,7 +4597,8 @@
           "video",
           "image",
           "subtitles",
-          "blend"
+          "blend",
+          "blob"
         ],
         "type": "string"
       },
@@ -4499,6 +4624,10 @@
             "items": {
               "type": "string"
             }
+          },
+          "uploadFileName": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false

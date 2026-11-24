@@ -15,8 +15,9 @@ interface IUploadProps {
     projectId: string;
     shardKind: components['schemas']['ShardKind'];
     artifactId: string;
-    onUploaded?: (id: HRIB) => void;
+    onUploaded?: (id: HRIB) => void | Promise<void>;
     repeatable?: boolean;
+    maxSize?: number;
 }
 
 export function Upload(props: IUploadProps) {
@@ -43,7 +44,9 @@ export function Upload(props: IUploadProps) {
             );
 
             if (response.status === 200) {
-                props.onUploaded && props.onUploaded(response.data);
+                if (props.onUploaded) {
+                    await props.onUploaded(response.data);
+                }
                 setStatus('uploaded');
             } else {
                 setStatus('error');
@@ -65,7 +68,7 @@ export function Upload(props: IUploadProps) {
 
     if (status === 'ready')
         return (
-            <Dropzone onDrop={upload} maxFiles={1}>
+            <Dropzone onDrop={upload} maxFiles={1} maxSize={props.maxSize}>
                 {({ getRootProps, getInputProps, isDragActive, isFileDialogActive }) => (
                     <Center
                         py={8}
@@ -85,7 +88,7 @@ export function Upload(props: IUploadProps) {
                                     </Text>
                                     <br />
                                     nebo klikněte pro výběr z počítače
-                                    <input {...getInputProps()} />
+                                    <input {...getInputProps()} data-testid={`shard-${props.shardKind}-input`} />
                                 </Trans>
                             </Text>
                         </Flex>

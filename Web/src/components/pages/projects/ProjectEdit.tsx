@@ -14,7 +14,7 @@ import {
     VStack,
 } from '@chakra-ui/react';
 import { t } from 'i18next';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { AiOutlineUnlock } from 'react-icons/ai';
 import { BsFillExclamationTriangleFill, BsX } from 'react-icons/bs';
 import { IoSaveOutline } from 'react-icons/io5';
@@ -42,6 +42,8 @@ export function ProjectEdit(props: IProjectEditProps) {
     const { id } = useParams();
     const { user } = useAuth();
     const navigate = useNavigate();
+    const [validationRevision, setValidationRevision] = useState(0);
+    const refreshValidation = useCallback(() => setValidationRevision((revision) => revision + 1), []);
 
     if (!id) {
         return <Status statusCode={404} embeded />;
@@ -71,7 +73,7 @@ export function ProjectEdit(props: IProjectEditProps) {
                                 alignItems="start"
                             >
                                 <Heading fontSize="4xl" fontWeight="semibold" as="h2" lineHeight="tight" mr="auto">
-                                    {project.getName()}
+                                    {project.getName() || " "}
                                 </Heading>
                                 <SendAPI
                                     value={project}
@@ -88,6 +90,7 @@ export function ProjectEdit(props: IProjectEditProps) {
                                         >
                                             {(savePerms, permsSaveStatus) => (
                                                 <Button
+                                                    data-testid="project-save"
                                                     leftIcon={<IoSaveOutline />}
                                                     colorScheme="blue"
                                                     isDisabled={project.changed.size === 0 && perms.changed.size === 0}
@@ -111,11 +114,17 @@ export function ProjectEdit(props: IProjectEditProps) {
                                 </Link>
                             </Flex>
                             <ProjectTags project={project} />
-                            <Tabs>
+                            <Tabs
+                                onChange={(index) => {
+                                    if (index === 0) {
+                                        refreshValidation();
+                                    }
+                                }}
+                            >
                                 <TabList>
-                                    <Tab>{t('projectEdit.tabs.status').toString()}</Tab>
-                                    <Tab>{t('projectEdit.tabs.info').toString()}</Tab>
-                                    <Tab>{t('projectEdit.tabs.files').toString()}</Tab>
+                                    <Tab data-testid="project-status-tab">{t('projectEdit.tabs.status').toString()}</Tab>
+                                    <Tab data-testid="project-basic-info-tab">{t('projectEdit.tabs.info').toString()}</Tab>
+                                    <Tab data-testid="project-files-tab">{t('projectEdit.tabs.files').toString()}</Tab>
                                     <Tab>{t('projectEdit.tabs.perms').toString()}</Tab>
                                     {project.userPermissions.includes('review') && (
                                         <Tab>
@@ -127,7 +136,7 @@ export function ProjectEdit(props: IProjectEditProps) {
 
                                 <TabPanels pt={6}>
                                     <TabPanel mt={-4}>
-                                        <ProjectStatus projectId={id} />
+                                        <ProjectStatus key={validationRevision} projectId={id} />
 
                                         <Heading as="h2" fontSize="lg" mb={4} pt={24}>
                                             {t('project.admin.archive').toString()}
@@ -151,6 +160,7 @@ export function ProjectEdit(props: IProjectEditProps) {
                                                         project={project}
                                                         artifactBlueprint={blueprint!}
                                                         slotName={slotName}
+                                                        onArtifactsChanged={refreshValidation}
                                                     />
                                                 ))}
                                         </Stack>

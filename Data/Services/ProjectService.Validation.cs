@@ -19,6 +19,8 @@ public partial class ProjectService
     public static readonly TimeSpan AcceptableDurationError = TimeSpan.FromSeconds(1);
     public const long FilmMaxFileLength = 2L << 30; // 2 GiB
     public const string FilmMaxFileLengthDescription = "2 GiB";
+    public const long LicenseFileMaxFileLength = 10L << 20; // 10 MiB
+    public const string LicenseFileMaxFileLengthDescription = "10 MiB";
     public const long VideoMinBitrate = 10_000_000;
     public const string VideoMinBitrateDescription = "10 Mbps";
     public const long VideoMaxBitrate = 20_000_000;
@@ -33,7 +35,8 @@ public partial class ProjectService
     public static readonly string[] AllowedContainers = new[]
     {
         "video/mp4",
-        "video/x-matroska"
+        "video/x-matroska",
+        "video/quicktime"
     };
     public static readonly string[] AllowedVideoCodecs = new[]
     {
@@ -400,6 +403,26 @@ public partial class ProjectService
         )
     );
 
+    public static readonly Diagnostic TooManyLicenseFiles = new Diagnostic(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: FileStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, $"A project can contain at most {Const.LicenseFileMaxCount} license files."),
+            (Const.CzechCulture, $"Projekt může obsahovat nejvýše {Const.LicenseFileMaxCount} licenčních souborů."),
+            (Const.SlovakCulture, $"Projekt môže obsahovať najviac {Const.LicenseFileMaxCount} licenčných súborov.")
+        )
+    );
+
+    public static readonly Diagnostic LicenseFileIsTooLarge = new Diagnostic(
+        Kind: DiagnosticKind.Error,
+        ValidationStage: FileStage,
+        Message: LocalizedString.Create(
+            (Const.InvariantCulture, $"A license file is larger than {LicenseFileMaxFileLengthDescription}."),
+            (Const.CzechCulture, $"Licenční soubor je větší než {LicenseFileMaxFileLengthDescription}."),
+            (Const.SlovakCulture, $"Licenčný súbor je väčší než {LicenseFileMaxFileLengthDescription}.")
+        )
+    );
+
     public static readonly Diagnostic FilmTooShort = new Diagnostic(
         Kind: DiagnosticKind.Error,
         ValidationStage: FileStage,
@@ -535,11 +558,11 @@ public partial class ProjectService
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "The film file uses an unsupported format. " +
-                "The supported formats are MP4, M4V, and MKV."),
+                "The supported formats are MP4, M4V, MKV, and MOV."),
             (Const.CzechCulture, "Soubor s filmem používá nepodporovaný kontejner. " +
-                "Podporovanými kontejnery jsou MP4, M4V a MKV."),
+                "Podporovanými kontejnery jsou MP4, M4V, MKV a MOV."),
             (Const.SlovakCulture, "Súbor s filmom používa nepodporovaný kontajner. " +
-                "Podporovanými kontajnermi sú MP4, M4V a MKV.")
+                "Podporovanými kontajnermi sú MP4, M4V, MKV a MOV.")
         )
     );
 
@@ -548,11 +571,11 @@ public partial class ProjectService
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "The video-annotation file uses an unsupported format. " +
-                "The supported formats are MP4, M4V, and MKV."),
+                "The supported formats are MP4, M4V, MKV, and MOV."),
             (Const.CzechCulture, "Soubor s videoanotací používá nepodporovaný kontejner. " +
-                "Podporovanými kontejnery jsou MP4, M4V a MKV."),
+                "Podporovanými kontejnery jsou MP4, M4V, MKV a MOV."),
             (Const.SlovakCulture, "Súbor s videoanotáciou používa nepodporovaný kontajner. " +
-                "Podporovanými kontajnermi sú MP4, M4V a MKV.")
+                "Podporovanými kontajnermi sú MP4, M4V, MKV a MOV.")
         )
     );
 
@@ -1311,6 +1334,28 @@ public partial class ProjectService
                         continue;
                     }
                     diagnostics.AddRange(ValidateImage(imageShard));
+                }
+            }
+        }
+
+        if (artifactBlueprints!.GetValueOrDefault(Const.LicenseFileBlueprintSlot, null) is not null)
+        {
+            var licenseArtifacts = artifacts
+                .Where(a => a.projectArtifact.BlueprintSlot == Const.LicenseFileBlueprintSlot)
+                .ToImmutableArray();
+            if (licenseArtifacts.Length > artifactBlueprints[Const.LicenseFileBlueprintSlot].Arity.Max)
+            {
+                diagnostics.Add(TooManyLicenseFiles);
+            }
+
+            var licenseShards = licenseArtifacts
+                .SelectMany(a => a.info.Shards.Where(s => s.Kind == ShardKind.Blob));
+            foreach (var licenseShard in licenseShards)
+            {
+                var blob = await db.LoadAsync<BlobShardInfo>(licenseShard.ShardId, token);
+                if (blob?.Info.FileLength > LicenseFileMaxFileLength)
+                {
+                    diagnostics.Add(LicenseFileIsTooLarge);
                 }
             }
         }

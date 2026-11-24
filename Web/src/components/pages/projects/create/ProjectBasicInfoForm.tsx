@@ -7,7 +7,7 @@ import { AuthorFlowDialog } from '../../../utils/Authors/AuthorFlowDialog';
 import { LocalizedInput } from '../../../utils/LocalizedInput';
 import { ProjectAuthorList } from '../../../utils/ProjectAuthorList';
 import { TextareaLimited } from '../../../utils/TextareaLimited';
-import { MultiSelect } from 'chakra-multiselect';
+import { MultiSelect, type SelectedListProps } from 'chakra-multiselect';
 import genreManager from '../../../../utils/managers/genreManager';
 
 interface ProjectBasicInfoFormProps {
@@ -27,6 +27,9 @@ export function ProjectBasicInfoForm({ project, onSubmit, status, update, noSelf
     };
 
     const isDropdownSelect = (project.genre === undefined || project.genreTags !== undefined);
+    const genreSelectedListProps: SelectedListProps & { 'data-testid': string } = {
+        'data-testid': 'project-genre-selected-options',
+    };
 
     return (
         <Stack spacing={8} direction="column" mb={8}>
@@ -49,7 +52,7 @@ export function ProjectBasicInfoForm({ project, onSubmit, status, update, noSelf
                     split
                 />
             </FormControl>
-            <FormControl my={4}>
+            <FormControl data-testid="project-genre-control" my={4}>
                 <FormLabel>{t('createProject.fields.genre').toString()}</FormLabel>
                 {isDropdownSelect ?
                 <>
@@ -57,6 +60,7 @@ export function ProjectBasicInfoForm({ project, onSubmit, status, update, noSelf
                         {t(`createProject.fields.genreHelp`).toString()}
                     </FormHelperText>
                     <MultiSelect
+                        selectedListProps={genreSelectedListProps}
                         options={genreManager.getOptions()}
                         value={project.genreTags}
                         onChange={value => genreManager.onChange(value, project, forceUpdate)}
@@ -245,6 +249,7 @@ export function ProjectBasicInfoForm({ project, onSubmit, status, update, noSelf
             {!noSelfSubmit && (
                 <HStack w="100%">
                     <Button
+                        data-testid="project-submit"
                         colorScheme="blue"
                         ml="auto"
                         isDisabled={status === 'sending' || status === 'ok'}

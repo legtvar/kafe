@@ -88,7 +88,7 @@ export function Upload(props: IUploadProps) {
                                     </Text>
                                     <br />
                                     nebo klikněte pro výběr z počítače
-                                    <input {...getInputProps()} />
+                                    <input {...getInputProps()} data-testid={`shard-${props.shardKind}-input`} />
                                 </Trans>
                             </Text>
                         </Flex>

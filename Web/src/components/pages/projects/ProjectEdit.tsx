@@ -90,6 +90,7 @@ export function ProjectEdit(props: IProjectEditProps) {
                                         >
                                             {(savePerms, permsSaveStatus) => (
                                                 <Button
+                                                    data-testid="project-save"
                                                     leftIcon={<IoSaveOutline />}
                                                     colorScheme="blue"
                                                     isDisabled={project.changed.size === 0 && perms.changed.size === 0}
@@ -121,9 +122,9 @@ export function ProjectEdit(props: IProjectEditProps) {
                                 }}
                             >
                                 <TabList>
-                                    <Tab>{t('projectEdit.tabs.status').toString()}</Tab>
-                                    <Tab>{t('projectEdit.tabs.info').toString()}</Tab>
-                                    <Tab>{t('projectEdit.tabs.files').toString()}</Tab>
+                                    <Tab data-testid="project-status-tab">{t('projectEdit.tabs.status').toString()}</Tab>
+                                    <Tab data-testid="project-basic-info-tab">{t('projectEdit.tabs.info').toString()}</Tab>
+                                    <Tab data-testid="project-files-tab">{t('projectEdit.tabs.files').toString()}</Tab>
                                     <Tab>{t('projectEdit.tabs.perms').toString()}</Tab>
                                     {project.userPermissions.includes('review') && (
                                         <Tab>

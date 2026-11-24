@@ -19,7 +19,7 @@ import {
     useDisclosure,
     VStack,
 } from '@chakra-ui/react';
-import { MultiSelect } from 'chakra-multiselect';
+import { MultiSelect, type SelectedListProps } from 'chakra-multiselect';
 import { t } from 'i18next';
 import { RefObject, useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -84,7 +84,7 @@ export function AuthorFlowDialog({
     return (
         <>
             {!initialAuthor && !initialStatus && (
-                <Button onClick={onOpen} mt={4}>
+                <Button data-testid="author-add-button" onClick={onOpen} mt={4}>
                     {t('authorSelect.button').toString()}
                 </Button>
             )}
@@ -170,6 +170,7 @@ function AuthorQueryModal({ initialRef, name, onNameChange, onSelect, onCreate, 
                             <AiOutlineSearch />
                         </InputLeftElement>
                         <Input
+                            data-testid="author-name-query"
                             ref={initialRef}
                             value={name}
                             onChange={(event) => onNameChange(event.target.value)}
@@ -197,6 +198,7 @@ function AuthorQueryModal({ initialRef, name, onNameChange, onSelect, onCreate, 
                                     </Box>
                                 ))}
                             <HStack
+                                data-testid="author-create-option"
                                 px={8}
                                 py={4}
                                 cursor="pointer"
@@ -292,6 +294,7 @@ function AuthorNewModal({ author, onChange, isExisting, canEdit, onSaved, onClos
                     >
                         {(onSubmit, sendStatus) => (
                             <Button
+                                data-testid="author-save"
                                 colorScheme="blue"
                                 mr={3}
                                 onClick={onSubmit}
@@ -322,6 +325,7 @@ function AuthorField({ author, field, onChange }: IAuthorFieldProps) {
         <FormControl mb={6}>
             <FormLabel>{t(`authorSelect.${field}`).toString()}</FormLabel>
             <Input
+                data-testid={`author-${field}-input`}
                 placeholder={t(`authorSelect.${field}`).toString()}
                 value={author[field]}
                 onChange={(event) => {
@@ -344,16 +348,20 @@ function AuthorRoleModal({ roles: initialRoles, isDropdownCrewSelect, onSaved, o
     const [roles, setRoles] = useState(initialRoles);
     const [roleString, setRoleString] = useState('');
     const { t } = useTranslation();
+    const rolesSelectedListProps: SelectedListProps & { 'data-testid': string } = {
+        'data-testid': 'author-roles-selected-options',
+    };
 
     return (
         <ModalContent>
             <ModalHeader>{t('authorSelect.selectRoles').toString()}</ModalHeader>
             <ModalCloseButton />
             <ModalBody pb={6}>
-                <FormControl mt={6}>
-                    <FormLabel>{t('authorSelect.selectRoles').toString()}</FormLabel>
+                <FormControl data-testid="author-roles-control" mt={6}>
+                    <FormLabel data-testid="author-roles-label">{t('authorSelect.selectRoles').toString()}</FormLabel>
                     {isDropdownCrewSelect ? (
                         <MultiSelect
+                            selectedListProps={rolesSelectedListProps}
                             options={crewRolesManager.getOptions()}
                             value={crewRolesManager.getValue(roles)}
                             onChange={(value) => crewRolesManager.onChange(value, setRoles)}
@@ -371,6 +379,7 @@ function AuthorRoleModal({ roles: initialRoles, isDropdownCrewSelect, onSaved, o
             </ModalBody>
             <ModalFooter>
                 <Button
+                    data-testid="author-roles-save"
                     colorScheme="blue"
                     mr={3}
                     onClick={() => {

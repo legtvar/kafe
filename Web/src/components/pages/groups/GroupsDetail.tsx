@@ -38,18 +38,27 @@ export function GroupsDetail(props: IGroupsDetailProps) {
                             mb={6}
                             alignItems="start"
                         >
-                            <Heading fontSize="4xl" fontWeight="semibold" as="h2" lineHeight="tight" mr="auto">
+                            <Heading
+                                data-testid="project-group-heading"
+                                fontSize="4xl"
+                                fontWeight="semibold"
+                                as="h2"
+                                lineHeight="tight"
+                                mr="auto"
+                            >
                                 {group.getName()}
                             </Heading>
                             {group.isOpen && (
                                 <Link to="create">
-                                    <Button leftIcon={<AiOutlinePlus />} colorScheme="brand">
+                                    <Button data-testid="project-create-button" leftIcon={<AiOutlinePlus />} colorScheme="brand">
                                         {t('createProject.signUp').toString()}
                                     </Button>
                                 </Link>
                             )}
                             <Link to="edit">
-                                <Button leftIcon={<AiOutlineEdit />}>{t('generic.edit').toString()}</Button>
+                                <Button data-testid="project-group-edit-button" leftIcon={<AiOutlineEdit />}>
+                                    {t('generic.edit').toString()}
+                                </Button>
                             </Link>
                         </Flex>
                         <Box>

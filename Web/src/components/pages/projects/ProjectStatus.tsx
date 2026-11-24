@@ -32,7 +32,7 @@ export function ProjectStatus(props: IProjectStatusProps) {
             {(validation: components['schemas']['ProjectValidationDto']) => (
                 <AwaitAPI request={getProject}>
                     {(project: Project) => (
-                        <>
+                        <Box data-testid="project-validation-status">
                             <StatusGroup stage="info" diagnostics={validation.diagnostics} />
                             <StatusGroup stage="file" diagnostics={validation.diagnostics} />
                             {project.blueprint.requiredReviewers.map((stage, i) => (
@@ -46,7 +46,7 @@ export function ProjectStatus(props: IProjectStatusProps) {
                                     .sort((a, b) => new Date(b.addedOn).getTime() - new Date(a.addedOn).getTime())
                                 }
                             />}
-                        </>
+                        </Box>
                     )}
                 </AwaitAPI>
             )}

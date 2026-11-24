@@ -155,6 +155,7 @@ export const LocalizedInput: ComponentWithAs<'input', ILocalizedInputProps> = ({
     const addLanguageMenu = (
         <Menu isLazy>
             <MenuButton
+                data-testid={`localized-input-${name}-add-language`}
                 as={IconButton}
                 icon={<IoAdd />}
                 size={split ? "lg" : undefined}
@@ -175,7 +176,11 @@ export const LocalizedInput: ComponentWithAs<'input', ILocalizedInputProps> = ({
                 {translated
                     .filter((lang) => !Object.keys(localizedValue).includes(lang.id))
                     .map((lang, key) => (
-                        <MenuItem onClick={() => addLanguage(lang.id)} key={key}>
+                        <MenuItem
+                            data-testid={`localized-input-${name}-language-option-${lang.id}`}
+                            onClick={() => addLanguage(lang.id)}
+                            key={key}
+                        >
                             <HStack>
                                 <Center w="18px">
                                     <lang.flag />
@@ -188,7 +193,11 @@ export const LocalizedInput: ComponentWithAs<'input', ILocalizedInputProps> = ({
                 {allFlags
                     .filter((lang) => !Object.keys(localizedValue).includes(lang.id))
                     .map((lang, key) => (
-                        <MenuItem onClick={() => addLanguage(lang.id)} key={key}>
+                        <MenuItem
+                            data-testid={`localized-input-${name}-all-language-option-${lang.id}`}
+                            onClick={() => addLanguage(lang.id)}
+                            key={key}
+                        >
                             <HStack>
                                 <Center w="18px">
                                     <lang.flag />
@@ -246,7 +255,10 @@ export const LocalizedInput: ComponentWithAs<'input', ILocalizedInputProps> = ({
                             </Tooltip>
                         )}
                         <VStack flexGrow={1} alignItems="start" spacing={0}>
-                            <Component {...inputProps} />
+                            <Component
+                                {...inputProps}
+                                data-testid={`localized-input-${name}-${key}-input`}
+                            />
                         </VStack>
                         <IconButton
                             aria-label={t('generic.remove').toString()}
@@ -294,11 +306,18 @@ export const LocalizedInput: ComponentWithAs<'input', ILocalizedInputProps> = ({
     }
 
     return (
-        <Tabs isManual variant="enclosed" onChange={(index) => setTabIndex(index)} index={tabIndex}>
+        <Tabs
+            data-testid={`localized-input-${name}`}
+            isManual
+            variant="enclosed"
+            onChange={(index) => setTabIndex(index)}
+            index={tabIndex}
+        >
             <TabList borderBottom="none" px={0}>
                 {keys.map((key) => (
                     <Tooltip key={key} label={getLanguageHint(key)} hasArrow>
                         <Tab
+                            data-testid={`localized-input-${name}-${key}-tab`}
                             as={FullyTabbableTab}
                             p={3}
                             aria-label={getLanguageName(key)}

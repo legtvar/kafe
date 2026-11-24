@@ -51,7 +51,7 @@ export function ArtifactGroupUpload(props: IArtifactGroupUploadProps) {
             repeatable
         >
             {(onSubmit, status) => (
-                <FormControl>
+                <FormControl data-testid={`artifact-group-${slotName}`}>
                     <FormLabel>{getPrefered(toLocalizedString(name))}</FormLabel>
                     <FormHelperText mb={6}>
                         {getPrefered(toLocalizedString(description))}{' '}
@@ -68,6 +68,7 @@ export function ArtifactGroupUpload(props: IArtifactGroupUploadProps) {
 
                     {artifactsInSlot.length < arity.max && (
                         <Box
+                            data-testid={`artifact-create-${slotName}`}
                             borderColor={border}
                             bg={bg}
                             borderWidth={1}

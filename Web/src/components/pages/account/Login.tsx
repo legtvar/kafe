@@ -47,7 +47,9 @@ export function Login() {
     return (
         <>
             <Stack align={'center'}>
-                <Heading fontSize={'4xl'}>{t('login.title').toString()}</Heading>
+                <Heading data-testid="account-login-heading" fontSize={'4xl'}>
+                    {t('login.title').toString()}
+                </Heading>
                 <Text fontSize={'lg'} color={'gray.600'}>
                     {t('register.subtitle').toString()}
                 </Text>
@@ -58,7 +60,12 @@ export function Login() {
                         <FormControl id="email" isRequired>
                             <FormLabel>{t('register.email').toString()}</FormLabel>
                             <form onSubmit={() => login()}>
-                                <Input type="email" value={email} onChange={(event) => setEmail(event.target.value)} />
+                                <Input
+                                    data-testid="account-login-email"
+                                    type="email"
+                                    value={email}
+                                    onChange={(event) => setEmail(event.target.value)}
+                                />
                             </form>
                         </FormControl>
                         {state === 'error' && (
@@ -68,6 +75,7 @@ export function Login() {
                         )}
                         <Stack spacing={10} pt={2}>
                             <Button
+                                data-testid="account-login-submit"
                                 loadingText={t('generic.submitting').toString()}
                                 size="lg"
                                 bg={'blue.400'}
@@ -122,7 +130,7 @@ export function Login() {
                 )}
                 {state === 'submited' && (
                     <>
-                        <Text as="p" pb={4}>
+                        <Text data-testid="account-login-confirmation-sent" as="p" pb={4}>
                             {t('temp.after').toString()}
                         </Text>
                         <Text as="p" pb={4}>

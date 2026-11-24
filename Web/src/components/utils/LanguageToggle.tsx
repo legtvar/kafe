@@ -62,14 +62,19 @@ export function LanguageToggle({ onLanguageToggled: onLanguageChange, ...rest }:
         [],
     );
 
-    const mapper = (onClick: (lang: Intl.Locale) => void) => (lang: Intl.Locale, key: number) => {
+    const mapper = (onClick: (lang: Intl.Locale) => void, kind: 'app' | 'content') => (lang: Intl.Locale, key: number) => {
         const Flag: Flags.FlagComponent | undefined = flags[lang.region ?? ''];
         const FlagIcon = Flag ?? BsGlobe;
 
         const lng = CountryLanguage.getLanguage(lang.language);
 
         return (
-            <MenuItemOption key={key} value={lang.language} onClick={() => onClick(lang)}>
+            <MenuItemOption
+                data-testid={`language-${kind}-option-${lang.language}`}
+                key={key}
+                value={lang.language}
+                onClick={() => onClick(lang)}
+            >
                 <HStack>
                     <FlagIcon width={18} />
                     <Text>
@@ -85,13 +90,21 @@ export function LanguageToggle({ onLanguageToggled: onLanguageChange, ...rest }:
 
     return (
         <Menu closeOnSelect={false}>
-            <MenuButton as={IconButton} size="lg" icon={CurrentFlag ? <CurrentFlag /> : <DefaultFlag />} p={3} variant="ghost" {...rest} />
+            <MenuButton
+                data-testid="language-selector"
+                as={IconButton}
+                size="lg"
+                icon={CurrentFlag ? <CurrentFlag /> : <DefaultFlag />}
+                p={3}
+                variant="ghost"
+                {...rest}
+            />
             <MenuList overflowY="auto" maxH="80vh" w={96}>
                 <MenuOptionGroup title={t('languageToggle.system')} value={i18next.language}>
                     {translated.map(
                         mapper((lang) => {
                             changeLanguage(lang.language);
-                        }),
+                        }, 'app'),
                     )}
                 </MenuOptionGroup>
                 <MenuDivider />
@@ -126,7 +139,7 @@ export function LanguageToggle({ onLanguageToggled: onLanguageChange, ...rest }:
                         all.map(
                             mapper((lang) => {
                                 changeContentLanguage(lang.language);
-                            }),
+                            }, 'content'),
                         )
                     )}
                 </MenuOptionGroup>

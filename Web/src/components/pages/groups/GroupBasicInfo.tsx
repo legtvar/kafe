@@ -120,6 +120,7 @@ export function GroupBasicInfo(props: IGroupBasicInfoProps) {
                     {!props.noSelfSubmit && (
                         <HStack w="100%">
                             <Button
+                                data-testid="project-group-save"
                                 colorScheme="blue"
                                 ml="auto"
                                 isDisabled={status === 'sending' || status === 'ok'}

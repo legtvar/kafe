@@ -63,7 +63,7 @@ export function ShardGroupUpload(props: IShardGroupUploadProps) {
                     mb={2}
                     key={i}
                 >
-                    <Text>
+                    <Text data-testid={`shard-${kind}-file-name`}>
                         <Icon fontSize="1.2em">
                             <FileIcon kind={kind} />
                         </Icon>{' '}
@@ -75,7 +75,7 @@ export function ShardGroupUpload(props: IShardGroupUploadProps) {
                 <Box w="100%" borderColor={border} bg={bg} borderWidth={1} borderRadius="md" py={4} px={4}>
                     <Accordion allowToggle m={-4}>
                         <AccordionItem borderWidth="0 !important">
-                            <AccordionButton color={'gray.500'}>
+                            <AccordionButton data-testid={`shard-${kind}-add-file`} color={'gray.500'}>
                                 <Box as="span" flex="1" textAlign="left">
                                     <Icon fontSize="1.2em">
                                         <AiOutlinePlus />

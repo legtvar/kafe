@@ -65,7 +65,7 @@ export function ArtifactUpload(props: IArtifactUploadProps) {
                 <Box borderColor={border} bg={bg} borderWidth={1} borderRadius="md" p={4} mb={2}>
                     <Accordion allowToggle m={-4}>
                         <AccordionItem borderWidth="0 !important">
-                            <AccordionButton>
+                            <AccordionButton data-testid={`artifact-${artifact.blueprintSlot}-toggle`}>
                                 <Box as="span" flex="1" textAlign="left">
                                     {artifact.getName()}{' '}
                                     {/* <Text as="span" pl={4} color={'gray.500'}>
@@ -98,6 +98,7 @@ export function ArtifactUpload(props: IArtifactUploadProps) {
                                             {t('artifact.section.preview.title')}
                                         </Text>
                                         <ContentThumbnail
+                                            data-testid="artifact-preview"
                                             artifact={artifact}
                                             w={{
                                                 base: '100%',

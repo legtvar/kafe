@@ -124,6 +124,7 @@ export function Navbar({ onOpen, forceReload, signedIn, ...rest }: INavbarProps)
                         <Flex alignItems={'center'}>
                             <Menu>
                                 <MenuButton
+                                    data-testid="account-menu-button"
                                     as={Button}
                                     size="lg"
                                     variant="ghost"
@@ -168,6 +169,7 @@ export function Navbar({ onOpen, forceReload, signedIn, ...rest }: INavbarProps)
                                     </HStack>
                                     <MenuDivider display={{ base: 'block', md: 'none' }} />
                                     <MenuItem
+                                        data-testid="account-sign-out"
                                         onClick={() => {
                                             setUser(null);
                                             api.accounts.logout();

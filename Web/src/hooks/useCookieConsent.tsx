@@ -55,6 +55,7 @@ export function useCookieConsent() {
                             {t('cookies.reject')}
                         </Button>
                         <Button
+                            data-testid="cookie-consent-accept"
                             colorScheme="blue"
                             onClick={() => {
                                 localStorage.setItem(LS_COOKIE_CONSENT, 'true');

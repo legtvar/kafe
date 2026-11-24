@@ -64,13 +64,18 @@ function SimpleProjectAuthorList({
             <KafeAvatar size={'md'} person={displayedAuthor} />
             <VStack alignItems="start" pl={2} spacing={0}>
                 {canEditDetails ? (
-                    <Text fontWeight="bolder">{displayedAuthor.name}</Text>
+                    <Text data-testid="project-author-name" fontWeight="bolder">{displayedAuthor.name}</Text>
                 ) : (
-                    <Button variant="link" fontWeight="bolder" onClick={() => setIsDialogOpen(true)}>
+                    <Button
+                        data-testid="project-author-name"
+                        variant="link"
+                        fontWeight="bolder"
+                        onClick={() => setIsDialogOpen(true)}
+                    >
                         {displayedAuthor.name}
                     </Button>
                 )}
-                <Text color="gray.500">
+                <Text data-testid="project-author-roles" color="gray.500">
                     {(isDropdownCrewList && displayedRoles.every((role) => crewRoleManager.tags.has(role))
                         ? displayedRoles.map((role) => t(`createProject.fields.crewRoles.${role}`))
                         : displayedRoles
@@ -81,6 +86,7 @@ function SimpleProjectAuthorList({
                 <HStack spacing={1}>
                     <Tooltip label={t('authorSelect.editDetails').toString()}>
                         <IconButton
+                            data-testid="project-author-edit-details"
                             aria-label={t('authorSelect.editDetails').toString()}
                             icon={<AiOutlineEdit />}
                             size="sm"
@@ -90,6 +96,7 @@ function SimpleProjectAuthorList({
                     </Tooltip>
                     <Tooltip label={t('authorSelect.editRoles').toString()}>
                         <IconButton
+                            data-testid="project-author-edit-roles"
                             aria-label={t('authorSelect.editRoles').toString()}
                             icon={<BsPeople />}
                             size="sm"

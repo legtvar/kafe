@@ -103,6 +103,7 @@ export function Video({ sources, subtitles, autoplay, videoProps, onNext, onPrev
     return (
         <DarkMode>
             <Box
+                data-testid="video-player"
                 ref={wrapperRef}
                 width={'100%'}
                 height={'100%'}
@@ -232,7 +233,7 @@ export function Video({ sources, subtitles, autoplay, videoProps, onNext, onPrev
                         {error ? (
                             <VStack>
                                 <Icon color={'yellow.500'} as={IoWarning} fontSize="5em" />
-                                <Text>{error.toString()}</Text>
+                                <Text data-testid="video-error">{error.toString()}</Text>
                             </VStack>
                         ) : (
                             (buffering || !loaded) && <Spinner size={'xl'} />
@@ -296,6 +297,7 @@ export function Video({ sources, subtitles, autoplay, videoProps, onNext, onPrev
                                     }}
                                 >
                                     <IconButton
+                                        data-testid="video-play-toggle"
                                         variant="ghost"
                                         aria-label={t('player.controls.play').toString()}
                                         onClick={() => {

@@ -47,20 +47,33 @@ public sealed class FilmSubmissionEndToEndTests(EndToEndFixture fixture)
     }
 
     [Fact]
-    public async Task FilmUpload_MovMimeType_RejectsUploadAndAllowsRetry()
+    public async Task FilmUpload_MovMimeType_ConvertsAndPlaysInBrowser()
     {
-        await RunBrowserTestAsync("mov-rejected", async page =>
+        await RunBrowserTestAsync("mov-supported", async page =>
         {
             await LogInThroughTemporaryAccountAsync(page);
             await CreateProjectFromOpenGroupAsync(page, $"E2E-{Guid.NewGuid():N}");
             var upload = await UploadFilmAsync(page, "sample.mov");
 
-            Assert.True((int)upload.StatusCode >= 400, $"MOV unexpectedly returned {(int)upload.StatusCode}.");
-            await Expect(page.GetByText("Upload failed", new() { Exact = true })).ToBeVisibleAsync();
+            Assert.Equal(HttpStatusCode.OK, upload.StatusCode);
+            Assert.False(string.IsNullOrWhiteSpace(upload.ShardId));
+            await WaitForVariantAsync(page, upload.ShardId!, "sd", TimeSpan.FromMinutes(3));
 
-            // The error state is clickable and returns to a usable upload control.
-            await page.GetByText("Upload failed", new() { Exact = true }).ClickAsync();
-            await Expect(page.Locator("input[type=file]").First).ToBeAttachedAsync();
+            await OpenFilmPreviewAsync(page);
+            var video = page.Locator("video");
+            await Expect(video).ToBeVisibleAsync();
+            await page.GetByRole(AriaRole.Button, new() { Name = "Play", Exact = true }).ClickAsync();
+            await page.WaitForFunctionAsync(
+                """
+                () => {
+                    const video = document.querySelector('video');
+                    return video && !video.paused && video.readyState >= 2 && video.currentTime > 0.1;
+                }
+                """);
+
+            var source = await video.GetAttributeAsync("src");
+            Assert.Contains("/sd", source);
+            Assert.True(await video.EvaluateAsync<double>("video => video.currentTime") > 0.1);
         });
     }
 
@@ -158,6 +171,7 @@ public sealed class FilmSubmissionEndToEndTests(EndToEndFixture fixture)
                 .ToHaveValueAsync(authorName);
             await Expect(editDialog.GetByPlaceholder("UCO", new() { Exact = true }))
                 .ToHaveValueAsync(uco);
+            await editDialog.GetByRole(AriaRole.Tab, new() { Name = "English", Exact = true }).ClickAsync();
             await Expect(editDialog.Locator("[id='bio.en']"))
                 .ToHaveValueAsync(englishBio);
 
@@ -217,7 +231,7 @@ public sealed class FilmSubmissionEndToEndTests(EndToEndFixture fixture)
             var validationResponse = page.WaitForResponseAsync(response =>
                 response.Request.Method == "GET"
                 && new Uri(response.Url).AbsolutePath.StartsWith("/api/v1/project-validation/"));
-            await page.GetByRole(AriaRole.Tab, new() { Name = "Status", Exact = true }).ClickAsync();
+            await page.GetByRole(AriaRole.Tab, new() { Name = "State", Exact = true }).ClickAsync();
             Assert.Equal(HttpStatusCode.OK, (HttpStatusCode)(await validationResponse).Status);
             await Expect(page.GetByText("The film is required.", new() { Exact = false })).ToHaveCountAsync(0);
         });
@@ -247,7 +261,9 @@ public sealed class FilmSubmissionEndToEndTests(EndToEndFixture fixture)
         await dialog.GetByPlaceholder("Name", new() { Exact = true }).First.FillAsync(authorName);
         await dialog.GetByText("New author", new() { Exact = true }).ClickAsync();
         await dialog.GetByPlaceholder("UCO", new() { Exact = true }).FillAsync(uco);
+        await dialog.GetByRole(AriaRole.Tab, new() { Name = "čeština", Exact = true }).ClickAsync();
         await dialog.Locator("[id='bio.cs']").FillAsync(czechBio);
+        await dialog.GetByRole(AriaRole.Tab, new() { Name = "English", Exact = true }).ClickAsync();
         await dialog.Locator("[id='bio.en']").FillAsync(englishBio);
 
         var createResponseTask = page.WaitForResponseAsync(response =>
@@ -336,7 +352,7 @@ public sealed class FilmSubmissionEndToEndTests(EndToEndFixture fixture)
         var filmSection = await OpenFilmSectionForArtifactCreationAsync(page);
         await filmSection.GetByText("Create a new artifact", new() { Exact = true }).ClickAsync();
         await filmSection.GetByRole(AriaRole.Button, new() { Name = "Film", Exact = true }).ClickAsync();
-        await filmSection.GetByText("Přidat nový soubor", new() { Exact = true }).First.ClickAsync();
+        await filmSection.GetByText("Add a new file", new() { Exact = true }).First.ClickAsync();
 
         var uploadResponse = page.WaitForResponseAsync(response =>
             response.Request.Method == "POST" && new Uri(response.Url).AbsolutePath == "/api/v1/shard");

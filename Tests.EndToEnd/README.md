@@ -11,11 +11,9 @@ Coverage:
   account instead of creating another account.
 - Admin group creation: the seeded administrator creates a project group through the
   frontend and reaches its detail page.
-- MP4 and MKV: temporary-account login, open project group, project creation,
+- MP4, MKV, and MOV: temporary-account login, open project group, project creation,
   artifact creation, video upload, conversion, artifact preview, and actual playback
   (`readyState >= 2`, unpaused, and `currentTime > 0`).
-- MOV: the unsupported `video/quicktime` upload enters the visible failure state and
-  can be reset for another attempt.
 - Corrupt MP4: media cannot reach a playable state and the browser shows the player
   error instead of playing.
 - Anonymous visitor: the authenticated project-group route redirects to login.

@@ -34,7 +34,7 @@ export function MessageButton({ titleKey, warningKey, descriptionKey, ...box }: 
                 display={{ base: 'flex', lg: 'none' }}
                 size="lg"
                 variant="ghost"
-                aria-label="Warning"
+                aria-label={t(warningKey).toString()}
                 color="yellow.500"
                 icon={<AiFillWarning />}
                 onClick={onOpen}
@@ -43,7 +43,7 @@ export function MessageButton({ titleKey, warningKey, descriptionKey, ...box }: 
             <Button
                 display={{ base: 'none', lg: 'flex' }}
                 variant="ghost"
-                aria-label="Warning"
+                aria-label={t(warningKey).toString()}
                 color="yellow.500"
                 leftIcon={<AiFillWarning />}
                 onClick={onOpen}

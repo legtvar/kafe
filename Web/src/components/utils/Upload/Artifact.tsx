@@ -109,7 +109,7 @@ export function ArtifactUpload(props: IArtifactUploadProps) {
                                 )}
 
                                 <Text mt={6} mb={2} opacity={0.5}>
-                                    Správa
+                                    {t('artifact.management').toString()}
                                 </Text>
                                 <Button colorScheme="red" leftIcon={<IoTrashOutline />} onClick={onOpen}>
                                     {t('artifact.delete').toString()}

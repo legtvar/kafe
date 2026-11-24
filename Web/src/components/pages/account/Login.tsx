@@ -68,7 +68,7 @@ export function Login() {
                         )}
                         <Stack spacing={10} pt={2}>
                             <Button
-                                loadingText="Submitting"
+                                loadingText={t('generic.submitting').toString()}
                                 size="lg"
                                 bg={'blue.400'}
                                 color={'white'}
@@ -129,7 +129,7 @@ export function Login() {
                             {t('temp.after2').toString()}
                         </Text>
                         <Button
-                            loadingText="Send again"
+                            loadingText={t('temp.sendingAgain').toString()}
                             size="lg"
                             bg={'blue.400'}
                             color={'white'}

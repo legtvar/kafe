@@ -1,4 +1,5 @@
 import { Box, Flex, Stack, useColorModeValue } from '@chakra-ui/react';
+import { t } from 'i18next';
 import { Outlet } from 'react-router-dom';
 import { useReloadVar } from '../../../hooks/useReload';
 import { ColorModeToggle } from '../../utils/ColorModeToggle';
@@ -12,13 +13,13 @@ export function AccountRoot(props: IAccountRootProps) {
     return (
         <Box w="100vw" h="100vh" overflowY="auto" position="relative">
             <LanguageToggle
-                aria-label="Toggle language"
+                aria-label={t('navbar.language').toString()}
                 position="absolute"
                 top={8}
                 right={8}
                 onLanguageToggled={() => reload()}
             />
-            <ColorModeToggle aria-label="Toggle color mode" position="absolute" top={8} right={20} />
+            <ColorModeToggle aria-label={t('navbar.colorMode').toString()} position="absolute" top={8} right={20} />
             <Flex
                 py={10}
                 minH={'100vh'}

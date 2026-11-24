@@ -61,7 +61,7 @@ export function Register() {
                     </FormControl>
                     <Stack spacing={10} pt={2}>
                         <Button
-                            loadingText="Submitting"
+                            loadingText={t('generic.submitting').toString()}
                             size="lg"
                             bg={'blue.400'}
                             color={'white'}

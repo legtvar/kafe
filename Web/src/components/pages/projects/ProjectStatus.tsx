@@ -27,7 +27,7 @@ export function ProjectStatus(props: IProjectStatusProps) {
     return (
         <AwaitAPI
             request={useCallback((api) => api.projects.validationById(props.projectId), [props.projectId])}
-            error={<Text color={lighten}>Automatizovaná kontrola nebyla spuštěna</Text>}
+            error={<Text color={lighten}>{t('projectStatus.notRun').toString()}</Text>}
         >
             {(validation: components['schemas']['ProjectValidationDto']) => (
                 <AwaitAPI request={getProject}>
@@ -129,7 +129,7 @@ export function StatusGroup(props: IStatusGroupProps) {
                                 >
                                     <img
                                         src={`/pigeons-img/${status}.png`}
-                                        alt="Status illustration"
+                                        alt={t('projectStatus.statusIllustration').toString()}
                                         style={{
                                             objectFit: "contain",
                                             height: "auto",

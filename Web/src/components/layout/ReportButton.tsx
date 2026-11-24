@@ -66,7 +66,7 @@ export function ReportButton({ ...box }: IReportButtonProps) {
         <Box {...box}>
             <Button
                 variant="ghost"
-                aria-label="Warning"
+                aria-label={t('troubleshooting.title').toString()}
                 color="yellow.500"
                 leftIcon={<AiFillWarning />}
                 onClick={onOpen}
@@ -135,7 +135,7 @@ export function ReportButton({ ...box }: IReportButtonProps) {
                                     position="absolute"
                                     top={2}
                                     right={2}
-                                    aria-label="copy"
+                                    aria-label={t('troubleshooting.copy').toString()}
                                     icon={copied ? <IoCheckmark /> : <IoCopyOutline />}
                                 />
                             </CopyToClipboard>

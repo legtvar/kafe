@@ -26,41 +26,7 @@ interface IAddReviewProps {
     project: Project;
 }
 
-const messages = {
-    ok: [
-        'Dobrý den,',
-        'Vámi přihlášený film prošel technickou kontrolou a postupuje do dramaturgie Filmového festivalu Fakulty informatiky Masarykovy univerzity.',
-        'Dramaturgie se uskuteční 12.04.2023 a odborná porota na ní vyhodnotí, zda Váš snímek postoupí do festivalové soutěže a bude promítnut 19.05.2023 v kině Scala a na Fakultě informatiky MU.',
-        'Děkujeme Vám za přihlášení do festivalu a brzy na viděnou s výsledky dramaturgie,',
-        'Za FFFFI MU, tým techniky.',
-    ],
-    nok: [
-        'Dobrý den,',
-        'Vámi přihlášený film neprošel technickou kontrolou a nemůže postoupit do dramaturgie Filmového festivalu Fakulty informatiky Masarykovy univerzity.  ',
-        'Prosíme Vás o dodání _____, abychom Váš film mohli úspěšně přijmout a promítnout odborné porotě na dramaturgii, která se uskuteční 12.04.2023. Deadline pro doplnění všech parametrů je stále čas do 09.04.2023. ',
-        'Děkujeme Vám za přihlášení do festivalu,',
-        'Za FFFFI MU, tým techniky.',
-    ],
-    pass: [
-        'Dobrý den,',
-        'gratulujeme, Váš film byl přijat do soutěžní sekce na 23. Filmový festival Fakulty informatiky MU. Těšíme se na Vás 19. 5. 2023 na festivalovém večeru.',
-        'Děkujeme za Vaši přízeň,',
-        'Za FFFFI MU, tým techniky.',
-    ],
-    reject: [
-        'Dobrý den,',
-        's lítostí Vám oznamujeme, že Váš film nebyl vybrán porotou na 23. Filmový festival Fakulty informatiky MU, konkurence byla letos vysoká. Přesto děkujeme za Váš zájem o festival a srdečně Vás zveme na festivalový večer 19. 5. 2023.',
-        'Děkujeme za Vaši přízeň,',
-        'Za FFFFI MU, tým techniky.',
-    ],
-    bonus: [
-        'Dobrý den,',
-        'gratulujeme, Váš film byl přijat do bonusové sekce na 23. Filmový festival Fakulty informatiky MU. To znamená, že pro něj nebude možné hlasovat, ale stále si ho diváci užijí na velkém plátně. Těšíme se na Vás 19. 5. 2023 na festivalovém večeru.',
-        'Děkujeme za Vaši přízeň,',
-        'Za FFFFI MU, tým techniky.',
-    ],
-    custom: [],
-};
+const messageTemplates = ['ok', 'nok', 'pass', 'reject', 'bonus', 'custom'] as const;
 
 export function AddReview(props: IAddReviewProps) {
     const { border, bg } = useColorScheme();
@@ -110,8 +76,11 @@ export function AddReview(props: IAddReviewProps) {
                         </Select>
                     </FormControl>
                     <HStack w="100%">
-                        {Object.entries(messages).map(([id, text], key) => (
-                            <Button key={key} onClick={() => setEmailContent(text.join('\n\n'))}>
+                        {messageTemplates.map((id) => (
+                            <Button
+                                key={id}
+                                onClick={() => setEmailContent(t(`project.admin.messages.${id}`).toString())}
+                            >
                                 {t(`project.admin.template.${id}`).toString()}
                             </Button>
                         ))}

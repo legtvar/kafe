@@ -297,7 +297,7 @@ export function Video({ sources, subtitles, autoplay, videoProps, onNext, onPrev
                                 >
                                     <IconButton
                                         variant="ghost"
-                                        aria-label="Play"
+                                        aria-label={t('player.controls.play').toString()}
                                         onClick={() => {
                                             setPlaying(!playing);
                                             updateMouse();
@@ -308,7 +308,7 @@ export function Video({ sources, subtitles, autoplay, videoProps, onNext, onPrev
                                     {onPrevious && (
                                         <IconButton
                                             variant="ghost"
-                                            aria-label="Previous"
+                                            aria-label={t('player.controls.previous').toString()}
                                             onClick={() => onPrevious()}
                                             tabIndex={-1}
                                             icon={<IoPlaySkipBackOutline />}
@@ -317,7 +317,7 @@ export function Video({ sources, subtitles, autoplay, videoProps, onNext, onPrev
                                     {onNext && (
                                         <IconButton
                                             variant="ghost"
-                                            aria-label="Next"
+                                            aria-label={t('player.controls.next').toString()}
                                             onClick={() => onNext()}
                                             tabIndex={-1}
                                             icon={<IoPlaySkipForwardOutline />}
@@ -337,7 +337,7 @@ export function Video({ sources, subtitles, autoplay, videoProps, onNext, onPrev
                                     </Text>
                                     <Slider
                                         ml={4}
-                                        aria-label="slider-ex-1"
+                                        aria-label={t('player.controls.seek').toString()}
                                         value={progressState?.playedSeconds}
                                         max={duration}
                                         step={0.01}
@@ -379,7 +379,7 @@ export function Video({ sources, subtitles, autoplay, videoProps, onNext, onPrev
                                     <IconButton
                                         ml={4}
                                         variant="ghost"
-                                        aria-label="Mute"
+                                        aria-label={t('player.controls.mute').toString()}
                                         onClick={() => setMuted(!muted)}
                                         tabIndex={-1}
                                         icon={muted ? <IoVolumeMuteOutline /> : <IoVolumeHighOutline />}
@@ -410,7 +410,7 @@ export function Video({ sources, subtitles, autoplay, videoProps, onNext, onPrev
                                             <MenuButton
                                                 variant="ghost"
                                                 as={IconButton}
-                                                aria-label="Subtitles"
+                                                aria-label={t('player.controls.subtitles').toString()}
                                                 icon={<IoChatboxEllipsesOutline />}
                                                 tabIndex={-1}
                                                 ml={{ base: 6, lg: 3 }}
@@ -441,7 +441,7 @@ export function Video({ sources, subtitles, autoplay, videoProps, onNext, onPrev
                                         <MenuButton
                                             variant="ghost"
                                             as={IconButton}
-                                            aria-label="Quality"
+                                            aria-label={t('player.controls.quality').toString()}
                                             icon={<BsGear />}
                                             tabIndex={-1}
                                             ml={{ base: 6, lg: 3 }}
@@ -464,7 +464,7 @@ export function Video({ sources, subtitles, autoplay, videoProps, onNext, onPrev
                                         <MenuButton
                                             variant="ghost"
                                             as={IconButton}
-                                            aria-label="Download"
+                                            aria-label={t('player.controls.download').toString()}
                                             icon={<BsDownload />}
                                             ml={{ base: 6, lg: 3 }}
                                             tabIndex={-1}
@@ -500,7 +500,7 @@ export function Video({ sources, subtitles, autoplay, videoProps, onNext, onPrev
                                             lg: 'flex',
                                         }}
                                         variant="ghost"
-                                        aria-label="Share"
+                                        aria-label={t('player.controls.share').toString()}
                                         icon={<IoLink />}
                                         tabIndex={-1}
                                     />
@@ -508,7 +508,7 @@ export function Video({ sources, subtitles, autoplay, videoProps, onNext, onPrev
                                     <IconButton
                                         ml={{ base: 6, lg: 2 }}
                                         variant="ghost"
-                                        aria-label="Headless fullscreen"
+                                        aria-label={t('player.controls.headlessFullscreen').toString()}
                                         tabIndex={-1}
                                         onClick={() => {
                                             if (headless) {
@@ -529,7 +529,7 @@ export function Video({ sources, subtitles, autoplay, videoProps, onNext, onPrev
                                     <IconButton
                                         ml={{ base: 2, lg: 1 }}
                                         variant="ghost"
-                                        aria-label="Fullscreen"
+                                        aria-label={t('player.controls.fullscreen').toString()}
                                         onClick={() => screenfull.toggle(wrapperRef.current!)}
                                         tabIndex={-1}
                                         icon={<IoScan />}

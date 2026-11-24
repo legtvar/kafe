@@ -177,7 +177,7 @@ export function PlaylistEdit(props: IPlaylistEditProps) {
                                                                                 <IconButton
                                                                                     className="hide-on-drag"
                                                                                     icon={<IoTrashOutline />}
-                                                                                    aria-label="Remove from playlist"
+                                                                                    aria-label={t('playlistsEdit.removeFile').toString()}
                                                                                     colorScheme="red"
                                                                                     onClick={() =>
                                                                                         playlist.set(

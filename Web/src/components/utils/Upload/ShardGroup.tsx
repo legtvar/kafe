@@ -9,6 +9,7 @@ import {
     Icon,
     Text,
 } from '@chakra-ui/react';
+import { t } from 'i18next';
 import { AiOutlinePlus } from 'react-icons/ai';
 import { Artifact } from '../../../data/Artifact';
 import { Project } from '../../../data/Project';
@@ -79,7 +80,7 @@ export function ShardGroupUpload(props: IShardGroupUploadProps) {
                                     <Icon fontSize="1.2em">
                                         <AiOutlinePlus />
                                     </Icon>{' '}
-                                    Přidat nový soubor
+                                    {t('artifact.addFile').toString()}
                                 </Box>
                             </AccordionButton>
                             <AccordionPanel pb={4}>

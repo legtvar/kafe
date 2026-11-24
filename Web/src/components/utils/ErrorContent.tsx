@@ -1,4 +1,5 @@
 import { Box, useColorModeValue } from '@chakra-ui/react';
+import { t } from 'i18next';
 import { components } from '../../schemas/api';
 
 interface IErrorContentProps {
@@ -6,7 +7,7 @@ interface IErrorContentProps {
 }
 
 export function ErrorContent(props: IErrorContentProps) {
-    let title = 'An error occurred';
+    let title = t('sendApi.error').toString();
     let description: string | null = null;
     let suberrors: components['schemas']['Error'][] = [];
 
@@ -16,7 +17,7 @@ export function ErrorContent(props: IErrorContentProps) {
         description = kpd?.detail ?? description;
         suberrors = kpd?.errors ?? [];
     } else {
-        title = 'A client error occurred';
+        title = t('error.client').toString();
         const jsError = props.error as Error;
         if (jsError)
         {

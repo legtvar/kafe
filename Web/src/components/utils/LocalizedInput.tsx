@@ -159,7 +159,7 @@ export const LocalizedInput: ComponentWithAs<'input', ILocalizedInputProps> = ({
                 icon={<IoAdd />}
                 size={split ? "lg" : undefined}
                 variant="link"
-                aria-label="Add"
+                aria-label={t('generic.add').toString()}
                 height={split ? "2rem" : undefined}
                 borderWidth={split ? "1px" : undefined}
                 borderColor={useColorModeValue('gray.300', 'gray.600')}
@@ -249,7 +249,7 @@ export const LocalizedInput: ComponentWithAs<'input', ILocalizedInputProps> = ({
                             <Component {...inputProps} />
                         </VStack>
                         <IconButton
-                            aria-label="Remove"
+                            aria-label={t('generic.remove').toString()}
                             variant="outline"
                             ml={2}
                             icon={<IoTrash />}

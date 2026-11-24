@@ -33,6 +33,7 @@
     "sendTo": "Prosíme odešlete nám toto hlášení na <1>kafe@fi.muni.cz</1>, děkujeme!",
     "mailContents": "Dobrý den,\n\npři používání KAFE jsem zaznamenal následující problém:\n{{message}}\n\nPřikládám vygenerovaný report\n\nDěkuji a přeji hezký den\n\n---\n\n",
     "selectAttachments": "Budeme rádi za co nejvíce podrobností o problému. Můžete si ale sami vybrat, jaké informace nám poskytnete:",
+    "copy": "Kopírovat hlášení",
     "page": "Stránku, na které k problému došlo",
     "browser": "Prohlížeč, který používáte",
     "user": "Účet, u kterého došlo k problému",
@@ -52,7 +53,8 @@
   },
   "content": {
     "noFileSelected": "Žádný vybraný soubor",
-    "unknownType": "Neznámý typ"
+    "unknownType": "Neznámý typ",
+    "info": "Informace"
   },
   "countdown": {
     "days": "dní",
@@ -172,7 +174,8 @@
     "title": "Jejky, tak to nešlo podle plánu",
     "tokenInvalid": "Token není platný",
     "leavePageTitle": "Neuložené změny",
-    "leavePageWarn": "Můžete mít neuložené změny, opravdu chcete stránku opustit?"
+    "leavePageWarn": "Můžete mít neuložené změny, opravdu chcete stránku opustit?",
+    "client": "Došlo k chybě klienta"
   },
   "generic": {
     "cancel": "Zrušit",
@@ -181,6 +184,9 @@
     "empty": "Kde nic, tu nic...",
     "for": "pro",
     "save": "Uložit",
+    "submitting": "Odesílání",
+    "add": "Přidat",
+    "remove": "Odebrat",
     "files": "souborů",
     "quitEdit": "Ukončit editaci",
     "construction": "Kde nic tu nic, tato stránka se připravuje...",
@@ -224,6 +230,7 @@
     "error": "Při přihlašování došlo k chybě, zkuste to prosím znovu!"
   },
   "navbar": {
+    "openMenu": "Otevřít menu",
     "colorMode": "Přepnout barevný režim",
     "language": "Jazyk / Language",
     "profile": "Profil",
@@ -285,6 +292,14 @@
         "reject": "Šablona odmítnut dramaturg",
         "bonus": "Šablona bonus blok",
         "custom": "Vlastní"
+      },
+      "messages": {
+        "ok": "Dobrý den,\n\nVámi přihlášený film prošel technickou kontrolou a postupuje do dramaturgie Filmového festivalu Fakulty informatiky Masarykovy univerzity.\n\nDramaturgie se uskuteční 12.04.2023 a odborná porota na ní vyhodnotí, zda Váš snímek postoupí do festivalové soutěže a bude promítnut 19.05.2023 v kině Scala a na Fakultě informatiky MU.\n\nDěkujeme Vám za přihlášení do festivalu a brzy na viděnou s výsledky dramaturgie,\n\nZa FFFFI MU, tým techniky.",
+        "nok": "Dobrý den,\n\nVámi přihlášený film neprošel technickou kontrolou a nemůže postoupit do dramaturgie Filmového festivalu Fakulty informatiky Masarykovy univerzity.\n\nProsíme Vás o dodání _____, abychom Váš film mohli úspěšně přijmout a promítnout odborné porotě na dramaturgii, která se uskuteční 12.04.2023. Deadline pro doplnění všech parametrů je stále čas do 09.04.2023.\n\nDěkujeme Vám za přihlášení do festivalu,\n\nZa FFFFI MU, tým techniky.",
+        "pass": "Dobrý den,\n\ngratulujeme, Váš film byl přijat do soutěžní sekce na 23. Filmový festival Fakulty informatiky MU. Těšíme se na Vás 19. 5. 2023 na festivalovém večeru.\n\nDěkujeme za Vaši přízeň,\n\nZa FFFFI MU, tým techniky.",
+        "reject": "Dobrý den,\n\ns lítostí Vám oznamujeme, že Váš film nebyl vybrán porotou na 23. Filmový festival Fakulty informatiky MU, konkurence byla letos vysoká. Přesto děkujeme za Váš zájem o festival a srdečně Vás zveme na festivalový večer 19. 5. 2023.\n\nDěkujeme za Vaši přízeň,\n\nZa FFFFI MU, tým techniky.",
+        "bonus": "Dobrý den,\n\ngratulujeme, Váš film byl přijat do bonusové sekce na 23. Filmový festival Fakulty informatiky MU. To znamená, že pro něj nebude možné hlasovat, ale stále si ho diváci užijí na velkém plátně. Těšíme se na Vás 19. 5. 2023 na festivalovém večeru.\n\nDěkujeme za Vaši přízeň,\n\nZa FFFFI MU, tým techniky.",
+        "custom": ""
       }
     },
     "edit": "Upravit",
@@ -341,6 +356,8 @@
       "nok": "Projekt byl zamítnut nebo vyžaduje revizi",
       "unknown": "Projekt zatím neobdržel žádný posudek"
     },
+    "notRun": "Automatizovaná kontrola nebyla spuštěna",
+    "statusIllustration": "Ilustrace stavu",
     "disclaimer": "Automatická kontrola je zatím ve stádiu vývoje. Výsledky prosím berte s rezervou."
   },
   "register": {
@@ -467,7 +484,8 @@
   "temp": {
     "after": "Na Vaši emailovou adresu jsme odeslali informace pro aktivaci dočasného účtu. Prosím klikněte na odkaz v emailu pro pokračování do KAFE.",
     "after2": "Pokud Vám email nepřišel, můžete si o něj zažádat znovu.",
-    "back": "Znovu požádat"
+    "back": "Znovu požádat",
+    "sendingAgain": "Odesílání znovu"
   },
   "tempAccount": {
     "title": "Vytvořte si dočasný účet"
@@ -493,6 +511,8 @@
     "note": "Role oddělujte čárkou, nebo novým řádkem"
   },
   "artifact": {
+    "management": "Správa",
+    "addFile": "Přidat nový soubor",
     "delete": "Odstranit celý artefakt",
     "deleteWarn": "Opravdu chcete odstranit vybraný artefakt? Tato operace je nevratná!",
     "noContent": "Artefakt neobsahuje žádné soubory",
@@ -505,6 +525,13 @@
         "subtitle": "Každý artefakt pod sebou může obsahovat několik souborů - střípků. Typickým příkladem může být film a jeho titulky. Tyto soubory se zobrazují společně v rámci jednoho artefaktu."
       }
     }
+  },
+  "pagination": {
+    "first": "První stránka",
+    "previous": "Předchozí stránka",
+    "page": "Stránka {{page}}",
+    "next": "Další stránka",
+    "last": "Poslední stránka"
   },
   "projectList": {
     "search": "Hledat projekty"
@@ -524,7 +551,10 @@
     "homepage": "Domovská obrazovka",
     "status": "Stav systému",
     "runningFrom": "Běží od",
-    "console": "Konzole"
+    "console": "Konzole",
+    "version": "Verze",
+    "commit": "Commit",
+    "from": "ze dne"
   },
   "perms": {
     "read": "Zobrazit",
@@ -615,7 +645,20 @@
     "none": "Skrýt titulky"
   },
   "player": {
-    "loadingError": "Toto video bohužel nelze přehrát v této kvalitě"
+    "loadingError": "Toto video bohužel nelze přehrát v této kvalitě",
+    "controls": {
+      "play": "Přehrát",
+      "previous": "Předchozí",
+      "next": "Další",
+      "seek": "Pozice videa",
+      "mute": "Ztlumit",
+      "subtitles": "Titulky",
+      "quality": "Kvalita",
+      "download": "Stáhnout",
+      "share": "Sdílet",
+      "headlessFullscreen": "Celá obrazovka bez ovládání",
+      "fullscreen": "Celá obrazovka"
+    }
   },
   "general": {
     "copied": "Zkopírováno!",
@@ -631,6 +674,7 @@
     "title": "Vytvořit nový playlist"
   },
   "playlistsEdit": {
+    "removeFile": "Odebrat z playlistu",
     "tabs": {
       "info": "Základní informace",
       "files": "Soubory",

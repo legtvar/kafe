@@ -67,7 +67,7 @@ export function Navbar({ onOpen, forceReload, signedIn, ...rest }: INavbarProps)
                     display={{ base: 'flex', md: 'none' }}
                     onClick={onOpen}
                     variant="ghost"
-                    aria-label="Open menu"
+                    aria-label={t('navbar.openMenu').toString()}
                     icon={<FiMenu />}
                 />
             )}
@@ -106,11 +106,14 @@ export function Navbar({ onOpen, forceReload, signedIn, ...rest }: INavbarProps)
 
             <HStack spacing={1}>
                 <LanguageToggle
-                    aria-label="Language"
+                    aria-label={t('navbar.language').toString()}
                     onLanguageToggled={() => forceReload()}
                     display={{ base: 'none', md: 'flex' }}
                 />
-                <ColorModeToggle display={{ base: 'none', md: 'flex' }} aria-label="Toggle Color Mode" />
+                <ColorModeToggle
+                    display={{ base: 'none', md: 'flex' }}
+                    aria-label={t('navbar.colorMode').toString()}
+                />
                 {!signedIn && (
                     <Link to="/account/login">
                         <Button ml={4}>{t('home.signin').toString()}</Button>
@@ -152,8 +155,11 @@ export function Navbar({ onOpen, forceReload, signedIn, ...rest }: INavbarProps)
                                 </MenuButton>
                                 <MenuList>
                                     <HStack display={{ base: 'flex', md: 'none' }} px={2}>
-                                        <LanguageToggle aria-label="Language" onLanguageToggled={() => forceReload()} />
-                                        <ColorModeToggle aria-label="Toggle Color Mode" />
+                                        <LanguageToggle
+                                            aria-label={t('navbar.language').toString()}
+                                            onLanguageToggled={() => forceReload()}
+                                        />
+                                        <ColorModeToggle aria-label={t('navbar.colorMode').toString()} />
                                         {!signedIn && (
                                             <Link to="/account/login">
                                                 <Button ml={4}>{t('home.signin').toString()}</Button>

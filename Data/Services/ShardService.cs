@@ -131,10 +131,10 @@ public class ShardService
         CancellationToken token = default
     )
     {
-        if (mimeType != Const.MatroskaMimeType && mimeType != Const.Mp4MimeType)
+        if (mimeType != Const.MatroskaMimeType && mimeType != Const.Mp4MimeType && mimeType != Const.MovMimeType)
         {
             throw new ArgumentException(
-                $"Only '{Const.MatroskaMimeType}' and '{Const.Mp4MimeType}' video container " +
+                $"Only '{Const.MatroskaMimeType}', '{Const.Mp4MimeType}', and '{Const.MovMimeType}' video container " +
                 $"formats are supported."
             );
         }
@@ -142,7 +142,9 @@ public class ShardService
         shardId ??= Hrib.Create();
         var originalFileExtension = mimeType == Const.MatroskaMimeType
             ? Const.MatroskaFileExtension
-            : Const.Mp4FileExtension;
+            : mimeType == Const.Mp4MimeType
+                ? Const.Mp4FileExtension
+                : Const.MovFileExtension;
         if (!await storageService.TryStoreShard(
                 ShardKind.Video,
                 shardId,

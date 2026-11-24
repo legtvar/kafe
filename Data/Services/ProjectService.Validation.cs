@@ -35,7 +35,8 @@ public partial class ProjectService
     public static readonly string[] AllowedContainers = new[]
     {
         "video/mp4",
-        "video/x-matroska"
+        "video/x-matroska",
+        "video/quicktime"
     };
     public static readonly string[] AllowedVideoCodecs = new[]
     {
@@ -557,11 +558,11 @@ public partial class ProjectService
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "The film file uses an unsupported format. " +
-                "The supported formats are MP4, M4V, and MKV."),
+                "The supported formats are MP4, M4V, MKV, and MOV."),
             (Const.CzechCulture, "Soubor s filmem používá nepodporovaný kontejner. " +
-                "Podporovanými kontejnery jsou MP4, M4V a MKV."),
+                "Podporovanými kontejnery jsou MP4, M4V, MKV a MOV."),
             (Const.SlovakCulture, "Súbor s filmom používa nepodporovaný kontajner. " +
-                "Podporovanými kontajnermi sú MP4, M4V a MKV.")
+                "Podporovanými kontajnermi sú MP4, M4V, MKV a MOV.")
         )
     );
 
@@ -570,11 +571,11 @@ public partial class ProjectService
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "The video-annotation file uses an unsupported format. " +
-                "The supported formats are MP4, M4V, and MKV."),
+                "The supported formats are MP4, M4V, MKV, and MOV."),
             (Const.CzechCulture, "Soubor s videoanotací používá nepodporovaný kontejner. " +
-                "Podporovanými kontejnery jsou MP4, M4V a MKV."),
+                "Podporovanými kontejnery jsou MP4, M4V, MKV a MOV."),
             (Const.SlovakCulture, "Súbor s videoanotáciou používa nepodporovaný kontajner. " +
-                "Podporovanými kontajnermi sú MP4, M4V a MKV.")
+                "Podporovanými kontajnermi sú MP4, M4V, MKV a MOV.")
         )
     );
 

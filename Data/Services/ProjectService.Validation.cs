@@ -21,8 +21,8 @@ public partial class ProjectService
     public const string FilmMaxFileLengthDescription = "8 GiB";
     public const long LicenseFileMaxFileLength = 10L << 20; // 10 MiB
     public const string LicenseFileMaxFileLengthDescription = "10 MiB";
-    public const long VideoMinBitrate = 10_000_000;
-    public const string VideoMinBitrateDescription = "10 Mbps";
+    public const long VideoMinBitrate = 20_000_000;
+    public const string VideoMinBitrateDescription = "20 Mbps";
     public const long VideoMaxBitrate = 100_000_000;
     public const string VideoMaxBitrateDescription = "100 Mbps";
     public const long VideoBitrateTolerance = 1_000_000;

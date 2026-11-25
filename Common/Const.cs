@@ -13,7 +13,7 @@ public static class Const
     public const string InvalidName = "Invalid";
     public const string InvalidMimeType = "invalid/invalid";
     public const long InvalidFileLength = -1;
-    public const long ShardSizeLimit = 8_589_934_592; // 8 GiB (8 * 2^30)
+    public const long ShardSizeLimit = 8L << 30; // 8 GiB
 
     public const string TechReviewer = "tech";
     public const string VisualReviewer = "visual";

@@ -17,14 +17,14 @@ public partial class ProjectService
     public static readonly TimeSpan VideoAnnotationMinLength = TimeSpan.FromSeconds(1);
     public static readonly TimeSpan VideoAnnotationMaxLength = TimeSpan.FromSeconds(30);
     public static readonly TimeSpan AcceptableDurationError = TimeSpan.FromSeconds(1);
-    public const long FilmMaxFileLength = 2L << 30; // 2 GiB
-    public const string FilmMaxFileLengthDescription = "2 GiB";
+    public const long FilmMaxFileLength = 8L << 30; // 8 GiB
+    public const string FilmMaxFileLengthDescription = "8 GiB";
     public const long LicenseFileMaxFileLength = 10L << 20; // 10 MiB
     public const string LicenseFileMaxFileLengthDescription = "10 MiB";
     public const long VideoMinBitrate = 10_000_000;
     public const string VideoMinBitrateDescription = "10 Mbps";
-    public const long VideoMaxBitrate = 20_000_000;
-    public const string VideoMaxBitrateDescription = "20 Mbps";
+    public const long VideoMaxBitrate = 100_000_000;
+    public const string VideoMaxBitrateDescription = "100 Mbps";
     public const long VideoBitrateTolerance = 1_000_000;
     public const int VideoShorterSideResolution = 1080;
     public const int CoverPhotoShorterSideResolution = 1080;
@@ -41,13 +41,14 @@ public partial class ProjectService
     public static readonly string[] AllowedVideoCodecs = new[]
     {
         "h264",
-        "mpeg4"
+        "hevc"
     };
     public static readonly string[] AllowedAudioCodecs = new[]
     {
         "aac",
-        "mp3",
-        "flac"
+        "flac",
+        "pcm_s16le",
+        "pcm_s24le"
     };
     public static readonly string[] AllowedSubtitleCodecs = new[]
     {
@@ -58,12 +59,10 @@ public partial class ProjectService
         "image/jpeg",
         "image/png"
     };
-    public const long Mp3MinBitrate = 192000;
-    public const string Mp3MinBitrateDescription = "192 kbps";
-    public static readonly double[] RequiredFramerate = [24.0, 25.0];
-    public const string RequiredFramerateDescriptionEnglish = "24 or 25 fps";
-    public const string RequiredFramerateDescriptionCzech = "24 nebo 25 fps";
-    public const string RequiredFramerateDescriptionSlovak = "24 alebo 25 fps";
+    public static readonly double[] RequiredFramerate = [25.0, 50.0];
+    public const string RequiredFramerateDescriptionEnglish = "25 or 50 fps";
+    public const string RequiredFramerateDescriptionCzech = "25 nebo 50 fps";
+    public const string RequiredFramerateDescriptionSlovak = "25 alebo 50 fps";
 
     public static long VideoAnnotationMaxFileLength = 512 << 20; // 512 MiB
     public static string VideoAnnotationMaxFileLengthDescription = "512 GiB";
@@ -584,11 +583,11 @@ public partial class ProjectService
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "The film file uses an unsupported video codec. " +
-                "The supported video codecs are H.264 and MPEG-4 Part 2."),
+                "The supported video codecs are H.265 and H.264."),
             (Const.CzechCulture, "Soubor s filmem používá nepodporovaný video kodek. " +
-                "Podporovanými video kodeky jsou H.264 a MPEG-4 Part 2."),
+                "Podporovanými video kodeky jsou H.265 a H.264."),
             (Const.SlovakCulture, "Súbor s filmom používa nepodporovaný video kodek. " +
-                "Podporovanými video kodekmi sú H.264 a MPEG-4 Part 2.")
+                "Podporovanými video kodekmi sú H.265 a H.264.")
         )
     );
 
@@ -597,11 +596,11 @@ public partial class ProjectService
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "The video-annotation file uses an unsupported video codec. " +
-                "The supported video codecs are H.264 and MPEG-4 Part 2."),
+                "The supported video codecs are H.265 and H.264."),
             (Const.CzechCulture, "Soubor s videoanotací používá nepodporovaný video kodek. " +
-                "Podporovanými video kodeky jsou H.264 a MPEG-4 Part 2."),
+                "Podporovanými video kodeky jsou H.265 a H.264."),
             (Const.SlovakCulture, "Súbor s videoanotáciou používa nepodporovaný video kodek. " +
-                "Podporovanými video kodekmi sú H.264 a MPEG-4 Part 2.")
+                "Podporovanými video kodekmi sú H.265 a H.264.")
         )
     );
 
@@ -610,11 +609,11 @@ public partial class ProjectService
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "The film file uses an unsupported audio codec. " +
-                $"The supported audio codecs are AAC, FLAC, and MP3 with bitrate at least {Mp3MinBitrateDescription}."),
+                "The supported audio codecs are AAC, WAV, and FLAC."),
             (Const.CzechCulture, "Soubor s filmem používá nepodporovaný audio kodek. " +
-                $"Podporovanými audio kodeky jsou AAC, FLAC a MP3 s bitratem alespoň {Mp3MinBitrateDescription}."),
+                "Podporovanými audio kodeky jsou AAC, WAV a FLAC."),
             (Const.SlovakCulture, "Súbor s filmom používa nepodporovaný audio kodek. " +
-                $"Podporovanými audio kodekmi sú AAC, FLAC a MP3 s bitratom aspoň {Mp3MinBitrateDescription}.")
+                "Podporovanými audio kodekmi sú AAC, WAV a FLAC.")
         )
     );
 
@@ -623,31 +622,11 @@ public partial class ProjectService
         ValidationStage: FileStage,
         Message: LocalizedString.Create(
             (Const.InvariantCulture, "The video-annotation file uses an unsupported audio codec. " +
-                $"The supported audio codecs are AAC, FLAC, and MP3 with bitrate at least {Mp3MinBitrateDescription}."),
+                "The supported audio codecs are AAC, WAV, and FLAC."),
             (Const.CzechCulture, "Soubor s videoanotací používá nepodporovaný audio kodek. " +
-                $"Podporovanými audio kodeky jsou AAC, FLAC a MP3 s bitratem alespoň {Mp3MinBitrateDescription}."),
+                "Podporovanými audio kodeky jsou AAC, WAV a FLAC."),
             (Const.SlovakCulture, "Súbor s videoanotáciou používa nepodporovaný audio kodek. " +
-                $"Podporovanými audio kodekmi sú AAC, FLAC a MP3 s bitratom aspoň {Mp3MinBitrateDescription}.")
-        )
-    );
-
-    public static readonly Diagnostic FilmMp3BitrateTooLow = new Diagnostic(
-        Kind: DiagnosticKind.Error,
-        ValidationStage: FileStage,
-        Message: LocalizedString.Create(
-            (Const.InvariantCulture, $"The bitrate of the MP3 audio in the film file must be at least {Mp3MinBitrateDescription}."),
-            (Const.CzechCulture, $"Bitrate MP3 audia v souboru s filmem musí být alespoň {Mp3MinBitrateDescription}."),
-            (Const.SlovakCulture, $"Bitrate MP3 audia v súbore s filmom musí byť aspoň {Mp3MinBitrateDescription}.")
-        )
-    );
-
-    public static readonly Diagnostic VideoAnnotationMp3BitrateTooLow = new Diagnostic(
-        Kind: DiagnosticKind.Error,
-        ValidationStage: FileStage,
-        Message: LocalizedString.Create(
-            (Const.InvariantCulture, $"The bitrate of the MP3 audio in the video-annotation file must be at least {Mp3MinBitrateDescription}."),
-            (Const.CzechCulture, $"Bitrate MP3 audia v souboru s videoanotací musí být alespoň {Mp3MinBitrateDescription}."),
-            (Const.SlovakCulture, $"Bitrate MP3 audia v súbore s videoanotáciou musí byť aspoň {Mp3MinBitrateDescription}.")
+                "Podporovanými audio kodekmi sú AAC, WAV a FLAC.")
         )
     );
 
@@ -1185,7 +1164,6 @@ public partial class ProjectService
                                 bitrateTooHighError: FilmUnsupportedBitrate,
                                 unsupportedVideoCodecError: FilmUnsupportedVideoCodec,
                                 unsupportedAudioCodecError: FilmUnsupportedAudioCodec,
-                                mp3BitrateTooLowError: FilmMp3BitrateTooLow,
                                 unsupportedFramerateError: FilmUnsupportedFramerate,
                                 wrongResolutionError: FilmWrongResolution
                             ));
@@ -1269,7 +1247,6 @@ public partial class ProjectService
                                 bitrateTooHighError: VideoAnnotationUnsupportedBitrate,
                                 unsupportedVideoCodecError: VideoAnnotationUnsupportedVideoCodec,
                                 unsupportedAudioCodecError: VideoAnnotationUnsupportedAudioCodec,
-                                mp3BitrateTooLowError: VideoAnnotationMp3BitrateTooLow,
                                 unsupportedFramerateError: VideoAnnotationUnsupportedFramerate,
                                 wrongResolutionError: VideoAnnotationWrongResolution
                             ));
@@ -1477,7 +1454,6 @@ public partial class ProjectService
         Diagnostic bitrateTooHighError,
         Diagnostic unsupportedVideoCodecError,
         Diagnostic unsupportedAudioCodecError,
-        Diagnostic mp3BitrateTooLowError,
         Diagnostic unsupportedFramerateError,
         Diagnostic wrongResolutionError)
     {
@@ -1547,11 +1523,6 @@ public partial class ProjectService
         if (!AllowedAudioCodecs.Contains(audioStream.Codec))
         {
             yield return unsupportedAudioCodecError;
-        }
-
-        if (audioStream.Codec == "mp3" && audioStream.Bitrate < Mp3MinBitrate)
-        {
-            yield return mp3BitrateTooLowError;
         }
 
         if (!RequiredFramerate.Contains(videoStream.Framerate))

@@ -46,7 +46,8 @@
   },
   "content": {
     "noFileSelected": "Žiadny vybraný súbor",
-    "unknownType": "Neznámy typ"
+    "unknownType": "Neznámy typ",
+    "loading": "Načítanie..."
   },
   "countdown": {
     "days": "dní",

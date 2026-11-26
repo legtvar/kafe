@@ -46,7 +46,8 @@
   },
   "content": {
     "noFileSelected": "No file selected",
-    "unknownType": "Unknown type"
+    "unknownType": "Unknown type",
+    "loading": "Loading..."
   },
   "countdown": {
     "days": "days",

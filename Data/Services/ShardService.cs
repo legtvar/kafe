@@ -420,7 +420,6 @@ public class ShardService
         CancellationToken token
     )
     {
-        bool foundSketch = false;
         try
         {
             await using var writer = await WriterFactory.OpenAsyncWriter(destination, ArchiveType.Zip, new WriterOptions(CompressionType.Deflate) , cancellationToken: token);
@@ -430,7 +429,6 @@ public class ShardService
             {
                 if (!reader.Entry.IsDirectory && reader.Entry.Key is not null)
                 {
-                    if (reader.Entry.Key.EndsWith("sketch.js")) foundSketch = true;
                     await using var entry = await reader.OpenEntryStreamAsync(token);
                     await writer.WriteAsync(reader.Entry.Key, entry, token);
                 }
@@ -441,7 +439,7 @@ public class ShardService
             return false;
         }
 
-        return foundSketch;
+        return true;
     }
 
     public async Task<Stream> OpenStream(Hrib id, string? variant, CancellationToken token = default)

@@ -1,4 +1,4 @@
-import { Button, Center, Text, VStack } from '@chakra-ui/react';
+import { Button, Center, Icon, Text, useColorModeValue, VStack } from '@chakra-ui/react';
 import { t } from 'i18next';
 import { AiOutlineDownload } from 'react-icons/ai';
 import { SiBlender } from "react-icons/si";
@@ -7,9 +7,9 @@ import { Artifact } from '../../data/Artifact';
 import { Shard } from '../../data/Shard';
 import { useApi } from '../../hooks/Caffeine';
 import { Video } from './Player/Video';
-import { GenerativeScript } from './GenerativeScript';
-import JSZip from 'jszip';
-import { useState } from 'react';
+import { GenerativeScript, loadScripts } from './GenerativeUtils';
+import { useEffect, useState } from 'react';
+import { IoWarning } from 'react-icons/io5';
 
 interface IContentViewerProps {
     artifact: Artifact;
@@ -125,35 +125,29 @@ export function ContentViewer({
                 );
             case 'Generative':
                 const generative = artifact.shards.filter((shard) => shard.kind === 'generative')[0];
-                const [code, setCode] = useState("");
-                api.shards.getZipContent(generative.id).then(function (response) {
-                    const zipBlob: Blob = response.data;
-                    JSZip.loadAsync(zipBlob).then(function (archive) {
-                        for (const [path, entry] of Object.entries(archive.files)) {
-                            if (entry.dir) continue;
-                            if (path.endsWith("sketch.js")) entry.async('string').then(function (content) {setCode(content)})
-                        }
-                    });
+                const [loading, setLoading] = useState(true);
+                const [success, setSuccess] = useState(false);
+                const [scripts, setScripts] = useState("");
+                useEffect(() => {
+                    api.shards.getZipContent(generative.id).then(
+                        (response) => loadScripts(response.data).then((scripts) => {
+                            setScripts(scripts);
+                            setLoading(false);
+                            if (scripts.length > 0) setSuccess(true);
+                        })
+                    );
                 });
+                if (loading) return <VStack spacing={6}>
+                                        <Text color="gray.500">{t('content.loading').toString()}</Text>
+                                    </VStack>
+                if (!success) return <VStack spacing={6}>
+                                        <Center h="full" color={useColorModeValue('gray.200', 'gray.900')}>
+                                            <Icon as={IoWarning} w={16} h={16} />
+                                        </Center>
+                                        <Text color="gray.500">{t('content.unknownType').toString()}</Text>
+                                     </VStack>
                 return (
-                    <GenerativeScript code={code}/>
-                    /*<VStack spacing={6}>
-                        {artifact.shards.map((shard) => (
-                            <Button
-                                key={shard.id}
-                                as={'a'}
-                                href={api.shards.defaultStreamUrl(shard.id)}
-                                leftIcon={<AiOutlineDownload />}
-                            >
-                                {t('generic.download')} {t('generic.file')} {shard.id}
-                            </Button>
-                        ))}
-                        {artifact.shards.length === 0 && (
-                            <Text color="gray.500" fontStyle="italic">
-                                {t('artifact.noContent').toString()}
-                            </Text>
-                        )}
-                    </VStack>*/
+                    <GenerativeScript scripts={scripts}/>
                 );
         }
     }

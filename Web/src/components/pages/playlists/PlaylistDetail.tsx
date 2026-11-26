@@ -115,16 +115,16 @@ export function PlaylistDetail(props: IPlaylistDetailProps) {
                                                     {artifacts.length > 0 && (
                                                         <VStack alignItems="start">
                                                             <Text fontSize="2xl" fontWeight="bold">
-                                                                {getPrefered(artifacts[item - 1].name)}
+                                                                {artifacts[item - 1].getDisplayName()}
                                                             </Text>
-                                                            {artifacts[item - 1].containingProjectIds[0] && (
+                                                            {artifacts[item - 1].containingProjects[0] && (
                                                                 <AwaitAPI
                                                                     request={(api) =>
                                                                         api.projects.getById(
-                                                                            artifacts[item - 1].containingProjectIds[0],
+                                                                            artifacts[item - 1].containingProjects[0].id,
                                                                         )
                                                                     }
-                                                                    key={artifacts[item - 1].containingProjectIds[0]}
+                                                                    key={artifacts[item - 1].containingProjects[0].id}
                                                                     loader={<></>}
                                                                     error={<></>}
                                                                 >
@@ -247,7 +247,7 @@ export function PlaylistDetail(props: IPlaylistDetailProps) {
                                                                                     overflowX="hidden"
                                                                                     whiteSpace="nowrap"
                                                                                 >
-                                                                                    {getPrefered(artifact.name)}
+                                                                                    {artifact.getDisplayName()}
                                                                                 </Box>
                                                                                 <Box
                                                                                     w={20}

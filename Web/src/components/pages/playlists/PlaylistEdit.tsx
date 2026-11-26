@@ -145,7 +145,7 @@ export function PlaylistEdit(props: IPlaylistEditProps) {
                                                                     <AwaitAPI
                                                                         request={(api) =>
                                                                             api.projects.getById(
-                                                                                artifact.containingProjectIds[0],
+                                                                                artifact.containingProjects[0].id,
                                                                             )
                                                                         }
                                                                     >

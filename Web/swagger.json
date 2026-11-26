@@ -345,26 +345,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "type": "string",
-                  "description": "Human-Readable Identifier Ballast",
-                  "format": "hrib",
-                  "example": "AAAAbadf00d"
+                  "$ref": "#/components/schemas/ArtifactDetailDto"
                 }
               },
               "application/json": {
                 "schema": {
-                  "type": "string",
-                  "description": "Human-Readable Identifier Ballast",
-                  "format": "hrib",
-                  "example": "AAAAbadf00d"
+                  "$ref": "#/components/schemas/ArtifactDetailDto"
                 }
               },
               "text/json": {
                 "schema": {
-                  "type": "string",
-                  "description": "Human-Readable Identifier Ballast",
-                  "format": "hrib",
-                  "example": "AAAAbadf00d"
+                  "$ref": "#/components/schemas/ArtifactDetailDto"
                 }
               }
             }
@@ -2729,6 +2720,63 @@
         },
         "additionalProperties": false
       },
+      "ArtifactDetailContainingProjectDto": {
+        "required": [
+          "id",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Human-Readable Identifier Ballast (HRIB)",
+            "format": "hrib",
+            "example": "AAAAbadf00d"
+          },
+          "name": {
+            "$ref": "#/components/schemas/LocalizedString"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ArtifactDetailDto": {
+        "required": [
+          "addedOn",
+          "containingProjects",
+          "id",
+          "name",
+          "shards"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Human-Readable Identifier Ballast (HRIB)",
+            "format": "hrib",
+            "example": "AAAAbadf00d"
+          },
+          "name": {
+            "$ref": "#/components/schemas/LocalizedString"
+          },
+          "addedOn": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "shards": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ShardListDto"
+            }
+          },
+          "containingProjects": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ArtifactDetailContainingProjectDto"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "AudioStreamDto": {
         "type": "object",
         "properties": {
@@ -2771,51 +2819,6 @@
         "properties": {
           "name": {
             "type": "string"
-          },
-          "globalPermissions": {
-            "$ref": "#/components/schemas/Permission"
-          },
-          "bio": {
-            "$ref": "#/components/schemas/LocalizedString"
-          },
-          "uco": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
-          "email": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
-          "phone": {
-            "type": [
-              "null",
-              "string"
-            ]
-          }
-        },
-        "additionalProperties": false
-      },
-      "AuthorEditDto": {
-        "required": [
-          "id"
-        ],
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "Human-Readable Identifier Ballast (HRIB)",
-            "format": "hrib",
-            "example": "AAAAbadf00d"
-          },
-          "name": {
-            "type": [
-              "null",
-              "string"
-            ]
           },
           "globalPermissions": {
             "$ref": "#/components/schemas/Permission"
@@ -2891,6 +2894,51 @@
             "items": {
               "$ref": "#/components/schemas/Permission"
             }
+          }
+        },
+        "additionalProperties": false
+      },
+      "AuthorEditDto": {
+        "required": [
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Human-Readable Identifier Ballast (HRIB)",
+            "format": "hrib",
+            "example": "AAAAbadf00d"
+          },
+          "name": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "globalPermissions": {
+            "$ref": "#/components/schemas/Permission"
+          },
+          "bio": {
+            "$ref": "#/components/schemas/LocalizedString"
+          },
+          "uco": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "email": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "phone": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         },
         "additionalProperties": false
@@ -3630,6 +3678,9 @@
               },
               "blend": {
                 "$ref": "#/components/schemas/ProjectArtifactShardBlueprintDto"
+              },
+              "blob": {
+                "$ref": "#/components/schemas/ProjectArtifactShardBlueprintDto"
               }
             },
             "additionalProperties": false
@@ -3996,8 +4047,10 @@
             ]
           },
           "isPublishedForUnlimitedTime": {
-            "type": "boolean",
-            "nullable": true
+            "type": [
+              "null",
+              "boolean"
+            ]
           },
           "crew": {
             "type": [
@@ -4578,8 +4631,10 @@
             "example": "AAAAbadf00d"
           },
           "uploadFileName": {
-            "type": "string",
-            "nullable": true
+            "type": [
+              "null",
+              "string"
+            ]
           }
         },
         "additionalProperties": false,
@@ -4626,8 +4681,10 @@
             }
           },
           "uploadFileName": {
-            "type": "string",
-            "nullable": true
+            "type": [
+              "null",
+              "string"
+            ]
           }
         },
         "additionalProperties": false

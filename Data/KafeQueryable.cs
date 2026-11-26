@@ -130,6 +130,15 @@ public static class KafeQueryable
                 nameof(sortString));
         }
 
+        var isNaturalNameSort = typeof(T) == typeof(ProjectInfo)
+            || typeof(T) == typeof(ProjectGroupInfo)
+            || typeof(T) == typeof(PlaylistInfo);
+        isNaturalNameSort &= sortString == "name" || sortString.StartsWith("name.", StringComparison.Ordinal);
+        if (isNaturalNameSort)
+        {
+            sortExpression += $" COLLATE {NaturalSortCollation.QualifiedName}";
+        }
+
         return query.OrderBySql(isDescending ? sortExpression + " DESC" : sortExpression);
     }
 

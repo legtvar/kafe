@@ -1,4 +1,5 @@
-﻿using Ardalis.ApiEndpoints;
+﻿using System.Linq;
+using Ardalis.ApiEndpoints;
 using Asp.Versioning;
 using Kafe.Api.Services;
 using Kafe.Api.Transfer;
@@ -19,13 +20,17 @@ public class ArtifactDetailEndpoint : EndpointBaseAsync
     .WithActionResult<ArtifactDetailDto>
 {
     private readonly ArtifactService artifacts;
+    private readonly ProjectService projects;
     private readonly IAuthorizationService authorization;
 
     public ArtifactDetailEndpoint(
         ArtifactService artifacts,
-        IAuthorizationService authorization)
+        ProjectService projects,
+        IAuthorizationService authorization
+    )
     {
         this.artifacts = artifacts;
+        this.projects = projects;
         this.authorization = authorization;
     }
 
@@ -35,7 +40,8 @@ public class ArtifactDetailEndpoint : EndpointBaseAsync
     [ProducesResponseType(400)]
     public override async Task<ActionResult<ArtifactDetailDto>> HandleAsync(
         string id,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         var auth = await authorization.AuthorizeAsync(User, id, EndpointPolicy.Read);
         if (!auth.Succeeded)
@@ -44,6 +50,19 @@ public class ArtifactDetailEndpoint : EndpointBaseAsync
         }
 
         var artifact = await artifacts.LoadDetail(id, cancellationToken);
-        return artifact is null ? NotFound() : Ok(TransferMaps.ToArtifactDetailDto(artifact));
+        if (artifact is null)
+        {
+            return NotFound();
+        }
+
+        var containingProjects = await projects.LoadMany(
+            artifact.ContainingProjectIds.OfType<Hrib>(),
+            cancellationToken
+        );
+        return TransferMaps.ToArtifactDetailDto(artifact) with
+        {
+            ContainingProjects =
+            [.. containingProjects.Select(p => new ArtifactDetailContainingProjectDto(p.Id, p.Name))]
+        };
     }
 }

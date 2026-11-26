@@ -2799,51 +2799,6 @@
         },
         "additionalProperties": false
       },
-      "AuthorEditDto": {
-        "required": [
-          "id"
-        ],
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "Human-Readable Identifier Ballast (HRIB)",
-            "format": "hrib",
-            "example": "AAAAbadf00d"
-          },
-          "name": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
-          "globalPermissions": {
-            "$ref": "#/components/schemas/Permission"
-          },
-          "bio": {
-            "$ref": "#/components/schemas/LocalizedString"
-          },
-          "uco": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
-          "email": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
-          "phone": {
-            "type": [
-              "null",
-              "string"
-            ]
-          }
-        },
-        "additionalProperties": false
-      },
       "AuthorDetailDto": {
         "required": [
           "globalPermissions",
@@ -2891,6 +2846,51 @@
             "items": {
               "$ref": "#/components/schemas/Permission"
             }
+          }
+        },
+        "additionalProperties": false
+      },
+      "AuthorEditDto": {
+        "required": [
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Human-Readable Identifier Ballast (HRIB)",
+            "format": "hrib",
+            "example": "AAAAbadf00d"
+          },
+          "name": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "globalPermissions": {
+            "$ref": "#/components/schemas/Permission"
+          },
+          "bio": {
+            "$ref": "#/components/schemas/LocalizedString"
+          },
+          "uco": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "email": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "phone": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         },
         "additionalProperties": false
@@ -3378,7 +3378,6 @@
       "Permission": {
         "title": "Permission",
         "enum": [
-          "none",
           "read",
           "append",
           "inspect",
@@ -3629,6 +3628,9 @@
                 "$ref": "#/components/schemas/ProjectArtifactShardBlueprintDto"
               },
               "blend": {
+                "$ref": "#/components/schemas/ProjectArtifactShardBlueprintDto"
+              },
+              "blob": {
                 "$ref": "#/components/schemas/ProjectArtifactShardBlueprintDto"
               }
             },
@@ -3996,8 +3998,10 @@
             ]
           },
           "isPublishedForUnlimitedTime": {
-            "type": "boolean",
-            "nullable": true
+            "type": [
+              "null",
+              "boolean"
+            ]
           },
           "crew": {
             "type": [
@@ -4578,8 +4582,10 @@
             "example": "AAAAbadf00d"
           },
           "uploadFileName": {
-            "type": "string",
-            "nullable": true
+            "type": [
+              "null",
+              "string"
+            ]
           }
         },
         "additionalProperties": false,
@@ -4626,8 +4632,10 @@
             }
           },
           "uploadFileName": {
-            "type": "string",
-            "nullable": true
+            "type": [
+              "null",
+              "string"
+            ]
           }
         },
         "additionalProperties": false

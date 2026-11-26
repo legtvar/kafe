@@ -15,20 +15,22 @@ public static class TransferMaps
         return new ProjectBlueprintDto(
             RequiredReviewers: projectBlueprint.RequiredReviewers,
             ArtifactBlueprints: projectBlueprint.ArtifactBlueprints.ToDictionary(
-                kvp => kvp.Key,
-                kvp => new ProjectArtifactBlueprintDto(
-                    Name: kvp.Value.Name,
-                    Description: kvp.Value.Description,
-                    Arity: kvp.Value.Arity,
-                    ShardBlueprints: kvp.Value.ShardBlueprints.ToDictionary(
-                        skvp => skvp.Key,
-                        skvp => new ProjectArtifactShardBlueprintDto(
-                            Name: skvp.Value.Name,
-                            Description: skvp.Value.Description,
-                            Arity: skvp.Value.Arity
-                        ))
-                        .ToImmutableDictionary()
-                ))
+                    kvp => kvp.Key,
+                    kvp => new ProjectArtifactBlueprintDto(
+                        Name: kvp.Value.Name,
+                        Description: kvp.Value.Description,
+                        Arity: kvp.Value.Arity,
+                        ShardBlueprints: kvp.Value.ShardBlueprints.ToDictionary(
+                                skvp => skvp.Key,
+                                skvp => new ProjectArtifactShardBlueprintDto(
+                                    Name: skvp.Value.Name,
+                                    Description: skvp.Value.Description,
+                                    Arity: skvp.Value.Arity
+                                )
+                            )
+                            .ToImmutableDictionary()
+                    )
+                )
                 .ToImmutableDictionary()
         );
     }
@@ -67,9 +69,10 @@ public static class TransferMaps
             ReleasedOn: data.ReleasedOn,
             IsLocked: data.IsLocked,
             LatestReviewKind: data.Reviews != null && !data.Reviews.IsDefaultOrEmpty
-            ? data.Reviews.MaxBy(r => r.AddedOn)?.Kind ?? ReviewKind.NotReviewed
-            : ReviewKind.NotReviewed,
-            OwnerId: data.OwnerId);
+                ? data.Reviews.MaxBy(r => r.AddedOn)?.Kind ?? ReviewKind.NotReviewed
+                : ReviewKind.NotReviewed,
+            OwnerId: data.OwnerId
+        );
     }
 
     public static ProjectDetailDto ToProjectDetailDto(ProjectInfo data, Permission userPermission = Permission.None)
@@ -116,7 +119,8 @@ public static class TransferMaps
         return new AuthorListDto(
             Id: data.Id,
             Name: data.Name,
-            GlobalPermissions: data.GlobalPermissions);
+            GlobalPermissions: data.GlobalPermissions
+        );
     }
 
     public static AuthorDetailDto ToAuthorDetailDto(AuthorInfo data, Permission userPermission)
@@ -129,7 +133,8 @@ public static class TransferMaps
             Uco: data.Uco,
             Email: data.Email,
             Phone: data.Phone,
-            UserPermissions: ToPermissionArray(data.GlobalPermissions | userPermission));
+            UserPermissions: ToPermissionArray(data.GlobalPermissions | userPermission)
+        );
     }
 
     public static PlaylistListDto ToPlaylistListDto(PlaylistInfo data)
@@ -139,7 +144,8 @@ public static class TransferMaps
             OrganizationId: data.OrganizationId,
             Name: data.Name,
             Description: data.Description,
-            GlobalPermissions: ToPermissionArray(data.GlobalPermissions));
+            GlobalPermissions: ToPermissionArray(data.GlobalPermissions)
+        );
     }
 
     public static PlaylistDetailDto ToPlaylistDetailDto(PlaylistInfo data)
@@ -150,7 +156,8 @@ public static class TransferMaps
             Name: data.Name,
             Description: data.Description,
             GlobalPermissions: ToPermissionArray(data.GlobalPermissions),
-            Entries: []);
+            Entries: []
+        );
     }
 
     public static ProjectGroupListDto ToProjectGroupListDto(ProjectGroupInfo data)
@@ -161,7 +168,8 @@ public static class TransferMaps
             Name: data.Name,
             Description: data.Description,
             Deadline: data.Deadline,
-            IsOpen: data.IsOpen);
+            IsOpen: data.IsOpen
+        );
     }
 
     public static ProjectGroupDetailDto ToProjectGroupDetailDto(ProjectGroupInfo data)
@@ -186,8 +194,13 @@ public static class TransferMaps
         return new ArtifactDetailDto(
             Id: data.Id,
             Name: data.Name,
-            Shards: [..data.Shards.Select(ToShardListDto)],
-            ContainingProjectIds: [..data.ContainingProjectIds.Select(i => (Hrib)i)],
+            Shards: [.. data.Shards.Select(ToShardListDto)],
+            ContainingProjects:
+            [
+                .. data.ContainingProjectIds.Select(i =>
+                    new ArtifactDetailContainingProjectDto(i, LocalizedString.Empty)
+                )
+            ],
             AddedOn: data.AddedOn
         );
     }
@@ -209,7 +222,8 @@ public static class TransferMaps
             Id: data.ShardId,
             Kind: data.Kind,
             Variants: data.Variants.ToImmutableArray(),
-            UploadFileName: data.UploadFileName);
+            UploadFileName: data.UploadFileName
+        );
     }
 
     public static VideoShardDetailDto ToVideoShardDetailDto(VideoShardInfo data)
@@ -219,7 +233,8 @@ public static class TransferMaps
             Kind: data.Kind,
             ArtifactId: data.ArtifactId,
             Variants: data.Variants.ToImmutableDictionary(v => v.Key, v => ToMediaInfoDto(v.Value)),
-            UploadFileName: data.UploadFileName);
+            UploadFileName: data.UploadFileName
+        );
     }
 
     public static MediaDto ToMediaInfoDto(MediaInfo data)
@@ -233,7 +248,8 @@ public static class TransferMaps
             AudioStreams: [.. data.AudioStreams.Select(ToAudioStreamDto)],
             SubtitleStreams: [.. data.SubtitleStreams.Select(ToSubtitleStreamDto)],
             IsCorrupted: data.IsCorrupted,
-            Error: data.Error);
+            Error: data.Error
+        );
     }
 
     public static VideoStreamDto ToVideoStreamDto(VideoStreamInfo data)
@@ -243,7 +259,8 @@ public static class TransferMaps
             Bitrate: data.Bitrate,
             Width: data.Width,
             Height: data.Height,
-            Framerate: data.Framerate);
+            Framerate: data.Framerate
+        );
     }
 
     public static AudioStreamDto ToAudioStreamDto(AudioStreamInfo data)
@@ -252,14 +269,16 @@ public static class TransferMaps
             Codec: data.Codec,
             Bitrate: data.Bitrate,
             Channels: data.Channels,
-            SampleRate: data.SampleRate);
+            SampleRate: data.SampleRate
+        );
     }
 
     public static SubtitleStreamDto ToSubtitleStreamDto(SubtitleStreamInfo data)
     {
         return new SubtitleStreamDto(
             Codec: data.Codec,
-            Bitrate: data.Bitrate);
+            Bitrate: data.Bitrate
+        );
     }
 
     public static ImageShardDetailDto ToImageShardDetailDto(ImageShardInfo data)
@@ -269,7 +288,8 @@ public static class TransferMaps
             Kind: data.Kind,
             ArtifactId: data.ArtifactId,
             Variants: data.Variants.ToImmutableDictionary(v => v.Key, v => ToImageDto(v.Value)),
-            UploadFileName: data.UploadFileName);
+            UploadFileName: data.UploadFileName
+        );
     }
 
     public static ImageDto ToImageDto(ImageInfo data)
@@ -279,7 +299,8 @@ public static class TransferMaps
             MimeType: data.MimeType,
             Width: data.Width,
             Height: data.Height,
-            IsCorrupted: data.IsCorrupted);
+            IsCorrupted: data.IsCorrupted
+        );
     }
 
     public static ShardDetailBaseDto ToShardDetailDto(IShardEntity data)
@@ -302,7 +323,8 @@ public static class TransferMaps
             Kind: data.Kind,
             ArtifactId: data.ArtifactId,
             Info: ToBlobDto(data.Info),
-            UploadFileName: data.UploadFileName);
+            UploadFileName: data.UploadFileName
+        );
     }
 
     public static BlobDto ToBlobDto(BlobInfo data)
@@ -310,7 +332,8 @@ public static class TransferMaps
         return new BlobDto(
             FileExtension: data.FileExtension,
             MimeType: data.MimeType,
-            FileLength: data.FileLength);
+            FileLength: data.FileLength
+        );
     }
 
     public static SubtitlesShardDetailDto ToSubtitlesShardDetailDto(SubtitlesShardInfo data)
@@ -320,7 +343,8 @@ public static class TransferMaps
             Kind: data.Kind,
             ArtifactId: data.ArtifactId,
             Variants: data.Variants.ToImmutableDictionary(p => p.Key, p => ToSubtitlesDto(p.Value)),
-            UploadFileName: data.UploadFileName);
+            UploadFileName: data.UploadFileName
+        );
     }
 
     public static SubtitlesDto ToSubtitlesDto(SubtitlesInfo data)
@@ -330,7 +354,8 @@ public static class TransferMaps
             MimeType: data.MimeType,
             Language: data.Language,
             Codec: data.Codec,
-            Bitrate: data.Bitrate);
+            Bitrate: data.Bitrate
+        );
     }
 
     public static BlendShardDetailDto ToBlendShardDetailDto(BlendShardInfo data)
@@ -341,7 +366,8 @@ public static class TransferMaps
             Kind: data.Kind,
             ArtifactId: data.ArtifactId,
             Variants: data.Variants.ToImmutableDictionary(p => p.Key, p => ToBlendDto(p.Value)),
-            UploadFileName: data.UploadFileName);
+            UploadFileName: data.UploadFileName
+        );
     }
 
     public static BlendDto ToBlendDto(BlendInfo data)
@@ -350,7 +376,8 @@ public static class TransferMaps
             FileExtension: data.FileExtension,
             MimeType: data.MimeType,
             Tests: data.Tests?.Select(ToBlendTestResponseDto).ToImmutableArray(),
-            Error: data.Error);
+            Error: data.Error
+        );
     }
 
     public static PigeonsTestInfoDto ToBlendTestResponseDto(PigeonsTestInfo data)
@@ -360,7 +387,8 @@ public static class TransferMaps
             State: data.State,
             Datablock: data.Datablock,
             Message: data.Message,
-            Traceback: data.Traceback);
+            Traceback: data.Traceback
+        );
     }
 
 
@@ -369,11 +397,13 @@ public static class TransferMaps
         return new TemporaryAccountInfoDto(
             Id: data.Id,
             EmailAddress: data.EmailAddress,
-            PreferredCulture: data.PreferredCulture);
+            PreferredCulture: data.PreferredCulture
+        );
     }
 
     public static AccountDetailDto ToAccountDetailDto(
-        AccountInfo data)
+        AccountInfo data
+    )
     {
         return new AccountDetailDto(
             Id: data.Id,
@@ -382,19 +412,20 @@ public static class TransferMaps
             EmailAddress: data.EmailAddress,
             PreferredCulture: data.PreferredCulture,
             Permissions: data.Permissions?.ToImmutableDictionary(p => (Hrib)p.Key, p => ToPermissionArray(p.Value))
-                ?? ImmutableDictionary<Hrib, ImmutableArray<Permission>>.Empty
+            ?? ImmutableDictionary<Hrib, ImmutableArray<Permission>>.Empty
         );
     }
 
     public static AccountListDto ToAccountListDto(
-        AccountInfo data)
+        AccountInfo data
+    )
     {
         return new AccountListDto(
             Id: data.Id,
             EmailAddress: data.EmailAddress,
             PreferredCulture: data.PreferredCulture,
             Permissions: data?.Permissions?.ToImmutableDictionary(p => (Hrib)p.Key, p => ToPermissionArray(p.Value))
-                ?? ImmutableDictionary<Hrib, ImmutableArray<Permission>>.Empty
+            ?? ImmutableDictionary<Hrib, ImmutableArray<Permission>>.Empty
         );
     }
 
@@ -412,19 +443,28 @@ public static class TransferMaps
             EntityType: entityType,
             GlobalPermissions: globalPermissions is null ? null : ToPermissionArray(globalPermissions.Value),
             UserPermissions: userPermissions is null ? null : ToPermissionArray(userPermissions.Value),
-            AccountPermissions: [
-                ..accounts.Select(a => new EntityPermissionsAccountListDto(
-                    Id: a.Id,
-                    EmailAddress: a.EmailAddress,
-                    Name: a.Name,
-                    Permissions: ToPermissionArray(a.Permissions?.GetValueOrDefault(id.ToString()) ?? Permission.None)
-                )).Concat(invites.Select(i => new EntityPermissionsAccountListDto(
-                    Id: null,
-                    EmailAddress: i.EmailAddress,
-                    Name: null,
-                    Permissions: ToPermissionArray(i.Permissions?.GetValueOrDefault(id.ToString())?.Permission
-                        ?? Permission.None)
-                    )))
+            AccountPermissions:
+            [
+                .. accounts.Select(a => new EntityPermissionsAccountListDto(
+                            Id: a.Id,
+                            EmailAddress: a.EmailAddress,
+                            Name: a.Name,
+                            Permissions: ToPermissionArray(
+                                a.Permissions?.GetValueOrDefault(id.ToString()) ?? Permission.None
+                            )
+                        )
+                    ).Concat(
+                        invites.Select(i => new EntityPermissionsAccountListDto(
+                                Id: null,
+                                EmailAddress: i.EmailAddress,
+                                Name: null,
+                                Permissions: ToPermissionArray(
+                                    i.Permissions?.GetValueOrDefault(id.ToString())?.Permission
+                                    ?? Permission.None
+                                )
+                            )
+                        )
+                    )
                     .OrderBy(e => e.EmailAddress)
             ]
         );
@@ -452,7 +492,8 @@ public static class TransferMaps
                 && v != Permission.All
                 && v != Permission.Inheritable
                 && v != Permission.Publishable
-                && (value & v) == v)
+                && (value & v) == v
+            )
             .ToImmutableArray();
     }
 
@@ -482,7 +523,7 @@ public static class TransferMaps
             Description: data.Description,
             CreatedOn: data.CreatedOn,
             Permissions: data.Permissions?.ToImmutableDictionary(p => (Hrib)p.Key, p => ToPermissionArray(p.Value))
-                ?? ImmutableDictionary<Hrib, ImmutableArray<Permission>>.Empty
+            ?? ImmutableDictionary<Hrib, ImmutableArray<Permission>>.Empty
         );
     }
 

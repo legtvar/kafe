@@ -100,6 +100,7 @@ public class ConfigureSwaggerOptions(
 
         ImmutableArray<JsonNode> permissionEnumValues =
         [
+            JsonValue.Create(Permission.None.ToString().ToLowerInvariant()),
             .. Enum.GetValues<Permission>()
                 .Where(v => BitOperations.PopCount((uint)v) == 1)
                 .Select(v =>

@@ -345,26 +345,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "type": "string",
-                  "description": "Human-Readable Identifier Ballast",
-                  "format": "hrib",
-                  "example": "AAAAbadf00d"
+                  "$ref": "#/components/schemas/ArtifactDetailDto"
                 }
               },
               "application/json": {
                 "schema": {
-                  "type": "string",
-                  "description": "Human-Readable Identifier Ballast",
-                  "format": "hrib",
-                  "example": "AAAAbadf00d"
+                  "$ref": "#/components/schemas/ArtifactDetailDto"
                 }
               },
               "text/json": {
                 "schema": {
-                  "type": "string",
-                  "description": "Human-Readable Identifier Ballast",
-                  "format": "hrib",
-                  "example": "AAAAbadf00d"
+                  "$ref": "#/components/schemas/ArtifactDetailDto"
                 }
               }
             }
@@ -2729,6 +2720,63 @@
         },
         "additionalProperties": false
       },
+      "ArtifactDetailContainingProjectDto": {
+        "required": [
+          "id",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Human-Readable Identifier Ballast (HRIB)",
+            "format": "hrib",
+            "example": "AAAAbadf00d"
+          },
+          "name": {
+            "$ref": "#/components/schemas/LocalizedString"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ArtifactDetailDto": {
+        "required": [
+          "addedOn",
+          "containingProjects",
+          "id",
+          "name",
+          "shards"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Human-Readable Identifier Ballast (HRIB)",
+            "format": "hrib",
+            "example": "AAAAbadf00d"
+          },
+          "name": {
+            "$ref": "#/components/schemas/LocalizedString"
+          },
+          "addedOn": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "shards": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ShardListDto"
+            }
+          },
+          "containingProjects": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ArtifactDetailContainingProjectDto"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "AudioStreamDto": {
         "type": "object",
         "properties": {
@@ -3378,6 +3426,7 @@
       "Permission": {
         "title": "Permission",
         "enum": [
+          "none",
           "read",
           "append",
           "inspect",

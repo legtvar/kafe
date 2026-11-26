@@ -36,7 +36,7 @@ public class ArtifactDetailEndpoint : EndpointBaseAsync
 
     [HttpGet]
     [SwaggerOperation(Tags = new[] { EndpointArea.Artifact })]
-    [ProducesResponseType(typeof(Hrib), 200)]
+    [ProducesResponseType(typeof(ArtifactDetailDto), 200)]
     [ProducesResponseType(400)]
     public override async Task<ActionResult<ArtifactDetailDto>> HandleAsync(
         string id,
@@ -56,7 +56,7 @@ public class ArtifactDetailEndpoint : EndpointBaseAsync
         }
 
         var containingProjects = await projects.LoadMany(
-            artifact.ContainingProjectIds.OfType<Hrib>(),
+            artifact.ContainingProjectIds.Select(i => (Hrib)i),
             cancellationToken
         );
         return TransferMaps.ToArtifactDetailDto(artifact) with

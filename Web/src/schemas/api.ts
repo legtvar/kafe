@@ -310,9 +310,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": string;
-                        "application/json": string;
-                        "text/json": string;
+                        "text/plain": components["schemas"]["ArtifactDetailDto"];
+                        "application/json": components["schemas"]["ArtifactDetailDto"];
+                        "text/json": components["schemas"]["ArtifactDetailDto"];
                     };
                 };
                 /** @description Bad Request */
@@ -2144,6 +2144,28 @@ export interface components {
             containingProject?: null | string;
             blueprintSlot?: null | string;
         };
+        ArtifactDetailContainingProjectDto: {
+            /**
+             * Format: hrib
+             * @description Human-Readable Identifier Ballast (HRIB)
+             * @example AAAAbadf00d
+             */
+            id: string;
+            name: components["schemas"]["LocalizedString"];
+        };
+        ArtifactDetailDto: {
+            /**
+             * Format: hrib
+             * @description Human-Readable Identifier Ballast (HRIB)
+             * @example AAAAbadf00d
+             */
+            id: string;
+            name: components["schemas"]["LocalizedString"];
+            /** Format: date-time */
+            addedOn: string;
+            shards: components["schemas"]["ShardListDto"][];
+            containingProjects: components["schemas"]["ArtifactDetailContainingProjectDto"][];
+        };
         AudioStreamDto: {
             codec?: null | string;
             /** Format: int64 */
@@ -2156,20 +2178,6 @@ export interface components {
         AuthorCreationDto: {
             name: string;
             globalPermissions: components["schemas"]["Permission"];
-            bio?: components["schemas"]["LocalizedString"];
-            uco?: null | string;
-            email?: null | string;
-            phone?: null | string;
-        };
-        AuthorEditDto: {
-            /**
-             * Format: hrib
-             * @description Human-Readable Identifier Ballast (HRIB)
-             * @example AAAAbadf00d
-             */
-            id: string;
-            name?: null | string;
-            globalPermissions?: components["schemas"]["Permission"];
             bio?: components["schemas"]["LocalizedString"];
             uco?: null | string;
             email?: null | string;
@@ -2189,6 +2197,20 @@ export interface components {
             email?: null | string;
             phone?: null | string;
             userPermissions: components["schemas"]["Permission"][];
+        };
+        AuthorEditDto: {
+            /**
+             * Format: hrib
+             * @description Human-Readable Identifier Ballast (HRIB)
+             * @example AAAAbadf00d
+             */
+            id: string;
+            name?: null | string;
+            globalPermissions?: components["schemas"]["Permission"];
+            bio?: components["schemas"]["LocalizedString"];
+            uco?: null | string;
+            email?: null | string;
+            phone?: null | string;
         };
         AuthorListDto: {
             /**
@@ -2450,6 +2472,7 @@ export interface components {
                 image?: components["schemas"]["ProjectArtifactShardBlueprintDto"];
                 subtitles?: components["schemas"]["ProjectArtifactShardBlueprintDto"];
                 blend?: components["schemas"]["ProjectArtifactShardBlueprintDto"];
+                blob?: components["schemas"]["ProjectArtifactShardBlueprintDto"];
             };
         };
         ProjectArtifactDto: {
@@ -2568,7 +2591,7 @@ export interface components {
             genre?: components["schemas"]["LocalizedString"];
             aiUsageDeclaration?: null | string;
             hearAboutUs?: null | string;
-            isPublishedForUnlimitedTime?: boolean | null;
+            isPublishedForUnlimitedTime?: null | boolean;
             crew?: null | components["schemas"]["ProjectCreationAuthorDto"][];
             cast?: null | components["schemas"]["ProjectCreationAuthorDto"][];
             artifacts?: null | components["schemas"]["ProjectArtifactAdditionDto"][];
@@ -2802,7 +2825,7 @@ export interface components {
              * @example AAAAbadf00d
              */
             artifactId: string;
-            uploadFileName?: string | null;
+            uploadFileName?: null | string;
         };
         /** @enum {string} */
         ShardKind: "unknown" | "video" | "image" | "subtitles" | "blend" | "blob";
@@ -2815,7 +2838,7 @@ export interface components {
             id: string;
             kind: components["schemas"]["ShardKind"];
             variants: string[];
-            uploadFileName?: string | null;
+            uploadFileName?: null | string;
         };
         SubtitleStreamDto: {
             codec?: null | string;

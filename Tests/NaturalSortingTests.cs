@@ -5,6 +5,7 @@ using Kafe.Data;
 using Kafe.Data.Aggregates;
 using Kafe.Data.Metadata;
 using Marten;
+using Marten.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
@@ -25,8 +26,7 @@ public class NaturalSortingTests(ApiFixture fixture, ITestOutputHelper testOutpu
             (id, name) => ProjectInfo.Create(TestSeedData.Group1Hrib, LocalizedString.CreateInvariant(name)) with
             {
                 Id = id
-            },
-            [OneId, TwoId, TenId]
+            }
         );
     }
 
@@ -37,8 +37,7 @@ public class NaturalSortingTests(ApiFixture fixture, ITestOutputHelper testOutpu
             (id, name) => ProjectGroupInfo.Create(TestSeedData.Org1Hrib, LocalizedString.CreateInvariant(name)) with
             {
                 Id = id
-            },
-            [OneId, TwoId, TenId]
+            }
         );
     }
 
@@ -49,8 +48,7 @@ public class NaturalSortingTests(ApiFixture fixture, ITestOutputHelper testOutpu
             (id, name) => PlaylistInfo.Create(TestSeedData.Org1Hrib, LocalizedString.CreateInvariant(name)) with
             {
                 Id = id
-            },
-            [OneId, TwoId, TenId]
+            }
         );
     }
 
@@ -59,13 +57,13 @@ public class NaturalSortingTests(ApiFixture fixture, ITestOutputHelper testOutpu
     {
         await AssertNameOrder(
             (id, name) => OrganizationInfo.Create(LocalizedString.CreateInvariant(name)) with { Id = id },
-            [OneId, TenId, TwoId]
+            expectNaturalSorting: false
         );
     }
 
     private async Task AssertNameOrder<T>(
         Func<string, string, T> create,
-        string[] expectedIds
+        bool expectNaturalSorting = true
     ) where T : IEntity
     {
         var entities = new[]
@@ -89,6 +87,18 @@ public class NaturalSortingTests(ApiFixture fixture, ITestOutputHelper testOutpu
             .OrderBySortString(metadataProvider, "name.iv")
             .ToListAsync(TestContext.Current.CancellationToken);
 
-        Assert.Equal(expectedIds, ordered.Select(e => e.Id));
+        if (!expectNaturalSorting)
+        {
+            // PostgreSQL's default ordering of punctuation depends on the database locale.
+            var sortExpression = metadataProvider.GetSortableMetadata(typeof(T)).SortExpressions["name.iv"];
+            var defaultOrdered = await query.Query<T>()
+                .Where(e => ids.Contains(e.Id))
+                .OrderBySql(sortExpression)
+                .ToListAsync(TestContext.Current.CancellationToken);
+            Assert.Equal(defaultOrdered.Select(e => e.Id), ordered.Select(e => e.Id));
+            return;
+        }
+
+        Assert.Equal([OneId, TwoId, TenId], ordered.Select(e => e.Id));
     }
 }

@@ -189,14 +189,18 @@ public sealed class FilmSubmissionEndToEndTests(EndToEndFixture fixture)
             await roleDialog.GetByTestId("author-roles-label").ClickAsync();
             await roleDialog.GetByTestId("author-roles-save").ClickAsync();
             await Expect(page.GetByTestId("project-author-roles")).ToHaveTextAsync("Director, Producer");
+            var editPath = new Uri(page.Url).AbsolutePath;
             var projectEditResponseTask = page.WaitForResponseAsync(response =>
                 response.Request.Method == "PATCH" && new Uri(response.Url).AbsolutePath == "/api/v1/project");
+            var successfulReloadTask = page.WaitForResponseAsync(response =>
+                response.Request.ResourceType == "document" && new Uri(response.Url).AbsolutePath == editPath);
             await page.GetByTestId("project-save").ClickAsync();
             var projectEditResponse = await projectEditResponseTask;
             Assert.Equal(HttpStatusCode.OK, (HttpStatusCode)projectEditResponse.Status);
+            await successfulReloadTask;
             await page.WaitForLoadStateAsync();
 
-            await page.GotoAsync(page.Url[..^5]);
+            await page.GetByTestId("project-basic-info-tab").ClickAsync();
             await Expect(page.GetByTestId("project-author-name")).ToHaveTextAsync(updatedName);
             await Expect(page.GetByTestId("project-author-roles")).ToHaveTextAsync("Director, Producer");
 

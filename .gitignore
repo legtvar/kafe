@@ -11,3 +11,6 @@ artifacts/
 .pnpm-store/
 .pi/cache/
 .pi/sessions/
+BenchmarkDotNet.Artifacts/
+*.tar.gz
+*_work_items_*.csv

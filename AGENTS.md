@@ -24,6 +24,7 @@
 ### C#
 
 - Methods always have bodies.
+- All tests (e.g., in `Tests/` or `Tests.EndToEnd/`) must use the `ConceptName_StateUnderTest_ExpectedBehavior` naming scheme where `ConceptName` is the thing being tested (e.g., `FilmSubmission`), `StateUnderTest` is the condition the concept is subjected to (e.g., `CorruptedFilmFile`), and `ExpectedBehavior` is what is supposed to happen (e.g., `ValidationFails`).
 
 ### TypeScript
 
@@ -32,6 +33,10 @@
 - Check node_modules for external API types; don't guess.
 - **No inline imports** (`await import()`, `import("pkg").Type`, dynamic type imports). Top-level imports only.
 - Never remove or downgrade code to fix type errors from outdated deps; upgrade the dep instead.
+
+## EndToEnd tests
+
+- When writing end-to-end tests, prefer relying on the `data-testid` locator and CSS classes. Never rely on UI texts which are localized and can change without warning, breaking the test.
 
 ## User Override
 

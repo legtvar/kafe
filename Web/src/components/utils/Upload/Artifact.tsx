@@ -112,7 +112,7 @@ export function ArtifactUpload(props: IArtifactUploadProps) {
                                 <Text mt={6} mb={2} opacity={0.5}>
                                     {t('artifact.management').toString()}
                                 </Text>
-                                <Button colorScheme="red" leftIcon={<IoTrashOutline />} onClick={onOpen}>
+                                <Button data-testid="artifact-delete" colorScheme="red" leftIcon={<IoTrashOutline />} onClick={onOpen}>
                                     {t('artifact.delete').toString()}
                                 </Button>
 
@@ -130,6 +130,7 @@ export function ArtifactUpload(props: IArtifactUploadProps) {
                                                     {t('generic.cancel').toString()}
                                                 </Button>
                                                 <Button
+                                                    data-testid="artifact-delete-confirm"
                                                     colorScheme="red"
                                                     onClick={() => {
                                                         onSubmit();

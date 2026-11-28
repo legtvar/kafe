@@ -235,6 +235,65 @@ public sealed class FilmSubmissionEndToEndTests(EndToEndFixture fixture)
     }
 
     [Fact]
+    public async Task ArtifactDeletion_ExistingCast_PreservesCast()
+    {
+        await RunBrowserTestAsync("artifact-deletion-preserves-cast", async page =>
+        {
+            await LogInThroughTemporaryAccountAsync(page);
+            await CreateProjectFromOpenGroupAsync(page, $"E2E-{Guid.NewGuid():N}");
+            var projectId = GetCurrentProjectId(page);
+            var castName = $"Cast {Guid.NewGuid():N}";
+
+            var authorResponse = await page.Context.APIRequest.PostAsync(
+                $"{fixture.ApiBaseUrl}/api/v1/author",
+                new()
+                {
+                    DataObject = new
+                    {
+                        name = castName,
+                        globalPermissions = "read",
+                        bio = (string?)null,
+                        uco = (string?)null,
+                        email = (string?)null,
+                        phone = (string?)null
+                    }
+                });
+            Assert.Equal(HttpStatusCode.OK, (HttpStatusCode)authorResponse.Status);
+            var authorId = (await authorResponse.TextAsync()).Trim().Trim('"');
+
+            var castResponse = await page.Context.APIRequest.PatchAsync(
+                $"{fixture.ApiBaseUrl}/api/v1/project",
+                new()
+                {
+                    DataObject = new
+                    {
+                        id = projectId,
+                        cast = new[] { new { id = authorId, roles = new[] { "Actor" } } }
+                    }
+                });
+            Assert.Equal(HttpStatusCode.OK, (HttpStatusCode)castResponse.Status);
+            Assert.Equal(castName, GetSingleCastName(await GetProjectDocumentAsync(page, projectId)));
+
+            var upload = await UploadFilmAsync(page, "sample.mp4");
+            Assert.Equal(HttpStatusCode.OK, upload.StatusCode);
+            await page.ReloadAsync();
+            await OpenFilesTabAsync(page);
+            var filmSection = page.GetByTestId("artifact-group-film");
+            await filmSection.GetByTestId("artifact-film-toggle").ClickAsync();
+            await filmSection.GetByTestId("artifact-delete").ClickAsync();
+
+            var deletionResponseTask = page.WaitForResponseAsync(response =>
+                response.Request.Method == "PATCH" && new Uri(response.Url).AbsolutePath == "/api/v1/project");
+            var confirmation = page.Locator("[role='alertdialog']");
+            await confirmation.GetByTestId("artifact-delete-confirm").ClickAsync();
+            Assert.Equal(HttpStatusCode.OK, (HttpStatusCode)(await deletionResponseTask).Status);
+
+            using var project = await GetProjectDocumentAsync(page, projectId);
+            Assert.Equal(castName, GetSingleCastName(project));
+        });
+    }
+
+    [Fact]
     public async Task ProjectGroup_AnonymousVisitor_RedirectsToLogin()
     {
         await RunBrowserTestAsync("authentication-required", async page =>
@@ -402,6 +461,24 @@ public sealed class FilmSubmissionEndToEndTests(EndToEndFixture fixture)
         }
 
         throw new TimeoutException($"Video '{shardId}' did not acquire the '{variant}' variant within {timeout}.");
+    }
+
+    private static string GetCurrentProjectId(IPage page)
+    {
+        return page.Url.Split("/projects/")[1].Split('/')[0];
+    }
+
+    private async Task<JsonDocument> GetProjectDocumentAsync(IPage page, string projectId)
+    {
+        var response = await page.Context.APIRequest.GetAsync($"{fixture.ApiBaseUrl}/api/v1/project/{projectId}");
+        Assert.Equal(HttpStatusCode.OK, (HttpStatusCode)response.Status);
+        return JsonDocument.Parse(await response.TextAsync());
+    }
+
+    private static string GetSingleCastName(JsonDocument project)
+    {
+        var cast = project.RootElement.GetProperty("cast").EnumerateArray().ToArray();
+        return Assert.Single(cast).GetProperty("name").GetString()!;
     }
 
     private static async Task OpenFilmPreviewAsync(IPage page)
